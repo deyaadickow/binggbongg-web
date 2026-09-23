@@ -12,6 +12,7 @@ export function Nav() {
         <NavLink to="/live">Live Now</NavLink>
         <NavLink to="/search">Search</NavLink>
         {isLoggedIn && <NavLink to="/wallet">Wallet</NavLink>}
+        {isLoggedIn && <NavLink to="/go-live">Go Live</NavLink>}
       </nav>
       <div className="me">
         {isLoggedIn && user ? (

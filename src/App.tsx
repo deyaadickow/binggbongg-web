@@ -9,6 +9,7 @@ import { SearchPage } from "./pages/SearchPage";
 import { LiveNowPage } from "./pages/LiveNowPage";
 import { LiveViewerPage } from "./pages/LiveViewerPage";
 import { WalletPage } from "./pages/WalletPage";
+import { GoLivePage } from "./pages/GoLivePage";
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
           <Route path="/live" element={<LiveNowPage />} />
           <Route path="/live/:room" element={<LiveViewerPage />} />
           <Route path="/wallet" element={<WalletPage />} />
+          <Route path="/go-live" element={<GoLivePage />} />
           <Route path="*" element={<HomePage />} />
         </Routes>
       </BrowserRouter>

@@ -63,6 +63,13 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     }
   }, [user, signOut]);
 
+  // Fill in the profile (name, avatar, balances) on every app load — a stored session may
+  // hold only the id, and balances change while the tab is closed.
+  useEffect(() => {
+    if (user && token) refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const value = useMemo<Session>(() => ({ user, token, isLoggedIn: !!(user && token), signIn, signOut, refresh }), [user, token, signIn, signOut, refresh]);
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
 }
