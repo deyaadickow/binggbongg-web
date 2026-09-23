@@ -16,7 +16,11 @@ const SessionContext = createContext<Session | null>(null);
 function load(): { user: UserSummary; token: string } | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
+    const parsed = raw ? (JSON.parse(raw) as { user: UserSummary; token: string }) : null;
+    // Install the headers right here, synchronously: a page's own effect (e.g. the wallet
+    // refreshing balances) runs BEFORE this provider's effect, and must not fire unauthenticated.
+    if (parsed?.user?.id && parsed.token) setAuthHeaders(parsed.token, parsed.user.id);
+    return parsed;
   } catch {
     return null;
   }
