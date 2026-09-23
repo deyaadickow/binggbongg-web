@@ -23,7 +23,9 @@ button, input, textarea, select { font: inherit; color: inherit; }
 img { display: block; max-width: 100%; }
 h1, h2, h3 { margin: 0; text-wrap: balance; }
 
-.nav { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 16px; padding: 10px 16px; background: var(--panel); border-bottom: 1px solid var(--gold-border); }
+.nav { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; flex-wrap: wrap; gap: 10px 16px; padding: 10px 16px; background: var(--panel); border-bottom: 1px solid var(--gold-border); }
+.nav .links { order: 3; flex-basis: 100%; }
+@media (min-width: 700px) { .nav .links { order: 0; flex-basis: auto; } }
 .nav .brand { font-weight: 800; font-size: 20px; color: var(--gold); letter-spacing: 0.3px; }
 .nav .links { display: flex; gap: 6px; flex: 1; overflow-x: auto; }
 .nav .links a { padding: 8px 12px; border-radius: 999px; color: var(--text-soft); font-weight: 600; white-space: nowrap; }
