@@ -4,6 +4,7 @@ import { displayName, giftPrice, mediaUrl, post, type Gift, type UserSummary } f
 import { useSession } from "../lib/session";
 import { chatChannel, ensureFirebaseSignIn, observeChat, sendChat, type ChatMessage } from "../lib/firebase";
 import { useLiveRoom, type LiveRole, type LiveTile } from "../lib/live";
+import { useBattle, type BattleData } from "../lib/battle";
 import { Avatar, Notice } from "../components/Common";
 
 interface Member { user_id: number; fullname?: string; username?: string; profile_image?: string; country?: string }
@@ -38,6 +39,16 @@ export function LiveViewerPage() {
 
   const live = useLiveRoom(roomName, role, isLoggedIn && !roomClosed);
   const isPublisher = role !== "viewer" && live.status === "live";
+
+  // Bingg Bongg Battle (1v1). Result overlay for the two battlers, a toast for everyone else.
+  const [battleResult, setBattleResult] = useState<BattleData | null>(null);
+  const [battlePicker, setBattlePicker] = useState(false);
+  const onBattleCompleted = useCallback((b: BattleData) => {
+    if (user && (b.player_one_user_id === user.id || b.player_two_user_id === user.id)) setBattleResult(b);
+    else setToast(b.winner_user_id ? "Battle over!" : "Battle over — it's a tie!");
+    refresh();
+  }, [user, refresh]);
+  const battle = useBattle(roomName, user?.id ?? null, isPublisher, isLoggedIn && !roomClosed, onBattleCompleted);
 
   const broadcasters = useMemo<Member[]>(() => {
     if (!members) return [];
@@ -125,7 +136,9 @@ export function LiveViewerPage() {
   async function sendGift(gift: Gift) {
     if (!user || !giftTarget) return;
     try {
-      const res = await post("sendCoinsToUser", { my_user_id: user.id, user_id: giftTarget, coins: giftPrice(gift), gift_id: gift.id, room_name: roomName });
+      const b = battle.battle;
+      const inBattle = b && b.status === "active" && (b.player_one_user_id === giftTarget || b.player_two_user_id === giftTarget);
+      const res = await post("sendCoinsToUser", { my_user_id: user.id, user_id: giftTarget, coins: giftPrice(gift), gift_id: gift.id, room_name: roomName, ...(inBattle ? { battle_id: b.battle_id } : {}) });
       if (!res.status) throw new Error(res.message ?? "Couldn't send that gift.");
       setToast(`Sent ${gift.name ?? "a gift"} (${giftPrice(gift)} coins) to ${displayName(nameOf(giftTarget) as Partial<UserSummary>)}`);
       setGiftTarget(null);
@@ -193,6 +206,9 @@ export function LiveViewerPage() {
 
       <div className="live-layout">
         <div>
+          {battle.battle && battle.battle.status !== "completed" && (
+            <BattleStrip b={battle.battle} secondsLeft={battle.secondsLeft} nameOf={(id) => displayName(nameOf(id) as Partial<UserSummary>)} />
+          )}
           <div className={`video-grid count-${Math.min(4, Math.max(1, orderedTiles.length))}`}>
             {orderedTiles.length === 0 && (
               <div className="tile" style={{ display: "grid", placeItems: "center" }}>
@@ -207,6 +223,9 @@ export function LiveViewerPage() {
               <button className="btn small" onClick={live.toggleCamera}>{live.cameraOn ? "📷 Camera off" : "📷 Camera on"}</button>
               <button className="btn small" onClick={live.toggleMic}>{live.micOn ? "🎤 Mute" : "🎤 Unmute"}</button>
               <button className="btn small" onClick={live.flipCamera}>🔄 Flip</button>
+              {(!battle.battle || battle.battle.status === "completed") && broadcasters.length > 1 && (
+                <button className="btn small" onClick={() => setBattlePicker(true)}>⚔️ Battle</button>
+              )}
               <span className="spacer" />
               {role === "host"
                 ? <button className="btn small" style={{ borderColor: "var(--red)", color: "var(--red)" }} onClick={endLive}>End live</button>
@@ -278,7 +297,69 @@ export function LiveViewerPage() {
           </form>
         </div>
       </div>
+      {battlePicker && (
+        <Overlay title="Bingg Bongg Battle — who do you challenge?" onClose={() => setBattlePicker(false)}>
+          {broadcasters.filter((b) => b.user_id !== user?.id).map((b) => (
+            <button key={b.user_id} className="btn block" style={{ marginBottom: 8 }} onClick={async () => {
+              setBattlePicker(false);
+              try { await battle.inviteOpponent(b.user_id); setToast(`Battle invite sent to ${displayName(b as Partial<UserSummary>)}.`); }
+              catch (e) { setToast((e as Error).message); }
+            }}>{displayName(b as Partial<UserSummary>)}</button>
+          ))}
+          <p className="muted" style={{ fontSize: 12 }}>5-minute battle. Whoever receives more gift coins when time runs out wins.</p>
+        </Overlay>
+      )}
+      {battle.invite && (
+        <Overlay title="Bingg Bongg Battle" onClose={battle.dismissInvite}>
+          <p className="soft">{battle.invite.opponent_fullname ?? battle.invite.opponent_username ?? "A streamer"} challenges you to a 5-minute battle{battle.invite.target_coins ? ` — first to ${battle.invite.target_coins} coins` : ""}.</p>
+          <div className="row" style={{ marginTop: 12 }}>
+            <button className="btn" style={{ flex: 1 }} onClick={() => battle.respond(battle.invite!.battle_id, true).catch((e) => setToast((e as Error).message))}>Accept</button>
+            <button className="btn ghost" style={{ flex: 1 }} onClick={() => battle.respond(battle.invite!.battle_id, false).catch((e) => setToast((e as Error).message))}>Decline</button>
+          </div>
+        </Overlay>
+      )}
+      {battleResult && user && (
+        <Overlay title={battleResult.winner_user_id === null ? "It's a tie" : battleResult.winner_user_id === user.id ? "🏆 You won!" : "You lost this one"} onClose={() => setBattleResult(null)}>
+          <p className="soft" style={{ textAlign: "center", fontSize: 18 }}>
+            {displayName(nameOf(battleResult.player_one_user_id) as Partial<UserSummary>)} {battleResult.player_one_score} — {battleResult.player_two_score} {displayName(nameOf(battleResult.player_two_user_id) as Partial<UserSummary>)}
+          </p>
+          <button className="btn block" style={{ marginTop: 12 }} onClick={() => setBattleResult(null)}>Close</button>
+        </Overlay>
+      )}
       {toast && <div className="notice" style={{ position: "fixed", left: 16, right: 16, bottom: 16, maxWidth: 480, margin: "0 auto", zIndex: 30 }}>{toast}</div>}
+    </div>
+  );
+}
+
+function BattleStrip({ b, secondsLeft, nameOf }: { b: BattleData; secondsLeft: number | null; nameOf: (id: number) => string }) {
+  const clock = secondsLeft === null ? "" : `${Math.floor(secondsLeft / 60)}:${String(secondsLeft % 60).padStart(2, "0")}`;
+  const p1 = b.player_one_score ?? 0, p2 = b.player_two_score ?? 0;
+  const total = p1 + p2;
+  const pct = total > 0 ? Math.round((p1 / total) * 100) : 50;
+  return (
+    <div className="card" style={{ marginBottom: 8, padding: "8px 12px" }}>
+      <div className="row" style={{ justifyContent: "space-between" }}>
+        <b style={{ color: "var(--gold)" }}>{b.target_coins ? "Game Limit" : "Bingg Bongg Battle"}</b>
+        <span className="pill">{b.status === "pending" ? "Waiting for answer…" : clock}</span>
+      </div>
+      <div className="row" style={{ justifyContent: "space-between", marginTop: 6, fontSize: 13 }}>
+        <span><b>{nameOf(b.player_one_user_id)}</b> <span style={{ color: "var(--gold)" }}>{p1.toLocaleString()}</span></span>
+        <span><span style={{ color: "var(--gold)" }}>{p2.toLocaleString()}</span> <b>{nameOf(b.player_two_user_id)}</b></span>
+      </div>
+      <div style={{ height: 6, borderRadius: 3, background: "#2a2a2a", overflow: "hidden", marginTop: 6 }}>
+        <div style={{ width: `${pct}%`, height: 6, background: "var(--gold)" }} />
+      </div>
+    </div>
+  );
+}
+
+function Overlay({ title, children, onClose }: { title: string; children: React.ReactNode; onClose: () => void }) {
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", display: "grid", placeItems: "center", zIndex: 40, padding: 16 }} onClick={onClose}>
+      <div className="card pad" style={{ width: "min(420px, 100%)" }} onClick={(e) => e.stopPropagation()}>
+        <h2 className="card-title" style={{ marginBottom: 10 }}>{title}</h2>
+        {children}
+      </div>
     </div>
   );
 }
