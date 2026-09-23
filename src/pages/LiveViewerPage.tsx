@@ -5,6 +5,8 @@ import { useSession } from "../lib/session";
 import { chatChannel, ensureFirebaseSignIn, observeChat, sendChat, type ChatMessage } from "../lib/firebase";
 import { useLiveRoom, type LiveRole, type LiveTile } from "../lib/live";
 import { useBattle, type BattleData } from "../lib/battle";
+import { fetchActiveTapGame, type TapGameType } from "../lib/tapgame";
+import { TapGameOverlay } from "../components/TapGameOverlay";
 import { Avatar, Notice } from "../components/Common";
 
 interface Member { user_id: number; fullname?: string; username?: string; profile_image?: string; country?: string }
@@ -49,6 +51,18 @@ export function LiveViewerPage() {
     refresh();
   }, [user, refresh]);
   const battle = useBattle(roomName, user?.id ?? null, isPublisher, isLoggedIn && !roomClosed, onBattleCompleted);
+
+  // Tap games: the host activates one from the phone (or later, here); everyone gets a Play button.
+  const [activeGame, setActiveGame] = useState<TapGameType | null>(null);
+  const [gameOpen, setGameOpen] = useState(false);
+  useEffect(() => {
+    if (!isLoggedIn || roomClosed) return;
+    let alive = true;
+    const tick = () => fetchActiveTapGame(roomName).then((g) => { if (alive) setActiveGame(g); });
+    tick();
+    const t = setInterval(tick, 5000);
+    return () => { alive = false; clearInterval(t); };
+  }, [roomName, isLoggedIn, roomClosed]);
 
   const broadcasters = useMemo<Member[]>(() => {
     if (!members) return [];
@@ -247,6 +261,15 @@ export function LiveViewerPage() {
             </div>
           )}
 
+          {activeGame && (
+            <div className="card row" style={{ marginTop: 12, padding: "10px 12px" }}>
+              <div style={{ flex: 1 }}>
+                <b style={{ color: "var(--gold)" }}>🎮 {activeGame.name ?? "Tap game"}</b>
+                <div className="muted" style={{ fontSize: 12 }}>{role === "host" ? "Running in your room — viewers can play now." : "The host started a game. 50 coins to play, keep or gift what you win."}</div>
+              </div>
+              <button className="btn small" onClick={() => setGameOpen(true)}>Play Now</button>
+            </div>
+          )}
           <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
             {role === "viewer" && live.status === "live" && (
               joinState === "requested"
@@ -297,6 +320,9 @@ export function LiveViewerPage() {
           </form>
         </div>
       </div>
+      {gameOpen && activeGame && (
+        <TapGameOverlay game={activeGame} roomName={roomName} onClose={() => setGameOpen(false)} onToast={setToast} />
+      )}
       {battlePicker && (
         <Overlay title="Bingg Bongg Battle — who do you challenge?" onClose={() => setBattlePicker(false)}>
           {broadcasters.filter((b) => b.user_id !== user?.id).map((b) => (
