@@ -1,0 +1,49 @@
+import { useCallback, useEffect, useState } from "react";
+import { post, type Post } from "../lib/api";
+import { useSession } from "../lib/session";
+import { PostCard } from "../components/PostCard";
+import { Loading, Notice } from "../components/Common";
+
+export function HomePage() {
+  const { user } = useSession();
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadMore = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await post<Post[]>("fetchPosts", user ? { my_user_id: user.id } : {});
+      if (!res.status) throw new Error(res.message ?? "Couldn't load the feed.");
+      setPosts((prev) => {
+        const seen = new Set(prev.map((p) => p.id));
+        return [...prev, ...(res.data ?? []).filter((p) => !seen.has(p.id))];
+      });
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    setPosts([]);
+    loadMore();
+  }, [loadMore]);
+
+  return (
+    <div className="page">
+      <h1 className="page-title">For You</h1>
+      {error && <Notice error>{error}</Notice>}
+      <div className="grid">
+        {posts.map((p) => <PostCard key={p.id} post={p} />)}
+      </div>
+      {loading ? <Loading /> : (
+        <div className="center" style={{ marginTop: 20 }}>
+          <button className="btn" onClick={loadMore}>Show more</button>
+        </div>
+      )}
+    </div>
+  );
+}
