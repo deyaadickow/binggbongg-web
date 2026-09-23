@@ -21,6 +21,8 @@ declare global {
   }
 }
 
+let gsiInitialised = false;
+
 function decodeJwt(token: string): Record<string, string> {
   const payload = token.split(".")[1] ?? "";
   const json = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
@@ -77,8 +79,13 @@ export function LoginPage() {
     script.async = true;
     script.onload = () => {
       if (!window.google || !buttonRef.current) return;
-      window.google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: (r) => register(r.credential) });
-      window.google.accounts.id.renderButton(buttonRef.current, { theme: "filled_black", size: "large", shape: "pill", width: 320 });
+      // GIS warns if initialize() runs twice (React StrictMode mounts twice in dev) — once is enough.
+      if (!gsiInitialised) {
+        window.google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: (r) => register(r.credential) });
+        gsiInitialised = true;
+      }
+      const width = Math.min(320, Math.max(200, (buttonRef.current.parentElement?.clientWidth ?? 320)));
+      window.google.accounts.id.renderButton(buttonRef.current, { theme: "filled_black", size: "large", shape: "pill", width });
     };
     document.head.appendChild(script);
     return () => {
