@@ -5,7 +5,7 @@ import { useSession } from "../lib/session";
 import { chatChannel, ensureFirebaseSignIn, observeChat, sendChat, type ChatMessage } from "../lib/firebase";
 import { useLiveRoom, type LiveRole, type LiveTile } from "../lib/live";
 import { useBattle, type BattleData } from "../lib/battle";
-import { fetchActiveTapGame, type TapGameType } from "../lib/tapgame";
+import { fetchActiveTapGame, gameTitle, type TapGameType } from "../lib/tapgame";
 import { TapGameOverlay } from "../components/TapGameOverlay";
 import { Avatar, Notice } from "../components/Common";
 
@@ -264,7 +264,7 @@ export function LiveViewerPage() {
           {activeGame && (
             <div className="card row" style={{ marginTop: 12, padding: "10px 12px" }}>
               <div style={{ flex: 1 }}>
-                <b style={{ color: "var(--gold)" }}>🎮 {activeGame.name ?? "Tap game"}</b>
+                <b style={{ color: "var(--gold)" }}>🎮 {gameTitle(activeGame)}</b>
                 <div className="muted" style={{ fontSize: 12 }}>{role === "host" ? "Running in your room — viewers can play now." : "The host started a game. 50 coins to play, keep or gift what you win."}</div>
               </div>
               <button className="btn small" onClick={() => setGameOpen(true)}>Play Now</button>

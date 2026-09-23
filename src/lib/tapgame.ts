@@ -5,6 +5,10 @@ import { post } from "./api";
 
 export interface TapGameType {
   id: number;
+  /** tbl_tap_game_types has display_name (+ catch_name, emoji); `name` is kept as a fallback. */
+  display_name?: string;
+  catch_name?: string;
+  emoji?: string;
   name?: string;
   game_mode?: "catch" | "falling_lanes" | "puzzle" | "race" | string;
   coin_value?: number;
@@ -67,4 +71,9 @@ export function speedProfile(speed?: string | null) {
     case "fast": return { spawnMs: 350, lifeMs: 1400 };
     default: return { spawnMs: 500, lifeMs: 2200 };
   }
+}
+
+export function gameTitle(g: TapGameType): string {
+  const base = g.display_name || g.name || "Tap game";
+  return g.emoji ? `${g.emoji} ${base}` : base;
 }

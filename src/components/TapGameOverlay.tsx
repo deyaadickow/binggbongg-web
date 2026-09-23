@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { mediaUrl } from "../lib/api";
-import { agreeToEntryFee, endTapGame, giftTapGameScore, speedProfile, startTapGame, type TapGameResult, type TapGameStart, type TapGameType } from "../lib/tapgame";
+import { agreeToEntryFee, endTapGame, gameTitle, giftTapGameScore, speedProfile, startTapGame, type TapGameResult, type TapGameStart, type TapGameType } from "../lib/tapgame";
 import { useSession } from "../lib/session";
 
 interface Target { id: number; x: number; y: number; bornAt: number; life: number }
@@ -149,7 +149,7 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 50, background: "#000", display: "flex", flexDirection: "column" }}>
       <div className="row" style={{ padding: "10px 14px", borderBottom: "1px solid var(--gold-border)", background: "var(--panel)" }}>
-        <b style={{ color: "var(--gold)", flex: 1 }}>{game.name ?? "Tap game"}</b>
+        <b style={{ color: "var(--gold)", flex: 1 }}>{gameTitle(game)}</b>
         {phase === "playing" && <span className="pill">{isRace ? `Station ${station}/${RACE_STATIONS} · ${clock(elapsed)}` : `${clock(secondsLeft)} left`}</span>}
         {phase === "playing" && <span className="pill" style={{ marginLeft: 8 }}>{isRace ? `${caught}/${RACE_FINISH}` : `Caught ${caught}`}</span>}
         {phase !== "playing" && <button className="btn small ghost" onClick={onClose}>Close</button>}
@@ -168,10 +168,10 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
             <div className="card pad" style={{ width: "min(420px, 100%)", textAlign: "center" }}>
               {phase === "intro" && (
                 <>
-                  <h2 className="card-title" style={{ fontSize: 22 }}>{game.name ?? "Tap game"}</h2>
+                  <h2 className="card-title" style={{ fontSize: 22 }}>{gameTitle(game)}</h2>
                   <p className="soft" style={{ marginTop: 8 }}>
                     {isRace ? `Tap as fast as you can: 5 stations, 20 taps each. Reach station 5 for 100 coins — your time goes on the leaderboard.`
-                      : `Tap every character before it disappears. Each catch is worth ${game.coin_value ?? 1} coin${(game.coin_value ?? 1) === 1 ? "" : "s"}.`}
+                      : `Tap every ${game.catch_name || "character"} before it disappears. Each catch is worth ${game.coin_value ?? 1} coin${(game.coin_value ?? 1) === 1 ? "" : "s"}.`}
                   </p>
                   <p className="muted" style={{ fontSize: 12, marginTop: 6 }}>Playing gifts the host 50 coins to start.</p>
                   <button className="btn block" style={{ marginTop: 14 }} onClick={begin}>Play Now</button>
