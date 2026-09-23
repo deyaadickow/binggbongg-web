@@ -35,7 +35,9 @@ export function LiveViewerPage() {
   useEffect(() => {
     let alive = true;
     async function load() {
-      const res = await post<LiveStream[]>("fetchActiveLiveStreams", { user_id: user?.id ?? 0, connections_only: false }).catch(() => null);
+      // Anonymous lookup on purpose: the list hides the CALLER's own room, and a member can
+      // watch their own live from a browser while hosting it on their phone.
+      const res = await post<LiveStream[]>("fetchActiveLiveStreams", { user_id: 0, connections_only: false }).catch(() => null);
       if (!alive || !res) return;
       const mine = (res.data ?? []).filter((s) => s.room_name === roomName);
       setBroadcasters(mine);
@@ -44,7 +46,7 @@ export function LiveViewerPage() {
     load();
     const t = setInterval(load, 10000);
     return () => { alive = false; clearInterval(t); };
-  }, [roomName, user, status]);
+  }, [roomName, status]);
 
   // LiveKit: viewer token from the token server, then subscribe to every publisher's camera.
   useEffect(() => {
