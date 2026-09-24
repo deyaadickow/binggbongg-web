@@ -14,6 +14,8 @@ export interface LiveTile {
   attach: (el: HTMLVideoElement) => () => void;
   isLocal: boolean;
   muted: boolean;
+  /** LiveKit's own active-speaker detection — the phones turn the tile border green on this. */
+  speaking: boolean;
 }
 
 function userIdOf(p: Participant): number | null {
@@ -43,6 +45,7 @@ export function useLiveRoom(roomName: string, role: LiveRole, enabled: boolean) 
         userId: userIdOf(local),
         isLocal: true,
         muted: localPub.isMuted,
+        speaking: local.isSpeaking,
         attach: (el) => { track.attach(el); return () => { track.detach(el); }; },
       });
     }
@@ -56,6 +59,7 @@ export function useLiveRoom(roomName: string, role: LiveRole, enabled: boolean) 
         userId: userIdOf(p),
         isLocal: false,
         muted: pub.isMuted,
+        speaking: p.isSpeaking,
         attach: (el) => { if (track) { track.attach(el); return () => { track.detach(el); }; } return () => undefined; },
       });
     });
@@ -79,6 +83,7 @@ export function useLiveRoom(roomName: string, role: LiveRole, enabled: boolean) 
       .on(RoomEvent.LocalTrackUnpublished, refresh)
       .on(RoomEvent.ParticipantConnected, refresh)
       .on(RoomEvent.ParticipantDisconnected, refresh)
+      .on(RoomEvent.ActiveSpeakersChanged, refresh)
       .on(RoomEvent.Disconnected, () => { if (!cancelled) setStatus("ended"); });
 
     (async () => {

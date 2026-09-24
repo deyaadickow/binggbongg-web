@@ -3,7 +3,7 @@
 // phones use. Power-ups (bombs, time, gloves) are not on the web yet.
 import { useCallback, useEffect, useRef, useState } from "react";
 import { post } from "./api";
-import { parseServerDate } from "./battle";
+import { parseServerDate, type BoxingWindow } from "./battle";
 
 const STATUS_POLL_MS = 3000;
 const INVITE_POLL_MS = 4000;
@@ -30,6 +30,7 @@ export interface SeriesData {
   current_round_number: number | null;
   current_round_id: number | null;
   current_round_ends_at?: string | null;
+  boxing_windows?: BoxingWindow[];
   winner_user_id: number | null;
   participants: SeriesParticipant[];
 }
@@ -143,8 +144,10 @@ export function useEngine<TData extends { status: EngineStatus }, TInvite>(
   isPublisher: boolean,
   enabled: boolean,
   onFinished: (d: TData) => void,
+  onStarted?: (d: TData) => void,
 ) {
   const [data, setData] = useState<TData | null>(null);
+  const startedIds = useRef(new Set<number>());
   const [invite, setInvite] = useState<TInvite | null>(null);
   const [now, setNow] = useState(Date.now());
   const lastOpenId = useRef<number | null>(null);
@@ -159,9 +162,12 @@ export function useEngine<TData extends { status: EngineStatus }, TInvite>(
       setData(null);
       return;
     }
-    if (d) lastOpenId.current = cfg.idOf(d);
+    if (d) {
+      lastOpenId.current = cfg.idOf(d);
+      if (d.status === "active" && !startedIds.current.has(cfg.idOf(d))) { startedIds.current.add(cfg.idOf(d)); onStarted?.(d); }
+    }
     setData(d);
-  }, [cfg, onFinished]);
+  }, [cfg, onFinished, onStarted]);
 
   useEffect(() => {
     if (!enabled || !roomName) return;

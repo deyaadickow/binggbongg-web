@@ -4,7 +4,7 @@ import { displayName, giftPrice, mediaUrl, post, type Gift, type UserSummary } f
 import { useSession } from "../lib/session";
 import { chatChannel, ensureFirebaseSignIn, observeChat, sendChat, type ChatMessage } from "../lib/firebase";
 import { useLiveRoom, type LiveRole, type LiveTile } from "../lib/live";
-import { useBattle, type BattleData } from "../lib/battle";
+import { activeBoxingWindow, useBattle, type BattleData } from "../lib/battle";
 import { FIVE_FIVE_FIVE, MARATHON, SERIES, TWO_V_TWO, cancel555, createSeries, finalize2v2, finalizeSeriesRound, invite2v2, invite555, inviteMarathon, secondsUntil, useEngine, voteMarathonCancel, type B555Data, type Battle2v2Data, type MarathonData, type SeriesData } from "../lib/battles";
 import { B555Strip, BattleMenu, InviteCard, MarathonStrip, MultiPicker, Overlay, ResultOverlay, SeriesStrip, TwoVTwoPicker, TwoVTwoStrip, describe2v2Invite, personName, resultTitle, type BattleKind } from "../components/BattleEngines";
 import { fetchActiveTapGame, gameTitle, type TapGameType } from "../lib/tapgame";
@@ -52,7 +52,11 @@ export function LiveViewerPage() {
     else setToast(b.winner_user_id ? "Battle over!" : "Battle over — it's a tie!");
     refresh();
   }, [user, refresh]);
-  const battle = useBattle(roomName, user?.id ?? null, isPublisher, isLoggedIn && !roomClosed, onBattleCompleted);
+  // Steve, 2026-09-06 (phones) / 2026-09-24 (web): the battle-start clip plays for everyone in
+  // the room the moment any battle goes active. Queued if one is already playing.
+  const [introQueue, setIntroQueue] = useState(0);
+  const onAnyBattleStarted = useCallback(() => setIntroQueue((n) => n + 1), []);
+  const battle = useBattle(roomName, user?.id ?? null, isPublisher, isLoggedIn && !roomClosed, onBattleCompleted, onAnyBattleStarted);
 
   // The other four engines: Best Out Of, 2v2, No Time Limit, 5-5-5. One result overlay at a time.
   const [result, setResult] = useState<{ title: string; rows: { label: string; value: string; win?: boolean }[] } | null>(null);
@@ -102,10 +106,13 @@ export function LiveViewerPage() {
     refresh();
   }, [myId, nameOfId, refresh]);
   const enginesOn = isLoggedIn && !roomClosed;
-  const series = useEngine(SERIES, roomName, myId, isPublisher, enginesOn, onSeriesFinished);
-  const two = useEngine(TWO_V_TWO, roomName, myId, isPublisher, enginesOn, on2v2Finished);
-  const marathon = useEngine(MARATHON, roomName, myId, isPublisher, enginesOn, onMarathonFinished);
-  const b555 = useEngine(FIVE_FIVE_FIVE, roomName, myId, isPublisher, enginesOn, on555Finished);
+  const series = useEngine(SERIES, roomName, myId, isPublisher, enginesOn, onSeriesFinished, onAnyBattleStarted);
+  const two = useEngine(TWO_V_TWO, roomName, myId, isPublisher, enginesOn, on2v2Finished, onAnyBattleStarted);
+  const marathon = useEngine(MARATHON, roomName, myId, isPublisher, enginesOn, onMarathonFinished, onAnyBattleStarted);
+  const b555 = useEngine(FIVE_FIVE_FIVE, roomName, myId, isPublisher, enginesOn, on555Finished, onAnyBattleStarted);
+  // Boxing gloves: 3 fixed 40s double-points windows per 1v1 battle / Best Out Of round.
+  const boxing = battle.boxing ?? (series.data?.status === "active" ? activeBoxingWindow(series.data.boxing_windows, series.now) : null);
+  const boxingLeft = boxing ? Math.max(0, Math.ceil((boxing.endMs - Math.max(battle.now, series.now)) / 1000)) : null;
   const anyBattleOpen = (!!battle.battle && battle.battle.status !== "completed") || !!series.data || !!two.data || !!marathon.data || !!b555.data;
 
   // Best Out Of: a participant finalizes the round the moment its clock hits zero (server
@@ -329,6 +336,12 @@ export function LiveViewerPage() {
               </div>
             )}
             {orderedTiles.map((t) => <VideoTile key={t.identity} tile={t} label={t.isLocal ? `${displayName(user)} (you)` : displayName(nameOf(t.userId) as Partial<UserSummary> ?? { fullname: t.name })} />)}
+            {boxing && (
+              <div className="boxing-gloves" title="Boxing gloves: every gift counts double">
+                <img src="/boxing_gloves.png" alt="Boxing gloves — double points" />
+                <span className="clock">{boxingLeft}s</span>
+              </div>
+            )}
           </div>
 
           {isPublisher && (
@@ -504,6 +517,7 @@ export function LiveViewerPage() {
           <button className="btn block" style={{ marginTop: 12 }} onClick={() => setBattleResult(null)}>Close</button>
         </Overlay>
       )}
+      {introQueue > 0 && <BattleIntro onDone={() => setIntroQueue((n) => Math.max(0, n - 1))} />}
       {toast && <div className="notice" style={{ position: "fixed", left: 16, right: 16, bottom: 16, maxWidth: 480, margin: "0 auto", zIndex: 30 }}>{toast}</div>}
     </div>
   );
@@ -531,6 +545,26 @@ function BattleStrip({ b, secondsLeft, nameOf }: { b: BattleData; secondsLeft: n
   );
 }
 
+/** Full-screen battle-start clip (same file the phones bundle). Ends on its own; a browser
+ *  that refuses sound falls back to muted playback, and a stalled load never blocks the room. */
+function BattleIntro({ onDone }: { onDone: () => void }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  const done = useRef(false);
+  const finish = useCallback(() => { if (!done.current) { done.current = true; onDone(); } }, [onDone]);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.play().catch(() => { el.muted = true; el.play().catch(finish); });
+    const t = setTimeout(finish, 15000);
+    return () => clearTimeout(t);
+  }, [finish]);
+  return (
+    <div className="battle-intro" onClick={finish}>
+      <video ref={ref} src="/battle_start.mp4" playsInline onEnded={finish} onError={finish} />
+    </div>
+  );
+}
+
 function VideoTile({ tile, label }: { tile: LiveTile; label: string }) {
   const ref = useRef<HTMLVideoElement>(null);
   useEffect(() => {
@@ -539,7 +573,7 @@ function VideoTile({ tile, label }: { tile: LiveTile; label: string }) {
     return tile.attach(el);
   }, [tile]);
   return (
-    <div className="tile">
+    <div className={`tile${tile.speaking ? " speaking" : ""}`}>
       <video ref={ref} autoPlay playsInline muted={tile.isLocal} style={tile.isLocal ? { transform: "scaleX(-1)" } : undefined} />
       <span className="name">{label || "Guest"}{tile.muted ? " · camera off" : ""}</span>
     </div>

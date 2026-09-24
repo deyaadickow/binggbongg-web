@@ -17,6 +17,19 @@ export interface BattleData {
   started_at?: string | null;
   ends_at?: string | null;
   trash_talk?: string | null;
+  /** 3 fixed 40s "boxing gloves" windows the server picked when the battle started — gifts count
+   *  double inside them (applied server-side at send time; this is only for the banner). */
+  boxing_windows?: BoxingWindow[];
+}
+export interface BoxingWindow { starts_at: string; ends_at: string }
+
+/** The window that contains `now`, or null. */
+export function activeBoxingWindow(windows: BoxingWindow[] | undefined, now: number): { startMs: number; endMs: number } | null {
+  for (const w of windows ?? []) {
+    const s = parseServerDate(w.starts_at), e = parseServerDate(w.ends_at);
+    if (s !== null && e !== null && now >= s && now < e) return { startMs: s, endMs: e };
+  }
+  return null;
 }
 
 export interface BattleInvite {
@@ -41,8 +54,9 @@ export function parseServerDate(s?: string | null): number | null {
  * Tracks the room's battle for every role; publishers additionally see invites addressed to
  * them. `onCompleted` fires once per battle when it flips to completed.
  */
-export function useBattle(roomName: string, myUserId: number | null, isPublisher: boolean, enabled: boolean, onCompleted: (b: BattleData) => void) {
+export function useBattle(roomName: string, myUserId: number | null, isPublisher: boolean, enabled: boolean, onCompleted: (b: BattleData) => void, onStarted?: (b: BattleData) => void) {
   const [battle, setBattle] = useState<BattleData | null>(null);
+  const startedIds = useRef(new Set<number>());
   const [invite, setInvite] = useState<BattleInvite | null>(null);
   const [now, setNow] = useState(Date.now());
   const completedIds = useRef(new Set<number>());
@@ -68,6 +82,10 @@ export function useBattle(roomName: string, myUserId: number | null, isPublisher
         if (data && (data.status === "pending" || data.status === "active")) data = null;
       }
       if (data && (data.status === "pending" || data.status === "active")) lastOpenId.current = data.battle_id;
+      if (data && data.status === "active" && !startedIds.current.has(data.battle_id)) {
+        startedIds.current.add(data.battle_id);
+        onStarted?.(data);
+      }
       if (data && data.status === "completed" && !completedIds.current.has(data.battle_id)) {
         completedIds.current.add(data.battle_id);
         onCompleted(data);
@@ -77,7 +95,7 @@ export function useBattle(roomName: string, myUserId: number | null, isPublisher
     tick();
     const t = setInterval(tick, STATUS_POLL_MS);
     return () => { alive = false; clearInterval(t); };
-  }, [roomName, enabled, onCompleted]);
+  }, [roomName, enabled, onCompleted, onStarted]);
 
   // Invites for me (host or guest), only while nothing is running.
   useEffect(() => {
@@ -102,6 +120,7 @@ export function useBattle(roomName: string, myUserId: number | null, isPublisher
     return () => clearInterval(t);
   }, [battle]);
 
+  const boxing = battle?.status === "active" ? activeBoxingWindow(battle.boxing_windows, now) : null;
   const endsAt = parseServerDate(battle?.ends_at);
   const secondsLeft = battle?.status === "active" && endsAt ? Math.max(0, Math.round((endsAt - now) / 1000)) : null;
   const iAmBattler = !!battle && !!myUserId && (battle.player_one_user_id === myUserId || battle.player_two_user_id === myUserId);
@@ -126,8 +145,11 @@ export function useBattle(roomName: string, myUserId: number | null, isPublisher
     setInvite(null);
     const res = await post<BattleData>("respondToBattleInvite", { user_id: myUserId, battle_id: battleId, approve });
     if (!res.status) throw new Error(res.message ?? "Couldn't answer that invite.");
-    if (res.data) setBattle(res.data);
-  }, [myUserId]);
+    if (res.data) {
+      if (res.data.status === "active" && !startedIds.current.has(res.data.battle_id)) { startedIds.current.add(res.data.battle_id); onStarted?.(res.data); }
+      setBattle(res.data);
+    }
+  }, [myUserId, onStarted]);
 
-  return { battle, invite, secondsLeft, iAmBattler, inviteOpponent, respond, dismissInvite: () => setInvite(null) };
+  return { battle, invite, secondsLeft, iAmBattler, boxing, now, inviteOpponent, respond, dismissInvite: () => setInvite(null) };
 }
