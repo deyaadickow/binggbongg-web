@@ -25,17 +25,17 @@ export function Overlay({ title, children, onClose, width = 440 }: { title: stri
 export type BattleKind = "1v1" | "series" | "2v2" | "marathon" | "555";
 
 export const BATTLE_KINDS: { kind: BattleKind; title: string; blurb: string; minPeople: number }[] = [
-  { kind: "1v1", title: "Bingg Bongg Battle", blurb: "1v1 · 5 minutes · most gift coins wins", minPeople: 2 },
-  { kind: "series", title: "Best Out Of", blurb: "Best of 3, 5, 7, 9 or 11 · 5-minute rounds", minPeople: 2 },
-  { kind: "2v2", title: "2v2 Battle", blurb: "You + a teammate vs. two others · 5 minutes", minPeople: 4 },
-  { kind: "marathon", title: "No Time Limit", blurb: "First to 100,000 gift coins wins", minPeople: 2 },
-  { kind: "555", title: "5-5-5", blurb: "5 Games / 5 Minutes / Reach 5000 coins and win", minPeople: 2 },
+  { kind: "1v1", title: "Bingg Bongg Battle", blurb: "1v1 · 5 minutes · most coins wins", minPeople: 2 },
+  { kind: "series", title: "Best Out Of", blurb: "Best of 3 to 11 · 5-minute rounds", minPeople: 2 },
+  { kind: "2v2", title: "2v2 Battle", blurb: "Two teams of two · 5 minutes", minPeople: 4 },
+  { kind: "marathon", title: "No Time Limit", blurb: "First to 100,000 coins wins", minPeople: 2 },
+  { kind: "555", title: "5-5-5", blurb: "5 games · 5 minutes · 5,000 coins", minPeople: 2 },
 ];
 
 /** Step 1 of the Battle button: which kind of battle. */
 export function BattleMenu({ peopleOnScreen, onPick, onClose, onNotice }: { peopleOnScreen: number; onPick: (k: BattleKind) => void; onClose: () => void; onNotice: (msg: string) => void }) {
   return (
-    <Overlay title="⚔️ Start a battle" onClose={onClose} width={560}>
+    <Overlay title="⚔️ Start a battle" onClose={onClose} width={640}>
       {peopleOnScreen < 2 && <p className="muted" style={{ fontSize: 13, marginTop: 0 }}>You're the only one on screen. Accept a viewer's "Ask to join" request first — battles are between the people streaming together.</p>}
       {BATTLE_KINDS.map((k) => {
         const ok = peopleOnScreen >= k.minPeople;
@@ -45,9 +45,8 @@ export function BattleMenu({ peopleOnScreen, onPick, onClose, onNotice }: { peop
         return (
           <button key={k.kind} className="btn block battle-kind" onClick={() => (ok ? onPick(k.kind) : onNotice(`${k.title} needs ${k.minPeople} people on screen — you have ${peopleOnScreen}.`))}>
             <span className="kind-title">{k.title}</span>
-            {ok
-              ? <span className="kind-blurb muted">{k.blurb}</span>
-              : <span className="kind-blurb" style={{ color: "var(--gold)", fontWeight: 700 }}>Needs {k.minPeople} people on screen</span>}
+            <span className="kind-blurb muted">{k.blurb}</span>
+            {ok ? <span className="kind-go">›</span> : <span className="kind-need">Needs {k.minPeople} people</span>}
           </button>
         );
       })}
