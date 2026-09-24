@@ -12,7 +12,7 @@ import { WalletPage } from "./pages/WalletPage";
 import { GoLivePage } from "./pages/GoLivePage";
 import { Sidebar } from "./components/Sidebar";
 import { AdReferralEarningsPage, AllVideosEarningsPage, PayoutHistoryPage, RedeemPage, RepostEarningsPage, RewardingActionsPage, StatementsPage } from "./pages/WalletPages";
-import { AccountSettingsPage, AdvertisePage, BlockedProfilesPage, ComingSoonPage, DeleteAccountPage, ModeratorsPage, QrCodePage, ReferralsPage, SettingsHubPage, ShareProfilePage, SimulcastPage } from "./pages/SettingsPages";
+import { AccountSettingsPage, AdvertisePage, BlockedProfilesPage, ComingSoonPage, ContestRequestsPage, DeleteAccountPage, FindABattlePage, ModeratorsPage, QrCodePage, ReferralsPage, SettingsHubPage, ShareProfilePage, SimulcastPage, SupportPage } from "./pages/SettingsPages";
 
 export default function App() {
   return (
@@ -44,16 +44,16 @@ export default function App() {
           <Route path="/settings/share" element={<ShareProfilePage />} />
           <Route path="/settings/qr" element={<QrCodePage />} />
           <Route path="/settings/referrals" element={<ReferralsPage />} />
-          <Route path="/settings/contest-requests" element={<ComingSoonPage title="Contest pending requests" note="Invitations to PK Battle contests that are waiting for your answer." />} />
+          <Route path="/settings/contest-requests" element={<ContestRequestsPage />} />
           <Route path="/settings/blocked" element={<BlockedProfilesPage />} />
           <Route path="/settings/moderators" element={<ModeratorsPage />} />
-          <Route path="/settings/find-a-battle" element={<ComingSoonPage title="Find a Battle" note="Members who are live or active right now and want someone to battle with, by country." />} />
+          <Route path="/settings/find-a-battle" element={<FindABattlePage />} />
           <Route path="/settings/simulcast" element={<SimulcastPage />} />
           <Route path="/settings/advertise" element={<AdvertisePage />} />
           <Route path="/settings/shop" element={<ComingSoonPage title="Bingg Bongg Shop" note="Products from members and partners, right inside Bingg Bongg." />} />
           <Route path="/settings/verification" element={<ComingSoonPage title="Request verification" note="Send your ID and a selfie to get the verified badge." />} />
           <Route path="/settings/language" element={<ComingSoonPage title="Change language" note="The web app is in English for now. The phone apps speak 53 languages." />} />
-          <Route path="/settings/support" element={<ComingSoonPage title="Support" note="Message the Bingg Bongg team from here." />} />
+          <Route path="/settings/support" element={<SupportPage />} />
           <Route path="/settings/delete-account" element={<DeleteAccountPage />} />
           <Route path="*" element={<HomePage />} />
         </Routes>

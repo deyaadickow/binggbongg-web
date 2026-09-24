@@ -425,6 +425,151 @@ export function AdvertisePage() {
   );
 }
 
+// ---- Find a Battle --------------------------------------------------------------------------
+interface BattleUser { id: number; fullname?: string; username?: string; profile_image?: string | null; country?: string; presence: "live" | "active"; team_label?: string | null }
+interface BattleSearchResult { status: boolean; active?: boolean; eligible?: boolean; country?: string | null; country_flag?: string; my_country?: string | null; data?: BattleUser[] }
+interface CountryRow { country: string; flag: string; count: number; is_mine: boolean }
+
+export function FindABattlePage() {
+  const { user, isLoggedIn } = useSession();
+  const [tab, setTab] = useState<"country" | "global">("country");
+  const [countries, setCountries] = useState<CountryRow[]>([]);
+  const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
+  const [result, setResult] = useState<BattleSearchResult | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    post<CountryRow[]>("fetchBattleSearchCountries", { user_id: user.id }).then((r) => {
+      const list = r.data ?? [];
+      setCountries(list);
+      const mine = list.find((c) => c.is_mine);
+      if (mine) setSelectedCountry(mine.country);
+    }).catch(() => undefined);
+  }, [user]);
+
+  const fetchList = useCallback(async (scope: "country" | "global", country?: string) => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      const params: Record<string, unknown> = { user_id: user.id, scope };
+      if (scope === "country" && country) params.country = country;
+      const r = await post<BattleSearchResult>("fetchBattleSearchList", params);
+      setResult(r.status ? (r.data ?? null) as unknown as BattleSearchResult : null);
+    } catch { setResult(null); } finally { setLoading(false); }
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    if (tab === "country" && selectedCountry) fetchList("country", selectedCountry);
+    else if (tab === "global") fetchList("global");
+  }, [tab, selectedCountry, user, fetchList]);
+
+  if (!isLoggedIn || !user) return <NeedLogin />;
+
+  const users = (result as unknown as { data?: BattleUser[] } | null)?.data ?? [];
+
+  return (
+    <Page title="Find a Battle">
+      <p className="muted" style={{ fontSize: 13 }}>Members who want to battle right now. Turn on "I want someone to battle with" in <a href="/settings/account" style={{ color: "var(--gold)" }}>Account settings</a> to appear here yourself.</p>
+      <div className="row" style={{ gap: 8, marginBottom: 12 }}>
+        {(["country", "global"] as const).map((t) => (
+          <button key={t} className={`btn small${tab === t ? "" : " ghost"}`} onClick={() => setTab(t)}>{t === "country" ? "By Country" : "Global"}</button>
+        ))}
+      </div>
+      {tab === "country" && (
+        <div className="card pad" style={{ marginBottom: 10 }}>
+          <select className="input" value={selectedCountry ?? ""} onChange={(e) => setSelectedCountry(e.target.value)} style={{ width: "100%" }}>
+            {countries.map((c) => <option key={c.country} value={c.country}>{c.flag} {c.country} ({c.count})</option>)}
+          </select>
+        </div>
+      )}
+      <div className="card">
+        {loading ? <Loading /> : users.length === 0
+          ? <p className="muted" style={{ padding: 14 }}>Nobody here right now — check back in a few minutes.</p>
+          : users.map((u) => (
+            <a key={u.id} href={`/profile/${u.id}`} className="row" style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)", textDecoration: "none", color: "inherit" }}>
+              <Avatar user={{ ...u, profile_image: u.profile_image ?? undefined }} size="lg" />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{u.fullname ?? u.username ?? `User ${u.id}`}</div>
+                <div className="muted" style={{ fontSize: 12 }}>@{u.username}{u.country ? ` · ${u.country}` : ""}</div>
+              </div>
+              <span className={`pill${u.presence === "live" ? " live" : ""}`}>{u.presence === "live" ? "● LIVE" : "Active"}</span>
+            </a>
+          ))}
+      </div>
+    </Page>
+  );
+}
+
+// ---- Contest pending requests ---------------------------------------------------------------
+interface ContestInvite { id: number; talent_contest_id?: number; talent_contest?: { name?: string; description?: string }; invited_by?: { fullname?: string; username?: string; profile_image?: string } | null; created_at?: string }
+
+export function ContestRequestsPage() {
+  const { user, isLoggedIn } = useSession();
+  const [list, setList] = useState<ContestInvite[] | null>(null);
+  const { setToast, el } = useToast();
+  const load = useCallback(() => {
+    if (!user) return;
+    post<ContestInvite[]>("fetchUserInvitesToUserCreatedTalentContests", { user_id: user.id, start: 0, count: 50 }).then((r) => setList(r.data ?? [])).catch(() => setList([]));
+  }, [user]);
+  useEffect(load, [load]);
+  if (!isLoggedIn || !user) return <NeedLogin />;
+  async function reject(inviteId: number) {
+    if (!user) return;
+    try {
+      const r = await post("rejectTalentContestInvite", { user_id: user.id, invite_id: inviteId });
+      if (!r.status) throw new Error(r.message ?? "Couldn't reject invite.");
+      setToast("Invite removed."); load();
+    } catch (e) { setToast((e as Error).message); }
+  }
+  return (
+    <Page title="Contest pending requests">
+      <p className="muted" style={{ fontSize: 13 }}>Invitations to Talent Contests that are waiting for your answer.</p>
+      <div className="card">
+        {list === null ? <Loading /> : list.length === 0
+          ? <p className="muted" style={{ padding: 14 }}>No pending invites.</p>
+          : list.map((inv) => (
+            <div key={inv.id} className="row" style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)", flexWrap: "wrap", gap: 8 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 700 }}>{inv.talent_contest?.name ?? `Contest #${inv.talent_contest_id}`}</div>
+                {inv.talent_contest?.description && <div className="muted" style={{ fontSize: 12, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{inv.talent_contest.description}</div>}
+                {inv.invited_by && <div className="muted" style={{ fontSize: 12 }}>Invited by {inv.invited_by.fullname ?? `@${inv.invited_by.username}`}</div>}
+              </div>
+              <button className="btn small ghost" style={{ color: "var(--red)", borderColor: "var(--red)" }} onClick={() => reject(inv.id)}>Remove</button>
+            </div>
+          ))}
+      </div>
+      {el}
+    </Page>
+  );
+}
+
+// ---- Support --------------------------------------------------------------------------------
+export function SupportPage() {
+  const [msg, setMsg] = useState("");
+  const [sent, setSent] = useState(false);
+  const { user } = useSession();
+  return (
+    <Page title="Support">
+      {sent ? (
+        <div className="card pad"><p className="soft" style={{ margin: 0 }}>Message sent. The Bingg Bongg team will get back to you by email.</p></div>
+      ) : (
+        <div className="card pad">
+          <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>Have a question or issue? Send us a message and we'll get back to you.</p>
+          <textarea className="input" rows={5} placeholder="Describe your issue…" value={msg} onChange={(e) => setMsg(e.target.value)} style={{ width: "100%", marginBottom: 10 }} />
+          <a
+            className="btn"
+            href={`mailto:support@binggbongg.com?subject=Support request${user ? ` (user ${user.id})` : ""}&body=${encodeURIComponent(msg)}`}
+            onClick={() => { if (msg.trim()) setSent(true); }}
+            style={{ textDecoration: "none", display: "inline-block" }}
+          >Send message</a>
+        </div>
+      )}
+    </Page>
+  );
+}
+
 // ---- Delete account -------------------------------------------------------------------------
 export function DeleteAccountPage() {
   const { user, isLoggedIn, signOut } = useSession();
