@@ -33,16 +33,20 @@ export const BATTLE_KINDS: { kind: BattleKind; title: string; blurb: string; min
 ];
 
 /** Step 1 of the Battle button: which kind of battle. */
-export function BattleMenu({ peopleOnScreen, onPick, onClose }: { peopleOnScreen: number; onPick: (k: BattleKind) => void; onClose: () => void }) {
+export function BattleMenu({ peopleOnScreen, onPick, onClose, onNotice }: { peopleOnScreen: number; onPick: (k: BattleKind) => void; onClose: () => void; onNotice: (msg: string) => void }) {
   return (
     <Overlay title="⚔️ Start a battle" onClose={onClose}>
       {peopleOnScreen < 2 && <p className="muted" style={{ fontSize: 13, marginTop: 0 }}>You're the only one on screen. Accept a viewer's "Ask to join" request first — battles are between the people streaming together.</p>}
       {BATTLE_KINDS.map((k) => {
         const ok = peopleOnScreen >= k.minPeople;
+        // Steve, 2026-09-24: a dimmed box read as broken — every kind stays full brightness and
+        // the one that can't start yet just says why (and repeats it as a toast on tap).
         return (
-          <button key={k.kind} className="btn block" style={{ marginBottom: 8, textAlign: "left", opacity: ok ? 1 : 0.45 }} disabled={!ok} onClick={() => onPick(k.kind)}>
+          <button key={k.kind} className="btn block" style={{ marginBottom: 8, textAlign: "left" }}
+            onClick={() => (ok ? onPick(k.kind) : onNotice(`${k.title} needs ${k.minPeople} people on screen — you have ${peopleOnScreen}.`))}>
             <div style={{ fontWeight: 800 }}>{k.title}</div>
-            <div className="muted" style={{ fontSize: 12, fontWeight: 400 }}>{ok ? k.blurb : `Needs ${k.minPeople} people on screen`}</div>
+            <div className="muted" style={{ fontSize: 12, fontWeight: 400 }}>{k.blurb}</div>
+            {!ok && <div style={{ fontSize: 12, fontWeight: 700, color: "var(--gold)", marginTop: 2 }}>Needs {k.minPeople} people on screen</div>}
           </button>
         );
       })}

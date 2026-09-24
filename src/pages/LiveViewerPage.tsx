@@ -436,7 +436,7 @@ export function LiveViewerPage() {
         <TapGameOverlay game={activeGame} roomName={roomName} onClose={() => setGameOpen(false)} onToast={setToast} />
       )}
       {menuOpen && (
-        <BattleMenu peopleOnScreen={broadcasters.length} onClose={() => setMenuOpen(false)} onPick={(k) => {
+        <BattleMenu peopleOnScreen={broadcasters.length} onClose={() => setMenuOpen(false)} onNotice={setToast} onPick={(k) => {
           setMenuOpen(false);
           if (k === "1v1") setBattlePicker(true); else setPicker(k);
         }} />
