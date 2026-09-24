@@ -4,6 +4,7 @@
 import { NavLink } from "react-router-dom";
 import { useSession } from "../lib/session";
 import { WEB_BASE } from "../lib/api";
+import { APP_STORE_URL, PLAY_STORE_URL } from "./Common";
 
 export interface SideLink { to: string; label: string; icon: string; external?: boolean; needsLogin?: boolean; action?: "signout" }
 export interface SideSection { title?: string; links: SideLink[] }
@@ -39,6 +40,10 @@ export function sidebarSections(userId: number | null): SideSection[] {
       { to: `${WEB_BASE}privacypolicy`, label: "Privacy Policy", icon: "🔒", external: true },
       { to: "/settings/delete-account", label: "Delete account", icon: "🗑️", needsLogin: true },
       { to: "#signout", label: "Log out", icon: "🚪", needsLogin: true, action: "signout" },
+    ] },
+    { title: "Get the app", links: [
+      { to: APP_STORE_URL, label: "App Store", icon: "", external: true },
+      { to: PLAY_STORE_URL, label: "Google Play", icon: "▶", external: true },
     ] },
   ];
 }

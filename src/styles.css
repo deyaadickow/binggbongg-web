@@ -160,3 +160,10 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 /* Balloon Pop: a balloon falls from above the arena to below it at one fixed pace. */
 @keyframes bb-fall { from { transform: translateY(-140px); } to { transform: translateY(110vh); } }
 @media (prefers-reduced-motion: reduce) { @keyframes bb-fall { from { transform: translateY(-140px); } to { transform: translateY(110vh); } } }
+
+/* App Store / Google Play download links (Steve, 2026-09-24). Black & gold like everything else. */
+.store-badges { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.store-badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 10px; border: 1.5px solid var(--gold-border); background: var(--panel); color: var(--gold); font-weight: 800; font-size: 14px; line-height: 1.05; white-space: nowrap; }
+.store-badge:hover { border-color: var(--gold-bright); color: var(--gold-bright); }
+.store-badge .logo { font-size: 20px; width: 22px; text-align: center; }
+.store-badge small { display: block; font-size: 10px; font-weight: 500; color: var(--text-dim); letter-spacing: 0.02em; }

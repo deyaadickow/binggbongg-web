@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { post, type Post } from "../lib/api";
 import { useSession } from "../lib/session";
 import { PostCard } from "../components/PostCard";
-import { Loading, Notice } from "../components/Common";
+import { Loading, Notice, StoreBadges } from "../components/Common";
 import { setFeed } from "../lib/feed";
 
 export function HomePage() {
@@ -37,7 +37,11 @@ export function HomePage() {
 
   return (
     <div className="page">
-      <h1 className="page-title">For You</h1>
+      <div className="row" style={{ marginBottom: 14, flexWrap: "wrap" }}>
+        <h1 className="page-title" style={{ margin: 0 }}>For You</h1>
+        <span className="spacer" />
+        <StoreBadges compact />
+      </div>
       {error && <Notice error>{error}</Notice>}
       <div className="grid">
         {posts.map((p) => <PostCard key={p.id} post={p} />)}

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { post, setAuthHeaders, type UserSummary } from "../lib/api";
 import { useSession } from "../lib/session";
-import { Notice } from "../components/Common";
+import { Notice, StoreBadges } from "../components/Common";
 
 // Google Identity Services. The web client id must be added to the backend's
 // GOOGLE_SIGNIN_CLIENT_IDS (registration verifies the ID token) — see README.
@@ -131,6 +131,7 @@ export function LoginPage() {
           </div>
         )}
       </div>
+      <div style={{ marginTop: 24 }}><StoreBadges /></div>
     </div>
   );
 }
