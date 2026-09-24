@@ -336,7 +336,7 @@ export function LiveViewerPage() {
               <button className="btn small" onClick={live.toggleCamera}>{live.cameraOn ? "📷 Camera off" : "📷 Camera on"}</button>
               <button className="btn small" onClick={live.toggleMic}>{live.micOn ? "🎤 Mute" : "🎤 Unmute"}</button>
               <button className="btn small" onClick={live.flipCamera}>🔄 Flip</button>
-              {!anyBattleOpen && broadcasters.length > 1 && (
+              {!anyBattleOpen && (
                 <button className="btn small" onClick={() => setMenuOpen(true)}>⚔️ Battle</button>
               )}
               <span className="spacer" />
