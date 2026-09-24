@@ -344,7 +344,7 @@ export function SimulcastPage() {
           <div className="card pad" style={{ marginBottom: 10, borderWidth: 2 }}>
             <div className="row">
               <div style={{ flex: 1 }}>
-                <b style={{ color: "var(--gold)", fontSize: 17 }}>Bingg Bongg</b>
+                <b style={{ color: "var(--gold)", fontSize: 17 }}>Bingg Bongg Live</b>
                 <div className="soft" style={{ fontSize: 13 }}>Once you connect with Bingg Bongg we will be able to connect you to all these social media platforms at the same time.</div>
               </div>
               <span className="pill live">● CONNECTED</span>
