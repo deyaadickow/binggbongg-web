@@ -46,6 +46,7 @@ export function useBattle(roomName: string, myUserId: number | null, isPublisher
   const [invite, setInvite] = useState<BattleInvite | null>(null);
   const [now, setNow] = useState(Date.now());
   const completedIds = useRef(new Set<number>());
+  const lastOpenId = useRef<number | null>(null);
   const shownInviteIds = useRef(new Set<number>());
   const finalizing = useRef(false);
 
@@ -56,15 +57,22 @@ export function useBattle(roomName: string, myUserId: number | null, isPublisher
     async function tick() {
       const res = await post<BattleData>("fetchBattleStatus", { room_name: roomName }).catch(() => null);
       if (!alive || !res) return;
-      const data = res.status ? (res.data ?? null) : null;
-      setBattle((prev) => {
-        if (data && data.status === "completed" && !completedIds.current.has(data.battle_id)) {
-          completedIds.current.add(data.battle_id);
-          onCompleted(data);
-        }
-        if (!data) return prev && prev.status === "active" ? prev : null;
-        return data;
-      });
+      let data = res.status ? (res.data ?? null) : null;
+      // The room query only returns open battles. If ours vanished (finalized by the other
+      // battler, or the room ended and the server settled it), read the final row by id.
+      if (!data && lastOpenId.current !== null) {
+        const fin = await post<BattleData>("fetchBattleStatus", { battle_id: lastOpenId.current }).catch(() => null);
+        if (!alive) return;
+        data = fin?.status ? (fin.data ?? null) : null;
+        lastOpenId.current = null;
+        if (data && (data.status === "pending" || data.status === "active")) data = null;
+      }
+      if (data && (data.status === "pending" || data.status === "active")) lastOpenId.current = data.battle_id;
+      if (data && data.status === "completed" && !completedIds.current.has(data.battle_id)) {
+        completedIds.current.add(data.battle_id);
+        onCompleted(data);
+      }
+      setBattle(data && data.status !== "completed" ? data : null);
     }
     tick();
     const t = setInterval(tick, STATUS_POLL_MS);
