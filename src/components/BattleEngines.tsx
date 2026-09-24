@@ -11,10 +11,10 @@ export function personName(p?: Person | null): string {
   return p ? displayName({ fullname: p.fullname ?? undefined, username: p.username ?? undefined } as Partial<UserSummary>) : "Someone";
 }
 
-export function Overlay({ title, children, onClose }: { title: string; children: React.ReactNode; onClose: () => void }) {
+export function Overlay({ title, children, onClose, width = 440 }: { title: string; children: React.ReactNode; onClose: () => void; width?: number }) {
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", display: "grid", placeItems: "center", zIndex: 40, padding: 16 }} onClick={onClose}>
-      <div className="card pad" style={{ width: "min(440px, 100%)", maxHeight: "90vh", overflowY: "auto" }} onClick={(e) => e.stopPropagation()}>
+      <div className="card pad" style={{ width: `min(${width}px, 100%)`, maxHeight: "90vh", overflowY: "auto" }} onClick={(e) => e.stopPropagation()}>
         <h2 className="card-title" style={{ marginBottom: 10 }}>{title}</h2>
         {children}
       </div>
@@ -35,18 +35,19 @@ export const BATTLE_KINDS: { kind: BattleKind; title: string; blurb: string; min
 /** Step 1 of the Battle button: which kind of battle. */
 export function BattleMenu({ peopleOnScreen, onPick, onClose, onNotice }: { peopleOnScreen: number; onPick: (k: BattleKind) => void; onClose: () => void; onNotice: (msg: string) => void }) {
   return (
-    <Overlay title="⚔️ Start a battle" onClose={onClose}>
+    <Overlay title="⚔️ Start a battle" onClose={onClose} width={560}>
       {peopleOnScreen < 2 && <p className="muted" style={{ fontSize: 13, marginTop: 0 }}>You're the only one on screen. Accept a viewer's "Ask to join" request first — battles are between the people streaming together.</p>}
       {BATTLE_KINDS.map((k) => {
         const ok = peopleOnScreen >= k.minPeople;
-        // Steve, 2026-09-24: a dimmed box read as broken — every kind stays full brightness and
-        // the one that can't start yet just says why (and repeats it as a toast on tap).
+        // Steve, 2026-09-24: a dimmed box read as broken, and three texts on one row wrapped
+        // ("it has 2 lines"). Every kind stays full brightness; each row is the title plus ONE
+        // line — the description, or, when it can't start yet, why (repeated as a toast on tap).
         return (
-          <button key={k.kind} className="btn block" style={{ marginBottom: 8, textAlign: "left" }}
-            onClick={() => (ok ? onPick(k.kind) : onNotice(`${k.title} needs ${k.minPeople} people on screen — you have ${peopleOnScreen}.`))}>
-            <div style={{ fontWeight: 800 }}>{k.title}</div>
-            <div className="muted" style={{ fontSize: 12, fontWeight: 400 }}>{k.blurb}</div>
-            {!ok && <div style={{ fontSize: 12, fontWeight: 700, color: "var(--gold)", marginTop: 2 }}>Needs {k.minPeople} people on screen</div>}
+          <button key={k.kind} className="btn block battle-kind" onClick={() => (ok ? onPick(k.kind) : onNotice(`${k.title} needs ${k.minPeople} people on screen — you have ${peopleOnScreen}.`))}>
+            <span className="kind-title">{k.title}</span>
+            {ok
+              ? <span className="kind-blurb muted">{k.blurb}</span>
+              : <span className="kind-blurb" style={{ color: "var(--gold)", fontWeight: 700 }}>Needs {k.minPeople} people on screen</span>}
           </button>
         );
       })}
