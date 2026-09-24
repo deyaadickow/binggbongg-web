@@ -3,6 +3,7 @@ import { post, type Post } from "../lib/api";
 import { useSession } from "../lib/session";
 import { PostCard } from "../components/PostCard";
 import { Loading, Notice } from "../components/Common";
+import { setFeed } from "../lib/feed";
 
 export function HomePage() {
   const { user } = useSession();
@@ -18,7 +19,9 @@ export function HomePage() {
       if (!res.status) throw new Error(res.message ?? "Couldn't load the feed.");
       setPosts((prev) => {
         const seen = new Set(prev.map((p) => p.id));
-        return [...prev, ...(res.data ?? []).filter((p) => !seen.has(p.id))];
+        const next = [...prev, ...(res.data ?? []).filter((p) => !seen.has(p.id))];
+        setFeed(next); // the video page steps through this same order
+        return next;
       });
     } catch (e) {
       setError((e as Error).message);
