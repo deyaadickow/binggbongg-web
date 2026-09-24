@@ -35,7 +35,7 @@ export const BATTLE_KINDS: { kind: BattleKind; title: string; blurb: string; min
 /** Step 1 of the Battle button: which kind of battle. */
 export function BattleMenu({ peopleOnScreen, onPick, onClose, onNotice }: { peopleOnScreen: number; onPick: (k: BattleKind) => void; onClose: () => void; onNotice: (msg: string) => void }) {
   return (
-    <Overlay title="⚔️ Start a battle" onClose={onClose} width={640}>
+    <Overlay title="⚔️ Start a battle" onClose={onClose} width={560}>
       {peopleOnScreen < 2 && <p className="muted" style={{ fontSize: 13, marginTop: 0 }}>You're the only one on screen. Accept a viewer's "Ask to join" request first — battles are between the people streaming together.</p>}
       {BATTLE_KINDS.map((k) => {
         const ok = peopleOnScreen >= k.minPeople;
