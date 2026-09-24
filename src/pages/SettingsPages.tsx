@@ -178,24 +178,32 @@ interface Referral { id: number; user?: UserSummary; created_at?: string }
 export function ReferralsPage() {
   const { user, isLoggedIn } = useSession();
   const [list, setList] = useState<Referral[] | null>(null);
+  const [code, setCode] = useState<string | null>(null);
   const { setToast, el } = useToast();
   const load = useCallback(() => {
     if (!user) return;
     post<Referral[]>("fetchMyReferrals", { user_id: user.id, start: 0, count: 100 }).then((r) => setList(r.data ?? [])).catch(() => setList([]));
+    // The member's own referral code (refer_code, e.g. STEVED123456) — the one an advertiser types
+    // into "Referral Code (optional)" while uploading a video ad.
+    post<{ refer_code?: string }>("fetchMyUserDetails", { my_user_id: user.id }).then((r) => setCode(r.data?.refer_code ?? null)).catch(() => undefined);
   }, [user]);
   useEffect(load, [load]);
   if (!isLoggedIn || !user) return <NeedLogin />;
   return (
     <Page title="Referrals">
       <div className="card pad" style={{ marginBottom: 12 }}>
-        <div className="muted" style={{ fontSize: 13 }}>Your referral code is your username. Anyone who signs up with it becomes your referral.</div>
-        <div className="row" style={{ marginTop: 8 }}><span className="pill">@{user.username}</span><button className="btn small ghost" onClick={() => navigator.clipboard.writeText(user.username ?? "").then(() => setToast("Copied.")).catch(() => undefined)}>Copy</button></div>
+        <div className="muted" style={{ fontSize: 13 }}>Your referral code. Anyone who signs up with it, or enters it while uploading a video ad, becomes your referral.</div>
+        <div className="row" style={{ marginTop: 8, flexWrap: "wrap" }}>
+          <span className="pill" style={{ fontSize: 15 }}>{code ?? "…"}</span>
+          <button className="btn small ghost" disabled={!code} onClick={() => navigator.clipboard.writeText(code ?? "").then(() => setToast("Copied.")).catch(() => undefined)}>Copy</button>
+          <span className="muted" style={{ fontSize: 12 }}>Your username <b>@{user.username}</b> works for sign-ups too.</span>
+        </div>
       </div>
       <div className="card pad" style={{ marginBottom: 12 }}>
         <b style={{ color: "var(--gold)" }}>What referrals earn you</b>
         <ul className="soft" style={{ fontSize: 14, margin: "8px 0 0", paddingLeft: 18 }}>
           <li><b>Simulcast for free.</b> 3 referrals in a month make your next month free. 36 lifetime referrals earn a free year. <Link to="/settings/simulcast">See your Simulcast status</Link>.</li>
-          <li><b>Video-ad commission.</b> When someone you referred buys a video ad, you get a one-time referral commission for that ad.</li>
+          <li><b>Video-ad commission.</b> An advertiser can enter your referral code only while uploading their ad. You then get a one-time commission for that ad.</li>
           <li><b>Share &amp; Earn 10%.</b> Share a live room with the button in the room. Gifts sent by the people who came through your link pay you 10%.</li>
         </ul>
       </div>
