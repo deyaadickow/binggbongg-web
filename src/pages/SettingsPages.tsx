@@ -171,21 +171,18 @@ export function QrCodePage() {
 }
 
 // ---- Referrals ------------------------------------------------------------------------------
+// Steve, 2026-09-24: the original cash-reward referral program is paused (backend flag
+// referral_cash_program_enabled). Referrals now count for Simulcast free months/years, video-ad
+// referral commissions and Share & Earn 10% — so no earnings boxes here, just the code and list.
 interface Referral { id: number; user?: UserSummary; created_at?: string }
-interface Earnings { todayEarnings?: number; thisWeekEarnings?: number; thisMonthEarnings?: number; yearEarnings?: number; totalEarnings?: number }
 export function ReferralsPage() {
   const { user, isLoggedIn } = useSession();
   const [list, setList] = useState<Referral[] | null>(null);
-  const [earn, setEarn] = useState<Earnings | null>(null);
   const [username, setUsername] = useState("");
   const { setToast, el } = useToast();
   const load = useCallback(() => {
     if (!user) return;
     post<Referral[]>("fetchMyReferrals", { user_id: user.id, start: 0, count: 100 }).then((r) => setList(r.data ?? [])).catch(() => setList([]));
-    const d = new Date();
-    const pad = (n: number) => String(n).padStart(2, "0");
-    post<unknown>("fetchReferralEarningData", { user_id: user.id, today_date: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`, month: d.getMonth() + 1, month_year: d.getFullYear(), year: d.getFullYear() })
-      .then((r) => setEarn(r as unknown as Earnings)).catch(() => undefined);
   }, [user]);
   useEffect(load, [load]);
   if (!isLoggedIn || !user) return <NeedLogin />;
@@ -197,23 +194,20 @@ export function ReferralsPage() {
       setToast("Referral added."); setUsername(""); load();
     } catch (e) { setToast((e as Error).message); }
   }
-  const money = (v?: number) => `$${Number(v ?? 0).toFixed(2)}`;
   return (
     <Page title="Referrals">
       <div className="card pad" style={{ marginBottom: 12 }}>
         <div className="muted" style={{ fontSize: 13 }}>Your referral code is your username. Anyone who signs up with it becomes your referral.</div>
         <div className="row" style={{ marginTop: 8 }}><span className="pill">@{user.username}</span><button className="btn small ghost" onClick={() => navigator.clipboard.writeText(user.username ?? "").then(() => setToast("Copied.")).catch(() => undefined)}>Copy</button></div>
       </div>
-      {earn && (
-        <div className="card pad" style={{ marginBottom: 12 }}>
-          <b style={{ color: "var(--gold)" }}>Referral earnings</b>
-          <div className="row" style={{ marginTop: 8, flexWrap: "wrap", gap: 16 }}>
-            {[["Today", earn.todayEarnings], ["This week", earn.thisWeekEarnings], ["This month", earn.thisMonthEarnings], ["This year", earn.yearEarnings], ["All time", earn.totalEarnings]].map(([k, v]) => (
-              <div key={k as string}><div className="muted" style={{ fontSize: 12 }}>{k as string}</div><div style={{ fontWeight: 800, color: "var(--gold)" }}>{money(v as number)}</div></div>
-            ))}
-          </div>
-        </div>
-      )}
+      <div className="card pad" style={{ marginBottom: 12 }}>
+        <b style={{ color: "var(--gold)" }}>What referrals earn you</b>
+        <ul className="soft" style={{ fontSize: 14, margin: "8px 0 0", paddingLeft: 18 }}>
+          <li><b>Simulcast for free.</b> 3 referrals in a month make your next month free. 36 lifetime referrals earn a free year. <Link to="/settings/simulcast">See your Simulcast status</Link>.</li>
+          <li><b>Video-ad commission.</b> When someone you referred buys a video ad, you get that ad's monthly referral commission.</li>
+          <li><b>Share &amp; Earn 10%.</b> Share a live room with the button in the room. Gifts sent by the people who came through your link pay you 10%.</li>
+        </ul>
+      </div>
       <div className="card pad" style={{ marginBottom: 12 }}>
         <b style={{ color: "var(--gold)" }}>Were you referred by someone?</b>
         <div className="row" style={{ marginTop: 8 }}>
@@ -341,9 +335,21 @@ export function SimulcastPage() {
   }
   return (
     <Page title="Simulcast">
-      <p className="muted" style={{ fontSize: 13 }}>Stream your Bingg Bongg live to YouTube, Facebook, Twitch, Instagram and TikTok at the same time. Paste each platform's stream key once; every live you start is sent there too.</p>
+      <p className="muted" style={{ fontSize: 13 }}>Go live once on Bingg Bongg and be live on YouTube, Facebook, Twitch, Instagram and TikTok at the same time. Paste each platform's stream key once; every live you start is sent there too.</p>
       {!ov ? <Loading /> : (
         <>
+          {/* Steve, 2026-09-24: "Bingg Bongg should be on top of the list … once you connect with
+              Bingg Bongg we will be able to connect you to all these social media platforms at the
+              same time." */}
+          <div className="card pad" style={{ marginBottom: 10, borderWidth: 2 }}>
+            <div className="row">
+              <div style={{ flex: 1 }}>
+                <b style={{ color: "var(--gold)", fontSize: 17 }}>Bingg Bongg</b>
+                <div className="soft" style={{ fontSize: 13 }}>Once you connect with Bingg Bongg we will be able to connect you to all these social media platforms at the same time.</div>
+              </div>
+              <span className="pill live">● CONNECTED</span>
+            </div>
+          </div>
           <div className="card pad" style={{ marginBottom: 12 }}>
             <div className="row" style={{ flexWrap: "wrap", gap: 16 }}>
               <div><div className="muted" style={{ fontSize: 12 }}>Status</div><div style={{ fontWeight: 800, color: "var(--gold)" }}>{ov.is_entitled ? "Active" : ov.status}</div></div>
