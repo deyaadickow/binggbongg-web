@@ -41,7 +41,8 @@ export const WALLET_LINKS: { to: string; icon: string; label: string; hint: stri
   { to: "/wallet/ad-referrals", icon: "📣", label: "Money earned from ad referrals", hint: "Commissions from video ads uploaded with your code" },
   { to: "/wallet/all-videos", icon: "🎬", label: "Money earned from all videos", hint: "Earnings from your uploaded videos" },
   { to: "/wallet/reposts", icon: "🔁", label: "Money earned from reposting videos", hint: "Earnings from videos you reposted" },
-  { to: "/wallet/rewards", icon: "🎁", label: "Rewarding actions", hint: "Daily check-in, upload and sign-up rewards" },
+  // Rewarding actions: removed from the list for now (Steve, 2026-09-24) — the page still exists
+  // at /wallet/rewards so it's one line to bring back.
 ];
 
 // ---- earnings totals (shared by Redeem and All videos) ---------------------------------------
