@@ -13,6 +13,7 @@ export function Nav() {
         <NavLink to="/search">Search</NavLink>
         {isLoggedIn && <NavLink to="/wallet">Wallet</NavLink>}
         {isLoggedIn && <NavLink to="/go-live">Go Live</NavLink>}
+        <NavLink to="/settings" className="only-narrow">Settings</NavLink>
       </nav>
       <div className="me">
         {isLoggedIn && user ? (
