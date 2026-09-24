@@ -301,7 +301,7 @@ export function ModeratorsPage() {
 
 // ---- Simulcast ------------------------------------------------------------------------------
 interface SimDest { platform: string; label: string; guaranteed: boolean; note?: string; default_rtmp_url?: string; rtmp_url?: string; has_key: boolean; is_enabled: boolean }
-interface SimOverview { enabled: boolean; daily_price: number; monthly_price: number; status: string; is_entitled: boolean; paid_until?: string | null; cash_wallet: number; referrals_this_month: number; referrals_needed_for_free_month: number; next_month_free: boolean; destinations: SimDest[] }
+interface SimOverview { enabled: boolean; free_year_referrals?: number; lifetime_referrals?: number; daily_price: number; monthly_price: number; status: string; is_entitled: boolean; paid_until?: string | null; cash_wallet: number; referrals_this_month: number; referrals_needed_for_free_month: number; next_month_free: boolean; destinations: SimDest[] }
 export function SimulcastPage() {
   const { user, isLoggedIn } = useSession();
   const [ov, setOv] = useState<SimOverview | null>(null);
@@ -356,6 +356,9 @@ export function SimulcastPage() {
               <div><div className="muted" style={{ fontSize: 12 }}>Price</div><div style={{ fontWeight: 800 }}>${Number(ov.daily_price).toFixed(2)}/day · ${Number(ov.monthly_price).toFixed(2)}/month</div></div>
               {ov.paid_until && <div><div className="muted" style={{ fontSize: 12 }}>Paid until</div><div style={{ fontWeight: 800 }}>{String(ov.paid_until).slice(0, 10)}</div></div>}
               <div><div className="muted" style={{ fontSize: 12 }}>Referrals this month</div><div style={{ fontWeight: 800 }}>{ov.referrals_this_month} / {ov.referrals_needed_for_free_month}{ov.next_month_free ? " · next month free!" : ""}</div></div>
+            </div>
+            <div className="soft" style={{ fontSize: 13, marginTop: 10 }}>
+              Every {ov.referrals_needed_for_free_month} referrals to this Simulcast get you a free month.{ov.free_year_referrals ? ` ${ov.free_year_referrals} lifetime referrals get you a free year.` : ""}
             </div>
           </div>
           {ov.destinations.map((d) => (
