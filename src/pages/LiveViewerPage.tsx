@@ -5,6 +5,8 @@ import { useSession } from "../lib/session";
 import { chatChannel, ensureFirebaseSignIn, observeChat, sendChat, type ChatMessage } from "../lib/firebase";
 import { useLiveRoom, type LiveRole, type LiveTile } from "../lib/live";
 import { useBattle, type BattleData } from "../lib/battle";
+import { FIVE_FIVE_FIVE, MARATHON, SERIES, TWO_V_TWO, cancel555, createSeries, finalize2v2, finalizeSeriesRound, invite2v2, invite555, inviteMarathon, secondsUntil, useEngine, voteMarathonCancel, type B555Data, type Battle2v2Data, type MarathonData, type SeriesData } from "../lib/battles";
+import { B555Strip, BattleMenu, InviteCard, MarathonStrip, MultiPicker, Overlay, ResultOverlay, SeriesStrip, TwoVTwoPicker, TwoVTwoStrip, describe2v2Invite, personName, resultTitle, type BattleKind } from "../components/BattleEngines";
 import { fetchActiveTapGame, gameTitle, type TapGameType } from "../lib/tapgame";
 import { TapGameOverlay } from "../components/TapGameOverlay";
 import { Avatar, Notice } from "../components/Common";
@@ -52,6 +54,81 @@ export function LiveViewerPage() {
   }, [user, refresh]);
   const battle = useBattle(roomName, user?.id ?? null, isPublisher, isLoggedIn && !roomClosed, onBattleCompleted);
 
+  // The other four engines: Best Out Of, 2v2, No Time Limit, 5-5-5. One result overlay at a time.
+  const [result, setResult] = useState<{ title: string; rows: { label: string; value: string; win?: boolean }[] } | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [picker, setPicker] = useState<BattleKind | null>(null);
+  const myId = user?.id ?? null;
+  const nameOfId = useCallback((id: number | null | undefined) => {
+    const m = broadcastersRef.current.find((b) => b.user_id === id);
+    return m ? displayName(m as Partial<UserSummary>) : "";
+  }, []);
+  const onSeriesFinished = useCallback((d: SeriesData) => {
+    const acc = d.participants.filter((p) => p.invite_status === "accepted");
+    setResult({
+      title: resultTitle(d.winner_user_id, myId, acc.some((p) => p.user_id === myId), d.status === "cancelled"),
+      rows: acc.map((p) => ({ label: nameOfId(p.user_id) || personName(p), value: `${p.rounds_won ?? 0} round${p.rounds_won === 1 ? "" : "s"}`, win: p.user_id === d.winner_user_id })),
+    });
+    refresh();
+  }, [myId, nameOfId, refresh]);
+  const on2v2Finished = useCallback((d: Battle2v2Data) => {
+    const mine = d.participants.find((p) => p.user_id === myId);
+    const iPlayed = !!mine && mine.invite_status === "accepted";
+    const iWon = !!mine && d.winning_team === mine.team;
+    const team = (t: "A" | "B") => d.participants.filter((p) => p.team === t).map((p) => nameOfId(p.user_id) || personName(p)).join(" & ");
+    setResult({
+      title: d.status === "cancelled" ? "Battle cancelled" : !d.winning_team ? "It's a tie" : !iPlayed ? "Battle over!" : iWon ? "🏆 Your team won!" : "Your team lost this one",
+      rows: [
+        { label: team("A"), value: (d.team_a_score ?? 0).toLocaleString(), win: d.winning_team === "A" },
+        { label: team("B"), value: (d.team_b_score ?? 0).toLocaleString(), win: d.winning_team === "B" },
+      ],
+    });
+    refresh();
+  }, [myId, nameOfId, refresh]);
+  const onMarathonFinished = useCallback((d: MarathonData) => {
+    const acc = d.participants.filter((p) => p.invite_status === "accepted");
+    setResult({
+      title: resultTitle(d.winner_user_id, myId, acc.some((p) => p.user_id === myId), d.status === "cancelled"),
+      rows: acc.map((p) => ({ label: nameOfId(p.user_id) || personName(p), value: (p.current_score ?? 0).toLocaleString(), win: p.user_id === d.winner_user_id })),
+    });
+    refresh();
+  }, [myId, nameOfId, refresh]);
+  const on555Finished = useCallback((d: B555Data) => {
+    const acc = d.participants.filter((p) => p.invite_status === "accepted");
+    setResult({
+      title: resultTitle(d.winner_user_id, myId, acc.some((p) => p.user_id === myId), d.status === "cancelled"),
+      rows: acc.map((p) => ({ label: nameOfId(p.user_id) || personName(p), value: `${p.games_completed ?? 0}/${d.games_to_win} games · ${(p.total_coins ?? 0).toLocaleString()} coins`, win: p.user_id === d.winner_user_id })),
+    });
+    refresh();
+  }, [myId, nameOfId, refresh]);
+  const enginesOn = isLoggedIn && !roomClosed;
+  const series = useEngine(SERIES, roomName, myId, isPublisher, enginesOn, onSeriesFinished);
+  const two = useEngine(TWO_V_TWO, roomName, myId, isPublisher, enginesOn, on2v2Finished);
+  const marathon = useEngine(MARATHON, roomName, myId, isPublisher, enginesOn, onMarathonFinished);
+  const b555 = useEngine(FIVE_FIVE_FIVE, roomName, myId, isPublisher, enginesOn, on555Finished);
+  const anyBattleOpen = (!!battle.battle && battle.battle.status !== "completed") || !!series.data || !!two.data || !!marathon.data || !!b555.data;
+
+  // Best Out Of: a participant finalizes the round the moment its clock hits zero (server
+  // rejects early calls, so a second or two of drift is harmless). 2v2: same at ends_at.
+  const seriesRoundSecs = series.data?.status === "active" ? secondsUntil(series.data.current_round_ends_at, series.now) : null;
+  const iAmInSeries = !!series.data && series.data.participants.some((p) => p.user_id === myId && p.invite_status === "accepted");
+  const finalizingRound = useRef<number | null>(null);
+  useEffect(() => {
+    const d = series.data;
+    if (!d || d.status !== "active" || seriesRoundSecs !== 0 || !iAmInSeries || !d.current_round_id || finalizingRound.current === d.current_round_id) return;
+    finalizingRound.current = d.current_round_id;
+    finalizeSeriesRound(d.current_round_id).catch(() => undefined).finally(() => { if (finalizingRound.current === d.current_round_id) finalizingRound.current = null; });
+  }, [series.data, seriesRoundSecs, iAmInSeries]);
+  const twoSecs = two.data?.status === "active" ? secondsUntil(two.data.ends_at, two.now) : null;
+  const iAmIn2v2 = !!two.data && two.data.participants.some((p) => p.user_id === myId && p.invite_status === "accepted");
+  const finalizing2v2 = useRef(false);
+  useEffect(() => {
+    const d = two.data;
+    if (!d || d.status !== "active" || twoSecs !== 0 || !iAmIn2v2 || finalizing2v2.current) return;
+    finalizing2v2.current = true;
+    finalize2v2(d.battle_id).then((res) => { if (res.status && res.data) two.absorb(res.data); }).catch(() => undefined).finally(() => { finalizing2v2.current = false; });
+  }, [two, twoSecs, iAmIn2v2]);
+
   // Tap games: the host activates one from the phone (or later, here); everyone gets a Play button.
   const [activeGame, setActiveGame] = useState<TapGameType | null>(null);
   const [gameOpen, setGameOpen] = useState(false);
@@ -69,6 +146,8 @@ export function LiveViewerPage() {
     return [{ user_id: members.host_user_id, fullname: members.host_fullname, username: members.host_username, profile_image: members.host_profile_image }, ...members.guests];
   }, [members]);
   const nameOf = useCallback((id: number | null) => broadcasters.find((b) => b.user_id === id), [broadcasters]);
+  const broadcastersRef = useRef<Member[]>([]);
+  broadcastersRef.current = broadcasters;
 
   // Room roster (host + approved guests) — checkHeader only, works before sign-in too.
   useEffect(() => {
@@ -151,8 +230,14 @@ export function LiveViewerPage() {
     if (!user || !giftTarget) return;
     try {
       const b = battle.battle;
-      const inBattle = b && b.status === "active" && (b.player_one_user_id === giftTarget || b.player_two_user_id === giftTarget);
-      const res = await post("sendCoinsToUser", { my_user_id: user.id, user_id: giftTarget, coins: giftPrice(gift), gift_id: gift.id, room_name: roomName, ...(inBattle ? { battle_id: b.battle_id } : {}) });
+      const tag: Record<string, number> = {};
+      const accepted = (ps: { user_id: number; invite_status: string }[]) => ps.some((p) => p.user_id === giftTarget && p.invite_status === "accepted");
+      if (b && b.status === "active" && (b.player_one_user_id === giftTarget || b.player_two_user_id === giftTarget)) tag.battle_id = b.battle_id;
+      else if (series.data?.status === "active" && series.data.current_round_id && accepted(series.data.participants)) tag.series_round_id = series.data.current_round_id;
+      else if (two.data?.status === "active" && accepted(two.data.participants)) tag.battle_2v2_id = two.data.battle_id;
+      else if (marathon.data?.status === "active" && accepted(marathon.data.participants)) tag.marathon_id = marathon.data.marathon_id;
+      else if (b555.data?.status === "active" && accepted(b555.data.participants)) tag.battle_555_id = b555.data.battle_555_id;
+      const res = await post("sendCoinsToUser", { my_user_id: user.id, user_id: giftTarget, coins: giftPrice(gift), gift_id: gift.id, room_name: roomName, ...tag });
       if (!res.status) throw new Error(res.message ?? "Couldn't send that gift.");
       setToast(`Sent ${gift.name ?? "a gift"} (${giftPrice(gift)} coins) to ${displayName(nameOf(giftTarget) as Partial<UserSummary>)}`);
       setGiftTarget(null);
@@ -223,6 +308,20 @@ export function LiveViewerPage() {
           {battle.battle && battle.battle.status !== "completed" && (
             <BattleStrip b={battle.battle} secondsLeft={battle.secondsLeft} nameOf={(id) => displayName(nameOf(id) as Partial<UserSummary>)} />
           )}
+          {series.data && <SeriesStrip d={series.data} now={series.now} nameOf={nameOfId} />}
+          {two.data && <TwoVTwoStrip d={two.data} now={two.now} nameOf={nameOfId} />}
+          {marathon.data && (
+            <MarathonStrip d={marathon.data} myUserId={myId} nameOf={nameOfId} onVote={(approve) => {
+              if (!myId || !marathon.data) return;
+              voteMarathonCancel(myId, marathon.data.marathon_id, approve).then(() => setToast(approve ? "Your vote to end is in." : "Vote withdrawn.")).catch((e) => setToast((e as Error).message));
+            }} />
+          )}
+          {b555.data && (
+            <B555Strip d={b555.data} myUserId={myId} nameOf={nameOfId} onCancel={() => {
+              if (!myId || !b555.data) return;
+              cancel555(myId, b555.data.battle_555_id).then(() => setToast("5-5-5 cancelled.")).catch((e) => setToast((e as Error).message));
+            }} />
+          )}
           <div className={`video-grid count-${Math.min(4, Math.max(1, orderedTiles.length))}`}>
             {orderedTiles.length === 0 && (
               <div className="tile" style={{ display: "grid", placeItems: "center" }}>
@@ -237,8 +336,8 @@ export function LiveViewerPage() {
               <button className="btn small" onClick={live.toggleCamera}>{live.cameraOn ? "📷 Camera off" : "📷 Camera on"}</button>
               <button className="btn small" onClick={live.toggleMic}>{live.micOn ? "🎤 Mute" : "🎤 Unmute"}</button>
               <button className="btn small" onClick={live.flipCamera}>🔄 Flip</button>
-              {(!battle.battle || battle.battle.status === "completed") && broadcasters.length > 1 && (
-                <button className="btn small" onClick={() => setBattlePicker(true)}>⚔️ Battle</button>
+              {!anyBattleOpen && broadcasters.length > 1 && (
+                <button className="btn small" onClick={() => setMenuOpen(true)}>⚔️ Battle</button>
               )}
               <span className="spacer" />
               {role === "host"
@@ -323,6 +422,59 @@ export function LiveViewerPage() {
       {gameOpen && activeGame && (
         <TapGameOverlay game={activeGame} roomName={roomName} onClose={() => setGameOpen(false)} onToast={setToast} />
       )}
+      {menuOpen && (
+        <BattleMenu peopleOnScreen={broadcasters.length} onClose={() => setMenuOpen(false)} onPick={(k) => {
+          setMenuOpen(false);
+          if (k === "1v1") setBattlePicker(true); else setPicker(k);
+        }} />
+      )}
+      {picker === "series" && myId && (
+        <MultiPicker title="Best Out Of" blurb="5-minute rounds. First to win more than half the rounds takes the series." lengths={[3, 5, 7, 9, 11]}
+          people={broadcasters.filter((b) => b.user_id !== myId)} onClose={() => setPicker(null)}
+          onSubmit={async (ids, length) => {
+            try { await createSeries(myId, roomName, length ?? 5, ids); setPicker(null); setToast(`Best Out Of ${length} invites sent.`); }
+            catch (e) { setToast((e as Error).message); }
+          }} />
+      )}
+      {picker === "2v2" && myId && (
+        <TwoVTwoPicker people={broadcasters.filter((b) => b.user_id !== myId)} onClose={() => setPicker(null)}
+          onSubmit={async (teammate, o1, o2) => {
+            try { await invite2v2(myId, roomName, teammate, o1, o2); setPicker(null); setToast("2v2 invites sent."); }
+            catch (e) { setToast((e as Error).message); }
+          }} />
+      )}
+      {picker === "marathon" && myId && (
+        <MultiPicker title="No Time Limit" blurb="No clock. The first player to reach 100,000 gift coins wins. Everyone in the battle can vote to end it early."
+          people={broadcasters.filter((b) => b.user_id !== myId)} onClose={() => setPicker(null)}
+          onSubmit={async (ids) => {
+            try { await inviteMarathon(myId, roomName, ids); setPicker(null); setToast("No Time Limit invites sent."); }
+            catch (e) { setToast((e as Error).message); }
+          }} />
+      )}
+      {picker === "555" && myId && (
+        <MultiPicker title="5-5-5" blurb="5 Games / 5 Minutes / Reach 5000 coins and win. Each game ends at 5,000 coins or when its 5 minutes run out; first to finish 5 games wins."
+          people={broadcasters.filter((b) => b.user_id !== myId)} onClose={() => setPicker(null)}
+          onSubmit={async (ids) => {
+            try { await invite555(myId, roomName, ids); setPicker(null); setToast("5-5-5 invites sent."); }
+            catch (e) { setToast((e as Error).message); }
+          }} />
+      )}
+      {series.invite && (
+        <InviteCard title="Best Out Of" onClose={series.dismissInvite} onAnswer={(ok) => series.respond(series.invite!.series_id, ok).catch((e) => setToast((e as Error).message))}
+          body={`${displayName({ fullname: series.invite.host_fullname, username: series.invite.host_username } as Partial<UserSummary>)} invites you to a Best Out Of ${series.invite.length} battle — 5-minute rounds, most gift coins wins each round.`} />
+      )}
+      {two.invite && (
+        <InviteCard title="2v2 Battle" onClose={two.dismissInvite} onAnswer={(ok) => two.respond(two.invite!.battle_id, ok).catch((e) => setToast((e as Error).message))} body={describe2v2Invite(two.invite)} />
+      )}
+      {marathon.invite && (
+        <InviteCard title="No Time Limit" onClose={marathon.dismissInvite} onAnswer={(ok) => marathon.respond(marathon.invite!.marathon_id, ok).catch((e) => setToast((e as Error).message))}
+          body={`${displayName({ fullname: marathon.invite.host_fullname, username: marathon.invite.host_username } as Partial<UserSummary>)} invites you to a No Time Limit battle — first to ${marathon.invite.target_points.toLocaleString()} gift coins wins.`} />
+      )}
+      {b555.invite && (
+        <InviteCard title="5-5-5" onClose={b555.dismissInvite} onAnswer={(ok) => b555.respond(b555.invite!.battle_555_id, ok).catch((e) => setToast((e as Error).message))}
+          body={`${displayName({ fullname: b555.invite.host_fullname, username: b555.invite.host_username } as Partial<UserSummary>)} invites you to 5-5-5 — 5 Games / 5 Minutes / Reach ${b555.invite.coins_per_game.toLocaleString()} coins and win.`} />
+      )}
+      {result && <ResultOverlay title={result.title} rows={result.rows} onClose={() => setResult(null)} />}
       {battlePicker && (
         <Overlay title="Bingg Bongg Battle — who do you challenge?" onClose={() => setBattlePicker(false)}>
           {broadcasters.filter((b) => b.user_id !== user?.id).map((b) => (
@@ -374,17 +526,6 @@ function BattleStrip({ b, secondsLeft, nameOf }: { b: BattleData; secondsLeft: n
       </div>
       <div style={{ height: 6, borderRadius: 3, background: "#2a2a2a", overflow: "hidden", marginTop: 6 }}>
         <div style={{ width: `${pct}%`, height: 6, background: "var(--gold)" }} />
-      </div>
-    </div>
-  );
-}
-
-function Overlay({ title, children, onClose }: { title: string; children: React.ReactNode; onClose: () => void }) {
-  return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", display: "grid", placeItems: "center", zIndex: 40, padding: 16 }} onClick={onClose}>
-      <div className="card pad" style={{ width: "min(420px, 100%)" }} onClick={(e) => e.stopPropagation()}>
-        <h2 className="card-title" style={{ marginBottom: 10 }}>{title}</h2>
-        {children}
       </div>
     </div>
   );
