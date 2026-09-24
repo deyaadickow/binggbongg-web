@@ -85,10 +85,10 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 /* Same as the phones: a single 4px gold border on every streamer tile, green while they talk
    (fg_pk_tile_border_idle / _speaking on Android). Drawn as an inset shadow so it never changes
    the grid's geometry. */
-.video-grid .tile { position: relative; background: #111; box-shadow: inset 0 0 0 4px var(--gold-border); }
-.video-grid .tile.speaking { box-shadow: inset 0 0 0 4px #4CD964; }
-.video-grid .tile video { position: relative; z-index: -1; }
-.video-grid { position: relative; isolation: isolate; }
+.video-grid .tile { position: relative; background: #111; }
+.video-grid .tile::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 0 4px var(--gold-border); pointer-events: none; }
+.video-grid .tile.speaking::after { box-shadow: inset 0 0 0 4px #4CD964; }
+.video-grid { position: relative; }
 .boxing-gloves { position: absolute; left: 0; right: 0; top: 40px; display: flex; flex-direction: column; align-items: center; gap: 6px; pointer-events: none; z-index: 3; }
 .boxing-gloves img { width: 240px; max-width: 70%; opacity: 0.95; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6)); }
 .boxing-gloves .clock { background: #101010; border: 1.5px solid var(--gold-border); color: var(--gold); border-radius: 10px; padding: 2px 14px; font-weight: 800; font-size: 22px; font-variant-numeric: tabular-nums; }
