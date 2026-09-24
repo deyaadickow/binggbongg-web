@@ -5,6 +5,7 @@ import { WEB_BASE, post } from "../lib/api";
 interface WebCoinPlan { id: number; coins: number; bonus_coins: number; total_coins: number; price: number }
 import { useSession } from "../lib/session";
 import { Loading, Notice } from "../components/Common";
+import { WALLET_LINKS } from "./WalletPages";
 
 export function WalletPage() {
   const { user, isLoggedIn, refresh } = useSession();
@@ -47,6 +48,19 @@ export function WalletPage() {
         <div className="card pad"><div className="muted">Coins to gift</div><div style={{ fontSize: 28, fontWeight: 800, color: "var(--gold)" }}>{user.no_redeem_wallet ?? 0}</div></div>
         <div className="card pad"><div className="muted">Earned coins</div><div style={{ fontSize: 28, fontWeight: 800, color: "var(--gold)" }}>{user.redeem_wallet ?? 0}</div></div>
         <div className="card pad"><div className="muted">Cash balance</div><div style={{ fontSize: 28, fontWeight: 800, color: "var(--gold)" }}>${Number(user.cash_wallet ?? 0).toFixed(2)}</div></div>
+      </div>
+      {/* Steve, 2026-09-24: the seven links under the phones' Wallet screen, as gold bullet boxes. */}
+      <div className="grid wide" style={{ marginTop: 14 }}>
+        {WALLET_LINKS.map((l) => (
+          <Link key={l.to} to={l.to} className="card pad wallet-link">
+            <span className="ico">{l.icon}</span>
+            <span style={{ flex: 1, minWidth: 0 }}>
+              <b style={{ color: "var(--gold)" }}>{l.label}</b>
+              <span className="muted" style={{ display: "block", fontSize: 12 }}>{l.hint}</span>
+            </span>
+            <span style={{ color: "var(--gold)", fontSize: 22 }}>›</span>
+          </Link>
+        ))}
       </div>
       <h2 className="page-title" style={{ marginTop: 22, fontSize: 18 }}>Buy coins</h2>
       {error && <Notice error>{error}</Notice>}

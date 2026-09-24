@@ -11,6 +11,7 @@ import { LiveViewerPage } from "./pages/LiveViewerPage";
 import { WalletPage } from "./pages/WalletPage";
 import { GoLivePage } from "./pages/GoLivePage";
 import { Sidebar } from "./components/Sidebar";
+import { AdReferralEarningsPage, AllVideosEarningsPage, PayoutHistoryPage, RedeemPage, RepostEarningsPage, RewardingActionsPage, StatementsPage } from "./pages/WalletPages";
 import { AccountSettingsPage, AdvertisePage, BlockedProfilesPage, ComingSoonPage, DeleteAccountPage, ModeratorsPage, QrCodePage, ReferralsPage, SettingsHubPage, ShareProfilePage, SimulcastPage } from "./pages/SettingsPages";
 
 export default function App() {
@@ -30,6 +31,13 @@ export default function App() {
           <Route path="/live" element={<LiveNowPage />} />
           <Route path="/live/:room" element={<LiveViewerPage />} />
           <Route path="/wallet" element={<WalletPage />} />
+          <Route path="/wallet/redeem" element={<RedeemPage />} />
+          <Route path="/wallet/payout-history" element={<PayoutHistoryPage />} />
+          <Route path="/wallet/statements" element={<StatementsPage />} />
+          <Route path="/wallet/ad-referrals" element={<AdReferralEarningsPage />} />
+          <Route path="/wallet/all-videos" element={<AllVideosEarningsPage />} />
+          <Route path="/wallet/reposts" element={<RepostEarningsPage />} />
+          <Route path="/wallet/rewards" element={<RewardingActionsPage />} />
           <Route path="/go-live" element={<GoLivePage />} />
           <Route path="/settings" element={<SettingsHubPage />} />
           <Route path="/settings/account" element={<AccountSettingsPage />} />
