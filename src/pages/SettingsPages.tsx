@@ -204,7 +204,7 @@ export function ReferralsPage() {
         <b style={{ color: "var(--gold)" }}>What referrals earn you</b>
         <ul className="soft" style={{ fontSize: 14, margin: "8px 0 0", paddingLeft: 18 }}>
           <li><b>Simulcast for free.</b> 3 referrals in a month make your next month free. 36 lifetime referrals earn a free year. <Link to="/settings/simulcast">See your Simulcast status</Link>.</li>
-          <li><b>Video-ad commission.</b> When someone you referred buys a video ad, you get that ad's monthly referral commission.</li>
+          <li><b>Video-ad commission.</b> When someone you referred buys a video ad, you get a one-time referral commission for that ad.</li>
           <li><b>Share &amp; Earn 10%.</b> Share a live room with the button in the room. Gifts sent by the people who came through your link pay you 10%.</li>
         </ul>
       </div>
