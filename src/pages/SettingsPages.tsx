@@ -178,7 +178,6 @@ interface Referral { id: number; user?: UserSummary; created_at?: string }
 export function ReferralsPage() {
   const { user, isLoggedIn } = useSession();
   const [list, setList] = useState<Referral[] | null>(null);
-  const [username, setUsername] = useState("");
   const { setToast, el } = useToast();
   const load = useCallback(() => {
     if (!user) return;
@@ -186,14 +185,6 @@ export function ReferralsPage() {
   }, [user]);
   useEffect(load, [load]);
   if (!isLoggedIn || !user) return <NeedLogin />;
-  async function add() {
-    if (!user || !username.trim()) return;
-    try {
-      const r = await post("createReferralFromUsername", { user_id: user.id, username: username.trim().replace(/^@/, "") });
-      if (!r.status) throw new Error(r.message ?? "Couldn't add that referral.");
-      setToast("Referral added."); setUsername(""); load();
-    } catch (e) { setToast((e as Error).message); }
-  }
   return (
     <Page title="Referrals">
       <div className="card pad" style={{ marginBottom: 12 }}>
@@ -207,13 +198,6 @@ export function ReferralsPage() {
           <li><b>Video-ad commission.</b> When someone you referred buys a video ad, you get a one-time referral commission for that ad.</li>
           <li><b>Share &amp; Earn 10%.</b> Share a live room with the button in the room. Gifts sent by the people who came through your link pay you 10%.</li>
         </ul>
-      </div>
-      <div className="card pad" style={{ marginBottom: 12 }}>
-        <b style={{ color: "var(--gold)" }}>Were you referred by someone?</b>
-        <div className="row" style={{ marginTop: 8 }}>
-          <input className="input" placeholder="Their username" value={username} onChange={(e) => setUsername(e.target.value)} style={{ flex: 1 }} />
-          <button className="btn small" onClick={add} disabled={!username.trim()}>Add</button>
-        </div>
       </div>
       <div className="card">
         <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)" }}><b style={{ color: "var(--gold)" }}>People you referred{list ? ` (${list.length})` : ""}</b></div>
