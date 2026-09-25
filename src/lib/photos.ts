@@ -80,3 +80,52 @@ export function uploadPhoto(
     xhr.send(form);
   });
 }
+
+// ---- Viewing and managing what's already uploaded -------------------------------------------
+
+export interface Photo {
+  id: number;
+  photo_path?: string | null;
+  thumb_path?: string | null;
+  is_favorited?: boolean | number | null;
+  folder_id?: number | null;
+  created_at?: string | null;
+}
+
+export const isFavourited = (p: Photo): boolean =>
+  p.is_favorited === true || p.is_favorited === 1;
+
+/** Favourites is virtual: asking for it returns every starred photo, whatever folder it lives in. */
+export async function fetchFolderPhotos(myUserId: number, folderId: number): Promise<{ folder: PhotoFolder | null; photos: Photo[] }> {
+  const res = await post<{ folder?: PhotoFolder; photos?: Photo[] }>("fetchFolderPhotos", {
+    my_user_id: myUserId,
+    folder_id: folderId,
+  });
+  if (!res.status) throw new Error(res.message ?? "Couldn't open that folder.");
+  return { folder: res.data?.folder ?? null, photos: res.data?.photos ?? [] };
+}
+
+export async function togglePhotoFavourite(myUserId: number, photoId: number): Promise<void> {
+  const res = await post("togglePhotoFavorite", { my_user_id: myUserId, photo_id: photoId });
+  if (!res.status) throw new Error(res.message ?? "Couldn't update that photo.");
+}
+
+export async function movePhoto(myUserId: number, photoId: number, targetFolderId: number): Promise<void> {
+  const res = await post("movePhoto", { my_user_id: myUserId, photo_id: photoId, target_folder_id: targetFolderId });
+  if (!res.status) throw new Error(res.message ?? "Couldn't move that photo.");
+}
+
+export async function deletePhoto(myUserId: number, photoId: number): Promise<void> {
+  const res = await post("deletePhoto", { my_user_id: myUserId, photo_id: photoId });
+  if (!res.status) throw new Error(res.message ?? "Couldn't delete that photo.");
+}
+
+export async function renameFolder(myUserId: number, folderId: number, name: string): Promise<void> {
+  const res = await post("renameFolder", { my_user_id: myUserId, folder_id: folderId, name });
+  if (!res.status) throw new Error(res.message ?? "Couldn't rename that folder.");
+}
+
+export async function deleteFolder(myUserId: number, folderId: number): Promise<void> {
+  const res = await post("deleteFolder", { my_user_id: myUserId, folder_id: folderId });
+  if (!res.status) throw new Error(res.message ?? "Couldn't delete that folder.");
+}
