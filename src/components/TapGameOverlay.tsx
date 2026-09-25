@@ -244,15 +244,22 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
               {phase === "finishing" && <p className="muted">Adding up your coins…</p>}
               {phase === "done" && result && (
                 <>
-                  <h2 className="card-title" style={{ fontSize: 22 }}>{isRace && caught >= RACE_FINISH ? `Station 5 in ${clock(elapsed)}!` : "Time's up!"}</h2>
-                  <p style={{ fontSize: 32, fontWeight: 800, color: "var(--gold-bright)", margin: "8px 0" }}>{Number(result.coins_earned).toLocaleString()} coins</p>
-                  <p className="soft">{result.objects_caught} {isRace ? "taps" : isLanes ? "popped" : "caught"}</p>
+                  {/* The same sentence the phones show. The score is what you can gift to the
+                      host, never coins you receive, so it is not presented as a standalone
+                      total and declining is "NO" rather than "keep them". */}
+                  <h2 className="card-title" style={{ fontSize: 18, whiteSpace: "pre-line" }}>
+                    {isRace
+                      ? `Your ${game.catch_name || "racer"} reached Station ${RACE_STATIONS}\nin ${clock(elapsed)} — ${Number(result.coins_earned).toLocaleString()} coins!`
+                      : isLanes
+                      ? `You popped ${result.objects_caught} balloons,\nworth ${Number(result.coins_earned).toLocaleString()} coins!`
+                      : `You caught ${result.objects_caught} ${game.catch_name || "objects"},\nworth ${Number(result.coins_earned).toLocaleString()} coins!`}
+                  </h2>
                   {!gifted && result.coins_earned > 0 && result.host_name && (
                     <>
-                      <p className="muted" style={{ marginTop: 10, fontSize: 13 }}>Gift these {Number(result.coins_earned).toLocaleString()} coins to {result.host_name}?</p>
+                      <p style={{ marginTop: 12, fontSize: 15, color: "var(--gold)" }}>Gift these to {result.host_name}?</p>
                       <div className="row" style={{ marginTop: 10 }}>
-                        <button className="btn ghost" style={{ flex: 1 }} onClick={onClose}>Keep them</button>
-                        <button className="btn" style={{ flex: 1 }} onClick={gift}>🎁 Gift to {result.host_name}</button>
+                        <button className="btn ghost" style={{ flex: 1 }} onClick={onClose}>NO</button>
+                        <button className="btn" style={{ flex: 1 }} onClick={gift}>YES, GIFT</button>
                       </div>
                     </>
                   )}
