@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { SessionProvider } from "./lib/session";
 import { Nav } from "./components/Nav";
+import { UploadVideoPage } from "./pages/UploadVideoPage";
 import { HomePage } from "./pages/HomePage";
 import { LoginPage } from "./pages/LoginPage";
 import { VideoPage } from "./pages/VideoPage";
@@ -39,6 +40,7 @@ export default function App() {
           <Route path="/wallet/reposts" element={<RepostEarningsPage />} />
           <Route path="/wallet/rewards" element={<RewardingActionsPage />} />
           <Route path="/go-live" element={<GoLivePage />} />
+          <Route path="/upload" element={<UploadVideoPage />} />
           <Route path="/settings" element={<SettingsHubPage />} />
           <Route path="/settings/account" element={<AccountSettingsPage />} />
           <Route path="/settings/share" element={<ShareProfilePage />} />
