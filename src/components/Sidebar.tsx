@@ -35,6 +35,7 @@ export function sidebarSections(userId: number | null): SideSection[] {
     { title: "General", links: [
       { to: "/settings/language", label: "Change language", icon: "🌐" },
       { to: "/settings/support", label: "Support", icon: "💬" },
+      { to: "/settings/terms", label: "Terms of Use", icon: "📄" },
 { to: "/settings/delete-account", label: "Delete account", icon: "🗑️", needsLogin: true },
       { to: "#signout", label: "Log out", icon: "🚪", needsLogin: true, action: "signout" },
     ] },

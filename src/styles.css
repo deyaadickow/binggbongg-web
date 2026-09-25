@@ -202,3 +202,15 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .stat-bullet span { font-size: 10px; color: var(--text-dim); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }
 .refer-row { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: #0d0d00; border: 1.5px solid var(--gold-border); border-radius: var(--radius); margin-top: 14px; }
 .refer-code { flex: 1; font-family: monospace; font-size: 17px; font-weight: 800; color: var(--gold); letter-spacing: 0.12em; }
+
+/* Admin-authored Terms of Use HTML */
+.terms-content { color: var(--text-soft); line-height: 1.65; }
+.terms-content h2, .terms-content h3 { color: var(--gold-border); font-size: 17px; margin: 26px 0 8px; }
+.terms-content p { margin: 0 0 12px; }
+.terms-content ul, .terms-content ol { padding-left: 20px; margin: 0 0 12px; }
+.terms-content li { margin-bottom: 5px; }
+.terms-content a { color: var(--gold-border); }
+.terms-content em { color: var(--text-dim); }
+.terms-content img { max-width: 100%; height: auto; }
+.terms-content table { display: block; overflow-x: auto; border-collapse: collapse; max-width: 100%; }
+.terms-content td, .terms-content th { border: 1px solid var(--gold-border); padding: 6px 8px; }

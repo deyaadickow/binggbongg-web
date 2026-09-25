@@ -585,6 +585,53 @@ export function SupportPage() {
   );
 }
 
+// ---- Terms of Use ---------------------------------------------------------------------------
+// Content comes from the admin panel (tbl_terms_of_use), so an edit there shows here
+// immediately with no web deploy. Same single source the phone apps read.
+export function TermsOfUsePage() {
+  const [html, setHtml] = useState<string | null>(null);
+  const [updated, setUpdated] = useState("");
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await post<{ content?: string; updated_at?: string }>("fetchTermsOfUse");
+        if (cancelled) return;
+        setHtml(res.data?.content ?? "");
+        setUpdated(res.data?.updated_at ?? "");
+      } catch {
+        if (!cancelled) setFailed(true);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  return (
+    <Page title="Terms of Use">
+      <div className="card pad">
+        {failed ? (
+          <p className="muted" style={{ margin: 0 }}>Could not load the Terms of Use. Please try again.</p>
+        ) : html === null ? (
+          <p className="muted" style={{ margin: 0 }}>Loading…</p>
+        ) : html.trim() === "" ? (
+          <p className="muted" style={{ margin: 0 }}>The Terms of Use have not been published yet.</p>
+        ) : (
+          <>
+            {updated && (
+              <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>
+                Last updated {new Date(updated).toLocaleDateString()}
+              </p>
+            )}
+            <div className="terms-content" dangerouslySetInnerHTML={{ __html: html }} />
+          </>
+        )}
+      </div>
+    </Page>
+  );
+}
+
 // ---- Delete account -------------------------------------------------------------------------
 export function DeleteAccountPage() {
   const { user, isLoggedIn, signOut } = useSession();
