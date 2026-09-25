@@ -3,7 +3,6 @@
 // a time." Every row of the phones' Settings screen, in the same order, plus the main tabs.
 import { NavLink } from "react-router-dom";
 import { useSession } from "../lib/session";
-import { WEB_BASE } from "../lib/api";
 import { APP_STORE_URL, PLAY_STORE_URL } from "./Common";
 
 export interface SideLink { to: string; label: string; icon: string; external?: boolean; needsLogin?: boolean; action?: "signout" }
