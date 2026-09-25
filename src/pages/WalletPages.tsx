@@ -188,7 +188,6 @@ export function RedeemPage() {
           </div>
         )}
         <button className="btn block" disabled={busy || (gateway === "Wise" && !wise?.has_profile)} onClick={redeem}>{busy ? "Sending…" : "Redeem"}</button>
-        <p className="muted" style={{ fontSize: 12, marginBottom: 0 }}>By redeeming you agree to the <a href="https://admin.binggbongg.com/termsOfUse" target="_blank" rel="noreferrer">Terms &amp; Policy</a>.</p>
       </div>
       {el}
     </Page>
