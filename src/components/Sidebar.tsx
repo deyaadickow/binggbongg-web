@@ -36,8 +36,7 @@ export function sidebarSections(userId: number | null): SideSection[] {
     { title: "General", links: [
       { to: "/settings/language", label: "Change language", icon: "🌐" },
       { to: "/settings/support", label: "Support", icon: "💬" },
-{ to: `${WEB_BASE}privacypolicy`, label: "Privacy Policy", icon: "🔒", external: true },
-      { to: "/settings/delete-account", label: "Delete account", icon: "🗑️", needsLogin: true },
+{ to: "/settings/delete-account", label: "Delete account", icon: "🗑️", needsLogin: true },
       { to: "#signout", label: "Log out", icon: "🚪", needsLogin: true, action: "signout" },
     ] },
     { title: "Get the app", links: [
