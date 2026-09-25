@@ -8,6 +8,7 @@
 // the server refuses an upload when that balance runs out. fetchMyPhotoStorageStatus is what
 // tells the member where they stand before they hit that wall.
 import { API_BASE, post } from "./api";
+import { uploadErrorMessage } from "./upload";
 
 export interface PhotoFolder {
   id: number;
@@ -73,9 +74,9 @@ export function uploadPhoto(
       let body: { status?: boolean; message?: string } = {};
       try { body = JSON.parse(xhr.responseText); } catch { /* falls through to the status check */ }
       if (xhr.status >= 200 && xhr.status < 300 && body.status) resolve();
-      else reject(new Error(body.message ?? `Upload failed (${xhr.status}). Please try again.`));
+      else reject(new Error(uploadErrorMessage(xhr.status, body.message)));
     };
-    xhr.onerror = () => reject(new Error("Upload failed — check your connection and try again."));
+    xhr.onerror = () => reject(new Error(uploadErrorMessage(0)));
     xhr.send(form);
   });
 }

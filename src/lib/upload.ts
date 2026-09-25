@@ -8,6 +8,33 @@
 // Nothing here ever sees a credential — the signed url IS the permission, and it expires.
 import { API_BASE, post } from "./api";
 
+/**
+ * What to tell a member when an upload fails.
+ *
+ * A bare "Upload failed (500)" tells them nothing and implies they did something wrong. A 5xx
+ * or a rejected signed url is our problem, not theirs — on 2026-09-25 every upload on every
+ * platform was failing this way because the backend's AWS key had been rotated without updating
+ * .env, and the only visible symptom was that number. So say plainly when it is our end, and
+ * keep the specifics for the server log, which is where the real answer was.
+ *
+ * `serverMessage` wins when there is one: the backend writes messages a member can act on
+ * ("deposit more to your Ad Cash Account", "this photo was flagged during review").
+ */
+export function uploadErrorMessage(status: number, serverMessage?: string | null): string {
+  const fromServer = serverMessage?.trim();
+  if (fromServer) return fromServer;
+
+  if (status === 0) return "Upload failed — check your connection and try again.";
+  if (status === 401 || status === 403) {
+    // A 403 here is the signed url or our credentials being refused, never the member.
+    return "Uploading isn't working right now. Please try again in a few minutes.";
+  }
+  if (status === 413) return "That file is too large to upload.";
+  if (status === 429) return "Too many uploads just now — give it a minute and try again.";
+  if (status >= 500) return "Uploading isn't working right now. Please try again shortly.";
+  return "Upload failed. Please try again.";
+}
+
 export interface UploadSlot {
   file_name: string;
   key: string;
@@ -46,9 +73,9 @@ export function putToSignedUrl(slot: UploadSlot, file: File, onProgress?: (fract
     };
     xhr.onload = () => {
       if (xhr.status >= 200 && xhr.status < 300) resolve();
-      else reject(new Error(`Upload failed (${xhr.status}). Please try again.`));
+      else reject(new Error(uploadErrorMessage(xhr.status)));
     };
-    xhr.onerror = () => reject(new Error("Upload failed — check your connection and try again."));
+    xhr.onerror = () => reject(new Error(uploadErrorMessage(0)));
     xhr.onabort = () => reject(new Error("Upload cancelled."));
     xhr.send(file);
   });

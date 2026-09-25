@@ -10,6 +10,7 @@
 // contest that comes back, titled with the contest's own name. Create a contest in admin and
 // its entry appears for the right members on its own; end it and the entry goes.
 import { API_BASE, post } from "./api";
+import { uploadErrorMessage } from "./upload";
 
 export interface OpenContest {
   id: number;
@@ -73,9 +74,9 @@ export function uploadContestVideo(
       let body: { status?: boolean; message?: string } = {};
       try { body = JSON.parse(xhr.responseText); } catch { /* falls through to the status check */ }
       if (xhr.status >= 200 && xhr.status < 300 && body.status) resolve();
-      else reject(new Error(body.message ?? `Upload failed (${xhr.status}). Please try again.`));
+      else reject(new Error(uploadErrorMessage(xhr.status, body.message)));
     };
-    xhr.onerror = () => reject(new Error("Upload failed — check your connection and try again."));
+    xhr.onerror = () => reject(new Error(uploadErrorMessage(0)));
     xhr.send(form);
   });
 }
