@@ -576,7 +576,7 @@ export function SupportPage() {
           <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>Have a question or issue? Send us a message and we'll get back to you.</p>
           <textarea className="input" rows={5} placeholder="Describe your issue…" value={msg} onChange={(e) => setMsg(e.target.value)} style={{ width: "100%", marginBottom: 10 }} />
           {error && <p style={{ color: "#f55", fontSize: 13, marginBottom: 8 }}>{error}</p>}
-          <button className="btn" onClick={send} disabled={busy || !msg.trim()}>
+          <button className="btn" onClick={send} disabled={busy || !msg.trim()} style={{ background: "var(--gold-border)", color: "#000", borderColor: "var(--gold-border)" }}>
             {busy ? "Sending…" : "Send message"}
           </button>
         </div>
