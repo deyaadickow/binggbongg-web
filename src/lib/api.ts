@@ -19,6 +19,12 @@ export function setAuthHeaders(token: string | null, userId: number | null) {
   authHeaders = token && userId ? { AUTHTOKEN: token, USERID: String(userId) } : {};
 }
 
+/** The headers every authorised call sends, for the two uploads that must build their own
+ *  request (multipart / progress) instead of going through post(). */
+export function currentAuthHeaders(): Record<string, string> {
+  return { apikey: API_KEY, ...authHeaders };
+}
+
 export class ApiError extends Error {
   status: number;
   constructor(status: number, message: string) {
