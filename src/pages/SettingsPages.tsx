@@ -549,21 +549,36 @@ export function ContestRequestsPage() {
 export function SupportPage() {
   const [msg, setMsg] = useState("");
   const [sent, setSent] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
   const { user } = useSession();
+
+  async function send() {
+    if (!msg.trim() || busy) return;
+    setBusy(true);
+    setError("");
+    try {
+      await post("sendSupportMessage", { message: msg.trim(), user_id: user?.id ?? 0 });
+      setSent(true);
+    } catch {
+      setError("Failed to send message. Please try again.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <Page title="Support">
       {sent ? (
-        <div className="card pad"><p className="soft" style={{ margin: 0 }}>Message sent. The Bingg Bongg team will get back to you by email.</p></div>
+        <div className="card pad"><p className="soft" style={{ margin: 0 }}>Message sent. The Bingg Bongg team will get back to you.</p></div>
       ) : (
         <div className="card pad">
           <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>Have a question or issue? Send us a message and we'll get back to you.</p>
           <textarea className="input" rows={5} placeholder="Describe your issue…" value={msg} onChange={(e) => setMsg(e.target.value)} style={{ width: "100%", marginBottom: 10 }} />
-          <a
-            className="btn"
-            href={`mailto:support@binggbongg.com?subject=Support request${user ? ` (user ${user.id})` : ""}&body=${encodeURIComponent(msg)}`}
-            onClick={() => { if (msg.trim()) setSent(true); }}
-            style={{ textDecoration: "none", display: "inline-block" }}
-          >Send message</a>
+          {error && <p style={{ color: "#f55", fontSize: 13, marginBottom: 8 }}>{error}</p>}
+          <button className="btn" onClick={send} disabled={busy || !msg.trim()}>
+            {busy ? "Sending…" : "Send message"}
+          </button>
         </div>
       )}
     </Page>
