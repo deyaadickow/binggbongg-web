@@ -41,6 +41,13 @@ export function LiveViewerPage() {
   const [toast, setToast] = useState<string | null>(null);
   const logRef = useRef<HTMLDivElement>(null);
 
+  // Auto Voice Thanks — TTS settings loaded from the backend for the host.
+  const [voiceThanksGift, setVoiceThanksGift] = useState(true);
+  // Raw TTS voice settings needed to call synthesizeSpeech with the host's own voice preference.
+  const ttsVoiceRef = useRef<{ voiceType: string; language: string; volume: number; enabled: boolean; filter: string; minCoins: number; blacklistWords: string }>({ voiceType: "male_deep", language: "en-US", volume: 1, enabled: true, filter: "", minCoins: 0, blacklistWords: "[]" });
+  // Tracks the sentAt watermark so we only fire for NEW gift messages, not replayed history.
+  const lastSeenGiftSentAtRef = useRef<number>(Date.now());
+
   const live = useLiveRoom(roomName, role, isLoggedIn && !roomClosed);
   const isPublisher = role !== "viewer" && live.status === "live";
 
@@ -218,6 +225,67 @@ export function LiveViewerPage() {
       .then((res) => setGifts((res.data?.gifts?.length ? res.data.gifts : res.data?.livestreamGifts) ?? []))
       .catch(() => undefined);
   }, []);
+
+  // Auto Voice Thanks — fetch TTS settings once the host is active so the voice/language match
+  // their personal preference. Falls back to defaults (male_deep / en-US / 1.0) on any error.
+  useEffect(() => {
+    if (role !== "host" || !user) return;
+    post<Record<string, unknown>>("getTextToVoiceSettings", { user_id: user.id })
+      .then((res) => {
+        const s = res as Record<string, unknown> & { settings?: Record<string, unknown> };
+        const settings = s.settings ?? s;
+        ttsVoiceRef.current = {
+          voiceType: String(settings.voice_type ?? "male_deep"),
+          language: String(settings.language ?? "en-US"),
+          volume: Number(settings.volume ?? 1),
+          enabled: settings.enabled !== false,
+          filter: String(settings.filter ?? ""),
+          minCoins: Number(settings.min_coins ?? 0),
+          blacklistWords: typeof settings.blacklist_words === "string" ? settings.blacklist_words : "[]",
+        };
+        setVoiceThanksGift(settings.voice_thanks_gift !== false);
+      })
+      .catch(() => undefined);
+  }, [role, user]);
+
+  // Auto Voice Thanks — watch the chat stream for new gift messages and play a TTS phrase.
+  // Only fires when I'm the host and the gift-thanks toggle is on. Uses the same
+  // synthesizeSpeech endpoint as Android/iOS, plays locally via HTMLAudioElement.
+  // Web has no stream-mix infrastructure (no AudioProcessor equivalent), so local-only is the
+  // best the web can do — the host hears it; the audience doesn't (same limitation as Android
+  // before SoundEffectMixer, or iOS before SoundPlayer was wired in).
+  useEffect(() => {
+    if (role !== "host" || !voiceThanksGift) return;
+    const newGifts = messages.filter((m) => m.senderUserId < 0 && m.sentAt > lastSeenGiftSentAtRef.current);
+    if (newGifts.length === 0) return;
+    lastSeenGiftSentAtRef.current = Math.max(...newGifts.map((m) => m.sentAt));
+    for (const msg of newGifts) {
+      const name = msg.senderName || msg.message.split(" sent a ")[0] || null;
+      if (!name) continue;
+      const { voiceType, language, volume } = ttsVoiceRef.current;
+      post<{ audioBase64?: string }>("synthesizeSpeech", { text: `Thanks for the gift ${name}`, voice_type: voiceType, language, volume })
+        .then((res) => {
+          const b64 = (res as Record<string, unknown>).audioBase64 as string | undefined
+            ?? (res as Record<string, unknown>).audio_base64 as string | undefined;
+          if (!b64) return;
+          const audio = new Audio(`data:audio/mp3;base64,${b64}`);
+          audio.volume = Math.min(1, Math.max(0, volume));
+          audio.play().catch(() => undefined);
+        })
+        .catch(() => undefined);
+    }
+  }, [messages, role, voiceThanksGift]);
+
+  function saveVoiceThanksGift(newVal: boolean) {
+    if (!user) return;
+    const { voiceType, language, volume, enabled, filter, minCoins, blacklistWords } = ttsVoiceRef.current;
+    post("saveTextToVoiceSettings", {
+      user_id: user.id, enabled, voice_type: voiceType, language, volume,
+      filter, min_coins: minCoins, blacklist_words: blacklistWords,
+      voice_thanks_follow: true, voice_thanks_gift: newVal,
+    }).catch(() => undefined);
+  }
+
   useEffect(() => {
     if (!toast) return;
     const t = setTimeout(() => setToast(null), 4000);
@@ -351,6 +419,13 @@ export function LiveViewerPage() {
               <button className="btn small" onClick={live.flipCamera}>🔄 Flip</button>
               {!anyBattleOpen && (
                 <button className="btn small" onClick={() => setMenuOpen(true)}>⚔️ Battle</button>
+              )}
+              {role === "host" && (
+                <button
+                  className={`btn small${voiceThanksGift ? "" : " ghost"}`}
+                  title="Say 'Thanks for the gift' out loud when someone sends a gift"
+                  onClick={() => { const next = !voiceThanksGift; setVoiceThanksGift(next); saveVoiceThanksGift(next); }}
+                >🔊 Voice Thanks</button>
               )}
               <span className="spacer" />
               {role === "host"
