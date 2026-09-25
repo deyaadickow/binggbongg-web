@@ -3,6 +3,7 @@ import { SessionProvider } from "./lib/session";
 import { Nav } from "./components/Nav";
 import { UploadVideoPage } from "./pages/UploadVideoPage";
 import { UploadPhotosPage } from "./pages/UploadPhotosPage";
+import { ContestUploadPage } from "./pages/ContestUploadPage";
 import { HomePage } from "./pages/HomePage";
 import { LoginPage } from "./pages/LoginPage";
 import { VideoPage } from "./pages/VideoPage";
@@ -43,6 +44,7 @@ export default function App() {
           <Route path="/go-live" element={<GoLivePage />} />
           <Route path="/upload" element={<UploadVideoPage />} />
           <Route path="/upload-photos" element={<UploadPhotosPage />} />
+          <Route path="/enter-contest" element={<ContestUploadPage />} />
           <Route path="/settings" element={<SettingsHubPage />} />
           <Route path="/settings/account" element={<AccountSettingsPage />} />
           <Route path="/settings/share" element={<ShareProfilePage />} />
