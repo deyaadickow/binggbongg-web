@@ -37,6 +37,7 @@ export function sidebarSections(userId: number | null): SideSection[] {
       { to: "/settings/support", label: "Support", icon: "💬" },
       { to: "/settings/terms", label: "Terms of Use", icon: "📄" },
       { to: "/settings/privacy", label: "Privacy Policy", icon: "🔒" },
+      { to: "/settings/contact", label: "Contact Us", icon: "✉️" },
 { to: "/settings/delete-account", label: "Delete account", icon: "🗑️", needsLogin: true },
       { to: "#signout", label: "Log out", icon: "🚪", needsLogin: true, action: "signout" },
     ] },

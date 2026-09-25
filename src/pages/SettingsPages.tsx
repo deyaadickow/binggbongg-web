@@ -642,6 +642,10 @@ export function PrivacyPolicyPage() {
   return <LegalPage title="Privacy Policy" endpoint="fetchPrivacyPolicy" />;
 }
 
+export function ContactUsPage() {
+  return <LegalPage title="Contact Us" endpoint="fetchContactUs" />;
+}
+
 // ---- Delete account -------------------------------------------------------------------------
 export function DeleteAccountPage() {
   const { user, isLoggedIn, signOut } = useSession();
