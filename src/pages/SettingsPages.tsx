@@ -585,19 +585,21 @@ export function SupportPage() {
   );
 }
 
-// ---- Terms of Use ---------------------------------------------------------------------------
-// Content comes from the admin panel (tbl_terms_of_use), so an edit there shows here
-// immediately with no web deploy. Same single source the phone apps read.
-export function TermsOfUsePage() {
+// ---- Legal pages (Terms of Use, Privacy Policy) ---------------------------------------------
+// Content comes from the admin panel, so an edit there shows here immediately with no web
+// deploy. Same single source the phone apps read.
+function LegalPage({ title, endpoint }: { title: string; endpoint: string }) {
   const [html, setHtml] = useState<string | null>(null);
   const [updated, setUpdated] = useState("");
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
+    setHtml(null);
+    setFailed(false);
     (async () => {
       try {
-        const res = await post<{ content?: string; updated_at?: string }>("fetchTermsOfUse");
+        const res = await post<{ content?: string; updated_at?: string }>(endpoint);
         if (cancelled) return;
         setHtml(res.data?.content ?? "");
         setUpdated(res.data?.updated_at ?? "");
@@ -606,17 +608,17 @@ export function TermsOfUsePage() {
       }
     })();
     return () => { cancelled = true; };
-  }, []);
+  }, [endpoint]);
 
   return (
-    <Page title="Terms of Use">
+    <Page title={title}>
       <div className="card pad">
         {failed ? (
-          <p className="muted" style={{ margin: 0 }}>Could not load the Terms of Use. Please try again.</p>
+          <p className="muted" style={{ margin: 0 }}>Could not load the {title}. Please try again.</p>
         ) : html === null ? (
           <p className="muted" style={{ margin: 0 }}>Loading…</p>
         ) : html.trim() === "" ? (
-          <p className="muted" style={{ margin: 0 }}>The Terms of Use have not been published yet.</p>
+          <p className="muted" style={{ margin: 0 }}>The {title} has not been published yet.</p>
         ) : (
           <>
             {updated && (
@@ -630,6 +632,14 @@ export function TermsOfUsePage() {
       </div>
     </Page>
   );
+}
+
+export function TermsOfUsePage() {
+  return <LegalPage title="Terms of Use" endpoint="fetchTermsOfUse" />;
+}
+
+export function PrivacyPolicyPage() {
+  return <LegalPage title="Privacy Policy" endpoint="fetchPrivacyPolicy" />;
 }
 
 // ---- Delete account -------------------------------------------------------------------------
