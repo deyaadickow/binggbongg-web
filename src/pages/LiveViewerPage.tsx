@@ -10,6 +10,8 @@ import { B555Strip, BattleMenu, InviteCard, MarathonStrip, MultiPicker, Overlay,
 import { fetchActiveTapGame, gameTitle, type TapGameType } from "../lib/tapgame";
 import { TapGameOverlay } from "../components/TapGameOverlay";
 import { HostGamesMenu } from "../components/HostGamesMenu";
+import { SoloBattleStandingsSheet, SoloBattleStrip } from "../components/SoloBattle";
+import { fetchActiveSoloBattle, startSoloBattle, type SoloBattle } from "../lib/solobattle";
 import { Avatar, Notice } from "../components/Common";
 
 interface Member { user_id: number; fullname?: string; username?: string; profile_image?: string; country?: string }
@@ -60,6 +62,10 @@ export function LiveViewerPage() {
   // so it is an open input rather than preset amounts).
   const [gameLimitPicker, setGameLimitPicker] = useState(false);
   const [gameLimitTarget, setGameLimitTarget] = useState("");
+  // Solo Battle — the room's own, keyed on the room host. Everyone in the room sees the strip;
+  // only the host can start one (the phones gate it the same way).
+  const [soloBattle, setSoloBattle] = useState<SoloBattle | null>(null);
+  const [soloStandingsOpen, setSoloStandingsOpen] = useState(false);
   const onBattleCompleted = useCallback((b: BattleData) => {
     if (user && (b.player_one_user_id === user.id || b.player_two_user_id === user.id)) setBattleResult(b);
     else setToast(b.winner_user_id ? "Battle over!" : "Battle over — it's a tie!");
@@ -150,6 +156,27 @@ export function LiveViewerPage() {
   }, [two, twoSecs, iAmIn2v2]);
 
   // Tap games: the host activates one from the phone (or later, here); everyone gets a Play button.
+  async function startSolo() {
+    if (role !== "host" || !user) { setToast("Only the host can start a Solo Battle."); return; }
+    try {
+      const b = await startSoloBattle(user.id);
+      setSoloBattle(b);
+      setToast("Solo Battle started — viewers have a couple of minutes to join.");
+    } catch (e) {
+      setToast((e as Error).message);
+    }
+  }
+
+  // A Solo Battle belongs to the room's host, so everyone here polls the same one.
+  useEffect(() => {
+    if (!hostUserId || roomClosed) return;
+    let alive = true;
+    const tick = () => fetchActiveSoloBattle(hostUserId, user?.id).then((b) => { if (alive) setSoloBattle(b); }).catch(() => undefined);
+    tick();
+    const t = setInterval(tick, 8000);
+    return () => { alive = false; clearInterval(t); };
+  }, [hostUserId, user?.id, roomClosed]);
+
   const [activeGame, setActiveGame] = useState<TapGameType | null>(null);
   const [gameOpen, setGameOpen] = useState(false);
   const [gamesMenuOpen, setGamesMenuOpen] = useState(false);
@@ -460,6 +487,15 @@ export function LiveViewerPage() {
             </div>
           )}
 
+          {soloBattle && (
+            <SoloBattleStrip
+              battle={soloBattle}
+              myUserId={user?.id ?? null}
+              onOpenStandings={() => setSoloStandingsOpen(true)}
+              onToast={setToast}
+              onJoined={() => { if (hostUserId) fetchActiveSoloBattle(hostUserId, user?.id).then(setSoloBattle).catch(() => undefined); }}
+            />
+          )}
           {activeGame && (
             <div className="card row" style={{ marginTop: 12, padding: "10px 12px" }}>
               <div style={{ flex: 1 }}>
@@ -519,6 +555,9 @@ export function LiveViewerPage() {
           </form>
         </div>
       </div>
+      {soloStandingsOpen && soloBattle && (
+        <SoloBattleStandingsSheet battle={soloBattle} myUserId={user?.id ?? null} onClose={() => setSoloStandingsOpen(false)} />
+      )}
       {gamesMenuOpen && user && (
         <HostGamesMenu
           userId={user.id}
@@ -537,6 +576,7 @@ export function LiveViewerPage() {
           setMenuOpen(false);
           if (k === "1v1") setBattlePicker(true);
           else if (k === "gameLimit") setGameLimitPicker(true);
+          else if (k === "solo") startSolo();
           else setPicker(k);
         }} />
       )}

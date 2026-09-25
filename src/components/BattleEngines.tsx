@@ -22,7 +22,7 @@ export function Overlay({ title, children, onClose, width = 440 }: { title: stri
   );
 }
 
-export type BattleKind = "1v1" | "gameLimit" | "virtual" | "series" | "2v2" | "marathon" | "555";
+export type BattleKind = "1v1" | "gameLimit" | "virtual" | "series" | "2v2" | "marathon" | "555" | "solo";
 
 /** Order, numbering and the (i) wording are Android's showBattleMenu, verbatim — the phones
  *  read #1..#9 and web should say the same thing about the same battle. `built: false` is a
@@ -46,6 +46,10 @@ export const BATTLE_KINDS: {
     info: "Race to 100,000 points against up to 4 players — no time limit at all. Play as much or as little as you want and pick it back up anytime; the battle stays open until someone reaches 100,000. Everyone gets paid for whatever they've earned, even if all players agree to cancel it before it's won." },
   { kind: "2v2", number: "#8", title: "2v2 Battle", blurb: "Two teams of two · 5 minutes", minPeople: 4,
     info: "2 hosts team up against 2 other hosts, all 4 in this same live room. Pick a teammate, then 2 opponents — a 5-minute countdown starts once everyone accepts, and whichever TEAM'S combined gifts are highest when time runs out wins." },
+  // Solo Battle needs nobody else on screen — the room's viewers are the entrants, so
+  // minPeople is 1. Starting one is host-only, gated at the call site like the phones do.
+  { kind: "solo", number: "#9", title: "Solo Battle", blurb: "Anyone watching can join and compete", minPeople: 1,
+    info: "Start one instantly, no admin needed. Everyone watching gets 2 minutes to go live and join — whoever's received the most gifts when it ends wins. Tap any name on the leaderboard to jump straight to their live." },
 ];
 
 /** Step 1 of the Battle button: which kind of battle. Numbered and with an (i) per row,
