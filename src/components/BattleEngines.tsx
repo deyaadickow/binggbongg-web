@@ -22,18 +22,47 @@ export function Overlay({ title, children, onClose, width = 440 }: { title: stri
   );
 }
 
-export type BattleKind = "1v1" | "series" | "2v2" | "marathon" | "555";
+export type BattleKind = "1v1" | "gameLimit" | "virtual" | "series" | "2v2" | "marathon" | "555";
 
-export const BATTLE_KINDS: { kind: BattleKind; title: string; blurb: string; minPeople: number }[] = [
-  { kind: "1v1", title: "Bingg Bongg Battle", blurb: "1v1 · 5 minutes · most coins wins", minPeople: 2 },
-  { kind: "series", title: "Best Out Of", blurb: "Best of 3 to 11 · 5-minute rounds", minPeople: 2 },
-  { kind: "2v2", title: "2v2 Battle", blurb: "Two teams of two · 5 minutes", minPeople: 4 },
-  { kind: "marathon", title: "No Time Limit", blurb: "First to 100,000 coins wins", minPeople: 2 },
-  { kind: "555", title: "5-5-5", blurb: "5 games · 5 minutes · 5,000 coins", minPeople: 2 },
+/** Order, numbering and the (i) wording are Android's showBattleMenu, verbatim — the phones
+ *  read #1..#9 and web should say the same thing about the same battle. `built: false` is a
+ *  type that exists on the phones but has no web engine yet; it stays visible with its
+ *  explanation rather than silently missing, and says so on tap. */
+export const BATTLE_KINDS: {
+  kind: BattleKind; title: string; blurb: string; minPeople: number;
+  number: string; info: string; built?: boolean;
+}[] = [
+  { kind: "1v1", number: "#1", title: "Bingg Bongg Battle", blurb: "1v1 · 5 minutes · most coins wins", minPeople: 2,
+    info: "Challenge another live streamer to a real-time, gift-scored battle. A 5-minute countdown starts the moment both sides accept — whoever's received the most gifts when time runs out wins." },
+  { kind: "gameLimit", number: "#2", title: "Game Limit", blurb: "1v1 · first to your coin target", minPeople: 2,
+    info: "Same as Bingg Bongg Battle, but you and your opponent agree on a custom coin target before starting. First to reach it wins instantly — if neither gets there in 5 minutes, whoever has the most coins wins." },
+  { kind: "virtual", number: "#3", title: "Virtual Battle", blurb: "Battle someone who isn't live", minPeople: 2, built: false,
+    info: "Challenge any member to a battle even if neither of you is live right now. Your followers get notified so they can jump in and gift — every gift is logged with the sender's name so you know exactly who to thank." },
+  { kind: "series", number: "#4", title: "Best Out Of", blurb: "Best of 3 to 11 · 5-minute rounds", minPeople: 2,
+    info: "A best-of series (3, 5, 7, 9, or 11 rounds), with up to 4 players in the battle. Each round is its own Bingg Bongg Battle — whoever wins the majority of rounds wins the series." },
+  { kind: "555", number: "#6", title: "5-5-5", blurb: "5 games · 5 minutes · 5,000 coins", minPeople: 2,
+    info: "Race to finish 5 games first, against up to 3 other players. Each game: first to 5000 coins wins, on your own 5-minute clock — you can start your next game the moment you finish one, even if others are still on theirs. Whoever completes all 5 games first wins the whole battle." },
+  { kind: "marathon", number: "#7", title: "No Time Limit", blurb: "First to 100,000 coins wins", minPeople: 2,
+    info: "Race to 100,000 points against up to 4 players — no time limit at all. Play as much or as little as you want and pick it back up anytime; the battle stays open until someone reaches 100,000. Everyone gets paid for whatever they've earned, even if all players agree to cancel it before it's won." },
+  { kind: "2v2", number: "#8", title: "2v2 Battle", blurb: "Two teams of two · 5 minutes", minPeople: 4,
+    info: "2 hosts team up against 2 other hosts, all 4 in this same live room. Pick a teammate, then 2 opponents — a 5-minute countdown starts once everyone accepts, and whichever TEAM'S combined gifts are highest when time runs out wins." },
 ];
 
-/** Step 1 of the Battle button: which kind of battle. */
+/** Step 1 of the Battle button: which kind of battle. Numbered and with an (i) per row,
+ *  matching the phones (Steve, 2026-09-08: "Please add the (i) for information for every
+ *  game" — the same treatment the Battle menu carries there). */
 export function BattleMenu({ peopleOnScreen, onPick, onClose, onNotice }: { peopleOnScreen: number; onPick: (k: BattleKind) => void; onClose: () => void; onNotice: (msg: string) => void }) {
+  const [info, setInfo] = useState<(typeof BATTLE_KINDS)[number] | null>(null);
+
+  if (info) {
+    return (
+      <Overlay title={info.title} onClose={() => setInfo(null)} width={560}>
+        <p className="soft" style={{ marginTop: 0, whiteSpace: "pre-line" }}>{info.info}</p>
+        <button className="btn ghost block" onClick={() => setInfo(null)}>Back</button>
+      </Overlay>
+    );
+  }
+
   return (
     <Overlay title="⚔️ Start a battle" onClose={onClose} width={560}>
       {peopleOnScreen < 2 && <p className="muted" style={{ fontSize: 13, marginTop: 0 }}>You're the only one on screen. Accept a viewer's "Ask to join" request first — battles are between the people streaming together.</p>}
@@ -43,11 +72,19 @@ export function BattleMenu({ peopleOnScreen, onPick, onClose, onNotice }: { peop
         // ("it has 2 lines"). Every kind stays full brightness; each row is the title plus ONE
         // line — the description, or, when it can't start yet, why (repeated as a toast on tap).
         return (
-          <button key={k.kind} className="btn block battle-kind" onClick={() => (ok ? onPick(k.kind) : onNotice(`${k.title} needs ${k.minPeople} people on screen — you have ${peopleOnScreen}.`))}>
-            <span className="kind-title">{k.title}</span>
-            <span className="kind-blurb muted">{k.blurb}</span>
-            {ok ? <span className="kind-go">›</span> : <span className="kind-need">Needs {k.minPeople} people</span>}
-          </button>
+          <div key={k.kind} className="battle-row">
+            <button className="btn block battle-kind"
+              onClick={() => {
+                if (k.built === false) { onNotice(`${k.title} is coming soon.`); return; }
+                if (!ok) { onNotice(`${k.title} needs ${k.minPeople} people on screen — you have ${peopleOnScreen}.`); return; }
+                onPick(k.kind);
+              }}>
+              <span className="kind-title">{k.number} {k.title}</span>
+              <span className="kind-blurb muted">{k.blurb}</span>
+              {ok && k.built !== false ? <span className="kind-go">›</span> : <span className="kind-need">{k.built === false ? "Coming soon" : `Needs ${k.minPeople} people`}</span>}
+            </button>
+            <button className="btn ghost battle-info" title={`About ${k.title}`} onClick={() => setInfo(k)}>i</button>
+          </div>
         );
       })}
     </Overlay>

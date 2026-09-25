@@ -214,3 +214,12 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .terms-content img { max-width: 100%; height: auto; }
 .terms-content table { display: block; overflow-x: auto; border-collapse: collapse; max-width: 100%; }
 .terms-content td, .terms-content th { border: 1px solid var(--gold-border); padding: 6px 8px; }
+
+/* Battle menu rows: the (i) sits beside the row, so the row itself has to be allowed to
+   shrink or its trailing pill ("Coming soon" / "Needs N people") gets clipped on a phone. */
+.battle-row { display: flex; align-items: stretch; gap: 8px; margin-bottom: 8px; }
+.battle-row .battle-kind { flex: 1 1 auto; min-width: 0; margin-bottom: 0; }
+.battle-row .battle-info { flex: 0 0 auto; width: 42px; padding: 0; margin-bottom: 0; font-weight: 800; font-style: italic; }
+@media (max-width: 520px) {
+  .battle-kind .kind-title { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+}

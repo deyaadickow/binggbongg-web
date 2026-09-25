@@ -55,6 +55,11 @@ export function LiveViewerPage() {
   // Bingg Bongg Battle (1v1). Result overlay for the two battlers, a toast for everyone else.
   const [battleResult, setBattleResult] = useState<BattleData | null>(null);
   const [battlePicker, setBattlePicker] = useState(false);
+  // "Game Limit" — the same 1v1 engine and invite, plus a coin target chosen first
+  // (Steve, 2026-09-01: "give them the option of adding as many coins as they want",
+  // so it is an open input rather than preset amounts).
+  const [gameLimitPicker, setGameLimitPicker] = useState(false);
+  const [gameLimitTarget, setGameLimitTarget] = useState("");
   const onBattleCompleted = useCallback((b: BattleData) => {
     if (user && (b.player_one_user_id === user.id || b.player_two_user_id === user.id)) setBattleResult(b);
     else setToast(b.winner_user_id ? "Battle over!" : "Battle over — it's a tie!");
@@ -530,7 +535,9 @@ export function LiveViewerPage() {
       {menuOpen && (
         <BattleMenu peopleOnScreen={broadcasters.length} onClose={() => setMenuOpen(false)} onNotice={setToast} onPick={(k) => {
           setMenuOpen(false);
-          if (k === "1v1") setBattlePicker(true); else setPicker(k);
+          if (k === "1v1") setBattlePicker(true);
+          else if (k === "gameLimit") setGameLimitPicker(true);
+          else setPicker(k);
         }} />
       )}
       {picker === "series" && myId && (
@@ -590,6 +597,25 @@ export function LiveViewerPage() {
             }}>{displayName(b as Partial<UserSummary>)}</button>
           ))}
           <p className="muted" style={{ fontSize: 12 }}>5-minute battle. Whoever receives more gift coins when time runs out wins.</p>
+        </Overlay>
+      )}
+      {gameLimitPicker && (
+        <Overlay title="Game Limit — who do you challenge?" onClose={() => { setGameLimitPicker(false); setGameLimitTarget(""); }}>
+          <label className="soft" style={{ fontSize: 13 }}>Coins to win</label>
+          <input className="input" inputMode="numeric" value={gameLimitTarget} placeholder="e.g. 5000"
+            onChange={(e) => setGameLimitTarget(e.target.value.replace(/[^0-9]/g, ""))}
+            style={{ width: "100%", marginBottom: 12 }} />
+          {broadcasters.filter((b) => b.user_id !== user?.id).map((b) => (
+            <button key={b.user_id} className="btn block" style={{ marginBottom: 8 }} onClick={async () => {
+              const target = Number(gameLimitTarget);
+              if (!target || target <= 0) { setToast("Enter how many coins wins it."); return; }
+              setGameLimitPicker(false);
+              setGameLimitTarget("");
+              try { await battle.inviteOpponent(b.user_id, target); setToast(`Game Limit invite sent to ${displayName(b as Partial<UserSummary>)} — first to ${target.toLocaleString()} coins.`); }
+              catch (e) { setToast((e as Error).message); }
+            }}>{displayName(b as Partial<UserSummary>)}</button>
+          ))}
+          <p className="muted" style={{ fontSize: 12 }}>First to your coin target wins instantly. If neither of you gets there in 5 minutes, whoever has the most coins wins.</p>
         </Overlay>
       )}
       {battle.invite && (
