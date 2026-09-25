@@ -646,6 +646,10 @@ export function ContactUsPage() {
   return <LegalPage title="Contact Us" endpoint="fetchContactUs" />;
 }
 
+export function AboutUsPage() {
+  return <LegalPage title="About Us" endpoint="fetchAboutUs" />;
+}
+
 // ---- Delete account -------------------------------------------------------------------------
 export function DeleteAccountPage() {
   const { user, isLoggedIn, signOut } = useSession();
