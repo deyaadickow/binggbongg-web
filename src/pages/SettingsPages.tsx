@@ -650,6 +650,10 @@ export function AboutUsPage() {
   return <LegalPage title="About Us" endpoint="fetchAboutUs" />;
 }
 
+export function FaqPage() {
+  return <LegalPage title="FAQ" endpoint="fetchFaq" />;
+}
+
 // ---- Delete account -------------------------------------------------------------------------
 export function DeleteAccountPage() {
   const { user, isLoggedIn, signOut } = useSession();
