@@ -77,3 +77,44 @@ export function gameTitle(g: TapGameType): string {
   const base = g.display_name || g.name || "Tap game";
   return g.emoji ? `${g.emoji} ${base}` : base;
 }
+
+// ---- Host side: choosing which game runs in the room -----------------------------------------
+// Mirrors the phones' (G) games menu. The server is authoritative once a game is activated —
+// it reads duration and coin value off the live row, not off each player's start request.
+
+export const GAME_DURATIONS = [60, 120, 180, 240, 300] as const;
+export const GAME_COIN_VALUES = [1, 2, 3, 4, 5] as const;
+
+/** Game modes with no length to pick: a puzzle has no clock, a race ends at the finish line. */
+export function needsDuration(g: TapGameType): boolean {
+  return !["puzzle", "race"].includes(g.game_mode ?? "");
+}
+
+/** Only catch/pop games score per object, so only they take a host-chosen coin value. */
+export function needsCoinValue(g: TapGameType): boolean {
+  return ["catch", "falling_lanes"].includes(g.game_mode ?? "");
+}
+
+export async function fetchTapGameTypes(): Promise<TapGameType[]> {
+  const res = await post<TapGameType[]>("fetchActiveTapGameTypes");
+  return res.status ? (res.data ?? []) : [];
+}
+
+export async function setActiveTapGame(
+  userId: number,
+  roomName: string,
+  game: TapGameType,
+  opts: { durationSeconds?: number; coinValue?: number } = {},
+): Promise<void> {
+  const params: Record<string, unknown> = { user_id: userId, room_name: roomName, tap_game_type_id: game.id };
+  if (needsDuration(game)) params.duration_seconds = opts.durationSeconds ?? 120;
+  if (needsCoinValue(game)) params.coin_value = opts.coinValue ?? 1;
+  const res = await post("setActiveTapGameForRoom", params);
+  if (!res.status) throw new Error(res.message ?? "Couldn't start that game.");
+}
+
+/** Sending no game id is how the server turns the room's game off. */
+export async function clearActiveTapGame(userId: number, roomName: string): Promise<void> {
+  const res = await post("setActiveTapGameForRoom", { user_id: userId, room_name: roomName });
+  if (!res.status) throw new Error(res.message ?? "Couldn't turn the game off.");
+}

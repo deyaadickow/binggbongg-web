@@ -9,6 +9,7 @@ import { FIVE_FIVE_FIVE, MARATHON, SERIES, TWO_V_TWO, cancel555, createSeries, f
 import { B555Strip, BattleMenu, InviteCard, MarathonStrip, MultiPicker, Overlay, ResultOverlay, SeriesStrip, TwoVTwoPicker, TwoVTwoStrip, describe2v2Invite, personName, resultTitle, type BattleKind } from "../components/BattleEngines";
 import { fetchActiveTapGame, gameTitle, type TapGameType } from "../lib/tapgame";
 import { TapGameOverlay } from "../components/TapGameOverlay";
+import { HostGamesMenu } from "../components/HostGamesMenu";
 import { Avatar, Notice } from "../components/Common";
 
 interface Member { user_id: number; fullname?: string; username?: string; profile_image?: string; country?: string }
@@ -146,6 +147,7 @@ export function LiveViewerPage() {
   // Tap games: the host activates one from the phone (or later, here); everyone gets a Play button.
   const [activeGame, setActiveGame] = useState<TapGameType | null>(null);
   const [gameOpen, setGameOpen] = useState(false);
+  const [gamesMenuOpen, setGamesMenuOpen] = useState(false);
   useEffect(() => {
     if (!isLoggedIn || roomClosed) return;
     let alive = true;
@@ -420,6 +422,11 @@ export function LiveViewerPage() {
               {!anyBattleOpen && (
                 <button className="btn small" onClick={() => setMenuOpen(true)}>⚔️ Battle</button>
               )}
+              {/* The phones' (G) menu — anyone broadcasting in the room can set its game,
+                  which is what setActiveTapGameForRoom itself allows. */}
+              <button className={`btn small${activeGame ? "" : " ghost"}`} onClick={() => setGamesMenuOpen(true)}>
+                🎮 Games
+              </button>
               {role === "host" && (
                 <button
                   className={`btn small${voiceThanksGift ? "" : " ghost"}`}
@@ -507,6 +514,16 @@ export function LiveViewerPage() {
           </form>
         </div>
       </div>
+      {gamesMenuOpen && user && (
+        <HostGamesMenu
+          userId={user.id}
+          roomName={roomName}
+          activeGame={activeGame}
+          onClose={() => setGamesMenuOpen(false)}
+          onChanged={() => fetchActiveTapGame(roomName).then(setActiveGame).catch(() => undefined)}
+          onToast={setToast}
+        />
+      )}
       {gameOpen && activeGame && (
         <TapGameOverlay game={activeGame} roomName={roomName} onClose={() => setGameOpen(false)} onToast={setToast} />
       )}
