@@ -251,6 +251,7 @@ export function ProfilePage() {
   const [photoCount, setPhotoCount] = useState<number | null>(null);
   const [viewingPhoto, setViewingPhoto] = useState<Photo | null>(null);
   const [tabLoading, setTabLoading] = useState(false);
+  const [tabError, setTabError] = useState<string | null>(null);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [showBattleBoard, setShowBattleBoard] = useState(false);
   const [showCreatePlaylist, setShowCreatePlaylist] = useState(false);
@@ -336,23 +337,44 @@ export function ProfilePage() {
     };
 
     const [endpoint, params] = endpointMap[tab];
+    // Start every tab from empty: a failed fetch used to leave the PREVIOUS tab's list on
+    // screen under the new tab's name (Steve's 2026-09-26 screenshots had Likes showing
+    // Reposted's four videos).
+    setTabUsers([]);
+    setTabVideos([]);
+    setTabError(null);
     post(endpoint, params)
       .then((r) => {
         const items = (r.data ?? r.list ?? []) as Record<string, unknown>[];
         if (USER_TABS.includes(tab)) {
           // These three come back as tbl_followers ROWS with the member nested inside, not as
-          // a flat member list: following -> toUser, followers -> fromUser, friends -> toUser.
-          // Casting the row straight to UserSummary gave cards with no name and no avatar,
-          // because every field the card reads lives one level down.
-          const nested = tab === "followers" ? "fromUser" : "toUser";
-          setTabUsers(items.map((row) => (row[nested] ?? row) as UserSummary).filter(Boolean));
+          // a flat member list. Laravel serialises the relation names in snake_case —
+          // `to_user` / `from_user`, NOT the `toUser` / `fromUser` the controller code reads —
+          // which is why every one of these tabs said "No members yet." on 2026-09-26 while
+          // the API was returning 30 rows. Following -> to_user, Followers -> from_user.
+          // Friends rows carry BOTH (a self-join on tbl_followers whose duplicate column names
+          // make "which side is the friend" depend on MySQL's column order), so for that tab
+          // the friend is simply whichever nested member is not the profile's owner.
+          const pick = (row: Record<string, unknown>): UserSummary | null => {
+            const to = (row.to_user ?? row.toUser) as UserSummary | undefined;
+            const from = (row.from_user ?? row.fromUser) as UserSummary | undefined;
+            if (tab === "following") return to ?? null;
+            if (tab === "followers") return from ?? null;
+            return [from, to].find((u) => u && u.id !== profileId) ?? null;
+          };
+          setTabUsers(items.map(pick).filter((u): u is UserSummary => !!u));
         } else {
           // Reposted and Likes are join rows carrying the post under `post`; Videos/Saved/History
           // are already posts. `?? row` keeps both shapes working through one path.
           setTabVideos(items.map((row) => (row.post ?? row) as ProfilePost).filter(Boolean));
         }
       })
-      .catch(() => {})
+      .catch((e: unknown) => {
+        // Friends and Reposted are members-only on the server (authorizeUser); signed out they
+        // answer 401. Say so instead of pretending the member has none.
+        const status = (e as { status?: number })?.status;
+        setTabError(status === 401 && !me ? "Sign in to see this." : "Couldn't load this tab.");
+      })
       .finally(() => setTabLoading(false));
   }, [tab, profile]);
 
@@ -602,6 +624,8 @@ export function ProfilePage() {
       <div style={{ marginTop: 4 }}>
         {tabLoading ? (
           <div style={{ padding: "32px 0" }}><Loading /></div>
+        ) : tabError ? (
+          <p className="muted" style={{ padding: "24px 0", textAlign: "center" }}>{tabError}</p>
         ) : tab === "photos" ? (
           tabPhotos.length === 0 ? (
             <p className="muted" style={{ padding: "24px 0", textAlign: "center" }}>
