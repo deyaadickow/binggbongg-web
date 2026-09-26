@@ -54,8 +54,13 @@ export function LoginPage() {
         fullname: name,
         identity: email,
         email,
+        // A browser has no FCM registration, so it must not look like one: the backend keeps
+        // ONE shared push token per member, and a web sign-in that claimed to be a device used
+        // to overwrite the phone's real token — silently unregistering their phone from
+        // notifications. "web" is the agreed marker the backend checks for (the empty string
+        // works too); device_type 3 = web, where 1/2 are android/ios.
         device_token: "web",
-        device_type: 1,
+        device_type: 3,
         login_type: 1,
         username: email.split("@")[0],
         provider_token: credential,
