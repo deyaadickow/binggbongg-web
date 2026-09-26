@@ -162,3 +162,17 @@ export async function fetchRandomFeedPhoto(myUserId: number): Promise<FeedPhoto 
   const res = await post<FeedPhoto>("fetchRandomFeedPhoto", { my_user_id: myUserId }).catch(() => null);
   return res?.status ? (res.data ?? null) : null;
 }
+
+/**
+ * One member's album, viewed by someone else. Needs its own endpoint because fetchFolderPhotos'
+ * my_user_id is always rebound to the caller — see the backend's fetchUserPhotos doc comment.
+ * Comes back empty for a member the directory wouldn't list, by the same eligibility rule.
+ */
+export async function fetchUserPhotos(myUserId: number, userId: number): Promise<{ user: DirectoryEntry | null; photos: Photo[] }> {
+  const res = await post<{ user?: DirectoryEntry; photos?: Photo[] }>("fetchUserPhotos", {
+    my_user_id: myUserId,
+    user_id: userId,
+  });
+  if (!res.status) throw new Error(res.message ?? "Couldn't open that album.");
+  return { user: res.data?.user ?? null, photos: res.data?.photos ?? [] };
+}

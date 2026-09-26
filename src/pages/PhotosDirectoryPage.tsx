@@ -1,10 +1,9 @@
 // The Photos directory: one tile per member who has photos, showing their most recent one.
 //
-// Tapping a tile opens that member's PROFILE, not their photo album. Steve's original intent was
-// the album ("when they click on any photo they will be linked to that member's photo album"),
-// but there is no endpoint for it on any platform: fetchFolderPhotos takes my_user_id, and the
-// AuthorizeUser middleware rewrites that to the caller on every request, so it can only ever
-// return your own photos. Opening someone else's album needs a new backend endpoint.
+// Tapping a tile opens that member's album (Steve, 2026-09-17: "when they click on any photo
+// they will be linked to that member's photo album"). That needed a new backend endpoint,
+// fetchUserPhotos — fetchFolderPhotos could never serve it, because AuthorizeUser rebinds its
+// my_user_id to the caller on every request.
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { mediaUrl } from "../lib/api";
@@ -42,7 +41,7 @@ export function PhotosDirectoryPage() {
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 10 }}>
           {rows.map((r) => (
-            <Link key={r.user_id} to={`/profile/${r.user_id}`}
+            <Link key={r.user_id} to={`/photos/${r.user_id}`}
               style={{ display: "block", border: "1px solid var(--line)", borderRadius: 12, overflow: "hidden", background: "var(--panel)" }}>
               <div style={{ aspectRatio: "1", background: "#000" }}>
                 {r.preview_thumb && (
