@@ -17,7 +17,18 @@ interface BreakdownData { supporter: UserSummary; period: Period; total_coins: n
 type Period = "day" | "month" | "year";
 
 const n = (v: number | undefined) => Number(v ?? 0).toLocaleString();
-const plural = (count: number, word: string) => `${n(count)} ${word}${count === 1 ? "" : "s"}`;
+
+// Steve, 2026-09-26: "Put the gifts in the middle of the page, large in gold." Every row (the
+// supporters list, the breakdown header and each day/month/year line) carries the gift count as
+// a big gold figure in its middle column.
+function GiftCount({ count }: { count: number | undefined }) {
+  return (
+    <div style={{ textAlign: "center", minWidth: 72 }}>
+      <div style={{ fontWeight: 900, fontSize: 26, lineHeight: 1, color: "var(--gold)" }}>{n(count)}</div>
+      <div className="muted" style={{ fontSize: 11, marginTop: 2 }}>{(count ?? 0) === 1 ? "gift" : "gifts"}</div>
+    </div>
+  );
+}
 
 function NeedLogin() {
   return <div className="page"><Notice>Sign in to see who supported you. <Link to="/login">Sign in</Link></Notice></div>;
@@ -62,9 +73,10 @@ export function SupportersPage() {
                   <Avatar user={s.user} />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontWeight: 800, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayName(s.user)}</div>
-                    <div className="muted" style={{ fontSize: 13 }}>@{s.user.username ?? ""} · {plural(s.gift_count, "gift")}</div>
+                    <div className="muted" style={{ fontSize: 13 }}>@{s.user.username ?? ""}</div>
                   </div>
-                  <div style={{ textAlign: "right", flexShrink: 0 }}>
+                  <GiftCount count={s.gift_count} />
+                  <div style={{ textAlign: "right", flexShrink: 0, minWidth: 72 }}>
                     <div style={{ fontWeight: 800 }}>{n(s.total_coins)}</div>
                     <div className="muted" style={{ fontSize: 12 }}>coins</div>
                   </div>
@@ -109,9 +121,10 @@ export function SupporterBreakdownPage() {
           <Link to={`/profile/${data.supporter.id}`}><Avatar user={data.supporter} size="lg" /></Link>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontWeight: 800, fontSize: 18 }}>{displayName(data.supporter)}</div>
-            <div className="muted" style={{ fontSize: 13 }}>@{data.supporter.username ?? ""} · {plural(data.gift_count, "gift")}</div>
+            <div className="muted" style={{ fontSize: 13 }}>@{data.supporter.username ?? ""}</div>
           </div>
-          <div style={{ textAlign: "right" }}>
+          <GiftCount count={data.gift_count} />
+          <div style={{ textAlign: "right", minWidth: 72 }}>
             <div style={{ fontWeight: 800, fontSize: 20 }}>{n(data.total_coins)}</div>
             <div className="muted" style={{ fontSize: 12 }}>total coins</div>
           </div>
@@ -135,8 +148,8 @@ export function SupporterBreakdownPage() {
             {data.rows.map((r) => (
               <div key={r.period} className="card row" style={{ padding: "10px 14px" }}>
                 <div style={{ flex: 1, fontWeight: 700 }}>{r.label}</div>
-                <div className="muted" style={{ fontSize: 13, marginRight: 16 }}>{plural(r.gift_count, "gift")}</div>
-                <div style={{ fontWeight: 800, minWidth: 80, textAlign: "right" }}>{n(r.total_coins)} coins</div>
+                <GiftCount count={r.gift_count} />
+                <div style={{ flex: 1, fontWeight: 800, textAlign: "right" }}>{n(r.total_coins)} coins</div>
               </div>
             ))}
           </div>
