@@ -32,6 +32,38 @@ function GiftCount({ count }: { count: number | undefined }) {
   );
 }
 
+// Steve, 2026-09-26: "Please separate the gifters by date, put date between them in the middle,
+// latest date on top." Grouped by the day of each member's LATEST gift (last_gift_at, server
+// time), newest day first; within a day the bigger total comes first.
+interface DayGroup { key: string; label: string; supporters: Supporter[] }
+function groupByLastGift(list: Supporter[]): DayGroup[] {
+  const sorted = [...list].sort((a, b) =>
+    (b.last_gift_at ?? "").localeCompare(a.last_gift_at ?? "") || b.total_coins - a.total_coins);
+  const groups: DayGroup[] = [];
+  for (const s of sorted) {
+    const key = (s.last_gift_at ?? "").slice(0, 10) || "unknown";
+    let g = groups[groups.length - 1];
+    if (!g || g.key !== key) {
+      const d = new Date(`${key}T00:00:00`);
+      const label = isNaN(d.getTime()) ? "Earlier" : d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+      g = { key, label, supporters: [] };
+      groups.push(g);
+    }
+    g.supporters.push(s);
+  }
+  return groups;
+}
+
+function DateDivider({ label }: { label: string }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "6px 0 2px" }}>
+      <div style={{ flex: 1, height: 1, background: "var(--gold-border)" }} />
+      <div style={{ fontWeight: 800, fontSize: 13, color: "var(--gold)", letterSpacing: "0.03em" }}>{label}</div>
+      <div style={{ flex: 1, height: 1, background: "var(--gold-border)" }} />
+    </div>
+  );
+}
+
 function NeedLogin() {
   return <div className="page"><Notice>Sign in to see who supported you. <Link to="/login">Sign in</Link></Notice></div>;
 }
@@ -70,7 +102,9 @@ export function SupportersPage() {
             <p className="muted" style={{ padding: "24px 0", textAlign: "center" }}>No one has sent you a gift yet.</p>
           ) : (
             <div style={{ display: "grid", gap: 8 }}>
-              {data.supporters.map((s) => (
+              {groupByLastGift(data.supporters).map((g) => [
+                <DateDivider key={`d-${g.key}`} label={g.label} />,
+                ...g.supporters.map((s) => (
                 <Link key={s.user.id} to={`/support/${s.user.id}`} className="card row" style={{ padding: 10, color: "inherit" }}>
                   <Avatar user={s.user} />
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -83,7 +117,8 @@ export function SupportersPage() {
                     <div className="muted" style={{ fontSize: 12 }}>coins</div>
                   </div>
                 </Link>
-              ))}
+                )),
+              ])}
             </div>
           )}
         </>
