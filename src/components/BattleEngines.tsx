@@ -22,7 +22,15 @@ export function Overlay({ title, children, onClose, width = 440 }: { title: stri
   );
 }
 
-export type BattleKind = "1v1" | "gameLimit" | "virtual" | "series" | "2v2" | "marathon" | "555" | "solo";
+export type BattleKind =
+  | "1v1" | "gameLimit" | "virtual" | "series" | "2v2" | "marathon" | "555" | "solo"
+  // Android numbers this one #5 and it belongs between Best Out Of and 5-5-5. It isn't a battle
+  // you start against someone in the room — it's a personal 31-day streak you opt into — so it
+  // needs no people on screen.
+  | "challenge31"
+  // The trailing unnumbered rows. Android calls them reference rows: they open a screen or an
+  // explanation rather than starting anything.
+  | "pkContests" | "gamesExplained" | "lifetimeBoard" | "punishments";
 
 /** Order, numbering and the (i) wording are Android's showBattleMenu, verbatim — the phones
  *  read #1..#9 and web should say the same thing about the same battle. `built: false` is a
@@ -30,7 +38,10 @@ export type BattleKind = "1v1" | "gameLimit" | "virtual" | "series" | "2v2" | "m
  *  explanation rather than silently missing, and says so on tap. */
 export const BATTLE_KINDS: {
   kind: BattleKind; title: string; blurb: string; minPeople: number;
-  number: string; info: string; built?: boolean;
+  /** Absent on the reference rows — the phones leave those unnumbered too. */
+  number?: string; info: string; built?: boolean;
+  /** Opens a screen or an explanation instead of starting a battle: never people-gated. */
+  reference?: boolean;
 }[] = [
   { kind: "1v1", number: "#1", title: "Bingg Bongg Battle", blurb: "1v1 · 5 minutes · most coins wins", minPeople: 2,
     info: "Challenge another live streamer to a real-time, gift-scored battle. A 5-minute countdown starts the moment both sides accept — whoever's received the most gifts when time runs out wins." },
@@ -40,6 +51,8 @@ export const BATTLE_KINDS: {
     info: "Challenge any member to a battle even if neither of you is live right now. Your followers get notified so they can jump in and gift — every gift is logged with the sender's name so you know exactly who to thank." },
   { kind: "series", number: "#4", title: "Best Out Of", blurb: "Best of 3 to 11 · 5-minute rounds", minPeople: 2,
     info: "A best-of series (3, 5, 7, 9, or 11 rounds), with up to 4 players in the battle. Each round is its own Bingg Bongg Battle — whoever wins the majority of rounds wins the series." },
+  { kind: "challenge31", number: "#5", title: "31 Day Battle Challenge", blurb: "Battle daily for 31 days · up to 15% bonus", minPeople: 1, reference: true,
+    info: "A personal 31-day streak, starting whenever you opt in. Battle at least once a day to keep your streak alive — hit 1, 2, or 3+ qualifying battles a day for a 5%, 10%, or 15% bonus on everything you earn that month. Miss a day and the streak restarts." },
   { kind: "555", number: "#6", title: "5-5-5", blurb: "5 games · 5 minutes · 5,000 coins", minPeople: 2,
     info: "Race to finish 5 games first, against up to 3 other players. Each game: first to 5000 coins wins, on your own 5-minute clock — you can start your next game the moment you finish one, even if others are still on theirs. Whoever completes all 5 games first wins the whole battle." },
   { kind: "marathon", number: "#7", title: "No Time Limit", blurb: "First to 100,000 coins wins", minPeople: 2,
@@ -50,6 +63,16 @@ export const BATTLE_KINDS: {
   // minPeople is 1. Starting one is host-only, gated at the call site like the phones do.
   { kind: "solo", number: "#9", title: "Solo Battle", blurb: "Anyone watching can join and compete", minPeople: 1,
     info: "Start one instantly, no admin needed. Everyone watching gets 2 minutes to go live and join — whoever's received the most gifts when it ends wins. Tap any name on the leaderboard to jump straight to their live." },
+  // Unnumbered from here down, exactly as on the phones: these aren't battles you can start, so
+  // they carry no "#n" and never check how many people are on screen.
+  { kind: "pkContests", title: "PK Battle Contests", blurb: "Admin-run · scored by gift coins", minPeople: 1, reference: true,
+    info: "Admin-run contests, scored by total gift coins received while they're running. Geographic contests pit real member locations against each other (e.g. USA vs Canada); Member contests are a curated list (e.g. \"top 20\"). Free to enter, no charge to battle — whoever's highest when it ends gets lifetime bragging rights." },
+  { kind: "gamesExplained", title: "Games Explained", blurb: "Play games while you battle", minPeople: 1, reference: true,
+    info: "You can play any of our games — Balloon Pop, Fishing, Deer Hunting, and more — anytime, even while you're in a battle. Every member in the room can jump into a game whenever they want, battling or not." },
+  { kind: "lifetimeBoard", title: "Lifetime Battle Board", blurb: "Every contest, all time", minPeople: 1, reference: true,
+    info: "Your full battle history, going back to day one — browse it day by day within a month, or month by month across a year. Tap into your history with any one member to see your total wins, lifetime score, and trash talk with them. Visible on your own profile and everyone else's." },
+  { kind: "punishments", title: "Friendly Punishment Suggestions", blurb: "Agree a forfeit before you start", minPeople: 1, reference: true,
+    info: "Battling just for fun? Agree on a friendly punishment for whoever loses before you start — tap in for a random pick, or browse the full list together. Admin-managed, so the list keeps growing." },
 ];
 
 /** Step 1 of the Battle button: which kind of battle. Numbered and with an (i) per row,
@@ -69,9 +92,11 @@ export function BattleMenu({ peopleOnScreen, onPick, onClose, onNotice }: { peop
 
   return (
     <Overlay title="⚔️ Start a battle" onClose={onClose} width={560}>
-      {peopleOnScreen < 2 && <p className="muted" style={{ fontSize: 13, marginTop: 0 }}>You're the only one on screen. Accept a viewer's "Ask to join" request first — battles are between the people streaming together.</p>}
+      {peopleOnScreen < 2 && <p className="muted" style={{ fontSize: 13, marginTop: 0 }}>You're the only one on screen. Accept a viewer's "Ask to join" request first — battles are between the people streaming together. The rows further down open on their own.</p>}
       {BATTLE_KINDS.map((k) => {
-        const ok = peopleOnScreen >= k.minPeople;
+        // A reference row opens a screen or an explanation, so who's on screen is irrelevant to
+        // it — gating those on headcount would hide the Lifetime Board from anyone alone.
+        const ok = k.reference === true || peopleOnScreen >= k.minPeople;
         // Steve, 2026-09-24: a dimmed box read as broken, and three texts on one row wrapped
         // ("it has 2 lines"). Every kind stays full brightness; each row is the title plus ONE
         // line — the description, or, when it can't start yet, why (repeated as a toast on tap).
@@ -81,11 +106,24 @@ export function BattleMenu({ peopleOnScreen, onPick, onClose, onNotice }: { peop
               onClick={() => {
                 if (k.built === false) { onNotice(`${k.title} is coming soon.`); return; }
                 if (!ok) { onNotice(`${k.title} needs ${k.minPeople} people on screen — you have ${peopleOnScreen}.`); return; }
+                // Games Explained has nothing to select — it IS the explanation — so tapping the
+                // row opens the same popup its (i) does, rather than a dead "coming soon". Same
+                // exception the phones make for this one row.
+                if (k.kind === "gamesExplained") { setInfo(k); return; }
                 onPick(k.kind);
               }}>
-              <span className="kind-title">{k.number} {k.title}</span>
+              <span className="kind-title">{k.number ? `${k.number} ` : ""}{k.title}</span>
               <span className="kind-blurb muted">{k.blurb}</span>
-              {ok && k.built !== false ? <span className="kind-go">›</span> : <span className="kind-need">{k.built === false ? "Coming soon" : `Needs ${k.minPeople} people`}</span>}
+              {ok && k.built !== false ? <span className="kind-go">›</span> : (
+                // Two spellings of the same pill: CSS shows the long one normally and the short
+                // one on a phone. Truncating the TITLE to keep "Needs 2 people" whole gets the
+                // priority backwards — the title is what identifies the row, and the reason is
+                // repeated as a toast on tap anyway.
+                <span className="kind-need">
+                  <span className="need-long">{k.built === false ? "Coming soon" : `Needs ${k.minPeople} people`}</span>
+                  <span className="need-short">{k.built === false ? "Soon" : `${k.minPeople}+`}</span>
+                </span>
+              )}
             </button>
             <button className="btn ghost battle-info" title={`About ${k.title}`} onClick={() => setInfo(k)}>i</button>
           </div>

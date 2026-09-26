@@ -150,6 +150,7 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .battle-kind { justify-content: flex-start; text-align: left; margin-bottom: 8px; white-space: nowrap; overflow: hidden; gap: 12px; }
 .battle-kind .kind-title { font-weight: 800; flex: 0 0 auto; min-width: 140px; }
 .battle-kind .kind-blurb { font-size: 13px; font-weight: 400; flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.battle-kind .kind-need .need-short { display: none; }
 .battle-kind .kind-need { flex: 0 0 auto; font-size: 12px; font-weight: 700; color: var(--gold); border: 1px solid var(--gold-border); border-radius: 999px; padding: 2px 10px; }
 .battle-kind .kind-go { flex: 0 0 auto; font-size: 22px; line-height: 1; color: var(--gold); }
 @media (max-width: 520px) { .battle-kind .kind-title { min-width: 0; } .battle-kind .kind-blurb { display: none; } }
@@ -239,5 +240,13 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .battle-row .battle-kind { flex: 1 1 auto; min-width: 0; margin-bottom: 0; }
 .battle-row .battle-info { flex: 0 0 auto; width: 42px; padding: 0; margin-bottom: 0; font-weight: 800; font-style: italic; }
 @media (max-width: 520px) {
-  .battle-kind .kind-title { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  /* The title must be allowed to SHRINK here, not just be told to ellipsis: with the
+     `flex: 0 0 auto` it carries at full width it keeps its natural size and pushes the
+     "Needs 2 people" pill off the right edge instead of truncating (the ellipsis never
+     applies to a box that never gets squeezed). The longest title + longest pill —
+     "#1 Bingg Bongg Battle" — was the one that overflowed. */
+  .battle-kind .kind-title { flex: 0 1 auto; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  /* ...and the pill gives up its words rather than the title giving up its letters. */
+  .battle-kind .kind-need .need-long { display: none; }
+  .battle-kind .kind-need .need-short { display: inline; }
 }

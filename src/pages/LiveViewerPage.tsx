@@ -7,6 +7,7 @@ import { useLiveRoom, type LiveRole, type LiveTile } from "../lib/live";
 import { activeBoxingWindow, useBattle, type BattleData } from "../lib/battle";
 import { FIVE_FIVE_FIVE, MARATHON, SERIES, TWO_V_TWO, cancel555, createSeries, finalize2v2, finalizeSeriesRound, invite2v2, invite555, inviteMarathon, secondsUntil, useEngine, voteMarathonCancel, type B555Data, type Battle2v2Data, type MarathonData, type SeriesData } from "../lib/battles";
 import { B555Strip, BattleMenu, InviteCard, MarathonStrip, MultiPicker, Overlay, ResultOverlay, SeriesStrip, TwoVTwoPicker, TwoVTwoStrip, describe2v2Invite, personName, resultTitle, type BattleKind } from "../components/BattleEngines";
+import { Challenge31Overlay, LifetimeBoardOverlay, PkContestsOverlay, PunishmentsOverlay } from "../components/BattleReference";
 import { fetchActiveTapGame, gameTitle, type TapGameType } from "../lib/tapgame";
 import { TapGameOverlay } from "../components/TapGameOverlay";
 import { HostGamesMenu } from "../components/HostGamesMenu";
@@ -577,8 +578,22 @@ export function LiveViewerPage() {
           if (k === "1v1") setBattlePicker(true);
           else if (k === "gameLimit") setGameLimitPicker(true);
           else if (k === "solo") startSolo();
+          // The 31-day challenge and the three reference rows open their own overlay off the
+          // same `picker` state — they start nothing, so they need no people-picker step.
           else setPicker(k);
         }} />
+      )}
+      {picker === "challenge31" && myId && (
+        <Challenge31Overlay userId={myId} onClose={() => setPicker(null)} onNotice={setToast} />
+      )}
+      {picker === "pkContests" && myId && (
+        <PkContestsOverlay userId={myId} onClose={() => setPicker(null)} />
+      )}
+      {picker === "lifetimeBoard" && (
+        <LifetimeBoardOverlay onClose={() => setPicker(null)} />
+      )}
+      {picker === "punishments" && (
+        <PunishmentsOverlay onClose={() => setPicker(null)} />
       )}
       {picker === "series" && myId && (
         <MultiPicker title="Best Out Of" blurb="5-minute rounds. First to win more than half the rounds takes the series." lengths={[3, 5, 7, 9, 11]}
