@@ -438,7 +438,7 @@ export function LiveViewerPage() {
                 <span className="muted">{live.status === "live" ? "Waiting for video…" : "Connecting…"}</span>
               </div>
             )}
-            {orderedTiles.map((t) => <VideoTile key={t.identity} tile={t} label={t.isLocal ? `${displayName(user)} (you)` : displayName(nameOf(t.userId) as Partial<UserSummary> ?? { fullname: t.name })} />)}
+            {orderedTiles.map((t) => <VideoTile key={t.identity} tile={t} user={t.isLocal ? user : (nameOf(t.userId) as Partial<UserSummary> | undefined) ?? { fullname: t.name }} label={t.isLocal ? `${displayName(user)} (you)` : displayName(nameOf(t.userId) as Partial<UserSummary> ?? { fullname: t.name })} />)}
             {boxing && (
               <div className="boxing-gloves" title="Boxing gloves: every gift counts double">
                 <img src="/boxing_gloves.png" alt="Boxing gloves — double points" />
@@ -738,7 +738,11 @@ function BattleIntro({ onDone }: { onDone: () => void }) {
   );
 }
 
-function VideoTile({ tile, label }: { tile: LiveTile; label: string }) {
+// Steve, 2026-09-26: "the camera supposed to shut off and their image supposed to show if image
+// is available, if the image is not available please add their initials in the circle." While a
+// tile's camera is off (own or anyone's — LiveKit's TrackMuted), the video is covered by a black
+// plate with the member's Avatar (photo, else initials on gold) in the middle.
+function VideoTile({ tile, label, user }: { tile: LiveTile; label: string; user?: Partial<UserSummary> | null }) {
   const ref = useRef<HTMLVideoElement>(null);
   useEffect(() => {
     const el = ref.current;
@@ -748,6 +752,11 @@ function VideoTile({ tile, label }: { tile: LiveTile; label: string }) {
   return (
     <div className={`tile${tile.speaking ? " speaking" : ""}`}>
       <video ref={ref} autoPlay playsInline muted={tile.isLocal} style={tile.isLocal ? { transform: "scaleX(-1)" } : undefined} />
+      {tile.muted && (
+        <div style={{ position: "absolute", inset: 0, background: "#000", display: "grid", placeItems: "center" }}>
+          <div style={{ transform: "scale(2.2)" }}><Avatar user={user ?? { fullname: label }} size="lg" /></div>
+        </div>
+      )}
       <span className="name">{label || "Guest"}{tile.muted ? " · camera off" : ""}</span>
     </div>
   );
