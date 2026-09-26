@@ -23,6 +23,9 @@ export function sidebarSections(userId: number | null): SideSection[] {
     ] },
     { title: "Account", links: [
       { to: userId ? `/profile/${userId}` : "/login", label: "My Profile", icon: "👤", needsLogin: true },
+      // Steve, 2026-09-26: "Where is support on the web?" — the 💝 Support button lives on the
+      // member's own profile page; this puts Who Supported Me one click away from anywhere too.
+      { to: "/support", label: "Who Supported Me", icon: "💝", needsLogin: true },
       { to: "/settings/account", label: "Account settings", icon: "⚙️", needsLogin: true },
       { to: "/settings/share", label: "Share profile", icon: "🔗", needsLogin: true },
       { to: "/settings/qr", label: "My QR code", icon: "▦", needsLogin: true },
