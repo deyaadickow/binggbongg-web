@@ -23,9 +23,11 @@ const n = (v: number | undefined) => Number(v ?? 0).toLocaleString();
 // a big gold figure in its middle column.
 function GiftCount({ count }: { count: number | undefined }) {
   return (
-    <div style={{ textAlign: "center", minWidth: 72 }}>
-      <div style={{ fontWeight: 900, fontSize: 26, lineHeight: 1, color: "var(--gold)" }}>{n(count)}</div>
-      <div className="muted" style={{ fontSize: 11, marginTop: 2 }}>{(count ?? 0) === 1 ? "gift" : "gifts"}</div>
+    // Number and word side by side (Steve, 2026-09-26: "14 Gifts, make them next to each other,
+    // not on top of each other"), aligned on their baseline.
+    <div style={{ display: "flex", alignItems: "baseline", justifyContent: "center", gap: 5, minWidth: 90 }}>
+      <span style={{ fontWeight: 900, fontSize: 26, lineHeight: 1, color: "var(--gold)" }}>{n(count)}</span>
+      <span className="muted" style={{ fontSize: 12 }}>{(count ?? 0) === 1 ? "gift" : "gifts"}</span>
     </div>
   );
 }
