@@ -576,6 +576,14 @@ export function ProfilePage() {
             🔍 Find Battle
           </button>
           {isMe && (
+            // Steve, 2026-09-26: "On each personal profile page please add a link called
+            // 'Support' but inside the link page call it, 'Who Supported Me'." Own profile only —
+            // it lists the gifts sent to the signed-in member.
+            <button className="btn ghost small" onClick={() => navigate("/support")}>
+              💝 Support
+            </button>
+          )}
+          {isMe && (
             <button className="btn ghost small" onClick={() => setShowCreatePlaylist(true)}>
               + Playlist
             </button>

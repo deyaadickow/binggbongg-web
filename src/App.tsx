@@ -11,6 +11,7 @@ import { HomePage } from "./pages/HomePage";
 import { LoginPage } from "./pages/LoginPage";
 import { VideoPage } from "./pages/VideoPage";
 import { ProfilePage } from "./pages/ProfilePage";
+import { SupporterBreakdownPage, SupportersPage } from "./pages/SupportersPage";
 import { SearchPage } from "./pages/SearchPage";
 import { LiveNowPage } from "./pages/LiveNowPage";
 import { LiveViewerPage } from "./pages/LiveViewerPage";
@@ -33,6 +34,8 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/video/:id" element={<VideoPage />} />
           <Route path="/profile/:id" element={<ProfilePage />} />
+          <Route path="/support" element={<SupportersPage />} />
+          <Route path="/support/:id" element={<SupporterBreakdownPage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/live" element={<LiveNowPage />} />
           <Route path="/live/:room" element={<LiveViewerPage />} />
