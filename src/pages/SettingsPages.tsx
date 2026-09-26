@@ -546,19 +546,33 @@ export function ContestRequestsPage() {
 }
 
 // ---- Support --------------------------------------------------------------------------------
+// Support (Steve, 2026-09-26: "Bingg Bongg Assistant" — Claude answers members instantly, in
+// their language; money / account / safety topics are handed to a person). The reply comes back
+// on the send call itself (data.reply) and on getUserSupport for the latest message.
+interface SupportReply { id: number; reply?: string | null; replied_by?: string | null; needs_human?: boolean }
 export function SupportPage() {
   const [msg, setMsg] = useState("");
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [reply, setReply] = useState<SupportReply | null>(null);
+  const [askedForPerson, setAskedForPerson] = useState(false);
   const { user } = useSession();
+
+  useEffect(() => {
+    if (!user) return;
+    post<SupportReply>("getUserSupport", { user_id: user.id })
+      .then((r) => { if (r.status && r.data?.reply) setReply(r.data); })
+      .catch(() => undefined);
+  }, [user]);
 
   async function send() {
     if (!msg.trim() || busy) return;
     setBusy(true);
     setError("");
     try {
-      await post("sendSupportMessage", { message: msg.trim(), user_id: user?.id ?? 0 });
+      const r = await post<SupportReply>("sendSupportMessage", { message: msg.trim(), user_id: user?.id ?? 0 });
+      if (r.data?.reply) { setReply(r.data); setAskedForPerson(false); }
       setSent(true);
     } catch {
       setError("Failed to send message. Please try again.");
@@ -567,13 +581,46 @@ export function SupportPage() {
     }
   }
 
+  async function askForPerson() {
+    if (!reply || !user) return;
+    setAskedForPerson(true);
+    await post("supportAssistantFeedback", { message_id: reply.id, user_id: user.id }).catch(() => undefined);
+  }
+
+  const byAssistant = reply?.replied_by === "assistant";
+  const replyCard = reply?.reply ? (
+    <div className="card pad" style={{ marginBottom: 12, borderColor: "var(--gold-border)" }}>
+      <div style={{ fontSize: 12, fontWeight: 800, color: "var(--gold)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 6 }}>
+        {byAssistant ? "💝 Bingg Bongg Assistant" : "Admin support replied"}
+      </div>
+      <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{reply.reply}</p>
+      {byAssistant && (
+        <div style={{ marginTop: 10 }}>
+          {reply.needs_human || askedForPerson ? (
+            <p className="muted" style={{ margin: 0, fontSize: 13 }}>A Bingg Bongg team member will get back to you here.</p>
+          ) : (
+            <button className="btn small" onClick={askForPerson} style={{ background: "transparent", color: "var(--gold)" }}>
+              This didn't help — talk to a person
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  ) : null;
+
   return (
     <Page title="Support">
+      {replyCard}
       {sent ? (
-        <div className="card pad"><p className="soft" style={{ margin: 0 }}>Message sent. The Bingg Bongg team will get back to you.</p></div>
+        <div className="card pad">
+          <p className="soft" style={{ margin: 0 }}>
+            {reply?.reply ? "Message sent. Ask another question any time." : "Message sent. The Bingg Bongg team will get back to you."}
+          </p>
+          <button className="btn small" onClick={() => { setSent(false); setMsg(""); }} style={{ marginTop: 10, background: "transparent", color: "var(--gold)" }}>Send another message</button>
+        </div>
       ) : (
         <div className="card pad">
-          <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>Have a question or issue? Send us a message and we'll get back to you.</p>
+          <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>Have a question or issue? Bingg Bongg Assistant answers right away, and a team member steps in when needed.</p>
           <textarea className="input" rows={5} placeholder="Describe your issue…" value={msg} onChange={(e) => setMsg(e.target.value)} style={{ width: "100%", marginBottom: 10 }} />
           {error && <p style={{ color: "#f55", fontSize: 13, marginBottom: 8 }}>{error}</p>}
           <button className="btn" onClick={send} disabled={busy || !msg.trim()} style={{ background: "var(--gold-border)", color: "#000", borderColor: "var(--gold-border)" }}>
