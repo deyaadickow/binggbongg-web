@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { displayName, mediaUrl, post, type Post, type UserSummary } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice } from "../components/Common";
+import { fetchUserPhotos, type Photo } from "../lib/photos";
 
 interface ProfileUser extends UserSummary {
   refer_code?: string;
@@ -49,7 +50,7 @@ interface BattleCareer {
   opponents?: BattleOpponent[];
 }
 
-type TabKey = "videos" | "likes" | "reposted" | "saved" | "history" | "following" | "followers" | "friends";
+type TabKey = "videos" | "photos" | "likes" | "reposted" | "saved" | "history" | "following" | "followers" | "friends";
 
 const USER_TABS: TabKey[] = ["following", "followers", "friends"];
 
@@ -238,6 +239,11 @@ export function ProfilePage() {
   const [tab, setTab] = useState<TabKey>("videos");
   const [tabVideos, setTabVideos] = useState<ProfilePost[]>([]);
   const [tabUsers, setTabUsers] = useState<UserSummary[]>([]);
+  // Photos are neither posts nor members, so they get their own bucket rather than being
+  // squeezed through tabVideos (different fields, different click target).
+  const [tabPhotos, setTabPhotos] = useState<Photo[]>([]);
+  const [photoCount, setPhotoCount] = useState<number | null>(null);
+  const [viewingPhoto, setViewingPhoto] = useState<Photo | null>(null);
   const [tabLoading, setTabLoading] = useState(false);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [showBattleBoard, setShowBattleBoard] = useState(false);
@@ -255,6 +261,8 @@ export function ProfilePage() {
     setTab("videos");
     setTabVideos([]);
     setTabUsers([]);
+    setTabPhotos([]);
+    setPhotoCount(null);
 
     (async () => {
       try {
@@ -279,9 +287,31 @@ export function ProfilePage() {
     setTabVideos([]);
     setTabUsers([]);
 
+    if (tab === "photos") {
+      // Its own call: fetchUserPhotos returns {user, photos, photo_count}, not the flat list
+      // every other tab here returns, and it needs my_user_id AND user_id (see lib/photos.ts).
+      // fetchUserPhotos needs a signed-in caller (my_user_id + authorizeUser), so a signed-out
+      // visitor gets a 401 — which must NOT be rendered as "no photos yet", since that blames
+      // the member for something that's really "you aren't signed in".
+      if (!me) {
+        setTabPhotos([]);
+        setPhotoCount(null);
+        setTabLoading(false);
+        return;
+      }
+      fetchUserPhotos(me.id, Number(id))
+        .then(({ photos, count }) => { setTabPhotos(photos); setPhotoCount(count); })
+        .catch(() => { setTabPhotos([]); setPhotoCount(0); })
+        .finally(() => setTabLoading(false));
+      return;
+    }
+
     const base = { start: 0, count: 30, ...(me ? { my_user_id: me.id } : {}) };
 
-    const endpointMap: Record<TabKey, [string, Record<string, unknown>]> = {
+    // Excludes "photos" deliberately: that tab returned above, because its endpoint's response
+    // shape doesn't match the flat list every tab in this map produces. Exclude<> rather than
+    // Partial<> so a NEW tab still has to be added here or fail the build.
+    const endpointMap: Record<Exclude<TabKey, "photos">, [string, Record<string, unknown>]> = {
       videos: ["fetchUserPosts", { user_id: id, ...base }],
       likes: ["fetchUserPostsWithLikes", { user_id: id, ...base }],
       reposted: ["fetchRepostVideos", { user_id: id, ...base }],
@@ -366,6 +396,9 @@ export function ProfilePage() {
 
   const tabs: { key: TabKey; label: string; count?: number }[] = [
     { key: "videos", label: "Videos", count: profile.post_counts },
+    // Steve, 2026-09-26: "next to videos we need to add photos". Count is only known once the
+    // tab has been opened, so it stays absent until then rather than showing a wrong 0.
+    { key: "photos", label: "Photos", count: photoCount ?? undefined },
     { key: "following", label: "Following", count: profile.total_followings },
     { key: "followers", label: "Followers", count: profile.total_followers },
     { key: "friends", label: "Friends", count: profile.friends_count },
@@ -549,6 +582,22 @@ export function ProfilePage() {
       <div style={{ marginTop: 4 }}>
         {tabLoading ? (
           <div style={{ padding: "32px 0" }}><Loading /></div>
+        ) : tab === "photos" ? (
+          tabPhotos.length === 0 ? (
+            <p className="muted" style={{ padding: "24px 0", textAlign: "center" }}>
+              {me ? "No photos yet." : "Sign in to see photos."}
+            </p>
+          ) : (
+            <div className="profile-vid-grid">
+              {tabPhotos.map((ph) => (
+                <button key={ph.id} onClick={() => setViewingPhoto(ph)}
+                  style={{ padding: 0, border: "none", background: "transparent", cursor: "pointer", display: "block", width: "100%" }}>
+                  <img src={mediaUrl(ph.thumb_path || ph.photo_path)} alt="" loading="lazy"
+                    style={{ width: "100%", aspectRatio: "1", objectFit: "cover", display: "block", borderRadius: 4 }} />
+                </button>
+              ))}
+            </div>
+          )
         ) : USER_TABS.includes(tab) ? (
           tabUsers.length === 0 ? (
             <p className="muted" style={{ padding: "24px 0", textAlign: "center" }}>No members yet.</p>
@@ -576,6 +625,15 @@ export function ProfilePage() {
           )
         )}
       </div>
+
+      {viewingPhoto && (
+        <div onClick={() => setViewingPhoto(null)}
+          style={{ position: "fixed", inset: 0, zIndex: 60, background: "rgba(0,0,0,.85)", display: "grid", placeItems: "center", padding: 16 }}>
+          <img src={mediaUrl(viewingPhoto.photo_path || viewingPhoto.thumb_path)} alt=""
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: "min(760px, 100%)", maxHeight: "86vh", objectFit: "contain", borderRadius: 10, display: "block" }} />
+        </div>
+      )}
 
       {/* Modals */}
       {showBattleBoard && (

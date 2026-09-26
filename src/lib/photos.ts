@@ -164,15 +164,20 @@ export async function fetchRandomFeedPhoto(myUserId: number): Promise<FeedPhoto 
 }
 
 /**
- * One member's album, viewed by someone else. Needs its own endpoint because fetchFolderPhotos'
- * my_user_id is always rebound to the caller — see the backend's fetchUserPhotos doc comment.
- * Comes back empty for a member the directory wouldn't list, by the same eligibility rule.
+ * One member's whole album, viewed by someone else — the profile Photos tab, and what a Photos
+ * directory tile opens. Needs its own endpoint because fetchFolderPhotos' my_user_id is always
+ * rebound to the caller; see the backend's fetchUserPhotos doc comment.
+ *
+ * Returns EVERY photo that member has, paid storage or not (2026-09-26). The paid-only rule still
+ * decides who appears in the directory and the main feed — it just doesn't hide an album from
+ * someone who deliberately opened that member's profile.
  */
-export async function fetchUserPhotos(myUserId: number, userId: number): Promise<{ user: DirectoryEntry | null; photos: Photo[] }> {
-  const res = await post<{ user?: DirectoryEntry; photos?: Photo[] }>("fetchUserPhotos", {
+export async function fetchUserPhotos(myUserId: number, userId: number): Promise<{ user: DirectoryEntry | null; photos: Photo[]; count: number }> {
+  const res = await post<{ user?: DirectoryEntry; photos?: Photo[]; photo_count?: number }>("fetchUserPhotos", {
     my_user_id: myUserId,
     user_id: userId,
   });
   if (!res.status) throw new Error(res.message ?? "Couldn't open that album.");
-  return { user: res.data?.user ?? null, photos: res.data?.photos ?? [] };
+  const photos = res.data?.photos ?? [];
+  return { user: res.data?.user ?? null, photos, count: res.data?.photo_count ?? photos.length };
 }
