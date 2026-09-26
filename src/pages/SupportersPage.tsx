@@ -118,8 +118,13 @@ export function SupporterBreakdownPage() {
         </div>
       )}
       <div className="row" style={{ gap: 8, marginBottom: 12 }}>
+        {/* Steve, 2026-09-26: "Make them gold border for day, month and year" — the .btn gold
+            border on all three (not .ghost, whose border is grey); the selected one is filled gold. */}
         {periods.map((p) => (
-          <button key={p.key} className={`btn small${period === p.key ? "" : " ghost"}`} onClick={() => setPeriod(p.key)}>{p.label}</button>
+          <button key={p.key} className="btn small" onClick={() => setPeriod(p.key)}
+            style={period === p.key ? { background: "var(--gold)", color: "#000" } : { background: "transparent", color: "var(--gold)" }}>
+            {p.label}
+          </button>
         ))}
       </div>
       {loading ? <Loading /> : error ? <Notice>{error}</Notice> : data && (
