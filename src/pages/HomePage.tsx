@@ -4,6 +4,7 @@ import { useSession } from "../lib/session";
 import { PostCard } from "../components/PostCard";
 import { Loading, Notice, StoreBadges } from "../components/Common";
 import { setFeed } from "../lib/feed";
+import { FeedPhotoCard } from "../components/FeedPhotoCard";
 
 export function HomePage() {
   const { user } = useSession();
@@ -43,6 +44,9 @@ export function HomePage() {
         <StoreBadges compact />
       </div>
       {error && <Notice error>{error}</Notice>}
+      {/* One member photo in the feed, the phones' fetchRandomFeedPhoto. Only members past the
+          free storage allowance are eligible — that is the server's rule, not ours. */}
+      <FeedPhotoCard />
       <div className="grid">
         {posts.map((p) => <PostCard key={p.id} post={p} />)}
       </div>

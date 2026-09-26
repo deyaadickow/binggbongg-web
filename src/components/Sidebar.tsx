@@ -15,6 +15,7 @@ export function sidebarSections(userId: number | null): SideSection[] {
       { to: "/live", label: "Live Now", icon: "🔴" },
       { to: "/search", label: "Search", icon: "🔍" },
       { to: "/upload", label: "Upload video", icon: "🎬", needsLogin: true },
+      { to: "/photos-directory", label: "Photos", icon: "📷", needsLogin: true },
       { to: "/photos", label: "My photos", icon: "🖼️", needsLogin: true },
       { to: "/upload-photos", label: "Upload photos", icon: "⬆️", needsLogin: true },
       { to: "/enter-contest", label: "Enter a contest", icon: "🏆", needsLogin: true },

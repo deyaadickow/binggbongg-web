@@ -129,3 +129,36 @@ export async function deleteFolder(myUserId: number, folderId: number): Promise<
   const res = await post("deleteFolder", { my_user_id: myUserId, folder_id: folderId });
   if (!res.status) throw new Error(res.message ?? "Couldn't delete that folder.");
 }
+
+// ---- Public surfaces: the directory and the feed --------------------------------------------
+//
+// Both only ever show photos from members whose photo storage is active AND who are past the
+// free allowance — i.e. members paying for storage. That is the server's rule
+// (eligiblePhotosQuery), not something the client decides.
+
+export interface DirectoryEntry {
+  user_id: number;
+  fullname?: string | null;
+  username?: string | null;
+  profile_image?: string | null;
+  /** Already a full url from the server, unlike profile_image which is a raw path. */
+  preview_thumb?: string | null;
+}
+
+export interface FeedPhoto extends Photo {
+  user?: { id?: number; fullname?: string | null; username?: string | null; profile_image?: string | null } | null;
+  thumb_url?: string | null;
+  photo_url?: string | null;
+}
+
+/** One row per member with photos, newest-active first. */
+export async function fetchPhotosDirectory(myUserId: number): Promise<DirectoryEntry[]> {
+  const res = await post<DirectoryEntry[]>("fetchPhotosDirectory", { my_user_id: myUserId });
+  return res.status ? (res.data ?? []) : [];
+}
+
+/** A single random eligible photo, or null when there are none. */
+export async function fetchRandomFeedPhoto(myUserId: number): Promise<FeedPhoto | null> {
+  const res = await post<FeedPhoto>("fetchRandomFeedPhoto", { my_user_id: myUserId }).catch(() => null);
+  return res?.status ? (res.data ?? null) : null;
+}
