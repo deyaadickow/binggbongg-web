@@ -60,12 +60,18 @@ export function Sidebar() {
   const { user, isLoggedIn, signOut } = useSession();
   return (
     <aside className="sidebar">
-      {sidebarSections(user?.id ?? null).map((sec, i) => (
-        <div key={i} className="side-section">
-          {sec.title && <div className="side-title">{sec.title}</div>}
-          {sec.links.filter((l) => !l.needsLogin || isLoggedIn).map((l) => <SideLinkItem key={l.label} link={l} onSignOut={signOut} />)}
-        </div>
-      ))}
+      {sidebarSections(user?.id ?? null).map((sec, i) => {
+        const links = sec.links.filter((l) => !l.needsLogin || isLoggedIn);
+        // Signed out, every ACCOUNT link is filtered away and the heading was left stranded
+        // over nothing — drop a section once it has no links left to show.
+        if (links.length === 0) return null;
+        return (
+          <div key={i} className="side-section">
+            {sec.title && <div className="side-title">{sec.title}</div>}
+            {links.map((l) => <SideLinkItem key={l.label} link={l} onSignOut={signOut} />)}
+          </div>
+        );
+      })}
     </aside>
   );
 }
