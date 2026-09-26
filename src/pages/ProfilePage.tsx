@@ -12,12 +12,18 @@ interface ProfileUser extends UserSummary {
   fb_url?: string;
   insta_url?: string;
   youtube_url?: string;
-  post_counts?: number;
-  friends_count?: number;
-  liked_videos_counts?: number;
-  reposted_counts?: number;
-  saved_posts_count?: number;
-  watch_history_count?: number;
+  // fetchUserDetails attaches these five as camelCase properties on the user object
+  // ($user->postCounts = ... in UsersController), NOT as snake_case columns. Reading
+  // post_counts/friends_count/etc. silently gave undefined, so every one of these tabs
+  // rendered with no number while Following/Followers — which ARE snake_case columns on
+  // tbl_users — showed theirs. Verified against the controller, 2026-09-26.
+  postCounts?: number;
+  friendsCount?: number;
+  likedVideosCounts?: number;
+  repostedCounts?: number;
+  memberSpecialContestsCount?: number;
+  saved_posts?: string;
+  watch_history?: string;
   is_following_each_other?: number;
   is_blocked?: number;
 }
@@ -311,25 +317,39 @@ export function ProfilePage() {
     // Excludes "photos" deliberately: that tab returned above, because its endpoint's response
     // shape doesn't match the flat list every tab in this map produces. Exclude<> rather than
     // Partial<> so a NEW tab still has to be added here or fail the build.
+    // Every name and parameter below was checked against routes/api.php and the controller's
+    // own validator on 2026-09-26. Three of these used to name routes that DO NOT EXIST —
+    // fetchRepostVideos, fetchFriendsList and fetchUserWatchHistory — so those tabs 404'd and
+    // rendered empty forever. A guessed endpoint name fails exactly like a missing feature.
     const endpointMap: Record<Exclude<TabKey, "photos">, [string, Record<string, unknown>]> = {
       videos: ["fetchUserPosts", { user_id: id, ...base }],
-      likes: ["fetchUserPostsWithLikes", { user_id: id, ...base }],
-      reposted: ["fetchRepostVideos", { user_id: id, ...base }],
+      // NOT fetchUserPostsWithLikes: that returns THIS member's own posts that have received
+      // likes, whereas the "Likes" count beside the tab is likedVideosCounts — the videos they
+      // liked. fetchUserLikedPosts is the one that matches the number.
+      likes: ["fetchUserLikedPosts", { user_id: id, ...base }],
+      reposted: ["fetchUserRepostedPosts", { user_id: id, ...base }],
       saved: ["fetchUserSavedPosts", { user_id: me?.id ?? id, ...base }],
-      history: ["fetchUserWatchHistory", { user_id: me?.id ?? id, ...base }],
+      history: ["fetchUserWatchHistoryPosts", { my_user_id: me?.id ?? id, ...base }],
       following: ["fetchFollowingList", { user_id: id, ...base }],
       followers: ["fetchFollowersList", { user_id: id, ...base }],
-      friends: ["fetchFriendsList", { user_id: id, ...base }],
+      friends: ["fetchUserFriends", { user_id: id, ...base }],
     };
 
     const [endpoint, params] = endpointMap[tab];
     post(endpoint, params)
       .then((r) => {
-        const items = (r.data ?? r.list ?? []) as unknown[];
+        const items = (r.data ?? r.list ?? []) as Record<string, unknown>[];
         if (USER_TABS.includes(tab)) {
-          setTabUsers(items as UserSummary[]);
+          // These three come back as tbl_followers ROWS with the member nested inside, not as
+          // a flat member list: following -> toUser, followers -> fromUser, friends -> toUser.
+          // Casting the row straight to UserSummary gave cards with no name and no avatar,
+          // because every field the card reads lives one level down.
+          const nested = tab === "followers" ? "fromUser" : "toUser";
+          setTabUsers(items.map((row) => (row[nested] ?? row) as UserSummary).filter(Boolean));
         } else {
-          setTabVideos(items as ProfilePost[]);
+          // Reposted and Likes are join rows carrying the post under `post`; Videos/Saved/History
+          // are already posts. `?? row` keeps both shapes working through one path.
+          setTabVideos(items.map((row) => (row.post ?? row) as ProfilePost).filter(Boolean));
         }
       })
       .catch(() => {})
@@ -395,15 +415,15 @@ export function ProfilePage() {
   const isMutualFollow = !isMe && profile.is_following_each_other === 1;
 
   const tabs: { key: TabKey; label: string; count?: number }[] = [
-    { key: "videos", label: "Videos", count: profile.post_counts },
+    { key: "videos", label: "Videos", count: profile.postCounts },
     // Steve, 2026-09-26: "next to videos we need to add photos". Count is only known once the
     // tab has been opened, so it stays absent until then rather than showing a wrong 0.
     { key: "photos", label: "Photos", count: photoCount ?? undefined },
     { key: "following", label: "Following", count: profile.total_followings },
     { key: "followers", label: "Followers", count: profile.total_followers },
-    { key: "friends", label: "Friends", count: profile.friends_count },
-    { key: "likes", label: "Likes", count: profile.liked_videos_counts },
-    { key: "reposted", label: "Reposted", count: profile.reposted_counts },
+    { key: "friends", label: "Friends", count: profile.friendsCount },
+    { key: "likes", label: "Likes", count: profile.likedVideosCounts },
+    { key: "reposted", label: "Reposted", count: profile.repostedCounts },
     ...(isMe ? [
       { key: "saved" as TabKey, label: "Saved" },
       { key: "history" as TabKey, label: "History" },
@@ -485,12 +505,12 @@ export function ProfilePage() {
         {/* Stat bullets */}
         <div style={{ display: "flex", overflowX: "auto", scrollbarWidth: "none", gap: 0, borderBottom: "1px solid var(--line)", borderTop: "1px solid var(--line)", margin: "0 -16px", padding: "0 4px" }}>
           {[
-            { label: "Videos", val: profile.post_counts, tab: "videos" as TabKey },
+            { label: "Videos", val: profile.postCounts, tab: "videos" as TabKey },
             { label: "Following", val: profile.total_followings, tab: "following" as TabKey },
             { label: "Followers", val: profile.total_followers, tab: "followers" as TabKey },
-            { label: "Friends", val: profile.friends_count, tab: "friends" as TabKey },
+            { label: "Friends", val: profile.friendsCount, tab: "friends" as TabKey },
             { label: "Likes", val: profile.total_likes, tab: "likes" as TabKey },
-            { label: "Reposted", val: profile.reposted_counts, tab: "reposted" as TabKey },
+            { label: "Reposted", val: profile.repostedCounts, tab: "reposted" as TabKey },
           ].map(({ label, val, tab: t }) => (
             <button
               key={label}
