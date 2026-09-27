@@ -422,6 +422,9 @@ export function LiveViewerPage() {
   }
 
   function leaveAsGuest() {
+    // Steve, 2026-09-27: an approved guest who backs out must stop counting as a room member
+    // on the server (battle invites / pickers kept including them). Fire and forget.
+    if (user) post("leaveLiveRoom", { my_user_id: user.id, room_name: roomName }).catch(() => undefined);
     live.disconnect();
     navigate("/live", { replace: true });
   }
