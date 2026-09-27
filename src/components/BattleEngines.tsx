@@ -390,9 +390,11 @@ export function VirtualPicker({ myUserId, guests, onSubmit, onClose }: { myUserI
     try { setResults(await searchVirtualMembers(myUserId, q)); } finally { setBusy(false); }
   }
   useEffectVB(() => { search(""); }, []);
-  const row = (id: number, name: string, hint: string) => (
+  // Steve, 2026-09-27 (picker screenshot): "Add everyone's avatar here" — photo or initials on every row.
+  const row = (id: number, name: string, hint: string, p?: Person) => (
     <label key={id} className="row" style={{ gap: 10, padding: "8px 10px", border: "1px solid var(--gold-border)", borderRadius: 10, cursor: "pointer", opacity: selected.has(id) ? 1 : 0.85 }}>
       <input type="checkbox" checked={selected.has(id)} onChange={() => toggle(id, name)} />
+      <span style={{ borderRadius: 17, overflow: "hidden", border: "1px solid var(--gold-border)", flex: "none" }}><VirtualLook p={{ profile_image: p?.profile_image, fullname: p?.fullname ?? name, username: p?.username }} size={34} /></span>
       <b>{name}</b><span className="muted" style={{ fontSize: 12 }}>· {hint}</span>
     </label>
   );
@@ -401,7 +403,7 @@ export function VirtualPicker({ myUserId, guests, onSubmit, onClose }: { myUserI
       <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>Pick up to 3 — guests in your room, members who aren't live, or search any member. Members who aren't live show their virtual look. 5 minutes, most coins wins.</p>
       {guests.length > 0 && <>
         <div style={{ fontSize: 12, fontWeight: 800, color: "var(--gold)", margin: "8px 0 6px" }}>In your room</div>
-        <div style={{ display: "grid", gap: 6 }}>{guests.map((g) => row(g.user_id, personName(g), "guest"))}</div>
+        <div style={{ display: "grid", gap: 6 }}>{guests.map((g) => row(g.user_id, personName(g), "guest", g))}</div>
       </>}
       <div style={{ fontSize: 12, fontWeight: 800, color: "var(--gold)", margin: "12px 0 6px" }}>Search members</div>
       <div className="row" style={{ gap: 8 }}>
@@ -411,7 +413,7 @@ export function VirtualPicker({ myUserId, guests, onSubmit, onClose }: { myUserI
       <div style={{ fontSize: 12, fontWeight: 800, color: "var(--gold)", margin: "12px 0 6px" }}>{query.trim() ? "Search results" : "Members not live right now"}</div>
       <div style={{ display: "grid", gap: 6, marginTop: 8, maxHeight: 260, overflowY: "auto" }}>
         {results.length === 0 && !busy && <span className="muted" style={{ fontSize: 12 }}>{query.trim() ? "No members found." : "No members to show yet."}</span>}
-        {results.filter((r) => !guests.some((g) => g.user_id === r.user_id)).map((m) => row(m.user_id, personName(m as Person), m.virtual_media_url ? "has a virtual look" : `@${m.username ?? ""}`))}
+        {results.filter((r) => !guests.some((g) => g.user_id === r.user_id)).map((m) => row(m.user_id, personName(m as Person), m.virtual_media_url ? "has a virtual look" : `@${m.username ?? ""}`, m as Person))}
       </div>
       {note && <p style={{ color: "#f55", fontSize: 12, margin: "8px 0 0" }}>{note}</p>}
       <div className="muted" style={{ fontSize: 12, margin: "10px 0" }}>Selected: {selected.size} / 3{selected.size ? " — " + Array.from(selected.values()).join(", ") : ""}</div>
