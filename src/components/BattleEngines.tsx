@@ -424,19 +424,33 @@ export function VirtualStrip({ d, now, myUserId, onGift }: { d: VirtualBattleDat
   // Steve, 2026-09-27: "When sending a gift to the virtual member remove his avatar and show the
   // gift than bring back his avatar." Flash the last gift over the card for 3 seconds whenever
   // last_gift_id changes (the first sight of a card is remembered, not flashed).
-  const shownRef = useRefVB<Map<number, number>>(new Map());
+  // "...and do this for every gift that avatar will receive": every gift not shown yet is queued
+  // and each flashes for 1.5 s in turn, so a burst of gifts shows one after another.
+  const shownRef = useRefVB<Map<number, Set<number>>>(new Map());
+  const queuesRef = useRefVB<Map<number, string[]>>(new Map());
+  const busyRef = useRefVB<Set<number>>(new Set());
   const [flashing, setFlashing] = useStateVB<Map<number, string>>(new Map());
+  const flashNext = (userId: number) => {
+    const queue = queuesRef.current.get(userId) ?? [];
+    const next = queue.shift();
+    queuesRef.current.set(userId, queue);
+    if (!next) { busyRef.current.delete(userId); setFlashing((cur) => { const m = new Map(cur); m.delete(userId); return m; }); return; }
+    busyRef.current.add(userId);
+    setFlashing((cur) => new Map(cur).set(userId, next));
+    setTimeout(() => flashNext(userId), 1500);
+  };
   useEffectVB(() => {
     for (const p of d.participants) {
-      const id = p.last_gift_id ?? 0;
-      if (!id || !p.last_gift_image) continue;
-      const seen = shownRef.current.get(p.user_id);
-      if (seen === undefined) { shownRef.current.set(p.user_id, id); continue; }
-      if (seen === id) continue;
-      shownRef.current.set(p.user_id, id);
-      const img = p.last_gift_image;
-      setFlashing((cur) => new Map(cur).set(p.user_id, img));
-      setTimeout(() => setFlashing((cur) => { const next = new Map(cur); next.delete(p.user_id); return next; }), 3000);
+      const recent = (p.recent_gifts ?? []).filter((g) => g.id && g.image);
+      let seen = shownRef.current.get(p.user_id);
+      if (!seen) { shownRef.current.set(p.user_id, new Set(recent.map((g) => g.id))); continue; }
+      const fresh = [...recent].reverse().filter((g) => !seen!.has(g.id));
+      if (fresh.length === 0) continue;
+      fresh.forEach((g) => seen!.add(g.id));
+      const queue = queuesRef.current.get(p.user_id) ?? [];
+      queue.push(...fresh.map((g) => g.image as string));
+      queuesRef.current.set(p.user_id, queue);
+      if (!busyRef.current.has(p.user_id)) flashNext(p.user_id);
     }
   }, [d]);
   return (

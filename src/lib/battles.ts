@@ -114,6 +114,8 @@ export interface VirtualParticipant {
   // The last gift this participant received — the strip flashes it over the avatar.
   last_gift_image?: string | null;
   last_gift_id?: number | null;
+  /** The last few gifts, newest first — the strip flashes each one it hasn't shown yet. */
+  recent_gifts?: { id: number; image?: string | null; coins?: number }[];
 }
 export interface VirtualBattleData {
   virtual_battle_id: number;
