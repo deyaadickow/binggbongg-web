@@ -359,8 +359,14 @@ export function VirtualLook({ p, size = 96 }: { p: { virtual_media_url?: string 
   const box: React.CSSProperties = { width: size, height: size, borderRadius: 8, objectFit: "cover", background: "#000", display: "block" };
   if (url && p.virtual_media_type === "video") return <video src={url} muted loop autoPlay playsInline style={box} />;
   const img = url || (p.profile_image ? mediaUrl(p.profile_image) : "");
-  if (img) return <img src={img} alt="" style={box} />;
-  return <div style={{ ...box, display: "grid", placeItems: "center", color: "var(--gold)", fontWeight: 800, fontSize: size * 0.3 }}>{initials}</div>;
+  // Initials always underneath; a photo that exists AND loads covers them (a dead profile_image
+  // URL must not leave an empty box — seen on Android 2026-09-27).
+  return (
+    <div style={{ ...box, position: "relative", display: "grid", placeItems: "center", color: "var(--gold)", fontWeight: 800, fontSize: size * 0.3 }}>
+      {initials}
+      {img && <img src={img} alt="" style={{ ...box, position: "absolute", inset: 0 }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />}
+    </div>
+  );
 }
 
 /** Host only: guests in the room + member search, up to 3. */
