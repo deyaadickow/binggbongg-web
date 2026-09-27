@@ -595,12 +595,12 @@ export function LiveViewerPage() {
       {soloStandingsOpen && soloBattle && (
         <SoloBattleStandingsSheet battle={soloBattle} myUserId={user?.id ?? null} onClose={() => setSoloStandingsOpen(false)} />
       )}
+      {whosPlayingOpen && <WhosPlayingOverlay roomName={roomName} onClose={() => setWhosPlayingOpen(false)} />}
+      {inviteOpen && myId !== null && (
+        <InviteOverlay myUserId={myId} roomName={roomName} onToast={setToast} onClose={() => setInviteOpen(false)}
+          excludeIds={new Set([myId, ...live.tiles.map((t) => t.userId).filter((id): id is number => id !== null)])} />
+      )}
       {gamesMenuOpen && user && (
-        {whosPlayingOpen && <WhosPlayingOverlay roomName={roomName} onClose={() => setWhosPlayingOpen(false)} />}
-        {inviteOpen && myId !== null && (
-          <InviteOverlay myUserId={myId} roomName={roomName} onToast={setToast} onClose={() => setInviteOpen(false)}
-            excludeIds={new Set([myId, ...live.tiles.map((t) => t.userId).filter((id): id is number => id !== null)])} />
-        )}
         <HostGamesMenu
           userId={user.id}
           roomName={roomName}
