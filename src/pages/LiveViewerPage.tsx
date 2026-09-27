@@ -14,6 +14,7 @@ import { HostGamesMenu } from "../components/HostGamesMenu";
 import { SoloBattleStandingsSheet, SoloBattleStrip } from "../components/SoloBattle";
 import { fetchActiveSoloBattle, startSoloBattle, type SoloBattle } from "../lib/solobattle";
 import { Avatar, Notice } from "../components/Common";
+import { InviteOverlay, WhosPlayingOverlay } from "../components/RoomPeople";
 
 interface Member { user_id: number; fullname?: string; username?: string; profile_image?: string; country?: string }
 interface RoomMembers { host_user_id: number; host_fullname?: string; host_username?: string; host_profile_image?: string; host_country?: string; guests: Member[] }
@@ -202,6 +203,9 @@ export function LiveViewerPage() {
   const [activeGame, setActiveGame] = useState<TapGameType | null>(null);
   const [gameOpen, setGameOpen] = useState(false);
   const [gamesMenuOpen, setGamesMenuOpen] = useState(false);
+  // Steve, 2026-09-27: the phones' Who's Playing / Invite header buttons, on the web too.
+  const [whosPlayingOpen, setWhosPlayingOpen] = useState(false);
+  const [inviteOpen, setInviteOpen] = useState(false);
   useEffect(() => {
     if (!isLoggedIn || roomClosed) return;
     let alive = true;
@@ -486,6 +490,13 @@ export function LiveViewerPage() {
                 🎮 Games
               </button>
               {role === "host" && (
+                <button className="btn small ghost" title="Who is playing a game in your room right now" onClick={() => setWhosPlayingOpen(true)}>👥 Who's Playing</button>
+              )}
+              {role === "host" && (
+                <button className="btn small ghost" title="Invite someone you follow into an open seat"
+                  onClick={() => { if (live.tiles.length >= 4) setToast("The room is full."); else setInviteOpen(true); }}>＋ Invite</button>
+              )}
+              {role === "host" && (
                 <button
                   className={`btn small${voiceThanksGift ? "" : " ghost"}`}
                   title="Say 'Thanks for the gift' out loud when someone sends a gift"
@@ -585,6 +596,11 @@ export function LiveViewerPage() {
         <SoloBattleStandingsSheet battle={soloBattle} myUserId={user?.id ?? null} onClose={() => setSoloStandingsOpen(false)} />
       )}
       {gamesMenuOpen && user && (
+        {whosPlayingOpen && <WhosPlayingOverlay roomName={roomName} onClose={() => setWhosPlayingOpen(false)} />}
+        {inviteOpen && myId !== null && (
+          <InviteOverlay myUserId={myId} roomName={roomName} onToast={setToast} onClose={() => setInviteOpen(false)}
+            excludeIds={new Set([myId, ...live.tiles.map((t) => t.userId).filter((id): id is number => id !== null)])} />
+        )}
         <HostGamesMenu
           userId={user.id}
           roomName={roomName}
