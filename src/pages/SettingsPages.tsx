@@ -622,7 +622,13 @@ export function SupportPage() {
   ) : null;
 
   return (
-    <Page title="Support">
+    <div className="page" style={{ maxWidth: 720 }}>
+      {/* Steve, 2026-09-26: "on top next to support text on the right side add the text 'Archive'
+          ... when they click on Archive they will see all the old messages and their answers." */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+        <h1 className="page-title">Support</h1>
+        <Link to="/settings/support/archive" className="btn small" style={{ background: "transparent", color: "var(--gold)", borderColor: "var(--gold-border)" }}>Archive</Link>
+      </div>
       {replyCard}
       {sent ? (
         <div className="card pad">
@@ -641,6 +647,58 @@ export function SupportPage() {
           </button>
         </div>
       )}
+    </div>
+  );
+}
+
+// Support → Archive (Steve, 2026-09-26): every message the member sent, newest first, with the
+// answer it got (assistant or team) or "waiting for a reply".
+interface SupportHistoryRow extends SupportReply { message?: string; replied_at?: string | null; created_at?: string }
+function prettyDate(iso?: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return isNaN(d.getTime()) ? iso : d.toLocaleString(undefined, { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" });
+}
+export function SupportArchivePage() {
+  const { user } = useSession();
+  const [rows, setRows] = useState<SupportHistoryRow[] | null>(null);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    post<SupportHistoryRow[]>("getUserSupportHistory", { user_id: user.id })
+      .then((r) => setRows(r.status ? (r.data ?? []) : []))
+      .catch(() => setFailed(true));
+  }, [user]);
+
+  if (!user) return <NeedLogin />;
+  return (
+    <Page title="Support · Archive">
+      <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>Every message you sent to Support, and the answer it got.</p>
+      {failed && <Notice>Couldn't load your archive. Please try again.</Notice>}
+      {!failed && rows === null && <Loading />}
+      {rows && rows.length === 0 && <p className="soft">No messages yet. Anything you send to Support will be kept here.</p>}
+      {rows?.map((row) => {
+        const byAssistant = row.replied_by === "assistant";
+        return (
+          <div key={row.id} className="card pad" style={{ marginBottom: 12, borderColor: "var(--gold-border)" }}>
+            <div style={{ fontSize: 12, fontWeight: 800, color: "var(--gold)", marginBottom: 4 }}>You · {prettyDate(row.created_at)}</div>
+            <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{row.message}</p>
+            <div style={{ height: 1, background: "var(--gold-border)", opacity: 0.35, margin: "10px 0" }} />
+            {row.reply ? (
+              <>
+                <div style={{ fontSize: 12, fontWeight: 800, color: "var(--gold)", marginBottom: 4 }}>
+                  {byAssistant ? "Bingg Bongg Assistant" : "Bingg Bongg Support"}{row.replied_at ? ` · ${prettyDate(row.replied_at)}` : ""}
+                </div>
+                <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{row.reply}</p>
+                {byAssistant && row.needs_human && <p className="muted" style={{ margin: "8px 0 0", fontSize: 13 }}>A Bingg Bongg team member will follow up here.</p>}
+              </>
+            ) : (
+              <p className="muted" style={{ margin: 0, fontSize: 13 }}>Waiting for a reply from the Bingg Bongg team.</p>
+            )}
+          </div>
+        );
+      })}
     </Page>
   );
 }
