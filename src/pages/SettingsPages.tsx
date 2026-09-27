@@ -572,12 +572,8 @@ export function SupportPage() {
   const [askedForPerson, setAskedForPerson] = useState(false);
   const { user } = useSession();
 
-  useEffect(() => {
-    if (!user) return;
-    post<SupportReply>("getUserSupport", { user_id: user.id })
-      .then((r) => { if (r.status && r.data?.reply) setReply(r.data); })
-      .catch(() => undefined);
-  }, [user]);
+  // Steve, 2026-09-27: the page opens fresh every time — the answer card only shows right after
+  // sending; every earlier question and answer lives in Archive (no getUserSupport on load).
 
   async function send() {
     if (!msg.trim() || busy) return;
@@ -629,7 +625,7 @@ export function SupportPage() {
         <h1 className="page-title">Support</h1>
         <Link to="/settings/support/archive" className="btn small" style={{ background: "transparent", color: "var(--gold)", borderColor: "var(--gold-border)" }}>Archive</Link>
       </div>
-      {replyCard}
+      {sent && replyCard}
       {sent ? (
         <div className="card pad">
           <p className="soft" style={{ margin: 0 }}>
@@ -639,7 +635,7 @@ export function SupportPage() {
         </div>
       ) : (
         <div className="card pad">
-          <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>Have a question or issue? Bingg Bongg Assistant answers right away, and a team member steps in when needed.</p>
+          <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>Have a question or issue? Bingg Bongg Assistant answers right away, and a team member steps in when needed. Your earlier questions and their answers are in <Link to="/settings/support/archive" style={{ color: "var(--gold)" }}>Archive</Link>.</p>
           <textarea className="input" rows={5} placeholder="Describe your issue…" value={msg} onChange={(e) => setMsg(e.target.value)} style={{ width: "100%", marginBottom: 10 }} />
           {error && <p style={{ color: "#f55", fontSize: 13, marginBottom: 8 }}>{error}</p>}
           <button className="btn" onClick={send} disabled={busy || !msg.trim()} style={{ background: "var(--gold-border)", color: "#000", borderColor: "var(--gold-border)" }}>
