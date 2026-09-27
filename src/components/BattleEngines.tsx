@@ -26,7 +26,7 @@ export function Overlay({ title, children, onClose, width = 440 }: { title: stri
 }
 
 export type BattleKind =
-  | "1v1" | "gameLimit" | "virtual" | "series" | "2v2" | "marathon" | "555" | "solo"
+  | "1v1" | "gameLimit" | "virtual" | "series" | "2v2" | "marathon" | "555" | "solo" | "hideSeek"
   // Android numbers this one #5 and it belongs between Best Out Of and 5-5-5. It isn't a battle
   // you start against someone in the room — it's a personal 31-day streak you opt into — so it
   // needs no people on screen.
@@ -66,6 +66,10 @@ export const BATTLE_KINDS: {
   // minPeople is 1. Starting one is host-only, gated at the call site like the phones do.
   { kind: "solo", number: "#9", title: "Solo Battle", blurb: "Anyone watching can join and compete", minPeople: 1,
     info: "Start one instantly, no admin needed. Everyone watching gets 2 minutes to go live and join — whoever's received the most gifts when it ends wins. Tap any name on the leaderboard to jump straight to their live." },
+  // Steve, 2026-09-27: "Hide & Seek" — 5 minutes, scores hidden until the end, 2-4 players free
+  // for all or 2v2 teams. Runs on the Best Out Of (single round) and 2v2 engines with hide_scores.
+  { kind: "hideSeek", number: "#10", title: "Hide & Seek", blurb: "5 minutes · scores hidden until the end", minPeople: 2,
+    info: "A 5-minute battle where nobody can see the scores — not the players, not the room — until the clock runs out and both sides are revealed at once. Play it 1v1, with 3 or 4 players free for all, or as 2v2 teams. Most gift coins wins; fun and nerve-wracking to the last second." },
   // Unnumbered from here down, exactly as on the phones: these aren't battles you can start, so
   // they carry no "#n" and never check how many people are on screen.
   { kind: "pkContests", title: "PK Battle Contests", blurb: "Admin-run · scored by gift coins", minPeople: 1, reference: true,
@@ -237,13 +241,13 @@ export function SeriesStrip({ d, now, nameOf }: { d: SeriesData; now: number; na
   const accepted = d.participants.filter((p) => p.invite_status === "accepted");
   const secs = d.status === "active" ? secondsUntil(d.current_round_ends_at, now) : null;
   return (
-    <Strip title={`Best Out Of ${d.length}${d.status === "active" && d.current_round_number ? ` · Round ${d.current_round_number}` : ""}`}
+    <Strip title={d.hide_scores ? "🙈 Hide & Seek" : `Best Out Of ${d.length}${d.status === "active" && d.current_round_number ? ` · Round ${d.current_round_number}` : ""}`}
       right={d.status === "pending_invites" ? waiting(accepted.length, d.participants.length) : <span className="pill">{clock(secs)}</span>}>
-      <div className="muted" style={{ fontSize: 11, marginTop: 4 }}>First to {d.rounds_needed_to_win} rounds. Each round is 5 minutes.</div>
+      <div className="muted" style={{ fontSize: 11, marginTop: 4 }}>{d.hide_scores ? "Scores stay hidden until the end — then everyone's revealed at once." : `First to ${d.rounds_needed_to_win} rounds. Each round is 5 minutes.`}</div>
       {(d.status === "active" ? accepted : d.participants).map((p) => (
         <div key={p.user_id} className="row" style={{ justifyContent: "space-between", marginTop: 4, fontSize: 13 }}>
           <span><b>{nameOf(p.user_id) || personName(p)}</b>{p.invite_status !== "accepted" ? <span className="muted"> · {p.invite_status}</span> : null}</span>
-          <span><span title="rounds won">{"★".repeat(p.rounds_won ?? 0)}</span> <span style={{ color: "var(--gold)" }}>{(p.current_round_score ?? 0).toLocaleString()}</span></span>
+          <span>{!d.hide_scores && <span title="rounds won">{"★".repeat(p.rounds_won ?? 0)}</span>} <span style={{ color: "var(--gold)" }}>{d.hide_scores && d.status === "active" ? "🙈 ?" : (p.current_round_score ?? 0).toLocaleString()}</span></span>
         </div>
       ))}
     </Strip>
@@ -253,17 +257,18 @@ export function SeriesStrip({ d, now, nameOf }: { d: SeriesData; now: number; na
 export function TwoVTwoStrip({ d, now, nameOf }: { d: Battle2v2Data; now: number; nameOf: NameOf }) {
   const team = (t: "A" | "B") => d.participants.filter((p) => p.team === t);
   const names = (t: "A" | "B") => team(t).map((p) => nameOf(p.user_id) || personName(p)).join(" & ");
+  const hidden = !!d.hide_scores && d.status === "active";
   const a = d.team_a_score ?? 0, b = d.team_b_score ?? 0;
   const total = a + b;
   const accepted = d.participants.filter((p) => p.invite_status === "accepted").length;
   const secs = d.status === "active" ? secondsUntil(d.ends_at, now) : null;
   return (
-    <Strip title="2v2 Battle" right={d.status === "pending_invites" ? waiting(accepted, d.participants.length) : <span className="pill">{clock(secs)}</span>}>
+    <Strip title={d.hide_scores ? "🙈 Hide & Seek 2v2" : "2v2 Battle"} right={d.status === "pending_invites" ? waiting(accepted, d.participants.length) : <span className="pill">{clock(secs)}</span>}>
       <div className="row" style={{ justifyContent: "space-between", marginTop: 6, fontSize: 13 }}>
-        <span><b>{names("A")}</b> <span style={{ color: "var(--gold)" }}>{a.toLocaleString()}</span></span>
-        <span><span style={{ color: "var(--gold)" }}>{b.toLocaleString()}</span> <b>{names("B")}</b></span>
+        <span><b>{names("A")}</b> <span style={{ color: "var(--gold)" }}>{hidden ? "?" : a.toLocaleString()}</span></span>
+        <span><span style={{ color: "var(--gold)" }}>{hidden ? "?" : b.toLocaleString()}</span> <b>{names("B")}</b></span>
       </div>
-      <Bar pct={total > 0 ? (a / total) * 100 : 50} />
+      {hidden ? <div className="muted" style={{ fontSize: 11, marginTop: 4 }}>Scores stay hidden until the end.</div> : <Bar pct={total > 0 ? (a / total) * 100 : 50} />}
     </Strip>
   );
 }

@@ -19,8 +19,10 @@ export interface Participant {
 }
 
 // ---- Best Out Of ------------------------------------------------------------------------
-export interface SeriesParticipant extends Participant { rounds_won: number; current_round_score: number }
+export interface SeriesParticipant extends Participant { rounds_won: number; current_round_score: number | null }
 export interface SeriesData {
+  /** Hide & Seek: scores are null while active and revealed at the end. */
+  hide_scores?: boolean;
   series_id: number;
   room_name: string;
   host_user_id: number;
@@ -34,11 +36,12 @@ export interface SeriesData {
   winner_user_id: number | null;
   participants: SeriesParticipant[];
 }
-export interface SeriesInvite { series_id: number; length: number; host_user_id: number; host_fullname?: string; host_username?: string; host_profile_image?: string }
+export interface SeriesInvite { series_id: number; length: number; hide_scores?: boolean; host_user_id: number; host_fullname?: string; host_username?: string; host_profile_image?: string }
 
 // ---- 2v2 ------------------------------------------------------------------------------
-export interface TeamParticipant extends Participant { team: "A" | "B"; current_score: number }
+export interface TeamParticipant extends Participant { team: "A" | "B"; current_score: number | null }
 export interface Battle2v2Data {
+  hide_scores?: boolean;
   battle_id: number;
   room_name: string;
   initiator_user_id: number;
@@ -51,6 +54,7 @@ export interface Battle2v2Data {
   ends_at?: string | null;
 }
 export interface Invite2v2 {
+  hide_scores?: boolean;
   battle_id: number;
   initiator_user_id: number; initiator_fullname?: string; initiator_username?: string;
   my_team: "A" | "B";
@@ -313,11 +317,11 @@ async function must(endpoint: string, params: Record<string, unknown>, fallback:
   return res;
 }
 
-export const createSeries = (myUserId: number, roomName: string, length: number, inviteeIds: number[]) =>
-  must("createBattleSeries", { my_user_id: myUserId, room_name: roomName, length, invitee_user_ids: inviteeIds }, "Couldn't start the Best Out Of battle.");
+export const createSeries = (myUserId: number, roomName: string, length: number, inviteeIds: number[], hideScores = false) =>
+  must("createBattleSeries", { ...(hideScores ? { hide_scores: 1 } : {}), my_user_id: myUserId, room_name: roomName, length, invitee_user_ids: inviteeIds }, "Couldn't start the Best Out Of battle.");
 
-export const invite2v2 = (myUserId: number, roomName: string, teammateId: number, opponent1Id: number, opponent2Id: number) =>
-  must("invite2v2Battle", { initiator_user_id: myUserId, room_name: roomName, teammate_user_id: teammateId, opponent1_user_id: opponent1Id, opponent2_user_id: opponent2Id }, "Couldn't send the 2v2 invites.");
+export const invite2v2 = (myUserId: number, roomName: string, teammateId: number, opponent1Id: number, opponent2Id: number, hideScores = false) =>
+  must("invite2v2Battle", { ...(hideScores ? { hide_scores: 1 } : {}), initiator_user_id: myUserId, room_name: roomName, teammate_user_id: teammateId, opponent1_user_id: opponent1Id, opponent2_user_id: opponent2Id }, "Couldn't send the 2v2 invites.");
 
 export const inviteMarathon = (myUserId: number, roomName: string, inviteeIds: number[]) =>
   must("inviteMarathonBattle", { my_user_id: myUserId, room_name: roomName, invitee_user_ids: inviteeIds }, "Couldn't send the No Time Limit invites.");

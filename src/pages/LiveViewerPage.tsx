@@ -83,6 +83,8 @@ export function LiveViewerPage() {
   const [result, setResult] = useState<{ title: string; rows: { label: string; value: string; win?: boolean }[] } | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [picker, setPicker] = useState<BattleKind | null>(null);
+  // Steve, 2026-09-27: Hide & Seek — pick the shape first (free for all 2-4, or 2v2 teams).
+  const [hideSeekMode, setHideSeekMode] = useState<"choose" | "series" | "2v2" | null>(null);
   const myId = user?.id ?? null;
   const virtualRef = useRef<VirtualBattleData | null>(null);
   const nameOfId = useCallback((id: number | null | undefined) => {
@@ -619,6 +621,7 @@ export function LiveViewerPage() {
           if (k === "virtual") { if (role === "host") setPicker("virtual"); else setToast("Only the live host can start a Virtual Battle."); return; }
           if (k === "1v1") setBattlePicker(true);
           else if (k === "gameLimit") setGameLimitPicker(true);
+          else if (k === "hideSeek") setHideSeekMode("choose");
           else if (k === "solo") startSolo();
           // The 31-day challenge and the three reference rows open their own overlay off the
           // same `picker` state — they start nothing, so they need no people-picker step.
@@ -636,6 +639,30 @@ export function LiveViewerPage() {
       )}
       {picker === "punishments" && (
         <PunishmentsOverlay onClose={() => setPicker(null)} />
+      )}
+      {hideSeekMode === "choose" && (
+        <Overlay title="🙈 Hide & Seek" onClose={() => setHideSeekMode(null)}>
+          <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>5 minutes, most gift coins wins — but nobody sees a single score until the clock runs out. How do you want to play it?</p>
+          <div style={{ display: "grid", gap: 8 }}>
+            <button className="btn" style={{ background: "var(--gold-border)", color: "#000", borderColor: "#000" }} onClick={() => setHideSeekMode("series")}>Free for all · 2 to 4 players</button>
+            <button className="btn" style={{ background: "var(--gold-border)", color: "#000", borderColor: "#000" }} onClick={() => setHideSeekMode("2v2")}>2v2 teams · 4 players</button>
+          </div>
+        </Overlay>
+      )}
+      {hideSeekMode === "series" && myId && (
+        <MultiPicker title="🙈 Hide & Seek" blurb="Invite 1 to 3 others. One 5-minute round, scores hidden until the end, most gift coins wins."
+          people={broadcasters.filter((b) => b.user_id !== myId)} onClose={() => setHideSeekMode(null)}
+          onSubmit={async (ids) => {
+            try { await createSeries(myId, roomName, 1, ids, true); setHideSeekMode(null); setToast("Hide & Seek invites sent."); }
+            catch (e) { setToast((e as Error).message); }
+          }} />
+      )}
+      {hideSeekMode === "2v2" && myId && (
+        <TwoVTwoPicker people={broadcasters.filter((b) => b.user_id !== myId)} onClose={() => setHideSeekMode(null)}
+          onSubmit={async (teammate, o1, o2) => {
+            try { await invite2v2(myId, roomName, teammate, o1, o2, true); setHideSeekMode(null); setToast("Hide & Seek 2v2 invites sent."); }
+            catch (e) { setToast((e as Error).message); }
+          }} />
       )}
       {picker === "series" && myId && (
         <MultiPicker title="Best Out Of" blurb="5-minute rounds. First to win more than half the rounds takes the series." lengths={[3, 5, 7, 9, 11]}
@@ -683,11 +710,13 @@ export function LiveViewerPage() {
           }} />
       )}
       {series.invite && (
-        <InviteCard title="Best Out Of" onClose={series.dismissInvite} onAnswer={(ok) => series.respond(series.invite!.series_id, ok).catch((e) => setToast((e as Error).message))}
-          body={`${displayName({ fullname: series.invite.host_fullname, username: series.invite.host_username } as Partial<UserSummary>)} invites you to a Best Out Of ${series.invite.length} battle — 5-minute rounds, most gift coins wins each round.`} />
+        <InviteCard title={series.invite.hide_scores ? "🙈 Hide & Seek" : "Best Out Of"} onClose={series.dismissInvite} onAnswer={(ok) => series.respond(series.invite!.series_id, ok).catch((e) => setToast((e as Error).message))}
+          body={series.invite.hide_scores
+            ? `${displayName({ fullname: series.invite.host_fullname, username: series.invite.host_username } as Partial<UserSummary>)} invites you to Hide & Seek — 5 minutes, most gift coins wins, and nobody sees the scores until the end.`
+            : `${displayName({ fullname: series.invite.host_fullname, username: series.invite.host_username } as Partial<UserSummary>)} invites you to a Best Out Of ${series.invite.length} battle — 5-minute rounds, most gift coins wins each round.`} />
       )}
       {two.invite && (
-        <InviteCard title="2v2 Battle" onClose={two.dismissInvite} onAnswer={(ok) => two.respond(two.invite!.battle_id, ok).catch((e) => setToast((e as Error).message))} body={describe2v2Invite(two.invite)} />
+        <InviteCard title={two.invite.hide_scores ? "🙈 Hide & Seek 2v2" : "2v2 Battle"} onClose={two.dismissInvite} onAnswer={(ok) => two.respond(two.invite!.battle_id, ok).catch((e) => setToast((e as Error).message))} body={`${describe2v2Invite(two.invite)}${two.invite.hide_scores ? " Hide & Seek: nobody sees the scores until the end." : ""}`} />
       )}
       {marathon.invite && (
         <InviteCard title="No Time Limit" onClose={marathon.dismissInvite} onAnswer={(ok) => marathon.respond(marathon.invite!.marathon_id, ok).catch((e) => setToast((e as Error).message))}
