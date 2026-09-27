@@ -14,6 +14,18 @@ export function WalletPage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => { refresh(); /* fresh balances */ }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  // Steve, 2026-09-27 ("Do the same on the web" after the phones' Stripe fix): the coin store
+  // opens in its own tab, so the balance here went stale after paying — with either gateway —
+  // until a full reload. Refresh whenever the member comes back to this tab.
+  useEffect(() => {
+    const onBack = () => { if (document.visibilityState === "visible") refresh(); };
+    document.addEventListener("visibilitychange", onBack);
+    window.addEventListener("focus", onBack);
+    return () => {
+      document.removeEventListener("visibilitychange", onBack);
+      window.removeEventListener("focus", onBack);
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!user) return;
     // The packs the WEBSITE checkout sells (with bonus coins) — not the phones' store products.
