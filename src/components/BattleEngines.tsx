@@ -141,11 +141,14 @@ export function BattleMenu({ peopleOnScreen, onPick, onClose, onNotice }: { peop
 }
 
 /** Multi-select of the other people on screen (Best Out Of, No Time Limit, 5-5-5). */
-export function MultiPicker({ title, blurb, people, lengths, onSubmit, onClose }: {
+export function MultiPicker({ title, blurb, people, lengths, exact, onSubmit, onClose }: {
   title: string; blurb: string; people: Person[]; lengths?: number[];
+  /** Hide & Seek (Steve, 2026-09-27): require exactly this many people picked. */
+  exact?: number;
   onSubmit: (ids: number[], length?: number) => Promise<void>; onClose: () => void;
 }) {
   const [picked, setPicked] = useState<number[]>(people.length === 1 ? [people[0].user_id] : []);
+  const exactOk = exact === undefined || picked.length === exact;
   const [length, setLength] = useState<number>(lengths?.[1] ?? lengths?.[0] ?? 0);
   const [busy, setBusy] = useState(false);
   const toggle = (id: number) => setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
@@ -167,7 +170,8 @@ export function MultiPicker({ title, blurb, people, lengths, onSubmit, onClose }
           <span style={{ fontWeight: 700 }}>{personName(p)}</span>
         </label>
       ))}
-      <button className="btn block" style={{ marginTop: 10 }} disabled={busy || picked.length === 0} onClick={async () => {
+      {exact !== undefined && <div className="muted" style={{ fontSize: 12, marginBottom: 6 }}>Pick exactly {exact} {exact === 1 ? "person" : "people"} ({picked.length}/{exact}).</div>}
+      <button className="btn block" style={{ marginTop: 10 }} disabled={busy || picked.length === 0 || !exactOk} onClick={async () => {
         setBusy(true);
         try { await onSubmit(picked, lengths ? length : undefined); } finally { setBusy(false); }
       }}>{busy ? "Sending…" : `Send invite${picked.length > 1 ? "s" : ""}`}</button>

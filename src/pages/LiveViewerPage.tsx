@@ -89,7 +89,7 @@ export function LiveViewerPage() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [picker, setPicker] = useState<BattleKind | null>(null);
   // Steve, 2026-09-27: Hide & Seek — pick the shape first (free for all 2-4, or 2v2 teams).
-  const [hideSeekMode, setHideSeekMode] = useState<"choose" | "series" | "2v2" | null>(null);
+  const [hideSeekMode, setHideSeekMode] = useState<"choose" | "2v2" | 1 | 2 | 3 | null>(null);
   const myId = user?.id ?? null;
   const virtualRef = useRef<VirtualBattleData | null>(null);
   const nameOfId = useCallback((id: number | null | undefined) => {
@@ -650,14 +650,17 @@ export function LiveViewerPage() {
       {hideSeekMode === "choose" && (
         <Overlay title="🙈 Hide & Seek" onClose={() => setHideSeekMode(null)}>
           <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>5 minutes, most gift coins wins — but nobody sees a single score until the clock runs out. How do you want to play it?</p>
+          {/* Steve, 2026-09-27: "1v1 on top, 2v2 below, 3 members below, 4 members last." */}
           <div style={{ display: "grid", gap: 8 }}>
-            <button className="btn" style={{ background: "var(--gold-border)", color: "#000", borderColor: "#000" }} onClick={() => setHideSeekMode("series")}>Free for all · 2 to 4 players</button>
-            <button className="btn" style={{ background: "var(--gold-border)", color: "#000", borderColor: "#000" }} onClick={() => setHideSeekMode("2v2")}>2v2 teams · 4 players</button>
+            <button className="btn" style={{ background: "var(--gold-border)", color: "#000", borderColor: "#000" }} onClick={() => setHideSeekMode(1)}>1v1</button>
+            <button className="btn" style={{ background: "var(--gold-border)", color: "#000", borderColor: "#000" }} onClick={() => setHideSeekMode("2v2")}>2v2</button>
+            <button className="btn" style={{ background: "var(--gold-border)", color: "#000", borderColor: "#000" }} onClick={() => setHideSeekMode(2)}>3 members</button>
+            <button className="btn" style={{ background: "var(--gold-border)", color: "#000", borderColor: "#000" }} onClick={() => setHideSeekMode(3)}>4 members</button>
           </div>
         </Overlay>
       )}
-      {hideSeekMode === "series" && myId && (
-        <MultiPicker title="🙈 Hide & Seek" blurb="Invite 1 to 3 others. One 5-minute round, scores hidden until the end, most gift coins wins."
+      {typeof hideSeekMode === "number" && myId && (
+        <MultiPicker title={`🙈 Hide & Seek · ${hideSeekMode === 1 ? "1v1" : `${hideSeekMode + 1} members`}`} blurb="One 5-minute round, scores hidden until the end, most gift coins wins." exact={hideSeekMode}
           people={broadcasters.filter((b) => b.user_id !== myId)} onClose={() => setHideSeekMode(null)}
           onSubmit={async (ids) => {
             try { await createSeries(myId, roomName, 1, ids, true); setHideSeekMode(null); setToast("Hide & Seek invites sent."); }
