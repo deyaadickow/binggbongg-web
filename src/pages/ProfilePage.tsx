@@ -248,6 +248,7 @@ export function ProfilePage() {
   // Photos are neither posts nor members, so they get their own bucket rather than being
   // squeezed through tabVideos (different fields, different click target).
   const [tabPhotos, setTabPhotos] = useState<Photo[]>([]);
+  const [tabError, setTabError] = useState(false);
   const [photoCount, setPhotoCount] = useState<number | null>(null);
   const [viewingPhoto, setViewingPhoto] = useState<Photo | null>(null);
   const [tabLoading, setTabLoading] = useState(false);
@@ -306,9 +307,13 @@ export function ProfilePage() {
         setTabLoading(false);
         return;
       }
+      setTabError(false);
       fetchUserPhotos(me.id, Number(id))
         .then(({ photos, count }) => { setTabPhotos(photos); setPhotoCount(count); })
-        .catch(() => { setTabPhotos([]); setPhotoCount(0); })
+        // 2026-09-27: a failed call (expired session, network) used to read as "No photos yet",
+        // which blames the member for something that is really a load error — leave the count
+        // unknown so the tab says the load failed instead.
+        .catch(() => { setTabPhotos([]); setPhotoCount(null); setTabError(true); })
         .finally(() => setTabLoading(false));
       return;
     }
@@ -637,14 +642,14 @@ export function ProfilePage() {
         ) : tab === "photos" ? (
           tabPhotos.length === 0 ? (
             <p className="muted" style={{ padding: "24px 0", textAlign: "center" }}>
-              {me ? "No photos yet." : "Sign in to see photos."}
+              {tabError ? "Couldn't load photos. Sign in again and retry." : me ? "No photos yet." : "Sign in to see photos."}
             </p>
           ) : (
             <div className="profile-vid-grid">
               {tabPhotos.map((ph) => (
                 <button key={ph.id} onClick={() => setViewingPhoto(ph)}
                   style={{ padding: 0, border: "none", background: "transparent", cursor: "pointer", display: "block", width: "100%" }}>
-                  <img src={mediaUrl(ph.thumb_path || ph.photo_path)} alt="" loading="lazy"
+                  <img src={ph.thumb_url || ph.photo_url || mediaUrl(ph.thumb_path || ph.photo_path)} alt="" loading="lazy"
                     style={{ width: "100%", aspectRatio: "1", objectFit: "cover", display: "block", borderRadius: 4 }} />
                 </button>
               ))}
@@ -681,7 +686,7 @@ export function ProfilePage() {
       {viewingPhoto && (
         <div onClick={() => setViewingPhoto(null)}
           style={{ position: "fixed", inset: 0, zIndex: 60, background: "rgba(0,0,0,.85)", display: "grid", placeItems: "center", padding: 16 }}>
-          <img src={mediaUrl(viewingPhoto.photo_path || viewingPhoto.thumb_path)} alt=""
+          <img src={viewingPhoto.photo_url || viewingPhoto.thumb_url || mediaUrl(viewingPhoto.photo_path || viewingPhoto.thumb_path)} alt=""
             onClick={(e) => e.stopPropagation()}
             style={{ maxWidth: "min(760px, 100%)", maxHeight: "86vh", objectFit: "contain", borderRadius: 10, display: "block" }} />
         </div>

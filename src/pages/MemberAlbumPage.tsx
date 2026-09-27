@@ -51,7 +51,7 @@ export function MemberAlbumPage() {
           {photos.map((p) => (
             <button key={p.id} onClick={() => setViewing(p)}
               style={{ padding: 0, border: "1px solid var(--line)", borderRadius: 10, overflow: "hidden", background: "var(--panel)", cursor: "pointer", aspectRatio: "1" }}>
-              <img src={mediaUrl(p.thumb_path || p.photo_path)} alt="" loading="lazy"
+              <img src={p.thumb_url || p.photo_url || mediaUrl(p.thumb_path || p.photo_path)} alt="" loading="lazy"
                 style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
             </button>
           ))}
@@ -61,7 +61,7 @@ export function MemberAlbumPage() {
       {viewing && (
         <div onClick={() => setViewing(null)}
           style={{ position: "fixed", inset: 0, zIndex: 60, background: "rgba(0,0,0,.85)", display: "grid", placeItems: "center", padding: 16 }}>
-          <img src={mediaUrl(viewing.photo_path || viewing.thumb_path)} alt=""
+          <img src={viewing.photo_url || viewing.thumb_url || mediaUrl(viewing.photo_path || viewing.thumb_path)} alt=""
             onClick={(e) => e.stopPropagation()}
             style={{ maxWidth: "min(900px, 100%)", maxHeight: "86vh", objectFit: "contain", borderRadius: 10 }} />
         </div>

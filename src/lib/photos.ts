@@ -87,6 +87,9 @@ export interface Photo {
   id: number;
   photo_path?: string | null;
   thumb_path?: string | null;
+  /** Absolute URLs the backend appends (Photo model); preferred over rebuilding from the paths. */
+  photo_url?: string | null;
+  thumb_url?: string | null;
   is_favorited?: boolean | number | null;
   folder_id?: number | null;
   created_at?: string | null;
