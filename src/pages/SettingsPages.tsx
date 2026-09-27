@@ -7,6 +7,8 @@ import { API_BASE, currentAuthHeaders, displayName, mediaUrl, post, type UserSum
 import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice, UserRow } from "../components/Common";
 import { SideLinkItem, sidebarSections } from "../components/Sidebar";
+import { fetchMyVirtualBattles, fetchVirtualGiftRecord, sendVirtualThankYou, type VirtualBattleData, type VirtualGiftRecord } from "../lib/battles";
+import { VirtualGiftRecordOverlay, personName } from "../components/BattleEngines";
 
 const SITE = "https://www.binggbongg.com";
 
@@ -849,6 +851,47 @@ export function VirtualLookPage() {
         </label>
         <button className="btn ghost" disabled={busy} onClick={remove}>Remove and use my profile photo</button>
       </div>
+    </Page>
+  );
+}
+
+
+// ---- My Virtual Battles (Steve, 2026-09-27: "where does the judge see who battled with him
+// and how many gift he got and from who?") — every battle I was in; a row opens its gift record.
+export function MyVirtualBattlesPage() {
+  const { user } = useSession();
+  const [battles, setBattles] = useState<VirtualBattleData[] | null>(null);
+  const [record, setRecord] = useState<VirtualGiftRecord | null>(null);
+  const [note, setNote] = useState("");
+  useEffect(() => { if (user) fetchMyVirtualBattles(user.id).then(setBattles).catch(() => setBattles([])); }, [user]);
+  if (!user) return <NeedLogin />;
+  const myId = user.id;
+  return (
+    <Page title="My Virtual Battles">
+      <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>Every Virtual Battle you were in. Open one to see who gifted you and say thanks.</p>
+      {note && <Notice>{note}</Notice>}
+      {battles === null && <Loading />}
+      {battles && battles.length === 0 && <p className="soft">No Virtual Battles yet.</p>}
+      {battles?.map((b) => {
+        const me = b.participants.find((p) => p.user_id === myId);
+        const others = b.participants.filter((p) => p.user_id !== myId).map((p) => personName(p)).join(", ");
+        const winner = b.participants.find((p) => p.user_id === b.winner_user_id);
+        const outcome = b.status !== "completed" ? "In progress" : b.winner_user_id === null ? "Tie" : b.winner_user_id === myId ? "🏆 You won" : `${winner ? personName(winner) : "Someone"} won`;
+        return (
+          <button key={b.virtual_battle_id} className="card pad" style={{ width: "100%", textAlign: "left", marginBottom: 10, borderColor: "var(--gold-border)", cursor: "pointer" }}
+            onClick={() => fetchVirtualGiftRecord(myId, b.virtual_battle_id).then(setRecord).catch((e) => setNote((e as Error).message))}>
+            <div className="row" style={{ justifyContent: "space-between", fontSize: 12, color: "var(--gold)", fontWeight: 800 }}>
+              <span>{b.started_at ? new Date(b.started_at).toLocaleString() : ""}</span><span>{outcome}</span>
+            </div>
+            <div style={{ marginTop: 4 }}>With <b>{others || "—"}</b></div>
+            <div className="muted" style={{ fontSize: 13 }}>You received {(me?.current_score ?? 0).toLocaleString()} coins</div>
+          </button>
+        );
+      })}
+      {record && (
+        <VirtualGiftRecordOverlay record={record} myUserId={myId} onClose={() => setRecord(null)}
+          onThank={async (to, message) => { try { setNote(await sendVirtualThankYou(myId, record.battle.virtual_battle_id, to, message)); } catch (e) { setNote((e as Error).message); } }} />
+      )}
     </Page>
   );
 }

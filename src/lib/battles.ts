@@ -111,6 +111,9 @@ export interface VirtualParticipant {
   virtual_media_url?: string | null;
   virtual_media_type?: "image" | "video" | string | null;
   current_score: number;
+  // The last gift this participant received — the strip flashes it over the avatar.
+  last_gift_image?: string | null;
+  last_gift_id?: number | null;
 }
 export interface VirtualBattleData {
   virtual_battle_id: number;
@@ -142,6 +145,10 @@ export async function sendVirtualThankYou(myUserId: number, battleId: number, to
   const res = await post("sendVirtualBattleThankYou", { my_user_id: myUserId, virtual_battle_id: battleId, to_user_ids: toUserIds.join(","), message });
   if (!res.status) throw new Error(res.message ?? "Couldn't send that.");
   return res.message ?? "Thanks sent.";
+}
+export async function fetchMyVirtualBattles(myUserId: number): Promise<VirtualBattleData[]> {
+  const res = await post<VirtualBattleData[]>("fetchMyVirtualBattles", { my_user_id: myUserId });
+  return res.status ? (res.data ?? []) : [];
 }
 export async function searchVirtualMembers(myUserId: number, keyword: string): Promise<VirtualMember[]> {
   const res = await post<VirtualMember[]>("searchVirtualBattleMembers", { my_user_id: myUserId, keyword });

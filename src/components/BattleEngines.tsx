@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { mediaUrl } from "../lib/api";
 import { searchVirtualMembers, secondsUntil as vbSecondsUntil, clock as vbClock, type VirtualBattleData, type VirtualGiftRecord, type VirtualMember, type VirtualParticipant } from "../lib/battles";
-import { useEffect as useEffectVB, useState as useStateVB } from "react";
+import { useEffect as useEffectVB, useRef as useRefVB, useState as useStateVB } from "react";
 import { displayName, type UserSummary } from "../lib/api";
 import { clock, secondsUntil, type B555Data, type Battle2v2Data, type Invite2v2, type MarathonData, type SeriesData } from "../lib/battles";
 
@@ -421,12 +421,32 @@ export function VirtualPicker({ myUserId, guests, onSubmit, onClose }: { myUserI
 export function VirtualStrip({ d, now, myUserId, onGift }: { d: VirtualBattleData; now: number; myUserId: number | null; onGift: (p: VirtualParticipant) => void }) {
   const secs = d.status === "active" ? vbSecondsUntil(d.ends_at, now) : null;
   const sorted = [...d.participants].sort((a, b) => (b.current_score ?? 0) - (a.current_score ?? 0));
+  // Steve, 2026-09-27: "When sending a gift to the virtual member remove his avatar and show the
+  // gift than bring back his avatar." Flash the last gift over the card for 3 seconds whenever
+  // last_gift_id changes (the first sight of a card is remembered, not flashed).
+  const shownRef = useRefVB<Map<number, number>>(new Map());
+  const [flashing, setFlashing] = useStateVB<Map<number, string>>(new Map());
+  useEffectVB(() => {
+    for (const p of d.participants) {
+      const id = p.last_gift_id ?? 0;
+      if (!id || !p.last_gift_image) continue;
+      const seen = shownRef.current.get(p.user_id);
+      if (seen === undefined) { shownRef.current.set(p.user_id, id); continue; }
+      if (seen === id) continue;
+      shownRef.current.set(p.user_id, id);
+      const img = p.last_gift_image;
+      setFlashing((cur) => new Map(cur).set(p.user_id, img));
+      setTimeout(() => setFlashing((cur) => { const next = new Map(cur); next.delete(p.user_id); return next; }), 3000);
+    }
+  }, [d]);
   return (
     <Strip title="Virtual Battle" right={<span className="pill">{vbClock(secs)}</span>}>
       <div className="row" style={{ gap: 8, marginTop: 8, flexWrap: "wrap" }}>
         {sorted.map((p) => (
           <div key={p.user_id} style={{ display: "grid", gap: 4, justifyItems: "center", padding: 6, border: "1px solid var(--gold-border)", borderRadius: 10, background: "#000" }}>
-            <VirtualLook p={p} size={84} />
+            {flashing.get(p.user_id)
+              ? <img src={flashing.get(p.user_id)!} alt="" style={{ width: 84, height: 84, borderRadius: 8, objectFit: "contain", background: "#000", padding: 6, boxSizing: "border-box" }} />
+              : <VirtualLook p={p} size={84} />}
             <b style={{ fontSize: 12, maxWidth: 84, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{personName(p as Person)}</b>
             <span className="muted" style={{ fontSize: 11 }}>{p.kind}</span>
             <span style={{ color: "var(--gold)", fontWeight: 800 }}>{(p.current_score ?? 0).toLocaleString()}</span>

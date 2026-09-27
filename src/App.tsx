@@ -19,7 +19,7 @@ import { WalletPage } from "./pages/WalletPage";
 import { GoLivePage } from "./pages/GoLivePage";
 import { Sidebar } from "./components/Sidebar";
 import { AdReferralEarningsPage, AllVideosEarningsPage, PayoutHistoryPage, RedeemPage, RepostEarningsPage, RewardingActionsPage, StatementsPage } from "./pages/WalletPages";
-import { AccountSettingsPage, AdvertisePage, BlockedProfilesPage, ComingSoonPage, ContestRequestsPage, DeleteAccountPage, FindABattlePage, ModeratorsPage, QrCodePage, ReferralsPage, SettingsHubPage, ShareProfilePage, SimulcastPage, SupportArchivePage, SupportPage, VirtualLookPage, TermsOfUsePage, PrivacyPolicyPage, ContactUsPage, AboutUsPage, FaqPage } from "./pages/SettingsPages";
+import { AccountSettingsPage, AdvertisePage, BlockedProfilesPage, ComingSoonPage, ContestRequestsPage, DeleteAccountPage, FindABattlePage, ModeratorsPage, QrCodePage, ReferralsPage, SettingsHubPage, ShareProfilePage, SimulcastPage, SupportArchivePage, SupportPage, VirtualLookPage, MyVirtualBattlesPage, TermsOfUsePage, PrivacyPolicyPage, ContactUsPage, AboutUsPage, FaqPage } from "./pages/SettingsPages";
 
 export default function App() {
   return (
@@ -65,6 +65,7 @@ export default function App() {
           <Route path="/settings/find-a-battle" element={<FindABattlePage />} />
           <Route path="/settings/simulcast" element={<SimulcastPage />} />
           <Route path="/settings/virtual-look" element={<VirtualLookPage />} />
+          <Route path="/settings/virtual-battles" element={<MyVirtualBattlesPage />} />
           <Route path="/settings/advertise" element={<AdvertisePage />} />
           <Route path="/settings/shop" element={<ComingSoonPage title="Bingg Bongg Shop" note="Products from members and partners, right inside Bingg Bongg." />} />
           <Route path="/settings/verification" element={<ComingSoonPage title="Request verification" note="Send your ID and a selfie to get the verified badge." />} />
