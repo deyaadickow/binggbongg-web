@@ -380,12 +380,16 @@ export function VirtualPicker({ myUserId, guests, onSubmit, onClose }: { myUserI
       return next;
     });
   };
-  async function search() {
-    const q = query.trim();
-    if (q.length < 2) { setNote("Type at least 2 letters."); return; }
+  // Steve, 2026-09-27: "also add members that are not live they can see and choose to battle
+  // with or they can search for them as well" — an empty search loads the server's browse list
+  // (members not hosting a live, most recently active first) on open; 2+ letters searches everyone.
+  async function search(text?: string) {
+    const q = (text ?? query).trim();
+    if (q.length === 1) { setNote("Type at least 2 letters."); return; }
     setBusy(true);
     try { setResults(await searchVirtualMembers(myUserId, q)); } finally { setBusy(false); }
   }
+  useEffectVB(() => { search(""); }, []);
   const row = (id: number, name: string, hint: string) => (
     <label key={id} className="row" style={{ gap: 10, padding: "8px 10px", border: "1px solid var(--gold-border)", borderRadius: 10, cursor: "pointer", opacity: selected.has(id) ? 1 : 0.85 }}>
       <input type="checkbox" checked={selected.has(id)} onChange={() => toggle(id, name)} />
@@ -394,7 +398,7 @@ export function VirtualPicker({ myUserId, guests, onSubmit, onClose }: { myUserI
   );
   return (
     <Overlay title="Virtual Battle" onClose={onClose}>
-      <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>Pick up to 3 — guests in your room, or search any member. Members who aren't live show their virtual look. 5 minutes, most coins wins.</p>
+      <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>Pick up to 3 — guests in your room, members who aren't live, or search any member. Members who aren't live show their virtual look. 5 minutes, most coins wins.</p>
       {guests.length > 0 && <>
         <div style={{ fontSize: 12, fontWeight: 800, color: "var(--gold)", margin: "8px 0 6px" }}>In your room</div>
         <div style={{ display: "grid", gap: 6 }}>{guests.map((g) => row(g.user_id, personName(g), "guest"))}</div>
@@ -402,9 +406,11 @@ export function VirtualPicker({ myUserId, guests, onSubmit, onClose }: { myUserI
       <div style={{ fontSize: 12, fontWeight: 800, color: "var(--gold)", margin: "12px 0 6px" }}>Search members</div>
       <div className="row" style={{ gap: 8 }}>
         <input className="input" placeholder="Name or username" value={query} onChange={(e) => setQuery(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") search(); }} style={{ flex: 1 }} />
-        <button className="btn small" onClick={search} disabled={busy}>{busy ? "…" : "Search"}</button>
+        <button className="btn small" onClick={() => search()} disabled={busy}>{busy ? "…" : "Search"}</button>
       </div>
-      <div style={{ display: "grid", gap: 6, marginTop: 8, maxHeight: 220, overflowY: "auto" }}>
+      <div style={{ fontSize: 12, fontWeight: 800, color: "var(--gold)", margin: "12px 0 6px" }}>{query.trim() ? "Search results" : "Members not live right now"}</div>
+      <div style={{ display: "grid", gap: 6, marginTop: 8, maxHeight: 260, overflowY: "auto" }}>
+        {results.length === 0 && !busy && <span className="muted" style={{ fontSize: 12 }}>{query.trim() ? "No members found." : "No members to show yet."}</span>}
         {results.filter((r) => !guests.some((g) => g.user_id === r.user_id)).map((m) => row(m.user_id, personName(m as Person), m.virtual_media_url ? "has a virtual look" : `@${m.username ?? ""}`))}
       </div>
       {note && <p style={{ color: "#f55", fontSize: 12, margin: "8px 0 0" }}>{note}</p>}
@@ -425,7 +431,7 @@ export function VirtualStrip({ d, now, myUserId, onGift }: { d: VirtualBattleDat
   // gift than bring back his avatar." Flash the last gift over the card for 3 seconds whenever
   // last_gift_id changes (the first sight of a card is remembered, not flashed).
   // "...and do this for every gift that avatar will receive": every gift not shown yet is queued
-  // and each flashes for 1.5 s in turn, so a burst of gifts shows one after another.
+  // and each flashes for 5 s in turn (Steve 2026-09-27), so a burst of gifts shows one after another.
   const shownRef = useRefVB<Map<number, Set<number>>>(new Map());
   const queuesRef = useRefVB<Map<number, string[]>>(new Map());
   const busyRef = useRefVB<Set<number>>(new Set());
@@ -437,7 +443,7 @@ export function VirtualStrip({ d, now, myUserId, onGift }: { d: VirtualBattleDat
     if (!next) { busyRef.current.delete(userId); setFlashing((cur) => { const m = new Map(cur); m.delete(userId); return m; }); return; }
     busyRef.current.add(userId);
     setFlashing((cur) => new Map(cur).set(userId, next));
-    setTimeout(() => flashNext(userId), 1500);
+    setTimeout(() => flashNext(userId), 5000); // Steve 2026-09-27: 5 s per gift
   };
   useEffectVB(() => {
     for (const p of d.participants) {
@@ -479,9 +485,12 @@ export function VirtualGiftRecordOverlay({ record, myUserId, onThank, onClose }:
   const [thanked, setThanked] = useStateVB<Set<number>>(new Set());
   const [editing, setEditing] = useStateVB<{ to: (number | "all")[]; who: string } | null>(null);
   const [draft, setDraft] = useStateVB(record.default_thank_you);
+  // Steve, 2026-09-27: every gifter row carries its own editable "Thank You For Your Gift" + Send
+  // on the right (any gifter in the battle, never myself) — one draft per gifter.
+  const [rowDrafts, setRowDrafts] = useStateVB<Map<number, string>>(new Map());
+  const rowDraft = (id: number) => rowDrafts.get(id) ?? record.default_thank_you;
   useEffectVB(() => {
-    const mine = record.participants.find((p) => p.user_id === myUserId);
-    setThanked(new Set((mine?.gifters ?? []).filter((g) => g.thanked).map((g) => g.user_id)));
+    setThanked(new Set(record.participants.flatMap((p) => p.gifters).filter((g) => g.thanked).map((g) => g.user_id)));
   }, [record, myUserId]);
   const mine = record.participants.filter((p) => p.user_id === myUserId);
   const others = record.participants.filter((p) => p.user_id !== myUserId);
@@ -525,12 +534,16 @@ export function VirtualGiftRecordOverlay({ record, myUserId, onThank, onClose }:
                       <b style={{ fontSize: 14 }}>{personName(g as Person)}</b>
                       <div className="muted" style={{ fontSize: 12 }}>{g.coins.toLocaleString()} coins · {g.gifts} gift{g.gifts === 1 ? "" : "s"}</div>
                     </div>
-                    {isMe && (thanked.has(g.user_id)
-                      ? <span className="pill" style={{ color: "var(--gold)" }}>✓ Thanked</span>
-                      : <>
-                          <button className="btn small" style={{ background: "var(--gold-border)", color: "#000", borderColor: "#000" }} onClick={() => send([g.user_id], record.default_thank_you, [g.user_id])}>Thank you</button>
-                          <button className="btn small ghost" onClick={() => { setDraft(record.default_thank_you); setEditing({ to: [g.user_id], who: personName(g as Person) }); }}>Edit</button>
-                        </>)}
+                    {g.user_id !== myUserId && (
+                      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+                        <input className="input" value={rowDraft(g.user_id)} placeholder="Your message" style={{ width: 170, fontSize: 12, padding: "5px 8px" }}
+                          onChange={(e) => setRowDrafts((cur) => new Map(cur).set(g.user_id, e.target.value))}
+                          onKeyDown={(e) => { if (e.key === "Enter") send([g.user_id], rowDraft(g.user_id), [g.user_id]); }} />
+                        {thanked.has(g.user_id)
+                          ? <span className="pill" style={{ color: "var(--gold)" }}>✓ Sent</span>
+                          : <button className="btn small" style={{ background: "var(--gold-border)", color: "#000", borderColor: "#000" }} onClick={() => send([g.user_id], rowDraft(g.user_id), [g.user_id])}>Send</button>}
+                      </div>
+                    )}
                   </div>
                 ))}
               </>
