@@ -248,7 +248,6 @@ export function ProfilePage() {
   // Photos are neither posts nor members, so they get their own bucket rather than being
   // squeezed through tabVideos (different fields, different click target).
   const [tabPhotos, setTabPhotos] = useState<Photo[]>([]);
-  const [tabError, setTabError] = useState(false);
   const [photoCount, setPhotoCount] = useState<number | null>(null);
   const [viewingPhoto, setViewingPhoto] = useState<Photo | null>(null);
   const [tabLoading, setTabLoading] = useState(false);
@@ -307,13 +306,12 @@ export function ProfilePage() {
         setTabLoading(false);
         return;
       }
-      setTabError(false);
       fetchUserPhotos(me.id, Number(id))
         .then(({ photos, count }) => { setTabPhotos(photos); setPhotoCount(count); })
         // 2026-09-27: a failed call (expired session, network) used to read as "No photos yet",
         // which blames the member for something that is really a load error — leave the count
         // unknown so the tab says the load failed instead.
-        .catch(() => { setTabPhotos([]); setPhotoCount(null); setTabError(true); })
+        .catch(() => { setTabPhotos([]); setPhotoCount(null); setTabError("Couldn't load photos. Sign in again and retry."); })
         .finally(() => setTabLoading(false));
       return;
     }
@@ -642,7 +640,7 @@ export function ProfilePage() {
         ) : tab === "photos" ? (
           tabPhotos.length === 0 ? (
             <p className="muted" style={{ padding: "24px 0", textAlign: "center" }}>
-              {tabError ? "Couldn't load photos. Sign in again and retry." : me ? "No photos yet." : "Sign in to see photos."}
+              {me ? "No photos yet." : "Sign in to see photos."}
             </p>
           ) : (
             <div className="profile-vid-grid">
