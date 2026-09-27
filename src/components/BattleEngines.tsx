@@ -1,6 +1,9 @@
 // UI for the multi-player battle engines in the web live room: the "Battle" menu + pickers,
 // invite cards, the score strips shown above the video grid, and the result overlays.
 import { useState } from "react";
+import { mediaUrl } from "../lib/api";
+import { searchVirtualMembers, secondsUntil as vbSecondsUntil, clock as vbClock, type VirtualBattleData, type VirtualGiftRecord, type VirtualMember, type VirtualParticipant } from "../lib/battles";
+import { useEffect as useEffectVB, useState as useStateVB } from "react";
 import { displayName, type UserSummary } from "../lib/api";
 import { clock, secondsUntil, type B555Data, type Battle2v2Data, type Invite2v2, type MarathonData, type SeriesData } from "../lib/battles";
 
@@ -47,7 +50,7 @@ export const BATTLE_KINDS: {
     info: "Challenge another live streamer to a real-time, gift-scored battle. A 5-minute countdown starts the moment both sides accept — whoever's received the most gifts when time runs out wins." },
   { kind: "gameLimit", number: "#2", title: "Game Limit", blurb: "1v1 · first to your coin target", minPeople: 2,
     info: "Same as Bingg Bongg Battle, but you and your opponent agree on a custom coin target before starting. First to reach it wins instantly — if neither gets there in 5 minutes, whoever has the most coins wins." },
-  { kind: "virtual", number: "#3", title: "Virtual Battle", blurb: "Host live, battle members who aren't", minPeople: 2, built: false,
+  { kind: "virtual", number: "#3", title: "Virtual Battle", blurb: "Host live, battle members who aren't", minPeople: 1,
     info: "You go live, then pick up to 3 members to battle with — any mix of guests already in your room and virtual members who aren't live, shown by the photo or looping video they chose. Everyone's followers get notified so they can jump in and gift — every gift is logged with the sender's name so you know exactly who to thank." },
   { kind: "series", number: "#4", title: "Best Out Of", blurb: "Best of 3 to 11 · 5-minute rounds", minPeople: 2,
     info: "A best-of series (3, 5, 7, 9, or 11 rounds), with up to 4 players in the battle. Each round is its own Bingg Bongg Battle — whoever wins the majority of rounds wins the series." },
@@ -341,6 +344,179 @@ export function ResultOverlay({ title, rows, onClose }: { title: string; rows: {
         </div>
       ))}
       <button className="btn block" style={{ marginTop: 12 }} onClick={onClose}>Close</button>
+    </Overlay>
+  );
+}
+
+
+// ---- Virtual Battle (Steve, 2026-09-27) ---------------------------------------------------
+
+/** Looping muted video, or the chosen photo, or the profile photo, or initials in gold. */
+export function VirtualLook({ p, size = 96 }: { p: { virtual_media_url?: string | null; virtual_media_type?: string | null; profile_image?: string | null; fullname?: string | null; username?: string | null }; size?: number }) {
+  const url = p.virtual_media_url || "";
+  const name = personName(p as Person);
+  const initials = name.split(" ").filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join("") || "?";
+  const box: React.CSSProperties = { width: size, height: size, borderRadius: 8, objectFit: "cover", background: "#000", display: "block" };
+  if (url && p.virtual_media_type === "video") return <video src={url} muted loop autoPlay playsInline style={box} />;
+  const img = url || (p.profile_image ? mediaUrl(p.profile_image) : "");
+  if (img) return <img src={img} alt="" style={box} />;
+  return <div style={{ ...box, display: "grid", placeItems: "center", color: "var(--gold)", fontWeight: 800, fontSize: size * 0.3 }}>{initials}</div>;
+}
+
+/** Host only: guests in the room + member search, up to 3. */
+export function VirtualPicker({ myUserId, guests, onSubmit, onClose }: { myUserId: number; guests: Person[]; onSubmit: (ids: number[]) => Promise<void>; onClose: () => void }) {
+  const [selected, setSelected] = useStateVB<Map<number, string>>(new Map());
+  const [query, setQuery] = useStateVB("");
+  const [results, setResults] = useStateVB<VirtualMember[]>([]);
+  const [busy, setBusy] = useStateVB(false);
+  const [note, setNote] = useStateVB("");
+  const toggle = (id: number, name: string) => {
+    setSelected((cur) => {
+      const next = new Map(cur);
+      if (next.has(id)) next.delete(id);
+      else if (next.size >= 3) { setNote("Up to 3 members."); return cur; }
+      else next.set(id, name);
+      setNote("");
+      return next;
+    });
+  };
+  async function search() {
+    const q = query.trim();
+    if (q.length < 2) { setNote("Type at least 2 letters."); return; }
+    setBusy(true);
+    try { setResults(await searchVirtualMembers(myUserId, q)); } finally { setBusy(false); }
+  }
+  const row = (id: number, name: string, hint: string) => (
+    <label key={id} className="row" style={{ gap: 10, padding: "8px 10px", border: "1px solid var(--gold-border)", borderRadius: 10, cursor: "pointer", opacity: selected.has(id) ? 1 : 0.85 }}>
+      <input type="checkbox" checked={selected.has(id)} onChange={() => toggle(id, name)} />
+      <b>{name}</b><span className="muted" style={{ fontSize: 12 }}>· {hint}</span>
+    </label>
+  );
+  return (
+    <Overlay title="Virtual Battle" onClose={onClose}>
+      <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>Pick up to 3 — guests in your room, or search any member. Members who aren't live show their virtual look. 5 minutes, most coins wins.</p>
+      {guests.length > 0 && <>
+        <div style={{ fontSize: 12, fontWeight: 800, color: "var(--gold)", margin: "8px 0 6px" }}>In your room</div>
+        <div style={{ display: "grid", gap: 6 }}>{guests.map((g) => row(g.user_id, personName(g), "guest"))}</div>
+      </>}
+      <div style={{ fontSize: 12, fontWeight: 800, color: "var(--gold)", margin: "12px 0 6px" }}>Search members</div>
+      <div className="row" style={{ gap: 8 }}>
+        <input className="input" placeholder="Name or username" value={query} onChange={(e) => setQuery(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") search(); }} style={{ flex: 1 }} />
+        <button className="btn small" onClick={search} disabled={busy}>{busy ? "…" : "Search"}</button>
+      </div>
+      <div style={{ display: "grid", gap: 6, marginTop: 8, maxHeight: 220, overflowY: "auto" }}>
+        {results.filter((r) => !guests.some((g) => g.user_id === r.user_id)).map((m) => row(m.user_id, personName(m as Person), m.virtual_media_url ? "has a virtual look" : `@${m.username ?? ""}`))}
+      </div>
+      {note && <p style={{ color: "#f55", fontSize: 12, margin: "8px 0 0" }}>{note}</p>}
+      <div className="muted" style={{ fontSize: 12, margin: "10px 0" }}>Selected: {selected.size} / 3{selected.size ? " — " + Array.from(selected.values()).join(", ") : ""}</div>
+      <button className="btn" style={{ width: "100%", background: "var(--gold-border)", color: "#000", borderColor: "#000" }} disabled={busy || selected.size === 0}
+        onClick={async () => { setBusy(true); try { await onSubmit(Array.from(selected.keys())); } catch (e) { setNote((e as Error).message); } finally { setBusy(false); } }}>
+        Start Battle
+      </button>
+    </Overlay>
+  );
+}
+
+/** The battle strip: clock plus one card per participant (virtual ones with their look), gift buttons. */
+export function VirtualStrip({ d, now, myUserId, onGift }: { d: VirtualBattleData; now: number; myUserId: number | null; onGift: (p: VirtualParticipant) => void }) {
+  const secs = d.status === "active" ? vbSecondsUntil(d.ends_at, now) : null;
+  const sorted = [...d.participants].sort((a, b) => (b.current_score ?? 0) - (a.current_score ?? 0));
+  return (
+    <Strip title="Virtual Battle" right={<span className="pill">{vbClock(secs)}</span>}>
+      <div className="row" style={{ gap: 8, marginTop: 8, flexWrap: "wrap" }}>
+        {sorted.map((p) => (
+          <div key={p.user_id} style={{ display: "grid", gap: 4, justifyItems: "center", padding: 6, border: "1px solid var(--gold-border)", borderRadius: 10, background: "#000" }}>
+            <VirtualLook p={p} size={84} />
+            <b style={{ fontSize: 12, maxWidth: 84, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{personName(p as Person)}</b>
+            <span className="muted" style={{ fontSize: 11 }}>{p.kind}</span>
+            <span style={{ color: "var(--gold)", fontWeight: 800 }}>{(p.current_score ?? 0).toLocaleString()}</span>
+            {myUserId !== p.user_id && d.status === "active" && (
+              <button className="btn small" style={{ background: "var(--gold-border)", color: "#000", borderColor: "#000" }} onClick={() => onGift(p)}>🎁 Gift</button>
+            )}
+          </div>
+        ))}
+      </div>
+    </Strip>
+  );
+}
+
+/** Who gifted each participant, totals, and the one-click / bulk Thank You (Steve, 2026-09-01). */
+export function VirtualGiftRecordOverlay({ record, myUserId, onThank, onClose }: { record: VirtualGiftRecord; myUserId: number | null; onThank: (to: (number | "all")[], message: string) => Promise<void>; onClose: () => void }) {
+  const [thanked, setThanked] = useStateVB<Set<number>>(new Set());
+  const [editing, setEditing] = useStateVB<{ to: (number | "all")[]; who: string } | null>(null);
+  const [draft, setDraft] = useStateVB(record.default_thank_you);
+  useEffectVB(() => {
+    const mine = record.participants.find((p) => p.user_id === myUserId);
+    setThanked(new Set((mine?.gifters ?? []).filter((g) => g.thanked).map((g) => g.user_id)));
+  }, [record, myUserId]);
+  const mine = record.participants.filter((p) => p.user_id === myUserId);
+  const others = record.participants.filter((p) => p.user_id !== myUserId);
+  const standings = [...record.battle.participants].sort((a, b) => b.current_score - a.current_score).map((p) => `${personName(p as Person)} ${p.current_score.toLocaleString()}`).join("  ·  ");
+  const winner = record.battle.participants.find((p) => p.user_id === record.battle.winner_user_id);
+  async function send(to: (number | "all")[], message: string, ids: number[]) {
+    await onThank(to, message);
+    setThanked((cur) => new Set([...cur, ...ids]));
+  }
+  return (
+    <Overlay title="Virtual Battle Gifts" onClose={onClose} width={520}>
+      <div className="card pad" style={{ marginBottom: 10, borderColor: "var(--gold-border)" }}>
+        <div style={{ fontSize: 12, fontWeight: 800, color: "var(--gold)" }}>{record.battle.status === "completed" ? "Final score" : "Live score"}</div>
+        <div style={{ fontSize: 13 }}>{standings}</div>
+        {record.battle.status === "completed" && <div style={{ color: "var(--gold)", fontWeight: 800, fontSize: 13 }}>{winner ? `🏆 ${personName(winner as Person)} won` : "It's a tie."}</div>}
+      </div>
+      {[...mine, ...others].map((p) => {
+        const isMe = p.user_id === myUserId;
+        return (
+          <div key={p.user_id} className="card pad" style={{ marginBottom: 10, borderColor: "var(--gold-border)" }}>
+            <div className="row" style={{ gap: 10 }}>
+              <VirtualLook p={p} size={40} />
+              <div style={{ flex: 1 }}>
+                <b>{isMe ? "You" : personName(p as Person)}</b>
+                <div style={{ color: "var(--gold)", fontSize: 12 }}>{p.total_coins.toLocaleString()} coins · {p.total_gifts} gift{p.total_gifts === 1 ? "" : "s"} · {p.kind}</div>
+              </div>
+            </div>
+            {p.gifters.length === 0 ? (
+              <p className="muted" style={{ margin: "8px 0 0", fontSize: 13 }}>{isMe ? "Nobody gifted you in this battle." : "No gifts."}</p>
+            ) : (
+              <>
+                {isMe && (
+                  <button className="btn small" style={{ width: "100%", marginTop: 8, background: "var(--gold-border)", color: "#000", borderColor: "#000" }}
+                    onClick={() => { setDraft(record.default_thank_you); setEditing({ to: ["all"], who: "everyone who gifted you" }); }}>💝 Thank everyone ({p.gifters.length})</button>
+                )}
+                <div style={{ height: 1, background: "var(--gold-border)", opacity: 0.35, margin: "10px 0 6px" }} />
+                {p.gifters.map((g) => (
+                  <div key={g.user_id} className="row" style={{ gap: 10, padding: "5px 0" }}>
+                    <VirtualLook p={{ profile_image: g.profile_image, fullname: g.fullname, username: g.username }} size={32} />
+                    <div style={{ flex: 1 }}>
+                      <b style={{ fontSize: 14 }}>{personName(g as Person)}</b>
+                      <div className="muted" style={{ fontSize: 12 }}>{g.coins.toLocaleString()} coins · {g.gifts} gift{g.gifts === 1 ? "" : "s"}</div>
+                    </div>
+                    {isMe && (thanked.has(g.user_id)
+                      ? <span className="pill" style={{ color: "var(--gold)" }}>✓ Thanked</span>
+                      : <>
+                          <button className="btn small" style={{ background: "var(--gold-border)", color: "#000", borderColor: "#000" }} onClick={() => send([g.user_id], record.default_thank_you, [g.user_id])}>Thank you</button>
+                          <button className="btn small ghost" onClick={() => { setDraft(record.default_thank_you); setEditing({ to: [g.user_id], who: personName(g as Person) }); }}>Edit</button>
+                        </>)}
+                  </div>
+                ))}
+              </>
+            )}
+          </div>
+        );
+      })}
+      {editing && (
+        <div className="card pad" style={{ borderColor: "var(--gold-border)" }}>
+          <b style={{ color: "var(--gold)" }}>Thank {editing.who}</b>
+          <textarea className="input" rows={3} value={draft} onChange={(e) => setDraft(e.target.value)} style={{ width: "100%", marginTop: 8 }} />
+          <div className="row" style={{ justifyContent: "flex-end", gap: 8, marginTop: 8 }}>
+            <button className="btn small ghost" onClick={() => setEditing(null)}>Cancel</button>
+            <button className="btn small" style={{ background: "var(--gold-border)", color: "#000", borderColor: "#000" }} onClick={async () => {
+              const ids = editing.to[0] === "all" ? (mine[0]?.gifters ?? []).map((g) => g.user_id) : editing.to.filter((t): t is number => typeof t === "number");
+              await send(editing.to, draft, ids); setEditing(null);
+            }}>Send</button>
+          </div>
+        </div>
+      )}
     </Overlay>
   );
 }

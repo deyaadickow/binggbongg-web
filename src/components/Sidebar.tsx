@@ -36,6 +36,7 @@ export function sidebarSections(userId: number | null): SideSection[] {
       { to: "/settings/moderators", label: "My Moderators", icon: "🛡️", needsLogin: true },
       { to: "/settings/find-a-battle", label: "Find a Battle", icon: "⚔️", needsLogin: true },
       { to: "/settings/simulcast", label: "Simulcast", icon: "📺", needsLogin: true },
+      { to: "/settings/virtual-look", label: "My Virtual Battle Look", icon: "🪞", needsLogin: true },
       { to: "/settings/advertise", label: "Advertise", icon: "📣", needsLogin: true },
       { to: "/settings/shop", label: "Bingg Bongg Shop", icon: "🛍️", needsLogin: true },
       { to: "/settings/verification", label: "Request verification", icon: "✅", needsLogin: true },

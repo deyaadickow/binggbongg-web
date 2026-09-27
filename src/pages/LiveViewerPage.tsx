@@ -5,8 +5,8 @@ import { useSession } from "../lib/session";
 import { chatChannel, ensureFirebaseSignIn, observeChat, sendChat, type ChatMessage } from "../lib/firebase";
 import { useLiveRoom, type LiveRole, type LiveTile } from "../lib/live";
 import { activeBoxingWindow, useBattle, type BattleData } from "../lib/battle";
-import { FIVE_FIVE_FIVE, MARATHON, SERIES, TWO_V_TWO, cancel555, createSeries, finalize2v2, finalizeSeriesRound, invite2v2, invite555, inviteMarathon, secondsUntil, useEngine, voteMarathonCancel, type B555Data, type Battle2v2Data, type MarathonData, type SeriesData } from "../lib/battles";
-import { B555Strip, BattleMenu, InviteCard, MarathonStrip, MultiPicker, Overlay, ResultOverlay, SeriesStrip, TwoVTwoPicker, TwoVTwoStrip, describe2v2Invite, personName, resultTitle, type BattleKind } from "../components/BattleEngines";
+import { VIRTUAL, fetchVirtualGiftRecord, sendVirtualThankYou, startVirtualBattle, type VirtualBattleData, type VirtualGiftRecord, type VirtualParticipant, FIVE_FIVE_FIVE, MARATHON, SERIES, TWO_V_TWO, cancel555, createSeries, finalize2v2, finalizeSeriesRound, invite2v2, invite555, inviteMarathon, secondsUntil, useEngine, voteMarathonCancel, type B555Data, type Battle2v2Data, type MarathonData, type SeriesData } from "../lib/battles";
+import { B555Strip, BattleMenu, InviteCard, MarathonStrip, MultiPicker, Overlay, ResultOverlay, SeriesStrip, TwoVTwoPicker, TwoVTwoStrip, VirtualGiftRecordOverlay, VirtualPicker, VirtualStrip, describe2v2Invite, personName, resultTitle, type BattleKind } from "../components/BattleEngines";
 import { Challenge31Overlay, LifetimeBoardOverlay, PkContestsOverlay, PunishmentsOverlay } from "../components/BattleReference";
 import { fetchActiveTapGame, gameTitle, type TapGameType } from "../lib/tapgame";
 import { TapGameOverlay } from "../components/TapGameOverlay";
@@ -83,9 +83,13 @@ export function LiveViewerPage() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [picker, setPicker] = useState<BattleKind | null>(null);
   const myId = user?.id ?? null;
+  const virtualRef = useRef<VirtualBattleData | null>(null);
   const nameOfId = useCallback((id: number | null | undefined) => {
     const m = broadcastersRef.current.find((b) => b.user_id === id);
-    return m ? displayName(m as Partial<UserSummary>) : "";
+    if (m) return displayName(m as Partial<UserSummary>);
+    // A virtual battler is not on screen — resolve them from the battle roster instead.
+    const v = virtualRef.current?.participants.find((p) => p.user_id === id);
+    return v ? personName(v) : "";
   }, []);
   const onSeriesFinished = useCallback((d: SeriesData) => {
     const acc = d.participants.filter((p) => p.invite_status === "accepted");
@@ -125,11 +129,28 @@ export function LiveViewerPage() {
     });
     refresh();
   }, [myId, nameOfId, refresh]);
+  // Virtual Battle (Steve, 2026-09-27): result for the battlers, then the gift record page.
+  const [virtualRecord, setVirtualRecord] = useState<VirtualGiftRecord | null>(null);
+  const [virtualGiftTarget, setVirtualGiftTarget] = useState<VirtualParticipant | null>(null);
+  const openVirtualRecord = useCallback((battleId: number) => {
+    if (!myId) return;
+    fetchVirtualGiftRecord(myId, battleId).then(setVirtualRecord).catch((e) => setToast((e as Error).message));
+  }, [myId]);
+  const onVirtualFinished = useCallback((d: VirtualBattleData) => {
+    const mine = d.participants.find((p) => p.user_id === myId);
+    setResult({
+      title: resultTitle(d.winner_user_id, myId, !!mine, d.status === "cancelled"),
+      rows: [...d.participants].sort((a, b) => b.current_score - a.current_score).map((p) => ({ label: nameOfId(p.user_id) || personName(p), value: (p.current_score ?? 0).toLocaleString(), win: p.user_id === d.winner_user_id })),
+    });
+    if (mine) setTimeout(() => openVirtualRecord(d.virtual_battle_id), 2500);
+    refresh();
+  }, [myId, nameOfId, refresh, openVirtualRecord]);
   const enginesOn = isLoggedIn && !roomClosed;
   const series = useEngine(SERIES, roomName, myId, isPublisher, enginesOn, onSeriesFinished, onAnyBattleStarted);
   const two = useEngine(TWO_V_TWO, roomName, myId, isPublisher, enginesOn, on2v2Finished, onAnyBattleStarted);
   const marathon = useEngine(MARATHON, roomName, myId, isPublisher, enginesOn, onMarathonFinished, onAnyBattleStarted);
   const b555 = useEngine(FIVE_FIVE_FIVE, roomName, myId, isPublisher, enginesOn, on555Finished, onAnyBattleStarted);
+  const virtual = useEngine(VIRTUAL, roomName, myId, isPublisher, enginesOn, onVirtualFinished, onAnyBattleStarted);
   // Boxing gloves: 3 fixed 40s double-points windows per 1v1 battle / Best Out Of round.
   const boxing = battle.boxing ?? (series.data?.status === "active" ? activeBoxingWindow(series.data.boxing_windows, series.now) : null);
   const boxingLeft = boxing ? Math.max(0, Math.ceil((boxing.endMs - Math.max(battle.now, series.now)) / 1000)) : null;
@@ -197,6 +218,7 @@ export function LiveViewerPage() {
   const nameOf = useCallback((id: number | null) => broadcasters.find((b) => b.user_id === id), [broadcasters]);
   const broadcastersRef = useRef<Member[]>([]);
   broadcastersRef.current = broadcasters;
+  virtualRef.current = virtual.data;
 
   // Room roster (host + approved guests) — checkHeader only, works before sign-in too.
   useEffect(() => {
@@ -347,10 +369,12 @@ export function LiveViewerPage() {
       else if (two.data?.status === "active" && accepted(two.data.participants)) tag.battle_2v2_id = two.data.battle_id;
       else if (marathon.data?.status === "active" && accepted(marathon.data.participants)) tag.marathon_id = marathon.data.marathon_id;
       else if (b555.data?.status === "active" && accepted(b555.data.participants)) tag.battle_555_id = b555.data.battle_555_id;
+      else if (virtual.data?.status === "active" && virtual.data.participants.some((p) => p.user_id === giftTarget)) tag.virtual_battle_id = virtual.data.virtual_battle_id;
       const res = await post("sendCoinsToUser", { my_user_id: user.id, user_id: giftTarget, coins: giftPrice(gift), gift_id: gift.id, room_name: roomName, ...tag });
       if (!res.status) throw new Error(res.message ?? "Couldn't send that gift.");
-      setToast(`Sent ${gift.name ?? "a gift"} (${giftPrice(gift)} coins) to ${displayName(nameOf(giftTarget) as Partial<UserSummary>)}`);
+      setToast(`Sent ${gift.name ?? "a gift"} (${giftPrice(gift)} coins) to ${nameOfId(giftTarget) || (virtualGiftTarget ? personName(virtualGiftTarget) : "")}`);
       setGiftTarget(null);
+      setVirtualGiftTarget(null);
       refresh();
     } catch (err) { setToast((err as Error).message); }
   }
@@ -420,6 +444,7 @@ export function LiveViewerPage() {
           )}
           {series.data && <SeriesStrip d={series.data} now={series.now} nameOf={nameOfId} />}
           {two.data && <TwoVTwoStrip d={two.data} now={two.now} nameOf={nameOfId} />}
+          {virtual.data && <VirtualStrip d={virtual.data} now={virtual.now} myUserId={myId} onGift={(p) => { setVirtualGiftTarget(p); setGiftTarget(p.user_id); }} />}
           {marathon.data && (
             <MarathonStrip d={marathon.data} myUserId={myId} nameOf={nameOfId} onVote={(approve) => {
               if (!myId || !marathon.data) return;
@@ -522,7 +547,7 @@ export function LiveViewerPage() {
           {giftTarget && (
             <div className="card" style={{ marginTop: 12 }}>
               <div className="row" style={{ padding: "10px 12px", borderBottom: "1px solid var(--line)" }}>
-                <b style={{ color: "var(--gold)" }}>Send a gift to {displayName(nameOf(giftTarget) as Partial<UserSummary>)}</b>
+                <b style={{ color: "var(--gold)" }}>Send a gift to {nameOfId(giftTarget) || (virtualGiftTarget ? personName(virtualGiftTarget) : "")}</b>
                 <span className="spacer" />
                 <button className="btn small ghost" onClick={() => setGiftTarget(null)}>Close</button>
               </div>
@@ -575,6 +600,7 @@ export function LiveViewerPage() {
       {menuOpen && (
         <BattleMenu peopleOnScreen={broadcasters.length} onClose={() => setMenuOpen(false)} onNotice={setToast} onPick={(k) => {
           setMenuOpen(false);
+          if (k === "virtual") { if (role === "host") setPicker("virtual"); else setToast("Only the live host can start a Virtual Battle."); return; }
           if (k === "1v1") setBattlePicker(true);
           else if (k === "gameLimit") setGameLimitPicker(true);
           else if (k === "solo") startSolo();
@@ -600,6 +626,20 @@ export function LiveViewerPage() {
           people={broadcasters.filter((b) => b.user_id !== myId)} onClose={() => setPicker(null)}
           onSubmit={async (ids, length) => {
             try { await createSeries(myId, roomName, length ?? 5, ids); setPicker(null); setToast(`Best Out Of ${length} invites sent.`); }
+            catch (e) { setToast((e as Error).message); }
+          }} />
+      )}
+      {picker === "virtual" && myId && (
+        <VirtualPicker myUserId={myId} guests={broadcasters.filter((b) => b.user_id !== myId)} onClose={() => setPicker(null)}
+          onSubmit={async (ids) => {
+            await startVirtualBattle(myId, roomName, ids); setPicker(null); setToast("Virtual Battle started — 5 minutes on the clock!");
+          }} />
+      )}
+      {virtualRecord && (
+        <VirtualGiftRecordOverlay record={virtualRecord} myUserId={myId} onClose={() => setVirtualRecord(null)}
+          onThank={async (to, message) => {
+            if (!myId) return;
+            try { setToast(await sendVirtualThankYou(myId, virtualRecord.battle.virtual_battle_id, to, message)); }
             catch (e) { setToast((e as Error).message); }
           }} />
       )}

@@ -99,11 +99,61 @@ export interface B555Data {
 }
 export interface B555Invite { battle_555_id: number; games_to_win: number; coins_per_game: number; seconds_per_game: number; host_user_id: number; host_fullname?: string; host_username?: string }
 
+// ---- Virtual Battle (Steve, 2026-09-27) --------------------------------------------------
+// Host live, up to 3 others — guests in the room or VIRTUAL members who are not live (shown by
+// their chosen photo / looping video). Starts on the spot, 5 minutes, most coins wins.
+export interface VirtualParticipant {
+  user_id: number;
+  kind: "host" | "guest" | "virtual" | string;
+  fullname?: string | null;
+  username?: string | null;
+  profile_image?: string | null;
+  virtual_media_url?: string | null;
+  virtual_media_type?: "image" | "video" | string | null;
+  current_score: number;
+}
+export interface VirtualBattleData {
+  virtual_battle_id: number;
+  room_name: string;
+  host_user_id: number;
+  status: EngineStatus;
+  participants: VirtualParticipant[];
+  winner_user_id: number | null;
+  started_at?: string | null;
+  ends_at?: string | null;
+  ended_at?: string | null;
+}
+export interface VirtualGifter { user_id: number; fullname?: string | null; username?: string | null; profile_image?: string | null; coins: number; gifts: number; thanked: boolean }
+export interface VirtualParticipantRecord { user_id: number; kind: string; fullname?: string | null; username?: string | null; profile_image?: string | null; total_coins: number; total_gifts: number; gifters: VirtualGifter[] }
+export interface VirtualGiftRecord { battle: VirtualBattleData; participants: VirtualParticipantRecord[]; default_thank_you: string }
+export interface VirtualMember { user_id: number; fullname?: string | null; username?: string | null; profile_image?: string | null; virtual_media_url?: string | null; virtual_media_type?: string | null }
+
+export async function startVirtualBattle(myUserId: number, roomName: string, participantUserIds: number[]): Promise<VirtualBattleData> {
+  const res = await post<VirtualBattleData>("startVirtualBattle", { my_user_id: myUserId, room_name: roomName, participant_user_ids: participantUserIds.join(",") });
+  if (!res.status || !res.data) throw new Error(res.message ?? "Couldn't start the Virtual Battle.");
+  return res.data;
+}
+export async function fetchVirtualGiftRecord(myUserId: number, battleId: number): Promise<VirtualGiftRecord> {
+  const res = await post<VirtualGiftRecord>("fetchVirtualBattleGiftRecord", { my_user_id: myUserId, virtual_battle_id: battleId });
+  if (!res.status || !res.data) throw new Error(res.message ?? "Couldn't load this battle's gifts.");
+  return res.data;
+}
+export async function sendVirtualThankYou(myUserId: number, battleId: number, toUserIds: (number | "all")[], message: string): Promise<string> {
+  const res = await post("sendVirtualBattleThankYou", { my_user_id: myUserId, virtual_battle_id: battleId, to_user_ids: toUserIds.join(","), message });
+  if (!res.status) throw new Error(res.message ?? "Couldn't send that.");
+  return res.message ?? "Thanks sent.";
+}
+export async function searchVirtualMembers(myUserId: number, keyword: string): Promise<VirtualMember[]> {
+  const res = await post<VirtualMember[]>("searchVirtualBattleMembers", { my_user_id: myUserId, keyword });
+  return res.status ? (res.data ?? []) : [];
+}
+
 export interface EngineConfig<TData, TInvite> {
-  key: "series" | "2v2" | "marathon" | "555";
+  key: "series" | "2v2" | "marathon" | "555" | "virtual";
   statusEndpoint: string;
   /** Param name the status endpoint takes to look a battle up by id. */
   statusIdParam: string;
+  /** Empty for an engine with no invite step (Virtual Battle starts on the spot). */
   pendingEndpoint: string;
   respondEndpoint: string;
   /** Param name respond takes for the id. */
@@ -127,6 +177,11 @@ export const MARATHON: EngineConfig<MarathonData, MarathonInvite> = {
 export const FIVE_FIVE_FIVE: EngineConfig<B555Data, B555Invite> = {
   key: "555", statusEndpoint: "fetch555BattleStatus", statusIdParam: "battle_555_id", pendingEndpoint: "fetchPending555Invites",
   respondEndpoint: "respond555Invite", respondIdParam: "battle_555_id", idOf: (d) => d.battle_555_id, inviteIdOf: (i) => i.battle_555_id,
+};
+
+export const VIRTUAL: EngineConfig<VirtualBattleData, never> = {
+  key: "virtual", statusEndpoint: "fetchVirtualBattleStatus", statusIdParam: "virtual_battle_id", pendingEndpoint: "",
+  respondEndpoint: "", respondIdParam: "virtual_battle_id", idOf: (d) => d.virtual_battle_id, inviteIdOf: () => 0,
 };
 
 export const isOpen = (s?: EngineStatus | null) => s === "pending_invites" || s === "active";
@@ -199,7 +254,7 @@ export function useEngine<TData extends { status: EngineStatus }, TInvite>(
   // sees the pending row before they've answered) — only an active battle does.
   const activeNow = data?.status === "active";
   useEffect(() => {
-    if (!enabled || !roomName || !isPublisher || !myUserId || activeNow) return;
+    if (!enabled || !roomName || !isPublisher || !myUserId || activeNow || !cfg.pendingEndpoint) return;
     let alive = true;
     async function tick() {
       const res = await post<TInvite[]>(cfg.pendingEndpoint, { user_id: myUserId, room_name: roomName }).catch(() => null);

@@ -3,7 +3,7 @@
 // (Steve, 2026-09-24: "add them anyway and work it out one at a time").
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { displayName, post, type UserSummary } from "../lib/api";
+import { API_BASE, currentAuthHeaders, displayName, mediaUrl, post, type UserSummary } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice, UserRow } from "../components/Common";
 import { SideLinkItem, sidebarSections } from "../components/Sidebar";
@@ -795,6 +795,60 @@ export function DeleteAccountPage() {
         <button className="btn" style={{ borderColor: "var(--red)", color: "var(--red)" }} disabled={typed !== "DELETE" || busy} onClick={del}>Delete my account</button>
       </div>
       {el}
+    </Page>
+  );
+}
+
+
+// ---- My Virtual Battle Look (Steve, 2026-09-27) -------------------------------------------
+// The photo or short looping video shown on my card when a host puts me in a Virtual Battle and
+// I'm not live. Profile photo is used until one is uploaded.
+interface VirtualLook { virtual_media_url?: string | null; virtual_media_type?: string | null }
+export function VirtualLookPage() {
+  const { user, refresh } = useSession();
+  const [look, setLook] = useState<VirtualLook>({ virtual_media_url: (user as (UserSummary & VirtualLook) | null)?.virtual_media_url, virtual_media_type: (user as (UserSummary & VirtualLook) | null)?.virtual_media_type });
+  const [busy, setBusy] = useState(false);
+  const [note, setNote] = useState("");
+  if (!user) return <NeedLogin />;
+
+  async function upload(file: File) {
+    if (file.type.startsWith("video/") && file.size > 60 * 1024 * 1024) { setNote("Videos must be under 60 MB — a short looping clip works best."); return; }
+    setBusy(true); setNote("Uploading…");
+    try {
+      const form = new FormData();
+      form.append("my_user_id", String(user!.id));
+      form.append("media", file);
+      const res = await fetch(API_BASE + "saveVirtualBattleLook", { method: "POST", headers: currentAuthHeaders(), body: form });
+      const body = await res.json() as { status?: boolean; message?: string; data?: VirtualLook };
+      if (!body.status) throw new Error(body.message ?? "Couldn't upload that.");
+      setLook(body.data ?? {});
+      setNote("Saved — this is your virtual battle look.");
+      refresh();
+    } catch (e) { setNote((e as Error).message); } finally { setBusy(false); }
+  }
+  async function remove() {
+    setBusy(true);
+    try {
+      const res = await post("removeVirtualBattleLook", { my_user_id: user!.id });
+      if (!res.status) throw new Error(res.message ?? "Couldn't do that right now.");
+      setLook({}); setNote("Removed — your profile photo will be used."); refresh();
+    } catch (e) { setNote((e as Error).message); } finally { setBusy(false); }
+  }
+  const url = look.virtual_media_url || "";
+  return (
+    <Page title="My Virtual Battle Look">
+      <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>When a host puts you in a Virtual Battle and you're not live, this is what everyone sees on your card. A photo, or a short video that loops. Your profile photo is used until you add one.</p>
+      <div className="card pad" style={{ display: "grid", gap: 12, justifyItems: "center", borderColor: "var(--gold-border)" }}>
+        {url && look.virtual_media_type === "video"
+          ? <video src={url} muted loop autoPlay playsInline style={{ width: 220, height: 220, objectFit: "cover", borderRadius: 14, border: "2px solid var(--gold-border)" }} />
+          : <img src={url || mediaUrl(user.profile_image)} alt="" style={{ width: 220, height: 220, objectFit: "cover", borderRadius: 14, border: "2px solid var(--gold-border)", background: "#000" }} />}
+        <div style={{ color: "var(--gold)", fontWeight: 800, fontSize: 13 }}>{note || (url ? (look.virtual_media_type === "video" ? "Your looping video" : "Your photo") : "Using your profile photo")}</div>
+        <label className="btn" style={{ background: "var(--gold-border)", color: "#000", borderColor: "#000", cursor: "pointer" }}>
+          {busy ? "Working…" : "Choose a photo or video"}
+          <input type="file" accept="image/*,video/*" style={{ display: "none" }} disabled={busy} onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(f); e.target.value = ""; }} />
+        </label>
+        <button className="btn ghost" disabled={busy} onClick={remove}>Remove and use my profile photo</button>
+      </div>
     </Page>
   );
 }
