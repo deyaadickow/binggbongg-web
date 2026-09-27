@@ -237,17 +237,23 @@ const Bar = ({ pct }: { pct: number }) => (
 
 const waiting = (accepted: number, total: number) => <span className="pill">Waiting for answers… {accepted}/{total}</span>;
 
+const BLINK_CSS = `@keyframes bbBlink { 0%,100% { opacity: 1 } 50% { opacity: .15 } } .bb-blink { animation: bbBlink .5s steps(1) infinite }`;
+
 export function SeriesStrip({ d, now, nameOf }: { d: SeriesData; now: number; nameOf: NameOf }) {
   const accepted = d.participants.filter((p) => p.invite_status === "accepted");
   const secs = d.status === "active" ? secondsUntil(d.current_round_ends_at, now) : null;
+  const done = d.status === "completed";
+  const title = d.hide_scores ? (done ? "🙈 Hide & Seek — REVEALED!" : "🙈 Hide & Seek")
+    : `Best Out Of ${d.length}${done ? " — FINAL" : d.status === "active" && d.current_round_number ? ` · Round ${d.current_round_number}` : ""}`;
   return (
-    <Strip title={d.hide_scores ? "🙈 Hide & Seek" : `Best Out Of ${d.length}${d.status === "active" && d.current_round_number ? ` · Round ${d.current_round_number}` : ""}`}
-      right={d.status === "pending_invites" ? waiting(accepted.length, d.participants.length) : <span className="pill">{clock(secs)}</span>}>
+    <Strip title={title}
+      right={d.status === "pending_invites" ? waiting(accepted.length, d.participants.length) : done ? <span className="pill" style={{ color: "var(--gold)" }}>Final</span> : <span className="pill">{clock(secs)}</span>}>
+      <style>{BLINK_CSS}</style>
       <div className="muted" style={{ fontSize: 11, marginTop: 4 }}>{d.hide_scores ? "Scores stay hidden until the end — then everyone's revealed at once." : `First to ${d.rounds_needed_to_win} rounds. Each round is 5 minutes.`}</div>
-      {(d.status === "active" ? accepted : d.participants).map((p) => (
-        <div key={p.user_id} className="row" style={{ justifyContent: "space-between", marginTop: 4, fontSize: 13 }}>
+      {(d.status === "active" || done ? accepted : d.participants).map((p) => (
+        <div key={p.user_id} className={`row${done && p.user_id === d.winner_user_id ? " bb-blink" : ""}`} style={{ justifyContent: "space-between", marginTop: 4, fontSize: 13 }}>
           <span><b>{nameOf(p.user_id) || personName(p)}</b>{p.invite_status !== "accepted" ? <span className="muted"> · {p.invite_status}</span> : null}</span>
-          <span>{!d.hide_scores && <span title="rounds won">{"★".repeat(p.rounds_won ?? 0)}</span>} <span style={{ color: "var(--gold)" }}>{d.hide_scores && d.status === "active" ? "🙈 ?" : (p.current_round_score ?? 0).toLocaleString()}</span></span>
+          <span>{!d.hide_scores && <span title="rounds won">{"★".repeat(p.rounds_won ?? 0)}</span>} <span style={{ color: "var(--gold)" }}>{d.hide_scores && d.status === "active" ? "🙈 ?" : (p.current_round_score ?? 0).toLocaleString()}{done && p.user_id === d.winner_user_id ? " 🏆" : ""}</span></span>
         </div>
       ))}
     </Strip>
@@ -258,15 +264,17 @@ export function TwoVTwoStrip({ d, now, nameOf }: { d: Battle2v2Data; now: number
   const team = (t: "A" | "B") => d.participants.filter((p) => p.team === t);
   const names = (t: "A" | "B") => team(t).map((p) => nameOf(p.user_id) || personName(p)).join(" & ");
   const hidden = !!d.hide_scores && d.status === "active";
+  const done = d.status === "completed";
   const a = d.team_a_score ?? 0, b = d.team_b_score ?? 0;
   const total = a + b;
   const accepted = d.participants.filter((p) => p.invite_status === "accepted").length;
   const secs = d.status === "active" ? secondsUntil(d.ends_at, now) : null;
   return (
-    <Strip title={d.hide_scores ? "🙈 Hide & Seek 2v2" : "2v2 Battle"} right={d.status === "pending_invites" ? waiting(accepted, d.participants.length) : <span className="pill">{clock(secs)}</span>}>
+    <Strip title={d.hide_scores ? (done ? "🙈 Hide & Seek 2v2 — REVEALED!" : "🙈 Hide & Seek 2v2") : (done ? "2v2 Battle — FINAL" : "2v2 Battle")} right={d.status === "pending_invites" ? waiting(accepted, d.participants.length) : done ? <span className="pill" style={{ color: "var(--gold)" }}>Final</span> : <span className="pill">{clock(secs)}</span>}>
+      <style>{BLINK_CSS}</style>
       <div className="row" style={{ justifyContent: "space-between", marginTop: 6, fontSize: 13 }}>
-        <span><b>{names("A")}</b> <span style={{ color: "var(--gold)" }}>{hidden ? "?" : a.toLocaleString()}</span></span>
-        <span><span style={{ color: "var(--gold)" }}>{hidden ? "?" : b.toLocaleString()}</span> <b>{names("B")}</b></span>
+        <span className={done && d.winning_team === "A" ? "bb-blink" : ""}><b>{names("A")}</b> <span style={{ color: "var(--gold)" }}>{hidden ? "?" : a.toLocaleString()}{done && d.winning_team === "A" ? " 🏆" : ""}</span></span>
+        <span className={done && d.winning_team === "B" ? "bb-blink" : ""}><span style={{ color: "var(--gold)" }}>{hidden ? "?" : b.toLocaleString()}{done && d.winning_team === "B" ? " 🏆" : ""}</span> <b>{names("B")}</b></span>
       </div>
       {hidden ? <div className="muted" style={{ fontSize: 11, marginTop: 4 }}>Scores stay hidden until the end.</div> : <Bar pct={total > 0 ? (a / total) * 100 : 50} />}
     </Strip>

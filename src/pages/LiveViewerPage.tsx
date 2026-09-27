@@ -76,7 +76,12 @@ export function LiveViewerPage() {
   // Steve, 2026-09-06 (phones) / 2026-09-24 (web): the battle-start clip plays for everyone in
   // the room the moment any battle goes active. Queued if one is already playing.
   const [introQueue, setIntroQueue] = useState(0);
-  const onAnyBattleStarted = useCallback(() => setIntroQueue((n) => n + 1), []);
+  // Steve, 2026-09-27: "keep the score on the board for at least 60 seconds or until they start
+  // another game" — the final Best Out Of / Hide & Seek / 2v2 payload stays on its strip for 60 s
+  // after it ends (the winner blinks), unless another battle starts first.
+  const [heldSeries, setHeldSeries] = useState<{ d: SeriesData; until: number } | null>(null);
+  const [heldTwo, setHeldTwo] = useState<{ d: Battle2v2Data; until: number } | null>(null);
+  const onAnyBattleStarted = useCallback(() => { setIntroQueue((n) => n + 1); setHeldSeries(null); setHeldTwo(null); }, []);
   const battle = useBattle(roomName, user?.id ?? null, isPublisher, isLoggedIn && !roomClosed, onBattleCompleted, onAnyBattleStarted);
 
   // The other four engines: Best Out Of, 2v2, No Time Limit, 5-5-5. One result overlay at a time.
@@ -95,6 +100,7 @@ export function LiveViewerPage() {
     return v ? personName(v) : "";
   }, []);
   const onSeriesFinished = useCallback((d: SeriesData) => {
+    setHeldSeries({ d, until: Date.now() + 60_000 });
     const acc = d.participants.filter((p) => p.invite_status === "accepted");
     setResult({
       title: resultTitle(d.winner_user_id, myId, acc.some((p) => p.user_id === myId), d.status === "cancelled"),
@@ -103,6 +109,7 @@ export function LiveViewerPage() {
     refresh();
   }, [myId, nameOfId, refresh]);
   const on2v2Finished = useCallback((d: Battle2v2Data) => {
+    setHeldTwo({ d, until: Date.now() + 60_000 });
     const mine = d.participants.find((p) => p.user_id === myId);
     const iPlayed = !!mine && mine.invite_status === "accepted";
     const iWon = !!mine && d.winning_team === mine.team;
@@ -448,8 +455,8 @@ export function LiveViewerPage() {
           {battle.battle && battle.battle.status !== "completed" && (
             <BattleStrip b={battle.battle} secondsLeft={battle.secondsLeft} nameOf={(id) => displayName(nameOf(id) as Partial<UserSummary>)} />
           )}
-          {series.data && <SeriesStrip d={series.data} now={series.now} nameOf={nameOfId} />}
-          {two.data && <TwoVTwoStrip d={two.data} now={two.now} nameOf={nameOfId} />}
+          {(series.data ?? (heldSeries && heldSeries.until > series.now ? heldSeries.d : null)) && <SeriesStrip d={series.data ?? heldSeries!.d} now={series.now} nameOf={nameOfId} />}
+          {(two.data ?? (heldTwo && heldTwo.until > two.now ? heldTwo.d : null)) && <TwoVTwoStrip d={two.data ?? heldTwo!.d} now={two.now} nameOf={nameOfId} />}
           {virtual.data && <VirtualStrip d={virtual.data} now={virtual.now} myUserId={myId} onGift={(p) => { setVirtualGiftTarget(p); setGiftTarget(p.user_id); }} />}
           {marathon.data && (
             <MarathonStrip d={marathon.data} myUserId={myId} nameOf={nameOfId} onVote={(approve) => {
