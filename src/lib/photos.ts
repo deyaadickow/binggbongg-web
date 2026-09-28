@@ -23,8 +23,20 @@ export interface PhotoStorageStatus {
   total_photos?: number | null;
   free_limit?: number | null;
   block_size?: number | null;
+  block_price?: number | null;
+  current_monthly_price?: number | null;
+  /** "active" | "paused_insufficient_funds" — see PhotoController::isUploadBlocked. */
+  status?: string | null;
+  next_billing_date?: string | null;
+  ad_cash_balance?: number | null;
   [k: string]: unknown;
 }
+
+export const isPhotoStoragePaused = (s: PhotoStorageStatus): boolean =>
+  s.status === "paused_insufficient_funds";
+
+export const isPhotoStoragePaidTier = (s: PhotoStorageStatus): boolean =>
+  Number(s.total_photos ?? 0) > Number(s.free_limit ?? 100);
 
 export const isFavouritesFolder = (f: PhotoFolder): boolean =>
   f.is_favorites === true || f.is_favorites === 1;

@@ -49,8 +49,10 @@ export function MemberAlbumPage() {
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 8 }}>
           {photos.map((p) => (
+            // Steve, 2026-09-28: "Add gold borders all around the thumbnaile including the
+            // photos" — read-only album, so no favourite star here (see MyPhotosPage for that).
             <button key={p.id} onClick={() => setViewing(p)}
-              style={{ padding: 0, border: "1px solid var(--line)", borderRadius: 10, overflow: "hidden", background: "var(--panel)", cursor: "pointer", aspectRatio: "1" }}>
+              style={{ padding: 0, border: "1.5px solid var(--gold-border)", borderRadius: 10, overflow: "hidden", background: "var(--panel)", cursor: "pointer", aspectRatio: "1" }}>
               <img src={p.thumb_url || p.photo_url || mediaUrl(p.thumb_path || p.photo_path)} alt="" loading="lazy"
                 style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
             </button>
