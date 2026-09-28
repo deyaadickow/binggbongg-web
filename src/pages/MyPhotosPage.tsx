@@ -219,7 +219,13 @@ export function MyPhotosPage() {
                   if (name && name.trim()) void act(() => renameFolder(user.id, openFolder.id, name.trim()), "all");
                 }}>Rename</button>
                 <button className="btn small ghost" disabled={busy} onClick={() => {
-                  if (!window.confirm(`Delete "${openFolder.name}" and everything in it? This cannot be undone.`)) return;
+                  // Steve, 2026-09-28: the old copy said "and everything in it," implying this
+                  // button also deletes the folder's photos — it doesn't. The server
+                  // (deleteFolder in PhotoController.php) refuses with "Move or delete every
+                  // photo in this folder first." if the folder isn't already empty, and act()
+                  // surfaces that real server message via the toast either way, so the confirm
+                  // text just needs to stop overpromising.
+                  if (!window.confirm(`Delete "${openFolder.name}"? The folder must be empty first — move or delete its photos before this will work. This cannot be undone.`)) return;
                   void act(async () => {
                     await deleteFolder(user.id, openFolder.id);
                     setOpenId(null);
