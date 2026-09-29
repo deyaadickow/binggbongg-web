@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSession } from "../lib/session";
 import { Loading, Notice } from "../components/Common";
-import { fetchExcitingNews, type ExcitingNewsFlyer, type ExcitingNewsType } from "../lib/excitingnews";
+import { cssAspectRatio, fetchExcitingNews, type ExcitingNewsFlyer, type ExcitingNewsType } from "../lib/excitingnews";
 
 const PAGE_SIZE = 20;
 
@@ -95,7 +95,7 @@ export function ExcitingNewsPage() {
             {f.description && (
               <div style={{ padding: "10px 14px", background: "rgba(0,0,0,0.4)", fontSize: 14 }}>{f.description}</div>
             )}
-            <div style={{ aspectRatio: "9 / 16", background: "#000", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ aspectRatio: cssAspectRatio(f), background: "#000", display: "flex", alignItems: "center", justifyContent: "center" }}>
               {f.type === "video" ? (
                 <video src={f.file} controls loop muted playsInline style={{ width: "100%", height: "100%", objectFit: "contain" }} />
               ) : (
