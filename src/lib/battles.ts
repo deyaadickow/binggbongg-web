@@ -135,7 +135,11 @@ export interface VirtualBattleData {
 export interface VirtualGifter { user_id: number; fullname?: string | null; username?: string | null; profile_image?: string | null; coins: number; gifts: number; thanked: boolean }
 export interface VirtualParticipantRecord { user_id: number; kind: string; fullname?: string | null; username?: string | null; profile_image?: string | null; total_coins: number; total_gifts: number; gifters: VirtualGifter[] }
 export interface VirtualGiftRecord { battle: VirtualBattleData; participants: VirtualParticipantRecord[]; default_thank_you: string }
-export interface VirtualMember { user_id: number; fullname?: string | null; username?: string | null; profile_image?: string | null; virtual_media_url?: string | null; virtual_media_type?: string | null }
+// Steve, 2026-09-29: "everyone wants to battle a popular or famous person... can multiple
+// members battle with one person?" — no, Virtual Battle is exclusive per person; is_busy (new
+// backend field, ChecksOpenBattles::activeVirtualBattleUserIds) flags a member already tied up
+// in someone else's active Virtual Battle right now, same as the Android picker's own fix.
+export interface VirtualMember { user_id: number; fullname?: string | null; username?: string | null; profile_image?: string | null; virtual_media_url?: string | null; virtual_media_type?: string | null; is_busy?: boolean }
 
 export async function startVirtualBattle(myUserId: number, roomName: string, participantUserIds: number[]): Promise<VirtualBattleData> {
   const res = await post<VirtualBattleData>("startVirtualBattle", { my_user_id: myUserId, room_name: roomName, participant_user_ids: participantUserIds.join(",") });

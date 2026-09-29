@@ -414,11 +414,15 @@ export function VirtualPicker({ myUserId, guests, onSubmit, onClose }: { myUserI
   }
   useEffectVB(() => { search(""); }, []);
   // Steve, 2026-09-27 (picker screenshot): "Add everyone's avatar here" — photo or initials on every row.
-  const row = (id: number, name: string, hint: string, p?: Person) => (
-    <label key={id} className="row" style={{ gap: 10, padding: "8px 10px", border: "1px solid var(--gold-border)", borderRadius: 10, cursor: "pointer", opacity: selected.has(id) ? 1 : 0.85 }}>
-      <input type="checkbox" checked={selected.has(id)} onChange={() => toggle(id, name)} />
+  // Steve, 2026-09-29: "everyone wants to battle a popular or famous person... can multiple
+  // members battle with one person?" — no, exclusive per person; isMemberBusy greys the row,
+  // disables its checkbox outright, and swaps the hint, so a host sees this BEFORE picking
+  // instead of a rejection after tapping Start Battle — same fix as the Android picker.
+  const row = (id: number, name: string, hint: string, p?: Person, isMemberBusy?: boolean) => (
+    <label key={id} className="row" style={{ gap: 10, padding: "8px 10px", border: "1px solid var(--gold-border)", borderRadius: 10, cursor: isMemberBusy ? "default" : "pointer", opacity: isMemberBusy ? 0.5 : (selected.has(id) ? 1 : 0.85) }}>
+      <input type="checkbox" checked={!isMemberBusy && selected.has(id)} disabled={isMemberBusy} onChange={() => { if (!isMemberBusy) toggle(id, name); }} />
       <span style={{ borderRadius: 17, overflow: "hidden", border: "1px solid var(--gold-border)", flex: "none" }}><VirtualLook p={{ profile_image: p?.profile_image, fullname: p?.fullname ?? name, username: p?.username }} size={34} /></span>
-      <b>{name}</b><span className="muted" style={{ fontSize: 12 }}>· {hint}</span>
+      <b>{name}</b><span className="muted" style={{ fontSize: 12 }}>· {isMemberBusy ? "Busy — in a battle" : hint}</span>
     </label>
   );
   return (
@@ -436,7 +440,7 @@ export function VirtualPicker({ myUserId, guests, onSubmit, onClose }: { myUserI
       <div style={{ fontSize: 12, fontWeight: 800, color: "var(--gold)", margin: "12px 0 6px" }}>{query.trim() ? "Search results" : "Members not live right now"}</div>
       <div style={{ display: "grid", gap: 6, marginTop: 8, maxHeight: 260, overflowY: "auto" }}>
         {results.length === 0 && !busy && <span className="muted" style={{ fontSize: 12 }}>{query.trim() ? "No members found." : "No members to show yet."}</span>}
-        {results.filter((r) => !guests.some((g) => g.user_id === r.user_id)).map((m) => row(m.user_id, personName(m as Person), m.virtual_media_url ? "has a virtual look" : `@${m.username ?? ""}`, m as Person))}
+        {results.filter((r) => !guests.some((g) => g.user_id === r.user_id)).map((m) => row(m.user_id, personName(m as Person), m.virtual_media_url ? "has a virtual look" : `@${m.username ?? ""}`, m as Person, m.is_busy))}
       </div>
       {note && <p style={{ color: "#f55", fontSize: 12, margin: "8px 0 0" }}>{note}</p>}
       <div className="muted" style={{ fontSize: 12, margin: "10px 0" }}>Selected: {selected.size} / 3{selected.size ? " — " + Array.from(selected.values()).join(", ") : ""}</div>
