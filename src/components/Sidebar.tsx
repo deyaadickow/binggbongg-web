@@ -12,6 +12,7 @@ export function sidebarSections(userId: number | null): SideSection[] {
   return [
     { links: [
       { to: "/", label: "For You", icon: "🏠" },
+      { to: "/exciting-news", label: "Exciting News", icon: "📣" },
       { to: "/live", label: "Live Now", icon: "🔴" },
       { to: "/search", label: "Search", icon: "🔍" },
       { to: "/upload", label: "Upload video", icon: "🎬", needsLogin: true },

@@ -8,6 +8,7 @@ import { PhotosDirectoryPage } from "./pages/PhotosDirectoryPage";
 import { MemberAlbumPage } from "./pages/MemberAlbumPage";
 import { ContestUploadPage } from "./pages/ContestUploadPage";
 import { HomePage } from "./pages/HomePage";
+import { ExcitingNewsPage } from "./pages/ExcitingNewsPage";
 import { LoginPage } from "./pages/LoginPage";
 import { VideoPage } from "./pages/VideoPage";
 import { ProfilePage } from "./pages/ProfilePage";
@@ -31,6 +32,7 @@ export default function App() {
         <main className="content">
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/exciting-news" element={<ExcitingNewsPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/video/:id" element={<VideoPage />} />
           <Route path="/profile/:id" element={<ProfilePage />} />

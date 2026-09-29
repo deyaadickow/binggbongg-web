@@ -9,6 +9,7 @@ export function Nav() {
       <Link to="/" className="brand">Bingg Bongg</Link>
       <nav className="links">
         <NavLink to="/" end>For You</NavLink>
+        <NavLink to="/exciting-news">Exciting News</NavLink>
         <NavLink to="/live">Live Now</NavLink>
         <NavLink to="/search">Search</NavLink>
         {isLoggedIn && <NavLink to="/wallet">Wallet</NavLink>}
