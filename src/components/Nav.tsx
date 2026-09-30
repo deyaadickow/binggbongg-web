@@ -12,6 +12,10 @@ export function Nav() {
         <NavLink to="/exciting-news">Exciting News</NavLink>
         <NavLink to="/live">Live Now</NavLink>
         <NavLink to="/search">Search</NavLink>
+        {/* Steve, 2026-09-30: "Also please add an 'Advertise' Tab on top with the other tabs".
+            Ungated on purpose, unlike Wallet/Go Live below: this is the one tab a signed-out
+            visitor has a reason to click, and the page itself asks them to sign in. */}
+        <NavLink to="/settings/advertise">Advertise</NavLink>
         {isLoggedIn && <NavLink to="/wallet">Wallet</NavLink>}
         {isLoggedIn && <NavLink to="/go-live">Go Live</NavLink>}
         <NavLink to="/settings" className="only-narrow">Settings</NavLink>

@@ -407,7 +407,10 @@ export function AdvertisePage() {
   useEffect(() => {
     if (!user) return;
     post<VideoAd[]>("fetchMyVideoAds", { my_user_id: user.id }).then((r) => setAds(r.data ?? [])).catch(() => setAds([]));
-    post<unknown>("fetchMyAdCashAccount", { my_user_id: user.id }).then((r) => setCash(r as unknown as AdCash)).catch(() => undefined);
+    // .data, not the envelope — this cast used to be `r as unknown as AdCash`, which put the
+    // whole {status, data} object into `cash`, so `cash.balance` was always undefined and the
+    // card showed $0.00 no matter how much the member had deposited.
+    post<AdCash>("fetchMyAdCashAccount", { my_user_id: user.id }).then((r) => setCash(r.data ?? {})).catch(() => undefined);
   }, [user]);
   if (!isLoggedIn || !user) return <NeedLogin />;
   return (
@@ -427,10 +430,9 @@ export function AdvertisePage() {
           const url = (r as { url?: string } | null)?.url;
           if (url) window.open(url, "_blank", "noopener"); else window.alert(r?.message ?? "Couldn't open the funding page.");
         }}>Add money to your cash account ↗</button>
-        {/* The apps pair that capsule with a "+ Create Ad" one. The web has no ad-creation flow
-            built at all — the backend's createVideoAd endpoint exists, only this UI is missing —
-            so this stays an honest note rather than a button that goes nowhere. */}
-        <p className="muted" style={{ fontSize: 12, marginTop: 10, marginBottom: 0 }}>Creating a new video ad from the web is coming next. For now, create ads from the app; they show here.</p>
+        {/* The apps pair that capsule with a "+ Create Ad" one — Steve, 2026-09-30: "Build it the
+            same way it works on ios". Same flow now lives at /settings/advertise/new. */}
+        <div style={{ marginTop: 10 }}><Link className="btn" to="/settings/advertise/new">+ Create Ad</Link></div>
       </div>
       <div className="card">
         <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)" }}><b style={{ color: "var(--gold)" }}>My ads{ads ? ` (${ads.length})` : ""}</b></div>

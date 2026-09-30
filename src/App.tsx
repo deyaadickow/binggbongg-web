@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { SessionProvider } from "./lib/session";
 import { Nav } from "./components/Nav";
 import { UploadVideoPage } from "./pages/UploadVideoPage";
+import { CreateVideoAdPage } from "./pages/CreateVideoAdPage";
 import { UploadPhotosPage } from "./pages/UploadPhotosPage";
 import { MyPhotosPage } from "./pages/MyPhotosPage";
 import { PhotosDirectoryPage } from "./pages/PhotosDirectoryPage";
@@ -69,6 +70,7 @@ export default function App() {
           <Route path="/settings/virtual-look" element={<VirtualLookPage />} />
           <Route path="/settings/virtual-battles" element={<MyVirtualBattlesPage />} />
           <Route path="/settings/advertise" element={<AdvertisePage />} />
+          <Route path="/settings/advertise/new" element={<CreateVideoAdPage />} />
           <Route path="/settings/shop" element={<ComingSoonPage title="Bingg Bongg Shop" note="Products from members and partners, right inside Bingg Bongg." />} />
           <Route path="/settings/verification" element={<ComingSoonPage title="Request verification" note="Send your ID and a selfie to get the verified badge." />} />
           <Route path="/settings/language" element={<ComingSoonPage title="Change language" note="The web app is in English for now. The phone apps speak 53 languages." />} />
