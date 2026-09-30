@@ -21,7 +21,7 @@ import { WalletPage } from "./pages/WalletPage";
 import { GoLivePage } from "./pages/GoLivePage";
 import { Sidebar } from "./components/Sidebar";
 import { AdReferralEarningsPage, AllVideosEarningsPage, PayoutHistoryPage, RedeemPage, RepostEarningsPage, RewardingActionsPage, StatementsPage } from "./pages/WalletPages";
-import { AccountSettingsPage, AdvertisePage, BlockedProfilesPage, ComingSoonPage, ContestRequestsPage, DeleteAccountPage, FindABattlePage, ModeratorsPage, QrCodePage, ReferralsPage, SettingsHubPage, ShareProfilePage, SimulcastPage, SupportArchivePage, SupportPage, VirtualLookPage, MyVirtualBattlesPage, TermsOfUsePage, PrivacyPolicyPage, ContactUsPage, AboutUsPage, FaqPage } from "./pages/SettingsPages";
+import { AccountSettingsPage, AdvertisePage, BlockedProfilesPage, ComingSoonPage, ContestRequestsPage, DeleteAccountPage, FindABattlePage, ModeratorsPage, QrCodePage, ReferralsPage, SettingsHubPage, ShareProfilePage, SimulcastPage, SupportArchivePage, SupportPage, VirtualLookPage, MyVirtualBattlesPage, TermsOfUsePage, PrivacyPolicyPage, ContactUsPage, AboutUsPage, FaqPage, AppFeaturesPage } from "./pages/SettingsPages";
 
 export default function App() {
   return (
@@ -81,6 +81,7 @@ export default function App() {
           <Route path="/settings/contact" element={<ContactUsPage />} />
           <Route path="/settings/about" element={<AboutUsPage />} />
           <Route path="/settings/faq" element={<FaqPage />} />
+          <Route path="/settings/app-features" element={<AppFeaturesPage />} />
           <Route path="/settings/delete-account" element={<DeleteAccountPage />} />
           <Route path="*" element={<HomePage />} />
         </Routes>

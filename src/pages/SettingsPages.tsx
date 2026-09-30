@@ -777,6 +777,13 @@ export function FaqPage() {
   return <LegalPage title="FAQ" endpoint="fetchFaq" />;
 }
 
+/** Steve, 2026-09-30: "Create a link in setting called 'App Features Explainer' — And we should
+ *  explain every feature that we offer and how it works exactly." Admin-editable like the pages
+ *  above, so it keeps up with the features with no redeploy. */
+export function AppFeaturesPage() {
+  return <LegalPage title="App Features Explainer" endpoint="fetchAppFeatures" />;
+}
+
 // ---- Delete account -------------------------------------------------------------------------
 export function DeleteAccountPage() {
   const { user, isLoggedIn, signOut } = useSession();
