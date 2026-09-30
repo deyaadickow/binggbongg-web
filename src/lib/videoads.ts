@@ -15,6 +15,24 @@ export const MAX_TARGETS_PER_AD = 25;
 
 export type GeoLevel = "city" | "state" | "country";
 
+/**
+ * Steve's own markets, pinned to the top of every country picker (2026-09-30, after the list went
+ * from 5 countries to 192: "add a search box and put my main countries on top").
+ *
+ * These are the 5 he priced himself before the worldwide seed. Changing them means an edit here
+ * and in the two apps' matching constants — it is not admin-editable yet. Worth promoting to a
+ * server flag on tbl_ad_pricing_tiers if the set starts moving.
+ */
+export const MAIN_MARKET_CODES = ["US", "CA", "GB", "ID", "PH"];
+
+/** Splits a country list into [pinned-in-MAIN_MARKET_CODES-order, everything else A-Z]. */
+export function splitMainMarkets<T extends { code: string }>(countries: T[]): { main: T[]; rest: T[] } {
+  const main = MAIN_MARKET_CODES.map((c) => countries.find((x) => x.code === c)).filter((x): x is T => x != null);
+  const pinned = new Set(main.map((x) => x.code));
+  return { main, rest: countries.filter((x) => !pinned.has(x.code)) };
+}
+
+
 /** One row of tbl_ad_pricing_tiers (fetchAdPricingTiers). Only active tiers come back, and a
  *  country absent from this list simply cannot be targeted — which is why the country picker is
  *  built from these rows rather than from the full country list. */

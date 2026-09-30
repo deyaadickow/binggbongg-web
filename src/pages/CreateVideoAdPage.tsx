@@ -19,7 +19,7 @@ import { Loading, Notice } from "../components/Common";
 import { videoDuration, videoThumbnail } from "../lib/upload";
 import {
   createVideoAd, fetchAdPricingTiers, fetchCitiesForState, MAX_AD_VIDEO_SECONDS, MAX_TARGETS_PER_AD,
-  priceForTarget, sameTarget, targetLabel, tierFor, totalMonthlyPrice,
+  priceForTarget, sameTarget, splitMainMarkets, targetLabel, tierFor, totalMonthlyPrice,
   type AdPricingTier, type GeoLevel, type PendingTarget,
 } from "../lib/videoads";
 
@@ -39,6 +39,7 @@ export function CreateVideoAdPage() {
 
   const [level, setLevel] = useState<GeoLevel>("city");
   const [countryCode, setCountryCode] = useState("");
+  const [countryQuery, setCountryQuery] = useState("");
   const [stateName, setStateName] = useState("");
   const [cities, setCities] = useState<string[] | null>(null);
   const [citiesError, setCitiesError] = useState<string | null>(null);
@@ -76,6 +77,16 @@ export function CreateVideoAdPage() {
     for (const t of tiers) if (t.level === level) seen.set(t.country_code, t.country_name);
     return [...seen.entries()].map(([code, name]) => ({ code, name })).sort((a, b) => a.name.localeCompare(b.name));
   }, [tiers, level]);
+
+  /* Steve, 2026-09-30, once the list reached 192: "add a search box and put my main countries on
+     top". Both groups are filtered by the same query, so a search never hides a main market. */
+  const { main: mainMarkets, rest: otherCountries } = useMemo(() => {
+    const q = countryQuery.trim().toLowerCase();
+    const match = (c: { code: string; name: string }) =>
+      !q || c.name.toLowerCase().includes(q) || c.code.toLowerCase() === q;
+    const { main, rest } = splitMainMarkets(countries);
+    return { main: main.filter(match), rest: rest.filter(match) };
+  }, [countries, countryQuery]);
 
   const states = useMemo(() => {
     const row = countryData.find((c) => (c.iso2 ?? "").toUpperCase() === countryCode.toUpperCase());
@@ -194,14 +205,33 @@ export function CreateVideoAdPage() {
             </div>
 
             <label style={{ marginTop: 12 }}>Country</label>
+            <input
+              className="input"
+              value={countryQuery}
+              onChange={(e) => setCountryQuery(e.target.value)}
+              placeholder={`Search ${countries.length} countries…`}
+              style={{ marginBottom: 6 }}
+            />
             <select
               className="input"
               value={countryCode}
               onChange={(e) => { setCountryCode(e.target.value); setStateName(""); setCities(null); }}
             >
               <option value="">—</option>
-              {countries.map((c) => <option key={c.code} value={c.code}>{c.name}</option>)}
+              {mainMarkets.length > 0 && (
+                <optgroup label="Main markets">
+                  {mainMarkets.map((c) => <option key={c.code} value={c.code}>{c.name}</option>)}
+                </optgroup>
+              )}
+              {otherCountries.length > 0 && (
+                <optgroup label={mainMarkets.length > 0 ? "All countries" : "Countries"}>
+                  {otherCountries.map((c) => <option key={c.code} value={c.code}>{c.name}</option>)}
+                </optgroup>
+              )}
             </select>
+            {mainMarkets.length + otherCountries.length === 0 && (
+              <p className="muted" style={{ fontSize: 12, marginTop: 4 }}>No country matches “{countryQuery}”.</p>
+            )}
             {countryCode && levelPrice != null && (
               <p className="muted" style={{ fontSize: 12, marginTop: 4 }}>{money(levelPrice)} / month per {level} in {countryName}.</p>
             )}
