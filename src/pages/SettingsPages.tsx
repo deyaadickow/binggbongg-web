@@ -399,7 +399,21 @@ export function SimulcastPage() {
 
 // ---- Advertise ------------------------------------------------------------------------------
 interface VideoAd { id: number; company_name?: string; status?: string; thumb_path?: string; advertiser_monthly_price?: number; next_billing_date?: string; started_at?: string }
-interface AdCash { balance?: number; minimum_deposit?: number; transactions?: { id: number; amount: number; type: string; note?: string; created_at?: string }[] }
+interface AdCash { balance?: number; minimum_deposit?: number; ad_credit_balance?: number; ad_credit_expires_at?: string | null; advertising_spendable?: number; transactions?: { id: number; amount: number; type: string; note?: string; created_at?: string }[] }
+/** Money with thousands separators. A partner credit runs to six figures, and "$100000.00" is
+ *  genuinely hard to read at a glance. */
+const usd = (n: number) => `$${Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+/** "2027-09-30" -> "30 September 2027", built in LOCAL time.
+ *  new Date("2027-09-30") parses as UTC midnight, so anywhere west of Greenwich it renders as the
+ *  29th — which is exactly what the first version of this did. Splitting the parts avoids the
+ *  shift entirely. Falls back to the raw string rather than dropping the date. */
+function longDate(iso: string): string {
+  const [y, m, d] = iso.slice(0, 10).split("-").map(Number);
+  if (!y || !m || !d) return iso;
+  return new Date(y, m - 1, d).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" });
+}
+
 export function AdvertisePage() {
   const { user, isLoggedIn } = useSession();
   const [ads, setAds] = useState<VideoAd[] | null>(null);
@@ -420,8 +434,23 @@ export function AdvertisePage() {
           it, no "Ad" in the wording) with the funding action as a gold-ringed capsule BELOW the
           card rather than a small button tucked inside it. Matched here. */}
       <div className="card pad center" style={{ marginBottom: 12 }}>
-        <div style={{ fontWeight: 800, color: "var(--gold)", fontSize: 30, lineHeight: 1.1 }}>${Number(cash?.balance ?? 0).toFixed(2)}</div>
+        <div style={{ fontWeight: 800, color: "var(--gold)", fontSize: 30, lineHeight: 1.1 }}>{usd(cash?.balance ?? 0)}</div>
         <div style={{ color: "var(--gold)", fontSize: 13, marginTop: 2 }}>Cash Account Balance</div>
+        {/* Steve, 2026-09-30: admin-granted advertising credit is a SEPARATE balance that can only
+            buy video ads — never a Shop listing or Photos storage — and it can expire. Shown as its
+            own line rather than added into the figure above, because merging them would tell a
+            partner they have money they can't actually spend on everything. */}
+        {Number(cash?.ad_credit_balance ?? 0) > 0 && (
+          <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid var(--gold-border)" }}>
+            <div style={{ fontWeight: 800, color: "var(--gold-bright)", fontSize: 22, lineHeight: 1.1 }}>
+              + {usd(cash?.ad_credit_balance ?? 0)}
+            </div>
+            <div style={{ color: "var(--gold)", fontSize: 13, marginTop: 2 }}>Advertising Credit</div>
+            <div className="muted" style={{ fontSize: 12, marginTop: 4 }}>
+              For video ads only{cash?.ad_credit_expires_at ? ` · expires ${longDate(cash.ad_credit_expires_at)}` : ""}
+            </div>
+          </div>
+        )}
       </div>
       <div className="center" style={{ marginBottom: 12 }}>
         <button className="btn" onClick={async () => {
