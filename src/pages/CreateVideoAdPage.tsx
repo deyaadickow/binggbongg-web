@@ -27,6 +27,13 @@ import {
  *  never needed them; the ad targeter does, to match tier country_code and look up cities. */
 interface CountryRow { name?: string | null; iso2?: string | null; states?: { name?: string | null; state_code?: string | null }[] }
 
+/** The three tap-to-open picker fields: same gold input box as every other field, with the chosen
+ *  value on the left and a chevron on the right — the same shape both apps use. */
+const pickerFieldStyle: React.CSSProperties = {
+  display: "flex", alignItems: "center", justifyContent: "space-between",
+  textAlign: "left", cursor: "pointer",
+};
+
 const money = (n: number) => `$${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 export function CreateVideoAdPage() {
@@ -39,7 +46,7 @@ export function CreateVideoAdPage() {
 
   const [level, setLevel] = useState<GeoLevel>("city");
   const [countryCode, setCountryCode] = useState("");
-  const [countryQuery, setCountryQuery] = useState("");
+  const [openSheet, setOpenSheet] = useState<null | "country" | "state" | "city">(null);
   const [stateName, setStateName] = useState("");
   const [cities, setCities] = useState<string[] | null>(null);
   const [citiesError, setCitiesError] = useState<string | null>(null);
@@ -78,15 +85,9 @@ export function CreateVideoAdPage() {
     return [...seen.entries()].map(([code, name]) => ({ code, name })).sort((a, b) => a.name.localeCompare(b.name));
   }, [tiers, level]);
 
-  /* Steve, 2026-09-30, once the list reached 192: "add a search box and put my main countries on
-     top". Both groups are filtered by the same query, so a search never hides a main market. */
-  const { main: mainMarkets, rest: otherCountries } = useMemo(() => {
-    const q = countryQuery.trim().toLowerCase();
-    const match = (c: { code: string; name: string }) =>
-      !q || c.name.toLowerCase().includes(q) || c.code.toLowerCase() === q;
-    const { main, rest } = splitMainMarkets(countries);
-    return { main: main.filter(match), rest: rest.filter(match) };
-  }, [countries, countryQuery]);
+  /* Steve, 2026-09-30: "put my main countries on top" — the 5 he priced himself lead the list,
+     everything else follows A-Z. PickerSheet captions and filters the two groups. */
+  const { main: mainMarkets, rest: otherCountries } = useMemo(() => splitMainMarkets(countries), [countries]);
 
   const states = useMemo(() => {
     const row = countryData.find((c) => (c.iso2 ?? "").toUpperCase() === countryCode.toUpperCase());
@@ -204,43 +205,13 @@ export function CreateVideoAdPage() {
               ))}
             </div>
 
+            {/* Tap-to-open fields, matching both apps: the list lives in a sheet with room to
+                breathe, not a short scroll window inside the form that cut the cards in half. */}
             <label style={{ marginTop: 12 }}>Country</label>
-            <input
-              className="input"
-              value={countryQuery}
-              onChange={(e) => setCountryQuery(e.target.value)}
-              placeholder={`Search ${countries.length} countries…`}
-              style={{ marginBottom: 8 }}
-            />
-            {/* Steve, 2026-09-30: "Make all countries black background with a gold border for each
-                country." This was a <select>, whose options can't be styled per-row in any
-                cross-browser way, so it's now a scrolling list of gold-bordered cards — the same
-                thing the two apps' picker sheets show. */}
-            <div style={{ maxHeight: 260, overflowY: "auto", paddingRight: 4 }}>
-              {[{ label: "Main markets", list: mainMarkets }, { label: mainMarkets.length > 0 ? "All countries" : "Countries", list: otherCountries }]
-                .filter((g) => g.list.length > 0)
-                .map((group) => (
-                  <div key={group.label}>
-                    <div className="muted" style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", margin: "8px 0 6px" }}>{group.label}</div>
-                    {group.list.map((c) => (
-                      <button
-                        key={c.code}
-                        onClick={() => { setCountryCode(c.code); setStateName(""); setCities(null); }}
-                        style={{
-                          display: "block", width: "100%", textAlign: "left", cursor: "pointer",
-                          padding: "11px 14px", marginBottom: 8, borderRadius: 10,
-                          background: "#101010", color: "var(--gold)",
-                          border: `1.5px solid ${c.code === countryCode ? "var(--gold-bright)" : "var(--gold-border)"}`,
-                          fontWeight: c.code === countryCode ? 800 : 500,
-                        }}
-                      >{c.name}</button>
-                    ))}
-                  </div>
-                ))}
-              {mainMarkets.length + otherCountries.length === 0 && (
-                <p className="muted" style={{ fontSize: 12, margin: "8px 0 0" }}>No country matches “{countryQuery}”.</p>
-              )}
-            </div>
+            <button className="input" style={pickerFieldStyle} onClick={() => setOpenSheet("country")}>
+              <span style={{ color: countryName ? "var(--gold)" : "var(--text-dim)" }}>{countryName || "Tap to choose a country…"}</span>
+              <span style={{ color: "var(--gold)" }}>▾</span>
+            </button>
             {countryCode && levelPrice != null && (
               <p className="muted" style={{ fontSize: 12, marginTop: 4 }}>{money(levelPrice)} / month per {level} in {countryName}.</p>
             )}
@@ -257,18 +228,10 @@ export function CreateVideoAdPage() {
             {level !== "country" && countryCode && (
               <>
                 <label style={{ marginTop: 12 }}>{level === "city" ? "State (to look up cities in)" : "State"}</label>
-                <select
-                  className="input"
-                  value={stateName}
-                  onChange={(e) => {
-                    const name = e.target.value;
-                    const code = states.find((s) => s.name === name)?.state_code ?? "";
-                    if (level === "city") void loadCities(code, name); else setStateName(name);
-                  }}
-                >
-                  <option value="">—</option>
-                  {states.map((s) => <option key={s.name ?? ""} value={s.name ?? ""}>{s.name}</option>)}
-                </select>
+                <button className="input" style={pickerFieldStyle} onClick={() => setOpenSheet("state")}>
+                  <span style={{ color: stateName ? "var(--gold)" : "var(--text-dim)" }}>{stateName || "Tap to choose a state…"}</span>
+                  <span style={{ color: "var(--gold)" }}>▾</span>
+                </button>
               </>
             )}
 
@@ -281,26 +244,17 @@ export function CreateVideoAdPage() {
             )}
 
             {level === "city" && stateName && (
-              <div style={{ marginTop: 10 }}>
+              <>
+                <label style={{ marginTop: 12 }}>City</label>
                 {cities === null ? <Loading text="Loading cities…" />
                   : cities.length === 0 ? <p className="muted" style={{ fontSize: 12 }}>{citiesError ?? `No cities listed for ${stateName}.`}</p>
                   : (
-                    <div style={{ maxHeight: 260, overflowY: "auto", paddingRight: 4 }}>
-                      {cities.map((city) => (
-                        <button
-                          key={city}
-                          style={{
-                            display: "block", width: "100%", textAlign: "left", cursor: "pointer",
-                            padding: "11px 14px", marginBottom: 8, borderRadius: 10,
-                            background: "#101010", color: "var(--gold)",
-                            border: "1.5px solid var(--gold-border)", fontWeight: 500,
-                          }}
-                          onClick={() => addTarget({ geo_level: "city", country_code: countryCode, country_name: countryName, state_name: stateName, city_name: city })}
-                        >{city}</button>
-                      ))}
-                    </div>
+                    <button className="input" style={pickerFieldStyle} onClick={() => setOpenSheet("city")}>
+                      <span style={{ color: "var(--text-dim)" }}>Tap to choose cities…</span>
+                      <span style={{ color: "var(--gold)" }}>▾</span>
+                    </button>
                   )}
-              </div>
+              </>
             )}
 
             {targets.length > 0 && (
@@ -356,6 +310,44 @@ export function CreateVideoAdPage() {
             </div>
           )}
 
+          {openSheet === "country" && (
+            <PickerSheet
+              title="Country"
+              noun="countries"
+              items={otherCountries}
+              pinned={mainMarkets}
+              pinnedLabel="Main markets"
+              restLabel="All countries"
+              selected={countryCode}
+              onPick={(code) => { setCountryCode(code); setStateName(""); setCities(null); }}
+              onClose={() => setOpenSheet(null)}
+            />
+          )}
+          {openSheet === "state" && (
+            <PickerSheet
+              title="State"
+              noun="states"
+              items={states.map((st) => ({ code: st.state_code ?? st.name ?? "", name: st.name ?? "" }))}
+              selected={states.find((st) => st.name === stateName)?.state_code ?? ""}
+              onPick={(code) => {
+                const picked = states.find((st) => (st.state_code ?? st.name) === code);
+                const name = picked?.name ?? "";
+                if (level === "city") void loadCities(picked?.state_code ?? "", name); else setStateName(name);
+              }}
+              onClose={() => setOpenSheet(null)}
+            />
+          )}
+          {openSheet === "city" && cities && (
+            <PickerSheet
+              title={`Cities in ${stateName}`}
+              noun="cities"
+              items={cities.map((c) => ({ code: c, name: c }))}
+              onPick={(city) => addTarget({ geo_level: "city", country_code: countryCode, country_name: countryName, state_name: stateName, city_name: city })}
+              onClose={() => setOpenSheet(null)}
+              stayOpen
+            />
+          )}
+
           <div className="center">
             <button className="btn" disabled={!canSubmit} onClick={() => void submit()}>Create Ad</button>
             <div style={{ marginTop: 10 }}>
@@ -364,6 +356,98 @@ export function CreateVideoAdPage() {
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+
+/**
+ * The web's version of the apps' picker sheets (GoldPickerSheet on iOS, MultiSelectListSheet on
+ * Android) — Steve, 2026-09-30: "add all the counties together including the main markets just
+ * like you did for the iphone and android", then "I see they are all together but open".
+ *
+ * "Open" was the cards being sliced in half by a short scroll window sitting inside the form.
+ * A full-height overlay is what the apps show and what fixes it: the list gets real room, so
+ * rows end where they end instead of being cut through the middle.
+ *
+ * `pinned` rows are listed first under `pinnedLabel`; both groups are filtered by the same query,
+ * so a search can never hide a main market, and the captions drop away while filtering because a
+ * filtered list has no sections.
+ */
+function PickerSheet({ title, noun, items, pinned = [], pinnedLabel, restLabel, selected, onPick, onClose, stayOpen }: {
+  title: string;
+  noun: string;
+  items: { code: string; name: string }[];
+  pinned?: { code: string; name: string }[];
+  pinnedLabel?: string;
+  restLabel?: string;
+  selected?: string;
+  onPick: (code: string) => void;
+  onClose: () => void;
+  /** Cities add several targets in a row, so that sheet stays open after each tap. */
+  stayOpen?: boolean;
+}) {
+  const [query, setQuery] = useState("");
+  const q = query.trim().toLowerCase();
+  const match = (c: { code: string; name: string }) => !q || c.name.toLowerCase().includes(q) || c.code.toLowerCase() === q;
+  const shownPinned = pinned.filter(match);
+  const shownRest = items.filter(match);
+  const total = pinned.length + items.length;
+  const filtering = q.length > 0;
+
+  const row = (c: { code: string; name: string }) => (
+    <button
+      key={c.code}
+      onClick={() => { onPick(c.code); if (!stayOpen) onClose(); }}
+      style={{
+        display: "block", width: "100%", textAlign: "left", cursor: "pointer",
+        padding: "13px 14px", marginBottom: 8, borderRadius: 10,
+        background: "#101010", color: "var(--gold)",
+        border: `1.5px solid ${c.code === selected ? "var(--gold-bright)" : "var(--gold-border)"}`,
+        fontWeight: c.code === selected ? 800 : 500, fontSize: 15,
+      }}
+    >{c.name}</button>
+  );
+
+  const caption = (text: string) => (
+    <div className="muted" style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", margin: "4px 0 6px" }}>{text}</div>
+  );
+
+  return (
+    <div
+      onClick={onClose}
+      style={{ position: "fixed", inset: 0, zIndex: 50, background: "rgba(0,0,0,.75)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}
+    >
+      {/* Stop clicks inside the card from reaching the backdrop's close handler. */}
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          display: "flex", flexDirection: "column", width: "100%", maxWidth: 520, maxHeight: "86vh",
+          background: "#000", border: "1.5px solid var(--gold-border)", borderRadius: 16, padding: 16,
+        }}
+      >
+        <div style={{ fontWeight: 800, fontSize: 18, color: "var(--gold)", textAlign: "center", marginBottom: 12 }}>{title}</div>
+        <input
+          className="input"
+          autoFocus
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={`Search ${total} ${noun}…`}
+          style={{ marginBottom: 12, flex: "0 0 auto" }}
+        />
+        <div style={{ overflowY: "auto", paddingRight: 4, flex: 1 }}>
+          {shownPinned.length > 0 && !filtering && pinnedLabel && caption(pinnedLabel)}
+          {shownPinned.map(row)}
+          {shownRest.length > 0 && !filtering && restLabel && shownPinned.length > 0 && caption(restLabel)}
+          {shownRest.map(row)}
+          {shownPinned.length + shownRest.length === 0 && (
+            <p className="muted" style={{ fontSize: 13, textAlign: "center", padding: "24px 0" }}>Nothing matches “{query}”.</p>
+          )}
+        </div>
+        <button className="btn ghost" onClick={onClose} style={{ marginTop: 12, flex: "0 0 auto" }}>
+          {stayOpen ? "Done" : "Close"}
+        </button>
+      </div>
     </div>
   );
 }
