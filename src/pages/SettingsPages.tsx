@@ -412,20 +412,25 @@ export function AdvertisePage() {
   if (!isLoggedIn || !user) return <NeedLogin />;
   return (
     <Page title="Advertise">
-      <div className="card pad" style={{ marginBottom: 12 }}>
-        <div className="row">
-          <div style={{ flex: 1 }}>
-            <div className="muted" style={{ fontSize: 12 }}>Ad cash account</div>
-            <div style={{ fontWeight: 800, color: "var(--gold)", fontSize: 22 }}>${Number(cash?.balance ?? 0).toFixed(2)}</div>
-          </div>
-          <button className="btn small" onClick={async () => {
-            // Same flow as the app: a 30-minute deposit session whose token opens the Fund page.
-            const r = await post<unknown>("startAdCashDepositSession", { my_user_id: user.id }).catch(() => null);
-            const url = (r as { url?: string } | null)?.url;
-            if (url) window.open(url, "_blank", "noopener"); else window.alert(r?.message ?? "Couldn't open the funding page.");
-          }}>Fund account ↗</button>
-        </div>
-        <p className="muted" style={{ fontSize: 12, marginBottom: 0 }}>Creating a new video ad from the web is coming next. For now, create ads from the app; they show here.</p>
+      {/* Steve, 2026-09-30: "The same that you did for ios and android do it for the [web]" — both
+          apps' Advertise pages are now a centred balance card (big gold amount, its label under
+          it, no "Ad" in the wording) with the funding action as a gold-ringed capsule BELOW the
+          card rather than a small button tucked inside it. Matched here. */}
+      <div className="card pad center" style={{ marginBottom: 12 }}>
+        <div style={{ fontWeight: 800, color: "var(--gold)", fontSize: 30, lineHeight: 1.1 }}>${Number(cash?.balance ?? 0).toFixed(2)}</div>
+        <div style={{ color: "var(--gold)", fontSize: 13, marginTop: 2 }}>Cash Account Balance</div>
+      </div>
+      <div className="center" style={{ marginBottom: 12 }}>
+        <button className="btn" onClick={async () => {
+          // Same flow as the app: a 30-minute deposit session whose token opens the Fund page.
+          const r = await post<unknown>("startAdCashDepositSession", { my_user_id: user.id }).catch(() => null);
+          const url = (r as { url?: string } | null)?.url;
+          if (url) window.open(url, "_blank", "noopener"); else window.alert(r?.message ?? "Couldn't open the funding page.");
+        }}>Add money to your cash account ↗</button>
+        {/* The apps pair that capsule with a "+ Create Ad" one. The web has no ad-creation flow
+            built at all — the backend's createVideoAd endpoint exists, only this UI is missing —
+            so this stays an honest note rather than a button that goes nowhere. */}
+        <p className="muted" style={{ fontSize: 12, marginTop: 10, marginBottom: 0 }}>Creating a new video ad from the web is coming next. For now, create ads from the app; they show here.</p>
       </div>
       <div className="card">
         <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)" }}><b style={{ color: "var(--gold)" }}>My ads{ads ? ` (${ads.length})` : ""}</b></div>
