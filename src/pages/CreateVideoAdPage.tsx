@@ -210,28 +210,37 @@ export function CreateVideoAdPage() {
               value={countryQuery}
               onChange={(e) => setCountryQuery(e.target.value)}
               placeholder={`Search ${countries.length} countries…`}
-              style={{ marginBottom: 6 }}
+              style={{ marginBottom: 8 }}
             />
-            <select
-              className="input"
-              value={countryCode}
-              onChange={(e) => { setCountryCode(e.target.value); setStateName(""); setCities(null); }}
-            >
-              <option value="">—</option>
-              {mainMarkets.length > 0 && (
-                <optgroup label="Main markets">
-                  {mainMarkets.map((c) => <option key={c.code} value={c.code}>{c.name}</option>)}
-                </optgroup>
+            {/* Steve, 2026-09-30: "Make all countries black background with a gold border for each
+                country." This was a <select>, whose options can't be styled per-row in any
+                cross-browser way, so it's now a scrolling list of gold-bordered cards — the same
+                thing the two apps' picker sheets show. */}
+            <div style={{ maxHeight: 260, overflowY: "auto", paddingRight: 4 }}>
+              {[{ label: "Main markets", list: mainMarkets }, { label: mainMarkets.length > 0 ? "All countries" : "Countries", list: otherCountries }]
+                .filter((g) => g.list.length > 0)
+                .map((group) => (
+                  <div key={group.label}>
+                    <div className="muted" style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", margin: "8px 0 6px" }}>{group.label}</div>
+                    {group.list.map((c) => (
+                      <button
+                        key={c.code}
+                        onClick={() => { setCountryCode(c.code); setStateName(""); setCities(null); }}
+                        style={{
+                          display: "block", width: "100%", textAlign: "left", cursor: "pointer",
+                          padding: "11px 14px", marginBottom: 8, borderRadius: 10,
+                          background: "#101010", color: "var(--gold)",
+                          border: `1.5px solid ${c.code === countryCode ? "var(--gold-bright)" : "var(--gold-border)"}`,
+                          fontWeight: c.code === countryCode ? 800 : 500,
+                        }}
+                      >{c.name}</button>
+                    ))}
+                  </div>
+                ))}
+              {mainMarkets.length + otherCountries.length === 0 && (
+                <p className="muted" style={{ fontSize: 12, margin: "8px 0 0" }}>No country matches “{countryQuery}”.</p>
               )}
-              {otherCountries.length > 0 && (
-                <optgroup label={mainMarkets.length > 0 ? "All countries" : "Countries"}>
-                  {otherCountries.map((c) => <option key={c.code} value={c.code}>{c.name}</option>)}
-                </optgroup>
-              )}
-            </select>
-            {mainMarkets.length + otherCountries.length === 0 && (
-              <p className="muted" style={{ fontSize: 12, marginTop: 4 }}>No country matches “{countryQuery}”.</p>
-            )}
+            </div>
             {countryCode && levelPrice != null && (
               <p className="muted" style={{ fontSize: 12, marginTop: 4 }}>{money(levelPrice)} / month per {level} in {countryName}.</p>
             )}
@@ -276,12 +285,16 @@ export function CreateVideoAdPage() {
                 {cities === null ? <Loading text="Loading cities…" />
                   : cities.length === 0 ? <p className="muted" style={{ fontSize: 12 }}>{citiesError ?? `No cities listed for ${stateName}.`}</p>
                   : (
-                    <div style={{ maxHeight: 240, overflowY: "auto", border: "1px solid var(--line)", borderRadius: 10 }}>
+                    <div style={{ maxHeight: 260, overflowY: "auto", paddingRight: 4 }}>
                       {cities.map((city) => (
                         <button
                           key={city}
-                          className="row"
-                          style={{ width: "100%", padding: "9px 12px", background: "none", border: "none", borderBottom: "1px solid var(--line)", color: "var(--text)", cursor: "pointer", textAlign: "left" }}
+                          style={{
+                            display: "block", width: "100%", textAlign: "left", cursor: "pointer",
+                            padding: "11px 14px", marginBottom: 8, borderRadius: 10,
+                            background: "#101010", color: "var(--gold)",
+                            border: "1.5px solid var(--gold-border)", fontWeight: 500,
+                          }}
                           onClick={() => addTarget({ geo_level: "city", country_code: countryCode, country_name: countryName, state_name: stateName, city_name: city })}
                         >{city}</button>
                       ))}
