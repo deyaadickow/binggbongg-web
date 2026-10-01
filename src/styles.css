@@ -175,11 +175,13 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 /* Steve, 2026-10-01: "Just bring the entire gift popup to the middle of the web page" — the shared
    backdrop pins sheets to the bottom edge; this one floats centred, fully rounded. */
 .modal-backdrop.gift-backdrop { align-items: center; padding: 16px; }
-.modal-sheet.gift-sheet { max-width: 440px; border-radius: var(--radius); max-height: 90vh; padding-bottom: 24px; }
+/* Steve, 2026-10-01: "You made it too long and too narrow." Wider, four across, capped shorter. */
+.modal-sheet.gift-sheet { max-width: 680px; border-radius: var(--radius); max-height: 76vh; padding-bottom: 24px; }
 .gift-purchase { display: flex; align-items: center; gap: 10px; padding: 14px 20px; margin: 0 6px 12px; border-radius: 999px; border: 2px solid var(--gold-border); background: rgba(0,0,0,.85); color: #fff; font-weight: 700; font-size: 17px; }
 .gift-purchase:hover { border-color: var(--gold-bright); color: #fff; }
 .gift-purchase b { color: var(--gold); font-size: 20px; font-weight: 800; }
-.gift-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0 6px; }
+.gift-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 0 6px; }
+@media (max-width: 480px) { .gift-grid { grid-template-columns: repeat(3, 1fr); } }
 .gift-grid button { aspect-ratio: 1 / 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 8px 4px; border-radius: 15px; border: 2px solid var(--gold-border); background: rgba(0,0,0,.88); color: #fff; cursor: pointer; font-size: 12px; min-width: 0; }
 .gift-grid button img { width: 45px; height: 45px; object-fit: contain; }
 .gift-grid button b { font-size: 14px; font-weight: 400; }
