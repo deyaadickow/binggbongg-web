@@ -81,7 +81,7 @@ export const usd = (n: number) => "$" + n.toLocaleString("en-US", { minimumFract
 
 export async function fetchBusinessCategories(): Promise<BusinessCategory[]> {
   const r = await post<BusinessCategory[]>("fetchBusinessCategories", { x: 1 });
-  return r.data ?? [];
+  return (r.data ?? []).slice().sort((a, b) => a.name.localeCompare(b.name));
 }
 
 export async function fetchBusinessPricing(): Promise<BusinessPricing | null> {

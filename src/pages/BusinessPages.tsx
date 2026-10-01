@@ -111,12 +111,12 @@ export function BusinessTabPage() {
         )}
         {(countryCode || categoryId || q) && <button className="btn small ghost" onClick={() => { setCountryCode(""); setStateCode(""); setCity(""); setCategoryId(0); setQ(""); setQuery(""); }}>Clear</button>}
       </div>
-
-      <div className="playlist-scroll" style={{ marginBottom: 6 }}>
-        <button className={`btn small${categoryId === 0 ? "" : " ghost"}`} style={{ flex: "0 0 auto" }} onClick={() => setCategoryId(0)}>All</button>
-        {categories.map((c) => (
-          <button key={c.id} className={`btn small${categoryId === c.id ? "" : " ghost"}`} style={{ flex: "0 0 auto" }} onClick={() => setCategoryId(c.id)}>{c.name}</button>
-        ))}
+      <div className="row" style={{ gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+        {/* Steve, 2026-10-01: "make categories in a dropdown in alphabetical order" */}
+        <select style={GOLD_SELECT} value={categoryId} onChange={(e) => setCategoryId(Number(e.target.value))}>
+          <option value={0}>All categories</option>
+          {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+        </select>
       </div>
 
       {nearText && items && items.length > 0 && <p className="muted" style={{ fontSize: 13, color: "var(--gold)" }}>Showing businesses near you first — {nearText}</p>}
