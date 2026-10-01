@@ -42,8 +42,6 @@ export interface Business {
   views: number;
   is_verified: boolean;
   is_live: boolean;
-  /** Set up but never paid for — only the owner can see it. */
-  is_draft: boolean;
   category?: BusinessCategory | null;
   owner?: Partial<UserSummary> | null;
   media?: BusinessMedia[];
@@ -77,8 +75,6 @@ export function nearLabel(n?: Near | null): string {
 }
 
 export function statusText(b: Business): string {
-  // Steve, 2026-10-01: a page is free to set up and only charged when published.
-  if (b.is_draft) return "Draft — only you can see this";
   if (b.is_live) return `Live · ${b.days_left} day${b.days_left === 1 ? "" : "s"} left`;
   if (b.status === "suspended") return "Suspended by Bingg Bongg";
   if (b.status === "archived") return "Taken down — renew to bring it back";
@@ -126,12 +122,6 @@ export async function fetchMyBusinesses(myUserId: number): Promise<MyBusinesses>
   if (!r.status) throw new Error(r.message ?? "Couldn't load your businesses.");
   const extra = r as unknown as Omit<MyBusinesses, "data">;
   return { data: r.data ?? [], pricing: extra.pricing, cash_balance: extra.cash_balance ?? 0, referral_code: extra.referral_code, referral_fee: extra.referral_fee ?? 0, referral_earned: extra.referral_earned ?? 0, referral_count: extra.referral_count ?? 0 };
-}
-
-export async function publishBusiness(myUserId: number, businessId: number): Promise<string> {
-  const r = await post("publishBusiness", { my_user_id: myUserId, business_id: businessId });
-  if (!r.status) throw new Error(r.message ?? "Couldn't publish.");
-  return r.message ?? "Published.";
 }
 
 export async function renewBusiness(myUserId: number, businessId: number): Promise<string> {
