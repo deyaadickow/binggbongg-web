@@ -176,7 +176,10 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
    backdrop pins sheets to the bottom edge; this one floats centred, fully rounded. */
 .modal-backdrop.gift-backdrop { align-items: center; padding: 16px; }
 /* Steve, 2026-10-01: "You made it too long and too narrow." Wider, four across, capped shorter. */
-.modal-sheet.gift-sheet { max-width: 680px; border-radius: var(--radius); max-height: 76vh; padding-bottom: 24px; }
+.modal-sheet.gift-sheet { max-width: 680px; border-radius: var(--radius); max-height: 76vh; padding-bottom: 24px; scrollbar-width: none; }
+/* Steve, 2026-10-01: "Do we have to have the white scroll line on the right side of the gifts?" —
+   no: it still scrolls (wheel, trackpad, touch), the bar is just not drawn. */
+.modal-sheet.gift-sheet::-webkit-scrollbar { display: none; }
 .gift-purchase { display: flex; align-items: center; gap: 10px; padding: 14px 20px; margin: 0 6px 12px; border-radius: 999px; border: 2px solid var(--gold-border); background: rgba(0,0,0,.85); color: #fff; font-weight: 700; font-size: 17px; }
 .gift-purchase:hover { border-color: var(--gold-bright); color: #fff; }
 .gift-purchase b { color: var(--gold); font-size: 20px; font-weight: 800; }
