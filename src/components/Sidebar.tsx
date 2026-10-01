@@ -13,6 +13,7 @@ export function sidebarSections(userId: number | null): SideSection[] {
     { links: [
       { to: "/", label: "For You", icon: "🏠" },
       { to: "/exciting-news", label: "Exciting News", icon: "📣" },
+      { to: "/business", label: "Business", icon: "🏪" },
       { to: "/live", label: "Live Now", icon: "🔴" },
       { to: "/search", label: "Search", icon: "🔍" },
       { to: "/upload", label: "Upload video", icon: "🎬", needsLogin: true },
@@ -40,6 +41,7 @@ export function sidebarSections(userId: number | null): SideSection[] {
       { to: "/settings/virtual-look", label: "My Virtual Battle Look", icon: "🪞", needsLogin: true },
       { to: "/settings/virtual-battles", label: "My Virtual Battles", icon: "🥊", needsLogin: true },
       { to: "/settings/advertise", label: "Advertise", icon: "📣", needsLogin: true },
+      { to: "/settings/business", label: "Bingg Bongg Business", icon: "💼", needsLogin: true },
       { to: "/settings/shop", label: "Bingg Bongg Shop", icon: "🛍️", needsLogin: true },
       { to: "/settings/verification", label: "Request verification", icon: "✅", needsLogin: true },
     ] },

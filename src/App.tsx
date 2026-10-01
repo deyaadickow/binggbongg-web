@@ -10,6 +10,7 @@ import { MemberAlbumPage } from "./pages/MemberAlbumPage";
 import { ContestUploadPage } from "./pages/ContestUploadPage";
 import { HomePage } from "./pages/HomePage";
 import { ExcitingNewsPage } from "./pages/ExcitingNewsPage";
+import { BusinessPage, BusinessTabPage, CreateBusinessPage, MyBusinessesPage } from "./pages/BusinessPages";
 import { LoginPage } from "./pages/LoginPage";
 import { VideoPage } from "./pages/VideoPage";
 import { ProfilePage } from "./pages/ProfilePage";
@@ -34,6 +35,8 @@ export default function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/exciting-news" element={<ExcitingNewsPage />} />
+          <Route path="/business" element={<BusinessTabPage />} />
+          <Route path="/business/:id" element={<BusinessPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/video/:id" element={<VideoPage />} />
           <Route path="/profile/:id" element={<ProfilePage />} />
@@ -71,6 +74,9 @@ export default function App() {
           <Route path="/settings/virtual-battles" element={<MyVirtualBattlesPage />} />
           <Route path="/settings/advertise" element={<AdvertisePage />} />
           <Route path="/settings/advertise/new" element={<CreateVideoAdPage />} />
+          <Route path="/settings/business" element={<MyBusinessesPage />} />
+          <Route path="/settings/business/new" element={<CreateBusinessPage />} />
+          <Route path="/settings/business/edit/:id" element={<CreateBusinessPage />} />
           <Route path="/settings/shop" element={<ComingSoonPage title="Bingg Bongg Shop" note="Products from members and partners, right inside Bingg Bongg." />} />
           <Route path="/settings/verification" element={<ComingSoonPage title="Request verification" note="Send your ID and a selfie to get the verified badge." />} />
           <Route path="/settings/language" element={<ComingSoonPage title="Change language" note="The web app is in English for now. The phone apps speak 53 languages." />} />

@@ -10,6 +10,7 @@ export function Nav() {
       <nav className="links">
         <NavLink to="/" end>For You</NavLink>
         <NavLink to="/exciting-news">Exciting News</NavLink>
+        <NavLink to="/business">Business</NavLink>
         <NavLink to="/live">Live Now</NavLink>
         <NavLink to="/search">Search</NavLink>
         {/* Steve, 2026-09-30: "Also please add an 'Advertise' Tab on top with the other tabs".
