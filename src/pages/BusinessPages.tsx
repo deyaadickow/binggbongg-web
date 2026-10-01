@@ -184,13 +184,13 @@ export function BusinessPage() {
   if (error) return <div className="page"><Notice error>{error}</Notice></div>;
   if (!b) return <div className="page"><Loading /></div>;
 
-  const address = fullAddress(b);
-  const hours = hoursOf(b);
   // Photos / Videos, then every folder the member made — Steve, 2026-10-01: "give members the
   // ability to add folders ... 'Daily Special' 'Weekly Specials' 'Monthly Specials'". A folder
   // holds both photos and videos, so its tab shows everything filed under it.
   const folders = b.folders ?? [];
   const activeFolder = folders.some((f) => f.id === folderId) ? folderId : null;
+  const address = fullAddress(b);
+  const hours = hoursOf(b);
   const media = activeFolder !== null
     ? (b.media ?? []).filter((m) => m.folder_id === activeFolder)
     : (b.media ?? []).filter((m) => !m.folder_id && (m.type === "video") === showVideos);
@@ -227,7 +227,28 @@ export function BusinessPage() {
       {isOwner && (
         <div className="card pad" style={{ marginTop: 12 }}>
           <b style={{ color: b.is_live ? "var(--gold)" : "#FF8A80" }}>{statusText(b)}</b>
+          {/* Steve, 2026-10-01: "Please give the members the same option" — the admin page makes
+              you pick the folder before uploading, so say plainly where an upload is going and
+              let it be changed here, rather than leaving it implied by the open tab. */}
           <div className="row" style={{ gap: 8, flexWrap: "wrap", marginTop: 10 }}>
+            <span className="muted">Upload into:</span>
+            <select
+              className="input"
+              style={{ maxWidth: 220 }}
+              value={activeFolder === null ? (showVideos ? "videos" : "photos") : String(activeFolder)}
+              onChange={(e) => {
+                const v = e.target.value;
+                if (v === "photos") { setFolderId(null); setShowVideos(false); }
+                else if (v === "videos") { setFolderId(null); setShowVideos(true); }
+                else setFolderId(Number(v));
+              }}
+            >
+              <option value="photos">Photos</option>
+              <option value="videos">Videos</option>
+              {folders.map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}
+            </select>
+          </div>
+          <div className="row" style={{ gap: 8, flexWrap: "wrap", marginTop: 8 }}>
             <label className="btn small">Upload Photos<input type="file" accept="image/*" hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) upload("photo", f); e.target.value = ""; }} /></label>
             <label className="btn small">Upload Video<input type="file" accept="video/*" hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) upload("video", f); e.target.value = ""; }} /></label>
             <button className="btn small" onClick={() => navigate(`/settings/business/edit/${b.id}`)}>Edit</button>
