@@ -187,6 +187,14 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .gift-grid button:hover { border-color: var(--gold-bright); }
 .gift-grid button:disabled { opacity: .6; cursor: default; }
 .gift-grid button.busy { border-color: var(--gold-bright); opacity: 1; }
+.gift-flash { position: absolute; inset: 0; z-index: 5; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.4); pointer-events: none; animation: gift-flash-fade 2.8s ease forwards; }
+.gift-flash-card { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 20px 30px; border-radius: 15px; border: 2px solid var(--gold-border); background: rgba(0,0,0,.9); color: #fff; animation: gift-flash-pop .5s ease-out; }
+.gift-flash-title { color: var(--gold); font-weight: 800; font-size: 18px; margin-bottom: 8px; }
+.gift-flash-card img { width: 90px; height: 90px; object-fit: contain; }
+.gift-flash-card b { font-size: 18px; font-weight: 400; }
+.gift-flash-card span { font-size: 18px; }
+@keyframes gift-flash-pop { from { transform: scale(1.2); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes gift-flash-fade { 0%, 80% { opacity: 1; } 100% { opacity: 0; } }
 .gift-notice { margin: 0 6px 12px; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--gold-border); background: #0d0d00; font-size: 14px; }
 
 .notice { padding: 12px 14px; border-radius: 10px; border: 1px solid var(--gold-border); color: var(--text-soft); background: var(--panel); }

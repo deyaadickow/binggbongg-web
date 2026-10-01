@@ -17,7 +17,7 @@ import { loadGifts } from "../lib/gifts";
  * server refuses gifting your own post and an overdrawn balance; both are also caught here
  * first so the member gets a plain message rather than a round trip.
  */
-export function PostGiftButton({ post: item, className = "btn small" }: { post: Post; className?: string }) {
+export function PostGiftButton({ post: item, className = "btn small", onSent }: { post: Post; className?: string; onSent?: (gift: Gift) => void }) {
   const { user, isLoggedIn } = useSession();
   const [open, setOpen] = useState(false);
   const own = !!user && user.id === item.user_id;
@@ -27,12 +27,35 @@ export function PostGiftButton({ post: item, className = "btn small" }: { post: 
       <button className={className} onClick={() => setOpen(true)} disabled={!isLoggedIn} title={isLoggedIn ? "Send a gift" : "Sign in to send a gift"}>
         🎁 Gift
       </button>
-      {open && <GiftSheet post={item} onClose={() => setOpen(false)} />}
+      {open && <GiftSheet post={item} onClose={() => setOpen(false)} onSent={onSent} />}
     </>
   );
 }
 
-function GiftSheet({ post: item, onClose }: { post: Post; onClose: () => void }) {
+/**
+ * The gift shown over the video once it has been sent — iOS ThumbsUpPopup's "You have sent"
+ * card (gift image, price, name) for 2.8 seconds. Steve, 2026-10-01: "when i'm giving a gift,
+ * it's not showing the gift on top of the video." The host puts this inside the video's own
+ * positioned box (the card thumbnail or the video stage), where it fills it.
+ */
+export function GiftFlash({ gift, onDone }: { gift: Gift; onDone: () => void }) {
+  useEffect(() => {
+    const t = setTimeout(onDone, 2800);
+    return () => clearTimeout(t);
+  }, [gift, onDone]);
+  return (
+    <div className="gift-flash" aria-live="polite">
+      <div className="gift-flash-card">
+        <div className="gift-flash-title">You have sent</div>
+        {gift.image ? <img src={mediaUrl(gift.image)} alt="" /> : <span style={{ fontSize: 64 }}>🎁</span>}
+        <b>{giftPrice(gift)}</b>
+        <span>{gift.name ?? "Gift"}</span>
+      </div>
+    </div>
+  );
+}
+
+function GiftSheet({ post: item, onClose, onSent }: { post: Post; onClose: () => void; onSent?: (gift: Gift) => void }) {
   const { user, refresh } = useSession();
   const [gifts, setGifts] = useState<Gift[]>([]);
   const [busy, setBusy] = useState<number | null>(null);
@@ -61,8 +84,9 @@ function GiftSheet({ post: item, onClose }: { post: Post; onClose: () => void })
       const res = await post("sendCoinsToPost", { my_user_id: user.id, coins: price, post_id: item.id });
       if (!res.status) throw new Error(res.message ?? "Couldn't send that gift.");
       await refresh();
-      setNotice({ text: `Sent ${gift.name ?? "a gift"} (${price} coins). Thank you!` });
-      setTimeout(onClose, 1400);
+      // Close straight away so the gift shows over the video, as the phones do.
+      onClose();
+      onSent?.(gift);
     } catch (err) {
       setNotice({ text: (err as Error).message });
     } finally {

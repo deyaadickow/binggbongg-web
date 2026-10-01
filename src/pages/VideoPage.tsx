@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { displayName, mediaUrl, post, type Post } from "../lib/api";
+import { displayName, mediaUrl, post, type Gift, type Post } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice } from "../components/Common";
-import { PostGiftButton } from "../components/GiftSheet";
+import { GiftFlash, PostGiftButton } from "../components/GiftSheet";
 import { appendToFeed, fetchMoreFeed, getFeed } from "../lib/feed";
 
 const AUTO_KEY = "bb.autoplayNext";
@@ -81,6 +81,9 @@ export function VideoPage() {
     try { localStorage.setItem(AUTO_KEY, v ? "1" : "0"); } catch { /* ignore */ }
   }
 
+  const [sentGift, setSentGift] = useState<Gift | null>(null);
+  const clearSentGift = useCallback(() => setSentGift(null), []);
+
   async function toggleLike() {
     if (!item || !user) return;
     const endpoint = liked ? "dislikePost" : "likePost";
@@ -97,6 +100,7 @@ export function VideoPage() {
       <div className="video-stage">
         <video key={item.id} ref={videoRef} className="player" src={mediaUrl(item.video)} poster={mediaUrl(item.thumbnail)} controls autoPlay playsInline
           loop={!auto} onEnded={() => { if (auto) goNext(); }} />
+        {sentGift && <GiftFlash gift={sentGift} onDone={clearSentGift} />}
         <div className="video-arrows">
           <button className="arrow" onClick={goPrev} disabled={!prev} title="Previous (↑)">▲</button>
           <button className="arrow" onClick={goNext} disabled={!next} title="Next (↓)">▼</button>
@@ -114,7 +118,7 @@ export function VideoPage() {
         <button className="btn small" onClick={toggleLike} disabled={!isLoggedIn} title={isLoggedIn ? "" : "Sign in to like"}>
           {liked ? "♥" : "♡"} {likes}
         </button>
-        <PostGiftButton post={item} />
+        <PostGiftButton post={item} onSent={setSentGift} />
       </div>
     </div>
   );
