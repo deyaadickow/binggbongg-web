@@ -174,8 +174,8 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
    pill with the balance, then three square black tiles across, gold-bordered, image / price / name. */
 /* Steve, 2026-10-01: "Just bring the entire gift popup to the middle of the web page" — the shared
    backdrop pins sheets to the bottom edge; this one floats centred, fully rounded. */
-.gift-backdrop { align-items: center; padding: 16px; }
-.gift-sheet { max-width: 440px; border-radius: var(--radius); max-height: 90vh; padding-bottom: 24px; }
+.modal-backdrop.gift-backdrop { align-items: center; padding: 16px; }
+.modal-sheet.gift-sheet { max-width: 440px; border-radius: var(--radius); max-height: 90vh; padding-bottom: 24px; }
 .gift-purchase { display: flex; align-items: center; gap: 10px; padding: 14px 20px; margin: 0 6px 12px; border-radius: 999px; border: 2px solid var(--gold-border); background: rgba(0,0,0,.85); color: #fff; font-weight: 700; font-size: 17px; }
 .gift-purchase:hover { border-color: var(--gold-bright); color: #fff; }
 .gift-purchase b { color: var(--gold); font-size: 20px; font-weight: 800; }
