@@ -268,6 +268,27 @@ export function BusinessPage() {
   );
 }
 
+/**
+ * One member's live pages, for the Business tab on their public profile — Steve, 2026-10-01:
+ * "Add a business tab in the public profile page for everyone to see his business."
+ */
+export function MemberBusinessesPanel({ userId }: { userId: number }) {
+  const [items, setItems] = useState<Business[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setItems(null);
+    fetchBusinesses({ user_id: userId })
+      .then((r) => setItems(r.data))
+      .catch((e) => { setError((e as Error).message); setItems([]); });
+  }, [userId]);
+
+  if (error) return <Notice error>{error}</Notice>;
+  if (items === null) return <Loading />;
+  if (items.length === 0) return <p className="muted" style={{ padding: "24px 0", textAlign: "center" }}>No business pages yet.</p>;
+  return <div className="grid wide">{items.map((b) => <BusinessCard key={b.id} b={b} />)}</div>;
+}
+
 // ---- The member's own pages ---------------------------------------------------------------
 
 /**

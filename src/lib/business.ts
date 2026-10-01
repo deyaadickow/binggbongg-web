@@ -89,7 +89,7 @@ export async function fetchBusinessPricing(): Promise<BusinessPricing | null> {
   return r.data ?? null;
 }
 
-export interface BusinessFilters { country_code?: string; state_code?: string; city?: string; category_id?: number; q?: string; my_user_id?: number }
+export interface BusinessFilters { country_code?: string; state_code?: string; city?: string; category_id?: number; q?: string; my_user_id?: number; user_id?: number }
 
 export async function fetchBusinesses(filters: BusinessFilters): Promise<{ data: Business[]; near: Near | null }> {
   const r = await post<Business[]>("fetchBusinesses", { ...filters, limit: 100 });

@@ -4,7 +4,7 @@ import { displayName, mediaUrl, post, type Post, type UserSummary } from "../lib
 import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice } from "../components/Common";
 import { fetchUserPhotos, type Photo } from "../lib/photos";
-import { MyBusinessesPanel } from "./BusinessPages";
+import { MemberBusinessesPanel, MyBusinessesPanel } from "./BusinessPages";
 
 interface ProfileUser extends UserSummary {
   refer_code?: string;
@@ -452,6 +452,10 @@ export function ProfilePage() {
     // Steve, 2026-09-26: "next to videos we need to add photos". Count is only known once the
     // tab has been opened, so it stays absent until then rather than showing a wrong 0.
     { key: "photos", label: "Photos", count: photoCount ?? undefined },
+    // Steve, 2026-10-01: "Add a business tab in the public profile page for everyone to see his
+    // business. and add a tab in their personal profile page is where they add/edit their
+    // business." One tab on every profile; the panel below decides which form to show.
+    { key: "business" as TabKey, label: "Business" },
     { key: "following", label: "Following", count: profile.total_followings },
     { key: "followers", label: "Followers", count: profile.total_followers },
     { key: "friends", label: "Friends", count: profile.friendsCount },
@@ -460,10 +464,6 @@ export function ProfilePage() {
     ...(isMe ? [
       { key: "saved" as TabKey, label: "Saved" },
       { key: "history" as TabKey, label: "History" },
-      // Steve, 2026-10-01: "Add a 'Business' tab in the personal profile page, from there they
-      // can add their business and not from the main page." Own profile only, like Saved and
-      // History — it is where you manage and buy YOUR pages.
-      { key: "business" as TabKey, label: "Business" },
     ] : []),
   ];
 
@@ -650,7 +650,7 @@ export function ProfilePage() {
         ) : tabError ? (
           <p className="muted" style={{ padding: "24px 0", textAlign: "center" }}>{tabError}</p>
         ) : tab === "business" ? (
-          <MyBusinessesPanel />
+          isMe ? <MyBusinessesPanel /> : <MemberBusinessesPanel userId={profile.id} />
         ) : tab === "photos" ? (
           tabPhotos.length === 0 ? (
             <p className="muted" style={{ padding: "24px 0", textAlign: "center" }}>
