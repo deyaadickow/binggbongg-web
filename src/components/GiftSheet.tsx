@@ -71,7 +71,7 @@ function GiftSheet({ post: item, onClose }: { post: Post; onClose: () => void })
   }
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
+    <div className="modal-backdrop gift-backdrop" onClick={onClose}>
       <div className="modal-sheet gift-sheet" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Send a gift">
         <div className="row" style={{ marginBottom: 12 }}>
           <h3 style={{ margin: 0, textAlign: "left" }}>Send a gift</h3>
