@@ -7,9 +7,12 @@ import { API_BASE, uploadErrorMessage } from "./upload";
 
 export interface BusinessCategory { id: number; name: string }
 
+export interface BusinessMediaFolder { id: number; name: string }
+
 export interface BusinessMedia {
   id: number;
   business_id: number;
+  folder_id?: number | null;
   type: "photo" | "video";
   file_url: string;
   thumb_url?: string | null;
@@ -42,6 +45,7 @@ export interface Business {
   category?: BusinessCategory | null;
   owner?: Partial<UserSummary> | null;
   media?: BusinessMedia[];
+  folders?: BusinessMediaFolder[];
 }
 
 export interface BusinessPricing { price_per_day: number; term_days: number; term_price: number; referral_fee: number; enabled: boolean }
@@ -201,11 +205,13 @@ export function updateBusiness(myUserId: number, businessId: number, f: Business
   return multipart<Business>("updateBusiness", form, onProgress);
 }
 
-export function uploadBusinessMedia(myUserId: number, businessId: number, type: "photo" | "video", file: File, thumbnail: Blob | null, onProgress?: (n: number) => void): Promise<BusinessMedia> {
+export function uploadBusinessMedia(myUserId: number, businessId: number, type: "photo" | "video", file: File, thumbnail: Blob | null, folderId: number | null, onProgress?: (n: number) => void): Promise<BusinessMedia> {
   const form = new FormData();
   form.append("my_user_id", String(myUserId));
   form.append("business_id", String(businessId));
   form.append("type", type);
+  // Uploads land in whichever tab is open — no second picker to get wrong.
+  if (folderId) form.append("folder_id", String(folderId));
   form.append("file", file);
   if (thumbnail) form.append("thumbnail", thumbnail, "thumb.jpg");
   return multipart<BusinessMedia>("uploadBusinessMedia", form, onProgress);
@@ -226,4 +232,23 @@ export function loadCountries(): Promise<CountryRow[]> {
 export async function fetchCities(countryCode: string, stateCode: string): Promise<string[]> {
   const r = await post<string[]>("fetchCitiesForState", { country_code: countryCode, state_code: stateCode });
   return r.data ?? [];
+}
+
+// ---- Member-made folders (Steve, 2026-10-01: "give members the ability to add folders") -------
+
+export async function createBusinessFolder(myUserId: number, businessId: number, name: string): Promise<number> {
+  const r = await post<BusinessMediaFolder>("createBusinessFolder", { my_user_id: myUserId, business_id: businessId, name });
+  if (!r.status || !r.data) throw new Error(r.message ?? "Couldn't add that folder.");
+  return r.data.id;
+}
+
+export async function renameBusinessFolder(myUserId: number, folderId: number, name: string): Promise<void> {
+  const r = await post("renameBusinessFolder", { my_user_id: myUserId, folder_id: folderId, name });
+  if (!r.status) throw new Error(r.message ?? "Couldn't rename that folder.");
+}
+
+export async function deleteBusinessFolder(myUserId: number, folderId: number): Promise<string> {
+  const r = await post("deleteBusinessFolder", { my_user_id: myUserId, folder_id: folderId });
+  if (!r.status) throw new Error(r.message ?? "Couldn't delete that folder.");
+  return r.message ?? "Folder deleted.";
 }

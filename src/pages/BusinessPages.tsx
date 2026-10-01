@@ -17,8 +17,8 @@ import { PickerSheet } from "../components/PickerSheet";
 import { MAIN_MARKET_CODES } from "../lib/videoads";
 import { videoThumbnail } from "../lib/upload";
 import {
-  DAYS, cancelBusiness, createBusiness, deleteBusinessMedia, fetchBusinessCategories, fetchBusinessDetail, fetchBusinesses,
-  fetchBusinessPricing, fetchCities, fetchMyBusinesses, fullAddress, hoursOf, loadCountries, nearLabel, placeLine, renewBusiness,
+  DAYS, cancelBusiness, createBusiness, createBusinessFolder, deleteBusinessFolder, deleteBusinessMedia, fetchBusinessCategories, fetchBusinessDetail, fetchBusinesses,
+  fetchBusinessPricing, fetchCities, fetchMyBusinesses, fullAddress, hoursOf, loadCountries, nearLabel, placeLine, renameBusinessFolder, renewBusiness,
   statusText, updateBusiness, uploadBusinessMedia, usd,
   type Business, type BusinessCategory, type BusinessForm, type BusinessMedia, type BusinessPricing, type CountryRow, type MyBusinesses, type Near,
 } from "../lib/business";
@@ -136,6 +136,8 @@ export function BusinessPage() {
   const [b, setB] = useState<Business | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showVideos, setShowVideos] = useState(false);
+  // null = the built-in Photos/Videos tabs; otherwise the member-made folder being shown.
+  const [folderId, setFolderId] = useState<number | null>(null);
   const [toast, setToast] = useState("");
   const [progress, setProgress] = useState<number | null>(null);
   const [viewing, setViewing] = useState<BusinessMedia | null>(null);
@@ -155,8 +157,8 @@ export function BusinessPage() {
     try {
       setProgress(0);
       const thumb = type === "video" ? await videoThumbnail(file) : null;
-      await uploadBusinessMedia(user.id, b.id, type, file, thumb, setProgress);
-      setShowVideos(type === "video");
+      await uploadBusinessMedia(user.id, b.id, type, file, thumb, folderId, setProgress);
+      if (folderId === null) setShowVideos(type === "video");
       load();
       setToast("Uploaded.");
     } catch (e) { setToast((e as Error).message); } finally { setProgress(null); }
@@ -184,7 +186,38 @@ export function BusinessPage() {
 
   const address = fullAddress(b);
   const hours = hoursOf(b);
-  const media = (b.media ?? []).filter((m) => (m.type === "video") === showVideos);
+  // Photos / Videos, then every folder the member made — Steve, 2026-10-01: "give members the
+  // ability to add folders ... 'Daily Special' 'Weekly Specials' 'Monthly Specials'". A folder
+  // holds both photos and videos, so its tab shows everything filed under it.
+  const folders = b.folders ?? [];
+  const activeFolder = folders.some((f) => f.id === folderId) ? folderId : null;
+  const media = activeFolder !== null
+    ? (b.media ?? []).filter((m) => m.folder_id === activeFolder)
+    : (b.media ?? []).filter((m) => !m.folder_id && (m.type === "video") === showVideos);
+
+  async function addFolder() {
+    if (!user || !b) return;
+    const name = window.prompt("New folder — a tab on your page, for example Daily Special, Weekly Specials, Monthly Specials. It can hold photos and videos.");
+    if (!name?.trim()) return;
+    try { const id = await createBusinessFolder(user.id, b.id, name.trim()); setFolderId(id); load(); }
+    catch (e) { setToast((e as Error).message); }
+  }
+
+  async function renameFolder() {
+    if (!user || !b || activeFolder === null) return;
+    const current = folders.find((f) => f.id === activeFolder)?.name ?? "";
+    const name = window.prompt("Rename folder", current);
+    if (!name?.trim()) return;
+    try { await renameBusinessFolder(user.id, activeFolder, name.trim()); load(); }
+    catch (e) { setToast((e as Error).message); }
+  }
+
+  async function removeFolder() {
+    if (!user || !b || activeFolder === null) return;
+    if (!window.confirm("Delete this folder? The folder goes away. Its photos and videos are kept — they move back to your Photos and Videos tabs.")) return;
+    try { setToast(await deleteBusinessFolder(user.id, activeFolder)); setFolderId(null); load(); }
+    catch (e) { setToast((e as Error).message); }
+  }
   const site = b.website ? (b.website.startsWith("http") ? b.website : `https://${b.website}`) : "";
 
   return (
@@ -236,11 +269,21 @@ export function BusinessPage() {
       )}
 
       <div className="card pad" style={{ marginTop: 12 }}>
-        <div className="row" style={{ gap: 8 }}>
-          <button className={`btn small${showVideos ? " ghost" : ""}`} onClick={() => setShowVideos(false)}>Photos</button>
-          <button className={`btn small${showVideos ? "" : " ghost"}`} onClick={() => setShowVideos(true)}>Videos</button>
+        <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
+          <button className={`btn small${activeFolder === null && !showVideos ? "" : " ghost"}`} onClick={() => { setFolderId(null); setShowVideos(false); }}>Photos</button>
+          <button className={`btn small${activeFolder === null && showVideos ? "" : " ghost"}`} onClick={() => { setFolderId(null); setShowVideos(true); }}>Videos</button>
+          {folders.map((f) => (
+            <button key={f.id} className={`btn small${activeFolder === f.id ? "" : " ghost"}`} onClick={() => setFolderId(f.id)}>{f.name}</button>
+          ))}
+          {isOwner && <button className="btn small ghost" onClick={addFolder}>+ Folder</button>}
         </div>
-        {media.length === 0 ? <p className="muted" style={{ marginTop: 10 }}>{showVideos ? "No videos yet." : "No photos yet."}</p> : (
+        {isOwner && activeFolder !== null && (
+          <div className="row" style={{ gap: 8, marginTop: 8 }}>
+            <button className="btn small ghost" onClick={renameFolder}>Rename</button>
+            <button className="btn small ghost" onClick={removeFolder}>Delete folder</button>
+          </div>
+        )}
+        {media.length === 0 ? <p className="muted" style={{ marginTop: 10 }}>{activeFolder !== null ? "Nothing in this folder yet." : showVideos ? "No videos yet." : "No photos yet."}</p> : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 8, marginTop: 10 }}>
             {media.map((m) => (
               <button key={m.id} onClick={() => setViewing(m)} style={{ aspectRatio: "1 / 1", padding: 0, border: "1.5px solid var(--gold-border)", borderRadius: 10, overflow: "hidden", background: "#000", cursor: "pointer", position: "relative" }}>
