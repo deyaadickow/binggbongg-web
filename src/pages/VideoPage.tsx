@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { displayName, mediaUrl, post, type Post } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice } from "../components/Common";
+import { PostGiftButton } from "../components/GiftSheet";
 import { appendToFeed, fetchMoreFeed, getFeed } from "../lib/feed";
 
 const AUTO_KEY = "bb.autoplayNext";
@@ -113,6 +114,7 @@ export function VideoPage() {
         <button className="btn small" onClick={toggleLike} disabled={!isLoggedIn} title={isLoggedIn ? "" : "Sign in to like"}>
           {liked ? "♥" : "♡"} {likes}
         </button>
+        <PostGiftButton post={item} />
       </div>
     </div>
   );

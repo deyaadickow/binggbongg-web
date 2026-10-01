@@ -170,6 +170,22 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .gifts button img { width: 40px; height: 40px; object-fit: contain; }
 .gifts button:hover { border-color: var(--gold-bright); }
 
+/* The gift page on a video (GiftSheet.tsx) — the phones' 2026-10-01 layout: a Purchase Coins
+   pill with the balance, then three square black tiles across, gold-bordered, image / price / name. */
+.gift-sheet { max-width: 440px; }
+.gift-purchase { display: flex; align-items: center; gap: 10px; padding: 14px 20px; margin: 0 6px 12px; border-radius: 999px; border: 2px solid var(--gold-border); background: rgba(0,0,0,.85); color: #fff; font-weight: 700; font-size: 17px; }
+.gift-purchase:hover { border-color: var(--gold-bright); color: #fff; }
+.gift-purchase b { color: var(--gold); font-size: 20px; font-weight: 800; }
+.gift-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0 6px; }
+.gift-grid button { aspect-ratio: 1 / 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 8px 4px; border-radius: 15px; border: 2px solid var(--gold-border); background: rgba(0,0,0,.88); color: #fff; cursor: pointer; font-size: 12px; min-width: 0; }
+.gift-grid button img { width: 45px; height: 45px; object-fit: contain; }
+.gift-grid button b { font-size: 14px; font-weight: 400; }
+.gift-grid button span { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gift-grid button:hover { border-color: var(--gold-bright); }
+.gift-grid button:disabled { opacity: .6; cursor: default; }
+.gift-grid button.busy { border-color: var(--gold-bright); opacity: 1; }
+.gift-notice { margin: 0 6px 12px; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--gold-border); background: #0d0d00; font-size: 14px; }
+
 .notice { padding: 12px 14px; border-radius: 10px; border: 1px solid var(--gold-border); color: var(--text-soft); background: var(--panel); }
 .notice.error { border-color: var(--red); color: var(--red); }
 .center { text-align: center; }
