@@ -18,7 +18,7 @@ import { MAIN_MARKET_CODES } from "../lib/videoads";
 import { videoThumbnail } from "../lib/upload";
 import {
   DAYS, cancelBusiness, createBusiness, createBusinessFolder, deleteBusinessFolder, deleteBusinessMedia, fetchBusinessCategories, fetchBusinessDetail, fetchBusinesses,
-  fetchBusinessPricing, fetchCities, fetchMyBusinesses, fullAddress, hoursOf, loadCountries, nearLabel, placeLine, renameBusinessFolder, renewBusiness,
+  fetchBusinessPricing, fetchCities, fetchMyBusinesses, fullAddress, hoursOf, loadCountries, nearLabel, placeLine, publishBusiness, renameBusinessFolder, renewBusiness,
   statusText, updateBusiness, uploadBusinessMedia, usd,
   type Business, type BusinessCategory, type BusinessForm, type BusinessMedia, type BusinessPricing, type CountryRow, type MyBusinesses, type Near,
 } from "../lib/business";
@@ -164,6 +164,12 @@ export function BusinessPage() {
     } catch (e) { setToast((e as Error).message); } finally { setProgress(null); }
   }
 
+  async function publish() {
+    if (!user || !b || !pricing) return;
+    if (!window.confirm(`Publish for ${pricing.term_days} days? ${usd(pricing.term_price)} will be charged from your Cash Account now. Your page goes live straight away. No refunds.`)) return;
+    try { setToast(await publishBusiness(user.id, b.id)); load(); } catch (e) { setToast((e as Error).message); }
+  }
+
   async function renew() {
     if (!user || !b || !pricing) return;
     if (!window.confirm(`Renew for ${pricing.term_days} days? ${usd(pricing.term_price)} will be charged from your Cash Account now. No refunds.`)) return;
@@ -252,9 +258,18 @@ export function BusinessPage() {
             <label className="btn small">Upload Photos<input type="file" accept="image/*" hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) upload("photo", f); e.target.value = ""; }} /></label>
             <label className="btn small">Upload Video<input type="file" accept="video/*" hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) upload("video", f); e.target.value = ""; }} /></label>
             <button className="btn small" onClick={() => navigate(`/settings/business/edit/${b.id}`)}>Edit</button>
-            <button className="btn small" onClick={renew} disabled={!pricing}>Renew</button>
-            {b.is_live && <button className="btn small ghost" onClick={takeDown}>Take down</button>}
+            {/* Steve, 2026-10-01: "let them set it up before paying." Nothing has been charged
+                yet; this is the one button that does. */}
+            {b.is_draft ? (
+              <button className="btn small" style={{ background: "var(--gold)", color: "#0d0d0d" }} onClick={publish} disabled={!pricing}>Publish</button>
+            ) : (
+              <>
+                <button className="btn small" onClick={renew} disabled={!pricing}>Renew</button>
+                {b.is_live && <button className="btn small ghost" onClick={takeDown}>Take down</button>}
+              </>
+            )}
           </div>
+          {b.is_draft && <div className="muted" style={{ fontSize: 12, marginTop: 8 }}>Add everything you want first — photos, videos, folders. You are only charged when you publish.</div>}
           {progress !== null && <div className="muted" style={{ marginTop: 8 }}>Uploading… {Math.round(progress * 100)}%</div>}
         </div>
       )}
@@ -407,10 +422,10 @@ export function MyBusinessesPanel() {
               <div style={{ aspectRatio: "16 / 6", background: "#000" }}>{b.banner_url && <img src={b.banner_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />}</div>
               <div style={{ padding: "10px 12px 12px" }}>
                 <div style={{ display: "flex", alignItems: "center" }}><b style={{ color: "var(--gold)", fontSize: 16 }}>{b.name}</b>{b.is_verified && <VerifiedCheck />}</div>
-                <div className="muted" style={{ fontSize: 13, color: b.is_live ? undefined : "#FF8A80" }}>{statusText(b)} · {b.views} views</div>
+                <div className="muted" style={{ fontSize: 13, color: b.is_live ? undefined : "#FF8A80" }}>{statusText(b)}{b.is_draft ? "" : ` · ${b.views} views`}</div>
                 <div className="row" style={{ gap: 8, marginTop: 10 }}>
                   <Link className="btn small" to={`/business/${b.id}`}>Open page</Link>
-                  {!b.is_live && b.status !== "suspended" && <Link className="btn small" style={{ background: "var(--gold)", color: "#0d0d0d" }} to={`/business/${b.id}`}>Renew</Link>}
+                  {!b.is_live && b.status !== "suspended" && <Link className="btn small" style={{ background: "var(--gold)", color: "#0d0d0d" }} to={`/business/${b.id}`}>{b.is_draft ? "Finish & publish" : "Renew"}</Link>}
                 </div>
               </div>
             </div>
@@ -542,10 +557,10 @@ export function CreateBusinessPage() {
         )}
 
         <div className="card pad" style={{ textAlign: "center" }}>
-          <div style={{ color: "var(--gold)" }}>{editingId ? "Edits are free — your paid days are unchanged." : pricing ? `${usd(pricing.term_price)} for ${pricing.term_days} days (${usd(pricing.price_per_day)}/day)` : "Loading price…"}</div>
+          <div style={{ color: "var(--gold)" }}>{editingId ? "Edits are free — your paid days are unchanged." : pricing ? `Free to set up. Publishing costs ${usd(pricing.term_price)} for ${pricing.term_days} days (${usd(pricing.price_per_day)}/day).` : "Loading price…"}</div>
           {error && <Notice error>{error}</Notice>}
-          <button className="btn" type="submit" disabled={busy} style={{ marginTop: 10, background: "var(--gold)", color: "#0d0d0d" }}>{busy ? (progress !== null ? `Uploading… ${Math.round(progress * 100)}%` : "Working…") : editingId ? "Save changes" : "Pay & publish"}</button>
-          {!editingId && <div className="muted" style={{ fontSize: 12, marginTop: 8 }}>Charged from your Cash Account. Cancel anytime, no refunds.</div>}
+          <button className="btn" type="submit" disabled={busy} style={{ marginTop: 10, background: "var(--gold)", color: "#0d0d0d" }}>{busy ? (progress !== null ? `Uploading… ${Math.round(progress * 100)}%` : "Working…") : editingId ? "Save changes" : "Save draft"}</button>
+          {!editingId && <div className="muted" style={{ fontSize: 12, marginTop: 8 }}>Nothing is charged yet. Add your photos, videos and folders first, then publish when you are ready.</div>}
         </div>
       </form>
       {sheet === "country" && <PickerSheet title="Country" noun="countries" items={splitMain(countries).rest} pinned={splitMain(countries).main} pinnedLabel="Main markets" restLabel="All countries" selected={form.country_code} onPick={(code) => { set("country_code", code); set("state_code", ""); set("city", ""); }} onClose={() => setSheet(null)} />}
