@@ -94,11 +94,9 @@ export function BusinessTabPage() {
   const nearText = nearLabel(near);
   return (
     <div className="page">
-      <div className="row" style={{ marginBottom: 14, flexWrap: "wrap" }}>
-        <h1 className="page-title" style={{ margin: 0 }}>Business</h1>
-        <span className="spacer" />
-        <Link className="btn small" to="/settings/business">+ Your business page</Link>
-      </div>
+      {/* Steve, 2026-10-01: "remove the link + your business page from main page" — a member adds
+          their own business from the Business tab on their profile page instead. */}
+      <h1 className="page-title">Business</h1>
 
       <form className="row" style={{ gap: 8, marginBottom: 10 }} onSubmit={(e) => { e.preventDefault(); setQ(query.trim()); }}>
         <input className="input" style={{ flex: 1 }} placeholder="Search businesses" value={query} onChange={(e) => setQuery(e.target.value)} />
@@ -120,7 +118,7 @@ export function BusinessTabPage() {
       {nearText && items && items.length > 0 && <p className="muted" style={{ fontSize: 13, color: "var(--gold)" }}>Showing businesses near you first — {nearText}</p>}
       {error && <Notice error>{error}</Notice>}
       {items === null ? <Loading /> : items.length === 0 ? (
-        <Notice>No businesses here yet. Be the first — <Link to="/settings/business">add your business page</Link>.</Notice>
+        <Notice>No businesses here yet. Be the first — add a business page from the Business tab on your profile.</Notice>
       ) : (
         <div className="grid wide">{items.map((b) => <BusinessCard key={b.id} b={b} />)}</div>
       )}
@@ -272,7 +270,13 @@ export function BusinessPage() {
 
 // ---- The member's own pages ---------------------------------------------------------------
 
-export function MyBusinessesPage() {
+/**
+ * The member's own pages, as a panel — Steve, 2026-10-01: "Add a 'Business' tab in the personal
+ * profile page, from there they can add their business." ProfilePage renders this inside its own
+ * Business tab; MyBusinessesPage below is the same panel as a standalone page for
+ * /settings/business.
+ */
+export function MyBusinessesPanel() {
   const { user, isLoggedIn } = useSession();
   const [mine, setMine] = useState<MyBusinesses | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -283,14 +287,13 @@ export function MyBusinessesPage() {
     fetchMyBusinesses(user.id).then(setMine).catch((e) => setError((e as Error).message));
   }, [user]);
 
-  if (!isLoggedIn) return <div className="page"><Notice>Sign in to list your business. <Link to="/login">Sign in</Link></Notice></div>;
-  if (error) return <div className="page"><Notice error>{error}</Notice></div>;
-  if (!mine) return <div className="page"><Loading /></div>;
+  if (!isLoggedIn) return <Notice>Sign in to list your business. <Link to="/login">Sign in</Link></Notice>;
+  if (error) return <Notice error>{error}</Notice>;
+  if (!mine) return <Loading />;
   const p = mine.pricing;
 
   return (
-    <div className="page" style={{ maxWidth: 760 }}>
-      <h1 className="page-title">Bingg Bongg Business</h1>
+    <>
       <div className="card pad" style={{ textAlign: "center" }}>
         <b style={{ color: "var(--gold)", fontSize: 18 }}>Your Business Page</b>
         {p && <div style={{ color: "var(--gold)", marginTop: 6 }}>{usd(p.price_per_day)}/day · {usd(p.term_price)} for {p.term_days} days, paid up front</div>}
@@ -329,6 +332,15 @@ export function MyBusinessesPage() {
           ))}
         </div>
       )}
+    </>
+  );
+}
+
+export function MyBusinessesPage() {
+  return (
+    <div className="page" style={{ maxWidth: 760 }}>
+      <h1 className="page-title">Bingg Bongg Business</h1>
+      <MyBusinessesPanel />
     </div>
   );
 }

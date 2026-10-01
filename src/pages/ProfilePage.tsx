@@ -4,6 +4,7 @@ import { displayName, mediaUrl, post, type Post, type UserSummary } from "../lib
 import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice } from "../components/Common";
 import { fetchUserPhotos, type Photo } from "../lib/photos";
+import { MyBusinessesPanel } from "./BusinessPages";
 
 interface ProfileUser extends UserSummary {
   refer_code?: string;
@@ -56,7 +57,7 @@ interface BattleCareer {
   opponents?: BattleOpponent[];
 }
 
-type TabKey = "videos" | "photos" | "likes" | "reposted" | "saved" | "history" | "following" | "followers" | "friends";
+type TabKey = "videos" | "photos" | "likes" | "reposted" | "saved" | "history" | "following" | "followers" | "friends" | "business";
 
 const USER_TABS: TabKey[] = ["following", "followers", "friends"];
 
@@ -294,6 +295,13 @@ export function ProfilePage() {
     setTabVideos([]);
     setTabUsers([]);
 
+    // Steve, 2026-10-01: "Add a 'Business' tab in the personal profile page." The panel fetches
+    // and renders its own data (fetchMyBusinesses), so there is nothing for this effect to load.
+    if (tab === "business") {
+      setTabLoading(false);
+      return;
+    }
+
     if (tab === "photos") {
       // Its own call: fetchUserPhotos returns {user, photos, photo_count}, not the flat list
       // every other tab here returns, and it needs my_user_id AND user_id (see lib/photos.ts).
@@ -325,7 +333,7 @@ export function ProfilePage() {
     // own validator on 2026-09-26. Three of these used to name routes that DO NOT EXIST —
     // fetchRepostVideos, fetchFriendsList and fetchUserWatchHistory — so those tabs 404'd and
     // rendered empty forever. A guessed endpoint name fails exactly like a missing feature.
-    const endpointMap: Record<Exclude<TabKey, "photos">, [string, Record<string, unknown>]> = {
+    const endpointMap: Record<Exclude<TabKey, "photos" | "business">, [string, Record<string, unknown>]> = {
       videos: ["fetchUserPosts", { user_id: id, ...base }],
       // NOT fetchUserPostsWithLikes: that returns THIS member's own posts that have received
       // likes, whereas the "Likes" count beside the tab is likedVideosCounts — the videos they
@@ -452,6 +460,10 @@ export function ProfilePage() {
     ...(isMe ? [
       { key: "saved" as TabKey, label: "Saved" },
       { key: "history" as TabKey, label: "History" },
+      // Steve, 2026-10-01: "Add a 'Business' tab in the personal profile page, from there they
+      // can add their business and not from the main page." Own profile only, like Saved and
+      // History — it is where you manage and buy YOUR pages.
+      { key: "business" as TabKey, label: "Business" },
     ] : []),
   ];
 
@@ -637,6 +649,8 @@ export function ProfilePage() {
           <div style={{ padding: "32px 0" }}><Loading /></div>
         ) : tabError ? (
           <p className="muted" style={{ padding: "24px 0", textAlign: "center" }}>{tabError}</p>
+        ) : tab === "business" ? (
+          <MyBusinessesPanel />
         ) : tab === "photos" ? (
           tabPhotos.length === 0 ? (
             <p className="muted" style={{ padding: "24px 0", textAlign: "center" }}>
