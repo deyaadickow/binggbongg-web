@@ -13,6 +13,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useSession } from "../lib/session";
 import { Loading, Notice } from "../components/Common";
+import { PickerSheet } from "../components/PickerSheet";
+import { MAIN_MARKET_CODES } from "../lib/videoads";
 import { videoThumbnail } from "../lib/upload";
 import {
   DAYS, cancelBusiness, createBusiness, deleteBusinessMedia, fetchBusinessCategories, fetchBusinessDetail, fetchBusinesses,
@@ -21,7 +23,17 @@ import {
   type Business, type BusinessCategory, type BusinessForm, type BusinessMedia, type BusinessPricing, type CountryRow, type MyBusinesses, type Near,
 } from "../lib/business";
 
-const GOLD_SELECT: React.CSSProperties = { background: "#0d0d0d", color: "var(--gold)", border: "1.5px solid var(--gold-border)", borderRadius: 999, padding: "8px 14px", fontWeight: 700, maxWidth: 220 };
+// Steve, 2026-10-01: "Make the countries into our design" — the native <select> is gone; every
+// dropdown is the black/gold searchable PickerSheet the Create Ad page uses, opened from a pill.
+function PickerPill({ label, active, onClick }: { label: string; active?: boolean; onClick: () => void }) {
+  return <button type="button" className="btn small" style={active ? { background: "var(--gold)", color: "#0d0d0d" } : undefined} onClick={onClick}>{label} ▾</button>;
+}
+
+function splitMain(countries: CountryRow[]) {
+  const main = MAIN_MARKET_CODES.map((code) => countries.find((c) => c.iso2 === code)).filter(Boolean) as CountryRow[];
+  const rest = countries.filter((c) => !MAIN_MARKET_CODES.includes(c.iso2!));
+  return { main: main.map((c) => ({ code: c.iso2!, name: c.name! })), rest: rest.map((c) => ({ code: c.iso2!, name: c.name! })) };
+}
 
 function VerifiedCheck() {
   return <span title="Verified business" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 20, height: 20, borderRadius: 999, background: "var(--gold)", color: "#0d0d0d", fontSize: 12, fontWeight: 800, marginLeft: 8 }}>✓</span>;
@@ -60,6 +72,7 @@ export function BusinessTabPage() {
   const [items, setItems] = useState<Business[] | null>(null);
   const [near, setNear] = useState<Near | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [sheet, setSheet] = useState<null | "country" | "state" | "city" | "category">(null);
 
   useEffect(() => { loadCountries().then(setCountries).catch(() => undefined); fetchBusinessCategories().then(setCategories).catch(() => undefined); }, []);
 
@@ -93,31 +106,16 @@ export function BusinessTabPage() {
       </form>
 
       <div className="row" style={{ gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
-        <select style={GOLD_SELECT} value={countryCode} onChange={(e) => { setCountryCode(e.target.value); setStateCode(""); setCity(""); }}>
-          <option value="">Country</option>
-          {countries.map((c) => <option key={c.iso2!} value={c.iso2!}>{c.name}</option>)}
-        </select>
-        {countryCode && (
-          <select style={GOLD_SELECT} value={stateCode} onChange={(e) => { setStateCode(e.target.value); setCity(""); }}>
-            <option value="">State</option>
-            {states.map((s) => <option key={s.state_code!} value={s.state_code!}>{s.name}</option>)}
-          </select>
-        )}
-        {stateCode && (
-          <select style={GOLD_SELECT} value={city} onChange={(e) => setCity(e.target.value)}>
-            <option value="">City</option>
-            {cities.map((c) => <option key={c} value={c}>{c}</option>)}
-          </select>
-        )}
+        <PickerPill label={countryCode ? (countries.find((c) => c.iso2 === countryCode)?.name ?? countryCode) : "Country"} active={!!countryCode} onClick={() => setSheet("country")} />
+        {countryCode && <PickerPill label={stateCode ? (states.find((s) => s.state_code === stateCode)?.name ?? stateCode) : "State"} active={!!stateCode} onClick={() => setSheet("state")} />}
+        {stateCode && <PickerPill label={city || "City"} active={!!city} onClick={() => setSheet("city")} />}
+        <PickerPill label={categoryId ? (categories.find((c) => c.id === categoryId)?.name ?? "Category") : "Category"} active={!!categoryId} onClick={() => setSheet("category")} />
         {(countryCode || categoryId || q) && <button className="btn small ghost" onClick={() => { setCountryCode(""); setStateCode(""); setCity(""); setCategoryId(0); setQ(""); setQuery(""); }}>Clear</button>}
       </div>
-      <div className="row" style={{ gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
-        {/* Steve, 2026-10-01: "make categories in a dropdown in alphabetical order" */}
-        <select style={GOLD_SELECT} value={categoryId} onChange={(e) => setCategoryId(Number(e.target.value))}>
-          <option value={0}>All categories</option>
-          {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-        </select>
-      </div>
+      {sheet === "country" && <PickerSheet title="Country" noun="countries" items={splitMain(countries).rest} pinned={splitMain(countries).main} pinnedLabel="Main markets" restLabel="All countries" selected={countryCode} onPick={(code) => { setCountryCode(code); setStateCode(""); setCity(""); }} onClose={() => setSheet(null)} />}
+      {sheet === "state" && <PickerSheet title="State" noun="states" items={states.map((st) => ({ code: st.state_code!, name: st.name! }))} selected={stateCode} onPick={(code) => { setStateCode(code); setCity(""); }} onClose={() => setSheet(null)} />}
+      {sheet === "city" && <PickerSheet title="City" noun="cities" items={cities.map((c) => ({ code: c, name: c }))} selected={city} onPick={setCity} onClose={() => setSheet(null)} />}
+      {sheet === "category" && <PickerSheet title="Category" noun="categories" items={[{ code: "0", name: "All categories" }, ...categories.map((c) => ({ code: String(c.id), name: c.name }))]} selected={String(categoryId)} onPick={(code) => setCategoryId(Number(code))} onClose={() => setSheet(null)} />}
 
       {nearText && items && items.length > 0 && <p className="muted" style={{ fontSize: 13, color: "var(--gold)" }}>Showing businesses near you first — {nearText}</p>}
       {error && <Notice error>{error}</Notice>}
@@ -354,6 +352,7 @@ export function CreateBusinessPage() {
   const [progress, setProgress] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(!editingId);
+  const [sheet, setSheet] = useState<null | "country" | "state" | "city" | "category">(null);
 
   useEffect(() => { loadCountries().then(setCountries).catch(() => undefined); fetchBusinessCategories().then(setCategories).catch(() => undefined); fetchBusinessPricing().then(setPricing).catch(() => undefined); }, []);
   useEffect(() => {
@@ -407,10 +406,7 @@ export function CreateBusinessPage() {
         <div className="card pad" style={{ display: "grid", gap: 8 }}>
           <b style={{ color: "var(--gold)" }}>Business</b>
           <input className="input" placeholder="Business name" value={form.name} onChange={(e) => set("name", e.target.value)} required />
-          <select className="input" value={form.category_id} onChange={(e) => set("category_id", Number(e.target.value))}>
-            <option value={0}>Category</option>
-            {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </select>
+          <div><PickerPill label={form.category_id ? (categories.find((c) => c.id === form.category_id)?.name ?? "Category") : "Category"} active={!!form.category_id} onClick={() => setSheet("category")} /></div>
           <textarea className="input" rows={4} placeholder="Describe your business" value={form.description} onChange={(e) => set("description", e.target.value)} />
           <input className="input" placeholder="Phone" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
           <input className="input" placeholder="Email" type="email" value={form.email} onChange={(e) => set("email", e.target.value)} />
@@ -421,22 +417,11 @@ export function CreateBusinessPage() {
           <b style={{ color: "var(--gold)" }}>Where</b>
           <div className="muted" style={{ fontSize: 12 }}>People find you by country, state and city.</div>
           <label className="row" style={{ gap: 8 }}><input type="checkbox" checked={form.is_online} onChange={(e) => set("is_online", e.target.checked)} /> Online service</label>
-          <select className="input" value={form.country_code} onChange={(e) => { set("country_code", e.target.value); set("state_code", ""); set("city", ""); }}>
-            <option value="">Country</option>
-            {countries.map((c) => <option key={c.iso2!} value={c.iso2!}>{c.name}</option>)}
-          </select>
-          {form.country_code && (
-            <select className="input" value={form.state_code} onChange={(e) => { set("state_code", e.target.value); set("city", ""); }}>
-              <option value="">State</option>
-              {states.map((s) => <option key={s.state_code!} value={s.state_code!}>{s.name}</option>)}
-            </select>
-          )}
-          {form.state_code && (
-            <select className="input" value={form.city} onChange={(e) => set("city", e.target.value)}>
-              <option value="">City</option>
-              {cities.map((c) => <option key={c} value={c}>{c}</option>)}
-            </select>
-          )}
+          <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
+            <PickerPill label={form.country_code ? (countries.find((c) => c.iso2 === form.country_code)?.name ?? form.country_code) : "Country"} active={!!form.country_code} onClick={() => setSheet("country")} />
+            {form.country_code && <PickerPill label={form.state_code ? (states.find((s) => s.state_code === form.state_code)?.name ?? form.state_code) : "State"} active={!!form.state_code} onClick={() => setSheet("state")} />}
+            {form.state_code && <PickerPill label={form.city || "City"} active={!!form.city} onClick={() => setSheet("city")} />}
+          </div>
           <input className="input" placeholder={form.is_online ? "Street address (optional for online)" : "Street address"} value={form.address_line} onChange={(e) => set("address_line", e.target.value)} />
         </div>
 
@@ -466,6 +451,10 @@ export function CreateBusinessPage() {
           {!editingId && <div className="muted" style={{ fontSize: 12, marginTop: 8 }}>Charged from your Cash Account. Cancel anytime, no refunds.</div>}
         </div>
       </form>
+      {sheet === "country" && <PickerSheet title="Country" noun="countries" items={splitMain(countries).rest} pinned={splitMain(countries).main} pinnedLabel="Main markets" restLabel="All countries" selected={form.country_code} onPick={(code) => { set("country_code", code); set("state_code", ""); set("city", ""); }} onClose={() => setSheet(null)} />}
+      {sheet === "state" && <PickerSheet title="State" noun="states" items={states.map((st) => ({ code: st.state_code!, name: st.name! }))} selected={form.state_code} onPick={(code) => { set("state_code", code); set("city", ""); }} onClose={() => setSheet(null)} />}
+      {sheet === "city" && <PickerSheet title="City" noun="cities" items={cities.map((c) => ({ code: c, name: c }))} selected={form.city} onPick={(c) => set("city", c)} onClose={() => setSheet(null)} />}
+      {sheet === "category" && <PickerSheet title="Category" noun="categories" items={categories.map((c) => ({ code: String(c.id), name: c.name }))} selected={String(form.category_id)} onPick={(code) => set("category_id", Number(code))} onClose={() => setSheet(null)} />}
     </div>
   );
 }
