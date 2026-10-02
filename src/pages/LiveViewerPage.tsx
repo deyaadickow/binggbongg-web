@@ -15,6 +15,8 @@ import { SoloBattleStandingsSheet, SoloBattleStrip } from "../components/SoloBat
 import { fetchActiveSoloBattle, startSoloBattle, type SoloBattle } from "../lib/solobattle";
 import { Avatar, Notice } from "../components/Common";
 import { InviteOverlay, WhosPlayingOverlay } from "../components/RoomPeople";
+import { PickerSheet } from "../components/PickerSheet";
+import { TRANSLATION_LANGUAGES, defaultTargetLanguage, languageName, translateChatMessage, type TranslationResult } from "../lib/translate";
 
 interface Member { user_id: number; fullname?: string; username?: string; profile_image?: string; country?: string }
 interface RoomMembers { host_user_id: number; host_fullname?: string; host_username?: string; host_profile_image?: string; host_country?: string; guests: Member[] }
@@ -215,6 +217,51 @@ export function LiveViewerPage() {
   // Steve, 2026-09-27: the phones' Who's Playing / Invite header buttons, on the web too.
   const [whosPlayingOpen, setWhosPlayingOpen] = useState(false);
   const [inviteOpen, setInviteOpen] = useState(false);
+
+  // ---- Message Translation (the phones' "MT" button) ------------------------------------------
+  // Steve, 2026-10-02: "On the web, Please add the automatic translation messages just like on the
+  // phones." Per-viewer and local: nothing is stored server-side and nobody else in the room is
+  // told. It seeds from the viewer's own language rather than starting at None, per Eddie's
+  // 2026-09-19 note that a message in Spanish should just arrive in English.
+  const [mtOpen, setMtOpen] = useState(false);
+  const [mtLang, setMtLang] = useState<string | null>(() => {
+    try {
+      const saved = localStorage.getItem("bb.mtLang");
+      if (saved !== null) return saved || null;   // "" is a deliberate "off", not "unset"
+    } catch { /* private window, blocked storage */ }
+    return defaultTargetLanguage();
+  });
+  const [translations, setTranslations] = useState<Record<string, TranslationResult>>({});
+  // Ids already sent to the server, so a re-render never re-asks and never bills twice.
+  const translatingRef = useRef<Set<string>>(new Set());
+
+  const pickMtLang = useCallback((code: string) => {
+    const next = code || null;
+    setMtLang(next);
+    try { localStorage.setItem("bb.mtLang", code); } catch { /* ignore */ }
+    // A new target invalidates everything already translated.
+    translatingRef.current = new Set();
+    setTranslations({});
+    setMtOpen(false);
+  }, []);
+
+  useEffect(() => {
+    if (!mtLang || !isLoggedIn) return;
+    let alive = true;
+    // Only the tail is worth translating: scrollback the viewer has already read past does not
+    // need a round trip each, and a busy room would otherwise fire dozens at once.
+    const recent = messages.slice(-40);
+    for (const m of recent) {
+      if (m.stickerUrl || !m.message.trim()) continue;
+      if (translatingRef.current.has(m.id)) continue;
+      translatingRef.current.add(m.id);
+      translateChatMessage(m.message, mtLang).then((r) => {
+        if (!alive || !r) return;
+        setTranslations((prev) => (prev[m.id] ? prev : { ...prev, [m.id]: r }));
+      });
+    }
+    return () => { alive = false; };
+  }, [messages, mtLang, isLoggedIn]);
   useEffect(() => {
     if (!isLoggedIn || roomClosed) return;
     let alive = true;
@@ -501,6 +548,14 @@ export function LiveViewerPage() {
               <button className={`btn small${activeGame ? "" : " ghost"}`} onClick={() => setGamesMenuOpen(true)}>
                 🎮 Games
               </button>
+              {/* Every role gets this one, as on the phones — a plain viewer most of all. */}
+              <button
+                className={`btn small${mtLang ? "" : " ghost"}`}
+                title={mtLang ? `Chat is being translated into ${languageName(mtLang)}` : "Translate chat messages into your language"}
+                onClick={() => setMtOpen(true)}
+              >
+                🌐 {mtLang ? languageName(mtLang) : "Translate"}
+              </button>
               {role === "host" && (
                 <button className="btn small ghost" title="Who is playing a game in your room right now" onClick={() => setWhosPlayingOpen(true)}>👥 Who's Playing</button>
               )}
@@ -591,10 +646,7 @@ export function LiveViewerPage() {
           <div className="row" style={{ padding: "10px 12px", borderBottom: "1px solid var(--line)" }}><b style={{ color: "var(--gold)" }}>Live chat</b></div>
           <div className="log" ref={logRef}>
             {messages.map((m) => (
-              <div key={m.id}>
-                <span className="who">{m.senderName || "Member"}: </span>
-                {m.stickerUrl ? <img src={mediaUrl(m.stickerUrl)} alt="sticker" style={{ width: 64, display: "inline-block" }} /> : <span className="soft">{m.message}</span>}
-              </div>
+              <ChatLine key={m.id} m={m} translation={translations[m.id]} targetLanguage={mtLang} />
             ))}
             {messages.length === 0 && <p className="muted">Say hello 👋</p>}
           </div>
@@ -608,6 +660,17 @@ export function LiveViewerPage() {
         <SoloBattleStandingsSheet battle={soloBattle} myUserId={user?.id ?? null} onClose={() => setSoloStandingsOpen(false)} />
       )}
       {whosPlayingOpen && <WhosPlayingOverlay roomName={roomName} onClose={() => setWhosPlayingOpen(false)} />}
+      {mtOpen && (
+        <PickerSheet
+          title="Message Translation"
+          noun="language"
+          selected={mtLang ?? ""}
+          items={[{ code: "", name: "None — show messages exactly as sent" },
+                  ...TRANSLATION_LANGUAGES.map((l) => ({ code: l.code, name: `${l.name} · ${l.native}` }))]}
+          onPick={pickMtLang}
+          onClose={() => setMtOpen(false)}
+        />
+      )}
       {inviteOpen && myId !== null && (
         <InviteOverlay myUserId={myId} roomName={roomName} onToast={setToast} onClose={() => setInviteOpen(false)}
           excludeIds={new Set([myId, ...live.tiles.map((t) => t.userId).filter((id): id is number => id !== null)])} />
@@ -856,6 +919,50 @@ function VideoTile({ tile, label, user }: { tile: LiveTile; label: string; user?
         </div>
       )}
       <span className="name">{label || "Guest"}{tile.muted ? " · camera off" : ""}</span>
+    </div>
+  );
+}
+
+/**
+ * One line of live chat, with the phones' translation layout.
+ *
+ * LiveChatAdapter on Android builds `Name: [Source: ]original` and, only when the translation
+ * genuinely differs, a second line `Target: translated`. The "only when it differs" check is the
+ * important half: without it an English room shows every line twice, which is what makes the
+ * feature feel broken rather than helpful.
+ */
+function ChatLine({ m, translation, targetLanguage }: {
+  m: ChatMessage;
+  translation?: TranslationResult;
+  targetLanguage: string | null;
+}) {
+  const original = m.message;
+  const translated = translation?.translated;
+  const differs = !!translated && translated.trim().toLowerCase() !== original.trim().toLowerCase();
+  const sourceLabel = differs ? languageName(translation?.detectedSource) : "";
+  const targetLabel = differs && targetLanguage ? languageName(targetLanguage) : "";
+
+  return (
+    <div>
+      <div>
+        <span className="who">{m.senderName || "Member"}: </span>
+        {m.stickerUrl ? (
+          <img src={mediaUrl(m.stickerUrl)} alt="sticker" style={{ width: 64, display: "inline-block" }} />
+        ) : (
+          <span className="soft">
+            {sourceLabel && <span style={{ color: "var(--gold)" }}>{sourceLabel}: </span>}
+            {original}
+          </span>
+        )}
+      </div>
+      {differs && (
+        <div style={{ paddingLeft: 2 }}>
+          <span className="soft">
+            {targetLabel && <span style={{ color: "var(--gold)" }}>{targetLabel}: </span>}
+            {translated}
+          </span>
+        </div>
+      )}
     </div>
   );
 }
