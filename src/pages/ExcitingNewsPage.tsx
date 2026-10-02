@@ -6,7 +6,12 @@ import { TRANSLATION_LANGUAGES, languageName } from "../lib/translate";
 import { DEFAULT_TEXT_AREAS, cssAspectRatio, fetchExcitingNews, type ExcitingNewsFlyer, type ExcitingNewsType, type TextAreas } from "../lib/excitingnews";
 import { FlyerOverlay } from "../components/FlyerOverlay";
 
-const PAGE_SIZE = 20;
+// Steve, 2026-10-02: "we should upload one flyer at a time so the first flyer will upload right
+// away and by the time they scroll to the second flyer, it's already there." The server translates
+// every flyer it is asked for before it answers, so asking for twenty meant waiting for twenty.
+// The first request asks for a few; the rest arrive while you are reading.
+const FIRST_PAGE = 2;
+const PAGE_SIZE = 6;
 
 /**
  * Steve, 2026-09-29: "Next to for you page link Add another page link called 'Exciting News'
@@ -55,9 +60,10 @@ export function ExcitingNewsPage() {
     setError(null);
     try {
       const start = reset ? 0 : flyers.length;
-      const page = await fetchExcitingNews(user?.id ?? 0, type, search.trim(), start, PAGE_SIZE, language);
+      const count = reset ? FIRST_PAGE : PAGE_SIZE;
+      const page = await fetchExcitingNews(user?.id ?? 0, type, search.trim(), start, count, language);
       setAreas(page.areas);
-      setReachedEnd(page.flyers.length < PAGE_SIZE);
+      setReachedEnd(page.flyers.length < count);
       setFlyers((prev) => (reset ? page.flyers : [...prev, ...page.flyers]));
     } catch (e) {
       setError((e as Error).message);
