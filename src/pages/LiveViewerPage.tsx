@@ -545,7 +545,12 @@ export function LiveViewerPage() {
               )}
               {/* The phones' (G) menu — anyone broadcasting in the room can set its game,
                   which is what setActiveTapGameForRoom itself allows. */}
-              <button className={`btn small${activeGame ? "" : " ghost"}`} onClick={() => setGamesMenuOpen(true)}>
+              {/* Steve, 2026-10-02: "Just add a gold border around Games, Who's playing and
+                  invite." The ghost variant swaps the gold border for a grey one, which is what
+                  made these three look unfinished next to Battle and Mute. Games keeps its
+                  "a game is running" signal in the SHADE of gold instead of by losing the border. */}
+              <button className="btn small" onClick={() => setGamesMenuOpen(true)}
+                style={activeGame ? { borderColor: "var(--gold-bright)", color: "var(--gold-bright)" } : undefined}>
                 🎮 Games
               </button>
               {/* Every role gets this one, as on the phones — a plain viewer most of all. */}
@@ -557,10 +562,10 @@ export function LiveViewerPage() {
                 🌐 {mtLang ? languageName(mtLang) : "Translate"}
               </button>
               {role === "host" && (
-                <button className="btn small ghost" title="Who is playing a game in your room right now" onClick={() => setWhosPlayingOpen(true)}>👥 Who's Playing</button>
+                <button className="btn small" title="Who is playing a game in your room right now" onClick={() => setWhosPlayingOpen(true)}>👥 Who's Playing</button>
               )}
               {role === "host" && (
-                <button className="btn small ghost" title="Invite someone you follow into an open seat"
+                <button className="btn small" title="Invite someone you follow into an open seat"
                   onClick={() => { if (live.tiles.length >= 4) setToast("The room is full."); else setInviteOpen(true); }}>＋ Invite</button>
               )}
               {role === "host" && (
