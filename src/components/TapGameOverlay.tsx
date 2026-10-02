@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { mediaUrl } from "../lib/api";
-import { agreeToEntryFee, endTapGame, gameTitle, giftTapGameScore, speedProfile, startTapGame, type TapGameResult, type TapGameStart, type TapGameType } from "../lib/tapgame";
+import { agreeToEntryFee, endTapGame, gameTitle, gameTitleWithRate, giftTapGameScore, isVideoUrl, sceneFor, speedProfile, startTapGame, type TapGameResult, type TapGameStart, type TapGameType } from "../lib/tapgame";
 import { useSession } from "../lib/session";
 
 interface Target { id: number; x: number; y: number; bornAt: number; life: number }
@@ -40,6 +40,8 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
   const [targets, setTargets] = useState<Target[]>([]);
   const [result, setResult] = useState<TapGameResult | null>(null);
   const [gifted, setGifted] = useState(false);
+  const [gifting, setGifting] = useState(false);
+  const [giftError, setGiftError] = useState<string | null>(null);
   const areaRef = useRef<HTMLDivElement>(null);
   const caughtRef = useRef(0);
   const startedAtRef = useRef(0);
@@ -126,7 +128,7 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
   // Clock + spawner while playing.
   useEffect(() => {
     if (phase !== "playing" || !start) return;
-    const { spawnMs, lifeMs } = speedProfile(start.speed);
+    const { spawnMs, lifeMs, lifeJitterMs } = speedProfile(start.speed);
     const clock = setInterval(() => {
       const el = Math.round((Date.now() - startedAtRef.current) / 1000);
       setElapsed(el);
@@ -151,7 +153,7 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
             const alive = prev.filter((t) => now - t.bornAt < t.life);
             if (alive.length >= MAX_ON_SCREEN) return alive;
             const w = Math.max(0, area.clientWidth - size), h = Math.max(0, area.clientHeight - size);
-            return [...alive, { id: nextId.current++, x: Math.random() * w, y: Math.random() * h, bornAt: now, life: lifeMs }];
+            return [...alive, { id: nextId.current++, x: Math.random() * w, y: Math.random() * h, bornAt: now, life: lifeMs + Math.random() * lifeJitterMs }];
           });
         }, spawnMs);
     return () => { clearInterval(clock); clearInterval(spawner); };
@@ -179,39 +181,81 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
   }
 
   async function gift() {
-    if (!user || !start) return;
+    if (!user || !start || gifting) return;
+    setGifting(true);
+    setGiftError(null);
     try {
       const msg = await giftTapGameScore(user.id, start.session_id);
       setGifted(true);
       onToast(msg);
       refresh();
-    } catch (e) { onToast((e as Error).message); }
+    } catch (e) {
+      // Shown on the card as well as in a toast: a toast over a full-screen game is easy to
+      // miss, and "nothing happened" was exactly how this failure was reported.
+      const msg = (e as Error).message;
+      setGiftError(msg);
+      onToast(msg);
+    } finally {
+      setGifting(false);
+    }
   }
 
   const station = Math.min(RACE_STATIONS, Math.floor(caught / (RACE_FINISH / RACE_STATIONS)));
   const clock = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
-  const bg = game.background_image_url
-    ? `url(${mediaUrl(game.background_image_url)}) center/cover`
-    : isLanes
-      ? "radial-gradient(ellipse 70% 22% at 20% 100%, #2E7A3A 0%, #2E7A3A 60%, transparent 61%), radial-gradient(ellipse 80% 26% at 75% 102%, #164A1E 0%, #164A1E 60%, transparent 61%), linear-gradient(#6FCBF2, #1E5AA0)"
-      : "radial-gradient(circle at 30% 20%, #2a2408, #000 70%)";
+  // Admin uploads ONE "background" field and it may hold a video — the Fishing game's is a 7 MB
+  // mp4. A video cannot go in CSS url(), so it mounts as a real <video> behind the play area and
+  // the CSS layer falls back to the painted scene underneath it.
+  const bgUrl = game.background_image_url ? mediaUrl(game.background_image_url) : null;
+  const bgIsVideo = isVideoUrl(bgUrl);
+  const bg = bgUrl && !bgIsVideo ? `url(${bgUrl}) center/cover` : sceneFor(game);
   const character = game.character_image_url ? mediaUrl(game.character_image_url) : null;
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 50, background: "#000", display: "flex", flexDirection: "column" }}>
       <div className="row" style={{ padding: "10px 14px", borderBottom: "1px solid var(--gold-border)", background: "var(--panel)" }}>
-        <b style={{ color: "var(--gold)", flex: 1 }}>{gameTitle(game)}</b>
+        <b style={{ color: "var(--gold)", flex: 1 }}>{gameTitleWithRate(game)}</b>
         {phase === "playing" && <span className="pill">{isRace ? `Station ${station}/${RACE_STATIONS} · ${clock(elapsed)}` : `${clock(secondsLeft)} left`}</span>}
         {phase === "playing" && <span className="pill" style={{ marginLeft: 8 }}>{isRace ? `${caught}/${RACE_FINISH}` : isLanes ? `Popped ${caught}` : `Caught ${caught}`}</span>}
         {phase !== "playing" && <button className="btn small ghost" onClick={onClose}>Close</button>}
       </div>
 
       <div ref={areaRef} style={{ flex: 1, position: "relative", overflow: "hidden", background: bg, touchAction: "manipulation", userSelect: "none" }}>
+        {bgIsVideo && bgUrl && (
+          <video
+            ref={(el) => {
+              if (!el) return;
+              // Steve, 2026-09-09, about the phones: "also please make the sound effect of the
+              // video work as well" — so this is deliberately NOT muted. The game only ever
+              // starts from the player's own tap, which satisfies autoplay policy; if a browser
+              // still refuses, drop to muted rather than showing a frozen frame.
+              el.play().catch(() => { el.muted = true; el.play().catch(() => undefined); });
+            }}
+            src={bgUrl} autoPlay loop playsInline
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", pointerEvents: "none" }}
+          />
+        )}
         {phase === "playing" && isLanes && balloons.map((b) => <BalloonSprite key={b.id} b={b} onPop={() => pop(b.id)} onMiss={() => missed(b.id)} />)}
+        {/* With admin art, the sprite itself is the target. Without it — which is every game but
+            one — the phones draw the game's OWN emoji as text (a fish for Fishing, a crab for Crab
+            Beach). The web used to draw a gold disc with a dartboard on it for all of them, which
+            is why the fishing game showed circles and no fish. */}
         {phase === "playing" && !isLanes && targets.map((t) => (
-          <button key={t.id} onPointerDown={() => hit(t.id)} aria-label="Tap"
-            style={{ position: "absolute", left: t.x, top: t.y, width: 72, height: 72, borderRadius: 36, border: "2px solid var(--gold-bright)", background: character ? `url(${character}) center/contain no-repeat, #101010` : "var(--gold)", cursor: "pointer", padding: 0 }}>
-            {!character && <span style={{ fontSize: 28 }}>🎯</span>}
+          <button key={t.id} onPointerDown={() => hit(t.id)} aria-label={`Tap the ${game.catch_name || "target"}`}
+            style={{
+              position: "absolute", left: t.x, top: t.y, width: 72, height: 72, padding: 0, cursor: "pointer",
+              display: "grid", placeItems: "center",
+              borderRadius: 36,
+              border: character ? "2px solid var(--gold-bright)" : "none",
+              // The phones draw the same translucent disc behind a sprite AND behind a bare
+              // emoji — it is the tap affordance, not the object.
+              background: character ? `url(${character}) center/contain no-repeat, rgba(0,0,0,0.2)` : "rgba(0,0,0,0.2)",
+            }}>
+            {!character && (
+              // A drop shadow so a dark emoji still reads against a dark scene and vice versa.
+              <span style={{ fontSize: 38, lineHeight: 1, filter: "drop-shadow(0 2px 3px rgba(0,0,0,0.6))" }}>
+                {game.emoji || "🎮"}
+              </span>
+            )}
           </button>
         ))}
 
@@ -254,22 +298,37 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
                       ? `You popped ${result.objects_caught} balloons,\nworth ${Number(result.coins_earned).toLocaleString()} coins!`
                       : `You caught ${result.objects_caught} ${game.catch_name || "objects"},\nworth ${Number(result.coins_earned).toLocaleString()} coins!`}
                   </h2>
-                  {!gifted && result.coins_earned > 0 && result.host_name && (
+                  {/* The offer used to be hidden unless the server also returned host_name, so a
+                      round where that came back empty ended with no way to gift at all and no
+                      explanation. Coins earned is the only thing that decides it now; the server
+                      still has the final say and its refusal is shown as-is. */}
+                  {!gifted && result.coins_earned > 0 && (
                     <>
-                      <p style={{ marginTop: 12, fontSize: 15, color: "var(--gold)" }}>Gift these to {result.host_name}?</p>
+                      <p style={{ marginTop: 12, fontSize: 15, color: "var(--gold)" }}>Gift these to {result.host_name || "the host"}?</p>
+                      {giftError && <p style={{ marginTop: 8, fontSize: 13, color: "var(--red)" }}>{giftError}</p>}
                       <div className="row" style={{ marginTop: 10 }}>
-                        <button className="btn ghost" style={{ flex: 1 }} onClick={onClose}>NO</button>
-                        <button className="btn" style={{ flex: 1 }} onClick={gift}>YES, GIFT</button>
+                        <button className="btn ghost" style={{ flex: 1 }} onClick={onClose} disabled={gifting}>NO</button>
+                        <button className="btn" style={{ flex: 1 }} onClick={gift} disabled={gifting}>{gifting ? "Gifting…" : "YES, GIFT"}</button>
                       </div>
                     </>
                   )}
-                  {(gifted || !(result.coins_earned > 0) || !result.host_name) && <button className="btn block" style={{ marginTop: 12 }} onClick={onClose}>Done</button>}
+                  {(gifted || !(result.coins_earned > 0)) && <button className="btn block" style={{ marginTop: 12 }} onClick={onClose}>Done</button>}
                 </>
               )}
               {phase === "error" && (
                 <>
                   <p style={{ color: "var(--red)" }}>{error}</p>
-                  <button className="btn block" style={{ marginTop: 12 }} onClick={onClose}>Close</button>
+                  {/* Steve, 2026-09-08, after a real abandoned session was found in the database:
+                      a network hiccup while charging the fee used to cost the player the whole
+                      screen. If a session already exists, offer the same retry the phones do. */}
+                  {start ? (
+                    <div className="row" style={{ marginTop: 12 }}>
+                      <button className="btn ghost" style={{ flex: 1 }} onClick={onClose}>CLOSE</button>
+                      <button className="btn" style={{ flex: 1 }} onClick={agree}>TRY AGAIN</button>
+                    </div>
+                  ) : (
+                    <button className="btn block" style={{ marginTop: 12 }} onClick={onClose}>Close</button>
+                  )}
                 </>
               )}
             </div>
