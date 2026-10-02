@@ -20,6 +20,8 @@ export interface ExcitingNewsFlyer {
   type: ExcitingNewsType;
   file: string;
   description?: string | null;
+  /** The admin's own words, untranslated — so the page can offer "show original". */
+  description_original?: string | null;
   countries?: string[];
   aspect_ratio?: ExcitingNewsAspectRatio;
 }
@@ -39,6 +41,11 @@ export async function fetchExcitingNews(
   search: string,
   start: number,
   count: number,
+  /** Steve, 2026-10-02: the reader's chosen language. Empty means "leave it as written" — the
+   *  server then falls back to the browser's own Accept-Language, so a first visit is already
+   *  readable before anyone touches the picker. The flyer IMAGE is never translated; this is the
+   *  description above it. */
+  language = "",
 ): Promise<ExcitingNewsFlyer[]> {
   const res = await post<ExcitingNewsFlyer[]>("fetchExcitingNews", {
     user_id: myUserId,
@@ -46,6 +53,7 @@ export async function fetchExcitingNews(
     search,
     start,
     count,
+    language,
   });
   if (!res.status) throw new Error(res.message ?? "Couldn't load Exciting News.");
   return (res.data ?? []).map((f) => ({ ...f, file: mediaUrl(f.file) }));

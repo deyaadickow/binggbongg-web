@@ -240,6 +240,11 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .profile-user-list .p-ucard:last-child { border-bottom: 0; }
 .playlist-scroll { display: flex; gap: 10px; overflow-x: auto; padding: 4px 0 8px; scrollbar-width: none; }
 .playlist-scroll::-webkit-scrollbar { display: none; }
+
+/* Steve, 2026-10-02: "Please remove the up and down sidebar on the right side of the languages."
+   The picker still scrolls; the bar just is not painted, same as the gift sheet above. */
+.picker-scroll { scrollbar-width: none; }
+.picker-scroll::-webkit-scrollbar { display: none; }
 .playlist-item { flex: 0 0 88px; cursor: pointer; }
 .playlist-item-thumb { width: 88px; height: 88px; border-radius: 8px; overflow: hidden; border: 1.5px solid var(--gold-border); background: #111; display: flex; align-items: center; justify-content: center; color: var(--text-dim); font-size: 28px; }
 .playlist-item-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }

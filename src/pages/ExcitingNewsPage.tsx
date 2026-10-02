@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSession } from "../lib/session";
 import { Loading, Notice } from "../components/Common";
+import { PickerSheet } from "../components/PickerSheet";
+import { TRANSLATION_LANGUAGES, languageName } from "../lib/translate";
 import { cssAspectRatio, fetchExcitingNews, type ExcitingNewsFlyer, type ExcitingNewsType } from "../lib/excitingnews";
 
 const PAGE_SIZE = 20;
@@ -35,13 +37,21 @@ export function ExcitingNewsPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reachedEnd, setReachedEnd] = useState(false);
+  // Steve, 2026-10-02: "Please add a tab that says 'Translate all flyers in 50 different
+  // languages' when they click on this tab, they can choose one of 50 languages to translate."
+  // Empty means "as written": the server then falls back to the browser's own language, so a
+  // first visit already reads correctly before anyone opens this.
+  const [langOpen, setLangOpen] = useState(false);
+  const [language, setLanguage] = useState<string>(() => {
+    try { return localStorage.getItem("bb.newsLang") ?? ""; } catch { return ""; }
+  });
 
   const load = useCallback(async (reset: boolean) => {
     setLoading(true);
     setError(null);
     try {
       const start = reset ? 0 : flyers.length;
-      const found = await fetchExcitingNews(user?.id ?? 0, type, search.trim(), start, PAGE_SIZE);
+      const found = await fetchExcitingNews(user?.id ?? 0, type, search.trim(), start, PAGE_SIZE, language);
       setReachedEnd(found.length < PAGE_SIZE);
       setFlyers((prev) => (reset ? found : [...prev, ...found]));
     } catch (e) {
@@ -50,16 +60,20 @@ export function ExcitingNewsPage() {
       setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, type, search]);
+  }, [user, type, search, language]);
 
-  // Reset and reload whenever the Photos/Video toggle changes — search is submitted explicitly
-  // (Enter or the Search button), same as the Virtual Battle picker's own "Search members" box,
-  // not on every keystroke.
+  // Reset and reload whenever the Photos/Video toggle OR the chosen language changes — search is
+  // submitted explicitly (Enter or the Search button), same as the Virtual Battle picker's own
+  // "Search members" box, not on every keystroke.
+  //
+  // `language` has to be in THIS list, not only in load()'s own. Leaving it out meant picking a
+  // language rebuilt the loader but never ran it: the button said Spanish and every flyer stayed
+  // in English, which is exactly how it behaved the first time it was tried in a browser.
   useEffect(() => {
     setFlyers([]);
     load(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [type]);
+  }, [type, language]);
 
   function runSearch() {
     setFlyers([]);
@@ -73,6 +87,15 @@ export function ExcitingNewsPage() {
         <span className="spacer" />
         <button className={`btn small ${type === "photo" ? "" : "ghost"}`} onClick={() => setType("photo")}>Photos</button>
         <button className={`btn small ${type === "video" ? "" : "ghost"}`} onClick={() => setType("video")}>Video</button>
+      </div>
+      {/* The flyer artwork is never translated — only the description above it. Saying so on the
+          button itself is kinder than letting someone pick a language and wonder why the picture
+          still reads in English. */}
+      <div className="row" style={{ marginBottom: 14 }}>
+        <button className="btn small block" onClick={() => setLangOpen(true)} style={{ justifyContent: "space-between" }}>
+          <span>🌐 Translate all flyers in {TRANSLATION_LANGUAGES.length} different languages</span>
+          <span style={{ color: "var(--gold-bright)" }}>{language ? languageName(language) : "As written"}</span>
+        </button>
       </div>
       <div className="row" style={{ gap: 8, marginBottom: 18 }}>
         <input
@@ -109,6 +132,21 @@ export function ExcitingNewsPage() {
         <div className="center" style={{ marginTop: 20 }}>
           <button className="btn" onClick={() => load(false)}>Show more</button>
         </div>
+      )}
+      {langOpen && (
+        <PickerSheet
+          title="Translate all flyers"
+          noun="language"
+          selected={language}
+          items={[{ code: "", name: "As written — don't translate" },
+                  ...TRANSLATION_LANGUAGES.map((l) => ({ code: l.code, name: `${l.name} · ${l.native}` }))]}
+          onPick={(code) => {
+            setLanguage(code);
+            try { localStorage.setItem("bb.newsLang", code); } catch { /* ignore */ }
+            setLangOpen(false);
+          }}
+          onClose={() => setLangOpen(false)}
+        />
       )}
     </div>
   );

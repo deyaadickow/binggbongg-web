@@ -74,7 +74,11 @@ export function PickerSheet({ title, noun, items, pinned = [], pinnedLabel, rest
           placeholder={`Search ${total} ${noun}…`}
           style={{ marginBottom: 12, flex: "0 0 auto" }}
         />
-        <div style={{ overflowY: "auto", paddingRight: 4, flex: 1 }}>
+        {/* Steve, 2026-10-02: "Please remove the up and down sidebar on the right side of the
+            languages." Same treatment the gift sheet already got — the list still scrolls, the
+            bar just is not drawn. paddingRight goes with it, since it only existed to keep text
+            clear of the bar. */}
+        <div className="picker-scroll" style={{ overflowY: "auto", flex: 1 }}>
           {shownPinned.length > 0 && !filtering && pinnedLabel && caption(pinnedLabel)}
           {shownPinned.map(row)}
           {shownRest.length > 0 && !filtering && restLabel && shownPinned.length > 0 && caption(restLabel)}
