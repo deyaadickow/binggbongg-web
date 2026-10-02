@@ -29,6 +29,9 @@ export interface ExcitingNewsFlyer {
    *  different designs, some with bigger boxes so they can fit more words" — so the boxes belong
    *  to the flyer, not to the feed. Absent means the usual template. */
   text_areas?: TextAreas | null;
+  /** Steve, 2026-10-02: on a design with no frames of its own, the app draws a black box with a
+   *  gold border that hugs the words it holds — so the box is the right size in every language. */
+  draw_panels?: boolean;
   countries?: string[];
   aspect_ratio?: ExcitingNewsAspectRatio;
 }

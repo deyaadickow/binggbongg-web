@@ -22,7 +22,7 @@ import type { ExcitingNewsFlyer, TextArea, TextAreas } from "../lib/excitingnews
  *  than clip — which loses words silently, the worst outcome on a flyer — the text steps down
  *  until it fits, and only stops at a floor where it would stop being readable.
  */
-function FitText({ children, max, min, bold, color, shadow, align = "center" }: {
+function FitText({ children, max, min, bold, color, shadow, align = "center", panel }: {
   children: React.ReactNode;
   /** Both as a share of the FLYER's height, so type scales with the card. */
   max: number;
@@ -31,6 +31,8 @@ function FitText({ children, max, min, bold, color, shadow, align = "center" }: 
   color: string;
   shadow: string;
   align?: "center" | "left";
+  /** Draw a black box with a gold border around the words, sized to the words themselves. */
+  panel?: boolean;
 }) {
   const box = useRef<HTMLDivElement>(null);
   const inner = useRef<HTMLDivElement>(null);
@@ -61,6 +63,17 @@ function FitText({ children, max, min, bold, color, shadow, align = "center" }: 
         style={{
           fontSize: size, lineHeight: 1.2, textAlign: align, width: "100%",
           fontWeight: bold ? 700 : 600, color, textShadow: shadow, overflowWrap: "break-word",
+          // The box takes its HEIGHT from the words it actually holds, which is what makes it the
+          // right size in a language that runs longer than English. Its width stays the width of
+          // the area, so a flyer's boxes line up with each other the way drawn ones do.
+          ...(panel ? {
+            background: "rgba(0,0,0,0.82)",
+            border: "2px solid #D4A72C",
+            borderRadius: size * 0.6,
+            padding: `${size * 0.55}px ${size * 0.8}px`,
+            boxShadow: "0 0 .6em rgba(212,167,44,.35)",
+            boxSizing: "border-box" as const,
+          } : {}),
         }}
       >
         {children}
@@ -86,6 +99,7 @@ export function FlyerOverlay({ flyer, areas, height }: {
 }) {
   const o = flyer.overlay;
   if (!o) return null;
+  const panel = flyer.draw_panels === true;
   const title = (o.title ?? "").trim();
   const subtitle = (o.subtitle ?? "").trim();
   const body1 = (o.body1 ?? "").trim();
@@ -105,14 +119,14 @@ export function FlyerOverlay({ flyer, areas, height }: {
         <div style={{ ...areaStyle(areas.header), display: "flex", flexDirection: "column", justifyContent: "center", gap: "3%" }}>
           {title && (
             <div style={{ flex: subtitle ? "0 0 62%" : "1 1 auto", minHeight: 0 }}>
-              <FitText max={height * 0.052} min={height * 0.019} bold color="#F7DD8C" shadow={goldShadow}>
+              <FitText max={height * 0.052} min={height * 0.019} bold color="#F7DD8C" shadow={goldShadow} panel={panel}>
                 {title}
               </FitText>
             </div>
           )}
           {subtitle && (
             <div style={{ flex: title ? "0 0 38%" : "1 1 auto", minHeight: 0 }}>
-              <FitText max={height * 0.026} min={height * 0.014} color="#F0C86E" shadow={goldShadow}>
+              <FitText max={height * 0.026} min={height * 0.014} color="#F0C86E" shadow={goldShadow} panel={panel}>
                 {subtitle}
               </FitText>
             </div>
@@ -121,18 +135,18 @@ export function FlyerOverlay({ flyer, areas, height }: {
       )}
       {body1 && (
         <div style={areaStyle(areas.body1)}>
-          <FitText max={height * 0.0175} min={height * 0.010} color="#FFF4D6" shadow={darkShadow}>{body1}</FitText>
+          <FitText max={height * 0.0175} min={height * 0.010} color="#FFF4D6" shadow={darkShadow} panel={panel}>{body1}</FitText>
         </div>
       )}
       {body2 && (
         <div style={areaStyle(areas.body2)}>
-          <FitText max={height * 0.0175} min={height * 0.010} color="#FFFFFF" shadow={darkShadow}>{body2}</FitText>
+          <FitText max={height * 0.0175} min={height * 0.010} color="#FFFFFF" shadow={darkShadow} panel={panel}>{body2}</FitText>
         </div>
       )}
       {/* Only the four-frame designs have a third box. A box with no size is never drawn. */}
       {body3 && hasSize(areas.body3) && (
         <div style={areaStyle(areas.body3!)}>
-          <FitText max={height * 0.0175} min={height * 0.010} color="#FFF4D6" shadow={darkShadow}>{body3}</FitText>
+          <FitText max={height * 0.0175} min={height * 0.010} color="#FFF4D6" shadow={darkShadow} panel={panel}>{body3}</FitText>
         </div>
       )}
     </div>
