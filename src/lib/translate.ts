@@ -31,8 +31,14 @@ export const TRANSLATION_LANGUAGES: TranslationLanguage[] = [
   { code: "zh", name: "Chinese", native: "中文" },
   { code: "da", name: "Danish", native: "Dansk" },
   { code: "nl", name: "Dutch", native: "Nederlands" },
-  { code: "fil", name: "Tagalog", native: "Filipino" },
-  { code: "tl", name: "Tagalog", native: "Tagalog" },
+  // Steve, 2026-10-02: "Fix the Tagalog duplicate." The list carried BOTH "fil" and "tl" and
+  // called both of them Tagalog in English, so the picker showed two rows that looked identical
+  // and did the same thing. Google treats the two codes as one language, so this is a single row
+  // now, named Filipino with Tagalog alongside it — searching either word still finds it.
+  //
+  // The app's own language chooser keeps both codes, because an interface locale is a different
+  // question from a translation target; it just names them correctly now.
+  { code: "tl", name: "Filipino", native: "Tagalog" },
   { code: "fr", name: "French", native: "Français" },
   { code: "de", name: "German", native: "Deutsch" },
   { code: "hi", name: "Hindi", native: "हिन्दी" },
