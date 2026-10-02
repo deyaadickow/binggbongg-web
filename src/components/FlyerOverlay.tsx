@@ -132,7 +132,7 @@ export function FlyerOverlay({ flyer, areas, height }: {
           )}
           {subtitle && (
             <div style={{ flex: title ? "0 0 38%" : "1 1 auto", minHeight: 0 }}>
-              <FitText max={height * 0.030} min={height * 0.016} color="#F0C86E" shadow={goldShadow} panel={panel}>
+              <FitText max={height * 0.034} min={height * 0.018} color="#F0C86E" shadow={goldShadow} panel={panel}>
                 {subtitle}
               </FitText>
             </div>
@@ -141,18 +141,18 @@ export function FlyerOverlay({ flyer, areas, height }: {
       )}
       {body1 && (
         <div style={areaStyle(areas.body1)}>
-          <FitText max={height * 0.024} min={height * 0.013} color="#FFF4D6" shadow={darkShadow} panel={panel}>{body1}</FitText>
+          <FitText max={height * 0.026} min={height * 0.014} color="#FFF4D6" shadow={darkShadow} panel={panel}>{body1}</FitText>
         </div>
       )}
       {body2 && (
         <div style={areaStyle(areas.body2)}>
-          <FitText max={height * 0.024} min={height * 0.013} color="#FFFFFF" shadow={darkShadow} panel={panel}>{body2}</FitText>
+          <FitText max={height * 0.026} min={height * 0.014} color="#FFFFFF" shadow={darkShadow} panel={panel}>{body2}</FitText>
         </div>
       )}
       {/* Only the four-frame designs have a third box. A box with no size is never drawn. */}
       {body3 && hasSize(areas.body3) && (
         <div style={areaStyle(areas.body3!)}>
-          <FitText max={height * 0.024} min={height * 0.013} color="#FFF4D6" shadow={darkShadow} panel={panel}>{body3}</FitText>
+          <FitText max={height * 0.026} min={height * 0.014} color="#FFF4D6" shadow={darkShadow} panel={panel}>{body3}</FitText>
         </div>
       )}
     </div>
