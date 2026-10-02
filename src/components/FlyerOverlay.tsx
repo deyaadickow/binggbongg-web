@@ -49,12 +49,18 @@ function FitText({ children, max, min, bold, color, shadow, align = "center", pa
     for (let n = 0; n < 7; n++) {
       const mid = (lo + hi) / 2;
       i.style.fontSize = `${mid}px`;
+      // The drawn box's padding is a share of the type size, so it has to be applied for EACH
+      // trial, not left at the previous render's value — otherwise the text is measured against
+      // one padding and drawn with another, and the box ends up taller than its area. That is how
+      // a two-line title grew over the subtitle underneath it.
+      if (panel) i.style.padding = `${mid * 0.55}px ${mid * 0.8}px`;
       const fits = i.scrollHeight <= h && i.scrollWidth <= w + 1;
       if (fits) { best = mid; lo = mid; } else { hi = mid; }
     }
     i.style.fontSize = `${best}px`;
+    if (panel) i.style.padding = `${best * 0.55}px ${best * 0.8}px`;
     setSize(best);
-  }, [children, max, min]);
+  }, [children, max, min, panel]);
 
   return (
     <div ref={box} style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
@@ -126,7 +132,7 @@ export function FlyerOverlay({ flyer, areas, height }: {
           )}
           {subtitle && (
             <div style={{ flex: title ? "0 0 38%" : "1 1 auto", minHeight: 0 }}>
-              <FitText max={height * 0.026} min={height * 0.014} color="#F0C86E" shadow={goldShadow} panel={panel}>
+              <FitText max={height * 0.030} min={height * 0.016} color="#F0C86E" shadow={goldShadow} panel={panel}>
                 {subtitle}
               </FitText>
             </div>
@@ -135,18 +141,18 @@ export function FlyerOverlay({ flyer, areas, height }: {
       )}
       {body1 && (
         <div style={areaStyle(areas.body1)}>
-          <FitText max={height * 0.0175} min={height * 0.010} color="#FFF4D6" shadow={darkShadow} panel={panel}>{body1}</FitText>
+          <FitText max={height * 0.024} min={height * 0.013} color="#FFF4D6" shadow={darkShadow} panel={panel}>{body1}</FitText>
         </div>
       )}
       {body2 && (
         <div style={areaStyle(areas.body2)}>
-          <FitText max={height * 0.0175} min={height * 0.010} color="#FFFFFF" shadow={darkShadow} panel={panel}>{body2}</FitText>
+          <FitText max={height * 0.024} min={height * 0.013} color="#FFFFFF" shadow={darkShadow} panel={panel}>{body2}</FitText>
         </div>
       )}
       {/* Only the four-frame designs have a third box. A box with no size is never drawn. */}
       {body3 && hasSize(areas.body3) && (
         <div style={areaStyle(areas.body3!)}>
-          <FitText max={height * 0.0175} min={height * 0.010} color="#FFF4D6" shadow={darkShadow} panel={panel}>{body3}</FitText>
+          <FitText max={height * 0.024} min={height * 0.013} color="#FFF4D6" shadow={darkShadow} panel={panel}>{body3}</FitText>
         </div>
       )}
     </div>
