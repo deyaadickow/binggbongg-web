@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useSession } from "../lib/session";
 import { Loading, Notice } from "../components/Common";
 import { PickerSheet } from "../components/PickerSheet";
-import { TRANSLATION_LANGUAGES, languageName } from "../lib/translate";
+import { TRANSLATION_LANGUAGES, languageName, defaultTargetLanguage } from "../lib/translate";
 import { DEFAULT_TEXT_AREAS, cssAspectRatio, fetchExcitingNews, type ExcitingNewsFlyer, type ExcitingNewsType, type TextAreas } from "../lib/excitingnews";
 import { FlyerOverlay } from "../components/FlyerOverlay";
 
@@ -51,9 +51,16 @@ export function ExcitingNewsPage() {
   // Empty means "as written": the server then falls back to the browser's own language, so a
   // first visit already reads correctly before anyone opens this.
   const [langOpen, setLangOpen] = useState(false);
+  // Empty means nobody has chosen, which makes the page follow the browser's own language — the
+  // server falls back to Accept-Language. "original" is the explicit "leave it as written"; empty
+  // would quietly translate anyway.
   const [language, setLanguage] = useState<string>(() => {
     try { return localStorage.getItem("bb.newsLang") ?? ""; } catch { return ""; }
   });
+  /** What the button says on the right — never "As written" while it is actually translating. */
+  const languageLabel = language === "original"
+    ? "As written"
+    : languageName(language || defaultTargetLanguage() || "") || "Your language";
 
   const load = useCallback(async (reset: boolean) => {
     setLoading(true);
@@ -105,7 +112,7 @@ export function ExcitingNewsPage() {
       <div className="row" style={{ marginBottom: 14 }}>
         <button className="btn small block" onClick={() => setLangOpen(true)} style={{ justifyContent: "space-between" }}>
           <span>🌐 Translate all flyers in {TRANSLATION_LANGUAGES.length} different languages</span>
-          <span style={{ color: "var(--gold-bright)" }}>{language ? languageName(language) : "As written"}</span>
+          <span style={{ color: "var(--gold-bright)" }}>{languageLabel}</span>
         </button>
       </div>
       <div className="row" style={{ gap: 8, marginBottom: 18 }}>
@@ -144,7 +151,7 @@ export function ExcitingNewsPage() {
           title="Translate all flyers"
           noun="language"
           selected={language}
-          items={[{ code: "", name: "As written — don't translate" },
+          items={[{ code: "original", name: "As written — don't translate" },
                   ...TRANSLATION_LANGUAGES.map((l) => ({ code: l.code, name: `${l.name} · ${l.native}` }))]}
           onPick={(code) => {
             setLanguage(code);
