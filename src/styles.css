@@ -193,7 +193,9 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .gift-grid button:disabled { opacity: .6; cursor: default; }
 .gift-grid button.busy { border-color: var(--gold-bright); opacity: 1; }
 .gift-flash { position: absolute; inset: 0; z-index: 5; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.4); pointer-events: none; animation: gift-flash-fade 2.8s ease forwards; }
-.gift-flash-card { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 20px 30px; border-radius: 15px; border: 2px solid var(--gold-border); background: rgba(0,0,0,.9); color: #fff; animation: gift-flash-pop .5s ease-out; }
+/* Steve, 2026-10-02: "When i give any gift and when a gift comes out please add a thick gold
+   border to the black background box." 2px read as a hairline against the video behind it. */
+.gift-flash-card { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 20px 30px; border-radius: 18px; border: 4px solid var(--gold-border); background: rgba(0,0,0,.95); color: #fff; box-shadow: 0 0 22px rgba(0,0,0,.65); animation: gift-flash-pop .5s ease-out; }
 .gift-flash-title { color: var(--gold); font-weight: 800; font-size: 18px; margin-bottom: 8px; }
 .gift-flash-card img { width: 90px; height: 90px; object-fit: contain; }
 .gift-flash-card b { font-size: 18px; font-weight: 400; }
