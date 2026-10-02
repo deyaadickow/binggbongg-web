@@ -25,6 +25,10 @@ export interface ExcitingNewsFlyer {
   /** Steve, 2026-10-02: the flyer's own words, kept OUT of the picture so they can be
    *  translated. Any piece may be empty — a flyer using fewer boxes just leaves them blank. */
   overlay?: { title?: string | null; subtitle?: string | null; body1?: string | null; body2?: string | null } | null;
+  /** Where this flyer's own words go. Steve, 2026-10-02: "I'm making 10 more flyers with
+   *  different designs, some with bigger boxes so they can fit more words" — so the boxes belong
+   *  to the flyer, not to the feed. Absent means the usual template. */
+  text_areas?: TextAreas | null;
   countries?: string[];
   aspect_ratio?: ExcitingNewsAspectRatio;
 }

@@ -123,7 +123,8 @@ export function ExcitingNewsPage() {
             {f.description && (
               <div style={{ padding: "10px 14px", background: "rgba(0,0,0,0.4)", fontSize: 14 }}>{f.description}</div>
             )}
-            <FlyerArt flyer={f} areas={areas} />
+            {/* This flyer's own boxes when it has them — the designs differ — else the feed's. */}
+            <FlyerArt flyer={f} areas={f.text_areas ?? areas} />
           </div>
         ))}
       </div>
