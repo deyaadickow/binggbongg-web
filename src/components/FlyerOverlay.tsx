@@ -69,6 +69,10 @@ function FitText({ children, max, min, bold, color, shadow, align = "center" }: 
   );
 }
 
+function hasSize(a?: TextArea): boolean {
+  return !!a && a.w > 0 && a.h > 0;
+}
+
 function areaStyle(a: TextArea): React.CSSProperties {
   return { position: "absolute", left: `${a.x}%`, top: `${a.y}%`, width: `${a.w}%`, height: `${a.h}%` };
 }
@@ -86,7 +90,8 @@ export function FlyerOverlay({ flyer, areas, height }: {
   const subtitle = (o.subtitle ?? "").trim();
   const body1 = (o.body1 ?? "").trim();
   const body2 = (o.body2 ?? "").trim();
-  if (!title && !subtitle && !body1 && !body2) return null;
+  const body3 = (o.body3 ?? "").trim();
+  if (!title && !subtitle && !body1 && !body2 && !body3) return null;
 
   // Gold for the header, cream and white for the two paragraphs — matching the flyer Steve
   // designed, so the drawn text looks like it was always part of it.
@@ -122,6 +127,12 @@ export function FlyerOverlay({ flyer, areas, height }: {
       {body2 && (
         <div style={areaStyle(areas.body2)}>
           <FitText max={height * 0.0175} min={height * 0.010} color="#FFFFFF" shadow={darkShadow}>{body2}</FitText>
+        </div>
+      )}
+      {/* Only the four-frame designs have a third box. A box with no size is never drawn. */}
+      {body3 && hasSize(areas.body3) && (
+        <div style={areaStyle(areas.body3!)}>
+          <FitText max={height * 0.0175} min={height * 0.010} color="#FFF4D6" shadow={darkShadow}>{body3}</FitText>
         </div>
       )}
     </div>

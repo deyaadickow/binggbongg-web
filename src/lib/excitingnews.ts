@@ -24,7 +24,7 @@ export interface ExcitingNewsFlyer {
   description_original?: string | null;
   /** Steve, 2026-10-02: the flyer's own words, kept OUT of the picture so they can be
    *  translated. Any piece may be empty — a flyer using fewer boxes just leaves them blank. */
-  overlay?: { title?: string | null; subtitle?: string | null; body1?: string | null; body2?: string | null } | null;
+  overlay?: { title?: string | null; subtitle?: string | null; body1?: string | null; body2?: string | null; body3?: string | null } | null;
   /** Where this flyer's own words go. Steve, 2026-10-02: "I'm making 10 more flyers with
    *  different designs, some with bigger boxes so they can fit more words" — so the boxes belong
    *  to the flyer, not to the feed. Absent means the usual template. */
@@ -44,7 +44,8 @@ export function cssAspectRatio(f: Pick<ExcitingNewsFlyer, "aspect_ratio">): stri
 
 /** One text box on the flyer, as a share of the image so the numbers fit any size. */
 export interface TextArea { x: number; y: number; w: number; h: number }
-export interface TextAreas { header: TextArea; body1: TextArea; body2: TextArea }
+/** `body3` only exists on the designs with four frames; a box with no size is never drawn. */
+export interface TextAreas { header: TextArea; body1: TextArea; body2: TextArea; body3?: TextArea }
 
 /** What the server sends today. Kept as a fallback only so a stale response still renders
  *  something sane; the server's own numbers always win, which is what lets a box be nudged
@@ -53,6 +54,7 @@ export const DEFAULT_TEXT_AREAS: TextAreas = {
   header: { x: 17, y: 9.5, w: 66, h: 11.5 },
   body1: { x: 19, y: 33.0, w: 62, h: 17.4 },
   body2: { x: 19, y: 56.0, w: 62, h: 15.8 },
+  body3: { x: 19, y: 0, w: 62, h: 0 },
 };
 
 export interface ExcitingNewsPage {
