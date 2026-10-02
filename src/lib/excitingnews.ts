@@ -22,6 +22,9 @@ export interface ExcitingNewsFlyer {
   description?: string | null;
   /** The admin's own words, untranslated — so the page can offer "show original". */
   description_original?: string | null;
+  /** Steve, 2026-10-02: the flyer's own words, kept OUT of the picture so they can be
+   *  translated. Any piece may be empty — a flyer using fewer boxes just leaves them blank. */
+  overlay?: { title?: string | null; subtitle?: string | null; body1?: string | null; body2?: string | null } | null;
   countries?: string[];
   aspect_ratio?: ExcitingNewsAspectRatio;
 }
@@ -35,6 +38,24 @@ export function cssAspectRatio(f: Pick<ExcitingNewsFlyer, "aspect_ratio">): stri
   return f.aspect_ratio === "9:32" ? "9 / 32" : "9 / 16";
 }
 
+/** One text box on the flyer, as a share of the image so the numbers fit any size. */
+export interface TextArea { x: number; y: number; w: number; h: number }
+export interface TextAreas { header: TextArea; body1: TextArea; body2: TextArea }
+
+/** What the server sends today. Kept as a fallback only so a stale response still renders
+ *  something sane; the server's own numbers always win, which is what lets a box be nudged
+ *  without an app release. */
+export const DEFAULT_TEXT_AREAS: TextAreas = {
+  header: { x: 17, y: 9.5, w: 66, h: 11.5 },
+  body1: { x: 19, y: 33.0, w: 62, h: 17.4 },
+  body2: { x: 19, y: 56.0, w: 62, h: 15.8 },
+};
+
+export interface ExcitingNewsPage {
+  flyers: ExcitingNewsFlyer[];
+  areas: TextAreas;
+}
+
 export async function fetchExcitingNews(
   myUserId: number,
   type: ExcitingNewsType,
@@ -46,7 +67,7 @@ export async function fetchExcitingNews(
    *  readable before anyone touches the picker. The flyer IMAGE is never translated; this is the
    *  description above it. */
   language = "",
-): Promise<ExcitingNewsFlyer[]> {
+): Promise<ExcitingNewsPage> {
   const res = await post<ExcitingNewsFlyer[]>("fetchExcitingNews", {
     user_id: myUserId,
     type,
@@ -56,5 +77,8 @@ export async function fetchExcitingNews(
     language,
   });
   if (!res.status) throw new Error(res.message ?? "Couldn't load Exciting News.");
-  return (res.data ?? []).map((f) => ({ ...f, file: mediaUrl(f.file) }));
+  return {
+    flyers: (res.data ?? []).map((f) => ({ ...f, file: mediaUrl(f.file) })),
+    areas: (res.text_areas as TextAreas | undefined) ?? DEFAULT_TEXT_AREAS,
+  };
 }
