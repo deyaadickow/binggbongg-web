@@ -62,16 +62,36 @@ export function ExcitingNewsPage() {
     ? "As written"
     : languageName(language || defaultTargetLanguage() || "") || "Your language";
 
+  // How many flyers we already have, kept in a ref rather than read from state inside load().
+  //
+  // Steve, 2026-10-03: "the exciting news on the web keeps duplicating the flyers multiple times."
+  // load() used to compute `start` from `flyers.length`, but `flyers` is deliberately NOT in its
+  // dependency list (adding it would rebuild the callback on every page and re-trigger the reset
+  // effect). So the closure kept the EMPTY list it was created with: every "Show more" asked the
+  // server for start=0 and appended the same first flyers again, and since the server always
+  // returned a full page, reachedEnd never became true and the button never went away.
+  const loadedCountRef = useRef(0);
+
   const load = useCallback(async (reset: boolean) => {
     setLoading(true);
     setError(null);
     try {
-      const start = reset ? 0 : flyers.length;
+      const start = reset ? 0 : loadedCountRef.current;
       const count = reset ? FIRST_PAGE : PAGE_SIZE;
       const page = await fetchExcitingNews(user?.id ?? 0, type, search.trim(), start, count, language);
       setAreas(page.areas);
-      setReachedEnd(page.flyers.length < count);
-      setFlyers((prev) => (reset ? page.flyers : [...prev, ...page.flyers]));
+      setFlyers((prev) => {
+        // De-dupe by id as well. The offset is correct now, but a flyer added or reordered in the
+        // admin panel between two pages can still shift the window and repeat one — and a repeated
+        // React key is a rendering bug, not just a cosmetic one.
+        const seen = new Set(reset ? [] : prev.map((f) => f.id));
+        const fresh = page.flyers.filter((f) => !seen.has(f.id));
+        const next = reset ? page.flyers : [...prev, ...fresh];
+        loadedCountRef.current = next.length;
+        // Nothing new came back — either the server ran out, or everything it sent was a repeat.
+        setReachedEnd(page.flyers.length < count || (!reset && fresh.length === 0));
+        return next;
+      });
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -89,12 +109,14 @@ export function ExcitingNewsPage() {
   // in English, which is exactly how it behaved the first time it was tried in a browser.
   useEffect(() => {
     setFlyers([]);
+    loadedCountRef.current = 0;
     load(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type, language]);
 
   function runSearch() {
     setFlyers([]);
+    loadedCountRef.current = 0;
     load(true);
   }
 
