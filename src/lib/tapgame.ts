@@ -204,6 +204,79 @@ const SCENES: Record<string, string> = {
     "linear-gradient(#9BE2FF 0%, #55B06A 45%, #2E8B45 100%)",
 };
 
+// A category is the right grain for most games, but Sports covers a stadium pitch, an ice rink,
+// a dojo and a dark bowling alley, and a grass gradient is simply wrong for most of those (Steve,
+// 2026-10-03, adding 20 sports games: "add the sports games on the engines we already have").
+// These are per-GAME overrides, checked before the category — the phones already paint every game
+// from a per-key palette, so this is the web catching up for the games where it matters most.
+const KEY_SCENES: Record<string, string> = {
+  // Basketball hall: wooden floor, lit from the roof.
+  hoops_tap:
+    "radial-gradient(ellipse 130% 38% at 50% 100%, #A9762E 0%, #A9762E 56%, transparent 57%)," +
+    "radial-gradient(ellipse 70% 30% at 50% 0%, rgba(255,235,180,0.30), transparent 70%)," +
+    "linear-gradient(#2A2118 0%, #3E3022 55%, #6B4A1E 100%)",
+  // Badminton hall: the green sprung court, not the wooden one, so it doesn't read as the
+  // basketball scene with a different ball on it.
+  badminton_smash:
+    "radial-gradient(ellipse 130% 40% at 50% 100%, #2E7A5A 0%, #2E7A5A 57%, transparent 58%)," +
+    "radial-gradient(ellipse 70% 28% at 50% 0%, rgba(255,235,180,0.28), transparent 70%)," +
+    "linear-gradient(#20282E 0%, #2A3A3A 55%, #1E5A46 100%)",
+  // Table tennis: blue table with its white centre line. The line layer comes FIRST so it paints
+  // ON the table — later layers sit behind, and behind the table it would be invisible.
+  table_tennis_rally:
+    "linear-gradient(90deg, transparent 0 49.4%, rgba(255,255,255,0.80) 49.4% 50.6%, transparent 50.6%) 0 100%/100% 38% no-repeat," +
+    "radial-gradient(ellipse 120% 40% at 50% 100%, #1E64A8 0%, #1E64A8 58%, transparent 59%)," +
+    "linear-gradient(#1A2230 0%, #0E1620 55%, #0A1A2E 100%)",
+  // Clay court: the orange surface takes the bottom half.
+  tennis_rally:
+    "radial-gradient(ellipse 130% 45% at 50% 100%, #C4633A 0%, #C4633A 58%, transparent 59%)," +
+    "linear-gradient(#7FD0F0 0%, #4AA8D4 45%, #8A3E22 100%)",
+  // Beach volleyball: sea sky over sand.
+  volleyball_spike:
+    "radial-gradient(ellipse 130% 40% at 50% 100%, #E8CF9A 0%, #E8CF9A 55%, transparent 56%)," +
+    "linear-gradient(#6FD4F2 0%, #3AAEDC 45%, #C9A86A 100%)",
+  // Ice: pale sheet below, cold arena dark above.
+  hockey_slapshot:
+    "radial-gradient(ellipse 140% 42% at 50% 100%, #EAF6FF 0%, #EAF6FF 58%, transparent 59%)," +
+    "linear-gradient(#2E6A9E 0%, #4A8ABF 45%, #CFEAFF 100%)",
+  // Bowling alley: one lit lane straight up the middle, neon either side. The lane is a BAND, not
+  // an ellipse — an ellipse anchored at the bottom reads as a hill, not a lane running away.
+  bowling_strike:
+    "linear-gradient(90deg, transparent 0 36%, rgba(201,138,58,0.95) 36% 64%, transparent 64%) 0 100%/100% 62% no-repeat," +
+    "radial-gradient(circle at 80% 20%, rgba(255,74,212,0.40), transparent 55%)," +
+    "radial-gradient(circle at 18% 30%, rgba(90,200,255,0.35), transparent 55%)," +
+    "linear-gradient(#2A2036 0%, #170F22 60%, #0E0818 100%)",
+  // Boxing: a hot overhead spotlight on the canvas, everything else dark.
+  boxing_round:
+    "radial-gradient(ellipse 120% 40% at 50% 100%, #8A4A3A 0%, #8A4A3A 56%, transparent 57%)," +
+    "radial-gradient(circle at 50% 10%, rgba(255,233,184,0.45), transparent 60%)," +
+    "linear-gradient(#3A1414 0%, #1E0808 60%, #140606 100%)",
+  // Dojo: paper screens above, tatami below with a single seam down the middle. Repeating stripes
+  // were tried here and came out as blotches at this size — one clean seam reads as a floor.
+  karate_strike:
+    "linear-gradient(90deg, transparent 0 49.4%, rgba(0,0,0,0.22) 49.4% 50.6%, transparent 50.6%) 0 100%/100% 44% no-repeat," +
+    "radial-gradient(ellipse 140% 44% at 50% 100%, #9A8A4E 0%, #9A8A4E 60%, transparent 61%)," +
+    "linear-gradient(#F0E4C8 0%, #D4C09A 52%, #6A5A2E 100%)",
+  // Darts corner: one lamp, a red glow off the board, dark everywhere else.
+  dart_bullseye:
+    "radial-gradient(circle at 50% 35%, rgba(255,74,74,0.30), transparent 50%)," +
+    "radial-gradient(ellipse 100% 30% at 50% 100%, #2A1A12 0%, #2A1A12 58%, transparent 59%)," +
+    "linear-gradient(#2E3A2E 0%, #141A14 60%, #0A0E0A 100%)",
+  // Concrete skate bowl at sunset.
+  skate_trick:
+    "radial-gradient(ellipse 140% 44% at 50% 100%, #6A6A74 0%, #6A6A74 58%, transparent 59%)," +
+    "linear-gradient(#F2845A 0%, #9A5A6A 45%, #3A2E4A 100%)",
+  // Open ocean, bright at the surface.
+  surf_the_wave:
+    "radial-gradient(ellipse 150% 50% at 50% 100%, #06526E 0%, #06526E 60%, transparent 61%)," +
+    "radial-gradient(ellipse 60% 24% at 25% 0%, rgba(255,255,255,0.35), transparent 70%)," +
+    "linear-gradient(#8FE4FF 0%, #2EB4DC 40%, #0A4A5A 100%)",
+  // Alpine snow under a pale winter sky.
+  ski_slalom:
+    "radial-gradient(ellipse 140% 48% at 50% 100%, #FFFFFF 0%, #FFFFFF 60%, transparent 61%)," +
+    "linear-gradient(#CFEAFF 0%, #8AA8C4 50%, #6A8AB8 100%)",
+};
+
 /** Daylight sky over grass — Balloon Pop's own scene, and the safe default for anything new. */
 const SKY_SCENE =
   "radial-gradient(ellipse 70% 22% at 20% 100%, #2E7A3A 0%, #2E7A3A 60%, transparent 61%)," +
@@ -212,6 +285,8 @@ const SKY_SCENE =
 
 /** The painted scene for a game that has no admin-uploaded background. */
 export function sceneFor(game: TapGameType): string {
+  const byKey = game.key && KEY_SCENES[game.key];
+  if (byKey) return byKey;
   if (game.game_mode === "falling_lanes" || game.game_mode === "race") {
     return game.game_mode === "race" ? SCENES["Races"] : SKY_SCENE;
   }
