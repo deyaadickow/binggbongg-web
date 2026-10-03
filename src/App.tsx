@@ -20,6 +20,7 @@ import { LiveNowPage } from "./pages/LiveNowPage";
 import { LiveViewerPage } from "./pages/LiveViewerPage";
 import { WalletPage } from "./pages/WalletPage";
 import { GoLivePage } from "./pages/GoLivePage";
+import { StreamFromPcPage } from "./pages/StreamFromPcPage";
 import { Sidebar } from "./components/Sidebar";
 import { AdReferralEarningsPage, AllVideosEarningsPage, PayoutHistoryPage, RedeemPage, RepostEarningsPage, RewardingActionsPage, StatementsPage } from "./pages/WalletPages";
 import { AccountSettingsPage, AdvertisePage, BlockedProfilesPage, ComingSoonPage, ContestRequestsPage, DeleteAccountPage, FindABattlePage, ModeratorsPage, QrCodePage, ReferralsPage, SettingsHubPage, ShareProfilePage, SimulcastPage, SupportArchivePage, SupportPage, VirtualLookPage, MyVirtualBattlesPage, TermsOfUsePage, PrivacyPolicyPage, ContactUsPage, AboutUsPage, FaqPage, AppFeaturesPage } from "./pages/SettingsPages";
@@ -54,6 +55,7 @@ export default function App() {
           <Route path="/wallet/reposts" element={<RepostEarningsPage />} />
           <Route path="/wallet/rewards" element={<RewardingActionsPage />} />
           <Route path="/go-live" element={<GoLivePage />} />
+          <Route path="/go-live/computer" element={<StreamFromPcPage />} />
           <Route path="/upload" element={<UploadVideoPage />} />
           <Route path="/photos" element={<MyPhotosPage />} />
           <Route path="/photos-directory" element={<PhotosDirectoryPage />} />

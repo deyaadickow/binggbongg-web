@@ -61,6 +61,11 @@ export function GoLivePage() {
       </button>
       {previewError && <p className="muted center" style={{ fontSize: 13, marginTop: 8 }}>You can still go live and turn the camera on from inside the room once the browser allows it.</p>}
       <p className="muted center" style={{ fontSize: 13, marginTop: 8 }}>Your followers see you in Live Now the moment you start. Viewers can ask to join; you approve them from the room.</p>
+      {/* Steve, 2026-10-03 — the gamers' route in. Someone with a capture card and OBS is not
+          going to find this under Settings, so it sits next to the camera button they came for. */}
+      <p className="center" style={{ fontSize: 13, marginTop: 14 }}>
+        Playing a game on your computer? <Link to="/go-live/computer">Go live from your PC with OBS</Link>
+      </p>
     </div>
   );
 }
