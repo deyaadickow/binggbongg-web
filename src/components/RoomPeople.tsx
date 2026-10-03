@@ -14,10 +14,19 @@ export async function fetchCurrentTapGamePlayers(roomName: string): Promise<Curr
   return res.status ? (res.data ?? []) : [];
 }
 
-export async function fetchFollowingPeople(myUserId: number): Promise<Person[]> {
-  const res = await post<{ to_user?: (Person & { id?: number }) | null }[]>("fetchFollowingList", { user_id: myUserId, my_user_id: myUserId, start: 0, count: 50 });
+/** Steve, 2026-10-03: "show only members you are following and only if they are online, also
+ *  add a search on top." Both happen on the server — fetchFollowingList paged the follow list
+ *  newest-first with no activity filter, so you got 50 people picked by WHEN you followed them.
+ *  The search term goes with the request rather than filtering what came back: the person you
+ *  are looking for is usually the one NOT on screen. "Online" is the app's existing definition
+ *  (live right now, or any activity in the last 15 minutes) — see UsersController. */
+export async function fetchOnlineFollowingPeople(myUserId: number, search?: string): Promise<Person[]> {
+  const body: Record<string, unknown> = { user_id: myUserId };
+  const term = (search ?? "").trim();
+  if (term) body.search = term;
+  const res = await post<(Person & { id?: number })[]>("fetchOnlineFollowingList", body);
   if (!res.status) return [];
-  return (res.data ?? []).map((r) => r.to_user).filter((u): u is Person & { id?: number } => !!u)
+  return (res.data ?? [])
     .map((u) => ({ user_id: u.user_id ?? u.id ?? 0, fullname: u.fullname, username: u.username, profile_image: u.profile_image }))
     .filter((u) => u.user_id > 0);
 }
@@ -57,7 +66,18 @@ export function WhosPlayingOverlay({ roomName, onClose }: { roomName: string; on
 export function InviteOverlay({ myUserId, roomName, excludeIds, onToast, onClose }: { myUserId: number; roomName: string; excludeIds: Set<number>; onToast: (s: string) => void; onClose: () => void }) {
   const [people, setPeople] = useState<Person[] | null>(null);
   const [invited, setInvited] = useState<Set<number>>(new Set());
-  useEffect(() => { fetchFollowingPeople(myUserId).then((list) => setPeople(list.filter((p) => !excludeIds.has(p.user_id)))).catch(() => setPeople([])); }, [myUserId]); // eslint-disable-line react-hooks/exhaustive-deps
+  const [query, setQuery] = useState("");
+  // Debounced: one request per typed name, not one per letter. The cleanup cancels the pending
+  // call, so an abandoned prefix never lands after the term that replaced it.
+  useEffect(() => {
+    let alive = true;
+    const t = setTimeout(() => {
+      fetchOnlineFollowingPeople(myUserId, query)
+        .then((list) => { if (alive) setPeople(list.filter((p) => !excludeIds.has(p.user_id))); })
+        .catch(() => { if (alive) setPeople([]); });
+    }, query ? 350 : 0);
+    return () => { alive = false; clearTimeout(t); };
+  }, [myUserId, query]); // eslint-disable-line react-hooks/exhaustive-deps
   async function invite(p: Person) {
     try {
       await inviteToLive(myUserId, roomName, p.user_id);
@@ -67,9 +87,17 @@ export function InviteOverlay({ myUserId, roomName, excludeIds, onToast, onClose
   }
   return (
     <Overlay title="Invite to the Room" onClose={onClose}>
-      <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>Pick someone you follow — they get a push that opens your room as a guest.</p>
+      <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>People you follow who are online right now — they get a push that opens your room as a guest.</p>
+      <input
+        className="input"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search by name"
+        aria-label="Search the people you follow"
+        style={{ width: "100%", marginBottom: 10 }}
+      />
       {people === null ? <p className="muted">Loading…</p>
-        : people.length === 0 ? <p className="muted">No one available to invite right now.</p>
+        : people.length === 0 ? <p className="muted">{query.trim() ? "No one online matches that name." : "No one you follow is online right now."}</p>
         : <div style={{ display: "grid", gap: 6, maxHeight: 360, overflowY: "auto" }}>
             {people.map((p) => row(p, invited.has(p.user_id)
               ? <span className="pill" style={{ color: "var(--gold)" }}>✓ Invited</span>
