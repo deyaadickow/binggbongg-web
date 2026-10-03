@@ -29,6 +29,10 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
   const { user, refresh } = useSession();
   const isRace = game.game_mode === "race";
   const isLanes = game.game_mode === "falling_lanes";
+  // Through Number(), because the API typed this as a number but sent a quoted decimal ("1.00")
+  // until the backend cast landed 2026-10-03 — which read as "worth 1.00 coins" and never
+  // matched the singular test. Old data and old caches can still hand us the string.
+  const coinsPer = Number(game.coin_value ?? 1) || 1;
   const [balloons, setBalloons] = useState<Balloon[]>([]);
   const laneLastSpawn = useRef<number[]>(new Array(LANES).fill(0));
   const [phase, setPhase] = useState<Phase>("intro");
@@ -266,9 +270,9 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
                 <>
                   <h2 className="card-title" style={{ fontSize: 22 }}>{gameTitle(game)}</h2>
                   <p className="soft" style={{ marginTop: 8 }}>
-                    {isLanes ? `Balloons fall down 8 lanes — tap them to pop them before they reach the bottom. Every pop is worth ${game.coin_value ?? 1} coin${(game.coin_value ?? 1) === 1 ? "" : "s"}.`
+                    {isLanes ? `Balloons fall down 8 lanes — tap them to pop them before they reach the bottom. Every pop is worth ${coinsPer} coin${coinsPer === 1 ? "" : "s"}.`
                       : isRace ? `Tap as fast as you can: 5 stations, 20 taps each. Reach station 5 for 100 coins — your time goes on the leaderboard.`
-                      : `Tap every ${game.catch_name || "character"} before it disappears. Each catch is worth ${game.coin_value ?? 1} coin${(game.coin_value ?? 1) === 1 ? "" : "s"}.`}
+                      : `Tap every ${game.catch_name || "character"} before it disappears. Each catch is worth ${coinsPer} coin${coinsPer === 1 ? "" : "s"}.`}
                   </p>
                   <p className="muted" style={{ fontSize: 12, marginTop: 6 }}>Playing gifts the host 50 coins to start.</p>
                   <button className="btn block" style={{ marginTop: 14 }} onClick={begin}>Play Now</button>

@@ -37,12 +37,15 @@ export function HostGamesMenu({ userId, roomName, activeGame, onClose, onChanged
   const [busy, setBusy] = useState(false);
   const [query, setQuery] = useState("");
   const [mode, setMode] = useState<ModeFilter>("all");
+  // A failed fetch is not an empty catalogue. Collapsing the two into one empty array is what
+  // told a host "no games available" while all 77 were live (2026-10-03) — keep them apart.
+  const [loadFailed, setLoadFailed] = useState(false);
 
   useEffect(() => {
     let alive = true;
     fetchTapGameTypes()
-      .then((list) => { if (alive) setGames(list); })
-      .catch(() => { if (alive) setGames([]); });
+      .then((list) => { if (alive) { setGames(list); setLoadFailed(false); } })
+      .catch(() => { if (alive) { setGames([]); setLoadFailed(true); } });
     return () => { alive = false; };
   }, []);
 
@@ -103,7 +106,7 @@ export function HostGamesMenu({ userId, roomName, activeGame, onClose, onChanged
 
         {!picked && (
           games === null ? <p className="muted">Loading games…</p>
-          : games.length === 0 ? <p className="muted">No games are available right now.</p>
+          : games.length === 0 ? <p className="muted">{loadFailed ? "Couldn't load the games — check your connection and try again." : "No games are available right now."}</p>
           : (
             <>
               <p className="muted" style={{ fontSize: 13, marginTop: 0 }}>
