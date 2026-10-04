@@ -398,7 +398,16 @@ export function SimulcastPage() {
 }
 
 // ---- Advertise ------------------------------------------------------------------------------
-interface VideoAd { id: number; company_name?: string; status?: string; thumb_path?: string; advertiser_monthly_price?: number; next_billing_date?: string; started_at?: string }
+interface VideoAdStats { total_views?: number; period_views?: number; days_left?: number; spend_so_far?: number; cost_per_view?: number; last_period_views?: number; last_period_spend?: number; last_period_cost_per_view?: number }
+interface VideoAd { id: number; company_name?: string; status?: string; thumb_path?: string; advertiser_monthly_price?: number; next_billing_date?: string; started_at?: string; stats?: VideoAdStats }
+
+// Steve, 2026-10-04: "show them how many times their ad has been seen in real time so they can
+// decide if it's worth it for them. we should also add how much it cost so far."
+// Below a cent, "$0.00 per view" tells the advertiser nothing — show it in cents instead.
+function perViewLabel(value?: number): string {
+  if (!value || value <= 0) return "—";
+  return value >= 0.01 ? `$${value.toFixed(2)} per view` : `${(value * 100).toFixed(2)}\u00A2 per view`;
+}
 interface AdCash { balance?: number; minimum_deposit?: number; ad_credit_balance?: number; ad_credit_expires_at?: string | null; advertising_spendable?: number; transactions?: { id: number; amount: number; type: string; note?: string; created_at?: string }[] }
 /** Money with thousands separators. A partner credit runs to six figures, and "$100000.00" is
  *  genuinely hard to read at a glance. */
@@ -468,6 +477,15 @@ export function AdvertisePage() {
         {ads === null ? <Loading /> : ads.length === 0 ? <p className="muted" style={{ padding: 14 }}>No ads yet.</p> : ads.map((a) => (
           <div key={a.id} className="row" style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)" }}>
             <div style={{ flex: 1 }}><b>{a.company_name ?? `Ad #${a.id}`}</b><div className="muted" style={{ fontSize: 12 }}>{a.status ?? ""}{a.advertiser_monthly_price ? ` · $${Number(a.advertiser_monthly_price).toFixed(2)}/month` : ""}{a.next_billing_date ? ` · next bill ${String(a.next_billing_date).slice(0, 10)}` : ""}</div></div>
+            {a.stats && (
+              <div style={{ textAlign: "right", marginRight: 10 }}>
+                <div style={{ color: "var(--gold)", fontWeight: 700 }}>{(a.stats.period_views ?? 0).toLocaleString()} seen · ${(a.stats.spend_so_far ?? 0).toFixed(2)}</div>
+                <div className="muted" style={{ fontSize: 12 }}>{perViewLabel(a.stats.cost_per_view)} · {a.stats.days_left ?? 0} days left</div>
+                {(a.stats.last_period_views ?? 0) > 0 && (
+                  <div className="muted" style={{ fontSize: 11 }}>Last month: {(a.stats.last_period_views ?? 0).toLocaleString()} seen · ${(a.stats.last_period_spend ?? 0).toFixed(2)} · {perViewLabel(a.stats.last_period_cost_per_view)}</div>
+                )}
+              </div>
+            )}
             <span className="pill">{a.status ?? "—"}</span>
           </div>
         ))}
