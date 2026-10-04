@@ -398,7 +398,7 @@ export function SimulcastPage() {
 }
 
 // ---- Advertise ------------------------------------------------------------------------------
-interface VideoAdStats { total_views?: number; period_views?: number; days_left?: number; spend_so_far?: number; cost_per_view?: number; last_period_views?: number; last_period_spend?: number; last_period_cost_per_view?: number }
+interface VideoAdStats { total_views?: number; period_views?: number; days_left?: number; spend_so_far?: number; cost_per_view?: number; period_clicks?: number; cost_per_click?: number; click_rate?: number; last_period_views?: number; last_period_clicks?: number; last_period_spend?: number; last_period_cost_per_view?: number }
 interface VideoAd { id: number; company_name?: string; status?: string; thumb_path?: string; advertiser_monthly_price?: number; next_billing_date?: string; started_at?: string; stats?: VideoAdStats }
 
 // Steve, 2026-10-04: "show them how many times their ad has been seen in real time so they can
@@ -481,8 +481,10 @@ export function AdvertisePage() {
               <div style={{ textAlign: "right", marginRight: 10 }}>
                 <div style={{ color: "var(--gold)", fontWeight: 700 }}>{(a.stats.period_views ?? 0).toLocaleString()} seen · ${(a.stats.spend_so_far ?? 0).toFixed(2)}</div>
                 <div className="muted" style={{ fontSize: 12 }}>{perViewLabel(a.stats.cost_per_view)} · {a.stats.days_left ?? 0} days left</div>
+                <div style={{ color: "var(--gold)", fontWeight: 700 }}>{(a.stats.period_clicks ?? 0).toLocaleString()} taps · {(a.stats.cost_per_click ?? 0) > 0 ? `$${(a.stats.cost_per_click ?? 0).toFixed(2)} per tap` : "—"}</div>
+                <div className="muted" style={{ fontSize: 12 }}>{(a.stats.period_clicks ?? 0) > 0 ? `${(a.stats.click_rate ?? 0).toFixed(1)}% of people who saw it tapped through` : "No taps through yet"}</div>
                 {(a.stats.last_period_views ?? 0) > 0 && (
-                  <div className="muted" style={{ fontSize: 11 }}>Last month: {(a.stats.last_period_views ?? 0).toLocaleString()} seen · ${(a.stats.last_period_spend ?? 0).toFixed(2)} · {perViewLabel(a.stats.last_period_cost_per_view)}</div>
+                  <div className="muted" style={{ fontSize: 11 }}>Last month: {(a.stats.last_period_views ?? 0).toLocaleString()} seen · {(a.stats.last_period_clicks ?? 0).toLocaleString()} taps · ${(a.stats.last_period_spend ?? 0).toFixed(2)} · {perViewLabel(a.stats.last_period_cost_per_view)}</div>
                 )}
               </div>
             )}
