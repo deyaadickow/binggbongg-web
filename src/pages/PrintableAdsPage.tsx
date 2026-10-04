@@ -3,7 +3,7 @@ import { mediaUrl, post } from "../lib/api";
 import { Loading } from "../components/Common";
 
 /**
- * Steve, 2026-10-04: "add a page called 'Ads You Can Print' where admin can add a flyer that
+ * Steve, 2026-10-04: "add a page called 'Create Your Own Ads' where admin can add a flyer that
  * members can download and print. With members to be able to add stickers and text to modify their
  * flyer before they download it."
  *
@@ -16,8 +16,20 @@ interface PrintableAd { id: number; title?: string; image_path?: string }
 interface Sticker { id: number; file?: string }
 
 type Overlay =
-  | { id: number; kind: "text"; text: string; cx: number; cy: number; size: number }
-  | { id: number; kind: "sticker"; url: string; cx: number; cy: number; size: number };
+  | { id: number; kind: "text"; text: string; cx: number; cy: number; size: number; colour: string; font: string }
+  // A sticker, a photo the member picked, or a video's opening frame — a printed page can't
+  // play a video, so that's what a video contributes.
+  | { id: number; kind: "image"; url: string; cx: number; cy: number; size: number };
+
+/** Steve, 2026-10-04: "make the text editable like color and different font etc." */
+const COLOURS = ["#ffffff", "#000000", "#D4AF37", "#FF1744", "#2979FF", "#00C853", "#FF6D00", "#AA00FF"];
+const FONTS = [
+  { label: "Bingg Bongg", css: "system-ui, sans-serif" },
+  { label: "Serif", css: "Georgia, serif" },
+  { label: "Typewriter", css: "'Courier New', monospace" },
+  { label: "Handwriting", css: "'Brush Script MT', cursive" },
+  { label: "Condensed", css: "'Arial Narrow', sans-serif" },
+];
 
 const full = (path?: string) => mediaUrl(path);
 
@@ -44,9 +56,9 @@ export function PrintableAdsPage() {
   if (chosen) return <FlyerEditor flyer={chosen} onBack={() => setChosen(null)} />;
 
   return (
-    <Page title="Ads You Can Print">
+    <Page title="Create Your Own Ads">
       <p className="muted" style={{ marginTop: 0 }}>
-        Pick a flyer, add your own stickers and words anywhere on it, then download or print it.
+        Pick a flyer, then add your own words, stickers and photos anywhere on it and download or print it.
       </p>
       {flyers === null ? (
         <Loading />
@@ -80,7 +92,7 @@ function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void
   const addText = () => {
     const text = window.prompt("Your text");
     if (!text || !text.trim()) return;
-    const overlay: Overlay = { id: Date.now(), kind: "text", text: text.trim(), cx: 0.5, cy: 0.5, size: 0.05 };
+    const overlay: Overlay = { id: Date.now(), kind: "text", text: text.trim(), cx: 0.5, cy: 0.5, size: 0.05, colour: "#ffffff", font: FONTS[0].css };
     setOverlays((o) => [...o, overlay]);
     setSelected(overlay.id);
   };
@@ -92,11 +104,42 @@ function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void
   };
 
   const addSticker = (s: Sticker) => {
-    const overlay: Overlay = { id: Date.now(), kind: "sticker", url: full(s.file), cx: 0.5, cy: 0.5, size: 0.22 };
+    const overlay: Overlay = { id: Date.now(), kind: "image", url: full(s.file), cx: 0.5, cy: 0.5, size: 0.22 };
     setOverlays((o) => [...o, overlay]);
     setSelected(overlay.id);
     setPickerOpen(false);
   };
+
+  /** Steve: "the ability to upload images and videos to add to the flyer". */
+  const onPickFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    if (file.type.startsWith("video")) {
+      // A printed page can't play a video, so its opening frame goes on instead.
+      const url = URL.createObjectURL(file);
+      const video = document.createElement("video");
+      video.src = url;
+      video.muted = true;
+      await new Promise((r) => { video.onloadeddata = r; video.currentTime = 0.1; });
+      const c = document.createElement("canvas");
+      c.width = video.videoWidth; c.height = video.videoHeight;
+      c.getContext("2d")?.drawImage(video, 0, 0);
+      URL.revokeObjectURL(url);
+      setOverlays((o) => [...o, { id: Date.now(), kind: "image", url: c.toDataURL("image/png"), cx: 0.5, cy: 0.5, size: 0.4 }]);
+      window.alert("A printed page can't play a video, so its opening picture was added.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () =>
+      setOverlays((o) => [...o, { id: Date.now(), kind: "image", url: String(reader.result), cx: 0.5, cy: 0.5, size: 0.4 }]);
+    reader.readAsDataURL(file);
+  };
+
+  const restyle = (patch: Partial<Extract<Overlay, { kind: "text" }>>) =>
+    setOverlays((o) => o.map((x) => (x.id === selected && x.kind === "text" ? { ...x, ...patch } : x)));
 
   const resize = (factor: number) =>
     setOverlays((o) => o.map((x) => (x.id === selected ? { ...x, size: Math.min(Math.max(x.size * factor, 0.02), 0.8) } : x)));
@@ -132,14 +175,14 @@ function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void
       const cy = overlay.cy * canvas.height;
       if (overlay.kind === "text") {
         const px = overlay.size * canvas.height;
-        ctx.font = `bold ${px}px system-ui, sans-serif`;
+        ctx.font = `bold ${px}px ${overlay.font}`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         // A white word on white artwork would be invisible and the member can't restyle it.
         ctx.shadowColor = "rgba(0,0,0,0.9)";
         ctx.shadowBlur = px * 0.12;
         ctx.shadowOffsetY = px * 0.04;
-        ctx.fillStyle = "#fff";
+        ctx.fillStyle = overlay.colour;
         ctx.fillText(overlay.text, cx, cy);
         ctx.shadowColor = "transparent";
       } else {
@@ -181,7 +224,7 @@ function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void
   };
 
   return (
-    <Page title="Ads You Can Print">
+    <Page title="Create Your Own Ads">
       <button className="btn" onClick={onBack} style={{ marginBottom: 12 }}>← Back to flyers</button>
 
       <div
@@ -211,7 +254,7 @@ function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void
           >
             {o.kind === "text" ? (
               <span style={{
-                color: "#fff", fontWeight: 700,
+                color: o.colour, fontWeight: 700, fontFamily: o.font,
                 fontSize: `calc(${o.size} * ${frameRef.current?.clientHeight ?? 500}px)`,
                 textShadow: "0 1px 3px #000",
               }}>{o.text}</span>
@@ -232,9 +275,36 @@ function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void
         )}
         <button className="btn" onClick={addText}>Add Text</button>
         <button className="btn" onClick={openStickers}>Add Sticker</button>
+        <label className="btn" style={{ cursor: "pointer" }}>
+          Add Photo / Video
+          <input type="file" accept="image/*,video/*" onChange={onPickFile} style={{ display: "none" }} />
+        </label>
         <button className="btn" onClick={download}>Download</button>
         <button className="btn" onClick={printFlyer}>Print</button>
       </div>
+
+      {(() => {
+        const current = overlays.find((o) => o.id === selected);
+        if (!current || current.kind !== "text") return null;
+        return (
+          <div className="card" style={{ marginTop: 12, padding: 12 }}>
+            <div className="muted" style={{ fontSize: 12, marginBottom: 6 }}>Colour</div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {COLOURS.map((c) => (
+                <button key={c} onClick={() => restyle({ colour: c })} aria-label={c}
+                  style={{ width: 26, height: 26, borderRadius: "50%", background: c, border: "1px solid #888", cursor: "pointer" }} />
+              ))}
+            </div>
+            <div className="muted" style={{ fontSize: 12, margin: "10px 0 6px" }}>Font</div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {FONTS.map((f) => (
+                <button key={f.label} className="btn" style={{ fontFamily: f.css }}
+                  onClick={() => restyle({ font: f.css })}>{f.label}</button>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
 
       {isPickerOpen && (
         <div className="card" style={{ marginTop: 14, padding: 12 }}>
