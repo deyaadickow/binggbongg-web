@@ -21,6 +21,17 @@ export function VideoPage() {
   const [auto, setAuto] = useState<boolean>(() => { try { return localStorage.getItem(AUTO_KEY) !== "0"; } catch { return true; } });
   const [loadingMore, setLoadingMore] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  // ---- watch measurement (Steve, 2026-10-03) -------------------------------------------------
+  // How long this video actually held the viewer, reported once when they leave it.
+  //
+  // Measured on the clock while playing rather than from currentTime, because currentTime says
+  // nothing about a video watched round twice and jumps about when someone drags the scrubber.
+  // Accumulated across pauses: someone who pauses to read the caption and plays on had ONE
+  // viewing, and splitting it would make a video that holds attention look like one that does not.
+  const watchStartedAt = useRef(0);
+  const watchAccumulatedMs = useRef(0);
+  const completedPlays = useRef(0);
+  const watchReported = useRef(false);
   const wheelLock = useRef(0);
 
   const index = feed.findIndex((p) => String(p.id) === String(id));
@@ -95,11 +106,54 @@ export function VideoPage() {
   if (!item) return <div className="page"><Loading /></div>;
   const likes = (item.likes ?? 0) + (liked && !item.is_post_liked ? 1 : 0) - (!liked && item.is_post_liked ? 1 : 0);
 
+  const watchClockStop = useCallback(() => {
+    if (watchStartedAt.current === 0) return;
+    watchAccumulatedMs.current += Date.now() - watchStartedAt.current;
+    watchStartedAt.current = 0;
+  }, []);
+
+  const reportWatch = useCallback(() => {
+    watchClockStop();
+    if (watchReported.current || watchAccumulatedMs.current < 300) return;
+    const durationMs = Math.round((videoRef.current?.duration ?? 0) * 1000);
+    // No length means nothing to compare against, so there is no completion to measure.
+    if (!Number.isFinite(durationMs) || durationMs <= 0) return;
+    watchReported.current = true;
+    void post("reportPostWatch", {
+      post_id: item?.id ?? 0,
+      watched_ms: watchAccumulatedMs.current,
+      duration_ms: durationMs,
+      // Reaching the end twice means it was watched round again — the strongest signal there is.
+      loops: Math.max(0, completedPlays.current - 1),
+      user_id: user?.id ?? "",
+    }).catch(() => {
+      // Deliberately silent: a failed report is a lost data point, not a broken page.
+    });
+  }, [item?.id, user?.id, watchClockStop]);
+
+  // A fresh viewing whenever the video changes, and a report for the one being left behind —
+  // including when the tab is closed, which fires no unmount.
+  useEffect(() => {
+    watchStartedAt.current = 0;
+    watchAccumulatedMs.current = 0;
+    completedPlays.current = 0;
+    watchReported.current = false;
+    const flush = () => reportWatch();
+    window.addEventListener("pagehide", flush);
+    return () => {
+      window.removeEventListener("pagehide", flush);
+      flush();
+    };
+  }, [item?.id, reportWatch]);
+
   return (
     <div className="page video-page">
       <div className="video-stage">
         <video key={item.id} ref={videoRef} className="player" src={mediaUrl(item.video)} poster={mediaUrl(item.thumbnail)} controls autoPlay playsInline
-          loop={!auto} onEnded={() => { if (auto) goNext(); }} />
+          loop={!auto}
+          onPlay={() => { if (watchStartedAt.current === 0) watchStartedAt.current = Date.now(); }}
+          onPause={watchClockStop}
+          onEnded={() => { completedPlays.current += 1; watchClockStop(); if (auto) goNext(); }} />
         {sentGift && <GiftFlash gift={sentGift} onDone={clearSentGift} />}
         <div className="video-arrows">
           <button className="arrow" onClick={goPrev} disabled={!prev} title="Previous (↑)">▲</button>
