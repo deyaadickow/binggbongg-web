@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { mediaUrl, post } from "../lib/api";
+import { useSession } from "../lib/session";
+import { fetchMyBusinesses, uploadFlyerAsset, saveBusinessFlyer, type Business } from "../lib/business";
 import { Loading } from "../components/Common";
 
 /**
@@ -18,8 +20,9 @@ interface Sticker { id: number; file?: string }
 type Overlay =
   | { id: number; kind: "text"; text: string; cx: number; cy: number; size: number; colour: string; font: string }
   // A sticker, a photo the member picked, or a video's opening frame — a printed page can't
-  // play a video, so that's what a video contributes.
-  | { id: number; kind: "image"; url: string; cx: number; cy: number; size: number };
+  // play a video, so that's what a video contributes. The file itself is kept when there is one:
+  // on a business page the clip stays a clip and a visitor can click it (Steve, 2026-10-05).
+  | { id: number; kind: "image"; url: string; cx: number; cy: number; size: number; video?: File };
 
 /** Steve, 2026-10-04: "make the text editable like color and different font etc." */
 const COLOURS = ["#ffffff", "#000000", "#D4AF37", "#FF1744", "#2979FF", "#00C853", "#FF6D00", "#AA00FF"];
@@ -84,6 +87,8 @@ export function PrintableAdsPage() {
 function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void }) {
   const [overlays, setOverlays] = useState<Overlay[]>([]);
   const [selected, setSelected] = useState<number | null>(null);
+  const [publishing, setPublishing] = useState<string | null>(null);
+  const { user } = useSession();
   const [stickers, setStickers] = useState<Sticker[]>([]);
   const [isPickerOpen, setPickerOpen] = useState(false);
   const frameRef = useRef<HTMLDivElement | null>(null);
@@ -127,8 +132,13 @@ function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void
       c.width = video.videoWidth; c.height = video.videoHeight;
       c.getContext("2d")?.drawImage(video, 0, 0);
       URL.revokeObjectURL(url);
-      setOverlays((o) => [...o, { id: Date.now(), kind: "image", url: c.toDataURL("image/png"), cx: 0.5, cy: 0.5, size: 0.4 }]);
-      window.alert("A printed page can't play a video, so its opening picture was added.");
+      const clips = overlays.filter((x) => x.kind === "image" && x.video).length;
+      if (clips >= 4) {
+        window.alert("Up to 4 videos on one flyer. Delete one to add another.");
+        return;
+      }
+      setOverlays((o) => [...o, { id: Date.now(), kind: "image", url: c.toDataURL("image/png"), cx: 0.5, cy: 0.5, size: 0.4, video: file }]);
+      window.alert("A printed page can't play a video, so its opening picture went on the flyer. Put the flyer on your business page and visitors can click it to watch.");
       return;
     }
 
@@ -157,7 +167,10 @@ function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void
   };
 
   /** Flattens the flyer at the artwork's own pixel size and hands back a PNG blob URL. */
-  const render = async (): Promise<string | null> => {
+  const renderBlob = async (): Promise<Blob | null> => (await renderPage())?.blob ?? null;
+
+  /** The page, plus where each clip ended up on it as fractions of the page. */
+  const renderPage = async (): Promise<{ blob: Blob; boxes: Record<number, { x: number; y: number; w: number; h: number }> } | null> => {
     const image = new Image();
     image.crossOrigin = "anonymous";
     image.src = full(flyer.image_path);
@@ -169,6 +182,8 @@ function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void
     const ctx = canvas.getContext("2d");
     if (!ctx) return null;
     ctx.drawImage(image, 0, 0);
+
+    const boxes: Record<number, { x: number; y: number; w: number; h: number }> = {};
 
     for (const overlay of overlays) {
       const cx = overlay.cx * canvas.width;
@@ -193,12 +208,97 @@ function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void
         const w = overlay.size * canvas.width;
         const h = w * (sticker.naturalHeight / Math.max(sticker.naturalWidth, 1));
         ctx.drawImage(sticker, cx - w / 2, cy - h / 2, w, h);
+        // Steve, 2026-10-05: "add a gold border to each uploaded video" — the flyer's own
+        // border, one point of stroke and ten of corner, scaled to the page.
+        if (overlay.video) {
+          boxes[overlay.id] = {
+            x: (cx - w / 2) / canvas.width,
+            y: (cy - h / 2) / canvas.height,
+            w: w / canvas.width,
+            h: h / canvas.height,
+          };
+          ctx.strokeStyle = "#D4AF37";
+          ctx.lineWidth = Math.max(canvas.width * 0.0026, 2);
+          const r = canvas.width * 0.026;
+          const x = cx - w / 2, y = cy - h / 2;
+          ctx.beginPath();
+          ctx.moveTo(x + r, y);
+          ctx.arcTo(x + w, y, x + w, y + h, r);
+          ctx.arcTo(x + w, y + h, x, y + h, r);
+          ctx.arcTo(x, y + h, x, y, r);
+          ctx.arcTo(x, y, x + w, y, r);
+          ctx.closePath();
+          ctx.stroke();
+        }
       }
     }
 
-    return await new Promise((resolve) =>
-      canvas.toBlob((blob) => resolve(blob ? URL.createObjectURL(blob) : null), "image/png")
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob((b) => resolve(b), "image/png")
     );
+    return blob ? { blob, boxes } : null;
+  };
+
+  /** The same page as an object URL, for Download and Print. */
+  const render = async (): Promise<string | null> => {
+    const blob = await renderBlob();
+    return blob ? URL.createObjectURL(blob) : null;
+  };
+
+  /**
+   * Steve, 2026-10-05: "I like the videos in still mode and when i click on each video, it goes
+   * to full screen" — which a downloaded file can never do, because a saved file is one flat
+   * picture. On a business page the flyer keeps its clips as separate things.
+   */
+  const publish = async () => {
+    const clips = overlays.filter((o): o is Extract<Overlay, { kind: "image" }> => o.kind === "image" && !!o.video);
+    if (clips.length === 0) {
+      window.alert("Add a video to the flyer first.");
+      return;
+    }
+    if (!user?.id) return;
+
+    let pages: Business[] = [];
+    try {
+      pages = (await fetchMyBusinesses(user.id)).data;
+    } catch {
+      window.alert("Couldn't load your business pages.");
+      return;
+    }
+    if (pages.length === 0) {
+      window.alert("You don't have a business page yet. Create one from Bingg Bongg Business.");
+      return;
+    }
+
+    const choice = pages.length === 1
+      ? pages[0]
+      : pages.find((p) => p.name === window.prompt("Put this flyer on which page?\n\n" + pages.map((p) => p.name).join("\n"), pages[0].name ?? ""));
+    if (!choice) return;
+
+    const rendered = await renderPage();
+    if (!rendered) { window.alert("Couldn't read the flyer."); return; }
+
+    setPublishing("Uploading the flyer…");
+    try {
+      const imagePath = await uploadFlyerAsset(user.id, choice.id, "image", rendered.blob, "flyer.png");
+      const uploaded = [];
+      for (let i = 0; i < clips.length; i++) {
+        const clip = clips[i];
+        setPublishing(`Uploading video ${i + 1} of ${clips.length}…`);
+        const videoPath = await uploadFlyerAsset(user.id, choice.id, "video", clip.video!, clip.video!.name || "clip.mp4");
+        // Fractions of the page, measured while the page was drawn, so a phone, a tablet and
+        // the website all put the clickable area in the same place.
+        const box = rendered.boxes[clip.id];
+        if (box) uploaded.push({ video_path: videoPath, ...box });
+      }
+      setPublishing("Almost there…");
+      const message = await saveBusinessFlyer(user.id, choice.id, imagePath, uploaded);
+      window.alert(message);
+    } catch (e) {
+      window.alert(e instanceof Error ? e.message : "Couldn't put it on your page.");
+    } finally {
+      setPublishing(null);
+    }
   };
 
   const download = async () => {
@@ -280,6 +380,9 @@ function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void
           <input type="file" accept="image/*,video/*" onChange={onPickFile} style={{ display: "none" }} />
         </label>
         <button className="btn" onClick={download}>Download</button>
+        <button className="btn" onClick={publish} disabled={!!publishing}>
+          {publishing ?? "Put on My Business Page"}
+        </button>
         <button className="btn" onClick={printFlyer}>Print</button>
       </div>
 

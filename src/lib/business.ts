@@ -257,3 +257,60 @@ export async function deleteBusinessFolder(myUserId: number, folderId: number): 
   if (!r.status) throw new Error(r.message ?? "Couldn't delete that folder.");
   return r.message ?? "Folder deleted.";
 }
+
+
+// ---------------------------------------------------------------- flyers on a business page
+
+/**
+ * Steve, 2026-10-05: a flyer made in Create Your Own Ads, put on a business page so a visitor
+ * sees the still page and clicks a clip to watch it full screen — which a saved MP4 or PNG can
+ * never do, because a saved file is one flat picture.
+ */
+export interface BusinessFlyerClip {
+  id: number;
+  video_url?: string | null;
+  /** Fractions of the page, from its top-left corner. */
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+export interface BusinessFlyer {
+  id: number;
+  image_url?: string | null;
+  clips?: BusinessFlyerClip[] | null;
+}
+
+export async function fetchBusinessFlyers(businessId: number): Promise<BusinessFlyer[]> {
+  const r = await post<BusinessFlyer[]>("fetchBusinessFlyers", { business_id: businessId });
+  if (!r.status) return [];
+  return r.data ?? [];
+}
+
+/** One file at a time: several sixty-second clips in a single request is a large upload. */
+export async function uploadFlyerAsset(myUserId: number, businessId: number, type: "image" | "video", file: Blob, name: string, onProgress?: (n: number) => void): Promise<string> {
+  const form = new FormData();
+  form.append("my_user_id", String(myUserId));
+  form.append("business_id", String(businessId));
+  form.append("type", type);
+  form.append("file", file, name);
+  const r = await multipart<unknown>("uploadFlyerAsset", form, onProgress);
+  const path = (r as unknown as { path?: string } | null)?.path;
+  if (!path) throw new Error("Couldn't upload that file.");
+  return path;
+}
+
+export interface FlyerClipUpload { video_path: string; x: number; y: number; w: number; h: number }
+
+export async function saveBusinessFlyer(myUserId: number, businessId: number, imagePath: string, clips: FlyerClipUpload[]): Promise<string> {
+  const r = await post("saveBusinessFlyer", { my_user_id: myUserId, business_id: businessId, image_path: imagePath, clips: JSON.stringify(clips) });
+  if (!r.status) throw new Error(r.message ?? "Couldn't save the flyer.");
+  return r.message ?? "On your business page.";
+}
+
+export async function deleteBusinessFlyer(myUserId: number, flyerId: number): Promise<string> {
+  const r = await post("deleteBusinessFlyer", { my_user_id: myUserId, flyer_id: flyerId });
+  if (!r.status) throw new Error(r.message ?? "Couldn't remove that flyer.");
+  return r.message ?? "Flyer removed.";
+}

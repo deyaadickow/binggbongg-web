@@ -21,6 +21,7 @@ import {
   fetchBusinessPricing, fetchCities, fetchMyBusinesses, fullAddress, hoursOf, loadCountries, nearLabel, placeLine, renameBusinessFolder, renewBusiness,
   statusText, updateBusiness, uploadBusinessMedia, usd,
   type Business, type BusinessCategory, type BusinessForm, type BusinessMedia, type BusinessPricing, type CountryRow, type MyBusinesses, type Near,
+  fetchBusinessFlyers, deleteBusinessFlyer, type BusinessFlyer
 } from "../lib/business";
 
 // Steve, 2026-10-01: "Make the countries into our design" — the native <select> is gone; every
@@ -142,11 +143,15 @@ export function BusinessPage() {
   const [progress, setProgress] = useState<number | null>(null);
   const [viewing, setViewing] = useState<BusinessMedia | null>(null);
   const [pricing, setPricing] = useState<BusinessPricing | null>(null);
+  /** Steve, 2026-10-05: flyers made in Create Your Own Ads, with clips you can click. */
+  const [flyers, setFlyers] = useState<BusinessFlyer[]>([]);
+  const [playingClip, setPlayingClip] = useState<string | null>(null);
 
   const load = useCallback(() => {
     fetchBusinessDetail(businessId, user?.id).then(setB).catch((e) => setError((e as Error).message));
   }, [businessId, user?.id]);
   useEffect(() => { load(); }, [load]);
+  useEffect(() => { fetchBusinessFlyers(businessId).then(setFlyers).catch(() => setFlyers([])); }, [businessId]);
 
   const isOwner = !!user && !!b && user.id === b.user_id;
   useEffect(() => { if (isOwner) fetchBusinessPricing().then(setPricing).catch(() => undefined); }, [isOwner]);
@@ -305,6 +310,71 @@ export function BusinessPage() {
           {site && <a className="btn small" href={site} target="_blank" rel="noreferrer">Visit Website</a>}
         </div>
       </div>
+
+      {flyers.length > 0 && (
+        <div className="card pad" style={{ marginTop: 12 }}>
+          <b style={{ color: "var(--gold)", fontSize: 16 }}>Flyers</b>
+          {flyers.map((flyer) => (
+            <div key={flyer.id} style={{ position: "relative", marginTop: 10 }}>
+              <img src={flyer.image_url ?? ""} alt="Flyer" style={{ width: "100%", display: "block", borderRadius: 8 }} />
+              {(flyer.clips ?? []).map((clip) => (
+                <button
+                  key={clip.id}
+                  onClick={() => clip.video_url && setPlayingClip(clip.video_url)}
+                  title="Watch this video"
+                  style={{
+                    position: "absolute",
+                    left: `${clip.x * 100}%`,
+                    top: `${clip.y * 100}%`,
+                    width: `${clip.w * 100}%`,
+                    height: `${clip.h * 100}%`,
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    color: "#fff",
+                    fontSize: 30,
+                    textShadow: "0 2px 6px rgba(0,0,0,.8)",
+                  }}
+                >
+                  ▶
+                </button>
+              ))}
+              {isOwner && (
+                <button
+                  className="btn small ghost"
+                  style={{ marginTop: 6 }}
+                  onClick={async () => {
+                    if (!user?.id || !window.confirm("Remove this flyer?")) return;
+                    try {
+                      setToast(await deleteBusinessFlyer(user.id, flyer.id));
+                      setFlyers(await fetchBusinessFlyers(businessId));
+                    } catch (e) { setToast((e as Error).message); }
+                  }}
+                >
+                  Remove this flyer
+                </button>
+              )}
+            </div>
+          ))}
+          <div className="muted" style={{ fontSize: 12, marginTop: 8 }}>Click a video on the flyer to watch it.</div>
+        </div>
+      )}
+
+      {playingClip && (
+        <div
+          onClick={() => setPlayingClip(null)}
+          style={{ position: "fixed", inset: 0, background: "#000", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }}
+        >
+          <video src={playingClip} controls autoPlay style={{ maxWidth: "100%", maxHeight: "100%" }} onClick={(e) => e.stopPropagation()} />
+          <button
+            onClick={() => setPlayingClip(null)}
+            aria-label="Close"
+            style={{ position: "absolute", top: 20, right: 20, width: 42, height: 42, borderRadius: 21, background: "rgba(0,0,0,.6)", color: "#fff", border: "1px solid #fff", fontSize: 20, cursor: "pointer" }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {Object.values(hours).some(Boolean) && (
         <div className="card pad" style={{ marginTop: 12 }}>
