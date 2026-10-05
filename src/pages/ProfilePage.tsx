@@ -75,6 +75,7 @@ function isValidUrl(url?: string | null): boolean {
 
 function ProfileThumb({ p, isMe, onClick }: { p: ProfilePost; isMe: boolean; onClick: () => void }) {
   const thumb = mediaUrl(p.thumbnail);
+  const navigate = useNavigate();
   return (
     <div className="p-thumb" onClick={onClick}>
       {thumb ? <img src={thumb} alt="" loading="lazy" /> : (
@@ -83,7 +84,18 @@ function ProfileThumb({ p, isMe, onClick }: { p: ProfilePost; isMe: boolean; onC
       {(p.views ?? 0) > 0 && <span className="p-views">{fmt(p.views)}</span>}
       {(p.lifetime_votes ?? 0) > 0 && <span className="p-votes">★ {fmt(p.lifetime_votes)}</span>}
       {p.user_video_number != null && <span className="p-num">#{p.user_video_number}</span>}
-      {isMe && <span className="p-ad">⚡</span>}
+      {/* Steve, 2026-10-05: "This is not working." It was a plain span with no click on it at
+          all — decoration sitting on a thumbnail that opens the video. It is a real button now,
+          and the click stops here instead of opening the video underneath. */}
+      {isMe && (
+        <button
+          className="p-ad"
+          title="Advertise this video"
+          onClick={(e) => { e.stopPropagation(); navigate("/settings/advertise/new"); }}
+        >
+          ⚡
+        </button>
+      )}
     </div>
   );
 }
