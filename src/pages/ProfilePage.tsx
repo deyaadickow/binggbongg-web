@@ -91,7 +91,11 @@ function ProfileThumb({ p, isMe, onClick }: { p: ProfilePost; isMe: boolean; onC
         <button
           className="p-ad"
           title="Advertise this video"
-          onClick={(e) => { e.stopPropagation(); navigate("/settings/advertise/new"); }}
+          onClick={(e) => {
+            e.stopPropagation();
+            // The video goes with it, so the ad page doesn't ask for a file he already uploaded.
+            navigate("/settings/advertise/new", { state: { videoUrl: mediaUrl(p.video) } });
+          }}
         >
           ⚡
         </button>

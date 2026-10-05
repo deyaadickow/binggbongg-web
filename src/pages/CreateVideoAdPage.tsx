@@ -11,8 +11,8 @@
 // Cash Account immediately, so the price they are agreeing to is on screen before the button —
 // Android already shows this (CreateVideoAdActivity's tv_total_price) and it is the better of the
 // two behaviours to copy.
-import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { post } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Loading, Notice } from "../components/Common";
@@ -130,6 +130,28 @@ export function CreateVideoAdPage() {
       setCitiesError((e as Error).message);
     }
   }
+
+  // Steve, 2026-10-05: the ⚡ on a profile video brings that video with it, so the ad page does
+  // not ask for a file he has already uploaded once. The CDN allows a plain cross-origin read —
+  // a Range header would force a preflight it doesn't answer, so this asks for the whole file.
+  const prefillVideo = (useLocation().state as { videoUrl?: string } | null)?.videoUrl;
+  const [prefillError, setPrefillError] = useState<string | null>(null);
+  const [prefilling, setPrefilling] = useState(false);
+  const prefilled = useRef(false);
+
+  useEffect(() => {
+    if (!prefillVideo || prefilled.current) return;
+    prefilled.current = true;
+    setPrefilling(true);
+    fetch(prefillVideo)
+      .then((r) => (r.ok ? r.blob() : Promise.reject(new Error(String(r.status)))))
+      .then((blob) => {
+        const name = prefillVideo.split("/").pop() || "video.mp4";
+        void onPickFile(new File([blob], name, { type: blob.type || "video/mp4" }));
+      })
+      .catch(() => setPrefillError("Couldn't bring that video over. Please choose it below."))
+      .finally(() => setPrefilling(false));
+  }, [prefillVideo]);
 
   async function onPickFile(f: File | null) {
     setFileError(null);
@@ -297,6 +319,8 @@ export function CreateVideoAdPage() {
               <input type="file" accept="video/*" className="input" disabled={busy} onChange={(e) => void onPickFile(e.target.files?.[0] ?? null)} />
             </div>
             {file && <p className="muted" style={{ fontSize: 12, marginTop: 6, marginBottom: 0 }}>{file.name}{duration != null ? ` · ${Math.round(duration)}s` : ""}</p>}
+            {prefilling && <div className="muted" style={{ fontSize: 13 }}>Bringing your video over…</div>}
+            {prefillError && <Notice error>{prefillError}</Notice>}
             {fileError && <Notice error>{fileError}</Notice>}
           </div>
 
