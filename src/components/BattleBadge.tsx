@@ -5,7 +5,7 @@
  *
  * Nothing is drawn for a member who hasn't battled yet — nobody wears an empty badge.
  */
-export function BattleBadge({ badge, size = 20, onClick }: { badge?: number | null; size?: number; onClick?: () => void }) {
+export function BattleBadge({ badge, size = 26, onClick }: { badge?: number | null; size?: number; onClick?: () => void }) {
   if (!badge || badge < 1) return null;
 
   // Three and four digits step the type down rather than growing the circle.

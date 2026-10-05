@@ -28,7 +28,7 @@ export function PostCard({ post }: { post: Post }) {
               <span style={{ fontWeight: 800, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{displayName(post.user)}</span>
               <BattleBadge
                 badge={post.user?.battle_badge}
-                size={18}
+                size={26}
                 onClick={() => {
                   window.alert(battleBadgeExplainer(displayName(post.user), post.user?.battle_badge ?? 0));
                 }}
