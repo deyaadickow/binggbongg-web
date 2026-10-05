@@ -527,6 +527,15 @@ export function CreateBusinessPage() {
               rather than searched for by street name. The server pulls coordinates out of a
               pasted map link, and falls back to the address when it can't. */}
           <input className="input" placeholder="Map pin (optional) — paste a map link or 30.2672,-97.7431" value={form.pin ?? ""} onChange={(e) => set("pin", e.target.value)} />
+          {/* Steve, 2026-10-04: the easiest pin of all — the owner is at the shop and taps this.
+              The browser asks for permission itself; no key or library involved. */}
+          <button type="button" className="btn small" onClick={() => {
+            if (!navigator.geolocation) { window.alert("This browser can't find your location. Paste a map link instead."); return; }
+            navigator.geolocation.getCurrentPosition(
+              (position) => set("pin", `${position.coords.latitude.toFixed(6)},${position.coords.longitude.toFixed(6)}`),
+              () => window.alert("Couldn't find you just now. Try again, or paste a map link.")
+            );
+          }}>Use My Current Location</button>
         </div>
 
         <div className="card pad" style={{ display: "grid", gap: 6 }}>
