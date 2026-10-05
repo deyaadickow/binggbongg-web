@@ -32,6 +32,9 @@ export interface Business {
   state_code?: string | null;
   country_name?: string | null;
   country_code?: string | null;
+  /** Where a maps app should be sent: the owner's pin when set, the address otherwise. */
+  map_query?: string | null;
+  has_pin?: boolean;
   phone?: string | null;
   email?: string | null;
   website?: string | null;
@@ -165,6 +168,8 @@ export interface BusinessForm {
   description: string;
   is_online: boolean;
   country_code: string;
+  /** A pasted map link or "lat,lng" — the server pulls the coordinates out. */
+  pin?: string;
   state_code: string;
   city: string;
   address_line: string;

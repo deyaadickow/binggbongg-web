@@ -190,6 +190,9 @@ export function BusinessPage() {
   const folders = b.folders ?? [];
   const activeFolder = folders.some((f) => f.id === folderId) ? folderId : null;
   const address = fullAddress(b);
+  // Steve, 2026-10-04: the owner's exact pin when they dropped one, the written address
+  // otherwise — the server decides which (Business::getMapQueryAttribute).
+  const destination = b.map_query && b.map_query.length > 0 ? b.map_query : address;
   const hours = hoursOf(b);
   const media = activeFolder !== null
     ? (b.media ?? []).filter((m) => m.folder_id === activeFolder)
@@ -267,15 +270,15 @@ export function BusinessPage() {
         <div className="muted" style={{ fontSize: 13 }}>{[b.category?.name, placeLine(b)].filter(Boolean).join(" · ")}</div>
         {b.description && <p className="soft" style={{ marginTop: 10, whiteSpace: "pre-wrap" }}>{b.description}</p>}
         <div style={{ display: "grid", gap: 6, marginTop: 10 }}>
-          {address && <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`} target="_blank" rel="noreferrer">📍 {address}</a>}
+          {address && <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destination)}`} target="_blank" rel="noreferrer">📍 {address}</a>}
           {b.phone && <a href={`tel:${b.phone}`}>📞 {b.phone}</a>}
           {b.email && <a href={`mailto:${b.email}`}>✉️ {b.email}</a>}
           {site && <a href={site} target="_blank" rel="noreferrer">🔗 {b.website}</a>}
         </div>
         <div className="row" style={{ gap: 8, flexWrap: "wrap", marginTop: 14 }}>
           {b.phone && <a className="btn small" href={`tel:${b.phone}`}>Call</a>}
-          {address && <a className="btn small" href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`} target="_blank" rel="noreferrer">Directions</a>}
-          {address && <a className="btn small" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`} target="_blank" rel="noreferrer">Maps</a>}
+          {address && <a className="btn small" href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`} target="_blank" rel="noreferrer">Directions</a>}
+          {address && <a className="btn small" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destination)}`} target="_blank" rel="noreferrer">Maps</a>}
           {site && <a className="btn small" href={site} target="_blank" rel="noreferrer">Visit Website</a>}
         </div>
       </div>
@@ -520,6 +523,10 @@ export function CreateBusinessPage() {
             {form.state_code && <PickerPill label={form.city || "City"} active={!!form.city} onClick={() => setSheet("city")} />}
           </div>
           <input className="input" placeholder={form.is_online ? "Street address (optional for online)" : "Street address"} value={form.address_line} onChange={(e) => set("address_line", e.target.value)} />
+          {/* Steve, 2026-10-04: a map pin, so a stall or a unit inside a mall is found exactly
+              rather than searched for by street name. The server pulls coordinates out of a
+              pasted map link, and falls back to the address when it can't. */}
+          <input className="input" placeholder="Map pin (optional) — paste a map link or 30.2672,-97.7431" value={form.pin ?? ""} onChange={(e) => set("pin", e.target.value)} />
         </div>
 
         <div className="card pad" style={{ display: "grid", gap: 6 }}>
