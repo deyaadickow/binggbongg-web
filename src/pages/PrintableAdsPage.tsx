@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { mediaUrl, post } from "../lib/api";
 import { useSession } from "../lib/session";
 import { fetchMyBusinesses, uploadFlyerAsset, saveBusinessFlyer, type Business } from "../lib/business";
@@ -60,12 +61,27 @@ function Page({ title, children }: { title: string; children: React.ReactNode })
 export function PrintableAdsPage() {
   const [flyers, setFlyers] = useState<PrintableAd[] | null>(null);
   const [chosen, setChosen] = useState<PrintableAd | null>(null);
+  // Steve, 2026-10-05: "Now add the same button to the business page flyers." Arriving from a
+  // business page goes straight into a blank sheet with the Assistant already asking, and the
+  // finished ad goes back to that page.
+  const [params] = useSearchParams();
+  const assistantFor = Number(params.get("assistant")) || null;
 
   useEffect(() => {
     post<PrintableAd[]>("fetchPrintableAds", {})
       .then((r) => setFlyers(r.data ?? []))
       .catch(() => setFlyers([]));
   }, []);
+
+  if (assistantFor) {
+    return (
+      <FlyerEditor
+        flyer={{ id: 0, title: "", image_path: "" }}
+        startWithAssistantFor={assistantFor}
+        onBack={() => setChosen(null)}
+      />
+    );
+  }
 
   if (chosen) return <FlyerEditor flyer={chosen} onBack={() => setChosen(null)} />;
 
@@ -95,7 +111,7 @@ export function PrintableAdsPage() {
   );
 }
 
-function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void }) {
+function FlyerEditor({ flyer, onBack, startWithAssistantFor }: { flyer: PrintableAd; onBack: () => void; startWithAssistantFor?: number | null }) {
   const [overlays, setOverlays] = useState<Overlay[]>([]);
   const [selected, setSelected] = useState<number | null>(null);
   const [publishing, setPublishing] = useState<string | null>(null);
@@ -106,7 +122,10 @@ function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void
   /** Steve, 2026-10-05: "Make all popup into our design black and gold." */
   const [notice, setNotice] = useState<string | null>(null);
   /** Steve: "make all flyers on a blank flyer" — the Assistant gets a clean white sheet. */
-  const [blankPage, setBlankPage] = useState(false);
+  const [blankPage, setBlankPage] = useState(!!startWithAssistantFor);
+  useEffect(() => {
+    if (startWithAssistantFor) setAskOpen(true);
+  }, [startWithAssistantFor]);
   const { user } = useSession();
   const [stickers, setStickers] = useState<Sticker[]>([]);
   const [isPickerOpen, setPickerOpen] = useState(false);
@@ -347,10 +366,6 @@ function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void
    */
   const publish = async () => {
     const clips = overlays.filter((o): o is Extract<Overlay, { kind: "image" }> => o.kind === "image" && !!o.video);
-    if (clips.length === 0) {
-      setNotice("Add a video to the flyer first.");
-      return;
-    }
     if (!user?.id) return;
 
     let pages: Business[] = [];
@@ -365,7 +380,9 @@ function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void
       return;
     }
 
-    const choice = pages.length === 1
+    // Straight back to the page they started from, without asking which one.
+    const fromBusiness = startWithAssistantFor ? pages.find((p) => p.id === startWithAssistantFor) : undefined;
+    const choice = fromBusiness ? fromBusiness : pages.length === 1
       ? pages[0]
       : pages.find((p) => p.name === window.prompt("Put this flyer on which page?\n\n" + pages.map((p) => p.name).join("\n"), pages[0].name ?? ""));
     if (!choice) return;

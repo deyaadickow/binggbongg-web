@@ -312,7 +312,9 @@ export function BusinessPage() {
         </div>
       </div>
 
-      {flyers.length > 0 && (
+      {/* The owner sees this section even with no flyers yet — that is exactly when they need
+          the button that makes one (Steve, 2026-10-05). */}
+      {(flyers.length > 0 || isOwner) && (
         <div className="card pad" style={{ marginTop: 12 }}>
           <b style={{ color: "var(--gold)", fontSize: 16 }}>Flyers</b>
           {flyers.map((flyer) => (
@@ -357,7 +359,19 @@ export function BusinessPage() {
               )}
             </div>
           ))}
-          <div className="muted" style={{ fontSize: 12, marginTop: 8 }}>Click a video on the flyer to watch it.</div>
+          {/* Steve, 2026-10-05: "Now add the same button to the business page flyers." */}
+          {isOwner && (
+            <button
+              className="btn"
+              style={{ width: "100%", marginTop: 12, padding: "12px 0", fontWeight: 700 }}
+              onClick={() => navigate(`/settings/printable-ads?assistant=${businessId}`)}
+            >
+              ✨  Ask Bingg Bongg Assistant to make my ad
+            </button>
+          )}
+          <div className="muted" style={{ fontSize: 12, marginTop: 8 }}>
+            {flyers.length === 0 ? "No flyers on this page yet." : "Click a video on the flyer to watch it."}
+          </div>
         </div>
       )}
 
