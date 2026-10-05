@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { displayName, mediaUrl, post, type Post, type UserSummary } from "../lib/api";
+import { BattleBadge, battleBadgeExplainer } from "../components/BattleBadge";
 import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice } from "../components/Common";
 import { fetchUserPhotos, type Photo } from "../lib/photos";
@@ -478,6 +479,11 @@ export function ProfilePage() {
               <h1 style={{ fontSize: 20, color: "var(--gold)", fontWeight: 800, margin: 0 }}>
                 {displayName(profile)}
               </h1>
+              {/* Steve, 2026-10-05: the Bingg Bongg Battle Badge beside their name. */}
+              <BattleBadge
+                badge={profile.battle_badge}
+                onClick={() => window.alert(battleBadgeExplainer(displayName(profile), profile.battle_badge ?? 0))}
+              />
               {profile.is_verified === 2 && (
                 <span title="Verified" style={{ color: "#4af", fontSize: 16 }}>✓</span>
               )}

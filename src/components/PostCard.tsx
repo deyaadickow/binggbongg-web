@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { Link } from "react-router-dom";
 import { displayName, mediaUrl, type Gift, type Post } from "../lib/api";
 import { Avatar } from "./Common";
+import { BattleBadge, battleBadgeExplainer } from "./BattleBadge";
 import { GiftFlash, PostGiftButton } from "./GiftSheet";
 
 export function PostCard({ post }: { post: Post }) {
@@ -21,7 +22,18 @@ export function PostCard({ post }: { post: Post }) {
         <Link to={`/profile/${post.user_id}`} className="row" style={{ color: "inherit", minWidth: 0, flex: 1 }}>
           <Avatar user={post.user} />
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontWeight: 800, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{displayName(post.user)}</div>
+            {/* Steve, 2026-10-05: the Bingg Bongg Battle Badge beside their name, and clicking
+                it explains what the number is. */}
+            <div className="row" style={{ gap: 6, minWidth: 0 }}>
+              <span style={{ fontWeight: 800, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{displayName(post.user)}</span>
+              <BattleBadge
+                badge={post.user?.battle_badge}
+                size={18}
+                onClick={() => {
+                  window.alert(battleBadgeExplainer(displayName(post.user), post.user?.battle_badge ?? 0));
+                }}
+              />
+            </div>
             <div className="muted" style={{ fontSize: 12, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{post.description || post.hashtags || ""}</div>
           </div>
         </Link>

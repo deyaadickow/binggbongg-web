@@ -67,6 +67,9 @@ export async function tokenServer<T = unknown>(path: string, init: { method?: st
 // ---- shapes we actually read (everything else in the payloads is ignored)
 export interface UserSummary {
   id: number;
+  /** Steve, 2026-10-05: "(BBBB) Bingg Bongg Battle Badge" — completed battles rounded up to the
+   *  next 25. 0 means they haven't battled yet and wear no badge. */
+  battle_badge?: number;
   fullname?: string;
   username?: string;
   profile_image?: string;
