@@ -102,10 +102,6 @@ export function VideoPage() {
     try { await post(endpoint, { user_id: user.id, post_id: item.id }); } catch { setLiked(liked); }
   }
 
-  if (error) return <div className="page"><Notice error>{error}</Notice></div>;
-  if (!item) return <div className="page"><Loading /></div>;
-  const likes = (item.likes ?? 0) + (liked && !item.is_post_liked ? 1 : 0) - (!liked && item.is_post_liked ? 1 : 0);
-
   const watchClockStop = useCallback(() => {
     if (watchStartedAt.current === 0) return;
     watchAccumulatedMs.current += Date.now() - watchStartedAt.current;
@@ -145,6 +141,16 @@ export function VideoPage() {
       flush();
     };
   }, [item?.id, reportWatch]);
+
+  // Steve, 2026-10-05: "When i click on any video on the web the whole app goes blank black."
+  //
+  // These guards used to sit ABOVE the watch-reporting hooks below. The first render has no post
+  // yet, so it returned here and never reached them; the render after the post arrived did, and
+  // React saw more hooks than last time and threw ("Rendered more hooks than during the previous
+  // render") — a blank black page on every video. Every hook now runs before any return.
+  if (error) return <div className="page"><Notice error>{error}</Notice></div>;
+  if (!item) return <div className="page"><Loading /></div>;
+  const likes = (item.likes ?? 0) + (liked && !item.is_post_liked ? 1 : 0) - (!liked && item.is_post_liked ? 1 : 0);
 
   return (
     <div className="page video-page">

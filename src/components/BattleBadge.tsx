@@ -42,9 +42,8 @@ export function BattleBadge({ badge, size = 26, onClick }: { badge?: number | nu
 export function battleBadgeExplainer(name: string, badge: number): string {
   const who = name.trim() === "" ? "This member" : name;
   return (
-    `${who} has Badge #${badge}.\n\n` +
-    "The more you battle, the bigger your badge number. Every 25 battles earns the next one: " +
-    "1 to 25 battles is Badge #25, 26 to 50 is Badge #50, 51 to 75 is Badge #75, and so on.\n\n" +
-    "Battle someone to earn yours."
+    `${who} has battled ${badge} ${badge === 1 ? "time" : "times"}.\n\n` +
+    "The circle counts every battle, one by one, and goes up the moment a battle finishes.\n\n" +
+    "Battle someone to start yours."
   );
 }
