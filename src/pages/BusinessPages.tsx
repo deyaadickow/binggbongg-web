@@ -193,6 +193,13 @@ export function BusinessPage() {
   // Steve, 2026-10-04: the owner's exact pin when they dropped one, the written address
   // otherwise — the server decides which (Business::getMapQueryAttribute).
   const destination = b.map_query && b.map_query.length > 0 ? b.map_query : address;
+  // The pin's own coordinates, when there is one — map_query is "lat,lng" in that case and the
+  // written address otherwise, so this is what tells the two apart.
+  const pin = (() => {
+    if (b.has_pin !== true || !b.map_query) return null;
+    const [lat, lng] = b.map_query.split(",").map((n) => Number(n.trim()));
+    return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
+  })();
   const hours = hoursOf(b);
   const media = activeFolder !== null
     ? (b.media ?? []).filter((m) => m.folder_id === activeFolder)
@@ -275,6 +282,22 @@ export function BusinessPage() {
           {b.email && <a href={`mailto:${b.email}`}>✉️ {b.email}</a>}
           {site && <a href={site} target="_blank" rel="noreferrer">🔗 {b.website}</a>}
         </div>
+        {/* Steve, 2026-10-05: "Add the pin to the website business pages too" — the map itself,
+            with the marker on it, not just links out. OpenStreetMap's embed needs no API key and
+            no billing account, unlike a Google Maps frame. Only shown when the owner actually
+            dropped a pin: a map centred on a guessed address is worse than no map, because it
+            looks authoritative. */}
+        {pin && (
+          <div style={{ marginTop: 14 }}>
+            <iframe
+              title={`Map showing ${b.name}`}
+              loading="lazy"
+              style={{ width: "100%", height: 260, border: 0, borderRadius: 10 }}
+              src={`https://www.openstreetmap.org/export/embed.html?bbox=${pin.lng - 0.004}%2C${pin.lat - 0.002}%2C${pin.lng + 0.004}%2C${pin.lat + 0.002}&layer=mapnik&marker=${pin.lat}%2C${pin.lng}`}
+            />
+          </div>
+        )}
+
         <div className="row" style={{ gap: 8, flexWrap: "wrap", marginTop: 14 }}>
           {b.phone && <a className="btn small" href={`tel:${b.phone}`}>Call</a>}
           {address && <a className="btn small" href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`} target="_blank" rel="noreferrer">Directions</a>}
