@@ -132,12 +132,12 @@ function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void
       c.width = video.videoWidth; c.height = video.videoHeight;
       c.getContext("2d")?.drawImage(video, 0, 0);
       URL.revokeObjectURL(url);
-      const clips = overlays.filter((x) => x.kind === "image" && x.video).length;
-      if (clips >= 4) {
-        window.alert("Up to 4 videos on one flyer. Delete one to add another.");
-        return;
-      }
-      setOverlays((o) => [...o, { id: Date.now(), kind: "image", url: c.toDataURL("image/png"), cx: 0.5, cy: 0.5, size: 0.4, video: file }]);
+      // One video per flyer (Steve, 2026-10-05). A new one replaces the old rather than being
+      // refused — replacing is what a member means by picking again.
+      setOverlays((o) => [
+        ...o.filter((x) => !(x.kind === "image" && x.video)),
+        { id: Date.now(), kind: "image", url: c.toDataURL("image/png"), cx: 0.5, cy: 0.5, size: 0.4, video: file },
+      ]);
       window.alert("A printed page can't play a video, so its opening picture went on the flyer. Put the flyer on your business page and visitors can click it to watch.");
       return;
     }
@@ -210,6 +210,9 @@ function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void
         ctx.drawImage(sticker, cx - w / 2, cy - h / 2, w, h);
         // Steve, 2026-10-05: "add a gold border to each uploaded video" — the flyer's own
         // border, one point of stroke and ten of corner, scaled to the page.
+        // Steve, 2026-10-05: "add the same border to all images as well." A photo or a video
+        // the member added gets the gold box; a sticker is a cut-out, so it doesn't.
+        const framed = overlay.url.startsWith("data:");
         if (overlay.video) {
           boxes[overlay.id] = {
             x: (cx - w / 2) / canvas.width,
@@ -217,8 +220,10 @@ function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void
             w: w / canvas.width,
             h: h / canvas.height,
           };
+        }
+        if (framed) {
           ctx.strokeStyle = "#D4AF37";
-          ctx.lineWidth = Math.max(canvas.width * 0.0026, 2);
+          ctx.lineWidth = Math.max(canvas.width * 0.011, 5);
           const r = canvas.width * 0.026;
           const x = cx - w / 2, y = cy - h / 2;
           ctx.beginPath();

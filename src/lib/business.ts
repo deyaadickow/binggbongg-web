@@ -35,6 +35,8 @@ export interface Business {
   /** Where a maps app should be sent: the owner's pin when set, the address otherwise. */
   map_query?: string | null;
   has_pin?: boolean;
+  /** Steve, 2026-10-05: a dropped pin only shows while the shop is open. */
+  pin_visible?: boolean;
   phone?: string | null;
   email?: string | null;
   website?: string | null;

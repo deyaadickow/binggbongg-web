@@ -201,7 +201,8 @@ export function BusinessPage() {
   // The pin's own coordinates, when there is one — map_query is "lat,lng" in that case and the
   // written address otherwise, so this is what tells the two apart.
   const pin = (() => {
-    if (b.has_pin !== true || !b.map_query) return null;
+    // The map only shows the dropped pin while the shop is open (Steve, 2026-10-05).
+    if (b.pin_visible !== true || !b.map_query) return null;
     const [lat, lng] = b.map_query.split(",").map((n) => Number(n.trim()));
     return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
   })();
