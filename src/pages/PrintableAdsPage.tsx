@@ -103,6 +103,10 @@ function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void
   const [askOpen, setAskOpen] = useState(false);
   const [wish, setWish] = useState("");
   const [claudeBusy, setClaudeBusy] = useState(false);
+  /** Steve, 2026-10-05: "Make all popup into our design black and gold." */
+  const [notice, setNotice] = useState<string | null>(null);
+  /** Steve: "make all flyers on a blank flyer" — the Assistant gets a clean white sheet. */
+  const [blankPage, setBlankPage] = useState(false);
   const { user } = useSession();
   const [stickers, setStickers] = useState<Sticker[]>([]);
   const [isPickerOpen, setPickerOpen] = useState(false);
@@ -153,7 +157,7 @@ function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void
         ...o.filter((x) => !(x.kind === "image" && x.video)),
         { id: Date.now(), kind: "image", url: c.toDataURL("image/png"), cx: 0.5, cy: 0.5, size: 0.4, video: file },
       ]);
-      window.alert("A printed page can't play a video, so its opening picture went on the flyer. Put the flyer on your business page and visitors can click it to watch.");
+      setNotice("A printed page can't play a video, so its opening picture went on the flyer. Put the flyer on your business page and visitors can click it to watch.");
       return;
     }
 
@@ -191,14 +195,14 @@ function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void
       const r = await post<unknown>("designFlyerAdWithAi", { my_user_id: user.id, wish: asked });
       const body = r as unknown as { status?: boolean; message?: string; items?: AiItem[] };
       if (!body.status || !body.items?.length) {
-        window.alert(body.message || "Couldn't make your ad just now. Please try again.");
+        setNotice(body.message || "Couldn't make your ad just now. Please try again.");
         return;
       }
       applyAiDesign(body.items);
       setAskOpen(false);
-      window.alert(body.message || "Your ad is ready. Drag anything to move it.");
+      setNotice(body.message || "Your ad is ready. Drag anything to move it.");
     } catch {
-      window.alert("Couldn't make your ad just now. Please try again.");
+      setNotice("Couldn't make your ad just now. Please try again.");
     } finally {
       setClaudeBusy(false);
     }
@@ -206,6 +210,7 @@ function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void
 
   /** Lays the design on as ordinary overlays, so every piece can still be moved and restyled. */
   const applyAiDesign = (items: AiItem[]) => {
+    setBlankPage(true);
     // A fresh design replaces the last one but leaves the member's own photos and videos — the
     // one thing Claude can't make for them.
     setOverlays((o) => {
@@ -239,11 +244,26 @@ function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void
 
   const renderBlob = async (): Promise<Blob | null> => (await renderPage())?.blob ?? null;
 
+  /** A plain white sheet the Assistant designs on, keeping the flyer's shape. */
+  const blankSheet = (w = 1080, h = 1528) => {
+    const c = document.createElement("canvas");
+    c.width = w;
+    c.height = h;
+    const ctx = c.getContext("2d");
+    if (ctx) {
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, w, h);
+    }
+    return c.toDataURL("image/png");
+  };
+
+  const pageSrc = () => (blankPage ? blankSheet() : full(flyer.image_path));
+
   /** The page, plus where each clip ended up on it as fractions of the page. */
   const renderPage = async (): Promise<{ blob: Blob; boxes: Record<number, { x: number; y: number; w: number; h: number }> } | null> => {
     const image = new Image();
     image.crossOrigin = "anonymous";
-    image.src = full(flyer.image_path);
+    image.src = pageSrc();
     try { await image.decode(); } catch { return null; }
 
     const canvas = document.createElement("canvas");
@@ -328,7 +348,7 @@ function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void
   const publish = async () => {
     const clips = overlays.filter((o): o is Extract<Overlay, { kind: "image" }> => o.kind === "image" && !!o.video);
     if (clips.length === 0) {
-      window.alert("Add a video to the flyer first.");
+      setNotice("Add a video to the flyer first.");
       return;
     }
     if (!user?.id) return;
@@ -337,11 +357,11 @@ function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void
     try {
       pages = (await fetchMyBusinesses(user.id)).data;
     } catch {
-      window.alert("Couldn't load your business pages.");
+      setNotice("Couldn't load your business pages.");
       return;
     }
     if (pages.length === 0) {
-      window.alert("You don't have a business page yet. Create one from Bingg Bongg Business.");
+      setNotice("You don't have a business page yet. Create one from Bingg Bongg Business.");
       return;
     }
 
@@ -351,7 +371,7 @@ function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void
     if (!choice) return;
 
     const rendered = await renderPage();
-    if (!rendered) { window.alert("Couldn't read the flyer."); return; }
+    if (!rendered) { setNotice("Couldn't read the flyer."); return; }
 
     setPublishing("Uploading the flyer…");
     try {
@@ -368,9 +388,9 @@ function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void
       }
       setPublishing("Almost there…");
       const message = await saveBusinessFlyer(user.id, choice.id, imagePath, uploaded);
-      window.alert(message);
+      setNotice(message);
     } catch (e) {
-      window.alert(e instanceof Error ? e.message : "Couldn't put it on your page.");
+      setNotice(e instanceof Error ? e.message : "Couldn't put it on your page.");
     } finally {
       setPublishing(null);
     }
@@ -409,14 +429,27 @@ function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void
         onClick={() => setAskOpen(true)}
         style={{ width: "100%", marginBottom: 12, padding: "12px 0", fontWeight: 700 }}
       >
-        ✨  Ask Claude to make my ad
+        ✨  Ask Bingg Bongg Assistant to make my ad
       </button>
+
+      {notice && (
+        <div
+          onClick={() => setNotice(null)}
+          style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.9)", zIndex: 1100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
+        >
+          <div className="card pad" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 420, width: "100%", border: "2px solid var(--gold)", background: "#000" }}>
+            <div style={{ color: "var(--gold)", fontWeight: 800, fontSize: 17, textAlign: "center" }}>Bingg Bongg Assistant</div>
+            <div style={{ color: "var(--gold)", fontSize: 14, textAlign: "center", margin: "12px 0 16px", whiteSpace: "pre-wrap" }}>{notice}</div>
+            <button className="btn" style={{ width: "100%" }} onClick={() => setNotice(null)}>OK</button>
+          </div>
+        </div>
+      )}
 
       {askOpen && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.9)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div className="card pad" style={{ maxWidth: 460, width: "100%", border: "2px solid var(--gold)" }}>
             <div style={{ color: "var(--gold)", fontWeight: 800, fontSize: 18, textAlign: "center" }}>
-              Ask Claude to make your ad
+              Ask Bingg Bongg Assistant to make your ad
             </div>
             <div style={{ color: "var(--gold)", fontSize: 14, textAlign: "center", margin: "10px 0 14px" }}>
               What would you like on your ad? Tell me in your own words and I will create it for you.
@@ -446,7 +479,7 @@ function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void
         onPointerLeave={() => (dragging.current = null)}
         style={{ position: "relative", maxWidth: 420, margin: "0 auto", touchAction: "none", userSelect: "none" }}
       >
-        <img src={full(flyer.image_path)} alt={flyer.title ?? "Flyer"}
+        <img src={pageSrc()} alt={flyer.title ?? "Flyer"}
           style={{ width: "100%", display: "block", borderRadius: 6 }}
           onClick={() => setSelected(null)} />
 
