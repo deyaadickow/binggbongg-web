@@ -17,6 +17,17 @@ import { Loading } from "../components/Common";
 interface PrintableAd { id: number; title?: string; image_path?: string }
 interface Sticker { id: number; file?: string }
 
+/** One piece of a Claude-designed flyer — see the backend's FlyerAdDesigner. */
+interface AiItem {
+  kind?: string;
+  text?: string;
+  url?: string;
+  x?: number;
+  y?: number;
+  size?: number;
+  colour?: string;
+}
+
 type Overlay =
   | { id: number; kind: "text"; text: string; cx: number; cy: number; size: number; colour: string; font: string }
   // A sticker, a photo the member picked, or a video's opening frame — a printed page can't
@@ -88,6 +99,10 @@ function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void
   const [overlays, setOverlays] = useState<Overlay[]>([]);
   const [selected, setSelected] = useState<number | null>(null);
   const [publishing, setPublishing] = useState<string | null>(null);
+  /** Steve, 2026-10-05: "I wanna members to ask Claude to create an ad for them." */
+  const [askOpen, setAskOpen] = useState(false);
+  const [wish, setWish] = useState("");
+  const [claudeBusy, setClaudeBusy] = useState(false);
   const { user } = useSession();
   const [stickers, setStickers] = useState<Sticker[]>([]);
   const [isPickerOpen, setPickerOpen] = useState(false);
@@ -167,6 +182,61 @@ function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void
   };
 
   /** Flattens the flyer at the artwork's own pixel size and hands back a PNG blob URL. */
+  /** Steve, 2026-10-05: "Claude will ask them, What would you like on your ad." */
+  const askClaude = async () => {
+    const asked = wish.trim();
+    if (!asked || !user?.id) return;
+    setClaudeBusy(true);
+    try {
+      const r = await post<unknown>("designFlyerAdWithAi", { my_user_id: user.id, wish: asked });
+      const body = r as unknown as { status?: boolean; message?: string; items?: AiItem[] };
+      if (!body.status || !body.items?.length) {
+        window.alert(body.message || "Couldn't make your ad just now. Please try again.");
+        return;
+      }
+      applyAiDesign(body.items);
+      setAskOpen(false);
+      window.alert(body.message || "Your ad is ready. Drag anything to move it.");
+    } catch {
+      window.alert("Couldn't make your ad just now. Please try again.");
+    } finally {
+      setClaudeBusy(false);
+    }
+  };
+
+  /** Lays the design on as ordinary overlays, so every piece can still be moved and restyled. */
+  const applyAiDesign = (items: AiItem[]) => {
+    // A fresh design replaces the last one but leaves the member's own photos and videos — the
+    // one thing Claude can't make for them.
+    setOverlays((o) => {
+      const mine = o.filter((x) => x.kind === "image" && (x.url.startsWith("data:") || x.video));
+      const made: Overlay[] = [];
+      items.forEach((item, i) => {
+        const cx = item.x ?? 0.5;
+        const cy = item.y ?? 0.5;
+        const size = item.size ?? 0.05;
+        if (item.kind === "sticker") {
+          if (!item.url) return;
+          made.push({ id: Date.now() + i, kind: "image", url: item.url, cx, cy, size });
+          return;
+        }
+        if (!item.text) return;
+        made.push({
+          id: Date.now() + i,
+          kind: "text",
+          text: item.text,
+          cx,
+          cy,
+          size,
+          colour: item.colour || "#ffffff",
+          font: FONTS[0].css,
+        });
+      });
+      return [...mine, ...made];
+    });
+    setSelected(null);
+  };
+
   const renderBlob = async (): Promise<Blob | null> => (await renderPage())?.blob ?? null;
 
   /** The page, plus where each clip ended up on it as fractions of the page. */
@@ -331,6 +401,43 @@ function FlyerEditor({ flyer, onBack }: { flyer: PrintableAd; onBack: () => void
   return (
     <Page title="Create Your Own Ads">
       <button className="btn" onClick={onBack} style={{ marginBottom: 12 }}>← Back to flyers</button>
+
+      {/* Steve, 2026-10-05: "I wanna members to ask Claude to create an ad for them" and
+          "Put it on top so they can see you." */}
+      <button
+        className="btn"
+        onClick={() => setAskOpen(true)}
+        style={{ width: "100%", marginBottom: 12, padding: "12px 0", fontWeight: 700 }}
+      >
+        ✨  Ask Claude to make my ad
+      </button>
+
+      {askOpen && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.9)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+          <div className="card pad" style={{ maxWidth: 460, width: "100%", border: "2px solid var(--gold)" }}>
+            <div style={{ color: "var(--gold)", fontWeight: 800, fontSize: 18, textAlign: "center" }}>
+              Ask Claude to make your ad
+            </div>
+            <div style={{ color: "var(--gold)", fontSize: 14, textAlign: "center", margin: "10px 0 14px" }}>
+              What would you like on your ad? Tell me in your own words and I will create it for you.
+            </div>
+            <textarea
+              className="input"
+              rows={4}
+              value={wish}
+              onChange={(e) => setWish(e.target.value)}
+              placeholder="For example: Pizza shop called Tony's, two for one every Tuesday, open till 11, call 555 0199"
+              style={{ width: "100%", resize: "vertical" }}
+            />
+            <div className="row" style={{ gap: 8, marginTop: 14 }}>
+              <button className="btn" style={{ flex: 1 }} disabled={claudeBusy} onClick={askClaude}>
+                {claudeBusy ? "Making your ad…" : "Create my ad"}
+              </button>
+              <button className="btn ghost" disabled={claudeBusy} onClick={() => setAskOpen(false)}>Not now</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div
         ref={frameRef}
