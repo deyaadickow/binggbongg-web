@@ -49,7 +49,8 @@ export function TapTapBurst({ gift }: { gift: Gift }) {
       startLeftPct: 55 + Math.random() * 35,
       driftPx: (Math.random() - 0.5) * 140,
       risePct: 45 + Math.random() * 25,
-      size: 26 + Math.random() * 14,
+      // Steve, 2026-10-06: "make the roses larger." Matches the apps' 56pt icon.
+      size: 46 + Math.random() * 20,
       spin: (Math.random() - 0.5) * 50,
     }));
   }, [gift]);
