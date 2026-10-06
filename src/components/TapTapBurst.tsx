@@ -25,18 +25,33 @@ export const BONGG_BURST = "Bongg Burst";
  */
 export const RAINFALL = "Rainfall";
 
+/**
+ * Steve, 2026-10-06: "'Left Hander' and 'Right Hander' where the gifts come out from the left
+ * side to the right and from the right side to the left." The NAME is which side they come FROM,
+ * so a Left Hander travels rightwards.
+ */
+export const LEFT_HANDER = "Left Hander";
+export const RIGHT_HANDER = "Right Hander";
+
+/** Which way a burst's icons travel. The gift decides; no caller passes this in. */
+export type BurstDirection = "up" | "down" | "left" | "right";
+
+/** null for an ordinary gift, which bursts not at all. */
+export function burstDirection(gift: Gift): BurstDirection | null {
+  if (gift.is_taptap === true) return "up";
+  if (gift.is_rainfall === true) return "down";
+  if (gift.is_left_hander === true) return "right";  // enters at the LEFT, travels right
+  if (gift.is_right_hander === true) return "left";  // enters at the RIGHT, travels left
+  return null;
+}
+
 /** Matches the apps: a very expensive gift is capped so it can't flood the screen. */
 const MAX_ICONS = 150;
 const STAGGER_MS = 55;
 const FLIGHT_MS = 2600;
 
 export function isTapTapGift(gift: Gift): boolean {
-  return gift.is_taptap === true || gift.is_rainfall === true;
-}
-
-/** True for the falling flavour. Drives direction, not whether a burst happens at all. */
-export function isRainfallGift(gift: Gift): boolean {
-  return gift.is_rainfall === true;
+  return burstDirection(gift) !== null;
 }
 
 /**
@@ -45,9 +60,13 @@ export function isRainfallGift(gift: Gift): boolean {
  * spending on one. null for an ordinary gift, which gets no nameplate at all.
  */
 export function burstLabel(gift: Gift): string | null {
-  if (gift.is_taptap === true) return BONGG_BURST;
-  if (gift.is_rainfall === true) return RAINFALL;
-  return null;
+  switch (burstDirection(gift)) {
+    case "up": return BONGG_BURST;
+    case "down": return RAINFALL;
+    case "right": return LEFT_HANDER;
+    case "left": return RIGHT_HANDER;
+    default: return null;
+  }
 }
 
 /** How long a burst of this gift runs, so the caller knows when to stop showing it. */
@@ -70,7 +89,8 @@ export function TapTapBurst({ gift }: { gift: Gift }) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
 
-  const falling = isRainfallGift(gift);
+  const dir = burstDirection(gift) ?? "up";
+  const horizontal = dir === "left" || dir === "right";
 
   const icons = useMemo<Icon[]>(() => {
     const count = Math.min(Math.max(giftPrice(gift), 1), MAX_ICONS);
@@ -78,18 +98,20 @@ export function TapTapBurst({ gift }: { gift: Gift }) {
     return Array.from({ length: count }, (_, i) => ({
       key: i,
       delayMs: i * STAGGER_MS,
-      // Rising: from the bottom-right, where the gift button is — the corner the apps use.
-      // Falling: across the FULL width, because rain in one corner doesn't read as rain.
-      startLeftPct: falling ? 2 + Math.random() * 94 : 55 + Math.random() * 35,
-      // A falling gift sways much less; a wide swerve on the way down reads as a bug.
-      driftPx: (Math.random() - 0.5) * (falling ? 40 : 140),
-      // Falls far enough to clear the bottom of the viewport instead of stopping part-way.
-      risePct: falling ? 115 + Math.random() * 20 : 45 + Math.random() * 25,
+      // UP comes from the bottom-right, where the gift button is — the corner the apps use.
+      // Everything else spreads right across its entry edge, because a stream from one corner
+      // doesn't read as a sweep.
+      startLeftPct: dir === "up" ? 55 + Math.random() * 35 : 2 + Math.random() * 94,
+      // Only a rising gift swerves; any other direction sways a little or it reads as a bug.
+      driftPx: (Math.random() - 0.5) * (dir === "up" ? 140 : 40),
+      // Everything except UP travels far enough to leave the far side instead of stopping
+      // part-way; UP fades out mid-air, because it has nowhere to go.
+      risePct: dir === "up" ? 45 + Math.random() * 25 : 115 + Math.random() * 20,
       // Steve, 2026-10-06: "make the roses larger." Matches the apps' 56pt icon.
       size: 46 + Math.random() * 20,
-      spin: (Math.random() - 0.5) * (falling ? 30 : 50),
+      spin: (Math.random() - 0.5) * (dir === "up" ? 50 : 30),
     }));
-  }, [gift, falling]);
+  }, [gift, dir]);
 
   const src = gift.image ? mediaUrl(gift.image) : undefined;
 
@@ -113,6 +135,20 @@ export function TapTapBurst({ gift }: { gift: Gift }) {
           88%  { opacity: 1; }
           100% { opacity: 0; transform: translate(var(--bb-drift), var(--bb-rise)) scale(1) rotate(var(--bb-spin)); }
         }
+        /* Left Hander: enters off the LEFT edge and sweeps right. Right Hander is its mirror.
+           Same "stays solid until it leaves" shape as the fall — it exits under its own steam. */
+        @keyframes bb-taptap-sweep-right {
+          0%   { opacity: 0; transform: translate(0, 0) scale(.7) rotate(0deg); }
+          8%   { opacity: 1; transform: translate(4vw, 0) scale(1) rotate(0deg); }
+          88%  { opacity: 1; }
+          100% { opacity: 0; transform: translate(var(--bb-rise), var(--bb-drift)) scale(1) rotate(var(--bb-spin)); }
+        }
+        @keyframes bb-taptap-sweep-left {
+          0%   { opacity: 0; transform: translate(0, 0) scale(.7) rotate(0deg); }
+          8%   { opacity: 1; transform: translate(-4vw, 0) scale(1) rotate(0deg); }
+          88%  { opacity: 1; }
+          100% { opacity: 0; transform: translate(calc(var(--bb-rise) * -1), var(--bb-drift)) scale(1) rotate(var(--bb-spin)); }
+        }
         @keyframes bb-taptap-name {
           0%   { opacity: 0; transform: scale(.85); }
           8%   { opacity: 1; transform: scale(1); }
@@ -134,7 +170,7 @@ export function TapTapBurst({ gift }: { gift: Gift }) {
             display: "inline-block", padding: "9px 18px", borderRadius: 999,
             background: "rgba(0,0,0,.75)", border: "1.5px solid var(--gold)",
             color: "var(--gold)", fontWeight: 800, fontSize: 20,
-          }}>{falling ? RAINFALL : BONGG_BURST}</span>
+          }}>{burstLabel(gift) ?? BONGG_BURST}</span>
         </div>
       )}
       {mounted && icons.map((icon) => (
@@ -143,18 +179,30 @@ export function TapTapBurst({ gift }: { gift: Gift }) {
           className="bb-taptap-icon"
           style={{
             position: "absolute",
-            left: `${icon.startLeftPct}%`,
-            // Rainfall hangs off the TOP edge, so no icon is seen appearing out of nothing.
-            ...(falling ? { top: `-${icon.size}px` } : { bottom: "12%" }),
+            // Each direction hangs just off its own entry edge, so no icon is ever seen
+            // appearing out of nothing. The cross-axis percentage spreads them along that edge.
+            ...(horizontal
+              ? { top: `${icon.startLeftPct}%`, ...(dir === "right"
+                  ? { left: `-${icon.size}px` }
+                  : { right: `-${icon.size}px` }) }
+              : { left: `${icon.startLeftPct}%`, ...(dir === "down"
+                  ? { top: `-${icon.size}px` }
+                  : { bottom: "12%" }) }),
             width: icon.size,
             height: icon.size,
             ["--bb-drift" as string]: `${icon.driftPx}px`,
-            ["--bb-rise" as string]: `${icon.risePct}vh`,
+            ["--bb-rise" as string]: `${icon.risePct}${horizontal ? "vw" : "vh"}`,
             ["--bb-spin" as string]: `${icon.spin}deg`,
-            // Rising floats and slows (ease-out); falling ACCELERATES like real rain (ease-in).
-            animation: falling
-              ? `bb-taptap-fall ${FLIGHT_MS}ms ease-in ${icon.delayMs}ms both`
-              : `bb-taptap-rise ${FLIGHT_MS}ms ease-out ${icon.delayMs}ms both`,
+            // Rising floats and slows (ease-out) because it fights gravity; falling ACCELERATES
+            // like real rain (ease-in). A sideways sweep does neither — steady, so linear.
+            animation:
+              dir === "up"
+                ? `bb-taptap-rise ${FLIGHT_MS}ms ease-out ${icon.delayMs}ms both`
+                : dir === "down"
+                ? `bb-taptap-fall ${FLIGHT_MS}ms ease-in ${icon.delayMs}ms both`
+                : dir === "right"
+                ? `bb-taptap-sweep-right ${FLIGHT_MS}ms linear ${icon.delayMs}ms both`
+                : `bb-taptap-sweep-left ${FLIGHT_MS}ms linear ${icon.delayMs}ms both`,
           }}
         >
           {src

@@ -129,6 +129,10 @@ export interface Gift {
   is_taptap?: boolean;
   /** Rainfall — the same burst falling instead of rising. Mutually exclusive with is_taptap. */
   is_rainfall?: boolean;
+  /** Left Hander / Right Hander — the NAME is the side they come FROM, so a Left Hander
+   *  travels rightwards. All four effects are mutually exclusive. */
+  is_left_hander?: boolean;
+  is_right_hander?: boolean;
 }
 export function giftPrice(g: Gift): number {
   return Number(g.coin_price ?? g.votes ?? 0);
