@@ -136,6 +136,8 @@ export interface Gift {
   /** Surprise — pops batches of 5-10 all over the screen for 5 seconds. The ONE effect whose
    *  count is not the gift's coin price. */
   is_surprise?: boolean;
+  /** Universal — each gift picks one of the four sides, so a quarter arrive from each. */
+  is_universal?: boolean;
 }
 export function giftPrice(g: Gift): number {
   return Number(g.coin_price ?? g.votes ?? 0);
