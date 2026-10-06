@@ -183,10 +183,10 @@ export function TapTapBurst({ gift }: { gift: Gift }) {
       // Everything except UP travels far enough to leave the far side instead of stopping
       // part-way; UP fades out mid-air, because it has nowhere to go.
       risePct: d === "up" ? 45 + Math.random() * 25 : 115 + Math.random() * 20,
-      // Steve, 2026-10-06: "make the roses larger" (the apps' 56pt), then "Universal gifts are
-      // too small, please make them larger" — Universal was the same size as everything else, but
-      // spread across four sides at once it reads much smaller than a single-direction burst.
-      size: dir === "universal" ? 70 + Math.random() * 26 : 46 + Math.random() * 20,
+      // Steve, 2026-10-06: the apps' 56pt, then raised for Universal, then "Please make them all
+      // the same size" — so every effect flies at the bigger size now. (Universal never actually
+      // rendered smaller; his Balloons2 artwork is just tall and narrow.)
+      size: 70 + Math.random() * 26,
       spin: (Math.random() - 0.5) * (d === "up" ? 50 : 30),
       };
     });
