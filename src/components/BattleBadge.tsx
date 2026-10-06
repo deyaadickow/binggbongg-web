@@ -174,8 +174,15 @@ export function BattleInfoPopup({
           textAlign: "center",
         }}
       >
-        <div style={{ fontWeight: 800, fontSize: 19, marginBottom: 12 }}>{title}</div>
-        <div style={{ fontSize: 14, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{body}</div>
+        {/* Steve, 2026-10-06: "make the text even to both lines so it will look cleaner" — no
+            more paragraphs ending in a lonely two words. Each paragraph is balanced on its own;
+            balancing one block would even out the total and leave a paragraph just as lopsided. */}
+        <div style={{ fontWeight: 800, fontSize: 19, marginBottom: 12, textWrap: "balance" }}>{title}</div>
+        <div style={{ fontSize: 14, lineHeight: 1.5 }}>
+          {body.split("\n\n").map((paragraph, i) => (
+            <p key={i} style={{ margin: i === 0 ? "0 0 10px" : "10px 0 0", textWrap: "balance" }}>{paragraph}</p>
+          ))}
+        </div>
         <button
           onClick={onClose}
           style={{
