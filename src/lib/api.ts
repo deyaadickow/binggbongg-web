@@ -133,6 +133,9 @@ export interface Gift {
    *  travels rightwards. All four effects are mutually exclusive. */
   is_left_hander?: boolean;
   is_right_hander?: boolean;
+  /** Surprise — pops batches of 5-10 all over the screen for 5 seconds. The ONE effect whose
+   *  count is not the gift's coin price. */
+  is_surprise?: boolean;
 }
 export function giftPrice(g: Gift): number {
   return Number(g.coin_price ?? g.votes ?? 0);

@@ -33,8 +33,18 @@ export const RAINFALL = "Rainfall";
 export const LEFT_HANDER = "Left Hander";
 export const RIGHT_HANDER = "Right Hander";
 
+/**
+ * Steve, 2026-10-06: "Appear all over the screen between 5 and 10 gifts at a time for 5 seconds
+ * and disappear. Call it 'Surprise'." The one effect that does not travel, and the one whose
+ * count is fixed by the effect rather than by the gift's coin price.
+ */
+export const SURPRISE = "Surprise";
+const SURPRISE_MS = 5000;
+const SURPRISE_BATCH_MS = 750;
+const SURPRISE_LIFE_MS = 900;
+
 /** Which way a burst's icons travel. The gift decides; no caller passes this in. */
-export type BurstDirection = "up" | "down" | "left" | "right";
+export type BurstDirection = "up" | "down" | "left" | "right" | "surprise";
 
 /** null for an ordinary gift, which bursts not at all. */
 export function burstDirection(gift: Gift): BurstDirection | null {
@@ -42,6 +52,7 @@ export function burstDirection(gift: Gift): BurstDirection | null {
   if (gift.is_rainfall === true) return "down";
   if (gift.is_left_hander === true) return "right";  // enters at the LEFT, travels right
   if (gift.is_right_hander === true) return "left";  // enters at the RIGHT, travels left
+  if (gift.is_surprise === true) return "surprise";
   return null;
 }
 
@@ -65,12 +76,15 @@ export function burstLabel(gift: Gift): string | null {
     case "down": return RAINFALL;
     case "right": return LEFT_HANDER;
     case "left": return RIGHT_HANDER;
+    case "surprise": return SURPRISE;
     default: return null;
   }
 }
 
 /** How long a burst of this gift runs, so the caller knows when to stop showing it. */
 export function tapTapBurstDuration(gift: Gift): number {
+  // Surprise runs for a fixed 5 seconds whatever the gift costs.
+  if (burstDirection(gift) === "surprise") return SURPRISE_MS + SURPRISE_LIFE_MS;
   const count = Math.min(Math.max(giftPrice(gift), 1), MAX_ICONS);
   return (count - 1) * STAGGER_MS + FLIGHT_MS + 200;
 }
@@ -83,6 +97,8 @@ interface Icon {
   risePct: number;
   size: number;
   spin: number;
+  /** Surprise only: it is the one effect placed in BOTH axes. */
+  topPct?: number;
 }
 
 export function TapTapBurst({ gift }: { gift: Gift }) {
@@ -93,15 +109,40 @@ export function TapTapBurst({ gift }: { gift: Gift }) {
   const horizontal = dir === "left" || dir === "right";
 
   const icons = useMemo<Icon[]>(() => {
+    // Surprise doesn't stream — batches of 5-10 at random places, each batch replacing the last,
+    // until 5 seconds are up. The gift's coin price has no say in how many.
+    if (dir === "surprise") {
+      const out: Icon[] = [];
+      let key = 0;
+      for (let at = 0; at < SURPRISE_MS; at += SURPRISE_BATCH_MS) {
+        const batch = 5 + Math.floor(Math.random() * 6);   // 5..10
+        for (let n = 0; n < batch; n++) {
+          out.push({
+            key: key++,
+            // A little jitter inside the batch so they don't all land on the same frame.
+            delayMs: at + Math.random() * 180,
+            // Kept clear of the very edges so a gift is never half off the screen.
+            startLeftPct: 10 + Math.random() * 80,
+            topPct: 12 + Math.random() * 76,
+            driftPx: 0,
+            risePct: 0,
+            size: 46 + Math.random() * 20,
+            spin: (Math.random() - 0.5) * 24,
+          });
+        }
+      }
+      return out;
+    }
+
     const count = Math.min(Math.max(giftPrice(gift), 1), MAX_ICONS);
     // Deterministic per-icon scatter: random() inside render would re-roll every paint.
     return Array.from({ length: count }, (_, i) => ({
       key: i,
       delayMs: i * STAGGER_MS,
-      // UP comes from the bottom-right, where the gift button is — the corner the apps use.
-      // Everything else spreads right across its entry edge, because a stream from one corner
-      // doesn't read as a sweep.
-      startLeftPct: dir === "up" ? 55 + Math.random() * 35 : 2 + Math.random() * 94,
+      // Steve, 2026-10-06: "make them appear from the entire screen and not just on one side."
+      // Bongg Burst used to rise only from the bottom-right, where the gift button is — that was
+      // the one side. Every direction now spreads right across its whole entry edge.
+      startLeftPct: 2 + Math.random() * 94,
       // Only a rising gift swerves; any other direction sways a little or it reads as a bug.
       driftPx: (Math.random() - 0.5) * (dir === "up" ? 140 : 40),
       // Everything except UP travels far enough to leave the far side instead of stopping
@@ -155,6 +196,14 @@ export function TapTapBurst({ gift }: { gift: Gift }) {
           80%  { opacity: 1; }
           100% { opacity: 0; }
         }
+        /* Surprise: pops where it is put, holds, and goes. Travels nowhere. */
+        @keyframes bb-taptap-pop {
+          0%   { opacity: 0; transform: scale(.2) rotate(0deg); }
+          18%  { opacity: 1; transform: scale(1.12) rotate(var(--bb-spin)); }
+          30%  { transform: scale(1) rotate(var(--bb-spin)); }
+          62%  { opacity: 1; }
+          100% { opacity: 0; transform: scale(1) rotate(var(--bb-spin)); }
+        }
         @media (prefers-reduced-motion: reduce) {
           .bb-taptap-icon { animation-duration: 1ms !important; opacity: .9; }
         }
@@ -181,7 +230,9 @@ export function TapTapBurst({ gift }: { gift: Gift }) {
             position: "absolute",
             // Each direction hangs just off its own entry edge, so no icon is ever seen
             // appearing out of nothing. The cross-axis percentage spreads them along that edge.
-            ...(horizontal
+            ...(dir === "surprise"
+              ? { left: `${icon.startLeftPct}%`, top: `${icon.topPct}%` }
+              : horizontal
               ? { top: `${icon.startLeftPct}%`, ...(dir === "right"
                   ? { left: `-${icon.size}px` }
                   : { right: `-${icon.size}px` }) }
@@ -196,7 +247,9 @@ export function TapTapBurst({ gift }: { gift: Gift }) {
             // Rising floats and slows (ease-out) because it fights gravity; falling ACCELERATES
             // like real rain (ease-in). A sideways sweep does neither — steady, so linear.
             animation:
-              dir === "up"
+              dir === "surprise"
+                ? `bb-taptap-pop ${SURPRISE_LIFE_MS}ms ease-out ${icon.delayMs}ms both`
+                : dir === "up"
                 ? `bb-taptap-rise ${FLIGHT_MS}ms ease-out ${icon.delayMs}ms both`
                 : dir === "down"
                 ? `bb-taptap-fall ${FLIGHT_MS}ms ease-in ${icon.delayMs}ms both`
