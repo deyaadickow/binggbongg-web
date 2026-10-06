@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { giftPrice, mediaUrl, post, type Gift, type Post } from "../lib/api";
 import { useSession } from "../lib/session";
 import { loadGifts } from "../lib/gifts";
-import { TapTapBurst, isTapTapGift, tapTapBurstDuration } from "./TapTapBurst";
+import { TapTapBurst, isTapTapGift, tapTapBurstDuration, burstLabel } from "./TapTapBurst";
 
 /**
  * The gift button on a video, and the gift page it opens.
@@ -127,6 +127,7 @@ function GiftSheet({ post: item, onClose, onSent }: { post: Post; onClose: () =>
               {g.image ? <img src={mediaUrl(g.image)} alt="" loading="lazy" /> : <span style={{ fontSize: 30 }}>🎁</span>}
               <b>{giftPrice(g)}</b>
               <span>{g.name ?? "Gift"}</span>
+              {burstLabel(g) && <em className="gift-burst-badge">{burstLabel(g)}</em>}
             </button>
           ))}
           {gifts.length === 0 && !notice && <div className="muted" style={{ gridColumn: "1 / -1", textAlign: "center" }}>Loading gifts…</div>}

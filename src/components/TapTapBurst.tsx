@@ -39,6 +39,17 @@ export function isRainfallGift(gift: Gift): boolean {
   return gift.is_rainfall === true;
 }
 
+/**
+ * Steve, 2026-10-06: "add the name on each gift here when we add Bongg Burst or Rainfall on that
+ * gift" — a member should be able to see which gifts do the big full-screen effect before
+ * spending on one. null for an ordinary gift, which gets no nameplate at all.
+ */
+export function burstLabel(gift: Gift): string | null {
+  if (gift.is_taptap === true) return BONGG_BURST;
+  if (gift.is_rainfall === true) return RAINFALL;
+  return null;
+}
+
 /** How long a burst of this gift runs, so the caller knows when to stop showing it. */
 export function tapTapBurstDuration(gift: Gift): number {
   const count = Math.min(Math.max(giftPrice(gift), 1), MAX_ICONS);

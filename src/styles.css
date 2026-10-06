@@ -189,6 +189,10 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .gift-grid button img { width: 45px; height: 45px; object-fit: contain; }
 .gift-grid button b { font-size: 14px; font-weight: 400; }
 .gift-grid button span { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* The Bongg Burst / Rainfall nameplate on a gift tile. Gold FILL with black text, not
+   gold-on-black: at this size a gold outline reads as part of the tile's own gold border and
+   disappears. Shrinks rather than wraps, so a square tile stays square. */
+.gift-grid button .gift-burst-badge { font-style: normal; font-weight: 800; font-size: 8px; line-height: 1.3; color: #000; background: var(--gold-border); border-radius: 999px; padding: 1px 5px; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .gift-grid button:hover { border-color: var(--gold-bright); }
 .gift-grid button:disabled { opacity: .6; cursor: default; }
 .gift-grid button.busy { border-color: var(--gold-bright); opacity: 1; }
