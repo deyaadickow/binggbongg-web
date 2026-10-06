@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { displayName, mediaUrl, post, type Post, type UserSummary } from "../lib/api";
-import { BattleBadge, battleBadgeExplainer } from "../components/BattleBadge";
+import { BattleBadge, BattleInfoPopup, BattleStreak, battleBadgeExplainer, battleStreakExplainer } from "../components/BattleBadge";
 import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice } from "../components/Common";
 import { fetchUserPhotos, type Photo } from "../lib/photos";
@@ -261,6 +261,9 @@ export function ProfilePage() {
   const [error, setError] = useState<string | null>(null);
   const [following, setFollowing] = useState(false);
   const [tab, setTab] = useState<TabKey>("videos");
+  // Steve, 2026-10-05: "Make all popup into our design black and gold" — the badge and streak
+  // explainers open the app's own popup instead of the browser's white alert box.
+  const [battleInfo, setBattleInfo] = useState<{ title: string; body: string } | null>(null);
   const [tabVideos, setTabVideos] = useState<ProfilePost[]>([]);
   const [tabUsers, setTabUsers] = useState<UserSummary[]>([]);
   // Photos are neither posts nor members, so they get their own bucket rather than being
@@ -498,7 +501,20 @@ export function ProfilePage() {
               {/* Steve, 2026-10-05: the Bingg Bongg Battle Badge beside their name. */}
               <BattleBadge
                 badge={profile.battle_badge}
-                onClick={() => window.alert(battleBadgeExplainer(displayName(profile), profile.battle_badge ?? 0))}
+                onClick={() => setBattleInfo({
+                  title: "Bingg Bongg Battle Badge",
+                  body: battleBadgeExplainer(displayName(profile), profile.battle_badge ?? 0),
+                })}
+              />
+              {/* Steve, 2026-10-05: the streak beside it — one flame per 30 days kept, and a
+                  flame is one free day. */}
+              <BattleStreak
+                streak={profile.battle_streak}
+                flames={profile.battle_flames}
+                onClick={() => setBattleInfo({
+                  title: "Battle Streak",
+                  body: battleStreakExplainer(displayName(profile), profile.battle_streak ?? 0, profile.battle_flames ?? 0),
+                })}
               />
               {profile.is_verified === 2 && (
                 <span title="Verified" style={{ color: "#4af", fontSize: 16 }}>✓</span>
@@ -736,6 +752,9 @@ export function ProfilePage() {
           onClose={() => setShowCreatePlaylist(false)}
           onCreated={(pl) => setPlaylists((prev) => [pl, ...prev])}
         />
+      )}
+      {battleInfo && (
+        <BattleInfoPopup title={battleInfo.title} body={battleInfo.body} onClose={() => setBattleInfo(null)} />
       )}
     </div>
   );

@@ -2,11 +2,14 @@ import { useCallback, useState } from "react";
 import { Link } from "react-router-dom";
 import { displayName, mediaUrl, type Gift, type Post } from "../lib/api";
 import { Avatar } from "./Common";
-import { BattleBadge, battleBadgeExplainer } from "./BattleBadge";
+import { BattleBadge, BattleInfoPopup, BattleStreak, battleBadgeExplainer, battleStreakExplainer } from "./BattleBadge";
 import { GiftFlash, PostGiftButton } from "./GiftSheet";
 
 export function PostCard({ post }: { post: Post }) {
   const [sent, setSent] = useState<Gift | null>(null);
+  // Steve, 2026-10-05: "Make all popup into our design black and gold" — the explainers for the
+  // two circles open the app's own popup, not the browser's white alert box.
+  const [info, setInfo] = useState<{ title: string; body: string } | null>(null);
   const clearSent = useCallback(() => setSent(null), []);
   return (
     <div className="card post-card">
@@ -29,8 +32,29 @@ export function PostCard({ post }: { post: Post }) {
               <BattleBadge
                 badge={post.user?.battle_badge}
                 size={26}
-                onClick={() => {
-                  window.alert(battleBadgeExplainer(displayName(post.user), post.user?.battle_badge ?? 0));
+                onClick={(e) => {
+                  // The whole card is a <Link> to the profile — explaining the circle must not
+                  // also navigate away from the feed.
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setInfo({
+                    title: "Bingg Bongg Battle Badge",
+                    body: battleBadgeExplainer(displayName(post.user), post.user?.battle_badge ?? 0),
+                  });
+                }}
+              />
+              {/* Steve, 2026-10-05: the streak beside it — the flames are the free days banked. */}
+              <BattleStreak
+                streak={post.user?.battle_streak}
+                flames={post.user?.battle_flames}
+                size={26}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setInfo({
+                    title: "Battle Streak",
+                    body: battleStreakExplainer(displayName(post.user), post.user?.battle_streak ?? 0, post.user?.battle_flames ?? 0),
+                  });
                 }}
               />
             </div>
@@ -40,6 +64,7 @@ export function PostCard({ post }: { post: Post }) {
         {/* Steve, 2026-10-01: "add gift boxes on all video on for you page on the web." */}
         <PostGiftButton post={post} onSent={setSent} />
       </div>
+      {info && <BattleInfoPopup title={info.title} body={info.body} onClose={() => setInfo(null)} />}
     </div>
   );
 }

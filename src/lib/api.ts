@@ -67,9 +67,13 @@ export async function tokenServer<T = unknown>(path: string, init: { method?: st
 // ---- shapes we actually read (everything else in the payloads is ignored)
 export interface UserSummary {
   id: number;
-  /** Steve, 2026-10-05: "(BBBB) Bingg Bongg Battle Badge" — completed battles rounded up to the
-   *  next 25. 0 means they haven't battled yet and wear no badge. */
+  /** Steve, 2026-10-05: "(BBBB) Bingg Bongg Battle Badge" — battles completed, counted one by
+   *  one ("just add the battles in real time… just count up one by one"). 0 = no badge yet. */
   battle_badge?: number;
+  /** Steve, 2026-10-05: days battled in a row, and the flames (free days) banked with them —
+   *  one flame for every 30 days kept. Server-computed; see Users::extendStreak. */
+  battle_streak?: number;
+  battle_flames?: number;
   fullname?: string;
   username?: string;
   profile_image?: string;
