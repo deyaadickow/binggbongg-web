@@ -8,6 +8,7 @@ import { post } from "../lib/api";
 import { useSession } from "../lib/session";
 import { createUploadUrls, putToSignedUrl, videoDuration, videoThumbnail } from "../lib/upload";
 import { Notice } from "../components/Common";
+import { GoldSelect } from "../components/GoldSelect";
 
 interface ContestCat { id: number; name?: string | null }
 interface CountryRow { name?: string | null; states?: { name?: string | null }[] }
@@ -168,10 +169,15 @@ export function UploadVideoPage() {
 
       <div className="card pad" style={{ marginBottom: 12 }}>
         <label className="soft" style={{ fontSize: 13 }}>Category</label>
-        <select className="input" value={catId} onChange={(e) => setCatId(e.target.value)} style={{ width: "100%", marginBottom: 10 }}>
-          <option value="">Choose a category…</option>
-          {cats.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-        </select>
+        <GoldSelect
+          ariaLabel="Category"
+          placeholder="Choose a category…"
+          searchable
+          value={catId}
+          options={cats.map((c) => ({ value: String(c.id), label: c.name ?? "" }))}
+          onChange={setCatId}
+          style={{ marginBottom: 10 }}
+        />
 
         <label className="soft" style={{ fontSize: 13 }}>Description</label>
         <textarea className="input" rows={3} value={link} onChange={(e) => setLink(e.target.value)}
@@ -180,17 +186,26 @@ export function UploadVideoPage() {
         <div className="row" style={{ gap: 10 }}>
           <div style={{ flex: 1 }}>
             <label className="soft" style={{ fontSize: 13 }}>Country</label>
-            <select className="input" value={country} onChange={(e) => { setCountry(e.target.value); setState(""); }} style={{ width: "100%" }}>
-              <option value="">—</option>
-              {countries.map((c) => <option key={c.name ?? ""} value={c.name ?? ""}>{c.name}</option>)}
-            </select>
+            <GoldSelect
+              ariaLabel="Country"
+              placeholder="—"
+              searchable
+              value={country}
+              options={countries.map((c) => ({ value: c.name ?? "", label: c.name ?? "" }))}
+              onChange={(v) => { setCountry(v); setState(""); }}
+            />
           </div>
           <div style={{ flex: 1 }}>
             <label className="soft" style={{ fontSize: 13 }}>State</label>
-            <select className="input" value={state} onChange={(e) => setState(e.target.value)} disabled={!states.length} style={{ width: "100%" }}>
-              <option value="">—</option>
-              {states.map((s) => <option key={s.name ?? ""} value={s.name ?? ""}>{s.name}</option>)}
-            </select>
+            <GoldSelect
+              ariaLabel="State"
+              placeholder="—"
+              searchable
+              disabled={!states.length}
+              value={state}
+              options={states.map((s) => ({ value: s.name ?? "", label: s.name ?? "" }))}
+              onChange={setState}
+            />
           </div>
         </div>
       </div>

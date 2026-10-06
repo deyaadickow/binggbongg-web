@@ -12,6 +12,7 @@ import {
   type PhotoFolder, type PhotoStorageStatus,
 } from "../lib/photos";
 import { Loading, Notice } from "../components/Common";
+import { GoldSelect } from "../components/GoldSelect";
 
 export function UploadPhotosPage() {
   const { user, isLoggedIn } = useSession();
@@ -108,12 +109,15 @@ export function UploadPhotosPage() {
         <label className="soft" style={{ fontSize: 13 }}>Folder</label>
         {folders === null ? <Loading /> : (
           <>
-            <select className="input" value={folderId} onChange={(e) => setFolderId(e.target.value)} style={{ width: "100%", marginBottom: 10 }}>
-              <option value="">Choose a folder…</option>
-              {uploadable.map((f) => (
-                <option key={f.id} value={f.id}>{f.name}{f.photo_count ? ` (${f.photo_count})` : ""}</option>
-              ))}
-            </select>
+            <GoldSelect
+              ariaLabel="Folder"
+              placeholder="Choose a folder…"
+              searchable
+              value={folderId}
+              options={uploadable.map((f) => ({ value: String(f.id), label: `${f.name}${f.photo_count ? ` (${f.photo_count})` : ""}` }))}
+              onChange={setFolderId}
+              style={{ marginBottom: 10 }}
+            />
             {uploadable.length === 0 && (
               <p className="muted" style={{ fontSize: 13, marginTop: 0 }}>
                 You don't have a folder yet — make one below. Favourites doesn't count: you star photos into it rather than uploading there.

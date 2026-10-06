@@ -8,6 +8,7 @@ import { post, type Post } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Loading, Notice } from "../components/Common";
 import { PostCard } from "../components/PostCard";
+import { GoldSelect } from "../components/GoldSelect";
 
 const money = (v: unknown, sym = "$") => `${sym}${Number(v ?? 0).toFixed(2)}`;
 
@@ -67,9 +68,15 @@ function EarningsRow({ earn, year, onYear }: { earn: Earnings | null; year: numb
         <div key={k as string}><div className="muted" style={{ fontSize: 12 }}>{k as string}</div><div style={{ fontWeight: 800, color: "var(--gold)", fontSize: 18 }}>{earn ? money(v) : "…"}</div></div>
       ))}
       <div>
-        <select className="input" style={{ minHeight: 30, padding: "0 8px", fontSize: 12 }} value={year} onChange={(e) => onYear(Number(e.target.value))}>
-          {[0, 1, 2, 3].map((i) => <option key={i} value={thisYear - i}>{thisYear - i}</option>)}
-        </select>
+        {/* Steve, 2026-10-06: "Please make these into our black and gold design" — the native
+            list opened as the operating system's grey menu with a red highlight. */}
+        <GoldSelect
+          ariaLabel="Year"
+          style={{ minWidth: 92 }}
+          value={String(year)}
+          options={[0, 1, 2, 3].map((i) => ({ value: String(thisYear - i), label: String(thisYear - i) }))}
+          onChange={(v) => onYear(Number(v))}
+        />
         <div style={{ fontWeight: 800, color: "var(--gold)", fontSize: 18 }}>{earn ? money(earn.yearEarnings) : "…"}</div>
       </div>
     </div>
@@ -167,12 +174,23 @@ export function RedeemPage() {
               <>
                 <b style={{ color: "var(--gold)" }}>Your Wise payout details</b>
                 <div className="grid" style={{ marginTop: 8, gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                  <select className="input" value={wf.country} onChange={(e) => setWf({ ...wf, country: e.target.value, provider: "" })}>
-                    <option value="">Country</option>
-                    {countries.map((c) => <option key={cc(c)} value={cc(c)}>{c.name ?? cc(c)}{c.currency ? ` (${c.currency})` : ""}</option>)}
-                  </select>
+                  <GoldSelect
+                    ariaLabel="Country"
+                    placeholder="Country"
+                    searchable
+                    value={wf.country}
+                    options={countries.map((c) => ({ value: cc(c), label: `${c.name ?? cc(c)}${c.currency ? ` (${c.currency})` : ""}` }))}
+                    onChange={(v) => setWf({ ...wf, country: v, provider: "" })}
+                  />
                   {provs.length > 0
-                    ? <select className="input" value={wf.provider} onChange={(e) => setWf({ ...wf, provider: e.target.value })}><option value="">Wallet / bank</option>{provs.map((p) => <option key={p.key} value={p.key}>{p.label}</option>)}</select>
+                    ? <GoldSelect
+                        ariaLabel="Wallet or bank"
+                        placeholder="Wallet / bank"
+                        searchable
+                        value={wf.provider}
+                        options={provs.map((p) => ({ value: p.key, label: p.label }))}
+                        onChange={(v) => setWf({ ...wf, provider: v })}
+                      />
                     : <input className="input" placeholder="Wallet / bank (provider)" value={wf.provider} onChange={(e) => setWf({ ...wf, provider: e.target.value })} />}
                   <input className="input" placeholder="Account number / mobile wallet number" value={wf.account_number} onChange={(e) => setWf({ ...wf, account_number: e.target.value })} />
                   <input className="input" placeholder="Account holder name" value={wf.account_holder_name} onChange={(e) => setWf({ ...wf, account_holder_name: e.target.value })} />

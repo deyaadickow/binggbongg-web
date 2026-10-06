@@ -29,6 +29,7 @@ import {
   renameFolder, togglePhotoFavourite, type Photo, type PhotoFolder, type PhotoStorageStatus,
 } from "../lib/photos";
 import { Loading, Notice } from "../components/Common";
+import { GoldSelect } from "../components/GoldSelect";
 
 const THUMB_BORDER = "1.5px solid var(--gold-border)";
 
@@ -287,19 +288,25 @@ export function MyPhotosPage() {
                 </button>
 
                 {moveTargets.length > 0 && (
-                  <select className="input" defaultValue="" disabled={busy}
-                    onChange={(e) => {
-                      const target = Number(e.target.value);
+                  <GoldSelect
+                    ariaLabel="Move to"
+                    placeholder="Move to…"
+                    searchable
+                    disabled={busy}
+                    // An action menu rather than a value: picking a folder moves the photo and
+                    // closes the viewer, so nothing is ever left showing as "chosen".
+                    value=""
+                    options={moveTargets.map((f) => ({ value: String(f.id), label: f.name ?? "" }))}
+                    onChange={(v) => {
+                      const target = Number(v);
                       if (!target) return;
                       void act(async () => {
                         await movePhoto(user.id, viewing.id, target);
                         setViewing(null);
                       }, "all");
                     }}
-                    style={{ flex: 1, minWidth: 150 }}>
-                    <option value="">Move to…</option>
-                    {moveTargets.map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}
-                  </select>
+                    style={{ flex: 1, minWidth: 150 }}
+                  />
                 )}
 
                 <button className="btn small ghost" disabled={busy} style={{ color: "#f55", borderColor: "#f55" }}

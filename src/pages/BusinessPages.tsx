@@ -16,6 +16,7 @@ import { Loading, Notice } from "../components/Common";
 import { PickerSheet } from "../components/PickerSheet";
 import { MAIN_MARKET_CODES } from "../lib/videoads";
 import { videoThumbnail } from "../lib/upload";
+import { GoldSelect } from "../components/GoldSelect";
 import {
   DAYS, cancelBusiness, createBusiness, createBusinessFolder, deleteBusinessFolder, deleteBusinessMedia, fetchBusinessCategories, fetchBusinessDetail, fetchBusinesses,
   fetchBusinessPricing, fetchCities, fetchMyBusinesses, fullAddress, hoursOf, loadCountries, nearLabel, placeLine, renameBusinessFolder, renewBusiness,
@@ -248,21 +249,21 @@ export function BusinessPage() {
               let it be changed here, rather than leaving it implied by the open tab. */}
           <div className="row" style={{ gap: 8, flexWrap: "wrap", marginTop: 10 }}>
             <span className="muted">Upload into:</span>
-            <select
-              className="input"
-              style={{ maxWidth: 220 }}
+            <GoldSelect
+              ariaLabel="Upload into"
+              style={{ maxWidth: 220, flex: "1 1 180px" }}
               value={activeFolder === null ? (showVideos ? "videos" : "photos") : String(activeFolder)}
-              onChange={(e) => {
-                const v = e.target.value;
+              options={[
+                { value: "photos", label: "Photos" },
+                { value: "videos", label: "Videos" },
+                ...folders.map((f) => ({ value: String(f.id), label: f.name })),
+              ]}
+              onChange={(v) => {
                 if (v === "photos") { setFolderId(null); setShowVideos(false); }
                 else if (v === "videos") { setFolderId(null); setShowVideos(true); }
                 else setFolderId(Number(v));
               }}
-            >
-              <option value="photos">Photos</option>
-              <option value="videos">Videos</option>
-              {folders.map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}
-            </select>
+            />
           </div>
           <div className="row" style={{ gap: 8, flexWrap: "wrap", marginTop: 8 }}>
             <label className="btn small">Upload Photos<input type="file" accept="image/*" hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) upload("photo", f); e.target.value = ""; }} /></label>

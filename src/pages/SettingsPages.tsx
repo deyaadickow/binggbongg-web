@@ -9,6 +9,7 @@ import { Avatar, Loading, Notice, UserRow } from "../components/Common";
 import { SideLinkItem, sidebarSections } from "../components/Sidebar";
 import { fetchMyVirtualBattles, fetchVirtualGiftRecord, sendVirtualThankYou, type VirtualBattleData, type VirtualGiftRecord } from "../lib/battles";
 import { VirtualGiftRecordOverlay, personName } from "../components/BattleEngines";
+import { GoldSelect } from "../components/GoldSelect";
 
 const SITE = "https://www.binggbongg.com";
 
@@ -539,9 +540,14 @@ export function FindABattlePage() {
       </div>
       {tab === "country" && (
         <div className="card pad" style={{ marginBottom: 10 }}>
-          <select className="input" value={selectedCountry ?? ""} onChange={(e) => setSelectedCountry(e.target.value)} style={{ width: "100%" }}>
-            {countries.map((c) => <option key={c.country} value={c.country}>{c.flag} {c.country} ({c.count})</option>)}
-          </select>
+          <GoldSelect
+            ariaLabel="Country"
+            placeholder="Country"
+            searchable
+            value={selectedCountry ?? ""}
+            options={countries.map((c) => ({ value: c.country, label: `${c.flag} ${c.country} (${c.count})` }))}
+            onChange={setSelectedCountry}
+          />
         </div>
       )}
       <div className="card">
