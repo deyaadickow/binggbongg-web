@@ -46,6 +46,15 @@ export const SURPRISE = "Surprise";
  */
 export const UNIVERSAL = "Universal";
 const UNIVERSAL_SIDES: BurstDirection[] = ["up", "down", "left", "right"];
+/**
+ * Icon size, ONE constant for both spawn paths. Steve, 2026-10-06: "Please make them all the same
+ * size." Surprise built its icons in a separate branch and kept its own literal, so when the
+ * travel effects were raised the web's Surprise stayed small — caught by grepping the deployed
+ * bundle and finding BOTH sizes in it. Same bug shape as the two name mappings that drifted.
+ */
+const ICON_SIZE_MIN = 70;
+const ICON_SIZE_RANGE = 26;
+
 const SURPRISE_MS = 5000;
 /* Steve, 2026-10-06: "they pop out and they move too fast, when they move slow them down." Each
    gift now takes ~1.7s to appear, sit and go (was ~0.9s), and the batches are spaced to match so
@@ -153,7 +162,7 @@ export function TapTapBurst({ gift }: { gift: Gift }) {
             topPct: 12 + Math.random() * 76,
             driftPx: 0,
             risePct: 0,
-            size: 46 + Math.random() * 20,
+            size: ICON_SIZE_MIN + Math.random() * ICON_SIZE_RANGE,
             spin: (Math.random() - 0.5) * 24,
           });
         }
@@ -186,7 +195,7 @@ export function TapTapBurst({ gift }: { gift: Gift }) {
       // Steve, 2026-10-06: the apps' 56pt, then raised for Universal, then "Please make them all
       // the same size" — so every effect flies at the bigger size now. (Universal never actually
       // rendered smaller; his Balloons2 artwork is just tall and narrow.)
-      size: 70 + Math.random() * 26,
+      size: ICON_SIZE_MIN + Math.random() * ICON_SIZE_RANGE,
       spin: (Math.random() - 0.5) * (d === "up" ? 50 : 30),
       };
     });
