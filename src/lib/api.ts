@@ -124,6 +124,9 @@ export interface Gift {
   /** tbl_gifts stores the price as `votes`; the battle ledgers call it coin_price. */
   votes?: number;
   coin_price?: number;
+  /** Eddie, 2026-09-19: "the gift will appear 100 times one after another" — an admin flag on
+   *  individual gifts. A 100-coin TapTap gift bursts 100 copies of its own icon instead of one. */
+  is_taptap?: boolean;
 }
 export function giftPrice(g: Gift): number {
   return Number(g.coin_price ?? g.votes ?? 0);

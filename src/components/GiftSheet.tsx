@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { giftPrice, mediaUrl, post, type Gift, type Post } from "../lib/api";
 import { useSession } from "../lib/session";
 import { loadGifts } from "../lib/gifts";
+import { TapTapBurst, isTapTapGift, tapTapBurstDuration } from "./TapTapBurst";
 
 /**
  * The gift button on a video, and the gift page it opens.
@@ -39,10 +40,17 @@ export function PostGiftButton({ post: item, className = "btn small", onSent }: 
  * positioned box (the card thumbnail or the video stage), where it fills it.
  */
 export function GiftFlash({ gift, onDone }: { gift: Gift; onDone: () => void }) {
+  // Eddie, 2026-09-19 / Steve, 2026-10-06: a TapTap gift bursts one icon per coin instead of
+  // showing the single card — and now does so everywhere a gift is given, not just live rooms.
+  const burst = isTapTapGift(gift);
+
   useEffect(() => {
-    const t = setTimeout(onDone, 2800);
+    const t = setTimeout(onDone, burst ? tapTapBurstDuration(gift) : 2800);
     return () => clearTimeout(t);
-  }, [gift, onDone]);
+  }, [gift, onDone, burst]);
+
+  if (burst) return <TapTapBurst gift={gift} />;
+
   return (
     <div className="gift-flash" aria-live="polite">
       <div className="gift-flash-card">
