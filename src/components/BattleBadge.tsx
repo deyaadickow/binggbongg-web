@@ -5,17 +5,19 @@ import type { MouseEvent } from "react";
  * #... please create just a round gold circle with the number that I add in gold. Very simple but
  * it's still a badge they will be willing to work for."
  *
- * Nothing is drawn for a member who hasn't battled yet — nobody wears an empty badge.
+ * Steve, 2026-10-05: "Everyone should have a badge, the ones that don't have a streak will be
+ * (0)" — so a member who has never battled wears a (0) rather than nothing, and tapping it tells
+ * them how to start.
  */
 export function BattleBadge({
   badge,
   size = 26,
   onClick,
 }: { badge?: number | null; size?: number; onClick?: (e: MouseEvent) => void }) {
-  if (!badge || badge < 1) return null;
+  const count = badge ?? 0;
 
   // Three and four digits step the type down rather than growing the circle.
-  const fontSize = badge >= 1000 ? size * 0.32 : badge >= 100 ? size * 0.38 : size * 0.46;
+  const fontSize = count >= 1000 ? size * 0.32 : count >= 100 ? size * 0.38 : size * 0.46;
 
   return (
     <span
@@ -39,7 +41,7 @@ export function BattleBadge({
         flex: "0 0 auto",
       }}
     >
-      {badge}
+      {count}
     </span>
   );
 }
@@ -47,10 +49,15 @@ export function BattleBadge({
 /** What the gold circle means, for anyone seeing it for the first time. */
 export function battleBadgeExplainer(name: string, badge: number): string {
   const who = name.trim() === "" ? "This member" : name;
+  // "has battled 0 times" is not English, so a member with no battles gets their own line.
+  const played =
+    badge === 0 ? `${who} hasn't battled yet.`
+      : badge === 1 ? `${who} has battled once.`
+        : `${who} has battled ${badge} times.`;
   return (
-    `${who} has battled ${badge} ${badge === 1 ? "time" : "times"}.\n\n` +
-    "The circle counts every battle, one by one, and goes up the moment a battle finishes.\n\n" +
-    "Battle someone to start yours."
+    `${played}\n\n` +
+    "The circle counts every battle, one by one, and goes up the moment a battle finishes." +
+    (badge === 0 ? "\n\nBattle someone to start it." : "")
   );
 }
 
@@ -67,8 +74,9 @@ export function BattleStreak({
   size = 26,
   onClick,
 }: { streak?: number | null; flames?: number | null; size?: number; onClick?: (e: MouseEvent) => void }) {
+  // Steve, 2026-10-05: a member with no streak shows (0), not nothing, so the pill is always
+  // there to be tapped and explained.
   const days = streak ?? 0;
-  if (days < 2) return null;
 
   const lit = (flames ?? 0) > 0;
   // 🔥 up to three — the cases Steve named — then ×N, so a long-running streak can never push
@@ -87,6 +95,10 @@ export function BattleStreak({
         alignItems: "center",
         justifyContent: "center",
         height: size,
+        // Wide enough that it always reads as a PILL. Once the zero state existed, a streak with
+        // no flames yet drew a near-circle holding the same number as the badge circle beside it,
+        // and the two were impossible to tell apart.
+        minWidth: size * 2,
         padding: "0 8px",
         borderRadius: size,
         border: "2px solid var(--gold)",
@@ -114,8 +126,12 @@ export function battleStreakExplainer(name: string, streak: number, flames: numb
       : flames === 1
         ? "1 flame saved: one day off, and the streak keeps going."
         : `${flames} flames saved: ${flames} days off, and the streak keeps going.`;
+  const run =
+    streak === 0 ? `${who} has no streak going. Battle someone today to start it.`
+      : streak === 1 ? `${who} has battled 1 day in a row.`
+        : `${who} has battled ${streak} days in a row.`;
   return (
-    `${who} has battled ${streak} days in a row.\n\n` +
+    `${run}\n\n` +
     "Battle at least once a day to keep it. Every 30 days in a row earns one flame 🔥 — 30 days is 1 flame, 60 days is 2, 90 days is 3.\n\n" +
     "A flame is one free day. Miss a day and a flame is spent instead of losing the streak.\n\n" +
     banked
