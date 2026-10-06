@@ -9,6 +9,7 @@ import { useSession } from "../lib/session";
 import { Loading, Notice } from "../components/Common";
 import { PostCard } from "../components/PostCard";
 import { GoldSelect } from "../components/GoldSelect";
+import { downloadStatement, printStatement, type StatementDoc } from "../lib/statementDoc";
 
 const money = (v: unknown, sym = "$") => `${sym}${Number(v ?? 0).toFixed(2)}`;
 
@@ -268,11 +269,49 @@ export function StatementsPage() {
     }).catch(() => setDays([]));
   }, [user, open]);
   if (!isLoggedIn || !user) return <NeedLogin />;
+
+  // Steve, 2026-10-06: "On these 2 pages add a download and a print button." Both buttons are
+  // built from the rows already on screen, so a member never downloads something different from
+  // what they are looking at.
+  const owner = user.fullname || user.username || undefined;
+  const monthName = open ? (open.month_label ?? `${open.year}-${String(open.month).padStart(2, "0")}`) : "";
+  const monthsDoc = (): StatementDoc => ({
+    title: "Monthly earnings statement",
+    subtitle: "All months",
+    owner,
+    rows: (months ?? []).map((m) => ({
+      left: m.month_label ?? `${m.year}-${String(m.month).padStart(2, "0")}`,
+      right: money(m.total_earned, sym),
+    })),
+    totalLabel: "Total earned",
+    total: money((months ?? []).reduce((t, m) => t + Number(m.total_earned ?? 0), 0), sym),
+  });
+  const daysDoc = (): StatementDoc => ({
+    title: "Monthly earnings statement",
+    subtitle: monthName,
+    owner,
+    rows: (days ?? []).map((d) => ({
+      left: `Day ${d.day}`,
+      note: d.entry_count ? `· ${d.entry_count} ${d.entry_count === 1 ? "entry" : "entries"}` : undefined,
+      right: money(d.total_earned, sym),
+    })),
+    totalLabel: "Total earned",
+    total: money(open?.total_earned, sym),
+  });
+  const safe = (text: string) => text.replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const buttons = (doc: () => StatementDoc, filename: string, ready: boolean) => (
+    <div className="row" style={{ gap: 8, marginBottom: 10 }}>
+      <button className="btn small" disabled={!ready} onClick={() => downloadStatement(doc(), filename)}>⤓ Download</button>
+      <button className="btn small ghost" disabled={!ready} onClick={() => printStatement(doc())}>⎙ Print</button>
+    </div>
+  );
+
   return (
     <Page title="Monthly earnings statement">
       {open ? (
         <>
           <div className="row" style={{ marginBottom: 10 }}><button className="btn small ghost" onClick={() => setOpen(null)}>‹ All months</button><b style={{ color: "var(--gold)" }}>{open.month_label ?? `${open.year}-${open.month}`}</b><span className="spacer" /><b>{money(open.total_earned, sym)}</b></div>
+          {buttons(daysDoc, `binggbongg-statement-${safe(monthName)}.pdf`, (days?.length ?? 0) > 0)}
           <div className="card">
             {days === null ? <Loading /> : days.length === 0 ? <p className="muted" style={{ padding: 14 }}>Nothing earned this month.</p> : days.map((d, i) => (
               <div key={i} className="row" style={{ padding: "8px 14px", borderBottom: "1px solid var(--line)" }}>
@@ -283,6 +322,8 @@ export function StatementsPage() {
           </div>
         </>
       ) : (
+        <>
+        {buttons(monthsDoc, "binggbongg-statement-all-months.pdf", (months?.length ?? 0) > 0)}
         <div className="card">
           {months === null ? <Loading /> : months.length === 0 ? <p className="muted" style={{ padding: 14 }}>No statements yet — they appear once you earn.</p> : months.map((m, i) => (
             <button key={i} className="side-link big" onClick={() => setOpen(m)} style={{ justifyContent: "space-between" }}>
@@ -291,6 +332,7 @@ export function StatementsPage() {
             </button>
           ))}
         </div>
+        </>
       )}
     </Page>
   );
