@@ -127,6 +127,8 @@ export interface Gift {
   /** Eddie, 2026-09-19: "the gift will appear 100 times one after another" — an admin flag on
    *  individual gifts. A 100-coin TapTap gift bursts 100 copies of its own icon instead of one. */
   is_taptap?: boolean;
+  /** Rainfall — the same burst falling instead of rising. Mutually exclusive with is_taptap. */
+  is_rainfall?: boolean;
 }
 export function giftPrice(g: Gift): number {
   return Number(g.coin_price ?? g.votes ?? 0);
