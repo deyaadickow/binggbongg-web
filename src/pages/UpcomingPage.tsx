@@ -44,6 +44,13 @@ export function UpcomingPage() {
             wording. */}
         <h2 className="lb-bar title">Scheduled Lives and Battles</h2>
       </div>
+      {/* Steve, 2026-10-07: he opened this page and asked where to schedule a battle. Telling
+          someone "go to your profile" is a worse answer than putting the button on the page they
+          are already looking at. */}
+      <Link to={`/profile/${me.id}`} className="btn wide" style={{ marginBottom: 10 }}>
+        + Schedule a Live or Battle
+      </Link>
+
       <div className="lb-tabs">
         {(["all", "live", "battle"] as const).map((f) => (
           <button key={f} className={`btn small ${filter === f ? "" : "ghost"}`} onClick={() => setFilter(f)}>
