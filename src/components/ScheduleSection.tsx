@@ -110,7 +110,7 @@ export function ScheduleSection({ profileId, myId }: { profileId: number; myId?:
       <div className="row">
         <h3 className="schedule-title">{isMine ? "My Live/Battle Schedule" : "Schedule"}</h3>
         <span className="spacer" />
-        <Link to="/upcoming" className="btn small ghost">What's on</Link>
+        <Link to="/upcoming" className="btn small ghost">L &amp; B</Link>
         {isMine && (
           <button className="btn small" onClick={() => { setShowAdd((v) => !v); setShowRequest(false); }}>
             {showAdd ? "Cancel" : "Add"}

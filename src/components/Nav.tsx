@@ -10,6 +10,9 @@ export function Nav() {
       <nav className="links">
         <NavLink to="/" end>For You</NavLink>
         <NavLink to="/exciting-news">Exciting News</NavLink>
+        {/* Steve, 2026-10-07: "L & B" — everyone's scheduled lives and battles, right after
+            Exciting News, same slot as both phones. */}
+        <NavLink to="/upcoming">L &amp; B</NavLink>
         <NavLink to="/business">Business</NavLink>
         <NavLink to="/live">Live Now</NavLink>
         <NavLink to="/search">Search</NavLink>
