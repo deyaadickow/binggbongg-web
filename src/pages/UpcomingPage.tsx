@@ -55,8 +55,8 @@ export function UpcomingPage() {
       ) : (
         items.map((item) => (
           <Link key={item.id} to={`/profile/${item.user_id}`} className="card schedule-row upcoming-row">
-            {item.user?.image ? (
-              <img className="upcoming-avatar" src={mediaUrl(item.user.image)} alt="" loading="lazy" />
+            {item.user?.profile_image ? (
+              <img className="upcoming-avatar" src={mediaUrl(item.user.profile_image)} alt="" loading="lazy" />
             ) : (
               <span className="upcoming-avatar upcoming-avatar-blank" aria-hidden />
             )}
