@@ -310,3 +310,29 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .upcoming-avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 1px solid var(--gold-border); }
 .upcoming-avatar-blank { display: inline-block; background: #111; }
 .upcoming-when { font-size: 13px; color: var(--gold); white-space: nowrap; text-align: right; }
+
+/* Steve, 2026-10-06: "make all these pages into our design with a back arrow circle and our
+   cosmic background and black and gold on all the tabs." The image is the SAME bg_vip_cosmic the
+   two apps use, copied into public/ rather than approximated with a gradient, so the three
+   platforms actually match. */
+.cosmic-page { position: relative; min-height: 100vh; }
+.cosmic-page::before {
+  content: "";
+  position: fixed; inset: 0; z-index: -1;
+  background: #000 url("/bg_vip_cosmic.webp") center / cover no-repeat;
+}
+/* Loose text over that backdrop is unreadable wherever it crosses the moon or a star — Steve has
+   flagged the same thing on the earnings statement. Anything that is not already on a card sits
+   on this plate. */
+.cosmic-plate { background: rgba(0,0,0,.8); border-radius: 12px; padding: 10px 12px; }
+/* The app's circled back arrow. */
+.back-circle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; flex: 0 0 36px;
+  border-radius: 50%; border: 2px solid var(--gold-border);
+  background: rgba(0,0,0,.6); color: var(--gold);
+  font-size: 18px; line-height: 1; cursor: pointer; padding: 0;
+}
+.back-circle:hover { border-color: var(--gold-bright); }
+.cosmic-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.cosmic-head h2 { margin: 0; color: var(--gold); font-size: 20px; }

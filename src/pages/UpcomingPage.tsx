@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSession } from "../lib/session";
 import {
   fetchUpcomingSchedules, formatScheduleTime, mediaUrl,
@@ -13,6 +13,7 @@ import {
  */
 export function UpcomingPage() {
   const { user: me } = useSession();
+  const navigate = useNavigate();
   const [items, setItems] = useState<ScheduleItem[]>([]);
   const [filter, setFilter] = useState<ScheduleKind | "all">("all");
   const [loading, setLoading] = useState(true);
@@ -36,8 +37,11 @@ export function UpcomingPage() {
   if (!me) return <div className="notice">Sign in to see what's coming up.</div>;
 
   return (
-    <div className="page">
-      <h2>What's on</h2>
+    <div className="page cosmic-page">
+      <div className="cosmic-head">
+        <button className="back-circle" onClick={() => navigate(-1)} aria-label="Back">‹</button>
+        <h2>What's on</h2>
+      </div>
       <div className="row" style={{ gap: 8, marginBottom: 12 }}>
         {(["all", "live", "battle"] as const).map((f) => (
           <button key={f} className={`btn small ${filter === f ? "" : "ghost"}`} onClick={() => setFilter(f)}>
@@ -49,9 +53,9 @@ export function UpcomingPage() {
       {error && <div className="notice">{error}</div>}
 
       {loading ? (
-        <div className="muted">Loading…</div>
+        <div className="muted cosmic-plate">Loading…</div>
       ) : items.length === 0 ? (
-        <div className="muted">Nothing scheduled yet. Be the first — add one on your profile.</div>
+        <div className="muted cosmic-plate">Nothing scheduled yet. Be the first — add one on your profile.</div>
       ) : (
         items.map((item) => (
           <Link key={item.id} to={`/profile/${item.user_id}`} className="card schedule-row upcoming-row">
