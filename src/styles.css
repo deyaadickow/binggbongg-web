@@ -336,3 +336,18 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .back-circle:hover { border-color: var(--gold-bright); }
 .cosmic-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
 .cosmic-head h2 { margin: 0; color: var(--gold); font-size: 20px; }
+
+/* Steve, 2026-10-07: on the L & B page "each line side to side and a black background and light
+   gold border on both top and bottom lines", "center all texts", and "The three tab as well,
+   side to side". */
+.lb-bar {
+  display: block; width: 100%; text-align: center;
+  background: rgba(0,0,0,.9); border: 1px solid rgba(212,175,55,.55);
+  border-radius: 14px; padding: 12px 14px; margin: 0 0 10px;
+}
+.lb-bar.title { color: var(--gold); font-weight: 700; font-size: 16px; }
+.lb-tabs { display: flex; gap: 6px; margin-bottom: 10px; }
+/* Steve, 2026-10-07: the cosmic backdrop was leaking through an unselected tab. */
+.lb-tabs .btn { flex: 1 1 0; text-align: center; }
+.lb-tabs .btn.ghost { background: rgba(0,0,0,.9); }
+.upcoming-row { text-align: center; }

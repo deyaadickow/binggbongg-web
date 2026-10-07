@@ -42,9 +42,9 @@ export function UpcomingPage() {
         <button className="back-circle" onClick={() => navigate(-1)} aria-label="Back">‹</button>
         {/* Steve, 2026-10-07: the chip is "L & B"; the page it opens is headed with his own
             wording. */}
-        <h2>Scheduled Lives and Battles</h2>
+        <h2 className="lb-bar title">Scheduled Lives and Battles</h2>
       </div>
-      <div className="row" style={{ gap: 8, marginBottom: 12 }}>
+      <div className="lb-tabs">
         {(["all", "live", "battle"] as const).map((f) => (
           <button key={f} className={`btn small ${filter === f ? "" : "ghost"}`} onClick={() => setFilter(f)}>
             {f === "all" ? "Everything" : f === "live" ? "Lives" : "Battles"}
@@ -55,9 +55,9 @@ export function UpcomingPage() {
       {error && <div className="notice">{error}</div>}
 
       {loading ? (
-        <div className="muted cosmic-plate">Loading…</div>
+        <div className="lb-bar">Loading…</div>
       ) : items.length === 0 ? (
-        <div className="muted cosmic-plate">Nothing scheduled yet. Be the first — add one on your profile.</div>
+        <div className="lb-bar">Nothing scheduled yet. Be the first — add one on your profile.</div>
       ) : (
         items.map((item) => (
           <Link key={item.id} to={`/profile/${item.user_id}`} className="card schedule-row upcoming-row">
