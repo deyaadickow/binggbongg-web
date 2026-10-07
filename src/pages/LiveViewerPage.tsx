@@ -67,10 +67,11 @@ export function LiveViewerPage() {
    * same thing. Uses the Web Share sheet on a phone and falls back to the clipboard on a desktop,
    * where navigator.share mostly does not exist.
    */
-  const shareBattleRecap = useCallback(async (battleId: number) => {
+  const shareBattleRecap = useCallback(async (battleId: number, engine = "1v1") => {
     setSharingRecap(true);
     try {
-      const res = await post<{ share_url?: string; share_text?: string }>("fetchBattleRecap", { battle_id: battleId });
+      // The engines have separate id spaces, so the id alone is ambiguous to the server.
+      const res = await post<{ share_url?: string; share_text?: string }>("fetchBattleRecap", { battle_id: battleId, engine });
       const url = res.data?.share_url;
       if (!res.status || !url) throw new Error("No recap yet");
       const text = [res.data?.share_text, url].filter(Boolean).join("\n");
@@ -113,7 +114,12 @@ export function LiveViewerPage() {
   const battle = useBattle(roomName, user?.id ?? null, isPublisher, isLoggedIn && !roomClosed, onBattleCompleted, onAnyBattleStarted);
 
   // The other four engines: Best Out Of, 2v2, No Time Limit, 5-5-5. One result overlay at a time.
-  const [result, setResult] = useState<{ title: string; rows: { label: string; value: string; win?: boolean }[] } | null>(null);
+  const [result, setResult] = useState<{
+    title: string;
+    rows: { label: string; value: string; win?: boolean }[];
+    /** Set only for engines the server can build a recap for. */
+    recap?: { id: number; engine: string };
+  } | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [picker, setPicker] = useState<BattleKind | null>(null);
   // Steve, 2026-09-27: Hide & Seek — pick the shape first (free for all 2-4, or 2v2 teams).
@@ -143,6 +149,7 @@ export function LiveViewerPage() {
     const iWon = !!mine && d.winning_team === mine.team;
     const team = (t: "A" | "B") => d.participants.filter((p) => p.team === t).map((p) => nameOfId(p.user_id) || personName(p)).join(" & ");
     setResult({
+      recap: d.status === "completed" ? { id: d.battle_id, engine: "2v2" } : undefined,
       title: d.status === "cancelled" ? "Battle cancelled" : !d.winning_team ? "It's a tie" : !iPlayed ? "Battle over!" : iWon ? "🏆 Your team won!" : "Your team lost this one",
       rows: [
         { label: team("A"), value: (d.team_a_score ?? 0).toLocaleString(), win: d.winning_team === "A" },
@@ -833,7 +840,15 @@ export function LiveViewerPage() {
         <InviteCard title="5-5-5" onClose={b555.dismissInvite} onAnswer={(ok) => b555.respond(b555.invite!.battle_555_id, ok).catch((e) => setToast((e as Error).message))}
           body={`${displayName({ fullname: b555.invite.host_fullname, username: b555.invite.host_username } as Partial<UserSummary>)} invites you to 5-5-5 — 5 Games / 5 Minutes / Reach ${b555.invite.coins_per_game.toLocaleString()} coins and win.`} />
       )}
-      {result && <ResultOverlay title={result.title} rows={result.rows} onClose={() => setResult(null)} />}
+      {result && (
+        <ResultOverlay
+          title={result.title}
+          rows={result.rows}
+          onClose={() => setResult(null)}
+          sharing={sharingRecap}
+          onShare={result.recap ? () => shareBattleRecap(result.recap!.id, result.recap!.engine) : undefined}
+        />
+      )}
       {battlePicker && (
         <Overlay title="Bingg Bongg Battle — who do you challenge?" onClose={() => setBattlePicker(false)}>
           {broadcasters.filter((b) => b.user_id !== user?.id).map((b) => (

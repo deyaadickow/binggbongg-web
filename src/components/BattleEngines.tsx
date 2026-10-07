@@ -351,7 +351,14 @@ export function resultTitle(winnerId: number | null | undefined, myUserId: numbe
   return winnerId === myUserId ? "🏆 You won!" : "You lost this one";
 }
 
-export function ResultOverlay({ title, rows, onClose }: { title: string; rows: { label: string; value: string; win?: boolean }[]; onClose: () => void }) {
+export function ResultOverlay({ title, rows, onClose, onShare, sharing }: {
+  title: string;
+  rows: { label: string; value: string; win?: boolean }[];
+  onClose: () => void;
+  /** Battle Recap — omitted for the engines the server has no recap builder for. */
+  onShare?: () => void;
+  sharing?: boolean;
+}) {
   return (
     <Overlay title={title} onClose={onClose}>
       {rows.map((r, i) => (
@@ -360,7 +367,12 @@ export function ResultOverlay({ title, rows, onClose }: { title: string; rows: {
           <span style={{ color: "var(--gold)" }}>{r.value}</span>
         </div>
       ))}
-      <button className="btn block" style={{ marginTop: 12 }} onClick={onClose}>Close</button>
+      {onShare && (
+        <button className="btn block" style={{ marginTop: 12 }} disabled={sharing} onClick={onShare}>
+          {sharing ? "Getting your recap…" : "Share this result"}
+        </button>
+      )}
+      <button className={onShare ? "btn block ghost" : "btn block"} style={{ marginTop: 8 }} onClick={onClose}>Close</button>
     </Overlay>
   );
 }
