@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSession } from "../lib/session";
+import { ScheduleSection } from "../components/ScheduleSection";
 import {
   fetchUpcomingSchedules, formatScheduleTime, mediaUrl,
   type ScheduleItem, type ScheduleKind,
@@ -17,6 +18,8 @@ export function UpcomingPage() {
   const [items, setItems] = useState<ScheduleItem[]>([]);
   const [filter, setFilter] = useState<ScheduleKind | "all">("all");
   const [loading, setLoading] = useState(true);
+  /** The scheduler, opened in place rather than sending anyone to their profile. */
+  const [showMine, setShowMine] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -44,12 +47,13 @@ export function UpcomingPage() {
             wording. */}
         <h2 className="lb-bar title">Scheduled Lives and Battles</h2>
       </div>
-      {/* Steve, 2026-10-07: he opened this page and asked where to schedule a battle. Telling
-          someone "go to your profile" is a worse answer than putting the button on the page they
-          are already looking at. */}
-      <Link to={`/profile/${me.id}`} className="btn wide" style={{ marginBottom: 10 }}>
-        + Schedule a Live or Battle
-      </Link>
+      {/* Steve, 2026-10-07: "Everything is still sitting in my profile." A button that bounced
+          him to his profile was barely better than telling him to go there — the scheduler itself
+          now opens HERE, on the page he is already looking at. */}
+      <button className="btn wide" style={{ marginBottom: 10 }} onClick={() => setShowMine((v) => !v)}>
+        {showMine ? "Hide my schedule" : "+ Schedule a Live or Battle"}
+      </button>
+      {showMine && <ScheduleSection profileId={me.id} myId={me.id} />}
 
       <div className="lb-tabs">
         {(["all", "live", "battle"] as const).map((f) => (
