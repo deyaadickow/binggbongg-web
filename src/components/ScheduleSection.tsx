@@ -107,32 +107,37 @@ export function ScheduleSection({ profileId, myId }: { profileId: number; myId?:
 
   return (
     <section className="card schedule-card">
-      <div className="row">
-        <h3 className="schedule-title">{isMine ? "My Live/Battle Schedule" : "Schedule"}</h3>
-        <span className="spacer" />
-        <Link to="/upcoming" className="btn small ghost">L &amp; B</Link>
+      {/* Steve, 2026-10-07: "do the same for the web" — the phones' three full-width stacked
+          buttons and the black-and-gold bars, instead of a row of small ones. */}
+      <h3 className="lb-bar title">{isMine ? "My Live/Battle Schedule" : "Schedule"}</h3>
+      <div className="schedule-actions">
         {isMine && (
-          <button className="btn small" onClick={() => { setShowAdd((v) => !v); setShowRequest(false); }}>
-            {showAdd ? "Cancel" : "Add"}
-          </button>
+          <>
+            <button className="btn wide" onClick={() => { setKind("live"); setShowAdd(true); setShowRequest(false); }}>
+              Schedule a Live
+            </button>
+            <button className="btn wide" onClick={() => { setKind("battle"); setShowAdd(true); setShowRequest(false); }}>
+              Schedule a Battle
+            </button>
+          </>
         )}
         {!isMine && myId != null && (
-          <button className="btn small" onClick={() => { setShowRequest((v) => !v); setShowAdd(false); }}>
-            {showRequest ? "Cancel" : "Request a battle"}
+          <button className="btn wide" onClick={() => { setShowRequest(true); setShowAdd(false); }}>
+            Request a Battle
+          </button>
+        )}
+        <Link to="/upcoming" className="btn wide">Scheduled Lives and Battles</Link>
+        {(showAdd || showRequest) && (
+          <button className="btn wide ghost" onClick={() => { setShowAdd(false); setShowRequest(false); }}>
+            Cancel
           </button>
         )}
       </div>
 
-      {notice && <div className="gift-notice">{notice}</div>}
+      {notice && <div className="lb-bar">{notice}</div>}
 
       {(showAdd || showRequest) && (
         <div className="schedule-form">
-          {showAdd && (
-            <div className="row">
-              <label><input type="radio" checked={kind === "live"} onChange={() => setKind("live")} /> Live</label>
-              <label><input type="radio" checked={kind === "battle"} onChange={() => setKind("battle")} /> Battle</label>
-            </div>
-          )}
           {(showRequest || kind === "battle") && (
             <label className="schedule-field">
               <span>Battle type</span>
@@ -176,9 +181,9 @@ export function ScheduleSection({ profileId, myId }: { profileId: number; myId?:
       )}
 
       {loading ? (
-        <div className="muted">Loading…</div>
+        <div className="lb-bar">Loading…</div>
       ) : items.length === 0 ? (
-        <div className="muted">
+        <div className="lb-bar">
           {isMine ? "Nothing scheduled yet. Add a live or a battle so your followers can plan to join."
                   : "Nothing scheduled right now."}
         </div>

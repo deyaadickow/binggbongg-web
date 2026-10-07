@@ -276,6 +276,8 @@ export function ProfilePage() {
   const [tabError, setTabError] = useState<string | null>(null);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [showBattleBoard, setShowBattleBoard] = useState(false);
+  /** Open by default: the point of the card is that people SEE what is scheduled. */
+  const [showSchedule, setShowSchedule] = useState(true);
   const [showCreatePlaylist, setShowCreatePlaylist] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
   const [copiedRefer, setCopiedRefer] = useState(false);
@@ -629,6 +631,12 @@ export function ProfilePage() {
           <button className="btn ghost small" onClick={() => navigate("/settings/find-a-battle")}>
             🔍 Find Battle
           </button>
+          {/* Steve, 2026-10-07: "My account is the good judge and i don't see it there" — it used
+              to sit below the playlists, far down the page. Next to Battle Board / Find Battle it
+              is where someone actually looks for it. */}
+          <button className="btn ghost small" onClick={() => setShowSchedule((v) => !v)}>
+            🗓 {showSchedule ? "Hide Schedule" : "My Live/Battle Schedule"}
+          </button>
           {isMe && (
             // Steve, 2026-09-26: "On each personal profile page please add a link called
             // 'Support' but inside the link page call it, 'Who Supported Me'." Own profile only —
@@ -643,6 +651,8 @@ export function ProfilePage() {
             </button>
           )}
         </div>
+
+        {showSchedule && <ScheduleSection profileId={profileId} myId={me?.id} />}
 
         {/* Playlists (own profile) */}
         {isMe && playlists.length > 0 && (
@@ -666,10 +676,6 @@ export function ProfilePage() {
           </div>
         )}
       </div>
-
-      {/* Steve, 2026-10-06: "On every member's profile page add a scheduler where a member can
-          fill out for all the members to see and maybe they will join." */}
-      <ScheduleSection profileId={profileId} myId={me?.id} />
 
       {/* Tab chips */}
       <div className="profile-tabs-wrap" style={{ margin: "0 -16px", padding: "0 12px" }}>

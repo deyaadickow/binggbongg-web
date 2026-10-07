@@ -351,3 +351,9 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .lb-tabs .btn { flex: 1 1 0; text-align: center; }
 .lb-tabs .btn.ghost { background: rgba(0,0,0,.9); }
 .upcoming-row { text-align: center; }
+
+/* The phones' full-width stacked buttons, on the web profile card. */
+.schedule-actions { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
+.btn.wide { display: block; width: 100%; text-align: center; padding: 12px 14px; font-weight: 700; }
+.btn.wide.ghost { background: rgba(0,0,0,.9); }
+.schedule-card .lb-bar.title { margin-bottom: 10px; }
