@@ -137,6 +137,12 @@ export function LiveViewerPage() {
     setHeldSeries({ d, until: Date.now() + 60_000 });
     const acc = d.participants.filter((p) => p.invite_status === "accepted");
     setResult({
+      // Only a TWO-player series has a recap — the engine allows more (Hide & Seek runs on it with
+      // up to four) and beyond two it stops being a versus story, which is the rule the server
+      // applies as well. Checking it here means the button is never offered for a share that 404s.
+      recap: d.status === "completed" && acc.length === 2 && d.winner_user_id
+        ? { id: d.series_id, engine: "best_out_of" }
+        : undefined,
       title: resultTitle(d.winner_user_id, myId, acc.some((p) => p.user_id === myId), d.status === "cancelled"),
       rows: acc.map((p) => ({ label: nameOfId(p.user_id) || personName(p), value: `${p.rounds_won ?? 0} round${p.rounds_won === 1 ? "" : "s"}`, win: p.user_id === d.winner_user_id })),
     });
