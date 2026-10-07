@@ -60,6 +60,32 @@ export function LiveViewerPage() {
 
   // Bingg Bongg Battle (1v1). Result overlay for the two battlers, a toast for everyone else.
   const [battleResult, setBattleResult] = useState<BattleData | null>(null);
+  const [sharingRecap, setSharingRecap] = useState(false);
+  /**
+   * Battle Recap (Steve, 2026-10-07). The share SENTENCE comes from the server rather than being
+   * written here, so Android, iOS and the web cannot drift into three different sentences for the
+   * same thing. Uses the Web Share sheet on a phone and falls back to the clipboard on a desktop,
+   * where navigator.share mostly does not exist.
+   */
+  const shareBattleRecap = useCallback(async (battleId: number) => {
+    setSharingRecap(true);
+    try {
+      const res = await post<{ share_url?: string; share_text?: string }>("fetchBattleRecap", { battle_id: battleId });
+      const url = res.data?.share_url;
+      if (!res.status || !url) throw new Error("No recap yet");
+      const text = [res.data?.share_text, url].filter(Boolean).join("\n");
+      if (navigator.share) {
+        await navigator.share({ text, url });
+      } else {
+        await navigator.clipboard.writeText(text);
+        setToast("Link copied — paste it anywhere.");
+      }
+    } catch (e) {
+      if ((e as Error)?.name !== "AbortError") setToast("Couldn't get the recap. Try again in a moment.");
+    } finally {
+      setSharingRecap(false);
+    }
+  }, []);
   const [battlePicker, setBattlePicker] = useState(false);
   // "Game Limit" — the same 1v1 engine and invite, plus a coin target chosen first
   // (Steve, 2026-09-01: "give them the option of adding as many coins as they want",
@@ -853,7 +879,17 @@ export function LiveViewerPage() {
           <p className="soft" style={{ textAlign: "center", fontSize: 18 }}>
             {displayName(nameOf(battleResult.player_one_user_id) as Partial<UserSummary>)} {battleResult.player_one_score} — {battleResult.player_two_score} {displayName(nameOf(battleResult.player_two_user_id) as Partial<UserSummary>)}
           </p>
-          <button className="btn block" style={{ marginTop: 12 }} onClick={() => setBattleResult(null)}>Close</button>
+          {/* Battle Recap (Steve, 2026-10-07). Shown to the LOSER exactly as to the winner —
+              "the loser has as much reason to post it as the winner" is the whole mechanic. */}
+          <button
+            className="btn block"
+            style={{ marginTop: 12 }}
+            disabled={sharingRecap}
+            onClick={() => shareBattleRecap(battleResult.battle_id)}
+          >
+            {sharingRecap ? "Getting your recap…" : "Share this result"}
+          </button>
+          <button className="btn block ghost" style={{ marginTop: 8 }} onClick={() => setBattleResult(null)}>Close</button>
         </Overlay>
       )}
       {introQueue > 0 && <BattleIntro onDone={() => setIntroQueue((n) => Math.max(0, n - 1))} />}
