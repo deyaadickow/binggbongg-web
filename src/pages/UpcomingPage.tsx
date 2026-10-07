@@ -42,7 +42,7 @@ export function UpcomingPage() {
         <button className="back-circle" onClick={() => navigate(-1)} aria-label="Back">‹</button>
         {/* Steve, 2026-10-07: the chip is "L & B"; the page it opens is headed with his own
             wording. */}
-        <h2>Scheduled Lives and battles</h2>
+        <h2>Scheduled Lives and Battles</h2>
       </div>
       <div className="row" style={{ gap: 8, marginBottom: 12 }}>
         {(["all", "live", "battle"] as const).map((f) => (
