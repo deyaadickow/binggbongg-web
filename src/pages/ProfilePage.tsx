@@ -6,6 +6,7 @@ import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice } from "../components/Common";
 import { fetchUserPhotos, type Photo } from "../lib/photos";
 import { MemberBusinessesPanel, MyBusinessesPanel } from "./BusinessPages";
+import { ScheduleSection } from "../components/ScheduleSection";
 
 interface ProfileUser extends UserSummary {
   refer_code?: string;
@@ -665,6 +666,10 @@ export function ProfilePage() {
           </div>
         )}
       </div>
+
+      {/* Steve, 2026-10-06: "On every member's profile page add a scheduler where a member can
+          fill out for all the members to see and maybe they will join." */}
+      <ScheduleSection profileId={profileId} myId={me?.id} />
 
       {/* Tab chips */}
       <div className="profile-tabs-wrap" style={{ margin: "0 -16px", padding: "0 12px" }}>

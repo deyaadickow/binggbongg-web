@@ -296,3 +296,17 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
   .battle-kind .kind-need .need-long { display: none; }
   .battle-kind .kind-need .need-short { display: inline; }
 }
+
+/* My Live/Battle Schedule (Steve, 2026-10-06) */
+.schedule-card { margin: 12px 0; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.schedule-title { margin: 0; font-size: 16px; color: var(--gold); }
+.schedule-form { display: flex; flex-direction: column; gap: 8px; padding: 10px; border: 1px solid var(--gold-border); border-radius: 12px; background: #0d0d00; }
+.schedule-field { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--text-soft); }
+.schedule-field input, .schedule-field select { padding: 8px 10px; border-radius: 10px; border: 1px solid var(--gold-border); background: #000; color: #fff; font-size: 14px; }
+.schedule-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid rgba(255,255,255,.08); }
+.schedule-row:first-of-type { border-top: 0; }
+.schedule-requests h4 { margin: 4px 0; font-size: 14px; color: var(--gold); }
+.upcoming-row { padding: 10px 12px; margin-bottom: 8px; border-radius: 14px; text-decoration: none; color: inherit; }
+.upcoming-avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 1px solid var(--gold-border); }
+.upcoming-avatar-blank { display: inline-block; background: #111; }
+.upcoming-when { font-size: 13px; color: var(--gold); white-space: nowrap; text-align: right; }

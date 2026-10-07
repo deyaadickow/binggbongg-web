@@ -163,3 +163,124 @@ export function initials(name: string): string {
   if (parts.length === 1) return parts[0][0].toUpperCase();
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
+
+/* ------------------------------------------------------------------------- *
+ * My Live/Battle Schedule (Steve, 2026-10-06)
+ *
+ * starts_at is UTC from the server, always. Render it with toLocaleString() and never with a
+ * hand-rolled format — members are in every timezone the app sells ads in.
+ * ------------------------------------------------------------------------- */
+
+export type ScheduleKind = "live" | "battle";
+
+export interface ScheduleItem {
+  id: number;
+  user_id: number;
+  kind: ScheduleKind;
+  battle_type?: string | null;
+  note?: string | null;
+  /** UTC. */
+  starts_at: string;
+  opponent_user_id?: number | null;
+  user?: UserSummary | null;
+  opponent?: UserSummary | null;
+}
+
+export interface BattleRequestItem {
+  id: number;
+  from_user_id: number;
+  to_user_id: number;
+  battle_type: string;
+  note?: string | null;
+  /** UTC. */
+  starts_at: string;
+  status: "pending" | "accepted" | "denied";
+  from_user?: UserSummary | null;
+  to_user?: UserSummary | null;
+}
+
+/** The nine battle engines, as the apps name them. */
+export const BATTLE_TYPES = [
+  "1v1", "2v2", "5-5-5", "Marathon", "Best Out Of", "Virtual", "Hide & Seek", "Solo", "PK Battle",
+] as const;
+
+/** A datetime-local input gives local time with no zone; the server wants UTC. */
+export function localInputToUtc(value: string): string {
+  return new Date(value).toISOString();
+}
+
+/** UTC from the server -> the viewer's own local time, in their own locale. */
+export function formatScheduleTime(utc: string): string {
+  const d = new Date(utc);
+  if (Number.isNaN(d.getTime())) return "";
+  return d.toLocaleString(undefined, {
+    weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
+  });
+}
+
+export async function fetchUserSchedule(userId: number, myId?: number) {
+  const res = await post<ScheduleItem[]>("fetchUserSchedule", {
+    user_id: userId,
+    ...(myId ? { my_user_id: myId } : {}),
+  });
+  return res.data ?? [];
+}
+
+export async function fetchUpcomingSchedules(myId: number, kind?: ScheduleKind) {
+  const res = await post<ScheduleItem[]>("fetchUpcomingSchedules", {
+    my_user_id: myId,
+    user_id: myId,
+    ...(kind ? { kind } : {}),
+  });
+  return res.data ?? [];
+}
+
+export async function addSchedule(input: {
+  myId: number;
+  kind: ScheduleKind;
+  startsAtUtc: string;
+  battleType?: string;
+  note?: string;
+}) {
+  return post("addSchedule", {
+    user_id: input.myId,
+    my_user_id: input.myId,
+    kind: input.kind,
+    starts_at: input.startsAtUtc,
+    battle_type: input.battleType,
+    note: input.note,
+  });
+}
+
+export async function deleteSchedule(myId: number, scheduleId: number) {
+  return post("deleteSchedule", { my_user_id: myId, user_id: myId, schedule_id: scheduleId });
+}
+
+export async function sendBattleRequest(input: {
+  myId: number;
+  toUserId: number;
+  battleType: string;
+  startsAtUtc: string;
+  note?: string;
+}) {
+  return post("sendBattleRequest", {
+    my_user_id: input.myId,
+    to_user_id: input.toUserId,
+    battle_type: input.battleType,
+    starts_at: input.startsAtUtc,
+    note: input.note,
+  });
+}
+
+export async function fetchMyBattleRequests(myId: number) {
+  const res = await post<BattleRequestItem[]>("fetchMyBattleRequests", {
+    my_user_id: myId, user_id: myId,
+  });
+  return { incoming: res.data ?? [], sent: ((res as unknown as { sent?: BattleRequestItem[] }).sent) ?? [] };
+}
+
+export async function respondToBattleRequest(myId: number, requestId: number, accept: boolean) {
+  return post("respondToBattleRequest", {
+    my_user_id: myId, user_id: myId, battle_request_id: requestId, accept: accept ? 1 : 0,
+  });
+}
