@@ -256,8 +256,15 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .playlist-item-thumb { width: 88px; height: 88px; border-radius: 8px; overflow: hidden; border: 1.5px solid var(--gold-border); background: #111; display: flex; align-items: center; justify-content: center; color: var(--text-dim); font-size: 28px; }
 .playlist-item-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .playlist-item-name { font-size: 11px; color: var(--text-soft); margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; font-weight: 600; }
-.modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.75); z-index: 100; display: flex; align-items: flex-end; justify-content: center; }
-.modal-sheet { background: var(--panel); border: 1.5px solid var(--gold-border); border-radius: var(--radius) var(--radius) 0 0; width: 100%; max-width: 600px; max-height: 82vh; overflow-y: auto; padding: 24px 16px 40px; }
+/* Steve, 2026-10-07: "Please center these two popups to the middle of the screen." These were
+   bottom sheets (align-items: flex-end) — right on a phone, but on a desktop browser they sat
+   pinned to the bottom edge with the whole page empty above them. Every other consumer was
+   already overriding this back to centre (the gift sheet, the business viewer), so centring is
+   now the default and those overrides are redundant. */
+.modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.75); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 16px; }
+/* Rounded on all four corners and evenly padded now it floats, instead of the flat bottom edge
+   and extra bottom padding a sheet needs when it is glued to the bottom of the screen. */
+.modal-sheet { background: var(--panel); border: 1.5px solid var(--gold-border); border-radius: var(--radius); width: 100%; max-width: 600px; max-height: 82vh; overflow-y: auto; padding: 24px 16px; }
 .modal-sheet h3 { color: var(--gold); font-size: 18px; font-weight: 800; margin-bottom: 16px; text-align: center; }
 .social-links { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
 .social-link { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line); font-size: 12px; color: var(--text-soft); }
