@@ -115,6 +115,9 @@ export interface LiveStream {
   host_profile_image?: string;
   viewers?: number;
   watching_count?: number;
+  /** Steve, 2026-10-07: favourites sort to the top of Live Now and the heart filters to them.
+   *  The server sends this on every row. */
+  is_favourite?: boolean;
 }
 
 export interface Gift {

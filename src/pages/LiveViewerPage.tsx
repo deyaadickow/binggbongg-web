@@ -46,6 +46,12 @@ export function LiveViewerPage() {
   const [gifts, setGifts] = useState<Gift[]>([]);
   const [giftTarget, setGiftTarget] = useState<number | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  // Favourite streamers (Steve, 2026-10-07). Private, silent, and deliberately NOT Follow:
+  // follow is about being told, favourite is about ordering what you see on Live Now.
+  const [isFavourite, setIsFavourite] = useState(false);
+  const [favBusy, setFavBusy] = useState(false);
+  const [favExplainer, setFavExplainer] = useState(false);
+  const holdTimer = useRef<number | null>(null);
   const logRef = useRef<HTMLDivElement>(null);
 
   // Auto Voice Thanks — TTS settings loaded from the backend for the host.
@@ -67,6 +73,43 @@ export function LiveViewerPage() {
    * same thing. Uses the Web Share sheet on a phone and falls back to the clipboard on a desktop,
    * where navigator.share mostly does not exist.
    */
+  // Fetched once so the heart is right before anyone clicks it, rather than drawing hollow and
+  // correcting itself a moment later.
+  useEffect(() => {
+    if (!user?.id || !hostUserId || role === "host") return;
+    let alive = true;
+    post<{ user_id: number }[]>("fetchFavouriteStreamers", { user_id: user.id })
+      .then((res) => {
+        if (!alive || !res.status) return;
+        setIsFavourite((res.data ?? []).some((f) => f.user_id === hostUserId));
+      })
+      .catch(() => undefined);
+    return () => { alive = false; };
+  }, [user?.id, hostUserId, role]);
+
+  const toggleFavourite = useCallback(async () => {
+    if (!user?.id || !hostUserId || favBusy) return;
+    setFavBusy(true);
+    try {
+      // is_favourite comes back at the TOP level, not inside data — ApiResponse carries
+      // `& Record<string, unknown>` for exactly this.
+      const res = await post("toggleFavouriteStreamer",
+        { user_id: user.id, streamer_user_id: hostUserId });
+      // Drawn from the SERVER's answer, never an optimistic flip: a failed click must not leave
+      // a heart claiming something untrue.
+      if (res.status) {
+        setIsFavourite(Boolean((res as { is_favourite?: boolean }).is_favourite));
+        setToast(res.message ?? "");
+      } else {
+        setToast(res.message ?? "Couldn't save that — try again.");
+      }
+    } catch {
+      setToast("Couldn't save that — try again.");
+    } finally {
+      setFavBusy(false);
+    }
+  }, [user?.id, hostUserId, favBusy]);
+
   const shareBattleRecap = useCallback(async (battleId: number, engine = "1v1") => {
     setSharingRecap(true);
     try {
@@ -573,6 +616,41 @@ export function LiveViewerPage() {
               </div>
             )}
           </div>
+
+          {/* Viewer-side. Deliberately NOT inside the isPublisher block below: a host would be
+              favouriting themselves, which the server refuses anyway. Hold it for two seconds for
+              the explainer, same gesture as both phones. */}
+          {!isPublisher && isLoggedIn && hostUserId > 0 && (
+            <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
+              <button
+                className={isFavourite ? "btn small" : "btn small ghost"}
+                disabled={favBusy}
+                onClick={toggleFavourite}
+                onPointerDown={() => {
+                  // A real two-second hold. The browser has no long-press of its own, and a
+                  // right-click menu is not a gesture a phone user has.
+                  holdTimer.current = window.setTimeout(() => setFavExplainer(true), 2000);
+                }}
+                onPointerUp={() => { if (holdTimer.current) window.clearTimeout(holdTimer.current); }}
+                onPointerLeave={() => { if (holdTimer.current) window.clearTimeout(holdTimer.current); }}
+                title="Save this streamer. Hold for two seconds to find out what it does."
+              >{isFavourite ? "♥ Favourited" : "♡ Favourite"}</button>
+            </div>
+          )}
+
+          {favExplainer && (
+            <div className="modal-backdrop" onClick={() => setFavExplainer(false)}>
+              <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
+                <h3 style={{ color: "var(--gold)", marginTop: 0 }}>Favourite</h3>
+                <p>Click the heart to save a streamer as a favourite.</p>
+                <p>Your favourites always show first when you scroll through who's live, and the
+                   heart on Live Now shows only them.</p>
+                <p>This is just for you — nobody is told, and it's different from Follow, which is
+                   about getting notified.</p>
+                <button className="btn" onClick={() => setFavExplainer(false)}>Got it</button>
+              </div>
+            </div>
+          )}
 
           {isPublisher && (
             <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>

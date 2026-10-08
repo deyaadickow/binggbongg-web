@@ -8,6 +8,10 @@ export function LiveNowPage() {
   const { user } = useSession();
   const [streams, setStreams] = useState<LiveStream[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Steve, 2026-10-08: "incase i just want to watch my favorite live streamers?" Favourites
+  // already sort to the top, but with forty people live that still means scrolling past
+  // everyone. Filtered here rather than re-fetched: the server sends is_favourite on every row.
+  const [favouritesOnly, setFavouritesOnly] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -16,9 +20,18 @@ export function LiveNowPage() {
         const res = await post<LiveStream[]>("fetchActiveLiveStreams", { user_id: user?.id ?? 0, connections_only: false });
         if (!alive) return;
         if (!res.status) throw new Error(res.message ?? "Couldn't load who's live.");
-        // One card per room (the API lists every broadcaster in a room; the host is first).
-        const seen = new Set<string>();
-        setStreams((res.data ?? []).filter((s) => (seen.has(s.room_name) ? false : (seen.add(s.room_name), true))));
+        // One card per room — the API lists every broadcaster in a room, host first.
+        //
+        // But PREFER a favourited broadcaster over the host when both are in the same room.
+        // Keeping the host blindly would drop a favourite who is a GUEST in someone else's
+        // battle, so the favourites filter below would find nothing while they were plainly
+        // live. The room is the same either way; whose name is on the card is not.
+        const byRoom = new Map<string, LiveStream>();
+        for (const s of res.data ?? []) {
+          const held = byRoom.get(s.room_name);
+          if (!held || (s.is_favourite && !held.is_favourite)) byRoom.set(s.room_name, s);
+        }
+        setStreams([...byRoom.values()]);
       } catch (e) {
         if (alive) setError((e as Error).message);
       }
@@ -28,15 +41,36 @@ export function LiveNowPage() {
     return () => { alive = false; clearInterval(t); };
   }, [user]);
 
+  const visible = streams === null ? null : favouritesOnly ? streams.filter((s) => s.is_favourite) : streams;
+
   return (
     <div className="page">
-      <h1 className="page-title">Live Now</h1>
+      <div className="row" style={{ alignItems: "center", gap: 12 }}>
+        <h1 className="page-title" style={{ margin: 0 }}>Live Now</h1>
+        <span style={{ flex: 1 }} />
+        {/* Filled when ON. Without that, an empty filtered list looks identical to
+            "nobody is live", which is the confusion worth avoiding. */}
+        <button
+          type="button"
+          className={favouritesOnly ? "btn" : "btn ghost"}
+          onClick={() => setFavouritesOnly((v) => !v)}
+          title="Show only my favourite streamers"
+        >
+          {favouritesOnly ? "♥ Favourites" : "♡ Favourites"}
+        </button>
+      </div>
       {error && <Notice error>{error}</Notice>}
-      {streams === null ? <Loading /> : streams.length === 0 ? (
-        <Notice>Nobody is live right now. Check back in a few minutes.</Notice>
+      {visible === null ? <Loading /> : visible.length === 0 ? (
+        <Notice>
+          {favouritesOnly
+            ? (streams && streams.some((s) => s.is_favourite)
+                ? "None of your favourites are live right now."
+                : "None of your favourites are live right now. Open a live stream and tap the heart to add one.")
+            : "Nobody is live right now. Check back in a few minutes."}
+        </Notice>
       ) : (
         <div className="grid wide">
-          {streams.map((s) => (
+          {visible.map((s) => (
             <Link key={s.room_name} to={`/live/${encodeURIComponent(s.room_name)}`} className="card row" style={{ padding: 14, color: "inherit" }}>
               <Avatar user={{ fullname: s.host_fullname, username: s.host_username, profile_image: s.host_profile_image }} size="lg" />
               <div style={{ flex: 1, minWidth: 0 }}>
