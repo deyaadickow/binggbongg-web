@@ -6,7 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { API_BASE, currentAuthHeaders, displayName, mediaUrl, post, type UserSummary } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice, UserRow } from "../components/Common";
-import { SideLinkItem, sidebarSections } from "../components/Sidebar";
+import { SideLinkItem, SiteFooter, sidebarSections } from "../components/Sidebar";
 import { fetchMyVirtualBattles, fetchVirtualGiftRecord, sendVirtualThankYou, type VirtualBattleData, type VirtualGiftRecord } from "../lib/battles";
 import { VirtualGiftRecordOverlay, personName } from "../components/BattleEngines";
 import { GoldSelect } from "../components/GoldSelect";
@@ -47,6 +47,9 @@ export function SettingsHubPage() {
           {sec.links.filter((l) => !l.needsLogin || isLoggedIn).map((l) => <SideLinkItem key={l.label} link={l} onSignOut={signOut} big />)}
         </div>
       ))}
+      {/* The sidebar that normally carries this is hidden under 900px, and a phone is how most
+          people see the site — so who operates it has to be reachable here too. */}
+      <SiteFooter />
     </Page>
   );
 }

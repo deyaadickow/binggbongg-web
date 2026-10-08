@@ -83,7 +83,33 @@ export function Sidebar() {
           </div>
         );
       })}
+      <SiteFooter />
     </aside>
+  );
+}
+
+/**
+ * Who operates this site.
+ *
+ * Microsoft PhotoDNA, 2026-10-08: "available only to qualified organizations, and we have been
+ * unable to verify the information provided." Nothing on binggbongg.com named a company — the
+ * About and legal pages were reachable only by digging through Settings, and a stranger landing
+ * on the site saw a video feed and two store badges.
+ *
+ * City and state, no street: the registered office is a home address.
+ */
+export function SiteFooter() {
+  return (
+    <div className="site-footer">
+      <div>© {new Date().getFullYear()} Bingg Bongg Inc.</div>
+      <div>Sterling Heights, Michigan, USA</div>
+      <div className="site-footer-links">
+        <NavLink to="/settings/about">About</NavLink>
+        <NavLink to="/settings/contact">Contact</NavLink>
+        <NavLink to="/settings/terms">Terms</NavLink>
+        <NavLink to="/settings/privacy">Privacy</NavLink>
+      </div>
+    </div>
   );
 }
 
