@@ -46,8 +46,69 @@ export async function post<T = unknown>(endpoint: string, params: Record<string,
     body,
   });
   if (res.status === 401) throw new ApiError(401, "Please sign in again.");
+  // Suspended or blocked (2026-10-09). The server answers 403 with the sentence meant to be
+  // shown — "Your account has been suspended until December 25th." Without this the member
+  // just sees "Server error (403)" on every click and has no idea what happened or when it ends.
+  if (res.status === 403) {
+    const body = await res.clone().json().catch(() => null);
+    if (body && (body.suspended === true || body.blocked === true)) {
+      const message = typeof body.message === "string" && body.message
+        ? body.message
+        : "Your account has been suspended.";
+      showSuspendedOverlay(message);
+      throw new ApiError(403, message);
+    }
+  }
   if (!res.ok) throw new ApiError(res.status, `Server error (${res.status})`);
   return (await res.json()) as ApiResponse<T>;
+}
+
+/**
+ * The one screen a suspended member sees.
+ *
+ * Built straight onto the document rather than as a React component on purpose: a suspension can
+ * land on any call from any page, including ones with no error UI of their own, and every one of
+ * those would otherwise fail silently. It is also deliberately not dismissable — there is nothing
+ * useful behind it until the suspension ends.
+ */
+let suspendedOverlayShown = false;
+function showSuspendedOverlay(message: string) {
+  if (suspendedOverlayShown || typeof document === "undefined") return;
+  suspendedOverlayShown = true;
+
+  const overlay = document.createElement("div");
+  overlay.setAttribute("role", "alertdialog");
+  overlay.setAttribute("aria-live", "assertive");
+  overlay.style.cssText = [
+    "position:fixed", "inset:0", "z-index:99999",
+    "background:rgba(0,0,0,0.94)",
+    "display:flex", "align-items:center", "justify-content:center",
+    "padding:24px",
+    "font-family:inherit",
+  ].join(";");
+
+  const card = document.createElement("div");
+  card.style.cssText = [
+    "max-width:420px", "width:100%",
+    "background:#0d0d0d", "border:2px solid #D4AF37", "border-radius:18px",
+    "padding:28px 24px", "text-align:center", "color:#fff",
+  ].join(";");
+
+  const title = document.createElement("div");
+  title.textContent = "Account Suspended";
+  title.style.cssText = "color:#FFD54A;font-size:20px;font-weight:700;margin-bottom:12px";
+
+  const text = document.createElement("div");
+  text.textContent = message;
+  text.style.cssText = "font-size:15px;line-height:1.5";
+
+  const help = document.createElement("div");
+  help.textContent = "If you think this is a mistake, contact support.";
+  help.style.cssText = "margin-top:14px;font-size:13px;color:#C8C8C8";
+
+  card.append(title, text, help);
+  overlay.append(card);
+  document.body.append(overlay);
 }
 
 /** LiveKit token server: same AUTHTOKEN/USERID headers, JSON bodies. */
