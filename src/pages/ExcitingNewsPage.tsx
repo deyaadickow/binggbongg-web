@@ -198,6 +198,8 @@ export function ExcitingNewsPage() {
 function FlyerArt({ flyer, areas }: { flyer: ExcitingNewsFlyer; areas: TextAreas }) {
   const ref = useRef<HTMLDivElement>(null);
   const [box, setBox] = useState({ w: 0, h: 0 });
+  /** Steve, 2026-10-10: the bullseye's popup. */
+  const [reading, setReading] = useState(false);
   /** The artwork's own proportions, which decide where inside the card it actually lands. */
   const [natural, setNatural] = useState<{ w: number; h: number } | null>(null);
 
@@ -249,6 +251,105 @@ function FlyerArt({ flyer, areas }: { flyer: ExcitingNewsFlyer; areas: TextAreas
           <FlyerOverlay flyer={flyer} areas={areas} height={rect.h} />
         </div>
       )}
+      {/* Steve, 2026-10-10: "By tapping a Bullseye that you can add on the right side of the
+          message." Only on a flyer carrying a typed-out copy of its printed words — the older
+          flyers have theirs painted on by the page, already in the right language, so there is
+          nothing to read out. Pinned to the CARD rather than to the drawn rectangle: it is a
+          control, not part of the artwork, and it must stay reachable while a letterboxed flyer
+          is still measuring itself. */}
+      {readableFlyerText(flyer) && (
+        <button
+          type="button"
+          onClick={() => setReading(true)}
+          aria-label={READ_THIS_FLYER}
+          title={READ_THIS_FLYER}
+          style={{
+            position: "absolute",
+            right: 14,
+            top: "50%",
+            transform: "translateY(-50%)",
+            width: 40,
+            height: 40,
+            borderRadius: "50%",
+            background: "rgba(0,0,0,0.55)",
+            border: "1.5px solid #F0C420",
+            color: "#F0C420",
+            font: "bold 21px/1 system-ui, sans-serif",
+            cursor: "pointer",
+          }}
+        >
+          {"\u25CE"}
+        </button>
+      )}
+      {reading && <FlyerTextDialog text={readableFlyerText(flyer) ?? ""} onClose={() => setReading(false)} />}
+    </div>
+  );
+}
+
+const READ_THIS_FLYER = "Read this flyer in your language";
+
+/** The words printed on this flyer, typed out by the admin, or null when it has none. */
+function readableFlyerText(flyer: ExcitingNewsFlyer): string | null {
+  const t = (flyer.flyer_text ?? "").trim();
+  return t === "" ? null : t;
+}
+
+/**
+ * Steve, 2026-10-10: "A popup will appear with a black background and gold border translated into
+ * that language."
+ *
+ * The text arrives already translated — the server does it once per flyer per language and caches
+ * it — so this only has to show what it was given. It scrolls because a whole flyer's worth of
+ * copy, in a language that runs longer than English, would otherwise push the close button off
+ * the bottom of the screen.
+ */
+function FlyerTextDialog({ text, onClose }: { text: string; onClose: () => void }) {
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      onClick={onClose}
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 60,
+        display: "grid",
+        placeItems: "center",
+        background: "rgba(0,0,0,0.7)",
+        padding: 16,
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          width: "min(520px, 100%)",
+          maxHeight: "80vh",
+          display: "flex",
+          flexDirection: "column",
+          background: "#000",
+          border: "1.5px solid #F0C420",
+          borderRadius: 14,
+          padding: 18,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+          <strong style={{ color: "#F0C420", fontSize: 16, flex: 1 }}>What this flyer says</strong>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            style={{ background: "none", border: "none", color: "#bdbdc7", fontSize: 20, cursor: "pointer" }}
+          >
+            {"\u00d7"}
+          </button>
+        </div>
+        <div style={{ height: 1.5, background: "#F0C420", marginBottom: 14 }} />
+        {/* whiteSpace: pre-wrap — the admin types this as it reads on the picture, line breaks
+            and all, and reflowing it into one paragraph would lose that. */}
+        <div style={{ overflowY: "auto", color: "#fff", fontSize: 15, lineHeight: 1.55, whiteSpace: "pre-wrap" }}>
+          {text}
+        </div>
+      </div>
     </div>
   );
 }

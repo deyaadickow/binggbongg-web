@@ -32,6 +32,10 @@ export interface ExcitingNewsFlyer {
   /** Steve, 2026-10-02: on a design with no frames of its own, the app draws a black box with a
    *  gold border that hugs the words it holds — so the box is the right size in every language. */
   draw_panels?: boolean;
+  /** Steve, 2026-10-10: everything printed ON the artwork, typed out by the admin so it can still
+   *  be translated. Arrives already in the viewer's language. Empty on a flyer that has the page
+   *  paint its words on instead — a flyer is one kind or the other, never both. */
+  flyer_text?: string | null;
   countries?: string[];
   aspect_ratio?: ExcitingNewsAspectRatio;
 }
