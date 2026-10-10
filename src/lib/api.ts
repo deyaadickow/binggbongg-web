@@ -301,14 +301,23 @@ export type DailyFortune = {
   date_of_birth?: string | null;
   age?: number | null;
   horoscope?: string | null;
+  /** Which language the reading actually came back in — "en" when translation was unavailable. */
+  horoscope_language?: string;
   disclaimer?: string;
 };
 
 export async function fetchDailyFortune(userId: number, dateOfBirth?: string): Promise<DailyFortune> {
   // This endpoint answers at the TOP level rather than nesting under `data`, so the response
   // is read as a whole rather than via res.data.
+  //
+  // The web has no app-wide language setting — the UI is English only — so the READING is
+  // asked for in the BROWSER's language (Steve, 2026-10-10: translate the reading too). "fr-FR"
+  // becomes "fr"; Google wants the base code. If the server has no translate key it returns
+  // English and says so in horoscope_language.
+  const browserLanguage = (navigator.language || "en").split("-")[0].toLowerCase();
   const res = await post("fetchDailyFortune", {
     user_id: userId,
+    language: browserLanguage,
     ...(dateOfBirth ? { date_of_birth: dateOfBirth } : {}),
   });
   return res as unknown as DailyFortune;
