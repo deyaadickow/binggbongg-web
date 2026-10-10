@@ -23,6 +23,10 @@ export function sidebarSections(userId: number | null): SideSection[] {
       { to: "/upload-photos", label: "Upload photos", icon: "⬆️", needsLogin: true },
       { to: "/enter-contest", label: "Enter a contest", icon: "🏆", needsLogin: true },
       { to: "/go-live", label: "Go Live", icon: "📡", needsLogin: true },
+      // Lucky numbers + daily horoscope (Steve, 2026-10-09) — the feed-level door, matching
+      // the Home chip on the phones. There is a second one under Account, matching their
+      // Settings row; Steve asked for both.
+      { to: "/lucky", label: "Lucky Numbers", icon: "🔮", needsLogin: true },
     ] },
     { title: "Account", links: [
       { to: userId ? `/profile/${userId}` : "/login", label: "My Profile", icon: "👤", needsLogin: true },
@@ -45,6 +49,7 @@ export function sidebarSections(userId: number | null): SideSection[] {
       { to: "/settings/printable-ads", label: "Create Your Own Ads", icon: "🖨️", needsLogin: true },
       { to: "/settings/business", label: "Bingg Bongg Business", icon: "💼", needsLogin: true },
       { to: "/settings/shop", label: "Bingg Bongg Shop", icon: "🛍️", needsLogin: true },
+      { to: "/lucky", label: "Lucky Numbers & Horoscope", icon: "🔮", needsLogin: true },
       { to: "/settings/verification", label: "Request verification", icon: "✅", needsLogin: true },
     ] },
     { title: "General", links: [

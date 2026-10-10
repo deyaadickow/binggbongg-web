@@ -282,6 +282,38 @@ export function formatScheduleTime(utc: string): string {
   });
 }
 
+/**
+ * Lucky numbers + daily horoscope (Steve, 2026-10-09): "for entertainment only so we can bring
+ * members to the app on a daily bases."
+ *
+ * The numbers are STRINGS and must stay strings: "048" is a three digit number and 48 is not,
+ * and roughly one draw in ten starts with a zero. Never Number() them.
+ *
+ * Pass `dateOfBirth` only to set or correct the member's own — the server stores it on the same
+ * column the age check reads, so there is nothing else to save.
+ */
+export type DailyFortune = {
+  status: boolean;
+  message?: string;
+  date?: string;
+  lucky_numbers?: Record<string, string>;
+  sign?: string | null;
+  date_of_birth?: string | null;
+  age?: number | null;
+  horoscope?: string | null;
+  disclaimer?: string;
+};
+
+export async function fetchDailyFortune(userId: number, dateOfBirth?: string): Promise<DailyFortune> {
+  // This endpoint answers at the TOP level rather than nesting under `data`, so the response
+  // is read as a whole rather than via res.data.
+  const res = await post("fetchDailyFortune", {
+    user_id: userId,
+    ...(dateOfBirth ? { date_of_birth: dateOfBirth } : {}),
+  });
+  return res as unknown as DailyFortune;
+}
+
 export async function fetchUserSchedule(userId: number, myId?: number) {
   const res = await post<ScheduleItem[]>("fetchUserSchedule", {
     user_id: userId,
