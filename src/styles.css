@@ -422,3 +422,16 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .dm-rule { height: 1px; background: var(--gold-border); opacity: .45; }
 .dm-composer { display: flex; gap: 8px; align-items: center; }
 .dm-composer .input { flex: 1; }
+
+/* Photos and video in messages — Steve, 2026-10-11: "Add photos and video to the messages." */
+.dm-media { display: block; max-width: 240px; max-height: 300px; width: 100%; border-radius: 8px;
+  border: 1px solid rgba(212,175,55,.5); background: #000; }
+.dm-caption { margin-top: 8px; }
+.dm-attach { min-width: 44px; padding: 0 14px; font-size: 20px; line-height: 1; }
+.dm-pending { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; padding: 8px 10px;
+  border-radius: 12px; background: rgba(0,0,0,.85); border: 1.5px solid var(--gold-border); }
+.dm-pending-media { width: 54px; height: 54px; object-fit: cover; border-radius: 8px;
+  border: 1px solid rgba(212,175,55,.5); background: #000; }
+.dm-pending-name { color: var(--gold); font-weight: 700; font-size: 13px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dm-pending-hint { color: var(--gold); opacity: .7; font-size: 12px; }

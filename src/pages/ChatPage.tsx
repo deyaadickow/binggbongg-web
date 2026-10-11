@@ -14,7 +14,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Avatar, Loading, Notice } from "../components/Common";
 import { post, type UserSummary } from "../lib/api";
-import { conversationId, markConversationRead, observeMessages, sendMessage, type DmMessage } from "../lib/dm";
+import {
+  conversationId, markConversationRead, observeMessages, sendMediaMessage, sendMessage,
+  uploadChatMedia, type DmMessage,
+} from "../lib/dm";
+import { mediaUrl } from "../lib/api";
 import { useSession } from "../lib/session";
 import { TRANSLATION_LANGUAGES, translateChatMessage } from "../lib/translate";
 
@@ -37,6 +41,13 @@ export function ChatPage() {
   const [draft, setDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
+
+  // Steve, 2026-10-11: "Add photos and video to the messages." Picked, previewed with a
+  // caption, then uploaded on send — so a mis-pick costs nothing and the caption travels with
+  // it the way it does on the phones.
+  const [pending, setPending] = useState<{ file: File; url: string; isVideo: boolean } | null>(null);
+  const [progress, setProgress] = useState(0);
+  const filePicker = useRef<HTMLInputElement | null>(null);
 
   // Translation: the language this conversation is READ in, plus one cached line per message.
   // A message mapped to "" is a resolved nothing-to-show (already in that language, or the
@@ -111,16 +122,38 @@ export function ChatPage() {
 
   useEffect(() => { messages?.forEach(wantTranslation); }, [messages, wantTranslation]);
 
+  function pick(files: FileList | null) {
+    const file = files?.[0];
+    if (!file) return;
+    setError(null);
+    setPending({ file, url: URL.createObjectURL(file), isVideo: file.type.startsWith("video/") });
+  }
+
+  function clearPending() {
+    if (pending) URL.revokeObjectURL(pending.url);
+    setPending(null);
+    setProgress(0);
+  }
+
   async function send() {
-    if (!user || !partner || !draft.trim() || sending) return;
+    if (!user || !partner || sending) return;
+    if (!pending && !draft.trim()) return;
     setSending(true);
+    setError(null);
     try {
-      await sendMessage(user, partner, draft);
+      if (pending) {
+        const { key, kind } = await uploadChatMedia(user.id, pending.file, setProgress);
+        await sendMediaMessage(user, partner, key, kind, draft);
+        clearPending();
+      } else {
+        await sendMessage(user, partner, draft);
+      }
       setDraft("");
     } catch (e) {
       setError((e as Error).message || "Couldn't send that.");
     } finally {
       setSending(false);
+      setProgress(0);
     }
   }
 
@@ -163,7 +196,15 @@ export function ChatPage() {
               {showDay && <div className="dm-day"><span>{day}</span></div>}
               <div className={`dm-msg-row ${mine ? "mine" : "theirs"}`}>
                 <div className={`dm-bubble ${mine ? "mine" : "theirs"}`}>
-                  <div>{m.msg}</div>
+                  {m.msgType === "image" && m.image && (
+                    <a href={mediaUrl(m.image)} target="_blank" rel="noopener noreferrer">
+                      <img className="dm-media" src={mediaUrl(m.image)} alt={m.msg || "Photo"} />
+                    </a>
+                  )}
+                  {m.msgType === "video" && m.image && (
+                    <video className="dm-media" src={mediaUrl(m.image)} controls preload="metadata" />
+                  )}
+                  {m.msg && <div className={m.msgType === "text" ? undefined : "dm-caption"}>{m.msg}</div>}
                   {second && <><div className="dm-bubble-rule" /><div className="dm-translated">{second}</div></>}
                 </div>
                 <span className="dm-time">
@@ -177,16 +218,46 @@ export function ChatPage() {
         <div ref={bottom} />
       </div>
 
+      {pending && (
+        <div className="dm-pending">
+          {pending.isVideo
+            ? <video className="dm-pending-media" src={pending.url} muted playsInline />
+            : <img className="dm-pending-media" src={pending.url} alt="" />}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div className="dm-pending-name">{pending.file.name}</div>
+            <div className="dm-pending-hint">
+              {sending
+                ? `Sending… ${Math.round(progress * 100)}%`
+                : "Add a caption if you like, then Send."}
+            </div>
+          </div>
+          <button className="btn ghost small" onClick={clearPending} disabled={sending}>Remove</button>
+        </div>
+      )}
+
       <div className="dm-composer">
         <input
+          ref={filePicker}
+          type="file"
+          accept="image/*,video/*"
+          hidden
+          onChange={(e) => { pick(e.target.files); e.target.value = ""; }}
+        />
+        <button
+          className="btn ghost dm-attach"
+          title="Send a photo or a video"
+          disabled={sending}
+          onClick={() => filePicker.current?.click()}
+        >+</button>
+        <input
           className="input"
-          placeholder="Write Something"
+          placeholder={pending ? "Caption (optional)" : "Write Something"}
           value={draft}
           maxLength={1000}
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter") void send(); }}
         />
-        <button className="btn" disabled={!draft.trim() || sending} onClick={() => void send()}>Send</button>
+        <button className="btn" disabled={(!draft.trim() && !pending) || sending} onClick={() => void send()}>Send</button>
       </div>
     </div>
   );

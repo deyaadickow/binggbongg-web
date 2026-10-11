@@ -41,6 +41,10 @@ export function senderUser(u: UserSummary & { identity?: string }, isNew: boolea
   };
 }
 
+/** What the phones put in the pointer doc's `lastMsg` for a media message — the inbox shows
+ *  this instead of an empty line. Taken from Android's strings: ic_text_image / ic_text_video. */
+const MEDIA_LAST_MSG: Record<string, string> = { image: "\u{1F4F7} image", video: "\u{1F3A5} video" };
+
 export interface DmMessage {
   id: string;
   msg: string;
@@ -127,6 +131,7 @@ export async function observeMessages(
           id: String(v.id ?? d.id),
           msg: String(v.msg ?? ""),
           msgType: String(v.msgType ?? "text"),
+          // A relative S3 key ("uploads/…") on a media message, "" on a text one.
           image: String(v.image ?? ""),
           // Written as a double by both apps; a string has been seen in older rows.
           time: Number(v.time ?? 0),
@@ -145,16 +150,14 @@ export async function observeMessages(
  *  BOTH pointer documents, so the conversation appears in each side's inbox with the right
  *  unread state. `merge` rather than the apps' set-or-update branch — same result, and it does
  *  not need to know first whether the pointer already exists. */
-export async function sendMessage(
+async function write(
   me: UserSummary & { identity?: string },
   partner: UserSummary & { identity?: string },
-  text: string,
+  opts: { msg: string; msgType: "text" | "image" | "video"; image: string },
 ): Promise<void> {
   const myIdentity = me.identity ?? "";
   const theirIdentity = partner.identity ?? "";
   if (!myIdentity || !theirIdentity) throw new Error("Missing identity");
-  const body = text.trim();
-  if (!body) return;
 
   await ensureFirebaseSignIn();
   const db = getFirestore(firebaseApp());
@@ -164,24 +167,51 @@ export async function sendMessage(
 
   await setDoc(doc(db, "chat", cid, "chat", timeStr), {
     id: timeStr,
-    msg: body,
-    msgType: "text",
-    image: "",
+    msg: opts.msg,
+    msgType: opts.msgType,
+    image: opts.image,
     time,
     senderUser: senderUser(me, true),
     not_deleted_identities: [myIdentity, theirIdentity],
   });
 
+  // The phones put a label in lastMsg for media, not the caption, so a photo with no words
+  // still reads as something in the inbox.
+  const lastMsg = opts.msgType === "text" ? opts.msg : MEDIA_LAST_MSG[opts.msgType] ?? opts.msg;
+
   await setDoc(
     doc(db, "userchatlist", myIdentity, "userlist", theirIdentity),
-    { user: senderUser(partner, false), conversationId: cid, newMsg: false, isDeleted: false, time, lastMsg: body },
+    { user: senderUser(partner, false), conversationId: cid, newMsg: false, isDeleted: false, time, lastMsg },
     { merge: true },
   );
   await setDoc(
     doc(db, "userchatlist", theirIdentity, "userlist", myIdentity),
-    { user: senderUser(me, true), conversationId: cid, newMsg: true, isDeleted: false, time, lastMsg: body },
+    { user: senderUser(me, true), conversationId: cid, newMsg: true, isDeleted: false, time, lastMsg },
     { merge: true },
   );
+}
+
+export async function sendMessage(
+  me: UserSummary & { identity?: string },
+  partner: UserSummary & { identity?: string },
+  text: string,
+): Promise<void> {
+  const body = text.trim();
+  if (!body) return;
+  await write(me, partner, { msg: body, msgType: "text", image: "" });
+}
+
+/** A photo or a video, already uploaded. [key] is the S3 key the upload came back with
+ *  ("uploads/…"), which is exactly what the phones store in `image`. */
+export async function sendMediaMessage(
+  me: UserSummary & { identity?: string },
+  partner: UserSummary & { identity?: string },
+  key: string,
+  kind: "image" | "video",
+  caption: string,
+): Promise<void> {
+  if (!key) throw new Error("Nothing uploaded");
+  await write(me, partner, { msg: caption.trim(), msgType: kind, image: key });
 }
 
 /** Clears the unread flag on the reader's own pointer — what the phones do on opening a thread. */
@@ -191,4 +221,88 @@ export async function markConversationRead(myIdentity: string, theirIdentity: st
   await setDoc(doc(db, "userchatlist", myIdentity, "userlist", theirIdentity), { newMsg: false }, { merge: true }).catch(
     () => {},
   );
+}
+
+// ---------------------------------------------------------------------------------------
+// Sending a photo or a video — Steve, 2026-10-11: "Add photos and video to the messages."
+//
+// Three steps, the same ones every other upload on the web takes (lib/upload.ts): ask the
+// backend for a pre-signed S3 slot, PUT the bytes, then write the message pointing at the key
+// it landed under. The browser never holds an AWS credential.
+//
+// PLUS one the phones do NOT do: the uploaded image is put through Hive before the message is
+// written, and a flagged one is never sent. The backend's moderateImage has existed since the
+// Hive work but its own doc comment says it is "not yet called from anywhere" — so chat media
+// is an ungated upload surface on both phones today. Adding a third ungated one, on the
+// platform anyone can reach without installing anything, was not a reasonable thing to do
+// given why that endpoint was built. It fails OPEN on any error or a missing key, so Hive
+// being down never blocks a legitimate message.
+
+import { createUploadUrls, putToSignedUrl, videoThumbnail } from "./upload";
+import { post } from "./api";
+
+export const DM_MAX_IMAGE_BYTES = 12 * 1024 * 1024;
+export const DM_MAX_VIDEO_BYTES = 80 * 1024 * 1024;
+
+/** True when the image at [url] should NOT be sent. Fails open — see the note above. */
+async function isFlagged(url: string): Promise<boolean> {
+  try {
+    const res = await post<{ flagged?: boolean }>("moderateImage", { url });
+    return res.status === true && (res.data?.flagged === true || (res as unknown as { flagged?: boolean }).flagged === true);
+  } catch {
+    return false;
+  }
+}
+
+export interface MediaUploadResult {
+  key: string;
+  kind: "image" | "video";
+}
+
+/**
+ * Uploads one picked file and returns the key to attach to a message.
+ *
+ * For a video the moderation check runs against its first frame, grabbed in the browser and
+ * uploaded alongside it — Hive's image endpoint needs something it can fetch, and a frame is a
+ * proportionate check for a chat clip. A thumbnail that cannot be produced (an odd codec, a
+ * blocked canvas) is not treated as a failure; the video just goes unchecked, same as on the
+ * phones.
+ */
+export async function uploadChatMedia(
+  userId: number,
+  file: File,
+  onProgress?: (fraction: number) => void,
+): Promise<MediaUploadResult> {
+  const isVideo = file.type.startsWith("video/");
+  const kind: "image" | "video" = isVideo ? "video" : "image";
+  const limit = isVideo ? DM_MAX_VIDEO_BYTES : DM_MAX_IMAGE_BYTES;
+  if (file.size > limit) {
+    throw new Error(isVideo ? "That video is too large to send." : "That photo is too large to send.");
+  }
+
+  const [slot] = await createUploadUrls(userId, [{ file_name: file.name, content_type: file.type || "application/octet-stream" }]);
+  if (!slot) throw new Error("Couldn't prepare the upload.");
+  await putToSignedUrl(slot, file, onProgress);
+
+  let checkUrl = slot.public_url;
+  if (isVideo) {
+    checkUrl = "";
+    try {
+      const frame = await videoThumbnail(file);
+      const thumbName = `${slot.file_name.replace(/\.[^.]+$/, "")}-frame.jpg`;
+      const [thumbSlot] = await createUploadUrls(userId, [{ file_name: thumbName, content_type: "image/jpeg" }]);
+      if (thumbSlot) {
+        await putToSignedUrl(thumbSlot, new File([frame], thumbName, { type: "image/jpeg" }));
+        checkUrl = thumbSlot.public_url;
+      }
+    } catch {
+      // No frame to check — see this function's own doc comment.
+    }
+  }
+
+  if (checkUrl && (await isFlagged(checkUrl))) {
+    throw new Error("That can't be sent. If you think this is wrong, contact support.");
+  }
+
+  return { key: slot.key, kind };
 }
