@@ -230,13 +230,15 @@ export async function markConversationRead(myIdentity: string, theirIdentity: st
 // backend for a pre-signed S3 slot, PUT the bytes, then write the message pointing at the key
 // it landed under. The browser never holds an AWS credential.
 //
-// PLUS one the phones do NOT do: the uploaded image is put through Hive before the message is
-// written, and a flagged one is never sent. The backend's moderateImage has existed since the
-// Hive work but its own doc comment says it is "not yet called from anywhere" — so chat media
-// is an ungated upload surface on both phones today. Adding a third ungated one, on the
-// platform anyone can reach without installing anything, was not a reasonable thing to do
-// given why that endpoint was built. It fails OPEN on any error or a missing key, so Hive
-// being down never blocks a legitimate message.
+// PLUS the gate: moderateChatMedia. Steve, 2026-10-11: "Gate the chat media on the backend for
+// all three." Chat media was the last unscanned upload surface in the app, on every platform,
+// because it never touches the server — the client gets a pre-signed S3 url, PUTs the bytes,
+// and writes the message into Firestore. The backend endpoint is now the chokepoint between
+// those two steps: same PhotoDNA + Hive helpers every other upload uses, and on a flag it
+// DELETES the object from S3 rather than leaving it in the bucket.
+//
+// Fails OPEN on a network error, so moderation being down never blocks a legitimate message —
+// but NOT on a flag, which is refused.
 
 import { createUploadUrls, putToSignedUrl, videoThumbnail } from "./upload";
 import { post } from "./api";
@@ -244,13 +246,24 @@ import { post } from "./api";
 export const DM_MAX_IMAGE_BYTES = 12 * 1024 * 1024;
 export const DM_MAX_VIDEO_BYTES = 80 * 1024 * 1024;
 
-/** True when the image at [url] should NOT be sent. Fails open — see the note above. */
-async function isFlagged(url: string): Promise<boolean> {
+/** Asks the backend's gate about an upload. Throws with the server's own wording when it is
+ *  refused; returns quietly when it is allowed OR when the check could not be made at all. */
+async function assertAllowed(userId: number, key: string, kind: "image" | "video", thumbKey?: string): Promise<void> {
+  let res;
   try {
-    const res = await post<{ flagged?: boolean }>("moderateImage", { url });
-    return res.status === true && (res.data?.flagged === true || (res as unknown as { flagged?: boolean }).flagged === true);
+    res = await post<unknown>("moderateChatMedia", {
+      user_id: userId,
+      key,
+      kind,
+      ...(thumbKey ? { thumb_key: thumbKey } : {}),
+    });
   } catch {
-    return false;
+    return; // Fails open — see this section's own note.
+  }
+  // `flagged` sits at the top level of the response, beside `status`, not inside `data`.
+  const body = res as unknown as { flagged?: boolean; message?: string };
+  if (body.flagged === true) {
+    throw new Error(body.message || "That can't be sent.");
   }
 }
 
@@ -284,25 +297,25 @@ export async function uploadChatMedia(
   if (!slot) throw new Error("Couldn't prepare the upload.");
   await putToSignedUrl(slot, file, onProgress);
 
-  let checkUrl = slot.public_url;
+  // A video goes up with a still from its first frame: PhotoDNA hashes stills only, so the
+  // frame is what gives a clip the cheaper, stronger half of the check. The backend takes both
+  // keys and checks the thumbnail first, exactly as it does for a posted video.
+  let thumbKey: string | undefined;
   if (isVideo) {
-    checkUrl = "";
     try {
       const frame = await videoThumbnail(file);
       const thumbName = `${slot.file_name.replace(/\.[^.]+$/, "")}-frame.jpg`;
       const [thumbSlot] = await createUploadUrls(userId, [{ file_name: thumbName, content_type: "image/jpeg" }]);
       if (thumbSlot) {
         await putToSignedUrl(thumbSlot, new File([frame], thumbName, { type: "image/jpeg" }));
-        checkUrl = thumbSlot.public_url;
+        thumbKey = thumbSlot.key;
       }
     } catch {
-      // No frame to check — see this function's own doc comment.
+      // No frame to be had (an odd codec, a blocked canvas) — the clip itself is still checked.
     }
   }
 
-  if (checkUrl && (await isFlagged(checkUrl))) {
-    throw new Error("That can't be sent. If you think this is wrong, contact support.");
-  }
+  await assertAllowed(userId, slot.key, kind, thumbKey);
 
   return { key: slot.key, kind };
 }
