@@ -307,9 +307,23 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 /* My Live/Battle Schedule (Steve, 2026-10-06) */
 .schedule-card { margin: 12px 0; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
 .schedule-title { margin: 0; font-size: 16px; color: var(--gold); }
-.schedule-form { display: flex; flex-direction: column; gap: 8px; padding: 10px; border: 1px solid var(--gold-border); border-radius: 12px; background: #0d0d00; }
-.schedule-field { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--text-soft); }
-.schedule-field input, .schedule-field select { padding: 8px 10px; border-radius: 10px; border: 1px solid var(--gold-border); background: #000; color: #fff; font-size: 14px; }
+.schedule-form { display: flex; flex-direction: column; gap: 14px; padding: 16px; border: 2px solid var(--gold-border); border-radius: 16px; background: rgba(0,0,0,.92); }
+.schedule-field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 700; color: var(--gold); }
+.schedule-field input, .schedule-field select { padding: 10px 12px; border-radius: 12px; border: 1.5px solid var(--gold-border); background: rgba(0,0,0,.5); color: var(--gold); font-size: 14px; }
+.schedule-field input::placeholder { color: rgba(212,175,55,.45); }
+
+/* Steve, 2026-10-11, of the phones' version of this form: "please redesign it with all our
+   design, Black, gold and borders", then "Whatever you did today please do it for all three
+   platforms". The battle type was a dropdown here and a scroll wheel on the phones; on all
+   three it is now pills, every type visible at once, the chosen one filled solid gold. */
+.schedule-types { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.schedule-type { padding: 9px 6px; border-radius: 999px; border: 1.5px solid var(--gold-border); background: rgba(0,0,0,.5); color: var(--gold); font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.schedule-type.on { background: var(--gold-border); color: #000; }
+.schedule-rule { height: 1px; background: var(--gold-border); opacity: .35; }
+
+/* Steve, 2026-10-11: "add a black background with gold borders and make the white lettering
+   gold". Text that would otherwise sit straight on the page artwork gets its own plate. */
+.gold-plate { display: inline-block; padding: 4px 10px; border-radius: 10px; background: rgba(0,0,0,.85); border: 1.5px solid var(--gold-border); color: var(--gold); }
 .schedule-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid rgba(255,255,255,.08); }
 .schedule-row:first-of-type { border-top: 0; }
 .schedule-requests h4 { margin: 4px 0; font-size: 14px; color: var(--gold); }

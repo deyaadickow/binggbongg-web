@@ -16,9 +16,12 @@ export function UserRow({ user, trailing }: { user: UserSummary; trailing?: Reac
   return (
     <Link to={`/profile/${user.id}`} className="card row" style={{ padding: 10, color: "inherit" }}>
       <Avatar user={user} />
+      {/* Steve, 2026-10-11: "For all the names, add a black background with gold borders and
+          make the white lettering gold." The card already carried the border; the lettering
+          was white and the handle grey. */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontWeight: 800 }}>{displayName(user)}</div>
-        <div className="muted" style={{ fontSize: 13 }}>@{user.username ?? ""}</div>
+        <div style={{ fontWeight: 800, color: "var(--gold)" }}>{displayName(user)}</div>
+        <div style={{ fontSize: 13, color: "var(--gold)", opacity: 0.75 }}>@{user.username ?? ""}</div>
       </div>
       {trailing}
     </Link>

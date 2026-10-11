@@ -139,17 +139,30 @@ export function ScheduleSection({ profileId, myId }: { profileId: number; myId?:
       {(showAdd || showRequest) && (
         <div className="schedule-form">
           {(showRequest || kind === "battle") && (
-            <label className="schedule-field">
-              <span>Battle type</span>
-              <select value={battleType} onChange={(e) => setBattleType(e.target.value)}>
-                {BATTLE_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
-              </select>
-            </label>
+            <>
+              <div className="schedule-field">
+                <span>Battle type</span>
+                {/* Steve, 2026-10-11: a dropdown here and a scroll wheel on the phones both
+                    showed one type at a time. Pills show all nine at once, the chosen one
+                    filled solid gold — the same control all three platforms now use. */}
+                <div className="schedule-types">
+                  {BATTLE_TYPES.map((t) => (
+                    <button key={t} type="button"
+                      className={`schedule-type${t === battleType ? " on" : ""}`}
+                      onClick={() => setBattleType(t)}>
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="schedule-rule" />
+            </>
           )}
           <label className="schedule-field">
             <span>When (your time)</span>
             <input type="datetime-local" value={when} onChange={(e) => setWhen(e.target.value)} />
           </label>
+          <div className="schedule-rule" />
           <label className="schedule-field">
             <span>Note (optional)</span>
             <input type="text" maxLength={191} value={note} onChange={(e) => setNote(e.target.value)}

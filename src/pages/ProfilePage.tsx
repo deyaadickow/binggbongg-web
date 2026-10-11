@@ -526,11 +526,14 @@ export function ProfilePage() {
                 <span className="pill" style={{ fontSize: 11 }}>{profile.profile_category.name}</span>
               )}
             </div>
-            <div className="muted" style={{ fontSize: 12, marginTop: 2 }}>
+            {/* Steve, 2026-10-11: "For this entire page put black borders around all the text
+                and make all the text in gold colour." The handle and bio were grey text
+                straight on the page. */}
+            <div className="gold-plate" style={{ fontSize: 12, marginTop: 4 }}>
               @{profile.username}{profile.country ? ` · ${profile.country}` : ""}
             </div>
             {profile.bio && (
-              <p className="soft" style={{ marginTop: 6, fontSize: 13, lineHeight: 1.4 }}>{profile.bio}</p>
+              <p className="gold-plate" style={{ marginTop: 6, fontSize: 13, lineHeight: 1.4 }}>{profile.bio}</p>
             )}
             {/* Social links */}
             {(isValidUrl(profile.fb_url) || isValidUrl(profile.insta_url) || isValidUrl(profile.youtube_url)) && (
