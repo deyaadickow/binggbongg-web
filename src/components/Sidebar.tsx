@@ -17,6 +17,8 @@ export function sidebarSections(userId: number | null): SideSection[] {
       { to: "/business", label: "Business", icon: "🏪" },
       { to: "/live", label: "Live Now", icon: "🔴" },
       { to: "/search", label: "Search", icon: "🔍" },
+      // Steve, 2026-10-11: "Yes please start the direct messages on the web."
+      { to: "/messages", label: "Messages", icon: "💬", needsLogin: true },
       { to: "/upload", label: "Upload video", icon: "🎬", needsLogin: true },
       { to: "/photos-directory", label: "Photos", icon: "📷", needsLogin: true },
       { to: "/photos", label: "My photos", icon: "🖼️", needsLogin: true },

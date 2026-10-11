@@ -15,6 +15,8 @@ import { LoginPage } from "./pages/LoginPage";
 import { VideoPage } from "./pages/VideoPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { UpcomingPage } from "./pages/UpcomingPage";
+import { MessagesPage } from "./pages/MessagesPage";
+import { ChatPage } from "./pages/ChatPage";
 import { DailyFortunePage } from "./pages/DailyFortunePage";
 import { SupporterBreakdownPage, SupportersPage } from "./pages/SupportersPage";
 import { SearchPage } from "./pages/SearchPage";
@@ -45,6 +47,9 @@ export default function App() {
           <Route path="/video/:id" element={<VideoPage />} />
           <Route path="/profile/:id" element={<ProfilePage />} />
           <Route path="/upcoming" element={<UpcomingPage />} />
+          {/* Steve, 2026-10-11: direct messages — the same Firestore conversations the phones use. */}
+          <Route path="/messages" element={<MessagesPage />} />
+          <Route path="/messages/:id" element={<ChatPage />} />
           {/* Lucky numbers + daily horoscope (Steve, 2026-10-09). */}
           <Route path="/lucky" element={<DailyFortunePage />} />
           <Route path="/support" element={<SupportersPage />} />

@@ -138,6 +138,11 @@ export interface UserSummary {
   fullname?: string;
   username?: string;
   profile_image?: string;
+  /** Steve, 2026-10-11 (direct messages): the chat identity string the phones key every
+   *  Firestore conversation off. Returned by the API for any member — it is NOT one of the
+   *  self-only hidden fields — and is what lib/dm.ts builds conversationId from. */
+  identity?: string;
+  is_verified?: number;
   bio?: string;
   country?: string;
   total_followers?: number;

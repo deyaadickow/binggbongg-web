@@ -385,3 +385,40 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .site-footer-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
 .site-footer-links a { color: var(--text-dim); text-decoration: none; border-bottom: 1px solid transparent; }
 .site-footer-links a:hover { color: var(--gold); border-bottom-color: var(--gold-border); }
+
+/* Direct messages — Steve, 2026-10-11: "Yes please start the direct messages on the web."
+   Mirrors the chat page the phones got the same day: both sides black with a gold ring (mine
+   full strength, theirs at half), gold lettering, a rule under every message, and the whole
+   conversation inside the gold frame with the header and the message bar outside it. */
+.dm-list { display: flex; flex-direction: column; gap: 8px; }
+.dm-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px;
+  background: rgba(0,0,0,.85); border: 1.5px solid var(--gold-border); color: inherit; text-decoration: none; }
+.dm-row-name { font-weight: 800; color: var(--gold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dm-row-last { font-size: 13px; color: var(--gold); opacity: .7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dm-handle { font-size: 12px; color: var(--gold); opacity: .75; }
+.dm-row-when { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--gold); opacity: .6; flex-shrink: 0; }
+.dm-unread { width: 9px; height: 9px; border-radius: 50%; background: var(--gold); display: inline-block; }
+
+.dm-page { display: flex; flex-direction: column; min-height: 70vh; }
+.dm-header { display: flex; align-items: center; gap: 10px; padding: 8px 0 10px; border-bottom: 1px solid rgba(212,175,55,.5); }
+.dm-translate { display: inline-flex; align-items: center; gap: 6px; }
+.dm-translate select { padding: 7px 10px; border-radius: 999px; border: 1.5px solid var(--gold-border);
+  background: rgba(0,0,0,.6); color: var(--gold); font-size: 13px; font-weight: 700; }
+
+.dm-thread { flex: 1; overflow-y: auto; max-height: 60vh; margin: 10px 0; padding: 10px;
+  border: 2px solid var(--gold-border); border-radius: 16px; background: rgba(0,0,0,.6); }
+.dm-day { text-align: center; margin: 10px 0; }
+.dm-day span { display: inline-block; padding: 5px 12px; border-radius: 10px; background: rgba(0,0,0,.85);
+  border: 1px solid rgba(212,175,55,.6); color: var(--gold); font-size: 13px; font-weight: 700; }
+.dm-msg-row { display: flex; align-items: flex-end; gap: 8px; padding: 6px 0; }
+.dm-msg-row.mine { justify-content: flex-end; }
+.dm-msg-row.theirs { flex-direction: row-reverse; justify-content: flex-end; }
+.dm-bubble { max-width: 72%; padding: 10px 12px; border-radius: 10px; color: var(--gold);
+  background: rgba(0,0,0,.9); border: 1.5px solid var(--gold-border); overflow-wrap: anywhere; }
+.dm-bubble.theirs { background: rgba(0,0,0,.6); border-color: rgba(212,175,55,.5); }
+.dm-bubble-rule { height: 1px; background: rgba(212,175,55,.35); margin: 6px 0; }
+.dm-translated { font-style: italic; font-size: 14px; color: var(--gold); opacity: .75; }
+.dm-time { font-size: 12px; color: var(--gold); opacity: .6; flex-shrink: 0; }
+.dm-rule { height: 1px; background: var(--gold-border); opacity: .45; }
+.dm-composer { display: flex; gap: 8px; align-items: center; }
+.dm-composer .input { flex: 1; }

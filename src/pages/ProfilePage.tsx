@@ -623,8 +623,12 @@ export function ProfilePage() {
               {following ? "Following" : "Follow"}
             </button>
           )}
+          {/* Steve, 2026-10-11: this button pointed at /chat?user=… since the profile page was
+              built, and there has never been a page there — direct messages did not exist on
+              the web. Now they do (lib/dm.ts), so it goes somewhere. Still gated on a mutual
+              follow, same as the phones. */}
           {isMutualFollow && (
-            <Link to={`/chat?user=${profile.id}`} className="btn ghost" style={{ flex: 1, textAlign: "center" }}>
+            <Link to={`/messages/${profile.id}`} className="btn ghost" style={{ flex: 1, textAlign: "center" }}>
               Chat
             </Link>
           )}

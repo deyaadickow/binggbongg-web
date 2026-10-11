@@ -17,6 +17,12 @@ function app() {
   return getApps()[0] ?? initializeApp(config);
 }
 
+/** The same initialised app the live chat uses — direct messages (lib/dm.ts) need it too, and
+ *  initialising a second one would mean a second auth session. */
+export function firebaseApp() {
+  return app();
+}
+
 let signedIn: Promise<void> | null = null;
 export function ensureFirebaseSignIn(): Promise<void> {
   if (!signedIn) {
