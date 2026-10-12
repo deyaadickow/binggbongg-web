@@ -93,6 +93,63 @@ export function uploadPhoto(
   });
 }
 
+// ---- Cartoon Me (Steve, 2026-10-12) ---------------------------------------------------------
+
+export interface CartoonSettings {
+  enabled?: boolean;
+  coins?: number;
+  image_size?: string;
+}
+
+/** Price and on/off come from the server so 25 can change without a deploy of three clients. */
+export async function fetchCartoonSettings(myUserId: number): Promise<CartoonSettings> {
+  const res = await post<CartoonSettings>("fetchCartoonSettings", { my_user_id: myUserId }).catch(() => null);
+  // Defaults match the server's own: hidden if we could not ask, priced at 25 if it answered oddly.
+  return res?.status ? (res.data ?? { enabled: false, coins: 25 }) : { enabled: false, coins: 25 };
+}
+
+export interface CartoonResult {
+  downloadUrl: string;
+  folderName: string;
+}
+
+/**
+ * Multipart, like uploadPhoto — makeCartoon takes a real file. No progress callback: the wait
+ * here is Google drawing the picture, not the upload, so a progress bar would sit at 100% for
+ * most of it and look broken.
+ */
+export function makeCartoon(
+  myUserId: number,
+  file: File,
+  headers: Record<string, string>,
+): Promise<CartoonResult> {
+  return new Promise((resolve, reject) => {
+    const form = new FormData();
+    form.append("my_user_id", String(myUserId));
+    form.append("photo", file);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", API_BASE + "makeCartoon", true);
+    for (const [k, v] of Object.entries(headers)) xhr.setRequestHeader(k, v);
+    // Generating at 2K takes a while; the browser default would give up too early.
+    xhr.timeout = 180000;
+    xhr.onload = () => {
+      let body: { status?: boolean; message?: string; download_url?: string; folder_name?: string } = {};
+      try { body = JSON.parse(xhr.responseText); } catch { /* falls through to the status check */ }
+      if (xhr.status >= 200 && xhr.status < 300 && body.status) {
+        resolve({ downloadUrl: body.download_url ?? "", folderName: body.folder_name ?? "Cartoons" });
+      } else {
+        // The server's own message carries the coin wording ("Top up your coins", "put back"),
+        // so it is preferred over anything invented here.
+        reject(new Error(body.message || uploadErrorMessage(xhr.status)));
+      }
+    };
+    xhr.ontimeout = () => reject(new Error("That took too long. If you were charged, your coins are put back automatically — please try again."));
+    xhr.onerror = () => reject(new Error(uploadErrorMessage(0)));
+    xhr.send(form);
+  });
+}
+
 // ---- Viewing and managing what's already uploaded -------------------------------------------
 
 export interface Photo {

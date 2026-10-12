@@ -4,6 +4,7 @@ import { Nav } from "./components/Nav";
 import { UploadVideoPage } from "./pages/UploadVideoPage";
 import { CreateVideoAdPage } from "./pages/CreateVideoAdPage";
 import { UploadPhotosPage } from "./pages/UploadPhotosPage";
+import { CartoonPage } from "./pages/CartoonPage";
 import { MyPhotosPage } from "./pages/MyPhotosPage";
 import { PhotosDirectoryPage } from "./pages/PhotosDirectoryPage";
 import { MemberAlbumPage } from "./pages/MemberAlbumPage";
@@ -72,6 +73,8 @@ export default function App() {
           <Route path="/photos-directory" element={<PhotosDirectoryPage />} />
           <Route path="/photos/:id" element={<MemberAlbumPage />} />
           <Route path="/upload-photos" element={<UploadPhotosPage />} />
+          {/* Cartoon Me (Steve, 2026-10-12) */}
+          <Route path="/cartoon" element={<CartoonPage />} />
           <Route path="/enter-contest" element={<ContestUploadPage />} />
           <Route path="/settings" element={<SettingsHubPage />} />
           <Route path="/settings/account" element={<AccountSettingsPage />} />

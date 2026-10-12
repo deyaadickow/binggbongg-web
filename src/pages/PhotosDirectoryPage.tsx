@@ -31,6 +31,13 @@ export function PhotosDirectoryPage() {
         <Link className="btn small ghost" to="/photos">My photos</Link>
       </div>
 
+      {/* Cartoon Me (Steve, 2026-10-12). Above the grid and outside the empty/loading branches,
+          so the way in is there even before anybody else's photos have loaded. */}
+      <Link to="/cartoon" className="card pad"
+            style={{ display: "block", textAlign: "center", color: "var(--gold)", fontWeight: 700, marginBottom: 12 }}>
+        ✨  Cartoon Me — turn a selfie into a cartoon
+      </Link>
+
       {rows === null ? <Loading /> : rows.length === 0 ? (
         <div className="card pad">
           <p className="soft" style={{ marginTop: 0 }}>No photos to browse yet.</p>
