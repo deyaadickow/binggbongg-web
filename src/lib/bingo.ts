@@ -198,3 +198,80 @@ export async function buyBingoSquare(
   });
   return res.status ? null : (res.message ?? "Couldn't gift that square.");
 }
+
+// ---- The lifetime board -----------------------------------------------------------------
+
+export type BingoBoardRow = {
+  bingo_game_id: number;
+  game_no: number;
+  status: string;
+  played_at: string | null;
+  winner_name: string | null;
+  wins_count: number;
+};
+
+export type BingoBoard = {
+  total_games: number;
+  total_wins: number;
+  total_members: number;
+  games: BingoBoardRow[];
+};
+
+export type BingoWinners = {
+  game_no: number;
+  played_at: string | null;
+  players: number;
+  squares_gifted: number;
+  winners: BingoWin[];
+};
+
+export async function fetchBingoBoard(): Promise<BingoBoard> {
+  const res = await post<Record<string, unknown>>("fetchBingoBoard", { start: 0, count: 50 });
+  if (!res.status) throw new Error(res.message ?? "Couldn't load the board.");
+  const d = (res.data ?? {}) as Record<string, unknown>;
+  return {
+    total_games: num(d.total_games) ?? 0,
+    total_wins: num(d.total_wins) ?? 0,
+    total_members: num(d.total_members) ?? 0,
+    games: (Array.isArray(d.games) ? d.games : []).map((g) => {
+      const row = g as Record<string, unknown>;
+      return {
+        bingo_game_id: num(row.bingo_game_id) ?? 0,
+        game_no: num(row.game_no) ?? 0,
+        status: String(row.status ?? ""),
+        played_at: (row.played_at as string | null) ?? null,
+        winner_name: (row.winner_name as string | null) ?? null,
+        wins_count: num(row.wins_count) ?? 0,
+      };
+    }),
+  };
+}
+
+export async function fetchBingoGameWinners(bingoGameId: number): Promise<BingoWinners> {
+  const res = await post<Record<string, unknown>>("fetchBingoGameWinners", { bingo_game_id: bingoGameId });
+  if (!res.status) throw new Error(res.message ?? "Couldn't load that game.");
+  const d = (res.data ?? {}) as Record<string, unknown>;
+  return {
+    game_no: num(d.game_no) ?? 0,
+    played_at: (d.played_at as string | null) ?? null,
+    players: num(d.players) ?? 0,
+    squares_gifted: num(d.squares_gifted) ?? 0,
+    winners: (Array.isArray(d.winners) ? d.winners : []).map((w) => {
+      const win = w as Record<string, unknown>;
+      return {
+        user_id: num(win.user_id),
+        name: (win.name as string | null) ?? null,
+        pattern: String(win.pattern ?? ""),
+        pattern_detail: (win.pattern_detail as string | null) ?? null,
+      };
+    }),
+  };
+}
+
+/** "12 Oct 2026" from the server's ISO string, or "" when there is none. */
+export function bingoPlayedOn(iso: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}

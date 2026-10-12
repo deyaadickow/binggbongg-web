@@ -504,3 +504,24 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .bingo-amount { color: var(--gold); font-weight: 800; font-size: 34px; min-width: 120px; text-align: center; }
 .bingo-quick { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-bottom: 10px; }
 .bingo-actions { display: flex; gap: 10px; justify-content: center; margin-top: 14px; }
+
+/* The bingo lifetime board and a game's winners. */
+.bingo-stats { display: flex; gap: 8px; margin-bottom: 12px; }
+.bingo-stats > div {
+  flex: 1; text-align: center; padding: 8px 4px;
+  border: 1.5px solid var(--gold); border-radius: 12px; background: rgba(0,0,0,.6);
+}
+.bingo-stats b { display: block; color: var(--gold); font-size: 19px; }
+.bingo-stats span { color: var(--muted); font-size: 11px; }
+.bingo-board-row, .bingo-winner-row {
+  display: flex; align-items: center; gap: 10px; text-align: left; margin-bottom: 8px;
+}
+.bingo-winner-row { padding: 10px 12px; border: 1.5px solid var(--gold); border-radius: 12px; background: rgba(0,0,0,.6); }
+.bingo-no, .bingo-pattern {
+  flex-shrink: 0; background: var(--gold); color: #000; font-weight: 900;
+  border-radius: 999px; padding: 3px 10px; font-size: 12px;
+}
+.bingo-row-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.bingo-row-main b { color: var(--gold); font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bingo-row-main .muted { font-size: 11px; }
+.bingo-row-wins { flex-shrink: 0; color: var(--gold); font-size: 12px; font-weight: 700; }

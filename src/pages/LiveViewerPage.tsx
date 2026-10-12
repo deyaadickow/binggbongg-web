@@ -8,7 +8,7 @@ import { activeBoxingWindow, useBattle, type BattleData } from "../lib/battle";
 import { VIRTUAL, fetchVirtualGiftRecord, sendVirtualThankYou, startVirtualBattle, type VirtualBattleData, type VirtualGiftRecord, type VirtualParticipant, FIVE_FIVE_FIVE, MARATHON, SERIES, TWO_V_TWO, cancel555, createSeries, finalize2v2, finalizeSeriesRound, invite2v2, invite555, inviteMarathon, secondsUntil, useEngine, voteMarathonCancel, type B555Data, type Battle2v2Data, type MarathonData, type SeriesData } from "../lib/battles";
 import { B555Strip, BattleMenu, InviteCard, MarathonStrip, MultiPicker, Overlay, ResultOverlay, SeriesStrip, TwoVTwoPicker, TwoVTwoStrip, VirtualGiftRecordOverlay, VirtualPicker, VirtualStrip, describe2v2Invite, personName, resultTitle, type BattleKind } from "../components/BattleEngines";
 import { Challenge31Overlay, LifetimeBoardOverlay, PkContestsOverlay, PunishmentsOverlay } from "../components/BattleReference";
-import { BingoOverlay, BingoStartDialog } from "../components/BingoOverlay";
+import { BingoBoardOverlay, BingoOverlay, BingoStartDialog, BingoWinnersOverlay } from "../components/BingoOverlay";
 import { BINGO_FALLBACK, bingoClamp, buyBingoSquare, cancelBingoBattle, fetchBingoGame, startBingoBattle, type BingoGame } from "../lib/bingo";
 import { fetchActiveTapGame, gameTitle, type TapGameType } from "../lib/tapgame";
 import { TapGameOverlay } from "../components/TapGameOverlay";
@@ -177,6 +177,12 @@ export function LiveViewerPage() {
   // spring back open on every poll tick after the viewer closed it.
   const bingoAutoOpened = useRef<number | null>(null);
   const bingoBuying = useRef(false);
+  const [bingoBoardOpen, setBingoBoardOpen] = useState(false);
+  // Steve, 2026-10-12: "when a game was over i did not see any of them." A finished game used
+  // to just stop being interactive, so unless you happened to have the card open at the moment
+  // the last square fell, the result passed you by entirely. Announced once per game.
+  const [bingoFinishedId, setBingoFinishedId] = useState<number | null>(null);
+  const bingoAnnouncedOver = useRef<number | null>(null);
   const [picker, setPicker] = useState<BattleKind | null>(null);
   // Steve, 2026-09-27: Hide & Seek — pick the shape first (free for all 2-4, or 2v2 teams).
   const [hideSeekMode, setHideSeekMode] = useState<"choose" | "2v2" | 1 | 2 | 3 | null>(null);
@@ -387,6 +393,10 @@ export function LiveViewerPage() {
         if (fresh && fresh.status === "active" && bingoAutoOpened.current !== fresh.bingo_game_id) {
           bingoAutoOpened.current = fresh.bingo_game_id;
           setBingoOpen(true);
+        }
+        if (fresh && fresh.status !== "active" && bingoAnnouncedOver.current !== fresh.bingo_game_id) {
+          bingoAnnouncedOver.current = fresh.bingo_game_id;
+          setBingoFinishedId(fresh.bingo_game_id);
         }
       } catch {
         // Fail open, same as every other poll in this room — keep the last good card rather
@@ -900,6 +910,10 @@ export function LiveViewerPage() {
           onClose={() => setBingoOpen(false)}
         />
       )}
+      {bingoBoardOpen && <BingoBoardOverlay onClose={() => setBingoBoardOpen(false)} />}
+      {bingoFinishedId !== null && (
+        <BingoWinnersOverlay bingoGameId={bingoFinishedId} onClose={() => setBingoFinishedId(null)} />
+      )}
       {bingoStartOpen && myId !== null && (
         <BingoStartDialog
           defaultPrice={bingoClamp(BINGO_FALLBACK)}
@@ -924,6 +938,7 @@ export function LiveViewerPage() {
           else if (k === "hideSeek") setHideSeekMode("choose");
           else if (k === "solo") startSolo();
           else if (k === "bingo") openBingo();
+          else if (k === "bingoBoard") setBingoBoardOpen(true);
           // The 31-day challenge and the three reference rows open their own overlay off the
           // same `picker` state — they start nothing, so they need no people-picker step.
           else setPicker(k);

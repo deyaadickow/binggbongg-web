@@ -27,7 +27,7 @@ export function Overlay({ title, children, onClose, width = 440 }: { title: stri
 
 export type BattleKind =
   | "1v1" | "gameLimit" | "virtual" | "series" | "2v2" | "marathon" | "555" | "solo" | "hideSeek"
-  | "bingo"
+  | "bingo" | "bingoBoard"
   // Android numbers this one #5 and it belongs between Best Out Of and 5-5-5. It isn't a battle
   // you start against someone in the room — it's a personal 31-day streak you opt into — so it
   // needs no people on screen.
@@ -84,6 +84,8 @@ export const BATTLE_KINDS: {
     info: "You can play any of our games — Balloon Pop, Fishing, Deer Hunting, and more — anytime, even while you're in a battle. Every member in the room can jump into a game whenever they want, battling or not." },
   { kind: "lifetimeBoard", title: "Lifetime Battle Board", blurb: "Every contest, all time", minPeople: 1, reference: true,
     info: "Your full battle history, going back to day one — browse it day by day within a month, or month by month across a year. Tap into your history with any one member to see your total wins, lifetime score, and trash talk with them. Visible on your own profile and everyone else's." },
+  { kind: "bingoBoard", title: "Bingo Battle Board", blurb: "Every bingo game ever played", minPeople: 1, reference: true,
+    info: "Every Bingg Bongg Bingo game ever played, numbered from 1 and never reset, newest first. Tap any game to see who won it and which pattern each of them got — vertical, horizontal, diagonal, 4 corners, X or the whole card. A game can have six different winners, and they all stay on the board for good." },
   { kind: "punishments", title: "Friendly Punishment Suggestions", blurb: "Agree a forfeit before you start", minPeople: 1, reference: true,
     info: "Battling just for fun? Agree on a friendly punishment for whoever loses before you start — tap in for a random pick, or browse the full list together. Admin-managed, so the list keeps growing." },
 ];

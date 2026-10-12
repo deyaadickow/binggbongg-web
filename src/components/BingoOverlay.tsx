@@ -17,7 +17,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   BINGO_CELL_H, BINGO_CELL_W, BINGO_COLUMNS, BINGO_COL_X, BINGO_ROW_Y, BINGO_ASPECT,
   BINGO_FALLBACK, BINGO_MIN, BINGO_PAYABLE_SQUARES, BINGO_QUICK_CHOICES, BINGO_STEP,
-  bingoClamp, bingoFormat, winLabel, type BingoCard, type BingoGame,
+  bingoClamp, bingoFormat, bingoPlayedOn, fetchBingoBoard, fetchBingoGameWinners, winLabel,
+  type BingoBoard, type BingoCard, type BingoGame, type BingoWinners,
 } from "../lib/bingo";
 import { Overlay } from "./BattleEngines";
 
@@ -232,6 +233,99 @@ export function BingoStartDialog({ defaultPrice, candidates, onStart, onClose }:
           onStart(picked, chosen);
         }}>Start Bingo</button>
       </div>
+    </Overlay>
+  );
+}
+
+/** "Bingg Bongg Bingo Battle Board" — every game ever, numbered from 1 and never reset,
+ *  newest first. Tap a game for its winners.
+ *
+ *  Steve, 2026-10-12: "How do we see the game winners and the lifetime bingo battle board?
+ *  when a game was over i did not see any of them." Android had both screens built and then
+ *  never linked from anywhere; iOS and web had neither. */
+export function BingoBoardOverlay({ onClose }: { onClose: () => void }) {
+  const [board, setBoard] = useState<BingoBoard | null>(null);
+  // A failed fetch is NOT an empty board. Collapsing the two is what tells somebody "no games
+  // yet" while the network is down, which reads as the feature being broken.
+  const [failed, setFailed] = useState(false);
+  const [openGameId, setOpenGameId] = useState<number | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    fetchBingoBoard()
+      .then((b) => { if (alive) { setBoard(b); setFailed(false); } })
+      .catch(() => { if (alive) setFailed(true); });
+    return () => { alive = false; };
+  }, []);
+
+  if (openGameId !== null) {
+    return <BingoWinnersOverlay bingoGameId={openGameId} onClose={() => setOpenGameId(null)} />;
+  }
+
+  return (
+    <Overlay title="🎱 Bingo Battle Board" onClose={onClose} width={520}>
+      {board && (
+        <div className="bingo-stats">
+          <div><b>{board.total_games}</b><span>games</span></div>
+          <div><b>{board.total_wins}</b><span>wins</span></div>
+          <div><b>{board.total_members}</b><span>members</span></div>
+        </div>
+      )}
+      {!board && failed && <p className="soft">Couldn't load the board — check your connection and try again.</p>}
+      {!board && !failed && <p className="soft">Loading…</p>}
+      {board && board.games.length === 0 && (
+        <p className="soft">No games yet. The first one played will be #1, and it stays on this board for good.</p>
+      )}
+      {board?.games.map((g) => (
+        <button key={g.bingo_game_id} className="btn block bingo-board-row" onClick={() => setOpenGameId(g.bingo_game_id)}>
+          <span className="bingo-no">#{g.game_no}</span>
+          <span className="bingo-row-main">
+            <b>{g.winner_name ?? (g.status === "active" ? "Playing now" : "No whole card")}</b>
+            <span className="muted">{bingoPlayedOn(g.played_at)}</span>
+          </span>
+          <span className="bingo-row-wins">{g.wins_count} win{g.wins_count === 1 ? "" : "s"}</span>
+          <span className="kind-go">›</span>
+        </button>
+      ))}
+    </Overlay>
+  );
+}
+
+/** One game's winners. A LIST, never a single winner: this engine has none by design — a
+ *  pattern falling does not end the game, only a whole card does, so one game can carry six
+ *  different names, and showing only the whole-card winner would throw away five results that
+ *  people paid real coins for. */
+export function BingoWinnersOverlay({ bingoGameId, onClose }: { bingoGameId: number; onClose: () => void }) {
+  const [data, setData] = useState<BingoWinners | null>(null);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    fetchBingoGameWinners(bingoGameId)
+      .then((w) => { if (alive) { setData(w); setFailed(false); } })
+      .catch(() => { if (alive) setFailed(true); });
+    return () => { alive = false; };
+  }, [bingoGameId]);
+
+  return (
+    <Overlay title={`🎱 Bingo #${data?.game_no ?? ""}`} onClose={onClose} width={460}>
+      {data && (
+        <p className="soft" style={{ marginTop: 0 }}>
+          {bingoPlayedOn(data.played_at)} · {data.players} player{data.players === 1 ? "" : "s"} · {data.squares_gifted} squares gifted
+        </p>
+      )}
+      {!data && failed && <p className="soft">Couldn't load this game — try again.</p>}
+      {!data && !failed && <p className="soft">Loading…</p>}
+      {data && data.winners.length === 0 && <p className="soft">Nobody completed a pattern in this game.</p>}
+      {data?.winners.map((w, i) => (
+        <div key={i} className="bingo-winner-row">
+          <span className="bingo-pattern">{winLabel(w.pattern)}</span>
+          <span className="bingo-row-main">
+            <b>{w.name ?? "A member"}</b>
+            {w.pattern_detail && <span className="muted">{w.pattern_detail}</span>}
+          </span>
+        </div>
+      ))}
     </Overlay>
   );
 }
