@@ -37,6 +37,18 @@ function splitMain(countries: CountryRow[]) {
   return { main: main.map((c) => ({ code: c.iso2!, name: c.name! })), rest: rest.map((c) => ({ code: c.iso2!, name: c.name! })) };
 }
 
+// Steve, 2026-10-12: "Please change the name of the business on top just like i have it. Our
+// design black background and gold text and border." The phones carry this on their toolbar;
+// the web business pages had no top bar at all, so the plate IS the page's top. Same black
+// ground, same 3px gold border, same bold gold letters as the plate on the card below it.
+function TitlePlate({ text }: { text: string }) {
+  return (
+    <div style={{ background: "#000", border: "3px solid var(--gold-border)", borderRadius: 16, padding: "10px 16px", marginBottom: 12 }}>
+      <h1 className="page-title" style={{ margin: 0, color: "var(--gold)", fontWeight: 800, textAlign: "center" }}>{text}</h1>
+    </div>
+  );
+}
+
 function VerifiedCheck() {
   return <span title="Verified business" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 20, height: 20, borderRadius: 999, background: "var(--gold)", color: "#0d0d0d", fontSize: 12, fontWeight: 800, marginLeft: 8 }}>✓</span>;
 }
@@ -251,6 +263,7 @@ export function BusinessPage() {
 
   return (
     <div className="page" style={{ maxWidth: 900 }}>
+      <TitlePlate text={b.name ?? "Business"} />
       {b.banner_url && (
         <div style={{ background: "#000", borderRadius: "var(--radius)", border: "1.5px solid var(--gold-border)", overflow: "hidden", display: "flex", justifyContent: "center" }}>
           <img src={b.banner_url} alt="" style={{ width: "100%", maxHeight: 420, objectFit: "contain", display: "block" }} />
@@ -554,7 +567,7 @@ export function MyBusinessesPanel() {
 export function MyBusinessesPage() {
   return (
     <div className="page" style={{ maxWidth: 760 }}>
-      <h1 className="page-title">Bingg Bongg Business</h1>
+      <TitlePlate text="Bingg Bongg Business" />
       <MyBusinessesPanel />
     </div>
   );
@@ -619,7 +632,7 @@ export function CreateBusinessPage() {
 
   return (
     <div className="page" style={{ maxWidth: 720 }}>
-      <h1 className="page-title">{editingId ? "Edit business page" : "Create a business page"}</h1>
+      <TitlePlate text={editingId ? "Edit business page" : "Create a business page"} />
       <form onSubmit={submit} style={{ display: "grid", gap: 12 }}>
         <div className="card pad">
           <b style={{ color: "var(--gold)" }}>Banner</b>
