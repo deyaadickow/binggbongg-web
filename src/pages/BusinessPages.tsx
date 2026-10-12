@@ -41,12 +41,24 @@ function VerifiedCheck() {
   return <span title="Verified business" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 20, height: 20, borderRadius: 999, background: "var(--gold)", color: "#0d0d0d", fontSize: 12, fontWeight: 800, marginLeft: 8 }}>✓</span>;
 }
 
+// Steve, 2026-10-12: "The main banner please make it longer because their heads are cut off."
+// Every banner used to sit in a fixed 16:x box with object-fit: cover, which crops whatever does
+// not match that shape — on Lucky R Market's photo, three people's heads. It now CONTAINS the
+// whole picture against black and grows to whatever height that needs, up to a ceiling so a
+// portrait upload cannot take over the page. Nothing is cropped again, for any business.
+function Banner({ url, maxHeight }: { url?: string | null; maxHeight: number }) {
+  if (!url) return <div style={{ aspectRatio: "16 / 7", background: "#000" }} />;
+  return (
+    <div style={{ background: "#000", display: "flex", justifyContent: "center" }}>
+      <img src={url} alt="" loading="lazy" style={{ width: "100%", maxHeight, objectFit: "contain", display: "block" }} />
+    </div>
+  );
+}
+
 function BusinessCard({ b }: { b: Business }) {
   return (
     <Link to={`/business/${b.id}`} className="card" style={{ display: "block", color: "inherit" }}>
-      <div style={{ aspectRatio: "16 / 7", background: "#000" }}>
-        {b.banner_url && <img src={b.banner_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} loading="lazy" />}
-      </div>
+      <Banner url={b.banner_url} maxHeight={320} />
       <div style={{ padding: "10px 12px 12px" }}>
         <div style={{ display: "flex", alignItems: "center" }}>
           <b style={{ color: "var(--gold)", fontSize: 16, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{b.name}</b>
@@ -239,7 +251,11 @@ export function BusinessPage() {
 
   return (
     <div className="page" style={{ maxWidth: 900 }}>
-      {b.banner_url && <img src={b.banner_url} alt="" style={{ width: "100%", aspectRatio: "16 / 6", objectFit: "cover", borderRadius: "var(--radius)", border: "1.5px solid var(--gold-border)", display: "block" }} />}
+      {b.banner_url && (
+        <div style={{ background: "#000", borderRadius: "var(--radius)", border: "1.5px solid var(--gold-border)", overflow: "hidden", display: "flex", justifyContent: "center" }}>
+          <img src={b.banner_url} alt="" style={{ width: "100%", maxHeight: 420, objectFit: "contain", display: "block" }} />
+        </div>
+      )}
 
       {isOwner && (
         <div className="card pad" style={{ marginTop: 12 }}>
@@ -277,8 +293,10 @@ export function BusinessPage() {
       )}
 
       <div className="card pad" style={{ marginTop: 12 }}>
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <h1 className="page-title" style={{ margin: 0 }}>{b.name}</h1>
+        {/* Steve, 2026-10-12: "a big bullet with a black background with a thick gold border
+            with bold gold letters.. this design will be for every business." */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#000", border: "3px solid var(--gold-border)", borderRadius: 16, padding: "10px 16px" }}>
+          <h1 className="page-title" style={{ margin: 0, color: "var(--gold)", fontWeight: 800 }}>{b.name}</h1>
           {b.is_verified && <VerifiedCheck />}
         </div>
         <div className="muted" style={{ fontSize: 13 }}>{[b.category?.name, placeLine(b)].filter(Boolean).join(" · ")}</div>
@@ -516,7 +534,7 @@ export function MyBusinessesPanel() {
         <div className="grid wide" style={{ marginTop: 12 }}>
           {mine.data.map((b) => (
             <div key={b.id} className="card">
-              <div style={{ aspectRatio: "16 / 6", background: "#000" }}>{b.banner_url && <img src={b.banner_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />}</div>
+              <Banner url={b.banner_url} maxHeight={240} />
               <div style={{ padding: "10px 12px 12px" }}>
                 <div style={{ display: "flex", alignItems: "center" }}><b style={{ color: "var(--gold)", fontSize: 16 }}>{b.name}</b>{b.is_verified && <VerifiedCheck />}</div>
                 <div className="muted" style={{ fontSize: 13, color: b.is_live ? undefined : "#FF8A80" }}>{statusText(b)} · {b.views} views</div>
