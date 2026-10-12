@@ -292,11 +292,11 @@ export function LiveViewerPage() {
 
   // Tap games: the host activates one from the phone (or later, here); everyone gets a Play button.
   async function startSolo() {
-    if (role !== "host" || !user) { setToast("Only the host can start a Solo Battle."); return; }
+    if (role !== "host" || !user) { setToast("Only the host can start a Solo Battle With Unlimited Players."); return; }
     try {
       const b = await startSoloBattle(user.id);
       setSoloBattle(b);
-      setToast("Solo Battle started — viewers have a couple of minutes to join.");
+      setToast("Solo Battle With Unlimited Players started — viewers have a couple of minutes to join.");
     } catch (e) {
       setToast((e as Error).message);
     }

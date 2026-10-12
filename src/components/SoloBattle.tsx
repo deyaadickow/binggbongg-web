@@ -51,7 +51,7 @@ export function SoloBattleStrip({ battle, myUserId, onOpenStandings, onToast, on
     <div className="card pad" style={{ marginTop: 12, borderColor: "var(--gold-border)" }}>
       <div className="row" style={{ alignItems: "center" }}>
         <div style={{ flex: 1 }}>
-          <b style={{ color: "var(--gold)" }}>🏆 Solo Battle</b>
+          <b style={{ color: "var(--gold)" }}>🏆 Solo Battle With Unlimited Players</b>
           <div className="muted" style={{ fontSize: 12 }}>
             {joinOpen
               ? `Anyone can join for the next ${clock(joinLeft)} — go live and the gifts you receive count.`
@@ -94,7 +94,7 @@ export function SoloBattleStandingsSheet({ battle, myUserId, onClose }: {
     <div style={{ position: "fixed", inset: 0, zIndex: 60, background: "rgba(0,0,0,0.65)", display: "grid", placeItems: "center", padding: 16 }}>
       <div className="card pad" style={{ width: "min(460px, 100%)", maxHeight: "86vh", overflowY: "auto" }}>
         <div className="row" style={{ marginBottom: 10 }}>
-          <b style={{ color: "var(--gold)", flex: 1, fontSize: 18 }}>🏆 Solo Battle</b>
+          <b style={{ color: "var(--gold)", flex: 1, fontSize: 18 }}>🏆 Solo Battle With Unlimited Players</b>
           <button className="btn small ghost" onClick={onClose}>Close</button>
         </div>
         {rows === null ? (

@@ -31,13 +31,13 @@ export interface StandingRow {
 
 export async function startSoloBattle(hostUserId: number): Promise<SoloBattle> {
   const res = await post<SoloBattle>("startSoloBattle", { host_user_id: hostUserId });
-  if (!res.status || !res.data) throw new Error(res.message ?? "Couldn't start a Solo Battle.");
+  if (!res.status || !res.data) throw new Error(res.message ?? "Couldn't start a Solo Battle With Unlimited Players.");
   return res.data;
 }
 
 export async function joinSoloBattle(contestId: number, userId: number): Promise<SoloBattle> {
   const res = await post<SoloBattle>("joinSoloBattle", { contest_id: contestId, user_id: userId });
-  if (!res.status || !res.data) throw new Error(res.message ?? "Couldn't join that Solo Battle.");
+  if (!res.status || !res.data) throw new Error(res.message ?? "Couldn't join that Solo Battle With Unlimited Players.");
   return res.data;
 }
 
