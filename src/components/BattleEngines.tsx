@@ -65,7 +65,7 @@ export const BATTLE_KINDS: {
     info: "2 hosts team up against 2 other hosts, all 4 in this same live room. Pick a teammate, then 2 opponents — a 5-minute countdown starts once everyone accepts, and whichever TEAM'S combined gifts are highest when time runs out wins." },
   // Solo Battle needs nobody else on screen — the room's viewers are the entrants, so
   // minPeople is 1. Starting one is host-only, gated at the call site like the phones do.
-  { kind: "solo", number: "#9", title: "Solo Battle", blurb: "Anyone watching can join and compete", minPeople: 1,
+  { kind: "solo", number: "#9", title: "Solo Battle With Unlimited Players", blurb: "Anyone watching can join and compete", minPeople: 1,
     info: "Start one instantly, no admin needed. Everyone watching gets 2 minutes to go live and join — whoever's received the most gifts when it ends wins. Tap any name on the leaderboard to jump straight to their live." },
   // Steve, 2026-09-27: "Hide & Seek" — 5 minutes, scores hidden until the end, 2-4 players free
   // for all or 2v2 teams. Runs on the Best Out Of (single round) and 2v2 engines with hide_scores.
