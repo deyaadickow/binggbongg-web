@@ -8,6 +8,8 @@ import { activeBoxingWindow, useBattle, type BattleData } from "../lib/battle";
 import { VIRTUAL, fetchVirtualGiftRecord, sendVirtualThankYou, startVirtualBattle, type VirtualBattleData, type VirtualGiftRecord, type VirtualParticipant, FIVE_FIVE_FIVE, MARATHON, SERIES, TWO_V_TWO, cancel555, createSeries, finalize2v2, finalizeSeriesRound, invite2v2, invite555, inviteMarathon, secondsUntil, useEngine, voteMarathonCancel, type B555Data, type Battle2v2Data, type MarathonData, type SeriesData } from "../lib/battles";
 import { B555Strip, BattleMenu, InviteCard, MarathonStrip, MultiPicker, Overlay, ResultOverlay, SeriesStrip, TwoVTwoPicker, TwoVTwoStrip, VirtualGiftRecordOverlay, VirtualPicker, VirtualStrip, describe2v2Invite, personName, resultTitle, type BattleKind } from "../components/BattleEngines";
 import { Challenge31Overlay, LifetimeBoardOverlay, PkContestsOverlay, PunishmentsOverlay } from "../components/BattleReference";
+import { BingoOverlay, BingoStartDialog } from "../components/BingoOverlay";
+import { BINGO_FALLBACK, bingoClamp, buyBingoSquare, cancelBingoBattle, fetchBingoGame, startBingoBattle, type BingoGame } from "../lib/bingo";
 import { fetchActiveTapGame, gameTitle, type TapGameType } from "../lib/tapgame";
 import { TapGameOverlay } from "../components/TapGameOverlay";
 import { HostGamesMenu } from "../components/HostGamesMenu";
@@ -164,6 +166,17 @@ export function LiveViewerPage() {
     recap?: { id: number; engine: string };
   } | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  // Bingg Bongg Bingo (Steve, 2026-10-11) — battle engine #11. Everyone polls, viewers
+  // included: it is the only way somebody who opens the room mid-game finds the card, since
+  // the chat line the host posts scrolls out of a busy room in seconds.
+  const [bingoGame, setBingoGame] = useState<BingoGame | null>(null);
+  const [bingoOpen, setBingoOpen] = useState(false);
+  const [bingoStartOpen, setBingoStartOpen] = useState(false);
+  // The game this browser has already opened the card for. Without it the overlay would
+  // spring back open on every poll tick after the viewer closed it.
+  const bingoAutoOpened = useRef<number | null>(null);
+  const bingoBuying = useRef(false);
   const [picker, setPicker] = useState<BattleKind | null>(null);
   // Steve, 2026-09-27: Hide & Seek — pick the shape first (free for all 2-4, or 2v2 teams).
   const [hideSeekMode, setHideSeekMode] = useState<"choose" | "2v2" | 1 | 2 | 3 | null>(null);
@@ -359,6 +372,42 @@ export function LiveViewerPage() {
   }, [members]);
   const nameOf = useCallback((id: number | null) => broadcasters.find((b) => b.user_id === id), [broadcasters]);
   const broadcastersRef = useRef<Member[]>([]);
+
+  // Bingo's one read. Polled for every role, and the only way a game is discovered.
+  useEffect(() => {
+    if (!roomName) return;
+    let alive = true;
+    const tick = async () => {
+      try {
+        const fresh = await fetchBingoGame(roomName);
+        if (!alive) return;
+        setBingoGame(fresh);
+        // Auto-open once per game, so the card appears when the host starts one — and never
+        // again for that game, or closing it would be pointless.
+        if (fresh && fresh.status === "active" && bingoAutoOpened.current !== fresh.bingo_game_id) {
+          bingoAutoOpened.current = fresh.bingo_game_id;
+          setBingoOpen(true);
+        }
+      } catch {
+        // Fail open, same as every other poll in this room — keep the last good card rather
+        // than blanking it on one bad tick.
+      }
+    };
+    void tick();
+    const id = window.setInterval(tick, 5000);
+    return () => { alive = false; window.clearInterval(id); };
+  }, [roomName]);
+
+  async function refreshBingo() {
+    if (!roomName) return;
+    try { setBingoGame(await fetchBingoGame(roomName)); } catch { /* keep the last good card */ }
+  }
+
+  function openBingo() {
+    if (bingoGame && bingoGame.status === "active") { setBingoOpen(true); return; }
+    if (role !== "host") { setToast("No bingo game is running — the host starts it."); return; }
+    setBingoStartOpen(true);
+  }
   broadcastersRef.current = broadcasters;
   virtualRef.current = virtual.data;
 
@@ -810,6 +859,62 @@ export function LiveViewerPage() {
       {gameOpen && activeGame && (
         <TapGameOverlay game={activeGame} roomName={roomName} onClose={() => setGameOpen(false)} onToast={setToast} />
       )}
+      {bingoOpen && bingoGame && myId !== null && (
+        <BingoOverlay
+          game={bingoGame}
+          myUserId={myId}
+          isHost={role === "host"}
+          // The live faces above the card. The room's own tiles are attached to a SECOND
+          // video element each — LiveKit allows one track on several elements, and the
+          // browser shares the decoded frames, so this costs a draw rather than a decode.
+          strip={orderedTiles.map((t) => (
+            <BingoStripTile key={t.identity} tile={t} label={t.isLocal ? displayName(user) : displayName(nameOf(t.userId) as Partial<UserSummary> ?? { fullname: t.name })} />
+          ))}
+          onBuy={async (card, cell) => {
+            // One at a time: a fast double-double-click would otherwise fire two charges for
+            // one square, and only the second would be refused — after the first had been paid.
+            if (bingoBuying.current) return;
+            if (card.user_id === myId) {
+              // sendCoinsToUser has refused a self-gift app-wide since long before bingo, and
+              // the card this opens on is YOUR OWN — so answer it here, in bingo's own words,
+              // rather than letting the server reply about votes.
+              setToast(bingoGame.cards.length > 1
+                ? "That's your own card — pick another player's card to gift."
+                : "This is your card — the people watching buy your squares.");
+              return;
+            }
+            bingoBuying.current = true;
+            const problem = await buyBingoSquare(myId, card.user_id, card.bingo_card_id, cell, roomName);
+            bingoBuying.current = false;
+            if (problem) setToast(problem);
+            // Straight back to the server for the truth rather than painting the cover
+            // locally: the same call brings back anything that just fell, and any square
+            // somebody else bought while this one was in flight.
+            await refreshBingo();
+          }}
+          onEndGame={async () => {
+            const problem = await cancelBingoBattle(myId, bingoGame.bingo_game_id);
+            setToast(problem ?? "Bingo game ended.");
+            await refreshBingo();
+          }}
+          onClose={() => setBingoOpen(false)}
+        />
+      )}
+      {bingoStartOpen && myId !== null && (
+        <BingoStartDialog
+          defaultPrice={bingoClamp(BINGO_FALLBACK)}
+          candidates={broadcasters.filter((b) => b.user_id !== myId).map((b) => ({ userId: b.user_id, name: personName(b) }))}
+          onClose={() => setBingoStartOpen(false)}
+          onStart={async (others, price) => {
+            setBingoStartOpen(false);
+            const { game, message } = await startBingoBattle(myId, roomName, others, price);
+            if (!game) { setToast(message ?? "Couldn't start the bingo game."); return; }
+            bingoAutoOpened.current = game.bingo_game_id;
+            setBingoGame(game);
+            setBingoOpen(true);
+          }}
+        />
+      )}
       {menuOpen && (
         <BattleMenu peopleOnScreen={broadcasters.length} onClose={() => setMenuOpen(false)} onNotice={setToast} onPick={(k) => {
           setMenuOpen(false);
@@ -818,6 +923,7 @@ export function LiveViewerPage() {
           else if (k === "gameLimit") setGameLimitPicker(true);
           else if (k === "hideSeek") setHideSeekMode("choose");
           else if (k === "solo") startSolo();
+          else if (k === "bingo") openBingo();
           // The 31-day challenge and the three reference rows open their own overlay off the
           // same `picker` state — they start nothing, so they need no people-picker step.
           else setPicker(k);
@@ -1043,6 +1149,25 @@ function BattleIntro({ onDone }: { onDone: () => void }) {
 // is available, if the image is not available please add their initials in the circle." While a
 // tile's camera is off (own or anyone's — LiveKit's TrackMuted), the video is covered by a black
 // plate with the member's Avatar (photo, else initials on gold) in the middle.
+/** One face in the bingo card's strip: a SECOND video element on a track the room's own grid
+ *  is already showing. LiveKit allows a track on several elements and the browser shares the
+ *  decoded frames, so this costs a draw, not a decode — which is why the web (like iOS, and
+ *  unlike Android) never has to move the room's real tiles into the overlay. */
+function BingoStripTile({ tile, label }: { tile: LiveTile; label: string }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    return tile.attach(el);
+  }, [tile]);
+  return (
+    <>
+      <video ref={ref} autoPlay playsInline muted style={tile.isLocal ? { transform: "scaleX(-1)" } : undefined} />
+      <span className="name" style={{ position: "absolute", left: 6, top: 6 }}>{label || "Guest"}</span>
+    </>
+  );
+}
+
 function VideoTile({ tile, label, user }: { tile: LiveTile; label: string; user?: Partial<UserSummary> | null }) {
   const ref = useRef<HTMLVideoElement>(null);
   useEffect(() => {

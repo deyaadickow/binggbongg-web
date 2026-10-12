@@ -435,3 +435,72 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .dm-pending-name { color: var(--gold); font-weight: 700; font-size: 13px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .dm-pending-hint { color: var(--gold); opacity: .7; font-size: 12px; }
+
+/* Bingg Bongg Bingo Battle (Steve, 2026-10-11) — battle engine #11.
+   The card is Steve's own artwork with the numbers laid into his empty boxes as PERCENTAGES
+   of the image, which is why the cells are absolutely positioned inside a position:relative
+   box rather than drawn: percentages mean the card scales as one piece, so a wide desktop
+   card and a narrow phone one stay aligned with no per-size arithmetic. */
+.bingo-overlay {
+  /* 100, matching .modal-backdrop rather than the 60 the battle-intro video uses: the nav is
+     sticky at z-index 20 but sits in its own stacking context, and at 60 it punched straight
+     through the scrim. Every other modal in this app is already at 100. */
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(0, 0, 0, 0.88);
+  overflow-y: auto;
+  display: flex; justify-content: center;
+}
+.bingo-inner {
+  width: min(560px, 100%);
+  padding: 14px 14px 32px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.bingo-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.bingo-strip { display: flex; gap: 6px; }
+.bingo-strip > div {
+  flex: 1 1 0; min-width: 0; height: 120px; overflow: hidden;
+  border: 1.5px solid var(--gold); border-radius: 10px; background: #000;
+}
+.bingo-strip video, .bingo-strip img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.bingo-title { text-align: center; color: var(--gold); font-weight: 800; font-size: 17px; }
+.bingo-price {
+  background: var(--gold); color: #000; font-weight: 800; font-size: 14px;
+  text-align: center; border-radius: 12px; padding: 9px 12px;
+}
+.bingo-pills { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.bingo-wins { color: var(--gold); opacity: 0.8; font-size: 12.5px; text-align: center; line-height: 1.45; }
+
+.bingo-card { position: relative; width: 100%; }
+.bingo-card > img { width: 100%; height: 100%; display: block; }
+.bingo-cell {
+  position: absolute; transform: translate(-50%, -50%);
+  display: flex; align-items: center; justify-content: center;
+  /* The whole box is the target, not just the glyph — a number is a few pixels wide and the
+     box around it is what a cursor aims at. */
+  cursor: pointer; user-select: none;
+  /* A double-click on a number must never select the text under it, which on a fast second
+     click is exactly what a browser does by default. */
+  -webkit-user-select: none;
+}
+.bingo-cell > span {
+  color: #141432; font-weight: 900; line-height: 1;
+  /* Sized off the cell rather than a fixed px so it tracks the card at any width. */
+  font-size: clamp(11px, 3.4vw, 34px);
+}
+.bingo-cell.covered {
+  /* Steve: "covered by a transparent Gold cover with Eddie's name in bold black on top".
+     Translucent on purpose — the box's own colour still reads through, so it stays his card
+     rather than becoming a grid of gold tiles. */
+  background: rgba(212, 175, 55, 0.80);
+  border: 2px solid #FFDD55; border-radius: 10px; box-sizing: border-box; padding: 2px;
+}
+.bingo-cell.covered > span {
+  font-size: clamp(7px, 1.5vw, 15px); text-align: center; overflow-wrap: anywhere; line-height: 1.05;
+}
+
+.bingo-players { display: flex; flex-direction: column; gap: 6px; max-height: 190px; overflow-y: auto; }
+.bingo-rule { border: 0; border-top: 1px solid rgba(212, 175, 55, 0.4); margin: 14px 0; }
+.bingo-stepper { display: flex; align-items: center; gap: 14px; justify-content: center; }
+.bingo-amount { color: var(--gold); font-weight: 800; font-size: 34px; min-width: 120px; text-align: center; }
+.bingo-quick { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-bottom: 10px; }
+.bingo-actions { display: flex; gap: 10px; justify-content: center; margin-top: 14px; }

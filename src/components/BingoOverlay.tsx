@@ -1,0 +1,237 @@
+// Bingg Bongg Bingo Battle (Steve, 2026-10-11) — the card over the live room, web side.
+//
+// The card is an OVERLAY on the room, not its own page. The whole mechanic is that viewers
+// double-click a number WHILE they watch; navigating away would mean they stop watching the
+// stream they are gifting into.
+//
+// The numbers sit on Steve's own artwork as PERCENTAGES of it, which is why this is a plain
+// <img> inside a position:relative box with absolutely-positioned cells rather than a canvas:
+// percentages mean the card scales as one piece, so a wide desktop card and a narrow phone
+// one stay aligned with no per-size arithmetic. That is also the one thing the web gets for
+// free that both phones had to compute by hand.
+//
+// Steve, 2026-10-11: "Add a live video grid for the host and all the guest on top of the
+// bingo card if there is more than just the host." Here the strip is the room's own video
+// elements cloned by the caller — see the `strip` prop; this component only lays them out.
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  BINGO_CELL_H, BINGO_CELL_W, BINGO_COLUMNS, BINGO_COL_X, BINGO_ROW_Y, BINGO_ASPECT,
+  BINGO_FALLBACK, BINGO_MIN, BINGO_PAYABLE_SQUARES, BINGO_QUICK_CHOICES, BINGO_STEP,
+  bingoClamp, bingoFormat, winLabel, type BingoCard, type BingoGame,
+} from "../lib/bingo";
+import { Overlay } from "./BattleEngines";
+
+export function BingoCardArt({ card, onBuy }: {
+  card: BingoCard | null;
+  /** Absent makes the card read-only — a finished game, or a card nobody may buy into. */
+  onBuy?: (cell: string) => void;
+}) {
+  const cells = useMemo(() => {
+    const out: { key: string; cell: string; number: number; left: string; top: string; gifter: string | null }[] = [];
+    if (!card) return out;
+    for (let col = 0; col < 5; col++) {
+      const column = card.numbers[col] ?? [];
+      for (let row = 0; row < 5; row++) {
+        const n = column[row];
+        // null is the free centre, already printed into the artwork.
+        if (n === null || n === undefined) continue;
+        const covered = card.covered.find((s) => s.col === col && s.row === row);
+        out.push({
+          key: `${col}-${row}`,
+          cell: `${BINGO_COLUMNS[col]}${n}`,
+          number: n,
+          left: `${(BINGO_COL_X[col] * 100).toFixed(2)}%`,
+          top: `${(BINGO_ROW_Y[row] * 100).toFixed(2)}%`,
+          gifter: covered ? (covered.gifter_name ?? "") : null,
+        });
+      }
+    }
+    return out;
+  }, [card]);
+
+  return (
+    <div className="bingo-card" style={{ aspectRatio: String(BINGO_ASPECT) }}>
+      <img src="/bingo_card_frame.webp" alt="Bingg Bongg bingo card" />
+      {cells.map((c) => (
+        <div
+          key={c.key}
+          className={`bingo-cell${c.gifter !== null ? " covered" : ""}`}
+          style={{
+            left: c.left, top: c.top,
+            width: `${BINGO_CELL_W * 100}%`, height: `${BINGO_CELL_H * 100}%`,
+          }}
+          // Double-click, matching the phones' double-tap. No confirmation step: that is the
+          // spec — "all they have to do is double tap that number" — and a confirm dialog
+          // would undo the mechanic it describes. The price band above is always on screen
+          // for exactly that reason.
+          onDoubleClick={onBuy ? () => onBuy(c.cell) : undefined}
+          title={c.gifter !== null ? `${c.cell} — gifted by ${c.gifter || "a member"}` : `Double-click to gift ${c.cell}`}
+        >
+          <span>{c.gifter !== null ? (c.gifter || "Gifted") : c.number}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function BingoOverlay({ game, myUserId, isHost, strip, onBuy, onEndGame, onClose }: {
+  game: BingoGame;
+  myUserId: number;
+  isHost: boolean;
+  /** The live faces, already rendered by the caller — empty or one entry draws no strip. */
+  strip: React.ReactNode[];
+  onBuy: (card: BingoCard, cell: string) => void;
+  onEndGame: () => void;
+  onClose: () => void;
+}) {
+  // "Mine if I have one, else the first" — resolved on every render rather than stored, so it
+  // stays right if the game's player list is not what this browser last saw.
+  const [pickedUserId, setPickedUserId] = useState<number | null>(null);
+  const shown = useMemo(() => {
+    return game.cards.find((c) => c.user_id === pickedUserId)
+      ?? game.cards.find((c) => c.user_id === myUserId)
+      ?? game.cards[0] ?? null;
+  }, [game.cards, pickedUserId, myUserId]);
+
+  // Escape closes it, like every other overlay in this app. The game keeps running.
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") closeRef.current(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  const active = game.status === "active";
+
+  return (
+    <div className="bingo-overlay">
+      <div className="bingo-inner">
+        <div className="bingo-top">
+          <button className="btn ghost" onClick={onClose}>✕ Close</button>
+          {isHost && active && <button className="btn" onClick={onEndGame}>End Game</button>}
+        </div>
+
+        {/* One face is the host looking at their own card, which the room behind already
+            shows — nothing worth a strip. */}
+        {strip.length > 1 && <div className="bingo-strip">{strip.map((node, i) => <div key={i}>{node}</div>)}</div>}
+
+        <div className="bingo-title">Bingo #{game.game_no}{active ? "" : " — finished"}</div>
+
+        {/* Always on screen, because a double-click spends this without asking. */}
+        <div className="bingo-price">
+          {active
+            ? `Double-click a number to gift it — ${bingoFormat(game.coins_per_square)} coins a square`
+            : "This game has finished"}
+        </div>
+
+        {game.cards.length > 1 && (
+          <div className="bingo-pills">
+            {game.cards.map((c) => (
+              <button
+                key={c.bingo_card_id}
+                className={`btn ${c.bingo_card_id === shown?.bingo_card_id ? "" : "ghost"}`}
+                onClick={() => setPickedUserId(c.user_id)}
+              >#{c.card_no} {c.player_name}</button>
+            ))}
+          </div>
+        )}
+
+        <BingoCardArt
+          card={shown}
+          onBuy={active && shown ? (cell) => onBuy(shown, cell) : undefined}
+        />
+
+        <div className="bingo-wins">
+          {game.wins.length === 0
+            ? "Vertical · Horizontal · Diagonal · 4 Corners · X · Whole Card — the game runs until somebody covers a whole card."
+            : game.wins.map((w) => `${winLabel(w.pattern)} — ${w.name ?? "A member"}`).join("   ")}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** The host picks who gets a card and what a square costs, in ONE dialog.
+ *
+ *  Steve, 2026-10-11: "Give the host the ability to change the coin cost settings for each
+ *  square. Minimum 50 coins." The admin setting is only the default this opens on; the host's
+ *  choice is snapshotted onto the game, so it is fixed for that game's life.
+ *
+ *  Two deliberate decisions, same as both phones:
+ *   - The floor is SHOWN as a figure, not only enforced. A host who wants a cheap game and
+ *     finds the minus button stopping dead will think it is broken; "Minimum 50" tells them
+ *     it is a rule.
+ *   - "A whole card is 24 squares" updates live. The price per square is what the host sets,
+ *     but what a viewer feels is the cost of filling a card — at 1,000 a square that is
+ *     24,000 coins, worth seeing BEFORE starting rather than when nobody plays.
+ */
+export function BingoStartDialog({ defaultPrice, candidates, onStart, onClose }: {
+  defaultPrice: number;
+  candidates: { userId: number; name: string }[];
+  onStart: (otherPlayerIds: number[], price: number) => void;
+  onClose: () => void;
+}) {
+  const [price, setPrice] = useState(() => bingoClamp(defaultPrice > 0 ? defaultPrice : BINGO_FALLBACK));
+  const [typed, setTyped] = useState("");
+  const [picked, setPicked] = useState<number[]>([]);
+  const [capWarning, setCapWarning] = useState(false);
+  const MAX_OTHERS = 3;
+
+  function toggle(userId: number) {
+    setPicked((prev) => {
+      if (prev.includes(userId)) { setCapWarning(false); return prev.filter((id) => id !== userId); }
+      // One card each, four cards maximum — Steve's rule, shown rather than silently refused.
+      if (prev.length >= MAX_OTHERS) { setCapWarning(true); return prev; }
+      return [...prev, userId];
+    });
+  }
+
+  return (
+    <Overlay title="🎱 Start Bingo" onClose={onClose} width={480}>
+      {candidates.length > 0 && (
+        <>
+          <p className="soft" style={{ marginTop: 0 }}>Who gets a card? Pick nobody to play it on your own — you always get one.</p>
+          <div className="bingo-players">
+            {candidates.map((c) => (
+              <button key={c.userId} className={`btn block ${picked.includes(c.userId) ? "" : "ghost"}`} onClick={() => toggle(c.userId)}>
+                {c.name}{picked.includes(c.userId) ? "  ✓" : ""}
+              </button>
+            ))}
+          </div>
+          {capWarning && <p className="muted" style={{ fontSize: 13 }}>Up to {MAX_OTHERS} others — four cards in all.</p>}
+          <hr className="bingo-rule" />
+        </>
+      )}
+
+      <p className="soft" style={{ marginBottom: 4 }}>What every square on the card costs to gift. Minimum {BINGO_MIN}.</p>
+      <div className="bingo-stepper">
+        <button className="btn ghost" onClick={() => setPrice(bingoClamp(price - BINGO_STEP))}>−</button>
+        <div className="bingo-amount">{bingoFormat(price)}</div>
+        <button className="btn ghost" onClick={() => setPrice(bingoClamp(price + BINGO_STEP))}>+</button>
+      </div>
+      <p className="muted" style={{ fontSize: 13, textAlign: "center" }}>
+        A whole card is {BINGO_PAYABLE_SQUARES} squares — {bingoFormat(price * BINGO_PAYABLE_SQUARES)} coins to fill.
+      </p>
+
+      <div className="bingo-quick">
+        {BINGO_QUICK_CHOICES.map((c) => (
+          <button key={c} className="btn ghost" onClick={() => { setTyped(""); setPrice(bingoClamp(c)); }}>{bingoFormat(c)}</button>
+        ))}
+      </div>
+
+      <input className="input block" inputMode="numeric" placeholder="Type a price"
+             value={typed} onChange={(e) => setTyped(e.target.value.replace(/[^0-9]/g, ""))} />
+
+      <div className="bingo-actions">
+        <button className="btn ghost" onClick={onClose}>Cancel</button>
+        <button className="btn" onClick={() => {
+          // A typed value wins over the stepper, and is CLAMPED rather than refused: a host
+          // who types 10 watches it become 50 instead of dismissing an error.
+          const chosen = typed.trim() === "" ? price : bingoClamp(Number(typed));
+          onStart(picked, chosen);
+        }}>Start Bingo</button>
+      </div>
+    </Overlay>
+  );
+}

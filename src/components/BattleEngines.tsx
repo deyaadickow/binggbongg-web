@@ -27,6 +27,7 @@ export function Overlay({ title, children, onClose, width = 440 }: { title: stri
 
 export type BattleKind =
   | "1v1" | "gameLimit" | "virtual" | "series" | "2v2" | "marathon" | "555" | "solo" | "hideSeek"
+  | "bingo"
   // Android numbers this one #5 and it belongs between Best Out Of and 5-5-5. It isn't a battle
   // you start against someone in the room — it's a personal 31-day streak you opt into — so it
   // needs no people on screen.
@@ -70,6 +71,11 @@ export const BATTLE_KINDS: {
   // for all or 2v2 teams. Runs on the Best Out Of (single round) and 2v2 engines with hide_scores.
   { kind: "hideSeek", number: "#10", title: "Hide & Seek", blurb: "5 minutes · scores hidden until the end", minPeople: 2,
     info: "A 5-minute battle where nobody can see the scores — not the players, not the room — until the clock runs out and both sides are revealed at once. Play it 1v1, with 3 or 4 players free for all, or as 2v2 teams. Most gift coins wins; fun and nerve-wracking to the last second." },
+  // Steve, 2026-10-11: "Bingg Bongg Bingo Battle". minPeople is 1 because a solo game is real
+  // — the host always gets a card and the room's VIEWERS are the ones who buy squares, so
+  // there is nobody who has to be on screen for it to work.
+  { kind: "bingo", number: "#11", title: "Bingg Bongg Bingo", blurb: "Viewers buy squares on your card", minPeople: 1,
+    info: "Everyone in the room gets a bingo card — play it on your own or with up to 3 others, each on a different card. Viewers double-click any number to gift it, and that square goes under a gold cover carrying THEIR name, so the card fills up with the people who paid for it. Vertical, horizontal, diagonal, 4 corners, X and the whole card all count, and the game keeps going until somebody covers a whole card — so one game can have six different winners. The host sets what a square costs." },
   // Unnumbered from here down, exactly as on the phones: these aren't battles you can start, so
   // they carry no "#n" and never check how many people are on screen.
   { kind: "pkContests", title: "PK Battle Contests", blurb: "Admin-run · scored by gift coins", minPeople: 1, reference: true,
