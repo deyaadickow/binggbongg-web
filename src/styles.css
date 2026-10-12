@@ -525,3 +525,41 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .bingo-row-main b { color: var(--gold); font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .bingo-row-main .muted { font-size: 11px; }
 .bingo-row-wins { flex-shrink: 0; color: var(--gold); font-size: 12px; font-weight: 700; }
+
+/* "One Stroke" (Steve, 2026-10-12) — the fifth tap-game engine.
+   The board is an SVG with a 0..1 viewBox, because the levels are authored as fractions of a
+   square: the browser then does every bit of the scaling, and the same coordinates the phones
+   have to convert by hand are simply the drawing instructions here. The viewBox is inset
+   slightly beyond 0..1 so a thick stroke on an edge node is not clipped in half. */
+.onestroke-overlay {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex; justify-content: center; overflow-y: auto;
+}
+.onestroke-inner { width: min(520px, 100%); padding: 14px 14px 28px; display: flex; flex-direction: column; gap: 10px; }
+.onestroke-top { display: flex; justify-content: space-between; align-items: center; }
+.onestroke-iq {
+  color: var(--gold); font-size: 20px; font-weight: 800;
+  border: 1.5px solid var(--gold); border-radius: 12px; padding: 4px 12px;
+}
+.onestroke-iq b {
+  background: var(--gold); color: #000; border-radius: 999px;
+  padding: 1px 8px; font-size: 13px; margin-right: 8px;
+}
+.onestroke-title { text-align: center; color: var(--gold); font-weight: 800; font-size: 17px; }
+.onestroke-hint { text-align: center; color: var(--muted); font-size: 13px; min-height: 18px; }
+.onestroke-board {
+  /* flex-shrink off, or the column squashes it out of square and the browser letterboxes the
+     drawing inside a wider box — harmless to look at, and the reason two attempts at manual
+     pointer maths were wrong before getScreenCTM replaced them. */
+  width: 100%; aspect-ratio: 1; flex: 0 0 auto;
+  touch-action: none; user-select: none; -webkit-user-select: none;
+}
+.onestroke-track, .onestroke-done {
+  fill: none; stroke-width: 0.055; stroke-linecap: round; stroke-linejoin: round;
+}
+.onestroke-track { stroke: #5C3E24; }
+.onestroke-done { stroke: #E8A33C; }
+.onestroke-node { fill: var(--gold); }
+.onestroke-node.live { fill: #fff; }
+.onestroke-actions { display: flex; gap: 10px; justify-content: center; margin-top: 4px; }

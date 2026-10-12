@@ -12,7 +12,7 @@ export interface TapGameType {
   catch_name?: string;
   emoji?: string;
   name?: string;
-  game_mode?: "catch" | "falling_lanes" | "puzzle" | "race" | string;
+  game_mode?: "catch" | "falling_lanes" | "puzzle" | "race" | "one_stroke" | string;
   /** "Water / Fishing", "Races", … — drives the painted scene when there is no uploaded art. */
   category?: string | null;
   coin_value?: number;
@@ -118,7 +118,7 @@ export const GAME_COIN_VALUES = [1, 2, 3, 4, 5] as const;
 
 /** Game modes with no length to pick: a puzzle has no clock, a race ends at the finish line. */
 export function needsDuration(g: TapGameType): boolean {
-  return !["puzzle", "race"].includes(g.game_mode ?? "");
+  return !["puzzle", "race", "one_stroke"].includes(g.game_mode ?? "");
 }
 
 /** Only catch/pop games score per object, so only they take a host-chosen coin value. */

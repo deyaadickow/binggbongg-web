@@ -9,6 +9,7 @@ import { VIRTUAL, fetchVirtualGiftRecord, sendVirtualThankYou, startVirtualBattl
 import { B555Strip, BattleMenu, InviteCard, MarathonStrip, MultiPicker, Overlay, ResultOverlay, SeriesStrip, TwoVTwoPicker, TwoVTwoStrip, VirtualGiftRecordOverlay, VirtualPicker, VirtualStrip, describe2v2Invite, personName, resultTitle, type BattleKind } from "../components/BattleEngines";
 import { Challenge31Overlay, LifetimeBoardOverlay, PkContestsOverlay, PunishmentsOverlay } from "../components/BattleReference";
 import { BingoBoardOverlay, BingoOverlay, BingoStartDialog, BingoWinnersOverlay } from "../components/BingoOverlay";
+import { OneStrokeOverlay } from "../components/OneStrokeOverlay";
 import { BINGO_FALLBACK, bingoClamp, buyBingoSquare, cancelBingoBattle, fetchBingoGame, startBingoBattle, type BingoGame } from "../lib/bingo";
 import { fetchActiveTapGame, gameTitle, type TapGameType } from "../lib/tapgame";
 import { TapGameOverlay } from "../components/TapGameOverlay";
@@ -867,7 +868,11 @@ export function LiveViewerPage() {
         />
       )}
       {gameOpen && activeGame && (
-        <TapGameOverlay game={activeGame} roomName={roomName} onClose={() => setGameOpen(false)} onToast={setToast} />
+        activeGame.game_mode === "one_stroke"
+          // Steve, 2026-10-12: "Create this game." — a fifth engine with its own overlay, since
+          // nothing about tracing a shape shares the spawn-and-tap machinery the other modes do.
+          ? <OneStrokeOverlay onClose={() => setGameOpen(false)} />
+          : <TapGameOverlay game={activeGame} roomName={roomName} onClose={() => setGameOpen(false)} onToast={setToast} />
       )}
       {bingoOpen && bingoGame && myId !== null && (
         <BingoOverlay
