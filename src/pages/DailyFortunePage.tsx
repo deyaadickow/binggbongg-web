@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { Link } from "react-router-dom";
 import { useSession } from "../lib/session";
 import { fetchDailyFortune, type DailyFortune } from "../lib/api";
@@ -51,6 +51,15 @@ export function DailyFortunePage() {
     .map(([length, value]) => ({ length: Number(length), value }))
     .sort((a, b) => a.length - b.length);
 
+  const headingPlate: CSSProperties = {
+    marginTop: 18, padding: "12px 16px", borderRadius: 10,
+    background: "var(--gold)", color: "#000", fontWeight: 800, fontSize: 18,
+    border: "2px solid #000", textAlign: "center",
+  };
+  const plainPlate: CSSProperties = {
+    padding: 16, borderRadius: 10, background: "#000", border: "2px solid #000",
+  };
+
   const hasSign = Boolean(fortune?.sign);
   const today = new Date().toISOString().slice(0, 10);
 
@@ -58,7 +67,11 @@ export function DailyFortunePage() {
     <div className="page">
       <h2>Lucky Numbers &amp; Horoscope</h2>
 
-      <h3 style={{ color: "var(--gold)", marginTop: 18 }}>Your lucky numbers</h3>
+      {/* Steve, 2026-10-13: "Put the 'Your Lucky Numbers' and 'Your Daily Horoscope' in a gold
+          box with bold black text. Add a black border to the rest of the boxes. All text should
+          be in gold. Make the 3 digit, 4 digit ... text the same size as the numbers." Same on
+          Android and iOS. */}
+      <div style={headingPlate}>Your lucky numbers</div>
       {loading && !fortune ? (
         <p className="muted">Loading…</p>
       ) : (
@@ -69,10 +82,12 @@ export function DailyFortunePage() {
               style={{
                 display: "flex", alignItems: "center", justifyContent: "space-between",
                 padding: "14px 16px", borderRadius: 10,
-                background: "rgba(0,0,0,.45)", border: "1px solid var(--gold-border)",
+                background: "#000", border: "2px solid #000",
               }}
             >
-              <span className="muted" style={{ fontSize: 13 }}>{n.length} digits</span>
+              {/* Same size and weight as the number beside it — a small grey caption made the
+                  row read as one number with a note, not as "this is the 3-digit one". */}
+              <span style={{ fontSize: 24, fontWeight: 700, color: "var(--gold)" }}>{n.length} digits</span>
               {/* Monospace so the digits do not jiggle between draws, and rendered as the
                   string we were given — Number() here would eat the leading zero. */}
               <span style={{ fontFamily: "ui-monospace, monospace", fontSize: 24, fontWeight: 700, letterSpacing: 2, color: "var(--gold)" }}>
@@ -86,13 +101,13 @@ export function DailyFortunePage() {
         {loading ? "…" : "Give me new numbers"}
       </button>
 
-      <h3 style={{ color: "var(--gold)", marginTop: 30 }}>Your daily horoscope</h3>
+      <div style={{ ...headingPlate, marginTop: 30 }}>Your daily horoscope</div>
       {error && <div className="notice">{error}</div>}
 
       {hasSign && !editingBirthday ? (
-        <div style={{ padding: 16, borderRadius: 10, background: "rgba(0,0,0,.45)", border: "1px solid var(--gold-border)" }}>
-          <div style={{ color: "var(--gold)", fontWeight: 600, textTransform: "capitalize" }}>{fortune?.sign}</div>
-          <p style={{ marginBottom: 0, marginTop: 10 }}>
+        <div style={plainPlate}>
+          <div style={{ color: "var(--gold)", fontWeight: 700, textTransform: "capitalize" }}>{fortune?.sign}</div>
+          <p style={{ marginBottom: 0, marginTop: 10, color: "var(--gold)" }}>
             {/* A sign with nothing in the bank yet is possible — say so rather than leave an
                 empty box that just looks broken. */}
             {fortune?.horoscope || "No reading for your sign today. Check back tomorrow."}
@@ -104,8 +119,8 @@ export function DailyFortunePage() {
         </div>
       ) : (
         // No birth date: the numbers above still work, so this asks rather than blocks.
-        <div style={{ padding: 16, borderRadius: 10, background: "rgba(0,0,0,.45)", border: "1px solid var(--gold-border)" }}>
-          <p style={{ marginTop: 0 }}>
+        <div style={plainPlate}>
+          <p style={{ marginTop: 0, color: "var(--gold)" }}>
             Tell us your birthday and we will show your star sign and today&apos;s reading.
             We only need the day and month — we keep it for next time.
           </p>
