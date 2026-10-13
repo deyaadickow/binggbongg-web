@@ -56,8 +56,10 @@ export function DailyFortunePage() {
     background: "var(--gold)", color: "#000", fontWeight: 800, fontSize: 18,
     border: "2px solid #000", textAlign: "center",
   };
+  // Steve, 2026-10-13: "Add a light border same as above on the bottom horoscope box" — the
+  // same hairline the digit rows carry, so the whole page reads as one set of boxes.
   const plainPlate: CSSProperties = {
-    padding: 16, borderRadius: 10, background: "#000", border: "2px solid #000",
+    padding: 16, borderRadius: 10, background: "#000", border: "1px solid var(--gold)",
   };
 
   const hasSign = Boolean(fortune?.sign);
