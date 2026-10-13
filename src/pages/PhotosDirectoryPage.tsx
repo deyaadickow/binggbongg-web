@@ -49,7 +49,9 @@ export function PhotosDirectoryPage() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 10 }}>
           {rows.map((r) => (
             <Link key={r.user_id} to={`/photos/${r.user_id}`}
-              style={{ display: "block", border: "1px solid var(--line)", borderRadius: 12, overflow: "hidden", background: "var(--panel)" }}>
+              /* Steve, 2026-10-13: "Add a border same as the cartoon border around the images."
+                 A 1px --line rim was invisible against the page; full gold, 2px. */
+              style={{ display: "block", border: "2px solid var(--gold)", borderRadius: 12, overflow: "hidden", background: "var(--panel)" }}>
               <div style={{ aspectRatio: "1", background: "#000" }}>
                 {r.preview_thumb && (
                   <img src={r.preview_thumb} alt="" loading="lazy"
