@@ -10,6 +10,7 @@ import { B555Strip, BattleMenu, InviteCard, MarathonStrip, MultiPicker, Overlay,
 import { Challenge31Overlay, LifetimeBoardOverlay, PkContestsOverlay, PunishmentsOverlay } from "../components/BattleReference";
 import { BingoBoardOverlay, BingoOverlay, BingoStartDialog, BingoWinnersOverlay } from "../components/BingoOverlay";
 import { OneStrokeOverlay } from "../components/OneStrokeOverlay";
+import { BlockEscapeOverlay } from "../components/BlockEscapeOverlay";
 import { BINGO_FALLBACK, bingoClamp, buyBingoSquare, cancelBingoBattle, fetchBingoGame, startBingoBattle, type BingoGame } from "../lib/bingo";
 import { fetchActiveTapGame, gameTitle, type TapGameType } from "../lib/tapgame";
 import { TapGameOverlay } from "../components/TapGameOverlay";
@@ -872,6 +873,10 @@ export function LiveViewerPage() {
           // Steve, 2026-10-12: "Create this game." — a fifth engine with its own overlay, since
           // nothing about tracing a shape shares the spawn-and-tap machinery the other modes do.
           ? <OneStrokeOverlay onClose={() => setGameOpen(false)} />
+          : activeGame.game_mode === "block_escape"
+          // Steve, 2026-10-12: the sixth engine — drag a block, it slides until something stops
+          // it, match it to its own gate to get it out. Its own overlay for the same reason.
+          ? <BlockEscapeOverlay onClose={() => setGameOpen(false)} />
           : <TapGameOverlay game={activeGame} roomName={roomName} onClose={() => setGameOpen(false)} onToast={setToast} />
       )}
       {bingoOpen && bingoGame && myId !== null && (

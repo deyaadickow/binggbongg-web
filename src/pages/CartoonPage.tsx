@@ -113,6 +113,8 @@ export function CartoonPage() {
                 onClick={run} disabled={!picked || busy}>
           {busy ? "Drawing your cartoon…" : `Make my cartoon · ${coins} coins`}
         </button>
+      ) : (
+        <div style={{ marginTop: 12 }}><Notice>Cartoons aren't switched on yet. Please check back soon.</Notice></div>
       )}
 
       {/* Steve, 2026-10-12: "we need a message to let them know while the wheel is turning."
@@ -121,8 +123,6 @@ export function CartoonPage() {
         <div className="muted" style={{ textAlign: "center", marginTop: 8 }}>
           This cartoon image creation will take between 30 to 60 seconds to complete.
         </div>
-      ) : (
-        <div style={{ marginTop: 12 }}><Notice>Cartoons aren't switched on yet. Please check back soon.</Notice></div>
       )}
 
       {error && <div style={{ marginTop: 12 }}><Notice error>{error}</Notice></div>}
