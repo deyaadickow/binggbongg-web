@@ -82,7 +82,9 @@ export function DailyFortunePage() {
               style={{
                 display: "flex", alignItems: "center", justifyContent: "space-between",
                 padding: "14px 16px", borderRadius: 10,
-                background: "#000", border: "2px solid #000",
+                // Steve, 2026-10-13: "Add a border around the digits not too thick." A hairline
+                // gold rim on the black plate — the horoscope boxes below keep their black one.
+                background: "#000", border: "1px solid var(--gold)",
               }}
             >
               {/* Same size and weight as the number beside it — a small grey caption made the
