@@ -644,11 +644,48 @@ export function LiveViewerPage() {
   function openTapSenders() {
     if (!roomName || !hostUserId) return;
     setTapSenders([]); setTapSendersTotal(0); setTapSendersLoading(true);
-    post<{ total?: number; data?: { user_id: number; fullname?: string; username?: string; profile_image?: string; taps: number }[] }>(
+    // post() resolves to the server's JSON itself, so `data` is the list and `total` a sibling —
+    // the first cut read r.data?.data and this list was always empty.
+    post<{ user_id: number; fullname?: string; username?: string; profile_image?: string; taps: number }[]>(
       "fetchLiveTapSenders", { room_name: roomName, to_user_id: hostUserId })
-      .then((r) => { setTapSenders(r.data?.data ?? []); setTapSendersTotal(r.data?.total ?? 0); })
+      .then((r) => { setTapSenders(r.data ?? []); setTapSendersTotal(typeof r.total === "number" ? r.total : 0); })
       .catch(() => setTapSenders([]))
       .finally(() => setTapSendersLoading(false));
+  }
+  // Steve, 2026-10-14: the live Leader Board (LB). "Any of the audience or any live streamer will
+  // have the option to click (LB)... up to 4 members on top. When they click on any member it will
+  // show the leaderboard with all members that gifted that member." One (LB) for every role.
+  // null = closed. Reads LivestreamController::fetchLiveGiftLeaderboard; same row shape both ways.
+  type LbRow = { user_id: number; fullname?: string; username?: string; profile_image?: string; is_host?: boolean; coins: number };
+  const [lbMembers, setLbMembers] = useState<LbRow[] | null>(null);
+  const [lbLoading, setLbLoading] = useState(false);
+  const [lbSelected, setLbSelected] = useState<LbRow | null>(null);
+  const [lbSenders, setLbSenders] = useState<LbRow[] | null>(null);
+  const [lbTotal, setLbTotal] = useState(0);
+  function openLeaderBoard() {
+    if (!roomName) return;
+    setLbMembers([]); setLbSelected(null); setLbSenders(null); setLbTotal(0); setLbLoading(true);
+    post("fetchLiveGiftLeaderboard", { room_name: roomName })
+      .then((r) => setLbMembers((r.members as LbRow[] | undefined) ?? []))
+      .catch(() => setLbMembers([]))
+      .finally(() => setLbLoading(false));
+  }
+  function selectLbMember(m: LbRow) {
+    if (!roomName) return;
+    setLbSelected(m); setLbSenders(null); setLbTotal(0);
+    post("fetchLiveGiftLeaderboard", { room_name: roomName, to_user_id: m.user_id })
+      .then((r) => {
+        // Only the latest tap's answer may land.
+        setLbSelected((cur) => {
+          if (cur?.user_id !== m.user_id) return cur;
+          setLbSenders((r.senders as LbRow[] | undefined) ?? []);
+          setLbTotal(typeof r.total === "number" ? r.total : 0);
+          const fresh = r.members as LbRow[] | undefined;
+          if (fresh && fresh.length) setLbMembers(fresh);
+          return cur;
+        });
+      })
+      .catch(() => setLbSenders([]));
   }
   const pendingTaps = useRef(0);
   const tapFlushTimer = useRef<number | null>(null);
@@ -771,6 +808,10 @@ export function LiveViewerPage() {
                 ❤️ {tapCount.toLocaleString()}
               </button>
             )}
+            <button type="button" className="live-lb" title="Leader Board — top givers this live"
+              onClick={(e) => { e.stopPropagation(); openLeaderBoard(); }}>
+              LB
+            </button>
             {orderedTiles.length === 0 && (
               <div className="tile" style={{ display: "grid", placeItems: "center" }}>
                 <span className="muted">{live.status === "live" ? "Waiting for video…" : "Connecting…"}</span>
@@ -836,6 +877,60 @@ export function LiveViewerPage() {
                   </div>
                 )}
                 <button className="btn" style={{ marginTop: 12 }} onClick={() => setTapSenders(null)}>Close</button>
+              </div>
+            </div>
+          )}
+
+          {lbMembers !== null && (
+            <div className="modal-backdrop" onClick={() => setLbMembers(null)}>
+              <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
+                <h3 style={{ color: "var(--gold)", marginTop: 0, textAlign: "center" }}>Leader Board</h3>
+                <p style={{ color: "var(--gold)", textAlign: "center", fontWeight: 600, fontSize: 13, margin: "0 0 12px" }}>
+                  Top givers this live. Tap a member to see who gifted them.
+                </p>
+                {lbLoading ? (
+                  <p className="muted">Loading…</p>
+                ) : lbMembers.length === 0 ? (
+                  <p className="muted">The Leader Board is empty right now.</p>
+                ) : (
+                  <>
+                    <div className="lb-members">
+                      {lbMembers.map((m) => (
+                        <button key={m.user_id} type="button" className={"lb-member" + (lbSelected?.user_id === m.user_id ? " selected" : "")}
+                          onClick={() => selectLbMember(m)}>
+                          <Avatar user={{ fullname: m.fullname, username: m.username, profile_image: m.profile_image } as Partial<UserSummary>} />
+                          <span className="lb-name">{displayName({ fullname: m.fullname, username: m.username } as Partial<UserSummary>)}</span>
+                          <span className="lb-coins">🪙 {m.coins.toLocaleString()}</span>
+                        </button>
+                      ))}
+                    </div>
+                    {lbSelected && (
+                      <>
+                        <h4 style={{ color: "var(--gold)", margin: "14px 0 8px", textAlign: "center" }}>
+                          Gifts for {displayName({ fullname: lbSelected.fullname, username: lbSelected.username } as Partial<UserSummary>)}{lbTotal > 0 ? ` (${lbTotal.toLocaleString()})` : ""}
+                        </h4>
+                        {lbSenders === null ? (
+                          <p className="muted">Loading…</p>
+                        ) : lbSenders.length === 0 ? (
+                          <p className="muted">No gifts yet.</p>
+                        ) : (
+                          <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: "45vh", overflowY: "auto" }}>
+                            {lbSenders.map((s) => (
+                              <div key={s.user_id} className="row" style={{ padding: "8px 10px", border: "1px solid var(--gold-border)", borderRadius: 10, background: "#111" }}>
+                                <Avatar user={{ fullname: s.fullname, username: s.username, profile_image: s.profile_image } as Partial<UserSummary>} />
+                                <div style={{ flex: 1, minWidth: 0, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                  {displayName({ fullname: s.fullname, username: s.username } as Partial<UserSummary>)}
+                                </div>
+                                <div style={{ color: "var(--gold)", fontWeight: 800, whiteSpace: "nowrap" }}>🪙 {s.coins.toLocaleString()}</div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </>
+                )}
+                <button className="btn" style={{ marginTop: 12 }} onClick={() => setLbMembers(null)}>Close</button>
               </div>
             </div>
           )}
