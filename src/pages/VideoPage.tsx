@@ -195,7 +195,7 @@ export function VideoPage() {
             title="Copy this video's link"
             onClick={() => void copyLink()}
             style={{ background: "#000", color: "var(--gold)", borderColor: "var(--gold)" }}>
-            {copied ? "Copied" : "(C)"}
+            {copied ? "Copied" : "C"}
           </button>
         </div>
         <div className="video-arrows">
