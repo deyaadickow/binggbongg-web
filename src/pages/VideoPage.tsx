@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { rememberCopiedLink, videoShareUrl } from "../lib/copiedLink";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { displayName, mediaUrl, post, type Gift, type Post } from "../lib/api";
 import { useSession } from "../lib/session";
@@ -153,7 +154,10 @@ export function VideoPage() {
   // backend, and the link is the same either way.
   async function copyLink() {
     if (!item) return;
-    const url = item.share_url || `${window.location.origin}/video/${item.id}`;
+    const url = videoShareUrl(item);
+    // Remembered either way, clipboard or not: this is what pre-fills the paste box on the
+    // upload page, and it is the half of (C) that cannot fail.
+    rememberCopiedLink(url);
     try {
       await navigator.clipboard.writeText(url);
     } catch {

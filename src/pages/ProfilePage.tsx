@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { rememberCopiedLink, videoShareUrl } from "../lib/copiedLink";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { displayName, mediaUrl, post, type Post, type UserSummary } from "../lib/api";
 import { BattleBadge, BattleInfoPopup, BattleStreak, battleBadgeExplainer, battleStreakExplainer } from "../components/BattleBadge";
@@ -77,6 +78,24 @@ function isValidUrl(url?: string | null): boolean {
 function ProfileThumb({ p, isMe, onClick }: { p: ProfilePost; isMe: boolean; onClick: () => void }) {
   const thumb = mediaUrl(p.thumbnail);
   const navigate = useNavigate();
+  const [copied, setCopied] = useState(false);
+
+  // Steve, 2026-10-13: "Add it on the tiles too." Same (C) as the video page, so a member can
+  // copy a link straight off a grid without opening the video first.
+  async function copyLink(e: MouseEvent) {
+    e.stopPropagation();      // the tile underneath opens the video
+    const url = videoShareUrl(p);
+    rememberCopiedLink(url);
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      window.prompt("Copy this video's link:", url);
+      return;
+    }
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1400);
+  }
+
   return (
     <div className="p-thumb" onClick={onClick}>
       {thumb ? <img src={thumb} alt="" loading="lazy" /> : (
@@ -88,19 +107,31 @@ function ProfileThumb({ p, isMe, onClick }: { p: ProfilePost; isMe: boolean; onC
       {/* Steve, 2026-10-05: "This is not working." It was a plain span with no click on it at
           all — decoration sitting on a thumbnail that opens the video. It is a real button now,
           and the click stops here instead of opening the video underneath. */}
-      {isMe && (
+      {/* Both bottom-right actions share one row — every other corner of the tile already
+          carries a badge (views, votes, video number), and two absolutely-positioned buttons
+          at the same corner would sit on top of each other. */}
+      <div className="p-actions" onClick={(e) => e.stopPropagation()}>
+        {isMe && (
+          <button
+            className="p-ad"
+            title="Advertise this video"
+            onClick={(e) => {
+              e.stopPropagation();
+              // The video goes with it, so the ad page doesn't ask for a file he already uploaded.
+              navigate("/settings/advertise/new", { state: { videoUrl: mediaUrl(p.video) } });
+            }}
+          >
+            ⚡
+          </button>
+        )}
         <button
-          className="p-ad"
-          title="Advertise this video"
-          onClick={(e) => {
-            e.stopPropagation();
-            // The video goes with it, so the ad page doesn't ask for a file he already uploaded.
-            navigate("/settings/advertise/new", { state: { videoUrl: mediaUrl(p.video) } });
-          }}
+          className="p-copy"
+          title="Copy this video's link"
+          onClick={(e) => void copyLink(e)}
         >
-          ⚡
+          {copied ? "✓" : "C"}
         </button>
-      )}
+      </div>
     </div>
   );
 }

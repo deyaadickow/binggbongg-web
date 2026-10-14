@@ -3,6 +3,7 @@
 // backend the key. The thumbnail uploadPost requires is taken from the video itself rather than
 // asked for separately.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { readCopiedLink } from "../lib/copiedLink";
 import { useNavigate } from "react-router-dom";
 import { post } from "../lib/api";
 import { useSession } from "../lib/session";
@@ -30,8 +31,10 @@ export function UploadVideoPage() {
   const [country, setCountry] = useState("");
   const [state, setState] = useState("");
   const [description, setDescription] = useState("");
-  // Steve, 2026-10-13: a link copied off another video with (C).
-  const [linkedUrl, setLinkedUrl] = useState("");
+  // Steve, 2026-10-13: a link copied off another video with (C). Seeded from the last link
+  // copied, so the usual journey — tap (C) on a video, come here to post — needs no paste at
+  // all, which is how it already works on Android and iOS.
+  const [linkedUrl, setLinkedUrl] = useState(readCopiedLink);
   const [canComment, setCanComment] = useState(true);
   const [canSave, setCanSave] = useState(true);
   const [allowRepost, setAllowRepost] = useState(true);
