@@ -641,6 +641,10 @@ export function LiveViewerPage() {
   // Double click, not single: a double tap is what sends a heart on the phones, and a single
   // click on the grid must stay free for everything else the tiles do.
   function dropHeart(e: React.MouseEvent<HTMLDivElement>) {
+    // Steve, 2026-10-14: "You can not Tap Tap and get hearts for your self." The web grid only
+    // ever hearts the host, so a host watching their own room is the self case: no animation,
+    // no count, nothing sent — and the server refuses it anyway.
+    if (myId && hostUserId && myId === hostUserId) return;
     const box = e.currentTarget.getBoundingClientRect();
     const id = Date.now() + Math.random();
     const heart = {
