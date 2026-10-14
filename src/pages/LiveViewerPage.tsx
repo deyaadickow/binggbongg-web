@@ -635,6 +635,21 @@ export function LiveViewerPage() {
   // meaningful point (somebody else's finger) and are placed bottom-centre instead.
   const [hearts, setHearts] = useState<{ id: number; x: number; y: number; drift: number; size: number; remote?: boolean }[]>([]);
   const [tapCount, setTapCount] = useState(0);
+  // Steve, 2026-10-14: "When i click on the red Tap Tap heart, please add all the members that
+  // tap taped for me and total hearts they sent me.... so the host can thank them all one by
+  // one." null = closed, [] = open and empty, undefined entries never happen.
+  const [tapSenders, setTapSenders] = useState<{ user_id: number; fullname?: string; username?: string; profile_image?: string; taps: number }[] | null>(null);
+  const [tapSendersTotal, setTapSendersTotal] = useState(0);
+  const [tapSendersLoading, setTapSendersLoading] = useState(false);
+  function openTapSenders() {
+    if (!roomName || !hostUserId) return;
+    setTapSenders([]); setTapSendersTotal(0); setTapSendersLoading(true);
+    post<{ total?: number; data?: { user_id: number; fullname?: string; username?: string; profile_image?: string; taps: number }[] }>(
+      "fetchLiveTapSenders", { room_name: roomName, to_user_id: hostUserId })
+      .then((r) => { setTapSenders(r.data?.data ?? []); setTapSendersTotal(r.data?.total ?? 0); })
+      .catch(() => setTapSenders([]))
+      .finally(() => setTapSendersLoading(false));
+  }
   const pendingTaps = useRef(0);
   const tapFlushTimer = useRef<number | null>(null);
 
@@ -750,7 +765,12 @@ export function LiveViewerPage() {
                   }}>❤️</span>
               ))}
             </div>
-            {tapCount > 0 && <div className="live-tap-count">❤️ {tapCount.toLocaleString()}</div>}
+            {tapCount > 0 && (
+              <button type="button" className="live-tap-count" title="Who sent these hearts"
+                onClick={(e) => { e.stopPropagation(); openTapSenders(); }}>
+                ❤️ {tapCount.toLocaleString()}
+              </button>
+            )}
             {orderedTiles.length === 0 && (
               <div className="tile" style={{ display: "grid", placeItems: "center" }}>
                 <span className="muted">{live.status === "live" ? "Waiting for video…" : "Connecting…"}</span>
@@ -783,6 +803,34 @@ export function LiveViewerPage() {
                 onPointerLeave={() => { if (holdTimer.current) window.clearTimeout(holdTimer.current); }}
                 title="Save this streamer. Hold for two seconds to find out what it does."
               >{isFavourite ? "♥ Favourited" : "♡ Favourite"}</button>
+            </div>
+          )}
+
+          {tapSenders !== null && (
+            <div className="modal-backdrop" onClick={() => setTapSenders(null)}>
+              <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
+                <h3 style={{ color: "var(--gold)", marginTop: 0 }}>
+                  ❤️ Hearts for {hostCard ? displayName(hostCard) : "the host"}{tapSendersTotal > 0 ? ` (${tapSendersTotal.toLocaleString()})` : ""}
+                </h3>
+                {tapSendersLoading ? (
+                  <p className="muted">Loading…</p>
+                ) : tapSenders.length === 0 ? (
+                  <p className="muted">No hearts yet.</p>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: "60vh", overflowY: "auto" }}>
+                    {tapSenders.map((s) => (
+                      <div key={s.user_id} className="row" style={{ padding: "8px 10px", border: "1px solid var(--gold-border)", borderRadius: 10, background: "#111" }}>
+                        <Avatar user={{ fullname: s.fullname, username: s.username, profile_image: s.profile_image } as Partial<UserSummary>} />
+                        <div style={{ flex: 1, minWidth: 0, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {displayName({ fullname: s.fullname, username: s.username } as Partial<UserSummary>)}
+                        </div>
+                        <div style={{ color: "var(--gold)", fontWeight: 800, whiteSpace: "nowrap" }}>❤️ {s.taps.toLocaleString()}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <button className="btn" style={{ marginTop: 12 }} onClick={() => setTapSenders(null)}>Close</button>
+              </div>
             </div>
           )}
 

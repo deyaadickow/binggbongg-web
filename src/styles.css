@@ -156,7 +156,7 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
   to   { opacity: 0;   transform: translate(calc(-50% + var(--drift, 0px)), calc(-50% - 190px)) scale(1.6); }
 }
 @media (prefers-reduced-motion: reduce) { .live-heart { animation-duration: .01ms; } }
-.live-tap-count { position: absolute; left: 10px; bottom: 10px; z-index: 5; pointer-events: none; display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: rgba(0,0,0,.8); border: 1px solid var(--gold); color: var(--gold); font-weight: 800; font-size: 13px; }
+.live-tap-count { position: absolute; left: 10px; bottom: 10px; z-index: 5; pointer-events: auto; cursor: pointer; font: inherit; display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: rgba(0,0,0,.8); border: 1px solid var(--gold); color: var(--gold); font-weight: 800; font-size: 13px; }
 .battle-kind { justify-content: flex-start; text-align: left; margin-bottom: 8px; white-space: nowrap; overflow: hidden; gap: 12px; }
 .battle-kind .kind-title { font-weight: 800; flex: 0 0 auto; min-width: 140px; }
 .battle-kind .kind-blurb { font-size: 13px; font-weight: 400; flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
