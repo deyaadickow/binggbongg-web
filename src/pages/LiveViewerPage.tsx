@@ -627,6 +627,50 @@ export function LiveViewerPage() {
     return <div className="page"><Notice>Sign in to watch this live, chat and send gifts. <Link to="/login">Sign in</Link></Notice></div>;
   }
 
+  // ---- Taps on the live (Steve, 2026-10-14) ------------------------------------------------
+  //
+  // Free hearts, like TikTok's, and one of the inputs to how Live Now is ordered now that it
+  // ranks rooms instead of just listing the newest first.
+  const [hearts, setHearts] = useState<{ id: number; x: number; y: number; drift: number; size: number }[]>([]);
+  const [tapCount, setTapCount] = useState(0);
+  const pendingTaps = useRef(0);
+  const tapFlushTimer = useRef<number | null>(null);
+
+  // Double click, not single: a double tap is what sends a heart on the phones, and a single
+  // click on the grid must stay free for everything else the tiles do.
+  function dropHeart(e: React.MouseEvent<HTMLDivElement>) {
+    const box = e.currentTarget.getBoundingClientRect();
+    const id = Date.now() + Math.random();
+    const heart = {
+      id,
+      x: e.clientX - box.left,
+      y: e.clientY - box.top,
+      drift: Math.round((Math.random() - 0.5) * 70),
+      size: 24 + Math.round(Math.random() * 12),
+    };
+    setHearts((h) => [...h, heart]);
+    window.setTimeout(() => setHearts((h) => h.filter((x) => x.id !== id)), 1200);
+
+    // The heart is already on screen; this half is only the reporting, and it must never hold
+    // the animation up.
+    pendingTaps.current += 1;
+    if (tapFlushTimer.current !== null) return;
+    tapFlushTimer.current = window.setTimeout(() => {
+      tapFlushTimer.current = null;
+      const taps = pendingTaps.current;
+      pendingTaps.current = 0;
+      if (taps <= 0 || !roomName) return;
+      post<{ tap_count?: number }>("sendLiveTaps", { user_id: myId ?? 0, room_name: roomName, taps })
+        .then((r) => { if (typeof r.data?.tap_count === "number") setTapCount(r.data.tap_count); })
+        // A dropped batch is a few hearts nobody counted. No message over a live stream, and no
+        // retry — a retry would double-count whatever did land.
+        .catch(() => {});
+    }, 1500);
+  }
+
+  // Nothing should still be pending when the page goes away.
+  useEffect(() => () => { if (tapFlushTimer.current !== null) window.clearTimeout(tapFlushTimer.current); }, []);
+
   return (
     <div className="page">
       <div className="row" style={{ marginBottom: 12 }}>
@@ -663,7 +707,16 @@ export function LiveViewerPage() {
               cancel555(myId, b555.data.battle_555_id).then(() => setToast("5-5-5 cancelled.")).catch((e) => setToast((e as Error).message));
             }} />
           )}
-          <div className={`video-grid count-${Math.min(4, Math.max(1, orderedTiles.length))}`}>
+          <div className={`video-grid count-${Math.min(4, Math.max(1, orderedTiles.length))}`} onDoubleClick={dropHeart}>
+            {/* Hearts and the room total. pointer-events:none in CSS — one stolen click here
+                would break everything the tiles underneath do. */}
+            <div className="live-hearts">
+              {hearts.map((h) => (
+                <span key={h.id} className="live-heart"
+                  style={{ left: h.x, top: h.y, fontSize: h.size, ["--drift" as string]: `${h.drift}px` }}>❤️</span>
+              ))}
+            </div>
+            {tapCount > 0 && <div className="live-tap-count">❤️ {tapCount.toLocaleString()}</div>}
             {orderedTiles.length === 0 && (
               <div className="tile" style={{ display: "grid", placeItems: "center" }}>
                 <span className="muted">{live.status === "live" ? "Waiting for video…" : "Connecting…"}</span>
