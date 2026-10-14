@@ -170,6 +170,12 @@ export interface Post {
   is_post_liked?: boolean | number;
   created_at?: string;
   user?: UserSummary;
+  /** Steve, 2026-10-13: what the (C) button copies for this video. */
+  share_url?: string;
+  /** Non-null only when the poster pasted a link onto this video — drives the "Link" tab.
+   *  The server also sends null when the linked video has since been deleted, so a tab is
+   *  never drawn for something that would open nothing. */
+  linked_video?: { id: number; thumbnail?: string; user_name?: string; url?: string } | null;
 }
 
 export interface LiveStream {

@@ -29,7 +29,9 @@ export function UploadVideoPage() {
   const [catId, setCatId] = useState<string>("");
   const [country, setCountry] = useState("");
   const [state, setState] = useState("");
-  const [link, setLink] = useState("");
+  const [description, setDescription] = useState("");
+  // Steve, 2026-10-13: a link copied off another video with (C).
+  const [linkedUrl, setLinkedUrl] = useState("");
   const [canComment, setCanComment] = useState(true);
   const [canSave, setCanSave] = useState(true);
   const [allowRepost, setAllowRepost] = useState(true);
@@ -108,7 +110,10 @@ export function UploadVideoPage() {
         can_save: canSave ? 1 : 0,
         allow_repost: allowRepost ? 1 : 0,
         contest_cat_id: catId,
-        ...(link.trim() ? { link: link.trim() } : {}),
+        // This was posted as `link` while the box was labelled Description — tbl_post.link is
+        // the external-URL column, so web captions were being written there and never shown.
+        ...(description.trim() ? { description: description.trim() } : {}),
+        ...(linkedUrl.trim() ? { linked_url: linkedUrl.trim() } : {}),
         ...(country ? { country } : {}),
         ...(state ? { state } : {}),
       });
@@ -135,7 +140,7 @@ export function UploadVideoPage() {
           <p className="soft" style={{ marginTop: 0 }}>Uploaded. It will appear on your profile and in the feed.</p>
           <div className="row">
             <button className="btn" onClick={() => navigate(`/profile/${user.id}`)}>See my profile</button>
-            <button className="btn ghost" onClick={() => { setDone(false); setFile(null); setDuration(null); setLink(""); }}>Upload another</button>
+            <button className="btn ghost" onClick={() => { setDone(false); setFile(null); setDuration(null); setDescription(""); setLinkedUrl(""); }}>Upload another</button>
           </div>
         </div>
       </div>
@@ -180,8 +185,15 @@ export function UploadVideoPage() {
         />
 
         <label className="soft" style={{ fontSize: 13 }}>Description</label>
-        <textarea className="input" rows={3} value={link} onChange={(e) => setLink(e.target.value)}
+        <textarea className="input" rows={3} value={description} onChange={(e) => setDescription(e.target.value)}
           placeholder="Say something about this video…" style={{ width: "100%", marginBottom: 10 }} />
+
+        {/* Steve, 2026-10-13: paste a link copied with (C) and this video carries a "Link" tab
+            straight to the one you pasted. */}
+        <label className="soft" style={{ fontSize: 13 }}>Linked video</label>
+        <input className="input" value={linkedUrl} onChange={(e) => setLinkedUrl(e.target.value)}
+          placeholder="Paste a copied video link (optional)"
+          style={{ width: "100%", marginBottom: 10, textAlign: "center" }} />
 
         <div className="row" style={{ gap: 10 }}>
           <div style={{ flex: 1 }}>

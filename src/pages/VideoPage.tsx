@@ -17,6 +17,7 @@ export function VideoPage() {
   const [item, setItem] = useState<Post | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [liked, setLiked] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [feed, setFeedState] = useState<Post[]>(() => getFeed());
   const [auto, setAuto] = useState<boolean>(() => { try { return localStorage.getItem(AUTO_KEY) !== "0"; } catch { return true; } });
   const [loadingMore, setLoadingMore] = useState(false);
@@ -148,6 +149,23 @@ export function VideoPage() {
   // yet, so it returned here and never reached them; the render after the post arrived did, and
   // React saw more hooks than last time and threw ("Rendered more hooks than during the previous
   // render") — a blank black page on every video. Every hook now runs before any return.
+  // Falls back to building the URL from the id: share_url only arrives from a deployed
+  // backend, and the link is the same either way.
+  async function copyLink() {
+    if (!item) return;
+    const url = item.share_url || `${window.location.origin}/video/${item.id}`;
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      // Clipboard is blocked without a secure context or a user gesture the browser trusts.
+      // Showing the URL is better than a button that silently does nothing.
+      window.prompt("Copy this video's link:", url);
+      return;
+    }
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1600);
+  }
+
   if (error) return <div className="page"><Notice error>{error}</Notice></div>;
   if (!item) return <div className="page"><Loading /></div>;
   const likes = (item.likes ?? 0) + (liked && !item.is_post_liked ? 1 : 0) - (!liked && item.is_post_liked ? 1 : 0);
@@ -161,6 +179,25 @@ export function VideoPage() {
           onPause={watchClockStop}
           onEnded={() => { completedPlays.current += 1; watchClockStop(); if (auto) goNext(); }} />
         {sentGift && <GiftFlash gift={sentGift} onDone={clearSentGift} />}
+        {/* Steve, 2026-10-13: "(C) ... for any member to click and copy that video", and a
+            "Link" tab top-left for a video whose poster pasted a copied link. */}
+        <div style={{ position: "absolute", top: 12, left: 12, display: "flex", flexDirection: "column", gap: 8, zIndex: 3 }}>
+          {item.linked_video && (
+            <button
+              className="btn small"
+              onClick={() => navigate(`/video/${item.linked_video!.id}`)}
+              style={{ background: "#000", color: "var(--gold)", borderColor: "var(--gold)" }}>
+              🔗 Link
+            </button>
+          )}
+          <button
+            className="btn small"
+            title="Copy this video's link"
+            onClick={() => void copyLink()}
+            style={{ background: "#000", color: "var(--gold)", borderColor: "var(--gold)" }}>
+            {copied ? "Copied" : "(C)"}
+          </button>
+        </div>
         <div className="video-arrows">
           <button className="arrow" onClick={goPrev} disabled={!prev} title="Previous (↑)">▲</button>
           <button className="arrow" onClick={goNext} disabled={!next} title="Next (↓)">▼</button>
