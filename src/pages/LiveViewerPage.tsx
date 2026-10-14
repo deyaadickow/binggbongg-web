@@ -631,7 +631,9 @@ export function LiveViewerPage() {
   //
   // Free hearts, like TikTok's, and one of the inputs to how Live Now is ordered now that it
   // ranks rooms instead of just listing the newest first.
-  const [hearts, setHearts] = useState<{ id: number; x: number; y: number; drift: number; size: number }[]>([]);
+  // `x`/`y` are px inside the grid for a heart you tapped yourself; `remote` ones have no
+  // meaningful point (somebody else's finger) and are placed bottom-centre instead.
+  const [hearts, setHearts] = useState<{ id: number; x: number; y: number; drift: number; size: number; remote?: boolean }[]>([]);
   const [tapCount, setTapCount] = useState(0);
   const pendingTaps = useRef(0);
   const tapFlushTimer = useRef<number | null>(null);
@@ -651,6 +653,11 @@ export function LiveViewerPage() {
     setHearts((h) => [...h, heart]);
     window.setTimeout(() => setHearts((h) => h.filter((x) => x.id !== id)), 1200);
 
+    // Steve, 2026-10-14: the heart has to reach the person it is FOR, not just the tapper.
+    // The web grid is one room with no per-tile targeting yet, so this is the host's identity —
+    // the same "user_<id>" form the phones key their tiles by.
+    if (hostUserId) live.sendHeart(`user_${hostUserId}`);
+
     // The heart is already on screen; this half is only the reporting, and it must never hold
     // the animation up.
     pendingTaps.current += 1;
@@ -667,6 +674,22 @@ export function LiveViewerPage() {
         .catch(() => {});
     }, 1500);
   }
+
+  // A heart somebody else tapped. Keyed on the seq, because the same identity twice running is
+  // two hearts and the identity alone would not change.
+  useEffect(() => {
+    if (!live.incomingHeart) return;
+    const id = Date.now() + Math.random();
+    setHearts((h) => [...h, {
+      id,
+      // Unused for a remote heart — see `remote` below.
+      x: 0, y: 0,
+      drift: Math.round((Math.random() - 0.5) * 70),
+      size: 24 + Math.round(Math.random() * 12),
+      remote: true,
+    }]);
+    window.setTimeout(() => setHearts((h) => h.filter((x) => x.id !== id)), 1200);
+  }, [live.incomingHeart?.seq]);
 
   // Nothing should still be pending when the page goes away.
   useEffect(() => () => { if (tapFlushTimer.current !== null) window.clearTimeout(tapFlushTimer.current); }, []);
@@ -713,7 +736,14 @@ export function LiveViewerPage() {
             <div className="live-hearts">
               {hearts.map((h) => (
                 <span key={h.id} className="live-heart"
-                  style={{ left: h.x, top: h.y, fontSize: h.size, ["--drift" as string]: `${h.drift}px` }}>❤️</span>
+                  style={{
+                    // A heart you tapped rises from your finger; one from somebody else has no
+                    // point on this screen, so it rises from the bottom centre of the video.
+                    left: h.remote ? "50%" : h.x,
+                    top: h.remote ? "88%" : h.y,
+                    fontSize: h.size,
+                    ["--drift" as string]: `${h.drift}px`,
+                  }}>❤️</span>
               ))}
             </div>
             {tapCount > 0 && <div className="live-tap-count">❤️ {tapCount.toLocaleString()}</div>}
