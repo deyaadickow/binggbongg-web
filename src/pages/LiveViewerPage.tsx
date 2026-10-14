@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { displayName, giftPrice, mediaUrl, post, type Gift, type UserSummary } from "../lib/api";
+import { TapTapBurst, isTapTapGift, tapTapBurstDuration } from "../components/TapTapBurst";
 import { useSession } from "../lib/session";
 import { chatChannel, ensureFirebaseSignIn, observeChat, sendChat, type ChatMessage } from "../lib/firebase";
 import { useLiveRoom, type LiveRole, type LiveTile } from "../lib/live";
@@ -64,6 +65,37 @@ export function LiveViewerPage() {
   const ttsVoiceRef = useRef<{ voiceType: string; language: string; volume: number; enabled: boolean; filter: string; minCoins: number; blacklistWords: string }>({ voiceType: "male_deep", language: "en-US", volume: 1, enabled: true, filter: "", minCoins: 0, blacklistWords: "[]" });
   // Tracks the sentAt watermark so we only fire for NEW gift messages, not replayed history.
   const lastSeenGiftSentAtRef = useRef<number>(Date.now());
+  // Steve, 2026-10-14: "add the effects to the web too." Every gift that lands in this room's
+  // chat plays on the video for EVERYONE here — the six effects (Bongg Burst, Rainfall, the two
+  // Handers, Surprise, Universal) through TapTapBurst, and a plain gift as the card the phones
+  // show. Until now the web live room showed nothing for a gift but the sender's own toast;
+  // TapTapBurst only ever ran on feed gifts. One at a time, in arrival order, like Android's
+  // queueGiftOverlay. Baselined at open so the chat history does not replay on entry; this ref
+  // is separate from lastSeenGiftSentAtRef, which belongs to the host's voice thank-you.
+  type GiftEffect = { key: string; gift: Gift | null; text: string };
+  const seenGiftEffectSentAtRef = useRef<number>(Date.now());
+  const [giftEffectQueue, setGiftEffectQueue] = useState<GiftEffect[]>([]);
+  const [giftEffect, setGiftEffect] = useState<GiftEffect | null>(null);
+  useEffect(() => {
+    const fresh = messages.filter((m) => m.senderUserId < 0 && m.sentAt > seenGiftEffectSentAtRef.current);
+    if (fresh.length === 0) return;
+    seenGiftEffectSentAtRef.current = Math.max(...fresh.map((m) => m.sentAt));
+    setGiftEffectQueue((q) => [...q, ...fresh.map((m) => ({
+      key: `${m.id}-${m.sentAt}`,
+      // A gift chat line carries its gift as a NEGATIVE sender id — see postGiftMessage on the phones.
+      gift: gifts.find((g) => Number(g.id) === -m.senderUserId) ?? null,
+      text: m.message,
+    }))]);
+  }, [messages, gifts]);
+  useEffect(() => {
+    if (giftEffect || giftEffectQueue.length === 0) return;
+    const [next, ...rest] = giftEffectQueue;
+    setGiftEffectQueue(rest);
+    setGiftEffect(next);
+    const burst = next.gift ? isTapTapGift(next.gift) : false;
+    const t = setTimeout(() => setGiftEffect(null), burst && next.gift ? tapTapBurstDuration(next.gift) : 3200);
+    return () => clearTimeout(t);
+  }, [giftEffect, giftEffectQueue]);
 
   const live = useLiveRoom(roomName, role, isLoggedIn && !roomClosed);
   const isPublisher = role !== "viewer" && live.status === "live";
@@ -802,6 +834,17 @@ export function LiveViewerPage() {
                   }}>❤️</span>
               ))}
             </div>
+            {/* The gift playing right now — an effect gift bursts, a plain one shows the card. */}
+            {giftEffect && (giftEffect.gift && isTapTapGift(giftEffect.gift) ? (
+              <TapTapBurst key={giftEffect.key} gift={giftEffect.gift} />
+            ) : (
+              <div key={giftEffect.key} className="gift-flash" aria-live="polite">
+                <div className="gift-flash-card">
+                  {giftEffect.gift?.image ? <img src={mediaUrl(giftEffect.gift.image)} alt="" /> : <span style={{ fontSize: 64 }}>🎁</span>}
+                  <span>{giftEffect.text}</span>
+                </div>
+              </div>
+            ))}
             {tapCount > 0 && (
               <button type="button" className="live-tap-count" title="Who sent these hearts"
                 onClick={(e) => { e.stopPropagation(); openTapSenders(); }}>
