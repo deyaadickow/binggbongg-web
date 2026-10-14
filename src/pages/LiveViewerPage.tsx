@@ -812,6 +812,12 @@ export function LiveViewerPage() {
                 <h3 style={{ color: "var(--gold)", marginTop: 0 }}>
                   ❤️ Hearts for {hostCard ? displayName(hostCard) : "the host"}{tapSendersTotal > 0 ? ` (${tapSendersTotal.toLocaleString()})` : ""}
                 </h3>
+                {/* Steve, 2026-10-14: "Please add this text on top of the page that when I see the
+                    total tap taps." Verbatim, his line break kept. True, if modest: taps are one
+                    term in the Live Now ranking (LivestreamController::liveHeatScores). */}
+                <p style={{ color: "var(--gold)", textAlign: "center", fontWeight: 600, fontSize: 13, margin: "0 0 12px", whiteSpace: "pre-line" }}>
+                  {"The more Tap Tap hearts you send me,\nthe more my live will be pushed to other members."}
+                </p>
                 {tapSendersLoading ? (
                   <p className="muted">Loading…</p>
                 ) : tapSenders.length === 0 ? (
