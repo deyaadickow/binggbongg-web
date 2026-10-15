@@ -96,7 +96,25 @@ export function VideoPage() {
   }
 
   const [sentGift, setSentGift] = useState<Gift | null>(null);
-  const clearSentGift = useCallback(() => setSentGift(null), []);
+  // Steve, 2026-10-15, on his phone: "I'm giving a gift but I don't see the gift and the video
+  // I'm watching switches to another video right away." The video kept playing under the gift
+  // sheet; with auto-play-next on it reached its end while he was choosing, onEnded jumped to
+  // the next video, and that jump rebuilt the stage the gift was about to show on. So: the
+  // video pauses while the sheet is open, and if it ends while a gift is playing the jump
+  // waits until the gift is done.
+  const [giftSheetOpen, setGiftSheetOpen] = useState(false);
+  const advanceAfterGift = useRef(false);
+  const onGiftSheetOpenChange = useCallback((open: boolean) => {
+    setGiftSheetOpen(open);
+    const v = videoRef.current;
+    if (!v) return;
+    if (open) v.pause();
+    else if (!v.ended) v.play().catch(() => undefined);
+  }, []);
+  const clearSentGift = useCallback(() => {
+    setSentGift(null);
+    if (advanceAfterGift.current) { advanceAfterGift.current = false; goNext(); }
+  }, [goNext]);
 
   async function toggleLike() {
     if (!item || !user) return;
@@ -182,7 +200,12 @@ export function VideoPage() {
           loop={!auto}
           onPlay={() => { if (watchStartedAt.current === 0) watchStartedAt.current = Date.now(); }}
           onPause={watchClockStop}
-          onEnded={() => { completedPlays.current += 1; watchClockStop(); if (auto) goNext(); }} />
+          onEnded={() => {
+            completedPlays.current += 1; watchClockStop();
+            if (!auto) return;
+            if (sentGift || giftSheetOpen) { advanceAfterGift.current = true; return; }
+            goNext();
+          }} />
         {sentGift && <GiftFlash gift={sentGift} onDone={clearSentGift} />}
         {/* Steve, 2026-10-13: "(C) ... for any member to click and copy that video", and a
             "Link" tab top-left for a video whose poster pasted a copied link. */}
@@ -225,7 +248,7 @@ export function VideoPage() {
           }}>
           {liked ? "♥" : "♡"} {likes}
         </button>
-        <PostGiftButton post={item} onSent={setSentGift} />
+        <PostGiftButton post={item} onSent={setSentGift} onOpenChange={onGiftSheetOpenChange} />
       </div>
     </div>
   );

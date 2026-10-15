@@ -18,7 +18,7 @@ import { TapTapBurst, isTapTapGift, tapTapBurstDuration, burstLabel } from "./Ta
  * server refuses gifting your own post and an overdrawn balance; both are also caught here
  * first so the member gets a plain message rather than a round trip.
  */
-export function PostGiftButton({ post: item, className = "btn small", onSent }: { post: Post; className?: string; onSent?: (gift: Gift) => void }) {
+export function PostGiftButton({ post: item, className = "btn small", onSent, onOpenChange }: { post: Post; className?: string; onSent?: (gift: Gift) => void; onOpenChange?: (open: boolean) => void }) {
   const { user, isLoggedIn } = useSession();
   const navigate = useNavigate();
   const location = useLocation();
@@ -35,10 +35,11 @@ export function PostGiftButton({ post: item, className = "btn small", onSent }: 
         onClick={() => {
           if (!isLoggedIn) { navigate("/login", { state: { from: location.pathname + location.search } }); return; }
           setOpen(true);
+          onOpenChange?.(true);
         }}>
         🎁 Gift
       </button>
-      {open && <GiftSheet post={item} onClose={() => setOpen(false)} onSent={onSent} />}
+      {open && <GiftSheet post={item} onClose={() => { setOpen(false); onOpenChange?.(false); }} onSent={onSent} />}
     </>
   );
 }
