@@ -58,7 +58,9 @@ export function VideoPage() {
         if (!fromFeed) setError((e as Error).message);
       }
     })();
-  }, [id, user]); // eslint-disable-line react-hooks/exhaustive-deps
+    // The member's ID, not the object: the session replaces the object on every balance
+    // refresh, and reloading the post for that unmounted whatever was open over the video.
+  }, [id, user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Keep the queue topped up: when we're within 2 of the end, fetch another batch.
   useEffect(() => {

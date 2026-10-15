@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { giftPrice, mediaUrl, post, type Gift, type Post } from "../lib/api";
+import { giftPrice, mediaUrl, post, type Gift, type Post, type UserSummary } from "../lib/api";
 import { useSession } from "../lib/session";
 import { loadGifts } from "../lib/gifts";
 import { TapTapBurst, isTapTapGift, tapTapBurstDuration, burstLabel } from "./TapTapBurst";
@@ -79,13 +79,22 @@ function GiftSheet({ post: item, onClose, onSent }: { post: Post; onClose: () =>
   const [gifts, setGifts] = useState<Gift[]>([]);
   const [busy, setBusy] = useState<number | null>(null);
   const [notice, setNotice] = useState<{ text: string; wallet?: boolean } | null>(null);
-  const coins = Number(user?.no_redeem_wallet ?? 0);
+  // The balance shown (and checked) here is the server's, fetched when the sheet opens — coins
+  // bought or received while this tab sat open would otherwise still read as the old number.
+  // Fetched into THIS sheet's state, not through the session's refresh(): that swaps the whole
+  // session user object, and the video page reloads its post whenever that object changes,
+  // which tore this sheet down a second after it opened (Steve, 2026-10-15: "I click on the
+  // gift box I see it for one second and disappears").
+  const [serverCoins, setServerCoins] = useState<number | null>(null);
+  const coins = serverCoins ?? Number(user?.no_redeem_wallet ?? 0);
 
   useEffect(() => {
     loadGifts().then(setGifts).catch(() => setNotice({ text: "Couldn't load the gifts. Please try again." }));
-    // The balance shown (and checked) here is the server's, fetched now — coins bought or
-    // received while this tab sat open would otherwise still read as the old number.
-    refresh();
+    if (user) {
+      post<UserSummary>("fetchMyUserDetails", { my_user_id: user.id })
+        .then((r) => { if (r.status && r.data) setServerCoins(Number(r.data.no_redeem_wallet ?? 0)); })
+        .catch(() => undefined);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
