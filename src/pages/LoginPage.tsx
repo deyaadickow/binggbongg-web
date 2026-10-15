@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { post, setAuthHeaders, type UserSummary } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Notice, StoreBadges } from "../components/Common";
@@ -35,12 +35,16 @@ export function LoginPage() {
   const buttonRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  // Where to go after signing in. A signed-out tap on Gift or the heart sends the member here
+  // with the video they were on; anything else lands on the feed as before.
+  const routerLocation = useLocation();
+  const from = (routerLocation.state as { from?: string } | null)?.from ?? "/";
   const devMode = new URLSearchParams(location.search).get("dev") === "1";
   const [devUserId, setDevUserId] = useState("");
   const [devToken, setDevToken] = useState("");
 
   useEffect(() => {
-    if (isLoggedIn) navigate("/", { replace: true });
+    if (isLoggedIn) navigate(from, { replace: true });
   }, [isLoggedIn, navigate]);
 
   async function register(credential: string) {
@@ -69,7 +73,7 @@ export function LoginPage() {
       const token = res.data.auth_token;
       if (!token) throw new Error("No session token came back.");
       signIn({ ...res.data, auth_token: undefined }, token);
-      navigate("/", { replace: true });
+      navigate(from, { replace: true });
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -108,7 +112,7 @@ export function LoginPage() {
       const res = await post<UserSummary>("fetchMyUserDetails", { my_user_id: id });
       if (!res.status || !res.data) throw new Error(res.message ?? "That session is not valid.");
       signIn({ ...res.data, auth_token: undefined }, devToken.trim());
-      navigate("/", { replace: true });
+      navigate(from, { replace: true });
     } catch (e) {
       setError((e as Error).message);
     } finally {

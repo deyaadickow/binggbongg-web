@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { rememberCopiedLink, videoShareUrl } from "../lib/copiedLink";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { displayName, mediaUrl, post, type Gift, type Post } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice } from "../components/Common";
@@ -14,6 +14,7 @@ const AUTO_KEY = "bb.autoplayNext";
 export function VideoPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, isLoggedIn } = useSession();
   const [item, setItem] = useState<Post | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -216,7 +217,12 @@ export function VideoPage() {
           {item.hashtags && <div className="muted" style={{ fontSize: 13 }}>{item.hashtags}</div>}
           <div className="muted" style={{ fontSize: 12, marginTop: 6 }}>{index >= 0 ? `${index + 1} of ${feed.length}${loadingMore ? " · loading more…" : ""}` : ""} · {auto ? "Auto-plays the next video" : "Repeats this video"} · ↑ ↓ keys or scroll to move</div>
         </div>
-        <button className="btn small" onClick={toggleLike} disabled={!isLoggedIn} title={isLoggedIn ? "" : "Sign in to like"}>
+        <button className="btn small" title={isLoggedIn ? "" : "Sign in to like"}
+          onClick={() => {
+            // Same as the gift button: signed out goes to Sign in and comes straight back.
+            if (!isLoggedIn) { navigate("/login", { state: { from: location.pathname + location.search } }); return; }
+            toggleLike();
+          }}>
           {liked ? "♥" : "♡"} {likes}
         </button>
         <PostGiftButton post={item} onSent={setSentGift} />

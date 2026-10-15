@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { giftPrice, mediaUrl, post, type Gift, type Post } from "../lib/api";
 import { useSession } from "../lib/session";
 import { loadGifts } from "../lib/gifts";
@@ -20,12 +20,22 @@ import { TapTapBurst, isTapTapGift, tapTapBurstDuration, burstLabel } from "./Ta
  */
 export function PostGiftButton({ post: item, className = "btn small", onSent }: { post: Post; className?: string; onSent?: (gift: Gift) => void }) {
   const { user, isLoggedIn } = useSession();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [open, setOpen] = useState(false);
   const own = !!user && user.id === item.user_id;
   if (own) return null;
+  // Steve, 2026-10-14, on his phone: "the gift box is grayed out." He was signed out — a gift
+  // needs a signed-in member — but a disabled button whose only explanation is a hover tooltip
+  // says nothing on a phone. Signed out, the button now goes to Sign in and brings the member
+  // straight back to this video afterwards (LoginPage reads `from`).
   return (
     <>
-      <button className={className} onClick={() => setOpen(true)} disabled={!isLoggedIn} title={isLoggedIn ? "Send a gift" : "Sign in to send a gift"}>
+      <button className={className} title={isLoggedIn ? "Send a gift" : "Sign in to send a gift"}
+        onClick={() => {
+          if (!isLoggedIn) { navigate("/login", { state: { from: location.pathname + location.search } }); return; }
+          setOpen(true);
+        }}>
         🎁 Gift
       </button>
       {open && <GiftSheet post={item} onClose={() => setOpen(false)} onSent={onSent} />}
