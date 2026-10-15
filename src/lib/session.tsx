@@ -64,11 +64,16 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   }, [user, signOut]);
 
   // Fill in the profile (name, avatar, balances) on every app load — a stored session may
-  // hold only the id, and balances change while the tab is closed.
+  // hold only the id, and balances change while the tab is closed — AND whenever the signed-in
+  // member changes. Steve, 2026-10-15: "it tells me to buy coins and I already have over 12k
+  // coins." This used to run only on load; a sign-in made inside the page (the Gift button
+  // now sends a signed-out member to Sign in and straight back) set the session from the
+  // sign-in response, which carries no wallet, and nothing fetched it until a reload.
+  // Keyed on the id, not the object: refresh() itself replaces the object.
   useEffect(() => {
     if (user && token) refresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user?.id, token]);
 
   const value = useMemo<Session>(() => ({ user, token, isLoggedIn: !!(user && token), signIn, signOut, refresh }), [user, token, signIn, signOut, refresh]);
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;

@@ -79,10 +79,14 @@ function GiftSheet({ post: item, onClose, onSent }: { post: Post; onClose: () =>
   const [gifts, setGifts] = useState<Gift[]>([]);
   const [busy, setBusy] = useState<number | null>(null);
   const [notice, setNotice] = useState<{ text: string; wallet?: boolean } | null>(null);
-  const coins = user?.no_redeem_wallet ?? 0;
+  const coins = Number(user?.no_redeem_wallet ?? 0);
 
   useEffect(() => {
     loadGifts().then(setGifts).catch(() => setNotice({ text: "Couldn't load the gifts. Please try again." }));
+    // The balance shown (and checked) here is the server's, fetched now — coins bought or
+    // received while this tab sat open would otherwise still read as the old number.
+    refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
