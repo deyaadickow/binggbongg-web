@@ -1,9 +1,15 @@
 import { NavLink, Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { fetchShopSettings } from "../lib/shop";
 import { useSession } from "../lib/session";
 import { Avatar } from "./Common";
 
 export function Nav() {
+  // Bingg Bongg Shop (2026-10-15): the link exists only while the admin has the shop on, and
+  // only for signed-in members (the settings call needs a session).
+  const [shopOn, setShopOn] = useState(false);
   const { user, isLoggedIn, signOut } = useSession();
+  useEffect(() => { if (!isLoggedIn) { setShopOn(false); return; } fetchShopSettings().then((s) => setShopOn(!!s.shop_enabled)).catch(() => setShopOn(false)); }, [isLoggedIn]);
   return (
     <header className="nav">
       <Link to="/" className="brand">Bingg Bongg</Link>
@@ -20,6 +26,7 @@ export function Nav() {
             Ungated on purpose, unlike Wallet/Go Live below: this is the one tab a signed-out
             visitor has a reason to click, and the page itself asks them to sign in. */}
         <NavLink to="/settings/advertise">Advertise</NavLink>
+        {isLoggedIn && shopOn && <NavLink to="/shop">Shop</NavLink>}
         {isLoggedIn && <NavLink to="/wallet">Wallet</NavLink>}
         {isLoggedIn && <NavLink to="/go-live">Go Live</NavLink>}
         <NavLink to="/settings" className="only-narrow">Settings</NavLink>

@@ -29,6 +29,7 @@ import { StreamFromPcPage } from "./pages/StreamFromPcPage";
 import { Sidebar } from "./components/Sidebar";
 import { AdReferralEarningsPage, AllVideosEarningsPage, PayoutHistoryPage, RedeemPage, RepostEarningsPage, RewardingActionsPage, StatementsPage } from "./pages/WalletPages";
 import { PrintableAdsPage } from "./pages/PrintableAdsPage";
+import { ShopPage, ShopProductPage } from "./pages/ShopPage";
 import { AccountSettingsPage, AdvertisePage, BlockedProfilesPage, ComingSoonPage, ContestRequestsPage, DeleteAccountPage, FindABattlePage, ModeratorsPage, QrCodePage, ReferralsPage, SettingsHubPage, ShareProfilePage, SimulcastPage, SupportArchivePage, SupportPage, VirtualLookPage, MyVirtualBattlesPage, TermsOfUsePage, PrivacyPolicyPage, ContactUsPage, AboutUsPage, FaqPage, AppFeaturesPage } from "./pages/SettingsPages";
 
 export default function App() {
@@ -94,7 +95,14 @@ export default function App() {
           <Route path="/settings/business" element={<MyBusinessesPage />} />
           <Route path="/settings/business/new" element={<CreateBusinessPage />} />
           <Route path="/settings/business/edit/:id" element={<CreateBusinessPage />} />
-          <Route path="/settings/shop" element={<ComingSoonPage title="Bingg Bongg Shop" note="Products from members and partners, right inside Bingg Bongg." />} />
+          {/* Bingg Bongg Shop — the marketplace (Steve, 2026-10-15). */}
+          <Route path="/shop" element={<ShopPage tab="shop" />} />
+          <Route path="/shop/showcase" element={<ShopPage tab="showcase" />} />
+          <Route path="/shop/orders" element={<ShopPage tab="orders" />} />
+          <Route path="/shop/earnings" element={<ShopPage tab="earnings" />} />
+          <Route path="/shop/showcase/:userId" element={<ShopPage />} />
+          <Route path="/shop/product/:id" element={<ShopProductPage />} />
+          <Route path="/settings/shop" element={<ShopPage tab="shop" />} />
           <Route path="/settings/verification" element={<ComingSoonPage title="Request verification" note="Send your ID and a selfie to get the verified badge." />} />
           <Route path="/settings/language" element={<ComingSoonPage title="Change language" note="The web app is in English for now. The phone apps speak 53 languages." />} />
           <Route path="/settings/support" element={<SupportPage />} />
