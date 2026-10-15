@@ -29,7 +29,13 @@ export function HomePage() {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+    // The member's ID, not the object. The session replaces the object on every balance
+    // refresh — the gift sheet does one after each gift — and this callback changing is what
+    // the effect below treats as "start over": it wiped the feed and loaded 10 fresh random
+    // posts, so the card just gifted vanished with the gift still on it (Steve, 2026-10-15:
+    // "I don't see the gift and the video switches to another video right away").
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   useEffect(() => {
     setPosts([]);

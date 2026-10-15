@@ -57,7 +57,12 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     if (!user) return;
     try {
       const res = await post<UserSummary>("fetchMyUserDetails", { my_user_id: user.id });
-      if (res.status && res.data) setUser({ ...res.data, auth_token: undefined });
+      if (res.status && res.data) {
+        const fresh = { ...res.data, auth_token: undefined };
+        // Same data, same object: every page that keys an effect on `user` would otherwise
+        // reload for nothing on each refresh.
+        setUser((cur) => (cur && JSON.stringify(cur) === JSON.stringify(fresh) ? cur : fresh));
+      }
     } catch (e) {
       if ((e as { status?: number }).status === 401) signOut();
     }

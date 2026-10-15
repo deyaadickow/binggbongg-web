@@ -538,7 +538,8 @@ export function LiveViewerPage() {
         setVoiceThanksGift(settings.voice_thanks_gift !== false);
       })
       .catch(() => undefined);
-  }, [role, user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [role, user?.id]);
 
   // Auto Voice Thanks — watch the chat stream for new gift messages and play a TTS phrase.
   // Only fires when I'm the host and the gift-thanks toggle is on. Uses the same

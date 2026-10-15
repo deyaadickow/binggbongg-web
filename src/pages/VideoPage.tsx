@@ -67,7 +67,8 @@ export function VideoPage() {
     if (index < 0 || loadingMore || feed.length - index > 2) return;
     setLoadingMore(true);
     fetchMoreFeed(user?.id ?? null).then(setFeedState).catch(() => undefined).finally(() => setLoadingMore(false));
-  }, [index, feed.length, loadingMore, user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [index, feed.length, loadingMore, user?.id]);
 
   const go = useCallback((p: Post | null) => { if (p) navigate(`/video/${p.id}`); }, [navigate]);
   const goNext = useCallback(() => go(next), [go, next]);
