@@ -278,7 +278,7 @@ function statusWord(status?: string): string {
 }
 
 function NewProduct({ myUserId, onDone, onError }: { myUserId: number; onDone: (m: string) => void; onError: (m: string) => void }) {
-  const [f, setF] = useState<NewProductForm>({ title: "", description: "", price_cents: 0, shipping_cents: 0, stock: "", samples_enabled: false });
+  const [f, setF] = useState<NewProductForm>({ title: "", description: "", price_cents: 0, shipping_cents: 0, stock: "", samples_enabled: false, sample_monthly_limit: "" });
   const [price, setPrice] = useState("");
   const [shipping, setShipping] = useState("");
   const [images, setImages] = useState<File[]>([]);
@@ -327,6 +327,13 @@ function NewProduct({ myUserId, onDone, onError }: { myUserId: number; onDone: (
         <input type="checkbox" checked={f.samples_enabled} onChange={(e) => setF({ ...f, samples_enabled: e.target.checked })} />
         <span>Let streamers ask for a free sample to show on their live</span>
       </label>
+      {/* Only asked once they've said yes, and it is a ceiling rather than a promise: an
+          expensive product can offer samples without an open-ended bill. */}
+      {f.samples_enabled && (
+        <Field label="Free samples a month" hint="Your limit for this product. Blank uses the shop's usual number. Products offering samples are listed ahead of those that don't.">
+          <input className="input" type="number" min="0" value={f.sample_monthly_limit} onChange={(e) => setF({ ...f, sample_monthly_limit: e.target.value })} placeholder="shop default" />
+        </Field>
+      )}
       <Field label="Photos" hint={`Up to ${MAX_PRODUCT_IMAGES}. The first one is the main picture.`}>
         <input type="file" accept="image/*" multiple onChange={(e) => setImages(Array.from(e.target.files ?? []).slice(0, MAX_PRODUCT_IMAGES))} />
       </Field>

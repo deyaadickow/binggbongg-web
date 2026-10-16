@@ -46,6 +46,9 @@ export interface NewProductForm {
   /** Blank means stock is not tracked here, which the server stores as NULL. */
   stock: string;
   samples_enabled: boolean;
+  /** How many free samples of this one the supplier will send in a month. Blank uses the shop
+   *  default — never unlimited. */
+  sample_monthly_limit: string;
 }
 
 /** The server takes up to this many photos, named image_1 … image_N. */
@@ -65,6 +68,9 @@ export function createSellerProduct(myUserId: number, f: NewProductForm, images:
   // own share, and a seller never sets or sees that number (Steve, 2026-10-16).
   if (f.stock.trim() !== "") form.append("stock", String(parseInt(f.stock, 10)));
   form.append("samples_enabled", f.samples_enabled ? "1" : "0");
+  if (f.samples_enabled && f.sample_monthly_limit.trim() !== "") {
+    form.append("sample_monthly_limit", String(parseInt(f.sample_monthly_limit, 10)));
+  }
   images.slice(0, MAX_PRODUCT_IMAGES).forEach((file, i) => form.append(`image_${i + 1}`, file));
   if (video) form.append("video", video);
   return multipart<ShopProduct>("createSellerProduct", form, onProgress);
