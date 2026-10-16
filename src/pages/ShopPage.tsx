@@ -71,6 +71,12 @@ export function ShopPage({ tab: initialTab }: { tab?: "shop" | "showcase" | "ord
       {toast && <Notice>{toast}</Notice>}
       <div className="row" style={{ alignItems: "center", gap: 12 }}>
         <h1 className="page-title" style={{ margin: 0 }}>{showcaseUserId ? "Shop" : "Bingg Bongg Shop"}</h1>
+        <span style={{ flex: 1 }} />
+        {/* The two business-side ways in (Steve, 2026-10-16). Selling follows the admin's own
+            sellers switch; being an agent does not, because agents are recruited directly and
+            are not waiting on supplier sign-up being open to the public. */}
+        {!showcaseUserId && isLoggedIn && settings?.sellers_enabled && <Link to="/shop/seller" className="btn ghost small">Sell here</Link>}
+        {!showcaseUserId && isLoggedIn && <Link to="/shop/agent" className="btn ghost small">Agents</Link>}
       </div>
       {!showcaseUserId && (
         <div className="row" style={{ gap: 6, margin: "10px 0" }}>

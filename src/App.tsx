@@ -31,6 +31,8 @@ import { AdReferralEarningsPage, AllVideosEarningsPage, PayoutHistoryPage, Redee
 import { PrintableAdsPage } from "./pages/PrintableAdsPage";
 import { ShopPage, ShopProductPage } from "./pages/ShopPage";
 import { AccountSettingsPage, AdvertisePage, BlockedProfilesPage, ComingSoonPage, ContestRequestsPage, DeleteAccountPage, FindABattlePage, ModeratorsPage, QrCodePage, ReferralsPage, SettingsHubPage, ShareProfilePage, SimulcastPage, SupportArchivePage, SupportPage, VirtualLookPage, MyVirtualBattlesPage, TermsOfUsePage, PrivacyPolicyPage, ContactUsPage, AboutUsPage, FaqPage, AppFeaturesPage } from "./pages/SettingsPages";
+import { SellerPage } from "./pages/SellerPage";
+import { AgentPage } from "./pages/AgentPage";
 
 export default function App() {
   return (
@@ -98,6 +100,10 @@ export default function App() {
           {/* Bingg Bongg Shop — the marketplace (Steve, 2026-10-15). */}
           <Route path="/shop" element={<ShopPage tab="shop" />} />
           <Route path="/shop/showcase" element={<ShopPage tab="showcase" />} />
+          {/* The two business-side portals (Steve, 2026-10-16). Both are desk work — loading a
+              catalogue, working through a day's orders — so they live on the web. */}
+          <Route path="/shop/seller" element={<SellerPage />} />
+          <Route path="/shop/agent" element={<AgentPage />} />
           <Route path="/shop/orders" element={<ShopPage tab="orders" />} />
           <Route path="/shop/earnings" element={<ShopPage tab="earnings" />} />
           <Route path="/shop/showcase/:userId" element={<ShopPage />} />
