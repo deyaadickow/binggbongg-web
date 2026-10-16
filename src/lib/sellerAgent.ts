@@ -20,8 +20,6 @@ export interface SellerStatus {
   name: string;
   status: "pending_review" | "approved" | "rejected" | "suspended" | string;
   stripe_connected: boolean;
-  /** NULL means no rate has been agreed yet, which is NOT the same as zero. */
-  default_commission_rate: number | null;
 }
 
 export async function fetchMySellerStatus(myUserId: number): Promise<{ seller: SellerStatus | null; sellersEnabled: boolean }> {
@@ -47,8 +45,6 @@ export interface NewProductForm {
   shipping_cents: number;
   /** Blank means stock is not tracked here, which the server stores as NULL. */
   stock: string;
-  /** What a streamer earns for selling it. Blank falls back to the shop default. */
-  commission_rate: string;
   samples_enabled: boolean;
 }
 
@@ -62,11 +58,12 @@ export function createSellerProduct(myUserId: number, f: NewProductForm, images:
   form.append("description", f.description);
   form.append("price_cents", String(f.price_cents));
   form.append("shipping_cents", String(f.shipping_cents));
-  // Only send the optional numbers when they were actually filled in. Sending an empty string
-  // would be read as 0, which for stock means "sold out" and for commission means "this
-  // product earns a streamer nothing" — two very different things from "leave it unset".
+  // Only send stock when it was actually filled in. An empty string would be read as 0, which
+  // means "sold out" rather than "not tracked".
+  //
+  // What a streamer earns is deliberately NOT here: Bingg Bongg pays the streamer out of its
+  // own share, and a seller never sets or sees that number (Steve, 2026-10-16).
   if (f.stock.trim() !== "") form.append("stock", String(parseInt(f.stock, 10)));
-  if (f.commission_rate.trim() !== "") form.append("commission_rate", String(parseFloat(f.commission_rate)));
   form.append("samples_enabled", f.samples_enabled ? "1" : "0");
   images.slice(0, MAX_PRODUCT_IMAGES).forEach((file, i) => form.append(`image_${i + 1}`, file));
   if (video) form.append("video", video);

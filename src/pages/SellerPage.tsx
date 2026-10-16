@@ -144,10 +144,7 @@ function SellerHeader({ myUserId, seller, onError }: { myUserId: number; seller:
         <div style={{ flex: 1, minWidth: 220 }}>
           <div style={{ fontWeight: 800, fontSize: 18 }}>{seller.name}</div>
           <div className="muted" style={{ fontSize: 13 }}>
-            {/* A null rate is "not agreed yet", which must never be shown as 0%. */}
-            {seller.default_commission_rate === null
-              ? "Streamer commission: the shop default"
-              : `Streamer commission: ${seller.default_commission_rate}%`}
+            {seller.status === "approved" ? "Approved seller" : seller.status}
           </div>
         </div>
         {seller.stripe_connected ? (
@@ -276,7 +273,7 @@ function statusWord(status?: string): string {
 }
 
 function NewProduct({ myUserId, onDone, onError }: { myUserId: number; onDone: (m: string) => void; onError: (m: string) => void }) {
-  const [f, setF] = useState<NewProductForm>({ title: "", description: "", price_cents: 0, shipping_cents: 0, stock: "", commission_rate: "", samples_enabled: false });
+  const [f, setF] = useState<NewProductForm>({ title: "", description: "", price_cents: 0, shipping_cents: 0, stock: "", samples_enabled: false });
   const [price, setPrice] = useState("");
   const [shipping, setShipping] = useState("");
   const [images, setImages] = useState<File[]>([]);
@@ -319,9 +316,7 @@ function NewProduct({ myUserId, onDone, onError }: { myUserId: number; onDone: (
         <div style={{ flex: 1, minWidth: 150 }}><Field label="Stock" hint="Leave blank if you never run out.">
           <input className="input" type="number" min="0" value={f.stock} onChange={(e) => setF({ ...f, stock: e.target.value })} placeholder="unlimited" />
         </Field></div>
-        <div style={{ flex: 1, minWidth: 150 }}><Field label="Streamer earns (%)" hint="Blank uses the shop's usual rate.">
-          <input className="input" type="number" step="0.1" min="0" max="50" value={f.commission_rate} onChange={(e) => setF({ ...f, commission_rate: e.target.value })} placeholder="shop default" />
-        </Field></div>
+
       </div>
       <label className="row" style={{ gap: 8, alignItems: "center" }}>
         <input type="checkbox" checked={f.samples_enabled} onChange={(e) => setF({ ...f, samples_enabled: e.target.checked })} />
