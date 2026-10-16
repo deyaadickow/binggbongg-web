@@ -190,6 +190,12 @@ export interface LiveStream {
   /** Steve, 2026-10-07: favourites sort to the top of Live Now and the heart filters to them.
    *  The server sends this on every row. */
   is_favourite?: boolean;
+  /** Daily Live Badge (Steve, 2026-10-16). 0 none, 1 Bronze, 2 Silver, 3 Gold, 4 Diamond —
+   *  today's badge for THIS broadcaster, earned by hosting a live with real viewers in it.
+   *  The server also uses it to lift the row up this same list. */
+  live_badge_tier?: number;
+  live_badge_tier_name?: string;
+  live_badge_minutes?: number;
 }
 
 export interface Gift {
