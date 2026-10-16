@@ -10,6 +10,9 @@ export interface ShopProduct {
   price_cents: number; compare_at_cents?: number | null; shipping_cents?: number; in_stock?: boolean;
   ships_in_days_min?: number | null; ships_in_days_max?: number | null; commission_rate?: number; samples_enabled?: boolean;
   image_url?: string; images?: string[]; video_url?: string; sold_count?: number; status?: string; pinned_live?: boolean;
+  /** Why the admin turned this listing down, in their own words. Only ever sent to the seller
+   *  who owns it (mySellerProducts), never on a shopper-facing list. */
+  rejection_reason?: string | null;
 }
 export interface ShopAddress { id: number; is_default?: boolean; full_name?: string; phone?: string; line1?: string; line2?: string; city?: string; state?: string; postal_code?: string; country_code?: string }
 export interface ShopOrderItem { shop_product_id: number; title?: string; image_url?: string; unit_cents: number; quantity: number; line_cents: number }

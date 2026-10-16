@@ -254,6 +254,11 @@ function SellerProducts({ myUserId, products, onChanged, onNotice, onError }: {
                 <div className="muted" style={{ fontSize: 12 }}>
                   {[statusWord(p.status), (p.sold_count ?? 0) > 0 ? `${p.sold_count} sold` : null].filter(Boolean).join(" · ")}
                 </div>
+                {/* The whole point of a rejection is that the seller can fix it, so the reason
+                    sits on the card rather than behind a tap. */}
+                {p.status === "rejected" && p.rejection_reason && (
+                  <div style={{ marginTop: 6, fontSize: 12, color: "var(--red, #e5484d)" }}>{p.rejection_reason}</div>
+                )}
               </div>
             </div>
           ))}
