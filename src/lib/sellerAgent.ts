@@ -106,6 +106,10 @@ export interface AgentStatus {
   default_commission_rate: number | null;
   stripe_connected: boolean;
   can_be_paid: boolean;
+  /** The signup-referral side: how many suppliers this agent brought in, and what those
+   *  referrals have earned so far across all of them. */
+  referral_suppliers?: number;
+  referral_earned_cents?: number;
 }
 
 export interface AgentProduct {
@@ -124,6 +128,9 @@ export interface AgentCommission {
   amount_cents: number;
   rate: number;
   status: string;
+  /** "referral" = a share of Bingg Bongg's profit for signing the supplier up.
+   *  "product" = a cut of the item price on a product they brought in. */
+  kind?: "referral" | "product";
   payable_at: string | null;
   created_at: string | null;
 }

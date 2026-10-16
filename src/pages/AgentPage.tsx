@@ -119,6 +119,13 @@ function AgentHeader({ myUserId, agent, suppliers, products, onError }: {
           <div className="muted" style={{ fontSize: 13 }}>
             {suppliers} supplier{suppliers === 1 ? "" : "s"} · {products} product{products === 1 ? "" : "s"}
           </div>
+          {/* The signup referral is what most agents are actually recruited on, so it gets its
+              own line rather than being buried in a total. */}
+          {(agent.referral_earned_cents ?? 0) > 0 && (
+            <div className="muted" style={{ fontSize: 13 }}>
+              {money(agent.referral_earned_cents)} earned from signing suppliers up
+            </div>
+          )}
         </div>
         <div style={{ textAlign: "right" }}>
           <div className="muted" style={{ fontSize: 12 }}>Your usual rate</div>
@@ -300,7 +307,12 @@ function AgentEarningsPanel({ myUserId, earnings, onChanged, onNotice, onError }
             <tbody>
               {earnings.commissions.map((c, i) => (
                 <tr key={`${c.order_number}-${i}`} style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                  <td style={{ padding: "8px 10px" }}>{c.order_number}</td>
+                  <td style={{ padding: "8px 10px" }}>
+                    {c.order_number}
+                    {c.kind === "referral" && (
+                      <div className="muted" style={{ fontSize: 11 }}>signing up the supplier</div>
+                    )}
+                  </td>
                   <td style={{ padding: "8px 10px", textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{money(c.amount_cents)}</td>
                   <td style={{ padding: "8px 10px", textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{c.rate}%</td>
                   <td style={{ padding: "8px 10px" }}>{c.status}</td>
