@@ -26,14 +26,20 @@ export function ShowsPage() {
   // history entry and getting out took as many backs as clicks. Arriving FROM the other page
   // means the only way out is back — no second door. The sidebar still reaches both directly.
   const cameFromMyShow = useLocation().state?.from === "my-show";
+  const [query, setQuery] = useState("");
 
+  // Steve, 2026-10-17: "with search on top". Asks the SERVER rather than filtering what was
+  // already fetched, so it finds a show by its host too and keeps working once the list
+  // outgrows one response. Debounced — a request per keystroke would be for nothing.
   useEffect(() => {
     let live = true;
-    fetchShows()
-      .then((r) => { if (live) setRows(r); })
-      .catch(() => { if (live) { setRows([]); setError("Couldn't load the shows."); } });
-    return () => { live = false; };
-  }, []);
+    const t = setTimeout(() => {
+      fetchShows(query.trim())
+        .then((r) => { if (live) { setRows(r); setError(""); } })
+        .catch(() => { if (live) { setRows([]); setError("Couldn't load the shows."); } });
+    }, query ? 350 : 0);
+    return () => { live = false; clearTimeout(t); };
+  }, [query]);
 
   return (
     <div className="page" style={{ maxWidth: 900 }}>
@@ -46,10 +52,20 @@ export function ShowsPage() {
         )}
       </div>
 
+      <input
+        className="input"
+        value={query}
+        placeholder="Search shows or hosts"
+        onChange={(e) => setQuery(e.target.value)}
+        style={{ width: "100%", margin: "10px 0 14px" }}
+      />
+
       {error && <Notice>{error}</Notice>}
       {rows === null && <Loading />}
       {rows !== null && rows.length === 0 && !error && (
-        <p className="soft">No shows yet. <Link to="/my-show" style={{ color: "var(--gold)" }}>Start your own.</Link></p>
+        query.trim()
+          ? <p className="soft">Nothing matches “{query.trim()}”.</p>
+          : <p className="soft">No shows yet. <Link to="/my-show" style={{ color: "var(--gold)" }}>Start your own.</Link></p>
       )}
 
       <div style={{ display: "grid", gap: 10 }}>

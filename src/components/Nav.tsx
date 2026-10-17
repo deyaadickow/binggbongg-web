@@ -19,6 +19,9 @@ export function Nav() {
         {/* Steve, 2026-10-07: "L & B" — everyone's scheduled lives and battles, right after
             Exciting News, same slot as both phones. */}
         <NavLink to="/upcoming">L &amp; B</NavLink>
+        {/* Steve, 2026-10-17: "add another tab on the main feed page for 'All Shows' with search
+            on top" — right after L & B, the same slot as both phones. */}
+        <NavLink to="/shows">All Shows</NavLink>
         <NavLink to="/business">Business</NavLink>
         <NavLink to="/live">Live Now</NavLink>
         <NavLink to="/search">Search</NavLink>

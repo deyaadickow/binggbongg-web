@@ -103,7 +103,8 @@ export async function cancelShow(myUserId: number) {
   return { message: r.message ?? "Your show has been stopped.", show: (r.data as MyShow | null) ?? null };
 }
 
-export async function fetchShows(): Promise<ShowListing[]> {
-  const r = await post<ShowListing[]>("fetchShows", {});
+/** `q` searches the show AND the host, server-side — see ShowController::fetchShows. */
+export async function fetchShows(q = ""): Promise<ShowListing[]> {
+  const r = await post<ShowListing[]>("fetchShows", { q });
   return r.data ?? [];
 }
