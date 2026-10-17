@@ -55,19 +55,66 @@ export const WALLET_LINKS: { to: string; icon: string; label: string; hint: stri
  * One way only, by design: the Cash Account buys things and can never be withdrawn, which is
  * what stops a card top-up being turned straight back into cash. So there is no button back.
  */
-function MoveToCashAccount({ userId, earnings, onMoved }: { userId: number; earnings: number; onMoved: () => void }) {
-  const [balance, setBalance] = useState<number | null>(null);
-  const [amount, setAmount] = useState("");
+/** The two accounts, side by side, each saying plainly what it is for. */
+function TwoAccounts({ userId, earnings, cashAccount }: { userId: number; earnings: number; cashAccount: number | null }) {
+  void userId;
+  const accounts: [string, number | null, string][] = [
+    ["Earned Cash Account", earnings,
+     "What you earned from gifts, battles and videos. This is the money you withdraw."],
+    ["Spending Cash Account", cashAccount,
+     "Pays for everything in the app — ads, your show, coins and the shop. Can't be withdrawn."],
+  ];
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12, marginBottom: 12 }}>
+      {accounts.map(([title, value, blurb]) => (
+        <div key={title} className="card pad" style={{ textAlign: "center", borderColor: "var(--gold-border)" }}>
+          <div style={{
+            width: 118, height: 118, margin: "0 auto 10px", borderRadius: "50%",
+            background: "#000", border: "3px solid var(--gold-border)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <span style={{ fontWeight: 900, color: "var(--gold)", fontSize: 22 }}>
+              {value === null ? "…" : money(value)}
+            </span>
+          </div>
+          <div style={{
+            display: "inline-block", background: "var(--gold-border)", color: "#000",
+            fontWeight: 800, fontSize: 12, borderRadius: 999, padding: "6px 12px", marginBottom: 8,
+          }}>{title}</div>
+          {/* Steve, 2026-10-17: "add a gold border around the explanation boxes under the big
+              circle and make the white text bold so i can see it". */}
+          <p style={{
+            fontSize: 12, margin: 0, fontWeight: 700, color: "var(--text)",
+            background: "#000", border: "1.5px solid var(--gold-border)",
+            borderRadius: 10, padding: 8,
+          }}>{blurb}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function MoveToCashAccount({ userId, onMoved, cashAccount, setCashAccount }: {
+  userId: number; onMoved: () => void;
+  cashAccount: number | null; setCashAccount: (v: number | null) => void;
+}) {
+  // Steve, 2026-10-17: "$0.00 as default" — not the whole balance, which reads as a
+  // decision already taken.
+  const [amount, setAmount] = useState("0.00");
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState("");
 
   const load = useCallback(() => {
     post<{ balance?: number }>("fetchMyAdCashAccount", { my_user_id: userId })
-      .then((r) => setBalance(Number(r.data?.balance ?? 0)))
-      .catch(() => setBalance(null));
+      .then((r) => setCashAccount(Number(r.data?.balance ?? 0)))
+      .catch(() => setCashAccount(null));
+    // setCashAccount is the owner's setter and stable; including it would re-run this on every
+    // render of the page above.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   useEffect(load, [load]);
+  void cashAccount;
 
   async function move() {
     const value = Number(amount);
@@ -82,7 +129,7 @@ function MoveToCashAccount({ userId, earnings, onMoved }: { userId: number; earn
       if (!r.status) throw new Error(r.message ?? "Couldn't move that.");
       setNote(r.message ?? "Moved.");
       setAmount("");
-      if (r.data?.cash_account !== undefined) setBalance(Number(r.data.cash_account));
+      if (r.data?.cash_account !== undefined) setCashAccount(Number(r.data.cash_account));
       onMoved();
     } catch (e) {
       setNote((e as Error).message);
@@ -93,32 +140,21 @@ function MoveToCashAccount({ userId, earnings, onMoved }: { userId: number; earn
 
   return (
     <div className="card pad" style={{ marginBottom: 12 }}>
-      <b style={{ color: "var(--gold)" }}>Move earnings to your Cash Account</b>
-      <p className="soft" style={{ fontSize: 13, margin: "6px 0 10px" }}>
-        Your Cash Account pays for everything in the app — ads, your show, coins and the shop.
-        You can move earnings into it, but you can't withdraw it back out.
+      <b style={{ color: "var(--gold)" }}>Move cash to spending account</b>
+      {/* The two balances are the circles above — repeating them here would just be two places
+          to disagree. */}
+      <p style={{ fontSize: 13, margin: "6px 0 10px", fontWeight: 700, color: "var(--text)" }}>
+        Moves money from your Earned Cash Account into your Spending Cash Account. One way only.
       </p>
-      <div style={{ display: "flex", gap: 20, flexWrap: "wrap", marginBottom: 10 }}>
-        <div>
-          <div className="muted" style={{ fontSize: 12 }}>Earnings</div>
-          <div style={{ fontWeight: 800, color: "var(--gold)", fontSize: 20 }}>{money(earnings)}</div>
-        </div>
-        <div>
-          <div className="muted" style={{ fontSize: 12 }}>Cash Account</div>
-          <div style={{ fontWeight: 800, color: "var(--gold)", fontSize: 20 }}>
-            {balance === null ? "…" : money(balance)}
-          </div>
-        </div>
-      </div>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         <input className="input" type="number" min={0.01} step="0.01" placeholder="Amount in $"
                value={amount} onChange={(e) => setAmount(e.target.value)} style={{ flex: 1, minWidth: 140 }} />
         <button className="btn" disabled={busy || !(Number(amount) > 0)} onClick={move}
                 style={{ background: "var(--gold-border)", color: "#000", borderColor: "var(--gold-border)" }}>
-          {busy ? "Moving…" : "Move"}
+          {busy ? "Moving…" : "Move cash to spending account"}
         </button>
       </div>
-      {note && <p className="soft" style={{ fontSize: 13, marginTop: 10, marginBottom: 0 }}>{note}</p>}
+      {note && <p style={{ fontSize: 13, marginTop: 10, marginBottom: 0, fontWeight: 700 }}>{note}</p>}
     </div>
   );
 }
@@ -163,6 +199,8 @@ interface WiseProfile { has_profile?: boolean; profile?: { country?: string; cur
 interface WiseCountry { code?: string; country?: string; name?: string; currency?: string; providers?: ({ key?: string; id?: string; value?: string; name?: string; label?: string } | string)[] }
 export function RedeemPage() {
   const { user, isLoggedIn, refresh } = useSession();
+  // Owned here so the Spending circle and the move card can never disagree about the figure.
+  const [cashAccount, setCashAccount] = useState<number | null>(null);
   const [year, setYear] = useState(new Date().getFullYear());
   const earn = useEarnings(user?.id, year);
   const [amount, setAmount] = useState("");
@@ -217,10 +255,14 @@ export function RedeemPage() {
   }
   return (
     <Page title="Redeem">
+      {/* Steve, 2026-10-17: "Add another big circle for a second wallet/account, call the first
+          one 'Earned Cash Account' and second 'Spending Cash Account' then you can explane what
+          each account does." Two genuinely different kinds of money, and the names now carry
+          that: one is yours to take out, the other is yours to spend in the app. */}
+      <TwoAccounts userId={user.id} earnings={Number(user.cash_wallet ?? 0)} cashAccount={cashAccount} />
+
       <div className="card pad" style={{ marginBottom: 12 }}>
-        <div className="muted" style={{ fontSize: 12 }}>Cash balance (after converting coins → gifts → diamonds → cash)</div>
-        <div style={{ fontWeight: 800, color: "var(--gold)", fontSize: 30 }}>{money(user.cash_wallet)}</div>
-        <div className="muted" style={{ fontSize: 12, margin: "10px 0 6px" }}>Total money earned from all your uploaded videos in all categories</div>
+        <div className="muted" style={{ fontSize: 12, marginBottom: 6 }}>Total money earned from all your uploaded videos in all categories</div>
         <EarningsRow earn={earn} year={year} onYear={setYear} />
       </div>
       {/* Steve, 2026-10-17: "Cash account they can not withdraw out of, they can only withdraw
@@ -228,7 +270,7 @@ export function RedeemPage() {
           sits next to the withdraw form because they are the two things you can do with earnings,
           and a member deciding between them should see both in one place. One way only — there is
           deliberately no button back. */}
-      <MoveToCashAccount userId={user.id} earnings={Number(user.cash_wallet ?? 0)} onMoved={refresh} />
+      <MoveToCashAccount userId={user.id} onMoved={refresh} cashAccount={cashAccount} setCashAccount={setCashAccount} />
 
       <div className="card pad" style={{ marginBottom: 12 }}>
         <b style={{ color: "var(--gold)" }}>How much money would you like to withdraw?</b>
