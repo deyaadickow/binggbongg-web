@@ -15,7 +15,19 @@
   --radius: 12px;
 }
 * { box-sizing: border-box; }
-html, body, #root { margin: 0; min-height: 100%; background: var(--bg); color: var(--text); }
+html, body, #root { margin: 0; min-height: 100%; color: var(--text); }
+/* Steve, 2026-10-17: "Please add our cosmic backgrounds to all pages."
+   The backdrop goes HERE, on body, not on a z-index:-1 pseudo-element. The old .cosmic-page
+   rule below never actually showed: #root carried an opaque black background of its own, and a
+   negative z-index puts the layer behind the element's CONTENT but still behind that opaque
+   ancestor — so every page it was applied to, /upcoming included, has been plain black since
+   it was written. Painting body and leaving html/#root transparent is the thing that works.
+   `fixed` so it stays put while the page scrolls, the same as both apps. */
+html { background: var(--bg); }
+body {
+  background: var(--bg) url("/bg_vip_cosmic.webp") center / cover no-repeat fixed;
+}
+#root { background: transparent; }
 body { font-family: "Urbanist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; font-size: 15px; line-height: 1.4; }
 a { color: var(--gold); text-decoration: none; }
 a:hover { color: var(--gold-bright); }
@@ -360,12 +372,9 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
    cosmic background and black and gold on all the tabs." The image is the SAME bg_vip_cosmic the
    two apps use, copied into public/ rather than approximated with a gradient, so the three
    platforms actually match. */
+/* Kept as a no-op marker: the backdrop is on body now (see the top of this file), so pages
+   that still carry this class are unaffected either way. */
 .cosmic-page { position: relative; min-height: 100vh; }
-.cosmic-page::before {
-  content: "";
-  position: fixed; inset: 0; z-index: -1;
-  background: #000 url("/bg_vip_cosmic.webp") center / cover no-repeat;
-}
 /* Loose text over that backdrop is unreadable wherever it crosses the moon or a star — Steve has
    flagged the same thing on the earnings statement. Anything that is not already on a card sits
    on this plate. */

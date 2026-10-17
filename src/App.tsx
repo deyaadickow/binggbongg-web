@@ -42,7 +42,10 @@ export default function App() {
         <Nav />
         <div className="shell">
         <Sidebar />
-        <main className="content">
+        {/* Steve, 2026-10-17: "Please add our cosmic backgrounds to all pages." Applied ONCE
+            here rather than to thirty page files: .cosmic-page's backdrop is position:fixed, so
+            one element covers every route and nothing can be missed or drift later. */}
+        <main className="content cosmic-page">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/exciting-news" element={<ExcitingNewsPage />} />
