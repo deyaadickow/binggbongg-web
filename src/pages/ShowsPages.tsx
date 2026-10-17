@@ -142,9 +142,11 @@ export function MyShowPage() {
         <li>Minimum {data.min_hours_per_day} hours a day.</li>
         <li>Bring your own advertisers and earn {data.ad_share_percent}% of what they pay — every month they stay.</li>
         <li>Earn an extra {data.gift_bonus_percent}% on every gift you receive on your show.</li>
+        <li><strong>Nothing to pay to start.</strong> The first month comes out of your earnings as you earn it.</li>
       </ul>
       <p className="muted" style={{ fontSize: 12, marginTop: 10, marginBottom: 0 }}>
-        The monthly fee comes out of your earnings, not a card.
+        The fee comes out of your earnings first, then your Cash Account. If neither covers it we'll
+        ask you to top up, and the show pauses after {data.grace_days} days if it stays unpaid.
       </p>
     </div>
   );
@@ -223,10 +225,10 @@ function ShowDashboard({ data, busy, onStart, onCancel }: {
           <div style={{ marginTop: 12 }}>
             <button className="btn" disabled={busy} onClick={onStart}
                     style={{ background: "var(--gold-border)", color: "#000", borderColor: "var(--gold-border)" }}>
-              {busy ? "Starting…" : `Put my show on the air — ${money(show.monthly_price)}`}
+              {busy ? "Starting…" : "Put my show on the air — nothing to pay now"}
             </button>
             <p className="muted" style={{ fontSize: 12, marginTop: 8, marginBottom: 0 }}>
-              Comes out of your earnings. You have {money(data.wallet)}.
+              The first month ({money(show.monthly_price)}) comes out of your earnings as you earn it.
             </p>
           </div>
         )}
@@ -237,6 +239,10 @@ function ShowDashboard({ data, busy, onStart, onCancel }: {
                     style={{ background: "var(--gold-border)", color: "#000", borderColor: "var(--gold-border)" }}>
               {busy ? "Starting…" : `Start it up again — ${money(show.monthly_price + show.balance_due)}`}
             </button>
+            <p className="muted" style={{ fontSize: 12, marginTop: 8, marginBottom: 0 }}>
+              {money(show.balance_due)} owed plus one month in advance. You have {money(data.available)}
+              {" "}between your earnings and your Cash Account.
+            </p>
           </div>
         )}
       </div>
@@ -287,9 +293,11 @@ function ShowDashboard({ data, busy, onStart, onCancel }: {
           <div className="card pad" style={{ marginBottom: 12 }}>
             <div style={{ fontWeight: 800, marginBottom: 8 }}>The fee</div>
             <p className="soft" style={{ margin: 0, fontSize: 13 }}>
-              {money(show.monthly_price)} a month, out of your earnings.
-              {show.paid_until ? ` Paid up to ${show.paid_until}.` : ""}
-              {show.balance_due > 0 ? ` ${money(show.balance_due)} still owing — it comes out as you earn.` : ""}
+              {money(show.monthly_price)} a month, out of your earnings first and then your Cash Account.
+              {show.paid_until ? ` Covers you to ${show.paid_until}.` : ""}
+              {show.balance_due > 0
+                ? ` ${money(show.balance_due)} owing — it comes out as you earn. Top up your Cash Account if you'd rather clear it now.`
+                : ""}
             </p>
             {show.charges.length > 0 && (
               <div style={{ marginTop: 10 }}>

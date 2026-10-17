@@ -48,6 +48,10 @@ export interface MyShowResponse {
   min_hours_per_day: number;
   ad_share_percent: number;
   gift_bonus_percent: number;
+  grace_days: number;
+  /** Earnings plus their own Cash Account — what a restart can actually be paid from. */
+  available: number;
+  cash_account: number;
   /** The host's own referral code — it IS what they hand an advertiser, so there is no second
    *  code to issue. See VideoAdController::createVideoAd. */
   my_referral_code?: string | null;
@@ -70,6 +74,9 @@ export async function fetchMyShow(myUserId: number): Promise<MyShowResponse> {
     min_hours_per_day: Number(body.min_hours_per_day ?? 2),
     ad_share_percent: Number(body.ad_share_percent ?? 30),
     gift_bonus_percent: Number(body.gift_bonus_percent ?? 5),
+    grace_days: Number(body.grace_days ?? 7),
+    available: Number(body.available ?? 0),
+    cash_account: Number(body.cash_account ?? 0),
     my_referral_code: (body.my_referral_code as string | null) ?? null,
     wallet: Number(body.wallet ?? 0),
     show: (r.data as MyShow | null) ?? null,
