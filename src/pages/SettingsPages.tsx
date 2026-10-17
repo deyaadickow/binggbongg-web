@@ -619,6 +619,9 @@ export function ContestRequestsPage() {
 // their language; money / account / safety topics are handed to a person). The reply comes back
 // on the send call itself (data.reply) and on getUserSupport for the latest message.
 interface SupportReply { id: number; reply?: string | null; replied_by?: string | null; needs_human?: boolean }
+/** "Reason For This Support" (Steve, 2026-10-17) — the list is the server's, so he can add a
+ *  reason from the admin panel without a release on any platform. */
+interface SupportReasonRow { id: number; label: string }
 export function SupportPage() {
   const [msg, setMsg] = useState("");
   const [sent, setSent] = useState(false);
@@ -626,7 +629,19 @@ export function SupportPage() {
   const [error, setError] = useState("");
   const [reply, setReply] = useState<SupportReply | null>(null);
   const [askedForPerson, setAskedForPerson] = useState(false);
+  const [reasons, setReasons] = useState<SupportReasonRow[]>([]);
+  const [reason, setReason] = useState("");
   const { user } = useSession();
+
+  // The dropdown only appears once the list arrives, so a backend without the endpoint yet
+  // leaves the page exactly as it was rather than showing an empty box.
+  useEffect(() => {
+    let live = true;
+    post<SupportReasonRow[]>("fetchSupportReasons", {})
+      .then((r) => { if (live) setReasons(r.data ?? []); })
+      .catch(() => undefined);
+    return () => { live = false; };
+  }, []);
 
   // Steve, 2026-09-27: the page opens fresh every time — the answer card only shows right after
   // sending; every earlier question and answer lives in Archive (no getUserSupport on load).
@@ -636,7 +651,7 @@ export function SupportPage() {
     setBusy(true);
     setError("");
     try {
-      const r = await post<SupportReply>("sendSupportMessage", { message: msg.trim(), user_id: user?.id ?? 0 });
+      const r = await post<SupportReply>("sendSupportMessage", { message: msg.trim(), reason, user_id: user?.id ?? 0 });
       if (r.data?.reply) { setReply(r.data); setAskedForPerson(false); }
       setSent(true);
     } catch {
@@ -696,6 +711,19 @@ export function SupportPage() {
           <p style={{ marginTop: 0, marginBottom: 12, fontSize: 13, textAlign: "center", color: "var(--gold)", background: "#000", border: "1.5px solid #fff", borderRadius: 12, padding: 12 }}>
             Have a question or issue? Bingg Bongg Assistant answers right away, and a team member steps in when needed. Your earlier questions and their answers are in <Link to="/settings/support/archive" style={{ color: "var(--gold)", textDecoration: "underline" }}>Archive</Link>.
           </p>
+          {/* Steve, 2026-10-17: "In between the boxes add another drop-down box that says
+              'Reason For This Support'." */}
+          {reasons.length > 0 && (
+            <div style={{ marginBottom: 10 }}>
+              <GoldSelect
+                value={reason}
+                options={reasons.map((r) => ({ value: r.label, label: r.label }))}
+                onChange={setReason}
+                placeholder="Reason For This Support"
+                ariaLabel="Reason For This Support"
+              />
+            </div>
+          )}
           <textarea className="input" rows={5} placeholder="Describe your issue…" value={msg} onChange={(e) => setMsg(e.target.value)} style={{ width: "100%", marginBottom: 10 }} />
           {error && <p style={{ color: "#f55", fontSize: 13, marginBottom: 8 }}>{error}</p>}
           <button className="btn" onClick={send} disabled={busy || !msg.trim()} style={{ background: "var(--gold-border)", color: "#000", borderColor: "var(--gold-border)" }}>
