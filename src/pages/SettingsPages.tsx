@@ -691,7 +691,11 @@ export function SupportPage() {
         </div>
       ) : (
         <div className="card pad">
-          <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>Have a question or issue? Bingg Bongg Assistant answers right away, and a team member steps in when needed. Your earlier questions and their answers are in <Link to="/settings/support/archive" style={{ color: "var(--gold)" }}>Archive</Link>.</p>
+          {/* Steve, 2026-10-17: black plate, white border, gold text, centred — the dimmed
+              grey was hard to read. */}
+          <p style={{ marginTop: 0, marginBottom: 12, fontSize: 13, textAlign: "center", color: "var(--gold)", background: "#000", border: "1.5px solid #fff", borderRadius: 12, padding: 12 }}>
+            Have a question or issue? Bingg Bongg Assistant answers right away, and a team member steps in when needed. Your earlier questions and their answers are in <Link to="/settings/support/archive" style={{ color: "var(--gold)", textDecoration: "underline" }}>Archive</Link>.
+          </p>
           <textarea className="input" rows={5} placeholder="Describe your issue…" value={msg} onChange={(e) => setMsg(e.target.value)} style={{ width: "100%", marginBottom: 10 }} />
           {error && <p style={{ color: "#f55", fontSize: 13, marginBottom: 8 }}>{error}</p>}
           <button className="btn" onClick={send} disabled={busy || !msg.trim()} style={{ background: "var(--gold-border)", color: "#000", borderColor: "var(--gold-border)" }}>
