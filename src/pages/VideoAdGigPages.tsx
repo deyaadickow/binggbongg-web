@@ -288,9 +288,11 @@ export function MyVideoAdGigsPage() {
       {notice && <div className="card pad" style={{ marginBottom: 12, borderColor: "var(--gold-border)" }}><p style={{ margin: 0, color: "var(--gold)" }}>{notice}</p></div>}
       {error && <Notice error>{error}</Notice>}
 
+      {/* Steve, 2026-10-17: "This should be Ads i sold" — the pair reads bought/sold. The left
+          tab really does hold what the member bought, so the right-hand one was the misnamed one. */}
       <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
         <button className="btn small" style={tab === "bought" ? gold : ghost} onClick={() => setTab("bought")}>Ads I bought</button>
-        <button className="btn small" style={tab === "working" ? gold : ghost} onClick={() => setTab("working")}>Work I'm doing</button>
+        <button className="btn small" style={tab === "working" ? gold : ghost} onClick={() => setTab("working")}>Ads I sold</button>
       </div>
 
       {tab === "bought" && (
