@@ -7,7 +7,7 @@
 //
 // Two pages: the Shows tab everyone sees, and My Show where a host applies and runs it.
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice } from "../components/Common";
 import {
@@ -22,6 +22,10 @@ const money = (v: number) => "$" + Number(v ?? 0).toFixed(2);
 export function ShowsPage() {
   const [rows, setRows] = useState<ShowListing[] | null>(null);
   const [error, setError] = useState("");
+  // Steve, 2026-10-17: the two pages linked to each other, so every click stacked another
+  // history entry and getting out took as many backs as clicks. Arriving FROM the other page
+  // means the only way out is back — no second door. The sidebar still reaches both directly.
+  const cameFromMyShow = useLocation().state?.from === "my-show";
 
   useEffect(() => {
     let live = true;
@@ -35,9 +39,11 @@ export function ShowsPage() {
     <div className="page" style={{ maxWidth: 900 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
         <h1 className="page-title">Shows</h1>
-        <Link to="/my-show" className="btn small" style={{ background: "transparent", color: "var(--gold)", borderColor: "var(--gold-border)" }}>
-          My Show
-        </Link>
+        {!cameFromMyShow && (
+          <Link to="/my-show" state={{ from: "shows" }} className="btn small" style={{ background: "transparent", color: "var(--gold)", borderColor: "var(--gold-border)" }}>
+            My Show
+          </Link>
+        )}
       </div>
 
       {error && <Notice>{error}</Notice>}
@@ -87,6 +93,7 @@ export function MyShowPage() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [form, setForm] = useState({ name: "", tagline: "", description: "" });
+  const cameFromShows = useLocation().state?.from === "shows";
 
   const userId = user?.id ?? 0;
 
@@ -146,7 +153,9 @@ export function MyShowPage() {
     <div className="page" style={{ maxWidth: 720 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
         <h1 className="page-title">My Show</h1>
-        <Link to="/shows" className="btn small" style={{ background: "transparent", color: "var(--gold)", borderColor: "var(--gold-border)" }}>All shows</Link>
+        {!cameFromShows && (
+          <Link to="/shows" state={{ from: "my-show" }} className="btn small" style={{ background: "transparent", color: "var(--gold)", borderColor: "var(--gold-border)" }}>All shows</Link>
+        )}
       </div>
 
       {notice && <div className="card pad" style={{ marginBottom: 12, borderColor: "var(--gold-border)" }}><p style={{ margin: 0, color: "var(--gold)" }}>{notice}</p></div>}
