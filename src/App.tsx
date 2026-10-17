@@ -22,6 +22,7 @@ import { DailyFortunePage } from "./pages/DailyFortunePage";
 import { SupporterBreakdownPage, SupportersPage } from "./pages/SupportersPage";
 import { SearchPage } from "./pages/SearchPage";
 import { LiveNowPage } from "./pages/LiveNowPage";
+import { MyShowPage, ShowsPage } from "./pages/ShowsPages";
 import { LiveViewerPage } from "./pages/LiveViewerPage";
 import { WalletPage } from "./pages/WalletPage";
 import { GoLivePage } from "./pages/GoLivePage";
@@ -60,6 +61,9 @@ export default function App() {
           <Route path="/support/:id" element={<SupporterBreakdownPage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/live" element={<LiveNowPage />} />
+          {/* Your own live Bingg Bongg show (Steve, 2026-10-17). */}
+          <Route path="/shows" element={<ShowsPage />} />
+          <Route path="/my-show" element={<MyShowPage />} />
           <Route path="/live/:room" element={<LiveViewerPage />} />
           <Route path="/wallet" element={<WalletPage />} />
           <Route path="/wallet/redeem" element={<RedeemPage />} />
