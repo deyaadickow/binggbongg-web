@@ -49,6 +49,80 @@ export const WALLET_LINKS: { to: string; icon: string; label: string; hint: stri
 ];
 
 // ---- earnings totals (shared by Redeem and All videos) ---------------------------------------
+/**
+ * "Move earnings to my Cash Account" (Steve, 2026-10-17).
+ *
+ * One way only, by design: the Cash Account buys things and can never be withdrawn, which is
+ * what stops a card top-up being turned straight back into cash. So there is no button back.
+ */
+function MoveToCashAccount({ userId, earnings, onMoved }: { userId: number; earnings: number; onMoved: () => void }) {
+  const [balance, setBalance] = useState<number | null>(null);
+  const [amount, setAmount] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [note, setNote] = useState("");
+
+  const load = useCallback(() => {
+    post<{ balance?: number }>("fetchMyAdCashAccount", { my_user_id: userId })
+      .then((r) => setBalance(Number(r.data?.balance ?? 0)))
+      .catch(() => setBalance(null));
+  }, [userId]);
+
+  useEffect(load, [load]);
+
+  async function move() {
+    const value = Number(amount);
+    if (!(value > 0) || busy) return;
+    setBusy(true); setNote("");
+    try {
+      const r = await post<{ earnings?: number; cash_account?: number }>(
+        "transferEarningsToCashAccount", { user_id: userId, amount: value },
+      );
+      // The server's own message carries the real figures when it refuses — most often that
+      // the earnings don't cover it — so it has to reach the member word for word.
+      if (!r.status) throw new Error(r.message ?? "Couldn't move that.");
+      setNote(r.message ?? "Moved.");
+      setAmount("");
+      if (r.data?.cash_account !== undefined) setBalance(Number(r.data.cash_account));
+      onMoved();
+    } catch (e) {
+      setNote((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="card pad" style={{ marginBottom: 12 }}>
+      <b style={{ color: "var(--gold)" }}>Move earnings to your Cash Account</b>
+      <p className="soft" style={{ fontSize: 13, margin: "6px 0 10px" }}>
+        Your Cash Account pays for everything in the app — ads, your show, coins and the shop.
+        You can move earnings into it, but you can't withdraw it back out.
+      </p>
+      <div style={{ display: "flex", gap: 20, flexWrap: "wrap", marginBottom: 10 }}>
+        <div>
+          <div className="muted" style={{ fontSize: 12 }}>Earnings</div>
+          <div style={{ fontWeight: 800, color: "var(--gold)", fontSize: 20 }}>{money(earnings)}</div>
+        </div>
+        <div>
+          <div className="muted" style={{ fontSize: 12 }}>Cash Account</div>
+          <div style={{ fontWeight: 800, color: "var(--gold)", fontSize: 20 }}>
+            {balance === null ? "…" : money(balance)}
+          </div>
+        </div>
+      </div>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <input className="input" type="number" min={0.01} step="0.01" placeholder="Amount in $"
+               value={amount} onChange={(e) => setAmount(e.target.value)} style={{ flex: 1, minWidth: 140 }} />
+        <button className="btn" disabled={busy || !(Number(amount) > 0)} onClick={move}
+                style={{ background: "var(--gold-border)", color: "#000", borderColor: "var(--gold-border)" }}>
+          {busy ? "Moving…" : "Move"}
+        </button>
+      </div>
+      {note && <p className="soft" style={{ fontSize: 13, marginTop: 10, marginBottom: 0 }}>{note}</p>}
+    </div>
+  );
+}
+
 interface Earnings { todayEarnings?: number; thisWeekEarnings?: number; thisMonthEarnings?: number; yearEarnings?: number }
 function useEarnings(userId: number | undefined, year: number) {
   const [earn, setEarn] = useState<Earnings | null>(null);
@@ -149,6 +223,13 @@ export function RedeemPage() {
         <div className="muted" style={{ fontSize: 12, margin: "10px 0 6px" }}>Total money earned from all your uploaded videos in all categories</div>
         <EarningsRow earn={earn} year={year} onYear={setYear} />
       </div>
+      {/* Steve, 2026-10-17: "Cash account they can not withdraw out of, they can only withdraw
+          the earnings but they can also transfer their earnings to their cash account." The move
+          sits next to the withdraw form because they are the two things you can do with earnings,
+          and a member deciding between them should see both in one place. One way only — there is
+          deliberately no button back. */}
+      <MoveToCashAccount userId={user.id} earnings={Number(user.cash_wallet ?? 0)} onMoved={refresh} />
+
       <div className="card pad" style={{ marginBottom: 12 }}>
         <b style={{ color: "var(--gold)" }}>How much money would you like to withdraw?</b>
         <input className="input" type="number" min={1} step="0.01" placeholder="Amount in $" value={amount} onChange={(e) => setAmount(e.target.value)} style={{ width: "100%", margin: "8px 0 12px" }} />
