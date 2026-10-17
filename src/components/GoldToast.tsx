@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createRoot } from "react-dom/client";
 
 /**
  * The app's notification banner — black card, gold border, dead centre of the page, with an OK
@@ -51,4 +52,50 @@ export function useToast() {
   ) : null;
 
   return { toast, setToast, el };
+}
+
+/**
+ * The same card, callable from anywhere — no hook, no `el` to render.
+ *
+ * Steve, 2026-10-17: "do it everywhere". The five remaining `window.alert(...)` calls on the
+ * web were the browser's own grey box, which is the one notification on this site that looked
+ * nothing like Bingg Bongg. They cannot use the hook, because they fire from inside event
+ * handlers that have no component to hang state on — so this mounts the card itself and tears
+ * it down when OK is pressed.
+ */
+export function showGoldAlert(message: string) {
+  const host = document.createElement("div");
+  document.body.appendChild(host);
+  const root = createRoot(host);
+
+  const close = () => {
+    root.unmount();
+    host.remove();
+  };
+
+  root.render(
+    <div
+      style={{
+        position: "fixed", inset: 0, zIndex: 70,
+        background: "rgba(0,0,0,.45)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        padding: 24,
+      }}
+    >
+      <div
+        className="card pad"
+        style={{ maxWidth: 420, width: "100%", textAlign: "center", background: "#000", borderColor: "var(--gold-border)" }}
+      >
+        <p style={{ margin: "4px 0 18px", color: "#fff", fontSize: 16 }}>{message}</p>
+        <button
+          className="btn"
+          onClick={close}
+          style={{ background: "var(--gold-border)", color: "#000", borderColor: "var(--gold-border)", minWidth: 140 }}
+          autoFocus
+        >
+          OK
+        </button>
+      </div>
+    </div>,
+  );
 }

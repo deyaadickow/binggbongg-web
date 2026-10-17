@@ -24,6 +24,7 @@ import {
   type Business, type BusinessCategory, type BusinessForm, type BusinessMedia, type BusinessPricing, type CountryRow, type MyBusinesses, type Near,
   fetchBusinessFlyers, deleteBusinessFlyer, type BusinessFlyer
 } from "../lib/business";
+import { showGoldAlert } from "../components/GoldToast";
 
 // Steve, 2026-10-01: "Make the countries into our design" — the native <select> is gone; every
 // dropdown is the black/gold searchable PickerSheet the Create Ad page uses, opened from a pill.
@@ -670,10 +671,10 @@ export function CreateBusinessPage() {
           {/* Steve, 2026-10-04: the easiest pin of all — the owner is at the shop and taps this.
               The browser asks for permission itself; no key or library involved. */}
           <button type="button" className="btn small" onClick={() => {
-            if (!navigator.geolocation) { window.alert("This browser can't find your location. Paste a map link instead."); return; }
+            if (!navigator.geolocation) { showGoldAlert("This browser can't find your location. Paste a map link instead."); return; }
             navigator.geolocation.getCurrentPosition(
               (position) => set("pin", `${position.coords.latitude.toFixed(6)},${position.coords.longitude.toFixed(6)}`),
-              () => window.alert("Couldn't find you just now. Try again, or paste a map link.")
+              () => showGoldAlert("Couldn't find you just now. Try again, or paste a map link.")
             );
           }}>Use My Current Location</button>
         </div>

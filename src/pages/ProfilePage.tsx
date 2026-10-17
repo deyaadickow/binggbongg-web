@@ -8,6 +8,7 @@ import { Avatar, Loading, Notice } from "../components/Common";
 import { fetchUserPhotos, type Photo } from "../lib/photos";
 import { MemberBusinessesPanel, MyBusinessesPanel } from "./BusinessPages";
 import { ScheduleSection } from "../components/ScheduleSection";
+import { showGoldAlert } from "../components/GoldToast";
 
 interface ProfileUser extends UserSummary {
   refer_code?: string;
@@ -473,7 +474,7 @@ export function ProfilePage() {
     if (!me || !profile) return;
     setShowOptions(false);
     await post("reportUser", { user_id: me.id, to_user_id: profile.id, reason: "Reported from web" }).catch(() => {});
-    alert("Report submitted. Thank you.");
+    showGoldAlert("Report submitted. Thank you.");
   }
 
   async function copyReferCode() {

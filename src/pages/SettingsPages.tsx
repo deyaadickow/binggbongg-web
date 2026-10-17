@@ -6,7 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { API_BASE, currentAuthHeaders, displayName, mediaUrl, post, type UserSummary } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice, UserRow } from "../components/Common";
-import { useToast } from "../components/GoldToast";
+import { useToast, showGoldAlert } from "../components/GoldToast";
 import { SideLinkItem, SiteFooter, sidebarSections } from "../components/Sidebar";
 import { fetchMyVirtualBattles, fetchVirtualGiftRecord, sendVirtualThankYou, type VirtualBattleData, type VirtualGiftRecord } from "../lib/battles";
 import { VirtualGiftRecordOverlay, personName } from "../components/BattleEngines";
@@ -455,7 +455,7 @@ export function AdvertisePage() {
           // Same flow as the app: a 30-minute deposit session whose token opens the Fund page.
           const r = await post<unknown>("startAdCashDepositSession", { my_user_id: user.id }).catch(() => null);
           const url = (r as { url?: string } | null)?.url;
-          if (url) window.open(url, "_blank", "noopener"); else window.alert(r?.message ?? "Couldn't open the funding page.");
+          if (url) window.open(url, "_blank", "noopener"); else showGoldAlert(r?.message ?? "Couldn't open the funding page.");
         }}>Add money to your cash account ↗</button>
         {/* The apps pair that capsule with a "+ Create Ad" one — Steve, 2026-09-30: "Build it the
             same way it works on ios". Same flow now lives at /settings/advertise/new. */}
