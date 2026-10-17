@@ -23,6 +23,7 @@ import { SupporterBreakdownPage, SupportersPage } from "./pages/SupportersPage";
 import { SearchPage } from "./pages/SearchPage";
 import { LiveNowPage } from "./pages/LiveNowPage";
 import { MyShowPage, ShowsPage } from "./pages/ShowsPages";
+import { VideoAdGigPage, MyVideoAdGigsPage } from "./pages/VideoAdGigPages";
 import { LiveViewerPage } from "./pages/LiveViewerPage";
 import { WalletPage } from "./pages/WalletPage";
 import { GoLivePage } from "./pages/GoLivePage";
@@ -67,6 +68,9 @@ export default function App() {
           {/* Your own live Bingg Bongg show (Steve, 2026-10-17). */}
           <Route path="/shows" element={<ShowsPage />} />
           <Route path="/my-show" element={<MyShowPage />} />
+          {/* Video Ad Gig (Steve, 2026-10-17) — the feed tab, and both sides of a gig. */}
+          <Route path="/gigs" element={<VideoAdGigPage />} />
+          <Route path="/my-gigs" element={<MyVideoAdGigsPage />} />
           <Route path="/live/:room" element={<LiveViewerPage />} />
           <Route path="/wallet" element={<WalletPage />} />
           <Route path="/wallet/redeem" element={<RedeemPage />} />

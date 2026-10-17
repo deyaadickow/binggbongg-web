@@ -22,6 +22,9 @@ export function Nav() {
         {/* Steve, 2026-10-17: "add another tab on the main feed page for 'All Shows' with search
             on top" — right after L & B, the same slot as both phones. */}
         <NavLink to="/shows">All Shows</NavLink>
+        {/* Steve, 2026-10-17: "a new page on main feed called 'Video Ad Gig'" — influencers
+            pitching to make your ad, right after All Shows, the same slot as both phones. */}
+        <NavLink to="/gigs">Video Ad Gig</NavLink>
         <NavLink to="/business">Business</NavLink>
         <NavLink to="/live">Live Now</NavLink>
         <NavLink to="/search">Search</NavLink>

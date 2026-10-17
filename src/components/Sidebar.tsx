@@ -18,6 +18,8 @@ export function sidebarSections(userId: number | null): SideSection[] {
       { to: "/live", label: "Live Now", icon: "🔴" },
       // Your own live Bingg Bongg show (Steve, 2026-10-17).
       { to: "/shows", label: "Shows", icon: "📺" },
+      // Video Ad Gig (Steve, 2026-10-17).
+      { to: "/gigs", label: "Video Ad Gig", icon: "🎥" },
       { to: "/search", label: "Search", icon: "🔍" },
       // Steve, 2026-10-11: "Yes please start the direct messages on the web."
       { to: "/messages", label: "Messages", icon: "💬", needsLogin: true },
@@ -28,6 +30,7 @@ export function sidebarSections(userId: number | null): SideSection[] {
       { to: "/enter-contest", label: "Enter a contest", icon: "🏆", needsLogin: true },
       { to: "/go-live", label: "Go Live", icon: "📡", needsLogin: true },
       { to: "/my-show", label: "My Show", icon: "🎙", needsLogin: true },
+      { to: "/my-gigs", label: "My Gigs", icon: "🎬", needsLogin: true },
       // Lucky numbers + daily horoscope (Steve, 2026-10-09) — the feed-level door, matching
       // the Home chip on the phones. There is a second one under Account, matching their
       // Settings row; Steve asked for both.
