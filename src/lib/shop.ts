@@ -67,6 +67,30 @@ export async function createShopOrder(myUserId: number, productId: number, quant
     return_url: `${window.location.origin}/shop/orders`,
   });
 }
+/** A return the buyer has going (Steve, 2026-10-16/17). label_url is what they print. */
+export interface ShopReturn {
+  id: number;
+  order_number: string;
+  status: string;
+  reason?: string | null;
+  decline_reason?: string | null;
+  label_url?: string | null;
+  carrier?: string | null;
+  tracking_number?: string | null;
+  created_at?: string | null;
+}
+
+export async function requestShopReturn(myUserId: number, orderNumber: string, reason: string) {
+  const r = await post("requestShopReturn", { my_user_id: myUserId, order_number: orderNumber, reason });
+  if (!r.status) throw new Error(r.message ?? "Couldn't request that return.");
+  return r.message ?? "Return requested.";
+}
+
+export async function fetchMyShopReturns(myUserId: number): Promise<ShopReturn[]> {
+  const r = await post<ShopReturn[]>("fetchMyShopReturns", { my_user_id: myUserId });
+  return r.data ?? [];
+}
+
 export async function fetchMyShopOrders(myUserId: number): Promise<ShopOrder[]> {
   const r = await post<ShopOrder[]>("fetchMyShopOrders", { my_user_id: myUserId });
   return r.data ?? [];

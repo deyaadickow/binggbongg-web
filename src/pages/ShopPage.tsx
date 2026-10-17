@@ -3,10 +3,10 @@ import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom"
 import { useSession } from "../lib/session";
 import { Loading, Notice } from "../components/Common";
 import {
-  addToShowcase, addressLine, cancelShopOrder, createShopOrder, fetchMySampleRequests, fetchMyShopEarnings, fetchMyShopOrders,
+  addToShowcase, addressLine, cancelShopOrder, createShopOrder, fetchMySampleRequests, fetchMyShopEarnings, fetchMyShopOrders, fetchMyShopReturns, requestShopReturn,
   fetchShopAddresses, fetchShopCatalog, fetchShopProduct, fetchShopSettings, fetchShowcase, money, pinShowcaseItem, removeFromShowcase,
   requestShopEarningsPayout, requestShopSample, saveShopAddress, startStripeConnect, type ShopAddress, type ShopEarnings, type ShopOrder,
-  type ShopProduct, type ShopSampleRequest, type ShopSettings,
+  type ShopProduct, type ShopReturn, type ShopSampleRequest, type ShopSettings,
 } from "../lib/shop";
 
 // Bingg Bongg Shop — the marketplace on the web (Steve, 2026-10-15). /shop (catalogue, Showcase,
@@ -38,6 +38,9 @@ export function ShopPage({ tab: initialTab }: { tab?: "shop" | "showcase" | "ord
   const [orders, setOrders] = useState<ShopOrder[] | null>(null);
   const [earnings, setEarnings] = useState<ShopEarnings | null>(null);
   const [samples, setSamples] = useState<ShopSampleRequest[]>([]);
+  // Returns the buyer has going, so the label is on the order it belongs to rather than in a
+  // separate screen they have to go looking for.
+  const [returns, setReturns] = useState<ShopReturn[]>([]);
   const [toast, setToast] = useState<string | null>(null);
   const [q, setQ] = useState("");
 
@@ -50,7 +53,11 @@ export function ShopPage({ tab: initialTab }: { tab?: "shop" | "showcase" | "ord
     if (showcaseUserId) { fetchShowcase(showcaseUserId).then(setProducts).catch(() => setProducts([])); return; }
     if (tab === "shop") fetchShopCatalog(user.id, q).then(setProducts).catch(() => setProducts([]));
     if (tab === "showcase") { fetchShowcase(user.id).then(setProducts).catch(() => setProducts([])); fetchMySampleRequests(user.id).then(setSamples).catch(() => undefined); }
-    if (tab === "orders") fetchMyShopOrders(user.id).then(setOrders).catch(() => setOrders([]));
+    if (tab === "orders") {
+      fetchMyShopOrders(user.id).then(setOrders).catch(() => setOrders([]));
+      // Fails quietly: a backend without the returns endpoint must not stop the order list.
+      fetchMyShopReturns(user.id).then(setReturns).catch(() => setReturns([]));
+    }
     if (tab === "earnings") fetchMyShopEarnings(user.id).then(setEarnings).catch(() => undefined);
   }, [user, tab, q, showcaseUserId]);
   useEffect(() => { setProducts(null); load(); }, [load]);
@@ -129,6 +136,44 @@ export function ShopPage({ tab: initialTab }: { tab?: "shop" | "showcase" | "ord
               <div className="muted" style={{ fontSize: 12 }}>Total {money(o.total_cents)}{(o.refunded_cents ?? 0) > 0 ? ` · refunded ${money(o.refunded_cents)}` : ""}{o.created_at ? ` · ${o.created_at.slice(0, 10)}` : ""}</div>
               {o.tracking_number && (o.tracking_url ? <a href={o.tracking_url} target="_blank" rel="noreferrer" style={{ color: "var(--gold)", fontSize: 13 }}>Tracking: {o.carrier ?? ""} {o.tracking_number}</a> : <div style={{ color: "var(--gold)", fontSize: 13 }}>Tracking: {o.carrier ?? ""} {o.tracking_number}</div>)}
               {(o.status === "paid" || o.status === "processing") && <button type="button" className="btn small ghost" style={{ marginTop: 6 }} onClick={() => { if (confirm("Cancel this order? You'll be refunded in full.")) cancelShopOrder(user.id, o.order_number).then((r) => { setToast(r.message ?? ""); load(); }); }}>Cancel order</button>}
+              {(() => {
+                const ret = returns.find((r) => r.order_number === o.order_number);
+                // Nothing open yet, and it has arrived: offer to send it back.
+                if (!ret && (o.status === "shipped" || o.status === "delivered")) {
+                  return (
+                    <button
+                      type="button"
+                      className="btn small ghost"
+                      style={{ marginTop: 6 }}
+                      onClick={() => {
+                        const reason = window.prompt("What's wrong with it? We'll send you a prepaid label.", "");
+                        if (reason === null) return;
+                        requestShopReturn(user.id, o.order_number, reason.trim())
+                          .then((m) => { setToast(m); load(); })
+                          .catch((e) => setToast((e as Error).message));
+                      }}
+                    >
+                      Send it back
+                    </button>
+                  );
+                }
+                if (!ret) return null;
+                return (
+                  <div style={{ marginTop: 8, paddingTop: 8, borderTop: "1px solid var(--gold-border)" }}>
+                    <div style={{ fontSize: 13, color: "var(--gold)", fontWeight: 700 }}>
+                      Return {ret.status === "requested" ? "requested — waiting on us" : ret.status}
+                    </div>
+                    {ret.decline_reason && <div className="muted" style={{ fontSize: 12 }}>{ret.decline_reason}</div>}
+                    {/* The whole point: somewhere to print it from, not just an email. */}
+                    {ret.label_url && (
+                      <a href={ret.label_url} target="_blank" rel="noreferrer" className="btn small" style={{ marginTop: 6, display: "inline-block" }}>
+                        Print return label
+                      </a>
+                    )}
+                    {ret.tracking_number && <div className="muted" style={{ fontSize: 12, marginTop: 4 }}>{ret.carrier ?? ""} {ret.tracking_number}</div>}
+                  </div>
+                );
+              })()}
             </div>
           ))}
         </div>
