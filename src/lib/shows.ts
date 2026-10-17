@@ -103,8 +103,18 @@ export async function cancelShow(myUserId: number) {
   return { message: r.message ?? "Your show has been stopped.", show: (r.data as MyShow | null) ?? null };
 }
 
+/** The headline figures for the offer card, sent with the list so no screen hardcodes them. */
+export interface ShowOffer {
+  monthly_price: number;
+  min_hours_per_day: number;
+  ad_share_percent: number;
+  gift_bonus_percent: number;
+  grace_days: number;
+}
+
 /** `q` searches the show AND the host, server-side — see ShowController::fetchShows. */
-export async function fetchShows(q = ""): Promise<ShowListing[]> {
+export async function fetchShows(q = ""): Promise<{ rows: ShowListing[]; offer: ShowOffer | null }> {
   const r = await post<ShowListing[]>("fetchShows", { q });
-  return r.data ?? [];
+  const offer = (r as unknown as { offer?: ShowOffer }).offer ?? null;
+  return { rows: r.data ?? [], offer };
 }

@@ -12,7 +12,7 @@ import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice } from "../components/Common";
 import {
   applyForShow, cancelShow, fetchMyShow, fetchShows, startShow,
-  type MyShowResponse, type ShowListing,
+  type MyShowResponse, type ShowListing, type ShowOffer,
 } from "../lib/shows";
 
 const money = (v: number) => "$" + Number(v ?? 0).toFixed(2);
@@ -21,6 +21,7 @@ const money = (v: number) => "$" + Number(v ?? 0).toFixed(2);
 
 export function ShowsPage() {
   const [rows, setRows] = useState<ShowListing[] | null>(null);
+  const [offer, setOffer] = useState<ShowOffer | null>(null);
   const [error, setError] = useState("");
   // Steve, 2026-10-17: the two pages linked to each other, so every click stacked another
   // history entry and getting out took as many backs as clicks. Arriving FROM the other page
@@ -35,7 +36,7 @@ export function ShowsPage() {
     let live = true;
     const t = setTimeout(() => {
       fetchShows(query.trim())
-        .then((r) => { if (live) { setRows(r); setError(""); } })
+        .then((r) => { if (live) { setRows(r.rows); if (r.offer) setOffer(r.offer); setError(""); } })
         .catch(() => { if (live) { setRows([]); setError("Couldn't load the shows."); } });
     }, query ? 350 : 0);
     return () => { live = false; clearTimeout(t); };
@@ -51,6 +52,12 @@ export function ShowsPage() {
           </Link>
         )}
       </div>
+
+      {/* Steve, 2026-10-17: "Please organize this text and add it to All shows on top of main
+          feed page." The run-on paragraph from My Show, turned into five lines that each say
+          one thing: what it costs, what it asks of you, what you pay today, and the two ways it
+          pays you back. Every figure is the server's, so changing one in admin changes it here. */}
+      {offer && <ShowOfferCard offer={offer} />}
 
       <input
         className="input"
@@ -96,6 +103,44 @@ export function ShowsPage() {
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+function ShowOfferCard({ offer }: { offer: ShowOffer }) {
+  const hours = offer.min_hours_per_day % 1 === 0 ? offer.min_hours_per_day : offer.min_hours_per_day.toFixed(1);
+  const lines = [
+    [`${money(offer.monthly_price)} a month`, "for as many hours a day as you want"],
+    [`Minimum ${hours} hours a day`, "every day your show is running"],
+    ["Nothing to pay to start", "your first month comes out of your earnings as you earn it"],
+    [`Earn ${offer.ad_share_percent}% of what your advertisers pay`, "every month they stay"],
+    [`Earn an extra ${offer.gift_bonus_percent}% on gifts`, "on every gift you receive on your show"],
+  ];
+
+  return (
+    <div className="card pad" style={{ borderColor: "var(--gold-border)" }}>
+      <div style={{ fontWeight: 900, color: "var(--gold)", fontSize: 18, marginBottom: 10 }}>
+        Your own live Bingg Bongg show
+      </div>
+      <div style={{ display: "grid", gap: 8 }}>
+        {lines.map(([head, tail]) => (
+          <div key={head} style={{ display: "flex", gap: 8, alignItems: "baseline" }}>
+            <span style={{ color: "var(--gold)" }}>•</span>
+            <span>
+              <strong style={{ color: "var(--gold)" }}>{head}</strong>
+              <span className="muted"> — {tail}</span>
+            </span>
+          </div>
+        ))}
+      </div>
+      <p className="muted" style={{ fontSize: 12, marginTop: 12, marginBottom: 0 }}>
+        The fee comes out of your earnings first, then your Cash Account. If neither covers it we'll
+        ask you to top up, and the show pauses after {offer.grace_days} days if it stays unpaid.
+      </p>
+      <Link to="/my-show" state={{ from: "shows" }} className="btn small"
+            style={{ marginTop: 12, background: "var(--gold-border)", color: "#000", borderColor: "var(--gold-border)" }}>
+        Start your show
+      </Link>
     </div>
   );
 }
