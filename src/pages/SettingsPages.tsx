@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { API_BASE, currentAuthHeaders, displayName, mediaUrl, post, type UserSummary } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice, UserRow } from "../components/Common";
+import { useToast } from "../components/GoldToast";
 import { SideLinkItem, SiteFooter, sidebarSections } from "../components/Sidebar";
 import { fetchMyVirtualBattles, fetchVirtualGiftRecord, sendVirtualThankYou, type VirtualBattleData, type VirtualGiftRecord } from "../lib/battles";
 import { VirtualGiftRecordOverlay, personName } from "../components/BattleEngines";
@@ -13,15 +14,6 @@ import { GoldSelect } from "../components/GoldSelect";
 
 const SITE = "https://www.binggbongg.com";
 
-function useToast() {
-  const [toast, setToast] = useState<string | null>(null);
-  useEffect(() => {
-    if (!toast) return;
-    const t = setTimeout(() => setToast(null), 4000);
-    return () => clearTimeout(t);
-  }, [toast]);
-  return { toast, setToast, el: toast ? <div className="notice" style={{ position: "fixed", left: 16, right: 16, bottom: 16, maxWidth: 480, margin: "0 auto", zIndex: 30 }}>{toast}</div> : null };
-}
 
 function Page({ title, children, wide }: { title: string; children: React.ReactNode; wide?: boolean }) {
   return (

@@ -7,21 +7,13 @@ import { Link } from "react-router-dom";
 import { post, type Post } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Loading, Notice } from "../components/Common";
+import { useToast } from "../components/GoldToast";
 import { PostCard } from "../components/PostCard";
 import { GoldSelect } from "../components/GoldSelect";
 import { downloadStatement, printStatement, type StatementDoc } from "../lib/statementDoc";
 
 const money = (v: unknown, sym = "$") => `${sym}${Number(v ?? 0).toFixed(2)}`;
 
-function useToast() {
-  const [toast, setToast] = useState<string | null>(null);
-  useEffect(() => {
-    if (!toast) return;
-    const t = setTimeout(() => setToast(null), 4000);
-    return () => clearTimeout(t);
-  }, [toast]);
-  return { setToast, el: toast ? <div className="notice" style={{ position: "fixed", left: 16, right: 16, bottom: 16, maxWidth: 480, margin: "0 auto", zIndex: 30 }}>{toast}</div> : null };
-}
 
 function Page({ title, children }: { title: string; children: React.ReactNode }) {
   return (
