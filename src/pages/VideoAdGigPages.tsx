@@ -247,7 +247,6 @@ export function MyVideoAdGigsPage() {
   const userId = user?.id ?? 0;
   const cameFromGigs = useLocation().state?.from === "gigs";
 
-  const [tab, setTab] = useState<"bought" | "working">("bought");
   const [bought, setBought] = useState<GigOrder[] | null>(null);
   const [cashAccount, setCashAccount] = useState(0);
   const [mine, setMine] = useState<GigCard | null>(null);
@@ -288,40 +287,30 @@ export function MyVideoAdGigsPage() {
       {notice && <div className="card pad" style={{ marginBottom: 12, borderColor: "var(--gold-border)" }}><p style={{ margin: 0, color: "var(--gold)" }}>{notice}</p></div>}
       {error && <Notice error>{error}</Notice>}
 
-      {/* Steve, 2026-10-17: "This should be Ads i sold" — the pair reads bought/sold. The left
-          tab really does hold what the member bought, so the right-hand one was the misnamed one. */}
-      <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-        <button className="btn small" style={tab === "bought" ? gold : ghost} onClick={() => setTab("bought")}>Ads I bought</button>
-        <button className="btn small" style={tab === "working" ? gold : ghost} onClick={() => setTab("working")}>Ads I sold</button>
+      {/* Steve, 2026-10-17: "This member is an influencer that is trying to sell gigs. Please
+          remove Ads I bought, no need for that. Just leave Ads i sold and list all the gigs he
+          sold if any." The seller's page, no tabs — but a member who HAS bought one still sees
+          it underneath, because Accept is what pays the influencer and the only way to get the
+          finished video. */}
+      <MyListing gig={mine} offer={offer} userId={userId} onSaved={(m) => { setNotice(m); reload(); }} />
+      <h2 style={{ fontSize: 16, marginTop: 18, color: "var(--gold)" }}>Ads I sold</h2>
+      {work.length === 0 && <p className="soft">No gigs sold yet.</p>}
+      <div style={{ display: "grid", gap: 10 }}>
+        {work.map((o) => (
+          <WorkRow key={o.id} order={o} userId={userId}
+                   onRespond={(a) => run(() => respondVideoAdGigOrder(userId, o.id, a))}
+                   onDelivered={(m) => { setNotice(m); reload(); }} />
+            ))}
       </div>
-
-      {tab === "bought" && (
+      {bought !== null && bought.length > 0 && (
         <>
+          <h2 style={{ fontSize: 16, marginTop: 24, color: "var(--gold)" }}>Ads I bought</h2>
           <p className="muted" style={{ fontSize: 12 }}>Spending Cash Account: {money(cashAccount)}</p>
-          {bought === null && <Loading />}
-          {bought !== null && bought.length === 0 && (
-            <p className="soft">You haven't ordered a video ad yet. <Link to="/gigs" state={{ from: "my-gigs" }} style={{ color: "var(--gold)" }}>Find an influencer.</Link></p>
-          )}
           <div style={{ display: "grid", gap: 10 }}>
             {(bought ?? []).map((o) => (
               <OrderRow key={o.id} order={o}
                         onAccept={() => run(() => acceptVideoAdGigOrder(userId, o.id))}
                         onCancel={() => run(() => cancelVideoAdGigOrder(userId, o.id))} />
-            ))}
-          </div>
-        </>
-      )}
-
-      {tab === "working" && (
-        <>
-          <MyListing gig={mine} offer={offer} userId={userId} onSaved={(m) => { setNotice(m); reload(); }} />
-          <h2 style={{ fontSize: 16, marginTop: 20, color: "var(--gold)" }}>Gigs people bought from me</h2>
-          {work.length === 0 && <p className="soft">No orders yet.</p>}
-          <div style={{ display: "grid", gap: 10 }}>
-            {work.map((o) => (
-              <WorkRow key={o.id} order={o} userId={userId}
-                       onRespond={(a) => run(() => respondVideoAdGigOrder(userId, o.id, a))}
-                       onDelivered={(m) => { setNotice(m); reload(); }} />
             ))}
           </div>
         </>
