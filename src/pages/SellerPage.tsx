@@ -8,6 +8,7 @@ import {
   MAX_PRODUCT_IMAGES, mySellerProducts, respondSellerSampleRequest, shipSellerOrder,
   type NewProductForm, type SellerStatus,
 } from "../lib/sellerAgent";
+import { useT } from "../lib/i18n";
 
 // The supplier's own portal. Suppliers set their own prices and ship their own orders; Bingg
 // Bongg takes its cut at checkout and the streamer who sold the item takes theirs.
@@ -25,6 +26,7 @@ const STATUS_WORDS: Record<string, string> = {
 };
 
 export function SellerPage() {
+  const { t } = useT();
   const { user, isLoggedIn } = useSession();
   const myUserId = user?.id ?? 0;
 
@@ -74,15 +76,15 @@ export function SellerPage() {
   useEffect(() => { void reload(); }, [reload]);
 
   if (!isLoggedIn) {
-    return <div className="page"><h1 className="page-title">Sell on Bingg Bongg</h1><Notice>Please sign in to apply.</Notice></div>;
+    return <div className="page"><h1 className="page-title">{t("sell_on_bingg_bongg")}</h1><Notice>{t("please_sign_in_to_apply")}</Notice></div>;
   }
   if (loading) return <div className="page"><Loading /></div>;
 
   if (!sellersEnabled && !seller) {
     return (
       <div className="page">
-        <h1 className="page-title">Sell on Bingg Bongg</h1>
-        <Notice>Seller sign-up isn't open yet. Check back soon.</Notice>
+        <h1 className="page-title">{t("sell_on_bingg_bongg")}</h1>
+        <Notice>{t("seller_sign_up_isn_t_open_yet_check_back")}</Notice>
       </div>
     );
   }
@@ -90,9 +92,9 @@ export function SellerPage() {
   return (
     <div className="page">
       <div className="row" style={{ alignItems: "center", gap: 12 }}>
-        <h1 className="page-title" style={{ margin: 0 }}>Sell on Bingg Bongg</h1>
+        <h1 className="page-title" style={{ margin: 0 }}>{t("sell_on_bingg_bongg")}</h1>
         <span style={{ flex: 1 }} />
-        <Link to="/shop" className="btn ghost small">Back to the shop</Link>
+        <Link to="/shop" className="btn ghost small">{t("back_to_the_shop")}</Link>
       </div>
 
       {error && <Notice error>{error}</Notice>}
@@ -107,11 +109,11 @@ export function SellerPage() {
           <SellerHeader myUserId={myUserId} seller={seller} onError={setError} />
 
           <div className="row" style={{ gap: 8, margin: "16px 0", flexWrap: "wrap" }}>
-            <button type="button" className={tab === "products" ? "btn" : "btn ghost"} onClick={() => setTab("products")}>Products</button>
+            <button type="button" className={tab === "products" ? "btn" : "btn ghost"} onClick={() => setTab("products")}>{t("products")}</button>
             <button type="button" className={tab === "orders" ? "btn" : "btn ghost"} onClick={() => setTab("orders")}>
               Orders{orders && orders.some((o) => o.status === "paid" || o.status === "processing") ? ` (${orders.filter((o) => o.status === "paid" || o.status === "processing").length} to ship)` : ""}
             </button>
-            <button type="button" className={tab === "samples" ? "btn" : "btn ghost"} onClick={() => setTab("samples")}>Samples</button>
+            <button type="button" className={tab === "samples" ? "btn" : "btn ghost"} onClick={() => setTab("samples")}>{t("samples")}</button>
           </div>
 
           {tab === "products" && <SellerProducts myUserId={myUserId} products={products} onChanged={reload} onNotice={setNotice} onError={setError} />}
@@ -137,6 +139,7 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 }
 
 function SellerHeader({ myUserId, seller, onError }: { myUserId: number; seller: SellerStatus; onError: (m: string) => void }) {
+  const { t } = useT();
   const [busy, setBusy] = useState(false);
   return (
     <div className="card" style={{ padding: 14 }}>
@@ -148,7 +151,7 @@ function SellerHeader({ myUserId, seller, onError }: { myUserId: number; seller:
           </div>
         </div>
         {seller.stripe_connected ? (
-          <span className="pill">Bank account connected</span>
+          <span className="pill">{t("bank_account_connected")}</span>
         ) : (
           <button
             type="button"
@@ -166,20 +169,19 @@ function SellerHeader({ myUserId, seller, onError }: { myUserId: number; seller:
               } catch (e) { onError((e as Error).message); setBusy(false); }
             }}
           >
-            Connect your bank account
-          </button>
+            {t("connect_your_bank_account")}</button>
         )}
       </div>
       {!seller.stripe_connected && (
         <div className="muted" style={{ fontSize: 13, marginTop: 8 }}>
-          You can list products now, but nobody can buy them until your bank account is connected.
-        </div>
+          {t("you_can_list_products_now_but_nobody_can")}</div>
       )}
     </div>
   );
 }
 
 function SellerApplication({ myUserId, onDone, onError }: { myUserId: number; onDone: (m: string) => void; onError: (m: string) => void }) {
+  const { t } = useT();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [country, setCountry] = useState("");
@@ -198,16 +200,14 @@ function SellerApplication({ myUserId, onDone, onError }: { myUserId: number; on
       }}
     >
       <p className="muted" style={{ margin: 0 }}>
-        You set your own prices and ship your own orders. Bingg Bongg takes its share at checkout
-        and pays you the rest straight to your bank.
-      </p>
-      <Field label="Your name or company name">
+        {t("you_set_your_own_prices_and_ship_your_ow")}</p>
+      <Field label={t("your_name_or_company_name")}>
         <input className="input" value={name} onChange={(e) => setName(e.target.value)} maxLength={120} required />
       </Field>
-      <Field label="Contact email">
+      <Field label={t("contact_email")}>
         <input className="input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={190} required />
       </Field>
-      <Field label="Country code" hint="Two letters, like PH or US.">
+      <Field label={t("country_code")} hint="Two letters, like PH or US.">
         <input className="input" value={country} onChange={(e) => setCountry(e.target.value.toUpperCase())} maxLength={2} minLength={2} required style={{ textTransform: "uppercase" }} />
       </Field>
       <button type="submit" className="btn" disabled={busy || !name.trim() || !email.trim() || country.trim().length !== 2}>
@@ -220,6 +220,7 @@ function SellerApplication({ myUserId, onDone, onError }: { myUserId: number; on
 function SellerProducts({ myUserId, products, onChanged, onNotice, onError }: {
   myUserId: number; products: ShopProduct[] | null; onChanged: () => void; onNotice: (m: string) => void; onError: (m: string) => void;
 }) {
+  const { t } = useT();
   const [adding, setAdding] = useState(false);
   if (products === null) return <Loading />;
 
@@ -242,7 +243,7 @@ function SellerProducts({ myUserId, products, onChanged, onNotice, onError }: {
       )}
 
       {products.length === 0 ? (
-        <Notice>No products yet. Add your first one and we'll review it.</Notice>
+        <Notice>{t("no_products_yet_add_your_first_one_and_w")}</Notice>
       ) : (
         <div className="grid wide">
           {products.map((p) => (
@@ -278,6 +279,7 @@ function statusWord(status?: string): string {
 }
 
 function NewProduct({ myUserId, onDone, onError }: { myUserId: number; onDone: (m: string) => void; onError: (m: string) => void }) {
+  const { t } = useT();
   const [f, setF] = useState<NewProductForm>({ title: "", description: "", price_cents: 0, shipping_cents: 0, stock: "", samples_enabled: false, sample_monthly_limit: "" });
   const [price, setPrice] = useState("");
   const [shipping, setShipping] = useState("");
@@ -305,48 +307,46 @@ function NewProduct({ myUserId, onDone, onError }: { myUserId: number; onDone: (
         finally { setBusy(false); }
       }}
     >
-      <Field label="Title">
+      <Field label={t("title")}>
         <input className="input" value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} maxLength={200} required />
       </Field>
-      <Field label="Description">
+      <Field label={t("_description")}>
         <textarea className="input" style={{ paddingTop: 10, paddingBottom: 10, minHeight: 110 }} value={f.description} onChange={(e) => setF({ ...f, description: e.target.value })} maxLength={5000} rows={4} required />
       </Field>
       <div className="row" style={{ gap: 12, flexWrap: "wrap" }}>
-        <div style={{ flex: 1, minWidth: 150 }}><Field label="Price ($)">
+        <div style={{ flex: 1, minWidth: 150 }}><Field label={t("price_2")}>
           <input className="input" type="number" step="0.01" min="1" value={price} onChange={(e) => setPrice(e.target.value)} required />
         </Field></div>
-        <div style={{ flex: 1, minWidth: 150 }}><Field label="Shipping ($)">
+        <div style={{ flex: 1, minWidth: 150 }}><Field label={t("shipping")}>
           <input className="input" type="number" step="0.01" min="0" value={shipping} onChange={(e) => setShipping(e.target.value)} />
         </Field></div>
-        <div style={{ flex: 1, minWidth: 150 }}><Field label="Stock" hint="Leave blank if you never run out.">
-          <input className="input" type="number" min="0" value={f.stock} onChange={(e) => setF({ ...f, stock: e.target.value })} placeholder="unlimited" />
+        <div style={{ flex: 1, minWidth: 150 }}><Field label={t("stock")} hint="Leave blank if you never run out.">
+          <input className="input" type="number" min="0" value={f.stock} onChange={(e) => setF({ ...f, stock: e.target.value })} placeholder={t("unlimited")} />
         </Field></div>
 
       </div>
       <label className="row" style={{ gap: 8, alignItems: "center" }}>
         <input type="checkbox" checked={f.samples_enabled} onChange={(e) => setF({ ...f, samples_enabled: e.target.checked })} />
-        <span>Let streamers ask for a free sample to show on their live</span>
+        <span>{t("let_streamers_ask_for_a_free_sample_to_s")}</span>
       </label>
       {/* Only asked once they've said yes, and it is a ceiling rather than a promise: an
           expensive product can offer samples without an open-ended bill. */}
       {f.samples_enabled && (
-        <Field label="Free samples a month" hint="Your limit for this product. Blank uses the shop's usual number. Products offering samples are listed ahead of those that don't.">
-          <input className="input" type="number" min="0" value={f.sample_monthly_limit} onChange={(e) => setF({ ...f, sample_monthly_limit: e.target.value })} placeholder="shop default" />
+        <Field label={t("free_samples_a_month")} hint="Your limit for this product. Blank uses the shop's usual number. Products offering samples are listed ahead of those that don't.">
+          <input className="input" type="number" min="0" value={f.sample_monthly_limit} onChange={(e) => setF({ ...f, sample_monthly_limit: e.target.value })} placeholder={t("shop_default")} />
         </Field>
       )}
-      <Field label="Photos" hint={`Up to ${MAX_PRODUCT_IMAGES}. The first one is the main picture.`}>
+      <Field label={t("photos")} hint={`Up to ${MAX_PRODUCT_IMAGES}. The first one is the main picture.`}>
         <input type="file" accept="image/*" multiple onChange={(e) => setImages(Array.from(e.target.files ?? []).slice(0, MAX_PRODUCT_IMAGES))} />
       </Field>
       {images.length > 0 && <div className="muted" style={{ fontSize: 12 }}>{images.length} photo{images.length === 1 ? "" : "s"} chosen</div>}
-      <Field label="Video" hint="Optional.">
+      <Field label={t("video")} hint="Optional.">
         <input type="file" accept="video/mp4,video/quicktime" onChange={(e) => setVideo(e.target.files?.[0] ?? null)} />
       </Field>
       {busy && progress > 0 && <div className="muted" style={{ fontSize: 13 }}>Uploading… {Math.round(progress * 100)}%</div>}
       <button type="submit" className="btn" disabled={busy}>{busy ? "Sending…" : "Submit for review"}</button>
       <div className="muted" style={{ fontSize: 12 }}>
-        Every photo is checked automatically before a listing goes live. Anything that fails the
-        check is rejected and you'll be told why.
-      </div>
+        {t("every_photo_is_checked_automatically_bef")}</div>
     </form>
   );
 }
@@ -354,8 +354,9 @@ function NewProduct({ myUserId, onDone, onError }: { myUserId: number; onDone: (
 function SellerOrders({ myUserId, orders, onChanged, onNotice, onError }: {
   myUserId: number; orders: ShopOrder[] | null; onChanged: () => void; onNotice: (m: string) => void; onError: (m: string) => void;
 }) {
+  const { t } = useT();
   if (orders === null) return <Loading />;
-  if (orders.length === 0) return <Notice>No orders yet.</Notice>;
+  if (orders.length === 0) return <Notice>{t("gig_no_orders_yet")}</Notice>;
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
@@ -367,6 +368,7 @@ function SellerOrders({ myUserId, orders, onChanged, onNotice, onError }: {
 function SellerOrderCard({ myUserId, order, onChanged, onNotice, onError }: {
   myUserId: number; order: ShopOrder; onChanged: () => void; onNotice: (m: string) => void; onError: (m: string) => void;
 }) {
+  const { t } = useT();
   const needsShipping = order.status === "paid" || order.status === "processing";
   const [open, setOpen] = useState(false);
   const [tracking, setTracking] = useState("");
@@ -408,13 +410,13 @@ function SellerOrderCard({ myUserId, order, onChanged, onNotice, onError }: {
           }}
         >
           <div className="row" style={{ gap: 10, flexWrap: "wrap" }}>
-            <div style={{ flex: 1, minWidth: 170 }}><Field label="Tracking number">
+            <div style={{ flex: 1, minWidth: 170 }}><Field label={t("tracking_number")}>
               <input className="input" value={tracking} onChange={(e) => setTracking(e.target.value)} required />
             </Field></div>
-            <div style={{ flex: 1, minWidth: 150 }}><Field label="Courier">
-              <input className="input" value={carrier} onChange={(e) => setCarrier(e.target.value)} placeholder="J&T, LBC, DHL…" />
+            <div style={{ flex: 1, minWidth: 150 }}><Field label={t("courier")}>
+              <input className="input" value={carrier} onChange={(e) => setCarrier(e.target.value)} placeholder={t("courier_examples")} />
             </Field></div>
-            <div style={{ flex: 1, minWidth: 190 }}><Field label="Tracking link" hint="Optional.">
+            <div style={{ flex: 1, minWidth: 190 }}><Field label={t("tracking_link")} hint="Optional.">
               <input className="input" type="url" value={url} onChange={(e) => setUrl(e.target.value)} />
             </Field></div>
           </div>
@@ -428,9 +430,10 @@ function SellerOrderCard({ myUserId, order, onChanged, onNotice, onError }: {
 function SellerSamples({ myUserId, samples, onChanged, onNotice, onError }: {
   myUserId: number; samples: ShopSampleRequest[] | null; onChanged: () => void; onNotice: (m: string) => void; onError: (m: string) => void;
 }) {
+  const { t } = useT();
   const [busyId, setBusyId] = useState<number | null>(null);
   if (samples === null) return <Loading />;
-  if (samples.length === 0) return <Notice>No sample requests. Streamers can ask for a free sample of any product you've allowed it on.</Notice>;
+  if (samples.length === 0) return <Notice>{t("no_sample_requests_streamers_can_ask_for")}</Notice>;
 
   const respond = async (id: number, action: "approve" | "decline") => {
     const reason = action === "decline" ? (window.prompt("Why are you turning this down? (optional)", "") ?? "") : "";
@@ -450,8 +453,8 @@ function SellerSamples({ myUserId, samples, onChanged, onNotice, onError }: {
           </div>
           {s.status === "requested" && (
             <div className="row" style={{ gap: 8 }}>
-              <button type="button" className="btn" disabled={busyId === s.id} onClick={() => respond(s.id, "approve")}>Send a sample</button>
-              <button type="button" className="btn ghost" disabled={busyId === s.id} onClick={() => respond(s.id, "decline")}>No thanks</button>
+              <button type="button" className="btn" disabled={busyId === s.id} onClick={() => respond(s.id, "approve")}>{t("send_a_sample")}</button>
+              <button type="button" className="btn ghost" disabled={busyId === s.id} onClick={() => respond(s.id, "decline")}>{t("no_thanks")}</button>
             </div>
           )}
         </div>

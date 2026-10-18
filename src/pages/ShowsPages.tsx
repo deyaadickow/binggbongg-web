@@ -14,12 +14,14 @@ import {
   applyForShow, cancelShow, fetchMyShow, fetchShows, startShow,
   type MyShowResponse, type ShowListing, type ShowOffer,
 } from "../lib/shows";
+import { useT } from "../lib/i18n";
 
 const money = (v: number) => "$" + Number(v ?? 0).toFixed(2);
 
 // ---- The Shows tab --------------------------------------------------------------------------
 
 export function ShowsPage() {
+  const { t } = useT();
   const [rows, setRows] = useState<ShowListing[] | null>(null);
   const [offer, setOffer] = useState<ShowOffer | null>(null);
   const [error, setError] = useState("");
@@ -45,11 +47,10 @@ export function ShowsPage() {
   return (
     <div className="page" style={{ maxWidth: 900 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-        <h1 className="page-title">Shows</h1>
+        <h1 className="page-title">{t("shows")}</h1>
         {!cameFromMyShow && (
           <Link to="/my-show" state={{ from: "shows" }} className="btn small" style={{ background: "transparent", color: "var(--gold)", borderColor: "var(--gold-border)" }}>
-            My Show
-          </Link>
+            {t("my_show")}</Link>
         )}
       </div>
 
@@ -62,7 +63,7 @@ export function ShowsPage() {
       <input
         className="input"
         value={query}
-        placeholder="Search shows or hosts"
+        placeholder={t("search_shows_or_hosts")}
         onChange={(e) => setQuery(e.target.value)}
         style={{ width: "100%", margin: "10px 0 14px" }}
       />
@@ -72,7 +73,7 @@ export function ShowsPage() {
       {rows !== null && rows.length === 0 && !error && (
         query.trim()
           ? <p className="soft">Nothing matches “{query.trim()}”.</p>
-          : <p className="soft">No shows yet. <Link to="/my-show" style={{ color: "var(--gold)" }}>Start your own.</Link></p>
+          : <p className="soft">No shows yet. <Link to="/my-show" style={{ color: "var(--gold)" }}>{t("start_your_own")}</Link></p>
       )}
 
       <div style={{ display: "grid", gap: 10 }}>
@@ -85,8 +86,7 @@ export function ShowsPage() {
                   <strong style={{ color: "var(--gold)" }}>{s.name}</strong>
                   {s.is_live_now && (
                     <span style={{ fontSize: 11, fontWeight: 800, color: "#000", background: "var(--gold-border)", borderRadius: 999, padding: "2px 8px" }}>
-                      LIVE NOW
-                    </span>
+                      {t("live_now_2")}</span>
                   )}
                 </div>
                 {s.tagline && <div className="muted" style={{ fontSize: 13 }}>{s.tagline}</div>}
@@ -95,8 +95,7 @@ export function ShowsPage() {
               {s.is_live_now && s.live_stream_id && (
                 <Link to={`/live/${s.live_stream_id}`} className="btn small"
                       style={{ background: "var(--gold-border)", color: "#000", borderColor: "var(--gold-border)" }}>
-                  Watch
-                </Link>
+                  {t("watch")}</Link>
               )}
             </div>
             {s.description && <p className="soft" style={{ marginBottom: 0, marginTop: 10, whiteSpace: "pre-wrap" }}>{s.description}</p>}
@@ -108,6 +107,7 @@ export function ShowsPage() {
 }
 
 function ShowOfferCard({ offer }: { offer: ShowOffer }) {
+  const { t } = useT();
   const hours = offer.min_hours_per_day % 1 === 0 ? offer.min_hours_per_day : offer.min_hours_per_day.toFixed(1);
   const lines = [
     [`${money(offer.monthly_price)} a month`, "for as many hours a day as you want"],
@@ -120,8 +120,7 @@ function ShowOfferCard({ offer }: { offer: ShowOffer }) {
   return (
     <div className="card pad" style={{ borderColor: "var(--gold-border)" }}>
       <div style={{ fontWeight: 900, color: "var(--gold)", fontSize: 18, marginBottom: 10 }}>
-        Your own live Bingg Bongg show
-      </div>
+        {t("your_own_live_bingg_bongg_show")}</div>
       <div style={{ display: "grid", gap: 8 }}>
         {lines.map(([head, tail]) => (
           <div key={head} style={{ display: "flex", gap: 8, alignItems: "baseline" }}>
@@ -139,8 +138,7 @@ function ShowOfferCard({ offer }: { offer: ShowOffer }) {
       </p>
       <Link to="/my-show" state={{ from: "shows" }} className="btn small"
             style={{ marginTop: 12, background: "var(--gold-border)", color: "#000", borderColor: "var(--gold-border)" }}>
-        Start your show
-      </Link>
+        {t("start_your_show")}</Link>
     </div>
   );
 }
@@ -148,6 +146,7 @@ function ShowOfferCard({ offer }: { offer: ShowOffer }) {
 // ---- My Show --------------------------------------------------------------------------------
 
 export function MyShowPage() {
+  const { t } = useT();
   const { user } = useSession();
   const [data, setData] = useState<MyShowResponse | null>(null);
   const [busy, setBusy] = useState(false);
@@ -168,14 +167,14 @@ export function MyShowPage() {
     // would re-run this and wipe what is on screen.
   }, [userId]);
 
-  if (!user) return <div className="page"><p className="soft">Sign in to start a show.</p></div>;
+  if (!user) return <div className="page"><p className="soft">{t("sign_in_to_start_a_show")}</p></div>;
   if (data === null) return <div className="page">{error ? <Notice>{error}</Notice> : <Loading />}</div>;
 
   if (!data.shows_enabled) {
     return (
       <div className="page" style={{ maxWidth: 720 }}>
-        <h1 className="page-title">My Show</h1>
-        <p className="soft">Shows aren't open yet. Check back soon.</p>
+        <h1 className="page-title">{t("my_show")}</h1>
+        <p className="soft">{t("shows_aren_t_open_yet_check_back_soon")}</p>
       </div>
     );
   }
@@ -197,13 +196,13 @@ export function MyShowPage() {
 
   const offer = (
     <div className="card pad" style={{ marginBottom: 12, borderColor: "var(--gold-border)" }}>
-      <div style={{ fontWeight: 900, color: "var(--gold)", marginBottom: 8 }}>Your own live Bingg Bongg show</div>
+      <div style={{ fontWeight: 900, color: "var(--gold)", marginBottom: 8 }}>{t("your_own_live_bingg_bongg_show")}</div>
       <ul className="soft" style={{ margin: 0, paddingLeft: 18, lineHeight: 1.7 }}>
         <li>{money(data.monthly_price)} a month, for as many hours a day as you want.</li>
         <li>Minimum {data.min_hours_per_day} hours a day.</li>
         <li>Bring your own advertisers and earn {data.ad_share_percent}% of what they pay — every month they stay.</li>
         <li>Earn an extra {data.gift_bonus_percent}% on every gift you receive on your show.</li>
-        <li><strong>Nothing to pay to start.</strong> The first month comes out of your earnings as you earn it.</li>
+        <li><strong>{t("nothing_to_pay_to_start")}</strong> The first month comes out of your earnings as you earn it.</li>
       </ul>
       <p className="muted" style={{ fontSize: 12, marginTop: 10, marginBottom: 0 }}>
         The fee comes out of your earnings first, then your Cash Account. If neither covers it we'll
@@ -215,9 +214,9 @@ export function MyShowPage() {
   return (
     <div className="page" style={{ maxWidth: 720 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-        <h1 className="page-title">My Show</h1>
+        <h1 className="page-title">{t("my_show")}</h1>
         {!cameFromShows && (
-          <Link to="/shows" state={{ from: "my-show" }} className="btn small" style={{ background: "transparent", color: "var(--gold)", borderColor: "var(--gold-border)" }}>All shows</Link>
+          <Link to="/shows" state={{ from: "my-show" }} className="btn small" style={{ background: "transparent", color: "var(--gold)", borderColor: "var(--gold-border)" }}>{t("all_shows_2")}</Link>
         )}
       </div>
 
@@ -231,13 +230,13 @@ export function MyShowPage() {
           {show?.status === "rejected" && show.rejected_reason && (
             <p style={{ color: "#f55", fontSize: 13 }}>Your last application wasn't approved: {show.rejected_reason}</p>
           )}
-          <label className="soft" style={{ fontSize: 13 }}>What is your show called?</label>
-          <input className="input" value={form.name} maxLength={120} placeholder="The name of your show"
+          <label className="soft" style={{ fontSize: 13 }}>{t("what_is_your_show_called")}</label>
+          <input className="input" value={form.name} maxLength={120} placeholder={t("the_name_of_your_show")}
                  onChange={(e) => setForm({ ...form, name: e.target.value })} style={{ width: "100%", marginBottom: 10 }} />
-          <label className="soft" style={{ fontSize: 13 }}>One line about it</label>
-          <input className="input" value={form.tagline} maxLength={191} placeholder="Every night, live from Manila"
+          <label className="soft" style={{ fontSize: 13 }}>{t("one_line_about_it")}</label>
+          <input className="input" value={form.tagline} maxLength={191} placeholder={t("every_night_live_from_manila")}
                  onChange={(e) => setForm({ ...form, tagline: e.target.value })} style={{ width: "100%", marginBottom: 10 }} />
-          <label className="soft" style={{ fontSize: 13 }}>Tell people what to expect</label>
+          <label className="soft" style={{ fontSize: 13 }}>{t("tell_people_what_to_expect")}</label>
           <textarea className="input" rows={4} value={form.description}
                     onChange={(e) => setForm({ ...form, description: e.target.value })} style={{ width: "100%", marginBottom: 10 }} />
           <button className="btn" disabled={busy || !form.name.trim()}
@@ -246,8 +245,7 @@ export function MyShowPage() {
             {busy ? "Sending…" : "Apply for a show"}
           </button>
           <p className="muted" style={{ fontSize: 12, marginTop: 10, marginBottom: 0 }}>
-            Nothing is charged now. We'll look at it first, and you pay the first month when you put the show on the air.
-          </p>
+            {t("nothing_is_charged_now_we_ll_look_at_it")}</p>
         </div>
       ) : (
         <ShowDashboard data={data} busy={busy} onStart={() => run(() => startShow(userId))} onCancel={() => run(() => cancelShow(userId))} />
@@ -259,6 +257,7 @@ export function MyShowPage() {
 function ShowDashboard({ data, busy, onStart, onCancel }: {
   data: MyShowResponse; busy: boolean; onStart: () => void; onCancel: () => void;
 }) {
+  const { t } = useT();
   const show = data.show!;
   const onAir = show.status === "active" || show.status === "past_due";
   const metToday = show.hours_today >= show.min_hours_per_day;
@@ -311,7 +310,7 @@ function ShowDashboard({ data, busy, onStart, onCancel }: {
       {onAir && (
         <>
           <div className="card pad" style={{ marginBottom: 12 }}>
-            <div style={{ fontWeight: 800, marginBottom: 8 }}>Today</div>
+            <div style={{ fontWeight: 800, marginBottom: 8 }}>{t("today")}</div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
               <span style={{ fontSize: 30, fontWeight: 900, color: metToday ? "var(--gold)" : "#f55" }}>{show.hours_today}</span>
               <span className="muted" style={{ fontSize: 13 }}>of {show.min_hours_per_day} hours</span>
@@ -332,7 +331,7 @@ function ShowDashboard({ data, busy, onStart, onCancel }: {
           </div>
 
           <div className="card pad" style={{ marginBottom: 12 }}>
-            <div style={{ fontWeight: 800, marginBottom: 8 }}>What the show has earned you</div>
+            <div style={{ fontWeight: 800, marginBottom: 8 }}>{t("what_the_show_has_earned_you")}</div>
             <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
               <div>
                 <div className="muted" style={{ fontSize: 12 }}>Your advertisers ({data.ad_share_percent}%)</div>
@@ -352,7 +351,7 @@ function ShowDashboard({ data, busy, onStart, onCancel }: {
           </div>
 
           <div className="card pad" style={{ marginBottom: 12 }}>
-            <div style={{ fontWeight: 800, marginBottom: 8 }}>The fee</div>
+            <div style={{ fontWeight: 800, marginBottom: 8 }}>{t("the_fee")}</div>
             <p className="soft" style={{ margin: 0, fontSize: 13 }}>
               {money(show.monthly_price)} a month, out of your earnings first and then your Cash Account.
               {show.paid_until ? ` Covers you to ${show.paid_until}.` : ""}
@@ -374,8 +373,7 @@ function ShowDashboard({ data, busy, onStart, onCancel }: {
 
           <button className="btn small" disabled={busy} onClick={onCancel}
                   style={{ background: "transparent", color: "#f77", borderColor: "#633" }}>
-            Stop my show
-          </button>
+            {t("stop_my_show")}</button>
         </>
       )}
     </>

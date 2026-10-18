@@ -20,6 +20,7 @@ import {
   respondVideoAdGigOrder,
   type GigCard, type GigOffer, type GigOrder,
 } from "../lib/videoAdGigs";
+import { useT } from "../lib/i18n";
 
 const money = (v: number) => "$" + Number(v ?? 0).toFixed(2);
 const gold = { background: "var(--gold-border)", color: "#000", borderColor: "var(--gold-border)" };
@@ -28,6 +29,7 @@ const ghost = { background: "transparent", color: "var(--gold)", borderColor: "v
 // ---- The feed tab ---------------------------------------------------------------------------
 
 export function VideoAdGigPage() {
+  const { t } = useT();
   const { user, isLoggedIn } = useSession();
   const [rows, setRows] = useState<GigCard[] | null>(null);
   const [offer, setOffer] = useState<GigOffer | null>(null);
@@ -52,13 +54,13 @@ export function VideoAdGigPage() {
   return (
     <div className="page" style={{ maxWidth: 900 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-        <h1 className="page-title">Video Ad Gig</h1>
+        <h1 className="page-title">{t("video_ad_gig")}</h1>
         {isLoggedIn && !cameFromMine && (
-          <Link to="/my-gigs" state={{ from: "gigs" }} className="btn small" style={ghost}>My Gigs</Link>
+          <Link to="/my-gigs" state={{ from: "gigs" }} className="btn small" style={ghost}>{t("gig_my_gigs")}</Link>
         )}
       </div>
 
-      {!enabled && <p className="soft">Video Ad Gig isn't open yet. Check back soon.</p>}
+      {!enabled && <p className="soft">{t("gig_not_open")}</p>}
 
       {enabled && offer && <GigOfferCard offer={offer} />}
 
@@ -66,7 +68,7 @@ export function VideoAdGigPage() {
         <input
           className="input"
           value={query}
-          placeholder="Search influencers"
+          placeholder={t("gig_search_hint")}
           onChange={(e) => setQuery(e.target.value)}
           style={{ width: "100%", margin: "10px 0 14px" }}
         />
@@ -77,7 +79,7 @@ export function VideoAdGigPage() {
       {enabled && rows !== null && rows.length === 0 && !error && (
         query.trim()
           ? <p className="soft">Nobody matches “{query.trim()}”.</p>
-          : <p className="soft">No influencers yet. {isLoggedIn && <Link to="/my-gigs" style={{ color: "var(--gold)" }}>Put your own video up.</Link>}</p>
+          : <p className="soft">No influencers yet. {isLoggedIn && <Link to="/my-gigs" style={{ color: "var(--gold)" }}>{t("put_your_own_video_up")}</Link>}</p>
       )}
 
       <div style={{ display: "grid", gap: 12 }}>
@@ -95,16 +97,16 @@ export function VideoAdGigPage() {
 
 /** The offer, in the words of the thing itself — every figure comes from the server. */
 function GigOfferCard({ offer }: { offer: GigOffer }) {
+  const { t } = useT();
   return (
     <div className="card pad" style={{ borderColor: "var(--gold-border)", marginBottom: 12 }}>
       <div style={{ fontWeight: 900, color: "var(--gold)", marginBottom: 8 }}>
-        Get a video ad made for you
-      </div>
+        {t("gig_offer_title")}</div>
       <ul className="soft" style={{ margin: 0, paddingLeft: 18, lineHeight: 1.7 }}>
-        <li>Influencers make a video ad for your business, your service, or just for you.</li>
-        <li>Watch their videos below, pick the one you like, and choose a length.</li>
-        <li>Pay from your Spending Cash Account — we hold it until you're happy with the ad.</li>
-        <li>Nobody takes it on, or it isn't delivered? You get every cent back.</li>
+        <li>{t("influencers_make_a_video_ad_for_your_bus")}</li>
+        <li>{t("watch_their_videos_below_pick_the_one_yo")}</li>
+        <li>{t("pay_from_your_spending_cash_account_we_h")}</li>
+        <li>{t("nobody_takes_it_on_or_it_isn_t_delivered")}</li>
       </ul>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 12 }}>
         {offer.prices.map((p) => (
@@ -123,6 +125,7 @@ function GigOfferCard({ offer }: { offer: GigOffer }) {
 }
 
 function GigRow({ gig, onOrder, canOrder }: { gig: GigCard; onOrder: () => void; canOrder: boolean }) {
+  const { t } = useT();
   return (
     <div className="card pad" style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
       <div style={{ width: 220, maxWidth: "100%" }}>
@@ -136,7 +139,7 @@ function GigRow({ gig, onOrder, canOrder }: { gig: GigCard; onOrder: () => void;
             style={{ width: "100%", borderRadius: 10, background: "#000", aspectRatio: "9 / 16", objectFit: "cover" }}
           />
         ) : (
-          <div className="muted" style={{ fontSize: 12 }}>No video yet</div>
+          <div className="muted" style={{ fontSize: 12 }}>{t("no_video_yet")}</div>
         )}
       </div>
       <div style={{ flex: 1, minWidth: 220 }}>
@@ -151,8 +154,7 @@ function GigRow({ gig, onOrder, canOrder }: { gig: GigCard; onOrder: () => void;
         </div>
         {canOrder && (
           <button className="btn small" style={{ ...gold, marginTop: 10 }} onClick={onOrder}>
-            Order a video ad
-          </button>
+            {t("order_a_video_ad")}</button>
         )}
       </div>
     </div>
@@ -162,6 +164,7 @@ function GigRow({ gig, onOrder, canOrder }: { gig: GigCard; onOrder: () => void;
 function OrderDialog({ gig, offer, myUserId, onClose }: {
   gig: GigCard; offer: GigOffer; myUserId: number; onClose: () => void;
 }) {
+  const { t } = useT();
   const [seconds, setSeconds] = useState(offer.prices[0]?.seconds ?? 15);
   const [businessName, setBusinessName] = useState("");
   const [brief, setBrief] = useState("");
@@ -197,7 +200,7 @@ function OrderDialog({ gig, offer, myUserId, onClose }: {
         {done ? (
           <>
             <p className="soft" style={{ fontSize: 14 }}>{done}</p>
-            <Link to="/my-gigs" state={{ from: "gigs" }} className="btn" style={gold}>See my gigs</Link>
+            <Link to="/my-gigs" state={{ from: "gigs" }} className="btn" style={gold}>{t("see_my_gigs")}</Link>
           </>
         ) : (
           <>
@@ -211,12 +214,12 @@ function OrderDialog({ gig, offer, myUserId, onClose }: {
               ))}
             </div>
 
-            <label className="soft" style={{ fontSize: 13 }}>Your business or service (optional)</label>
+            <label className="soft" style={{ fontSize: 13 }}>{t("gig_business_hint")}</label>
             <input className="input" value={businessName} maxLength={191}
                    onChange={(e) => setBusinessName(e.target.value)} style={{ width: "100%", marginBottom: 10 }} />
 
-            <label className="soft" style={{ fontSize: 13 }}>What should the ad say?</label>
-            <textarea className="input" rows={4} value={brief} placeholder="What you sell, who it's for, anything that must be in it"
+            <label className="soft" style={{ fontSize: 13 }}>{t("gig_brief_hint")}</label>
+            <textarea className="input" rows={4} value={brief} placeholder={t("what_you_sell_who_it_s_for_anything_that")}
                       onChange={(e) => setBrief(e.target.value)} style={{ width: "100%", marginBottom: 10 }} />
 
             {error && <Notice error>{error}</Notice>}
@@ -231,7 +234,7 @@ function OrderDialog({ gig, offer, myUserId, onClose }: {
               <button className="btn" style={gold} disabled={busy} onClick={submit}>
                 {busy ? "Ordering…" : `Pay ${money(price)}`}
               </button>
-              <button className="btn" style={ghost} onClick={onClose}>Cancel</button>
+              <button className="btn" style={ghost} onClick={onClose}>{t("cancel")}</button>
             </div>
           </>
         )}
@@ -243,6 +246,7 @@ function OrderDialog({ gig, offer, myUserId, onClose }: {
 // ---- My Gigs: both sides ---------------------------------------------------------------------
 
 export function MyVideoAdGigsPage() {
+  const { t } = useT();
   const { user, isLoggedIn } = useSession();
   const userId = user?.id ?? 0;
   const cameFromGigs = useLocation().state?.from === "gigs";
@@ -274,16 +278,16 @@ export function MyVideoAdGigsPage() {
     catch (e) { setError(e instanceof Error ? e.message : "That didn't work."); }
   };
 
-  if (!isLoggedIn) return <div className="page"><p className="soft">Please sign in to see your gigs.</p></div>;
+  if (!isLoggedIn) return <div className="page"><p className="soft">{t("please_sign_in_to_see_your_gigs")}</p></div>;
 
   return (
     <div className="page" style={{ maxWidth: 820 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-        <h1 className="page-title">My Gigs</h1>
-        {!cameFromGigs && <Link to="/gigs" state={{ from: "my-gigs" }} className="btn small" style={ghost}>Video Ad Gig</Link>}
+        <h1 className="page-title">{t("gig_my_gigs")}</h1>
+        {!cameFromGigs && <Link to="/gigs" state={{ from: "my-gigs" }} className="btn small" style={ghost}>{t("video_ad_gig")}</Link>}
       </div>
 
-      {!enabled && <p className="soft">Video Ad Gig isn't open yet. Check back soon.</p>}
+      {!enabled && <p className="soft">{t("gig_not_open")}</p>}
       {notice && <div className="card pad" style={{ marginBottom: 12, borderColor: "var(--gold-border)" }}><p style={{ margin: 0, color: "var(--gold)" }}>{notice}</p></div>}
       {error && <Notice error>{error}</Notice>}
 
@@ -293,8 +297,8 @@ export function MyVideoAdGigsPage() {
           it underneath, because Accept is what pays the influencer and the only way to get the
           finished video. */}
       <MyListing gig={mine} offer={offer} userId={userId} onSaved={(m) => { setNotice(m); reload(); }} />
-      <h2 style={{ fontSize: 16, marginTop: 18, color: "var(--gold)" }}>Ads I sold</h2>
-      {work.length === 0 && <p className="soft">No gigs sold yet.</p>}
+      <h2 style={{ fontSize: 16, marginTop: 18, color: "var(--gold)" }}>{t("gig_tab_working")}</h2>
+      {work.length === 0 && <p className="soft">{t("no_gigs_sold_yet")}</p>}
       <div style={{ display: "grid", gap: 10 }}>
         {work.map((o) => (
           <WorkRow key={o.id} order={o} userId={userId}
@@ -304,7 +308,7 @@ export function MyVideoAdGigsPage() {
       </div>
       {bought !== null && bought.length > 0 && (
         <>
-          <h2 style={{ fontSize: 16, marginTop: 24, color: "var(--gold)" }}>Ads I bought</h2>
+          <h2 style={{ fontSize: 16, marginTop: 24, color: "var(--gold)" }}>{t("gig_tab_bought")}</h2>
           <p className="muted" style={{ fontSize: 12 }}>Spending Cash Account: {money(cashAccount)}</p>
           <div style={{ display: "grid", gap: 10 }}>
             {(bought ?? []).map((o) => (
@@ -320,6 +324,7 @@ export function MyVideoAdGigsPage() {
 }
 
 function OrderRow({ order, onAccept, onCancel }: { order: GigOrder; onAccept: () => void; onCancel: () => void }) {
+  const { t } = useT();
   return (
     <div className="card pad">
       <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
@@ -340,13 +345,13 @@ function OrderRow({ order, onAccept, onCancel }: { order: GigOrder; onAccept: ()
       )}
 
       <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
-        {order.status === "delivered" && <button className="btn small" style={gold} onClick={onAccept}>Accept this ad</button>}
+        {order.status === "delivered" && <button className="btn small" style={gold} onClick={onAccept}>{t("accept_this_ad")}</button>}
         {order.status === "delivered" && order.video && (
-          <a className="btn small" style={ghost} href={mediaUrl(order.video)} download target="_blank" rel="noopener">Download</a>
+          <a className="btn small" style={ghost} href={mediaUrl(order.video)} download target="_blank" rel="noopener">{t("download")}</a>
         )}
-        {order.status === "pending" && <button className="btn small" style={ghost} onClick={onCancel}>Cancel &amp; refund</button>}
+        {order.status === "pending" && <button className="btn small" style={ghost} onClick={onCancel}>{t("cancel_refund")}</button>}
         {order.status === "completed" && order.video && (
-          <a className="btn small" style={ghost} href={mediaUrl(order.video)} download target="_blank" rel="noopener">Download</a>
+          <a className="btn small" style={ghost} href={mediaUrl(order.video)} download target="_blank" rel="noopener">{t("download")}</a>
         )}
       </div>
 
@@ -367,6 +372,7 @@ function OrderRow({ order, onAccept, onCancel }: { order: GigOrder; onAccept: ()
 function WorkRow({ order, userId, onRespond, onDelivered }: {
   order: GigOrder; userId: number; onRespond: (a: "accept" | "decline") => void; onDelivered: (m: string) => void;
 }) {
+  const { t } = useT();
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -403,8 +409,8 @@ function WorkRow({ order, userId, onRespond, onDelivered }: {
 
       {order.status === "pending" && (
         <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
-          <button className="btn small" style={gold} onClick={() => onRespond("accept")}>Take this gig</button>
-          <button className="btn small" style={ghost} onClick={() => onRespond("decline")}>No thanks</button>
+          <button className="btn small" style={gold} onClick={() => onRespond("accept")}>{t("take_this_gig")}</button>
+          <button className="btn small" style={ghost} onClick={() => onRespond("decline")}>{t("no_thanks")}</button>
         </div>
       )}
 
@@ -436,6 +442,7 @@ function WorkRow({ order, userId, onRespond, onDelivered }: {
 function MyListing({ gig, offer, userId, onSaved }: {
   gig: GigCard | null; offer: GigOffer | null; userId: number; onSaved: (message: string) => void;
 }) {
+  const { t } = useT();
   const [headline, setHeadline] = useState("");
   const [about, setAbout] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -486,7 +493,7 @@ function MyListing({ gig, offer, userId, onSaved }: {
           {gig.completed_count} ad{gig.completed_count === 1 ? "" : "s"} finished
           {offer ? ` · you earn ${offer.influencer_share_percent}% of every gig` : ""}
         </div>
-        <button className="btn small" style={{ ...ghost, marginTop: 10 }} onClick={() => setEditing(true)}>Change my video or pitch</button>
+        <button className="btn small" style={{ ...ghost, marginTop: 10 }} onClick={() => setEditing(true)}>{t("change_my_video_or_pitch")}</button>
       </div>
     );
   }
@@ -505,15 +512,15 @@ function MyListing({ gig, offer, userId, onSaved }: {
         </p>
       )}
 
-      <label className="soft" style={{ fontSize: 13 }}>Your one line</label>
-      <input className="input" value={headline} maxLength={120} placeholder="I make ads that sell"
+      <label className="soft" style={{ fontSize: 13 }}>{t("your_one_line")}</label>
+      <input className="input" value={headline} maxLength={120} placeholder={t("i_make_ads_that_sell")}
              onChange={(e) => setHeadline(e.target.value)} style={{ width: "100%", marginBottom: 10 }} />
 
-      <label className="soft" style={{ fontSize: 13 }}>Tell buyers about you</label>
+      <label className="soft" style={{ fontSize: 13 }}>{t("gig_about_hint")}</label>
       <textarea className="input" rows={4} value={about}
                 onChange={(e) => setAbout(e.target.value)} style={{ width: "100%", marginBottom: 10 }} />
 
-      <label className="soft" style={{ fontSize: 13 }}>Your pitch video</label>
+      <label className="soft" style={{ fontSize: 13 }}>{t("your_pitch_video")}</label>
       <input type="file" accept="video/*" onChange={(e) => setFile(e.target.files?.[0] ?? null)} style={{ display: "block", marginBottom: 10 }} />
 
       {error && <Notice error>{error}</Notice>}
@@ -522,11 +529,10 @@ function MyListing({ gig, offer, userId, onSaved }: {
         <button className="btn" style={gold} disabled={busy || !headline.trim() || (!gig && !file)} onClick={save}>
           {busy ? (progress > 0 ? `Uploading ${Math.round(progress * 100)}%` : "Sending…") : gig ? "Send for review" : "Apply"}
         </button>
-        {gig && <button className="btn" style={ghost} onClick={() => setEditing(false)}>Cancel</button>}
+        {gig && <button className="btn" style={ghost} onClick={() => setEditing(false)}>{t("cancel")}</button>}
       </div>
       <p className="muted" style={{ fontSize: 12, marginTop: 10, marginBottom: 0 }}>
-        A new video goes back for review before it appears on the page.
-      </p>
+        {t("gig_pitch_note")}</p>
     </div>
   );
 }

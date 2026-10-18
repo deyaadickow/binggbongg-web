@@ -8,18 +8,20 @@ import {
   requestShopEarningsPayout, requestShopSample, saveShopAddress, startStripeConnect, type ShopAddress, type ShopEarnings, type ShopOrder,
   type ShopProduct, type ShopReturn, type ShopSampleRequest, type ShopSettings,
 } from "../lib/shop";
+import { useT } from "../lib/i18n";
 
 // Bingg Bongg Shop — the marketplace on the web (Steve, 2026-10-15). /shop (catalogue, Showcase,
 // Orders, Earnings), /shop/product/:id, /shop/showcase/:userId (a member's Showcase). Buying goes
 // to Stripe Checkout and comes back to /shop/orders. Hidden while the admin has the shop off.
 
 function ProductCard({ p, to }: { p: ShopProduct; to: string }) {
+  const { t } = useT();
   return (
     <Link to={to} className="card" style={{ display: "flex", gap: 12, padding: 10, textDecoration: "none", color: "inherit", border: "1px solid var(--gold-border)", borderRadius: 10, background: "#111" }}>
       {p.image_url ? <img src={p.image_url} alt="" style={{ width: 84, height: 84, objectFit: "cover", borderRadius: 8, border: "1px solid var(--gold-border)" }} /> : <div style={{ width: 84, height: 84 }} />}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontWeight: 800 }}>{p.title}</div>
-        <div style={{ color: "var(--gold)", fontWeight: 800 }}>{money(p.price_cents)} {(p.shipping_cents ?? 0) > 0 ? <span className="muted" style={{ fontWeight: 400 }}>+ {money(p.shipping_cents)} shipping</span> : <span className="muted" style={{ fontWeight: 400 }}>· free shipping</span>}</div>
+        <div style={{ color: "var(--gold)", fontWeight: 800 }}>{money(p.price_cents)} {(p.shipping_cents ?? 0) > 0 ? <span className="muted" style={{ fontWeight: 400 }}>+ {money(p.shipping_cents)} shipping</span> : <span className="muted" style={{ fontWeight: 400 }}>{t("free_shipping")}</span>}</div>
         <div className="muted" style={{ fontSize: 12 }}>{[p.in_stock === false ? "Sold out" : null, (p.commission_rate ?? 0) > 0 ? `Earn ${p.commission_rate}%` : null, (p.sold_count ?? 0) > 0 ? `${p.sold_count} sold` : null, p.seller_name].filter(Boolean).join(" · ")}</div>
       </div>
     </Link>
@@ -27,6 +29,7 @@ function ProductCard({ p, to }: { p: ShopProduct; to: string }) {
 }
 
 export function ShopPage({ tab: initialTab }: { tab?: "shop" | "showcase" | "orders" | "earnings" }) {
+  const { t } = useT();
   const { user, isLoggedIn } = useSession();
   const navigate = useNavigate();
   const { userId: showcaseUserIdParam } = useParams();
@@ -68,8 +71,8 @@ export function ShopPage({ tab: initialTab }: { tab?: "shop" | "showcase" | "ord
     if (o && r) setToast(r === "success" ? `Payment received — order ${o} is confirmed.` : `Payment cancelled — nothing was charged for ${o}.`);
   }, [params]);
 
-  if (!isLoggedIn || !user) return <div className="page"><Notice>Sign in to open the Shop. <Link to="/login">Sign in</Link></Notice></div>;
-  if (settings && settings.shop_enabled === false) return <div className="page"><Notice>Bingg Bongg Shop isn't open yet.</Notice></div>;
+  if (!isLoggedIn || !user) return <div className="page"><Notice>Sign in to open the Shop. <Link to="/login">{t("sign_in")}</Link></Notice></div>;
+  if (settings && settings.shop_enabled === false) return <div className="page"><Notice>{t("bingg_bongg_shop_isn_t_open_yet")}</Notice></div>;
 
   const goTab = (t: typeof tab) => { setTab(t); navigate(t === "shop" ? "/shop" : `/shop/${t}`); };
 
@@ -82,8 +85,8 @@ export function ShopPage({ tab: initialTab }: { tab?: "shop" | "showcase" | "ord
         {/* The two business-side ways in (Steve, 2026-10-16). Selling follows the admin's own
             sellers switch; being an agent does not, because agents are recruited directly and
             are not waiting on supplier sign-up being open to the public. */}
-        {!showcaseUserId && isLoggedIn && settings?.sellers_enabled && <Link to="/shop/seller" className="btn ghost small">Sell here</Link>}
-        {!showcaseUserId && isLoggedIn && <Link to="/shop/agent" className="btn ghost small">Agents</Link>}
+        {!showcaseUserId && isLoggedIn && settings?.sellers_enabled && <Link to="/shop/seller" className="btn ghost small">{t("sell_here")}</Link>}
+        {!showcaseUserId && isLoggedIn && <Link to="/shop/agent" className="btn ghost small">{t("agents")}</Link>}
       </div>
       {!showcaseUserId && (
         <div className="row" style={{ gap: 6, margin: "10px 0" }}>
@@ -95,8 +98,8 @@ export function ShopPage({ tab: initialTab }: { tab?: "shop" | "showcase" | "ord
 
       {(showcaseUserId || tab === "shop") && (
         <>
-          {!showcaseUserId && <input className="input" placeholder="Search products" value={q} onChange={(e) => setQ(e.target.value)} style={{ marginBottom: 10 }} />}
-          {products === null ? <Loading /> : products.length === 0 ? <p className="muted">Nothing here yet.</p> : (
+          {!showcaseUserId && <input className="input" placeholder={t("search_products")} value={q} onChange={(e) => setQ(e.target.value)} style={{ marginBottom: 10 }} />}
+          {products === null ? <Loading /> : products.length === 0 ? <p className="muted">{t("exciting_news_empty")}</p> : (
             <div style={{ display: "grid", gap: 10 }}>{products.map((p) => <ProductCard key={p.id} p={p} to={`/shop/product/${p.id}${showcaseUserId ? `?streamer=${showcaseUserId}` : ""}`} />)}</div>
           )}
         </>
@@ -104,15 +107,15 @@ export function ShopPage({ tab: initialTab }: { tab?: "shop" | "showcase" | "ord
 
       {!showcaseUserId && tab === "showcase" && (
         <>
-          <p className="muted" style={{ fontSize: 13 }}>Products you sell on your lives. Pin one while live and it shows in your room's shopping bag; every sale from it pays you a commission.</p>
-          {products === null ? <Loading /> : products.length === 0 ? <p className="muted">Your Showcase is empty — open Shop and use "Add to my Showcase" on anything you'd like to sell.</p> : (
+          <p className="muted" style={{ fontSize: 13 }}>{t("products_you_sell_on_your_lives_pin_one")}</p>
+          {products === null ? <Loading /> : products.length === 0 ? <p className="muted">{t("your_showcase_is_empty_open_shop_and_use")}</p> : (
             <div style={{ display: "grid", gap: 10 }}>
               {products.map((p) => (
                 <div key={p.id}>
                   <ProductCard p={p} to={`/shop/product/${p.id}`} />
                   <div className="row" style={{ gap: 8, marginTop: 6 }}>
                     <button type="button" className={p.pinned_live ? "btn small" : "btn small ghost"} onClick={() => pinShowcaseItem(user.id, p.id, !p.pinned_live).then((r) => { setToast(r.message ?? ""); load(); })}>{p.pinned_live ? "Pinned on live ✓" : "Pin on live"}</button>
-                    <button type="button" className="btn small ghost" onClick={() => removeFromShowcase(user.id, p.id).then(load)}>Remove</button>
+                    <button type="button" className="btn small ghost" onClick={() => removeFromShowcase(user.id, p.id).then(load)}>{t("remove")}</button>
                   </div>
                 </div>
               ))}
@@ -120,14 +123,14 @@ export function ShopPage({ tab: initialTab }: { tab?: "shop" | "showcase" | "ord
           )}
           {samples.length > 0 && (
             <>
-              <h3 style={{ color: "var(--gold)", marginTop: 18 }}>My sample requests</h3>
+              <h3 style={{ color: "var(--gold)", marginTop: 18 }}>{t("my_sample_requests")}</h3>
               {samples.map((s) => <div key={s.id} className="card" style={{ padding: 10, marginBottom: 8, border: "1px solid var(--gold-border)", borderRadius: 10 }}><b>{s.product?.title}</b><div className="muted" style={{ fontSize: 13 }}>{s.status}{s.tracking_number ? ` · ${s.tracking_number}` : ""}{s.go_live_deadline_at ? ` · go live by ${s.go_live_deadline_at.slice(0, 10)}` : ""}{s.decline_reason ? ` · ${s.decline_reason}` : ""}</div></div>)}
             </>
           )}
         </>
       )}
 
-      {!showcaseUserId && tab === "orders" && (orders === null ? <Loading /> : orders.length === 0 ? <p className="muted">No orders yet.</p> : (
+      {!showcaseUserId && tab === "orders" && (orders === null ? <Loading /> : orders.length === 0 ? <p className="muted">{t("gig_no_orders_yet")}</p> : (
         <div style={{ display: "grid", gap: 10 }}>
           {orders.map((o) => (
             <div key={o.id} className="card" style={{ padding: 12, border: "1px solid var(--gold-border)", borderRadius: 10, background: "#111" }}>
@@ -135,7 +138,7 @@ export function ShopPage({ tab: initialTab }: { tab?: "shop" | "showcase" | "ord
               {o.items.map((i) => <div key={i.shop_product_id} style={{ fontSize: 13 }}>{i.title} ×{i.quantity}  {money(i.line_cents)}</div>)}
               <div className="muted" style={{ fontSize: 12 }}>Total {money(o.total_cents)}{(o.refunded_cents ?? 0) > 0 ? ` · refunded ${money(o.refunded_cents)}` : ""}{o.created_at ? ` · ${o.created_at.slice(0, 10)}` : ""}</div>
               {o.tracking_number && (o.tracking_url ? <a href={o.tracking_url} target="_blank" rel="noreferrer" style={{ color: "var(--gold)", fontSize: 13 }}>Tracking: {o.carrier ?? ""} {o.tracking_number}</a> : <div style={{ color: "var(--gold)", fontSize: 13 }}>Tracking: {o.carrier ?? ""} {o.tracking_number}</div>)}
-              {(o.status === "paid" || o.status === "processing") && <button type="button" className="btn small ghost" style={{ marginTop: 6 }} onClick={() => { if (confirm("Cancel this order? You'll be refunded in full.")) cancelShopOrder(user.id, o.order_number).then((r) => { setToast(r.message ?? ""); load(); }); }}>Cancel order</button>}
+              {(o.status === "paid" || o.status === "processing") && <button type="button" className="btn small ghost" style={{ marginTop: 6 }} onClick={() => { if (confirm("Cancel this order? You'll be refunded in full.")) cancelShopOrder(user.id, o.order_number).then((r) => { setToast(r.message ?? ""); load(); }); }}>{t("cancel_order")}</button>}
               {(() => {
                 const ret = returns.find((r) => r.order_number === o.order_number);
                 // Nothing open yet, and it has arrived: offer to send it back.
@@ -153,8 +156,7 @@ export function ShopPage({ tab: initialTab }: { tab?: "shop" | "showcase" | "ord
                           .catch((e) => setToast((e as Error).message));
                       }}
                     >
-                      Send it back
-                    </button>
+                      {t("send_it_back")}</button>
                   );
                 }
                 if (!ret) return null;
@@ -167,8 +169,7 @@ export function ShopPage({ tab: initialTab }: { tab?: "shop" | "showcase" | "ord
                     {/* The whole point: somewhere to print it from, not just an email. */}
                     {ret.label_url && (
                       <a href={ret.label_url} target="_blank" rel="noreferrer" className="btn small" style={{ marginTop: 6, display: "inline-block" }}>
-                        Print return label
-                      </a>
+                        {t("print_return_label")}</a>
                     )}
                     {ret.tracking_number && <div className="muted" style={{ fontSize: 12, marginTop: 4 }}>{ret.carrier ?? ""} {ret.tracking_number}</div>}
                   </div>
@@ -185,15 +186,15 @@ export function ShopPage({ tab: initialTab }: { tab?: "shop" | "showcase" | "ord
             <div style={{ color: "var(--gold)", fontWeight: 800, fontSize: 20 }}>Payable now {money(earnings.payable_cents)}</div>
             <div className="muted" style={{ fontSize: 12 }}>Pending {money(earnings.pending_cents)} (released after the return window) · Paid {money(earnings.paid_cents)}</div>
           </div>
-          <div><b>To get paid you need:</b></div>
-          <div style={{ color: earnings.stripe_connected ? "var(--gold)" : undefined }}>{earnings.stripe_connected ? "✓" : "○"} A bank account connected through Stripe {!earnings.stripe_connected && <button type="button" className="btn small ghost" style={{ marginLeft: 8 }} onClick={() => startStripeConnect(user.id).then((r) => { const u = r.url as string | undefined; if (r.status && u) window.location.href = u; else setToast(r.message ?? "Couldn't start Stripe."); })}>Connect bank account</button>}</div>
+          <div><b>{t("to_get_paid_you_need")}</b></div>
+          <div style={{ color: earnings.stripe_connected ? "var(--gold)" : undefined }}>{earnings.stripe_connected ? "✓" : "○"} A bank account connected through Stripe {!earnings.stripe_connected && <button type="button" className="btn small ghost" style={{ marginLeft: 8 }} onClick={() => startStripeConnect(user.id).then((r) => { const u = r.url as string | undefined; if (r.status && u) window.location.href = u; else setToast(r.message ?? "Couldn't start Stripe."); })}>{t("connect_bank_account")}</button>}</div>
           <div style={{ color: earnings.tax_form_status === "accepted" ? "var(--gold)" : undefined }}>{earnings.tax_form_status === "accepted" ? "✓" : "○"} A tax form on file ({earnings.tax_form_status === "missing" ? "W-9 for the US, W-8BEN elsewhere — submit it from the phone app" : earnings.tax_form_status})</div>
           {earnings.payout_ready && earnings.payable_cents > 0 && <button type="button" className="btn" onClick={() => requestShopEarningsPayout(user.id).then((r) => { setToast(r.message ?? ""); load(); })}>Request payout of {money(earnings.payable_cents)}</button>}
-          {earnings.payouts.length > 0 && <><h3 style={{ color: "var(--gold)", margin: "10px 0 0" }}>Payouts</h3>{earnings.payouts.map((p) => <div key={p.id} style={{ fontSize: 13 }}>{money(p.amount_cents)} · {p.status}{p.sent_at ? ` · sent ${p.sent_at.slice(0, 10)}` : p.created_at ? ` · requested ${p.created_at.slice(0, 10)}` : ""}</div>)}</>}
-          <h3 style={{ color: "var(--gold)", margin: "10px 0 0" }}>Commissions</h3>
-          {earnings.commissions.length === 0 && <p className="muted">No sales yet. Pin products from your Showcase while you're live.</p>}
+          {earnings.payouts.length > 0 && <><h3 style={{ color: "var(--gold)", margin: "10px 0 0" }}>{t("payouts")}</h3>{earnings.payouts.map((p) => <div key={p.id} style={{ fontSize: 13 }}>{money(p.amount_cents)} · {p.status}{p.sent_at ? ` · sent ${p.sent_at.slice(0, 10)}` : p.created_at ? ` · requested ${p.created_at.slice(0, 10)}` : ""}</div>)}</>}
+          <h3 style={{ color: "var(--gold)", margin: "10px 0 0" }}>{t("commissions")}</h3>
+          {earnings.commissions.length === 0 && <p className="muted">{t("no_sales_yet_pin_products_from_your_show")}</p>}
           {earnings.commissions.map((c, i) => <div key={i} style={{ fontSize: 13 }}>{c.order_number}  {money(c.amount_cents)} ({c.rate}%) · {c.status}{c.status === "pending" && c.payable_at ? ` until ${c.payable_at.slice(0, 10)}` : ""}</div>)}
-          <p className="muted" style={{ fontSize: 12 }}>Tell your viewers you earn a commission on what you sell — it's the rule, and they'll trust you more for it.</p>
+          <p className="muted" style={{ fontSize: 12 }}>{t("tell_your_viewers_you_earn_a_commission")}</p>
         </div>
       ))}
     </div>
@@ -201,6 +202,7 @@ export function ShopPage({ tab: initialTab }: { tab?: "shop" | "showcase" | "ord
 }
 
 export function ShopProductPage() {
+  const { t } = useT();
   const { id } = useParams();
   const [params] = useSearchParams();
   const { user, isLoggedIn } = useSession();
@@ -220,7 +222,7 @@ export function ShopProductPage() {
   useEffect(() => { if (user) fetchShopAddresses(user.id).then((a) => { setAddresses(a); setAddressId((a.find((x) => x.is_default) ?? a[0])?.id ?? 0); }).catch(() => undefined); }, [user]);
 
   if (p === undefined) return <div className="page"><Loading /></div>;
-  if (!p) return <div className="page"><Notice error>That product isn't available.</Notice></div>;
+  if (!p) return <div className="page"><Notice error>{t("that_product_isn_t_available")}</Notice></div>;
   const sub = p.price_cents * qty; const ship = (p.shipping_cents ?? 0) * qty;
 
   async function saveAddress() {
@@ -247,24 +249,24 @@ export function ShopProductPage() {
       <h1 className="page-title" style={{ marginBottom: 4 }}>{p.title}</h1>
       <div style={{ color: "var(--gold)", fontWeight: 800, fontSize: 22 }}>{money(p.price_cents)} {p.compare_at_cents && p.compare_at_cents > p.price_cents && <s className="muted" style={{ fontSize: 14, fontWeight: 400 }}>{money(p.compare_at_cents)}</s>}</div>
       <div className="muted" style={{ fontSize: 13 }}>{[(p.shipping_cents ?? 0) > 0 ? `Shipping ${money(p.shipping_cents)}` : "Free shipping", p.ships_in_days_min != null && p.ships_in_days_max != null ? `arrives in ${p.ships_in_days_min}–${p.ships_in_days_max} days` : null, `sold by ${p.seller_name ?? "Bingg Bongg"}`].filter(Boolean).join(" · ")}</div>
-      {streamerUserId && streamerUserId !== user?.id && <p style={{ color: "var(--gold)", fontSize: 12 }}>Buying from this Showcase supports the streamer — they earn a commission on this sale.</p>}
+      {streamerUserId && streamerUserId !== user?.id && <p style={{ color: "var(--gold)", fontSize: 12 }}>{t("buying_from_this_showcase_supports_the_s")}</p>}
       <p style={{ whiteSpace: "pre-wrap" }}>{p.description}</p>
       <div className="row" style={{ gap: 12, alignItems: "center" }}>
-        <span className="muted">Quantity</span>
+        <span className="muted">{t("quantity")}</span>
         <button type="button" className="btn small ghost" onClick={() => setQty((v) => Math.max(1, v - 1))}>−</button><b>{qty}</b><button type="button" className="btn small ghost" onClick={() => setQty((v) => Math.min(20, v + 1))}>+</button>
       </div>
       {isLoggedIn && (
         <div style={{ margin: "14px 0" }}>
-          <b>Ship to</b>
-          {addresses.length === 0 && <p className="muted" style={{ fontSize: 13 }}>No address yet — add one below.</p>}
+          <b>{t("ship_to")}</b>
+          {addresses.length === 0 && <p className="muted" style={{ fontSize: 13 }}>{t("no_address_yet_add_one_below")}</p>}
           {addresses.map((a) => <div key={a.id} style={{ padding: 6, cursor: "pointer", color: a.id === addressId ? "var(--gold)" : undefined }} onClick={() => setAddressId(a.id)}>{a.id === addressId ? "● " : "○ "}{addressLine(a)}</div>)}
-          <button type="button" className="btn small ghost" onClick={() => setShowForm((v) => !v)}>+ Add address</button>
+          <button type="button" className="btn small ghost" onClick={() => setShowForm((v) => !v)}>{t("add_address")}</button>
           {showForm && (
             <div style={{ display: "grid", gap: 6, marginTop: 8, maxWidth: 420 }}>
               {([["full_name", "Full name"], ["phone", "Phone"], ["line1", "Street address"], ["line2", "Apt, unit (optional)"], ["city", "City"], ["state", "State / province"], ["postal_code", "Postal code"], ["country_code", "Country code (US, PH, …)"]] as const).map(([k, label]) => (
                 <input key={k} className="input" placeholder={label} value={form[k]} onChange={(e) => setForm({ ...form, [k]: e.target.value })} />
               ))}
-              <button type="button" className="btn small" onClick={saveAddress}>Save address</button>
+              <button type="button" className="btn small" onClick={saveAddress}>{t("save_address_2")}</button>
             </div>
           )}
         </div>
@@ -273,10 +275,10 @@ export function ShopProductPage() {
       {status && <p style={{ color: "var(--gold)" }}>{status}</p>}
       <div className="row" style={{ gap: 8, marginTop: 10, flexWrap: "wrap" }}>
         <button type="button" className="btn" disabled={busy || p.in_stock === false} onClick={pay}>{p.in_stock === false ? "Sold out" : `Pay ${money(sub + ship)} with Stripe`}</button>
-        {isLoggedIn && user && streamerUserId !== user.id && <button type="button" className="btn ghost" onClick={() => addToShowcase(user.id, p.id).then((r) => setStatus(r.message ?? ""))}>Add to my Showcase</button>}
-        {isLoggedIn && user && p.samples_enabled && <button type="button" className="btn ghost" onClick={() => { const a = addresses.find((x) => x.is_default) ?? addresses[0]; if (!a) { setStatus("Add a shipping address first."); return; } const msg = prompt("Why you? (optional — your audience, what you'd show)") ?? ""; requestShopSample(user.id, p.id, a.id, msg).then((r) => setStatus(r.message ?? "")); }}>Request a free sample</button>}
+        {isLoggedIn && user && streamerUserId !== user.id && <button type="button" className="btn ghost" onClick={() => addToShowcase(user.id, p.id).then((r) => setStatus(r.message ?? ""))}>{t("add_to_my_showcase")}</button>}
+        {isLoggedIn && user && p.samples_enabled && <button type="button" className="btn ghost" onClick={() => { const a = addresses.find((x) => x.is_default) ?? addresses[0]; if (!a) { setStatus("Add a shipping address first."); return; } const msg = prompt("Why you? (optional — your audience, what you'd show)") ?? ""; requestShopSample(user.id, p.id, a.id, msg).then((r) => setStatus(r.message ?? "")); }}>{t("request_a_free_sample")}</button>}
       </div>
-      <p className="muted" style={{ fontSize: 12, marginTop: 10 }}>Paid securely on Stripe's own page. Bingg Bongg never sees your card number.</p>
+      <p className="muted" style={{ fontSize: 12, marginTop: 10 }}>{t("paid_securely_on_stripe_s_own_page_bingg")}</p>
     </div>
   );
 }

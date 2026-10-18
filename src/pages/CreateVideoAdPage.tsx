@@ -23,6 +23,7 @@ import {
   priceForTarget, sameTarget, splitMainMarkets, targetLabel, tierFor, totalMonthlyPrice,
   type AdPricingTier, type GeoLevel, type PendingTarget,
 } from "../lib/videoads";
+import { useT } from "../lib/i18n";
 
 /** countryStates.json rows. iso2 and state_code are both in the payload — UploadVideoPage just
  *  never needed them; the ad targeter does, to match tier country_code and look up cities. */
@@ -38,6 +39,7 @@ const pickerFieldStyle: React.CSSProperties = {
 const money = (n: number) => `$${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 export function CreateVideoAdPage() {
+  const { t } = useT();
   const { user, isLoggedIn } = useSession();
   const navigate = useNavigate();
 
@@ -114,7 +116,7 @@ export function CreateVideoAdPage() {
       setError(`You can target at most ${MAX_TARGETS_PER_AD} locations on one ad.`);
       return;
     }
-    if (targets.some((t) => sameTarget(t, next))) return; // already added — same as iOS, a silent no-op
+    if (targets.some((target) => sameTarget(target, next))) return; // already added — same as iOS, a silent no-op
     setTargets((prev) => [...prev, next]);
   }
 
@@ -202,7 +204,7 @@ export function CreateVideoAdPage() {
   }
 
   if (!isLoggedIn || !user) {
-    return <div className="page"><Notice>Sign in to open this page. <Link to="/login">Sign in</Link></Notice></div>;
+    return <div className="page"><Notice>Sign in to open this page. <Link to="/login">{t("sign_in")}</Link></Notice></div>;
   }
 
   const busy = stage != null;
@@ -210,7 +212,7 @@ export function CreateVideoAdPage() {
 
   return (
     <div className="page" style={{ maxWidth: 720 }}>
-      <h1 className="page-title">Create a Video Ad</h1>
+      <h1 className="page-title">{t("create_a_video_ad")}</h1>
 
       {tiers === null ? <Loading /> : (
         <>
@@ -230,7 +232,7 @@ export function CreateVideoAdPage() {
 
             {/* Tap-to-open fields, matching both apps: the list lives in a sheet with room to
                 breathe, not a short scroll window inside the form that cut the cards in half. */}
-            <label style={{ marginTop: 12 }}>Country</label>
+            <label style={{ marginTop: 12 }}>{t("battle_tab_country")}</label>
             <button className="input" style={pickerFieldStyle} onClick={() => setOpenSheet("country")}>
               <span style={{ color: countryName ? "var(--gold)" : "var(--text-dim)" }}>{countryName || "Tap to choose a country…"}</span>
               <span style={{ color: "var(--gold)" }}>▾</span>
@@ -268,12 +270,12 @@ export function CreateVideoAdPage() {
 
             {level === "city" && stateName && (
               <>
-                <label style={{ marginTop: 12 }}>City</label>
+                <label style={{ marginTop: 12 }}>{t("city")}</label>
                 {cities === null ? <Loading text="Loading cities…" />
                   : cities.length === 0 ? <p className="muted" style={{ fontSize: 12 }}>{citiesError ?? `No cities listed for ${stateName}.`}</p>
                   : (
                     <button className="input" style={pickerFieldStyle} onClick={() => setOpenSheet("city")}>
-                      <span style={{ color: "var(--text-dim)" }}>Tap to choose cities…</span>
+                      <span style={{ color: "var(--text-dim)" }}>{t("tap_to_choose_cities")}</span>
                       <span style={{ color: "var(--gold)" }}>▾</span>
                     </button>
                   )}
@@ -282,13 +284,13 @@ export function CreateVideoAdPage() {
 
             {targets.length > 0 && (
               <div style={{ marginTop: 14 }}>
-                {targets.map((t) => (
-                  <div key={targetLabel(t)} className="row" style={{ padding: "8px 0", borderTop: "1px solid var(--line)" }}>
+                {targets.map((target) => (
+                  <div key={targetLabel(target)} className="row" style={{ padding: "8px 0", borderTop: "1px solid var(--line)" }}>
                     <div style={{ flex: 1 }}>
-                      <div>{targetLabel(t)}</div>
-                      <div className="muted" style={{ fontSize: 12 }}>{money(priceForTarget(tiers, t))} / month</div>
+                      <div>{targetLabel(target)}</div>
+                      <div className="muted" style={{ fontSize: 12 }}>{money(priceForTarget(tiers, target))} / month</div>
                     </div>
-                    <button className="btn small ghost" onClick={() => setTargets((prev) => prev.filter((p) => !sameTarget(p, t)))}>Remove</button>
+                    <button className="btn small ghost" onClick={() => setTargets((prev) => prev.filter((p) => !sameTarget(p, target)))}>{t("remove")}</button>
                   </div>
                 ))}
                 <div style={{ borderTop: "1px solid var(--line)", paddingTop: 10, marginTop: 4, fontWeight: 800, color: "var(--gold)" }}>
@@ -308,8 +310,8 @@ export function CreateVideoAdPage() {
 
           {/* ---- Referral code ------------------------------------------------------------ */}
           <div className="card pad" style={{ marginBottom: 12 }}>
-            <label>Referral Code (optional)</label>
-            <input className="input" value={referralCode} onChange={(e) => setReferralCode(e.target.value)} placeholder="A member's referral code" />
+            <label>{t("referral_code_optional")}</label>
+            <input className="input" value={referralCode} onChange={(e) => setReferralCode(e.target.value)} placeholder={t("a_member_s_referral_code")} />
           </div>
 
           {/* ---- Video -------------------------------------------------------------------- */}
@@ -319,7 +321,7 @@ export function CreateVideoAdPage() {
               <input type="file" accept="video/*" className="input" disabled={busy} onChange={(e) => void onPickFile(e.target.files?.[0] ?? null)} />
             </div>
             {file && <p className="muted" style={{ fontSize: 12, marginTop: 6, marginBottom: 0 }}>{file.name}{duration != null ? ` · ${Math.round(duration)}s` : ""}</p>}
-            {prefilling && <div className="muted" style={{ fontSize: 13 }}>Bringing your video over…</div>}
+            {prefilling && <div className="muted" style={{ fontSize: 13 }}>{t("bringing_your_video_over")}</div>}
             {prefillError && <Notice error>{prefillError}</Notice>}
             {fileError && <Notice error>{fileError}</Notice>}
           </div>
@@ -337,7 +339,7 @@ export function CreateVideoAdPage() {
 
           {openSheet === "country" && (
             <PickerSheet
-              title="Country"
+              title={t("battle_tab_country")}
               noun="countries"
               items={otherCountries}
               pinned={mainMarkets}
@@ -350,7 +352,7 @@ export function CreateVideoAdPage() {
           )}
           {openSheet === "state" && (
             <PickerSheet
-              title="State"
+              title={t("state")}
               noun="states"
               items={states.map((st) => ({ code: st.state_code ?? st.name ?? "", name: st.name ?? "" }))}
               selected={states.find((st) => st.name === stateName)?.state_code ?? ""}
@@ -374,9 +376,9 @@ export function CreateVideoAdPage() {
           )}
 
           <div className="center">
-            <button className="btn" disabled={!canSubmit} onClick={() => void submit()}>Create Ad</button>
+            <button className="btn" disabled={!canSubmit} onClick={() => void submit()}>{t("create_ad_2")}</button>
             <div style={{ marginTop: 10 }}>
-              <Link className="btn ghost small" to="/settings/advertise">Cancel</Link>
+              <Link className="btn ghost small" to="/settings/advertise">{t("cancel")}</Link>
             </div>
           </div>
         </>

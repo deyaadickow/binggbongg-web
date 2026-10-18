@@ -7,6 +7,7 @@ import {
   applyShopAgent, fetchMyAgentEarnings, fetchMyAgentProducts, fetchMyAgentStatus, requestAgentEarningsPayout,
   type AgentEarnings, type AgentProduct, type AgentStatus,
 } from "../lib/sellerAgent";
+import { useT } from "../lib/i18n";
 
 // The agent's own portal (Steve, 2026-10-16): "I'm going to hire multiple agents so each agent
 // can bring us more items."
@@ -24,6 +25,7 @@ const STATUS_WORDS: Record<string, string> = {
 };
 
 export function AgentPage() {
+  const { t } = useT();
   const { user, isLoggedIn } = useSession();
   const myUserId = user?.id ?? 0;
 
@@ -58,7 +60,7 @@ export function AgentPage() {
   useEffect(() => { void reload(); }, [reload]);
 
   if (!isLoggedIn) {
-    return <div className="page"><h1 className="page-title">Become an agent</h1><Notice>Please sign in to apply.</Notice></div>;
+    return <div className="page"><h1 className="page-title">{t("become_an_agent")}</h1><Notice>{t("please_sign_in_to_apply")}</Notice></div>;
   }
   if (loading) return <div className="page"><Loading /></div>;
 
@@ -67,7 +69,7 @@ export function AgentPage() {
       <div className="row" style={{ alignItems: "center", gap: 12 }}>
         <h1 className="page-title" style={{ margin: 0 }}>{agent ? "Agent" : "Become an agent"}</h1>
         <span style={{ flex: 1 }} />
-        <Link to="/shop" className="btn ghost small">Back to the shop</Link>
+        <Link to="/shop" className="btn ghost small">{t("back_to_the_shop")}</Link>
       </div>
 
       {error && <Notice error>{error}</Notice>}
@@ -82,8 +84,8 @@ export function AgentPage() {
           <AgentHeader myUserId={myUserId} agent={agent} suppliers={suppliers} products={products?.length ?? 0} onError={setError} />
 
           <div className="row" style={{ gap: 8, margin: "16px 0", flexWrap: "wrap" }}>
-            <button type="button" className={tab === "products" ? "btn" : "btn ghost"} onClick={() => setTab("products")}>What I brought in</button>
-            <button type="button" className={tab === "earnings" ? "btn" : "btn ghost"} onClick={() => setTab("earnings")}>Earnings</button>
+            <button type="button" className={tab === "products" ? "btn" : "btn ghost"} onClick={() => setTab("products")}>{t("what_i_brought_in")}</button>
+            <button type="button" className={tab === "earnings" ? "btn" : "btn ghost"} onClick={() => setTab("earnings")}>{t("earnings")}</button>
           </div>
 
           {tab === "products" && <AgentProducts products={products} />}
@@ -110,6 +112,7 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 function AgentHeader({ myUserId, agent, suppliers, products, onError }: {
   myUserId: number; agent: AgentStatus; suppliers: number; products: number; onError: (m: string) => void;
 }) {
+  const { t } = useT();
   const [busy, setBusy] = useState(false);
   return (
     <div className="card" style={{ padding: 14 }}>
@@ -128,7 +131,7 @@ function AgentHeader({ myUserId, agent, suppliers, products, onError }: {
           )}
         </div>
         <div style={{ textAlign: "right" }}>
-          <div className="muted" style={{ fontSize: 12 }}>Your usual rate</div>
+          <div className="muted" style={{ fontSize: 12 }}>{t("your_usual_rate")}</div>
           {/* A null rate means no rate has been agreed, which is not the same as zero. Saying
               "0%" here would read as a settled deal that pays nothing. */}
           <div style={{ fontWeight: 800, fontSize: 20, color: agent.default_commission_rate === null ? undefined : "var(--gold)" }}>
@@ -138,14 +141,13 @@ function AgentHeader({ myUserId, agent, suppliers, products, onError }: {
       </div>
 
       {agent.default_commission_rate === null && (
-        <Notice>Your rate hasn't been set yet, so nothing is being earned. Ask Bingg Bongg to set it.</Notice>
+        <Notice>{t("your_rate_hasn_t_been_set_yet_so_nothing")}</Notice>
       )}
 
       {!agent.stripe_connected && (
         <div className="row" style={{ alignItems: "center", gap: 12, marginTop: 10, flexWrap: "wrap" }}>
           <div className="muted" style={{ flex: 1, minWidth: 220, fontSize: 13 }}>
-            Connect a bank account and we can pay you. You'll still earn before you do.
-          </div>
+            {t("connect_a_bank_account_and_we_can_pay_yo")}</div>
           <button
             type="button"
             className="btn"
@@ -160,8 +162,7 @@ function AgentHeader({ myUserId, agent, suppliers, products, onError }: {
               } catch (e) { onError((e as Error).message); setBusy(false); }
             }}
           >
-            Connect your bank account
-          </button>
+            {t("connect_your_bank_account")}</button>
         </div>
       )}
     </div>
@@ -169,6 +170,7 @@ function AgentHeader({ myUserId, agent, suppliers, products, onError }: {
 }
 
 function AgentApplication({ myUserId, onDone, onError }: { myUserId: number; onDone: (m: string) => void; onError: (m: string) => void }) {
+  const { t } = useT();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -190,20 +192,17 @@ function AgentApplication({ myUserId, onDone, onError }: { myUserId: number; onD
       }}
     >
       <p className="muted" style={{ margin: 0 }}>
-        Agents find suppliers and bring their products to Bingg Bongg. You don't hold stock and
-        you don't ship anything. You earn a share of every sale of the products you brought in,
-        for as long as they keep selling.
-      </p>
-      <Field label="Your name or company name">
+        {t("agents_find_suppliers_and_bring_their_pr")}</p>
+      <Field label={t("your_name_or_company_name")}>
         <input className="input" value={name} onChange={(e) => setName(e.target.value)} maxLength={120} required />
       </Field>
-      <Field label="Contact email">
+      <Field label={t("contact_email")}>
         <input className="input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={190} />
       </Field>
-      <Field label="Phone or WhatsApp">
+      <Field label={t("phone_or_whatsapp")}>
         <input className="input" value={phone} onChange={(e) => setPhone(e.target.value)} maxLength={40} />
       </Field>
-      <Field label="Country code" hint="Two letters, like PH or CN.">
+      <Field label={t("country_code")} hint="Two letters, like PH or CN.">
         <input className="input" value={country} onChange={(e) => setCountry(e.target.value.toUpperCase())} maxLength={2} style={{ textTransform: "uppercase" }} />
       </Field>
       <button type="submit" className="btn" disabled={busy || !name.trim()}>{busy ? "Sending…" : "Apply to be an agent"}</button>
@@ -212,9 +211,10 @@ function AgentApplication({ myUserId, onDone, onError }: { myUserId: number; onD
 }
 
 function AgentProducts({ products }: { products: AgentProduct[] | null }) {
+  const { t } = useT();
   if (products === null) return <Loading />;
   if (products.length === 0) {
-    return <Notice>Nothing yet. Once a supplier you signed up has products on the shop, they'll be listed here with what each one pays you.</Notice>;
+    return <Notice>{t("nothing_yet_once_a_supplier_you_signed_u")}</Notice>;
   }
 
   const sold = products.reduce((n, p) => n + (p.sold_count ?? 0), 0);
@@ -226,11 +226,11 @@ function AgentProducts({ products }: { products: AgentProduct[] | null }) {
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ textAlign: "left", borderBottom: "1px solid var(--gold-border)" }}>
-              <th style={{ padding: "8px 10px" }}>Product</th>
-              <th style={{ padding: "8px 10px" }}>Supplier</th>
-              <th style={{ padding: "8px 10px", textAlign: "right" }}>Price</th>
-              <th style={{ padding: "8px 10px", textAlign: "right" }}>Sold</th>
-              <th style={{ padding: "8px 10px", textAlign: "right" }}>You earn</th>
+              <th style={{ padding: "8px 10px" }}>{t("product")}</th>
+              <th style={{ padding: "8px 10px" }}>{t("supplier")}</th>
+              <th style={{ padding: "8px 10px", textAlign: "right" }}>{t("price")}</th>
+              <th style={{ padding: "8px 10px", textAlign: "right" }}>{t("sold")}</th>
+              <th style={{ padding: "8px 10px", textAlign: "right" }}>{t("you_earn")}</th>
             </tr>
           </thead>
           <tbody>
@@ -247,7 +247,7 @@ function AgentProducts({ products }: { products: AgentProduct[] | null }) {
                   {p.agent_rate > 0 ? `${p.agent_rate}%` : "—"}
                   {/* Worth saying which rate is in force: a product with its own rate is not
                       affected when the agent's usual rate changes. */}
-                  {p.agent_rate > 0 && p.rate_source === "product" && <div className="muted" style={{ fontSize: 11 }}>set for this product</div>}
+                  {p.agent_rate > 0 && p.rate_source === "product" && <div className="muted" style={{ fontSize: 11 }}>{t("set_for_this_product")}</div>}
                 </td>
               </tr>
             ))}
@@ -261,15 +261,16 @@ function AgentProducts({ products }: { products: AgentProduct[] | null }) {
 function AgentEarningsPanel({ myUserId, earnings, onChanged, onNotice, onError }: {
   myUserId: number; earnings: AgentEarnings | null; onChanged: () => void; onNotice: (m: string) => void; onError: (m: string) => void;
 }) {
+  const { t } = useT();
   const [busy, setBusy] = useState(false);
   if (earnings === null) return <Loading />;
 
   return (
     <>
       <div className="grid wide" style={{ marginBottom: 14 }}>
-        <Figure label="Still settling" value={money(earnings.pending_cents)} hint="Earned, but held until the buyer's return window closes." />
-        <Figure label="Ready to pay out" value={money(earnings.payable_cents)} gold />
-        <Figure label="Paid so far" value={money(earnings.paid_cents)} />
+        <Figure label={t("still_settling")} value={money(earnings.pending_cents)} hint="Earned, but held until the buyer's return window closes." />
+        <Figure label={t("ready_to_pay_out")} value={money(earnings.payable_cents)} gold />
+        <Figure label={t("paid_so_far")} value={money(earnings.paid_cents)} />
       </div>
 
       <div className="row" style={{ alignItems: "center", gap: 12, marginBottom: 16, flexWrap: "wrap" }}>
@@ -286,22 +287,22 @@ function AgentEarningsPanel({ myUserId, earnings, onChanged, onNotice, onError }
         >
           {busy ? "Requesting…" : "Request a payout"}
         </button>
-        {!earnings.payout_ready && <span className="muted" style={{ fontSize: 13 }}>Connect a bank account first.</span>}
-        {earnings.payout_ready && earnings.payable_cents <= 0 && <span className="muted" style={{ fontSize: 13 }}>Nothing is ready to pay out yet.</span>}
+        {!earnings.payout_ready && <span className="muted" style={{ fontSize: 13 }}>{t("connect_a_bank_account_first")}</span>}
+        {earnings.payout_ready && earnings.payable_cents <= 0 && <span className="muted" style={{ fontSize: 13 }}>{t("nothing_is_ready_to_pay_out_yet")}</span>}
       </div>
 
-      <h2 style={{ fontSize: 16, fontWeight: 800, margin: "0 0 8px" }}>Every sale</h2>
+      <h2 style={{ fontSize: 16, fontWeight: 800, margin: "0 0 8px" }}>{t("every_sale")}</h2>
       {earnings.commissions.length === 0 ? (
-        <Notice>No sales yet.</Notice>
+        <Notice>{t("no_sales_yet")}</Notice>
       ) : (
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ textAlign: "left", borderBottom: "1px solid var(--gold-border)" }}>
-                <th style={{ padding: "8px 10px" }}>Order</th>
-                <th style={{ padding: "8px 10px", textAlign: "right" }}>You earned</th>
-                <th style={{ padding: "8px 10px", textAlign: "right" }}>Rate</th>
-                <th style={{ padding: "8px 10px" }}>State</th>
+                <th style={{ padding: "8px 10px" }}>{t("order")}</th>
+                <th style={{ padding: "8px 10px", textAlign: "right" }}>{t("you_earned")}</th>
+                <th style={{ padding: "8px 10px", textAlign: "right" }}>{t("rate")}</th>
+                <th style={{ padding: "8px 10px" }}>{t("state")}</th>
               </tr>
             </thead>
             <tbody>
@@ -310,7 +311,7 @@ function AgentEarningsPanel({ myUserId, earnings, onChanged, onNotice, onError }
                   <td style={{ padding: "8px 10px" }}>
                     {c.order_number}
                     {c.kind === "referral" && (
-                      <div className="muted" style={{ fontSize: 11 }}>signing up the supplier</div>
+                      <div className="muted" style={{ fontSize: 11 }}>{t("signing_up_the_supplier")}</div>
                     )}
                   </td>
                   <td style={{ padding: "8px 10px", textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{money(c.amount_cents)}</td>
@@ -325,7 +326,7 @@ function AgentEarningsPanel({ myUserId, earnings, onChanged, onNotice, onError }
 
       {earnings.payouts.length > 0 && (
         <>
-          <h2 style={{ fontSize: 16, fontWeight: 800, margin: "18px 0 8px" }}>Payouts</h2>
+          <h2 style={{ fontSize: 16, fontWeight: 800, margin: "18px 0 8px" }}>{t("payouts")}</h2>
           <div style={{ display: "grid", gap: 8 }}>
             {earnings.payouts.map((p) => (
               <div key={p.id} className="card row" style={{ padding: 12, gap: 12, alignItems: "center" }}>
