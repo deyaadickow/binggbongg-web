@@ -120,7 +120,7 @@ export function BingoOverlay({ game, myUserId, isHost, strip, onBuy, onEndGame, 
             shows — nothing worth a strip. */}
         {strip.length > 1 && <div className="bingo-strip">{strip.map((node, i) => <div key={i}>{node}</div>)}</div>}
 
-        <div className="bingo-title">Bingo #{game.game_no}{active ? "" : " — finished"}</div>
+        <div className="bingo-title">{active ? t("bingo_number", game.game_no) : t("bingo_number_finished", game.game_no)}</div>
 
         {/* Always on screen, because a double-click spends this without asking. */}
         <div className="bingo-price">
@@ -204,19 +204,19 @@ export function BingoStartDialog({ defaultPrice, candidates, onStart, onClose }:
               </button>
             ))}
           </div>
-          {capWarning && <p className="muted" style={{ fontSize: 13 }}>Up to {MAX_OTHERS} others — four cards in all.</p>}
+          {capWarning && <p className="muted" style={{ fontSize: 13 }}>{t("up_to_n_others_four_cards", MAX_OTHERS)}</p>}
           <hr className="bingo-rule" />
         </>
       )}
 
-      <p className="soft" style={{ marginBottom: 4 }}>What every square on the card costs to gift. Minimum {BINGO_MIN}.</p>
+      <p className="soft" style={{ marginBottom: 4 }}>{t("square_cost_explainer", BINGO_MIN)}</p>
       <div className="bingo-stepper">
         <button className="btn ghost" onClick={() => setPrice(bingoClamp(price - BINGO_STEP))}>−</button>
         <div className="bingo-amount">{bingoFormat(price)}</div>
         <button className="btn ghost" onClick={() => setPrice(bingoClamp(price + BINGO_STEP))}>+</button>
       </div>
       <p className="muted" style={{ fontSize: 13, textAlign: "center" }}>
-        A whole card is {BINGO_PAYABLE_SQUARES} squares — {bingoFormat(price * BINGO_PAYABLE_SQUARES)} coins to fill.
+        {t("whole_card_is_n_squares", BINGO_PAYABLE_SQUARES, bingoFormat(price * BINGO_PAYABLE_SQUARES))}
       </p>
 
       <div className="bingo-quick">
@@ -288,7 +288,7 @@ export function BingoBoardOverlay({ onClose }: { onClose: () => void }) {
             <b>{g.winner_name ?? (g.status === "active" ? "Playing now" : "No whole card")}</b>
             <span className="muted">{bingoPlayedOn(g.played_at)}</span>
           </span>
-          <span className="bingo-row-wins">{g.wins_count} win{g.wins_count === 1 ? "" : "s"}</span>
+          <span className="bingo-row-wins">{t(g.wins_count === 1 ? "n_win" : "n_wins", g.wins_count)}</span>
           <span className="kind-go">›</span>
         </button>
       ))}
@@ -317,7 +317,8 @@ export function BingoWinnersOverlay({ bingoGameId, onClose }: { bingoGameId: num
     <Overlay title={`🎱 Bingo #${data?.game_no ?? ""}`} onClose={onClose} width={460}>
       {data && (
         <p className="soft" style={{ marginTop: 0 }}>
-          {bingoPlayedOn(data.played_at)} · {data.players} player{data.players === 1 ? "" : "s"} · {data.squares_gifted} squares gifted
+          {t(data.players === 1 ? "bingo_summary_one_player" : "bingo_summary_n_players",
+             bingoPlayedOn(data.played_at), data.players, data.squares_gifted)}
         </p>
       )}
       {!data && failed && <p className="soft">{t("couldn_t_load_this_game_try_again")}</p>}

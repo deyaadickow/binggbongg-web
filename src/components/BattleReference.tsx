@@ -53,7 +53,7 @@ function MemberRow({ rank, image, name, sub, value, valueLabel }: {
 // ---- 31 Day Battle Challenge ------------------------------------------------------------------
 
 export function Challenge31Overlay({ userId, onClose, onNotice }: { userId: number; onClose: () => void; onNotice: (m: string) => void }) {
-  const { t } = useT();
+  const { t, tn } = useT();
   const [status, setStatus] = useState<ChallengeStatus | null | "loading">("loading");
   const [busy, setBusy] = useState(false);
 
@@ -79,15 +79,15 @@ export function Challenge31Overlay({ userId, onClose, onNotice }: { userId: numb
   const tiers = (
     <div style={{ marginTop: 12 }}>
       <div className="muted" style={{ fontSize: 12, marginBottom: 6 }}>{t("daily_tiers")}</div>
-      {CHALLENGE_TIERS.map((t) => (
-        <div key={t.percent} className="row" style={{ justifyContent: "space-between", padding: "5px 0", fontSize: 13 }}>
-          <span>{t.battles === 3 ? "3 or more" : t.battles} qualifying battle{t.battles === 1 ? "" : "s"} in a day</span>
-          <b style={{ color: "var(--gold)" }}>{t.percent}%</b>
+      {CHALLENGE_TIERS.map((tier) => (
+        <div key={tier.percent} className="row" style={{ justifyContent: "space-between", padding: "5px 0", fontSize: 13 }}>
+          <span>{t(tier.battles === 1 ? "one_qualifying_battle_in_a_day" : "n_qualifying_battles_in_a_day",
+                   tier.battles === 3 ? t("three_or_more") : tier.battles)}</span>
+          <b style={{ color: "var(--gold)" }}>{t("n_percent", tier.percent)}</b>
         </div>
       ))}
       <p className="muted" style={{ fontSize: 12, marginTop: 8, marginBottom: 0 }}>
-        Your bonus for the whole 31 days is your <b>{t("lowest")}</b> day, not your average — one quiet day
-        sets the rate for all of it. Miss a day completely and the challenge restarts from day 1.
+        {tn("challenge_lowest_day_note", <b>{t("lowest")}</b>)}
       </p>
     </div>
   );
@@ -98,10 +98,10 @@ export function Challenge31Overlay({ userId, onClose, onNotice }: { userId: numb
         <>
           <div className="card pad" style={{ marginBottom: 10, textAlign: "center" }}>
             <div style={{ fontSize: 30, fontWeight: 800, color: "var(--gold)" }}>
-              Day {status.current_day_number} of 31
+              {t("day_n_of_31", status.current_day_number ?? 0)}
             </div>
             <div className="muted" style={{ fontSize: 13 }}>
-              {status.days_remaining} day{status.days_remaining === 1 ? "" : "s"} to go
+              {t(status.days_remaining === 1 ? "one_day_to_go" : "n_days_to_go", status.days_remaining ?? 0)}
             </div>
           </div>
 
@@ -109,7 +109,7 @@ export function Challenge31Overlay({ userId, onClose, onNotice }: { userId: numb
             <div className="card pad" style={{ flex: 1, textAlign: "center" }}>
               <div style={{ fontSize: 22, fontWeight: 800 }}>{status.today_battle_count ?? 0}</div>
               <div className="muted" style={{ fontSize: 12 }}>{t("battles_today")}</div>
-              <div style={{ color: "var(--gold)", fontWeight: 700, fontSize: 13 }}>{status.today_tier_percent ?? 0}% tier</div>
+              <div style={{ color: "var(--gold)", fontWeight: 700, fontSize: 13 }}>{t("n_percent_tier", status.today_tier_percent ?? 0)}</div>
             </div>
             <div className="card pad" style={{ flex: 1, textAlign: "center" }}>
               <div style={{ fontSize: 22, fontWeight: 800, color: "var(--gold)" }}>{status.running_lowest_tier_percent ?? 0}%</div>
@@ -132,8 +132,10 @@ export function Challenge31Overlay({ userId, onClose, onNotice }: { userId: numb
           )}
           {status?.just_completed && (
             <p style={{ color: "var(--gold)", fontSize: 14, marginTop: 0 }}>
-              You finished all 31 days at {status.last_challenge_final_tier_percent ?? 0}%
-              {status.last_challenge_final_bonus_amount != null && ` — $${Number(status.last_challenge_final_bonus_amount).toFixed(2)} bonus`}.
+              {status.last_challenge_final_bonus_amount != null
+                ? t("finished_31_days_at_with_bonus", status.last_challenge_final_tier_percent ?? 0,
+                    Number(status.last_challenge_final_bonus_amount).toFixed(2))
+                : t("finished_31_days_at", status.last_challenge_final_tier_percent ?? 0)}
             </p>
           )}
           <p className="soft" style={{ marginTop: 0 }}>
@@ -305,7 +307,7 @@ export function PunishmentsOverlay({ onClose }: { onClose: () => void }) {
         <>
           <button className="btn block" onClick={pickRandom} style={{ marginBottom: 10 }}>
             {t("pick_one_at_random")}</button>
-          <div className="muted" style={{ fontSize: 12, marginBottom: 6 }}>All {rows.length} suggestions</div>
+          <div className="muted" style={{ fontSize: 12, marginBottom: 6 }}>{t("all_n_suggestions", rows.length)}</div>
           {rows.map((r, i) => (
             <div key={i} style={{ padding: "8px 4px", borderBottom: "1px solid var(--line)", fontSize: 14 }}>{r}</div>
           ))}

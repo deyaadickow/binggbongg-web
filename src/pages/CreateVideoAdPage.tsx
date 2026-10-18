@@ -39,7 +39,7 @@ const pickerFieldStyle: React.CSSProperties = {
 const money = (n: number) => `$${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 export function CreateVideoAdPage() {
-  const { t } = useT();
+  const { t, tn } = useT();
   const { user, isLoggedIn } = useSession();
   const navigate = useNavigate();
 
@@ -204,7 +204,7 @@ export function CreateVideoAdPage() {
   }
 
   if (!isLoggedIn || !user) {
-    return <div className="page"><Notice>Sign in to open this page. <Link to="/login">{t("sign_in")}</Link></Notice></div>;
+    return <div className="page"><Notice>{tn("sign_in_to_open_this_page", <Link to="/login">{t("sign_in")}</Link>)}</Notice></div>;
   }
 
   const busy = stage != null;
@@ -218,7 +218,7 @@ export function CreateVideoAdPage() {
         <>
           {/* ---- Targets ------------------------------------------------------------------ */}
           <div className="card pad" style={{ marginBottom: 12 }}>
-            <b style={{ color: "var(--gold)" }}>Target Locations ({targets.length}/{MAX_TARGETS_PER_AD})</b>
+            <b style={{ color: "var(--gold)" }}>{t("target_locations_count", targets.length, MAX_TARGETS_PER_AD)}</b>
 
             <div className="row" style={{ gap: 8, marginTop: 10, flexWrap: "wrap" }}>
               {(["city", "state", "country"] as GeoLevel[]).map((l) => (
@@ -238,7 +238,7 @@ export function CreateVideoAdPage() {
               <span style={{ color: "var(--gold)" }}>▾</span>
             </button>
             {countryCode && levelPrice != null && (
-              <p className="muted" style={{ fontSize: 12, marginTop: 4 }}>{money(levelPrice)} / month per {level} in {countryName}.</p>
+              <p className="muted" style={{ fontSize: 12, marginTop: 4 }}>{t("price_per_level_in_country", money(levelPrice), level, countryName)}</p>
             )}
 
             {/* Country level adds straight from here, exactly as iOS does. */}
@@ -247,7 +247,7 @@ export function CreateVideoAdPage() {
                 className="btn"
                 style={{ marginTop: 10 }}
                 onClick={() => addTarget({ geo_level: "country", country_code: countryCode, country_name: countryName })}
-              >Add {countryName} as a target</button>
+              >{t("add_as_a_target", countryName)}</button>
             )}
 
             {level !== "country" && countryCode && (
@@ -265,7 +265,7 @@ export function CreateVideoAdPage() {
                 className="btn"
                 style={{ marginTop: 10 }}
                 onClick={() => addTarget({ geo_level: "state", country_code: countryCode, country_name: countryName, state_name: stateName })}
-              >Add {stateName} as a target</button>
+              >{t("add_as_a_target", stateName)}</button>
             )}
 
             {level === "city" && stateName && (
@@ -288,20 +288,21 @@ export function CreateVideoAdPage() {
                   <div key={targetLabel(target)} className="row" style={{ padding: "8px 0", borderTop: "1px solid var(--line)" }}>
                     <div style={{ flex: 1 }}>
                       <div>{targetLabel(target)}</div>
-                      <div className="muted" style={{ fontSize: 12 }}>{money(priceForTarget(tiers, target))} / month</div>
+                      <div className="muted" style={{ fontSize: 12 }}>{t("per_month_amount", money(priceForTarget(tiers, target)))}</div>
                     </div>
                     <button className="btn small ghost" onClick={() => setTargets((prev) => prev.filter((p) => !sameTarget(p, target)))}>{t("remove")}</button>
                   </div>
                 ))}
                 <div style={{ borderTop: "1px solid var(--line)", paddingTop: 10, marginTop: 4, fontWeight: 800, color: "var(--gold)" }}>
-                  Total: {money(total)} / month across {targets.length} location{targets.length === 1 ? "" : "s"}
+                  {t(targets.length === 1 ? "total_per_month_one_location" : "total_per_month_n_locations",
+                     money(total), targets.length)}
                 </div>
                 {balance != null && (
                   <p className="muted" style={{ fontSize: 12, marginTop: 4, marginBottom: 0 }}>
-                    Cash Account balance {money(balance)}.{" "}
+                    {t("cash_account_balance_amount", money(balance))}{" "}
                     {shortBy > 0
-                      ? <span style={{ color: "var(--red)" }}>You need {money(shortBy)} more — add money before creating this ad.</span>
-                      : "The first month is charged when you create the ad."}
+                      ? <span style={{ color: "var(--red)" }}>{t("you_need_more_add_money", money(shortBy))}</span>
+                      : t("first_month_charged_on_create")}
                   </p>
                 )}
               </div>
@@ -316,7 +317,7 @@ export function CreateVideoAdPage() {
 
           {/* ---- Video -------------------------------------------------------------------- */}
           <div className="card pad" style={{ marginBottom: 12 }}>
-            <b style={{ color: "var(--gold)" }}>Video (up to {MAX_AD_VIDEO_SECONDS} seconds)</b>
+            <b style={{ color: "var(--gold)" }}>{t("video_up_to_n_seconds", MAX_AD_VIDEO_SECONDS)}</b>
             <div style={{ marginTop: 10 }}>
               <input type="file" accept="video/*" className="input" disabled={busy} onChange={(e) => void onPickFile(e.target.files?.[0] ?? null)} />
             </div>
