@@ -7,6 +7,7 @@
 // He named it on the same day: the page is "CvC" wherever it is linked, and the heading inside
 // it is "Country VS Country".
 import { post } from "./api";
+import { tt } from "./i18n";
 
 export interface CvCRow {
   id: number;
@@ -90,7 +91,7 @@ export async function fetchCountryChallenges(): Promise<{ upcoming: CvCRow[]; co
 
 export async function fetchCountryChallenge(id: number): Promise<CvCDetail> {
   const r = await post<CvCDetail>("fetchCountryChallenge", { challenge_id: id });
-  if (!r.status || !r.data) throw new Error(r.message ?? "Couldn't load that battle.");
+  if (!r.status || !r.data) throw new Error(r.message ?? tt("couldn_t_load_that_battle"));
   return r.data;
 }
 

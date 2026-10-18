@@ -9,7 +9,7 @@ import { Link, useParams } from "react-router-dom";
 import { displayName, post, type UserSummary } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice } from "../components/Common";
-import { useT } from "../lib/i18n";
+import { tt, useT  } from "../lib/i18n";
 
 interface Supporter { user: UserSummary; total_coins: number; gift_count: number; last_gift_at?: string | null }
 interface SupportersData { total_coins: number; gift_count: number; supporter_count: number; supporters: Supporter[] }
@@ -81,8 +81,8 @@ export function SupportersPage() {
     if (!user) return;
     setLoading(true);
     post<SupportersData>("fetchMySupporters", { my_user_id: user.id, start: 0, count: 200 })
-      .then((r) => { if (r.status && r.data) setData(r.data); else setError(r.message ?? "Couldn't load your supporters."); })
-      .catch(() => setError("Couldn't load your supporters."))
+      .then((r) => { if (r.status && r.data) setData(r.data); else setError(r.message ?? tt("couldn_t_load_your_supporters")); })
+      .catch(() => setError(tt("couldn_t_load_your_supporters")))
       .finally(() => setLoading(false));
   }, [user]);
 
@@ -143,8 +143,8 @@ export function SupporterBreakdownPage() {
     if (!user || !id) return;
     setLoading(true);
     post<BreakdownData>("fetchSupporterGiftBreakdown", { my_user_id: user.id, supporter_user_id: Number(id), period })
-      .then((r) => { if (r.status && r.data) setData(r.data); else setError(r.message ?? "Couldn't load this breakdown."); })
-      .catch(() => setError("Couldn't load this breakdown."))
+      .then((r) => { if (r.status && r.data) setData(r.data); else setError(r.message ?? tt("couldn_t_load_this_breakdown")); })
+      .catch(() => setError(tt("couldn_t_load_this_breakdown")))
       .finally(() => setLoading(false));
   }, [user, id, period]);
 

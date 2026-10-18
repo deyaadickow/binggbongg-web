@@ -5,6 +5,7 @@
 // Battle Contest — host_user_id is the only field that distinguishes the two, which is why the
 // standings call below is the shared contest one rather than anything solo-specific.
 import { post } from "./api";
+import { tt } from "./i18n";
 
 export interface SoloBattle {
   id: number;
@@ -31,13 +32,13 @@ export interface StandingRow {
 
 export async function startSoloBattle(hostUserId: number): Promise<SoloBattle> {
   const res = await post<SoloBattle>("startSoloBattle", { host_user_id: hostUserId });
-  if (!res.status || !res.data) throw new Error(res.message ?? "Couldn't start a Solo Battle With Unlimited Players.");
+  if (!res.status || !res.data) throw new Error(res.message ?? tt("couldn_t_start_a_solo_battle_with_unlimi"));
   return res.data;
 }
 
 export async function joinSoloBattle(contestId: number, userId: number): Promise<SoloBattle> {
   const res = await post<SoloBattle>("joinSoloBattle", { contest_id: contestId, user_id: userId });
-  if (!res.status || !res.data) throw new Error(res.message ?? "Couldn't join that Solo Battle With Unlimited Players.");
+  if (!res.status || !res.data) throw new Error(res.message ?? tt("couldn_t_join_that_solo_battle_with_unli"));
   return res.data;
 }
 

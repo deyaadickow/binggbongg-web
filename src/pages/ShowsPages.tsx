@@ -14,7 +14,7 @@ import {
   applyForShow, cancelShow, fetchMyShow, fetchShows, startShow,
   type MyShowResponse, type ShowListing, type ShowOffer,
 } from "../lib/shows";
-import { useT } from "../lib/i18n";
+import { tt, useT  } from "../lib/i18n";
 
 const money = (v: number) => "$" + Number(v ?? 0).toFixed(2);
 
@@ -39,7 +39,7 @@ export function ShowsPage() {
     const t = setTimeout(() => {
       fetchShows(query.trim())
         .then((r) => { if (live) { setRows(r.rows); if (r.offer) setOffer(r.offer); setError(""); } })
-        .catch(() => { if (live) { setRows([]); setError("Couldn't load the shows."); } });
+        .catch(() => { if (live) { setRows([]); setError(tt("couldn_t_load_the_shows")); } });
     }, query ? 350 : 0);
     return () => { live = false; clearTimeout(t); };
   }, [query]);
@@ -161,7 +161,7 @@ export function MyShowPage() {
     let live = true;
     fetchMyShow(userId)
       .then((r) => { if (live) setData(r); })
-      .catch(() => { if (live) setError("Couldn't load your show."); });
+      .catch(() => { if (live) setError(tt("couldn_t_load_your_show")); });
     // Keyed on the id, not the user object: a session object that is replaced on every gift
     // would re-run this and wipe what is on screen.
   }, [userId]);

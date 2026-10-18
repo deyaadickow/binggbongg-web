@@ -1,6 +1,7 @@
 import { currentAuthHeaders, post } from "./api";
 import { API_BASE, uploadErrorMessage } from "./upload";
 import type { ShopProduct, ShopOrder, ShopSampleRequest } from "./shop";
+import { tt } from "./i18n";
 
 // The two business-side roles in the Bingg Bongg Shop, mirroring ShopController.php.
 //
@@ -29,7 +30,7 @@ export async function fetchMySellerStatus(myUserId: number): Promise<{ seller: S
 
 export async function applyShopSeller(myUserId: number, f: { name: string; contact_email: string; country_code: string }) {
   const r = await post("applyShopSeller", { my_user_id: myUserId, ...f });
-  if (!r.status) throw new Error(r.message ?? "Couldn't send that application.");
+  if (!r.status) throw new Error(r.message ?? tt("couldn_t_send_that_application"));
   return r.message ?? "Application received.";
 }
 
@@ -83,7 +84,7 @@ export async function fetchSellerOrders(myUserId: number): Promise<ShopOrder[]> 
 
 export async function shipSellerOrder(myUserId: number, orderNumber: string, f: { tracking_number: string; carrier: string; tracking_url: string }) {
   const r = await post("shipSellerOrder", { my_user_id: myUserId, order_number: orderNumber, ...f });
-  if (!r.status) throw new Error(r.message ?? "Couldn't mark that as shipped.");
+  if (!r.status) throw new Error(r.message ?? tt("couldn_t_mark_that_as_shipped"));
   return r.message ?? "Marked as shipped.";
 }
 
@@ -94,7 +95,7 @@ export async function fetchSellerSampleRequests(myUserId: number): Promise<ShopS
 
 export async function respondSellerSampleRequest(myUserId: number, id: number, action: "approve" | "decline", reason = "") {
   const r = await post("respondSellerSampleRequest", { my_user_id: myUserId, id, action, reason });
-  if (!r.status) throw new Error(r.message ?? "Couldn't send that.");
+  if (!r.status) throw new Error(r.message ?? tt("couldn_t_send_that"));
   return r.message ?? "Sent.";
 }
 
@@ -167,25 +168,25 @@ export async function fetchMyAgentStatus(myUserId: number): Promise<AgentStatus 
 
 export async function applyShopAgent(myUserId: number, f: { name: string; contact_email: string; phone: string; country_code: string }) {
   const r = await post<AgentStatus>("applyShopAgent", { my_user_id: myUserId, ...f });
-  if (!r.status) throw new Error(r.message ?? "Couldn't send that application.");
+  if (!r.status) throw new Error(r.message ?? tt("couldn_t_send_that_application"));
   return { message: r.message ?? "Application received.", agent: (r.data as AgentStatus | null) ?? null };
 }
 
 export async function fetchMyAgentProducts(myUserId: number): Promise<{ suppliers: number; products: AgentProduct[] }> {
   const r = await post<{ suppliers_count: number; products_count: number; products: AgentProduct[] }>("fetchMyAgentProducts", { my_user_id: myUserId });
-  if (!r.status) throw new Error(r.message ?? "Couldn't load your products.");
+  if (!r.status) throw new Error(r.message ?? tt("couldn_t_load_your_products"));
   return { suppliers: r.data?.suppliers_count ?? 0, products: r.data?.products ?? [] };
 }
 
 export async function fetchMyAgentEarnings(myUserId: number): Promise<AgentEarnings> {
   const r = await post<AgentEarnings>("fetchMyAgentEarnings", { my_user_id: myUserId });
-  if (!r.status) throw new Error(r.message ?? "Couldn't load your earnings.");
+  if (!r.status) throw new Error(r.message ?? tt("couldn_t_load_your_earnings"));
   return r.data as AgentEarnings;
 }
 
 export async function requestAgentEarningsPayout(myUserId: number) {
   const r = await post("requestAgentEarningsPayout", { my_user_id: myUserId });
-  if (!r.status) throw new Error(r.message ?? "Couldn't request that payout.");
+  if (!r.status) throw new Error(r.message ?? tt("couldn_t_request_that_payout"));
   return r.message ?? "Payout requested.";
 }
 

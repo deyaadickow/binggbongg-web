@@ -86,6 +86,6 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
 export function useSession(): Session {
   const ctx = useContext(SessionContext);
-  if (!ctx) throw new Error("useSession outside SessionProvider");
+  if (!ctx) throw new Error(/* i18n-exempt: a programming error, never shown to a member. */ "useSession outside SessionProvider");
   return ctx;
 }

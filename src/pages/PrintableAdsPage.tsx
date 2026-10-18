@@ -4,7 +4,7 @@ import { mediaUrl, post } from "../lib/api";
 import { useSession } from "../lib/session";
 import { fetchMyBusinesses, uploadFlyerAsset, saveBusinessFlyer, type Business } from "../lib/business";
 import { Loading } from "../components/Common";
-import { useT } from "../lib/i18n";
+import { tt, useT  } from "../lib/i18n";
 
 /**
  * Steve, 2026-10-04: "add a page called 'Create Your Own Ads' where admin can add a flyer that
@@ -178,7 +178,7 @@ function FlyerEditor({ flyer, onBack, startWithAssistantFor }: { flyer: Printabl
         ...o.filter((x) => !(x.kind === "image" && x.video)),
         { id: Date.now(), kind: "image", url: c.toDataURL("image/png"), cx: 0.5, cy: 0.5, size: 0.4, video: file },
       ]);
-      setNotice("A printed page can't play a video, so its opening picture went on the flyer. Put the flyer on your business page and visitors can click it to watch.");
+      setNotice(tt("a_printed_page_can_t_play_a_video_so_its"));
       return;
     }
 
@@ -223,7 +223,7 @@ function FlyerEditor({ flyer, onBack, startWithAssistantFor }: { flyer: Printabl
       setAskOpen(false);
       setNotice(body.message || "Your ad is ready. Drag anything to move it.");
     } catch {
-      setNotice("Couldn't make your ad just now. Please try again.");
+      setNotice(tt("couldn_t_make_your_ad_just_now_please_tr"));
     } finally {
       setClaudeBusy(false);
     }
@@ -374,11 +374,11 @@ function FlyerEditor({ flyer, onBack, startWithAssistantFor }: { flyer: Printabl
     try {
       pages = (await fetchMyBusinesses(user.id)).data;
     } catch {
-      setNotice("Couldn't load your business pages.");
+      setNotice(tt("couldn_t_load_your_business_pages"));
       return;
     }
     if (pages.length === 0) {
-      setNotice("You don't have a business page yet. Create one from Bingg Bongg Business.");
+      setNotice(tt("no_business_page_yet"));
       return;
     }
 
@@ -390,7 +390,7 @@ function FlyerEditor({ flyer, onBack, startWithAssistantFor }: { flyer: Printabl
     if (!choice) return;
 
     const rendered = await renderPage();
-    if (!rendered) { setNotice("Couldn't read the flyer."); return; }
+    if (!rendered) { setNotice(tt("couldn_t_read_the_flyer")); return; }
 
     setPublishing("Uploading the flyer…");
     try {

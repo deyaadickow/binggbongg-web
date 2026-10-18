@@ -25,7 +25,7 @@ import {
   fetchBusinessFlyers, deleteBusinessFlyer, type BusinessFlyer
 } from "../lib/business";
 import { showGoldAlert } from "../components/GoldToast";
-import { useT } from "../lib/i18n";
+import { tt, useT  } from "../lib/i18n";
 
 // Steve, 2026-10-01: "Make the countries into our design" — the native <select> is gone; every
 // dropdown is the black/gold searchable PickerSheet the Create Ad page uses, opened from a pill.
@@ -134,10 +134,10 @@ export function BusinessTabPage() {
       </form>
 
       <div className="row" style={{ gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
-        <PickerPill label={countryCode ? (countries.find((c) => c.iso2 === countryCode)?.name ?? countryCode) : "Country"} active={!!countryCode} onClick={() => setSheet("country")} />
+        <PickerPill label={countryCode ? (countries.find((c) => c.iso2 === countryCode)?.name ?? countryCode) : t("country")} active={!!countryCode} onClick={() => setSheet("country")} />
         {countryCode && <PickerPill label={stateCode ? (states.find((s) => s.state_code === stateCode)?.name ?? stateCode) : "State"} active={!!stateCode} onClick={() => setSheet("state")} />}
         {stateCode && <PickerPill label={city || "City"} active={!!city} onClick={() => setSheet("city")} />}
-        <PickerPill label={categoryId ? (categories.find((c) => c.id === categoryId)?.name ?? "Category") : "Category"} active={!!categoryId} onClick={() => setSheet("category")} />
+        <PickerPill label={categoryId ? (categories.find((c) => c.id === categoryId)?.name ?? t("category")) : t("category")} active={!!categoryId} onClick={() => setSheet("category")} />
         {(countryCode || categoryId || q) && <button className="btn small ghost" onClick={() => { setCountryCode(""); setStateCode(""); setCity(""); setCategoryId(0); setQ(""); setQuery(""); }}>{t("clear")}</button>}
       </div>
       {sheet === "country" && <PickerSheet title={t("battle_tab_country")} noun="countries" items={splitMain(countries).rest} pinned={splitMain(countries).main} pinnedLabel={t("main_markets")} restLabel={t("all_countries")} selected={countryCode} onPick={(code) => { setCountryCode(code); setStateCode(""); setCity(""); }} onClose={() => setSheet(null)} />}
@@ -622,10 +622,10 @@ export function CreateBusinessPage() {
     e.preventDefault();
     if (!user) return;
     setError(null);
-    if (!form.name.trim()) return setError("Give your business a name.");
-    if (!form.category_id) return setError("Choose a category.");
-    if (!form.country_code) return setError("Choose a country.");
-    if (!editingId && !banner) return setError("Choose a banner image.");
+    if (!form.name.trim()) return setError(tt("give_your_business_a_name"));
+    if (!form.category_id) return setError(tt("choose_a_category_2"));
+    if (!form.country_code) return setError(tt("choose_a_country"));
+    if (!editingId && !banner) return setError(tt("choose_a_banner_image"));
     setBusy(true);
     try {
       const b = editingId ? await updateBusiness(user.id, editingId, form, banner, setProgress) : await createBusiness(user.id, form, banner!, setProgress);
@@ -652,7 +652,7 @@ export function CreateBusinessPage() {
         <div className="card pad" style={{ display: "grid", gap: 8 }}>
           <b style={{ color: "var(--gold)" }}>{t("business")}</b>
           <input className="input" placeholder={t("business_name")} value={form.name} onChange={(e) => set("name", e.target.value)} required />
-          <div><PickerPill label={form.category_id ? (categories.find((c) => c.id === form.category_id)?.name ?? "Category") : "Category"} active={!!form.category_id} onClick={() => setSheet("category")} /></div>
+          <div><PickerPill label={form.category_id ? (categories.find((c) => c.id === form.category_id)?.name ?? t("category")) : t("category")} active={!!form.category_id} onClick={() => setSheet("category")} /></div>
           <textarea className="input" rows={4} placeholder={t("describe_your_business")} value={form.description} onChange={(e) => set("description", e.target.value)} />
           <input className="input" placeholder={t("phone")} value={form.phone} onChange={(e) => set("phone", e.target.value)} />
           <input className="input" placeholder={t("email")} type="email" value={form.email} onChange={(e) => set("email", e.target.value)} />
@@ -664,7 +664,7 @@ export function CreateBusinessPage() {
           <div className="muted" style={{ fontSize: 12 }}>{t("people_find_you_by_country_state_and_cit")}</div>
           <label className="row" style={{ gap: 8 }}><input type="checkbox" checked={form.is_online} onChange={(e) => set("is_online", e.target.checked)} /> {t("online_service")}</label>
           <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
-            <PickerPill label={form.country_code ? (countries.find((c) => c.iso2 === form.country_code)?.name ?? form.country_code) : "Country"} active={!!form.country_code} onClick={() => setSheet("country")} />
+            <PickerPill label={form.country_code ? (countries.find((c) => c.iso2 === form.country_code)?.name ?? form.country_code) : t("country")} active={!!form.country_code} onClick={() => setSheet("country")} />
             {form.country_code && <PickerPill label={form.state_code ? (states.find((s) => s.state_code === form.state_code)?.name ?? form.state_code) : "State"} active={!!form.state_code} onClick={() => setSheet("state")} />}
             {form.state_code && <PickerPill label={form.city || "City"} active={!!form.city} onClick={() => setSheet("city")} />}
           </div>
@@ -676,10 +676,10 @@ export function CreateBusinessPage() {
           {/* Steve, 2026-10-04: the easiest pin of all — the owner is at the shop and taps this.
               The browser asks for permission itself; no key or library involved. */}
           <button type="button" className="btn small" onClick={() => {
-            if (!navigator.geolocation) { showGoldAlert("This browser can't find your location. Paste a map link instead."); return; }
+            if (!navigator.geolocation) { showGoldAlert(tt("this_browser_can_t_find_your_location_pa")); return; }
             navigator.geolocation.getCurrentPosition(
               (position) => set("pin", `${position.coords.latitude.toFixed(6)},${position.coords.longitude.toFixed(6)}`),
-              () => showGoldAlert("Couldn't find you just now. Try again, or paste a map link.")
+              () => showGoldAlert(tt("couldn_t_find_you_just_now_try_again_or"))
             );
           }}>{t("use_my_current_location")}</button>
         </div>

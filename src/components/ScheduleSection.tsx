@@ -5,7 +5,7 @@ import {
   formatScheduleTime, localInputToUtc, respondToBattleRequest, sendBattleRequest,
   type BattleRequestItem, type ScheduleItem, type ScheduleKind,
 } from "../lib/api";
-import { useT } from "../lib/i18n";
+import { tt, useT  } from "../lib/i18n";
 
 /**
  * "My Live/Battle Schedule" — Steve, 2026-10-06.
@@ -45,7 +45,7 @@ export function ScheduleSection({ profileId, myId }: { profileId: number; myId?:
         setIncoming(inc);
       }
     } catch {
-      setNotice("Could not load the schedule.");
+      setNotice(tt("could_not_load_the_schedule"));
     } finally {
       setLoading(false);
     }
@@ -63,7 +63,7 @@ export function ScheduleSection({ profileId, myId }: { profileId: number; myId?:
         battleType: kind === "battle" ? battleType : undefined,
         note: note.trim() || undefined,
       });
-      if (res.status === false) { setNotice(res.message ?? "Could not add that."); return; }
+      if (res.status === false) { setNotice(res.message ?? tt("could_not_add_that")); return; }
       setShowAdd(false); setWhen(""); setNote("");
       await reload();
     } finally { setBusy(false); }

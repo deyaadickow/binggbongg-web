@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { post, type UserSummary } from "../lib/api";
 import { Avatar } from "./Common";
 import { Overlay, personName, type Person } from "./BattleEngines";
-import { useT } from "../lib/i18n";
+import { tt, useT  } from "../lib/i18n";
 
 export interface CurrentPlayer extends Person { game_emoji?: string | null; game_name?: string | null }
 
@@ -34,7 +34,7 @@ export async function fetchOnlineFollowingPeople(myUserId: number, search?: stri
 
 export async function inviteToLive(myUserId: number, roomName: string, inviteUserId: number): Promise<string> {
   const res = await post<unknown>("inviteToLive", { user_id: myUserId, room_name: roomName, invite_user_id: inviteUserId });
-  if (!res.status) throw new Error(res.message ?? "Couldn't send that invite.");
+  if (!res.status) throw new Error(res.message ?? tt("couldn_t_send_that_invite"));
   return res.message ?? "Invited.";
 }
 

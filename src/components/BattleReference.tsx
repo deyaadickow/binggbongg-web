@@ -12,7 +12,7 @@ import {
   type ChallengeStatus, type LifetimeRow, type PkContest, type StandingRow,
 } from "../lib/challenges";
 import { Overlay } from "./BattleEngines";
-import { useT } from "../lib/i18n";
+import { tt, useT  } from "../lib/i18n";
 
 function Loading() {
   const { t } = useT();
@@ -67,7 +67,7 @@ export function Challenge31Overlay({ userId, onClose, onNotice }: { userId: numb
     setBusy(true);
     try {
       await startChallenge(userId);
-      onNotice("You're on day 1 of 31. Battle at least once today to keep it alive.");
+      onNotice(tt("you_re_on_day_1_of_31_battle_at_least_on"));
       load();
     } catch (e) {
       onNotice((e as Error).message);

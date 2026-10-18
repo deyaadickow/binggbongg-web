@@ -6,6 +6,7 @@
 // posts real multipart parts rather than the pre-signed-URL keys uploadPost uses.
 import { API_BASE, currentAuthHeaders, post } from "./api";
 import { uploadErrorMessage } from "./upload";
+import { tt } from "./i18n";
 
 /** Mirrors iOS's AdVideoValidator.maxDurationSeconds and the backend's own expectation. */
 export const MAX_AD_VIDEO_SECONDS = 60;
@@ -59,7 +60,7 @@ export async function fetchAdPricingTiers(): Promise<AdPricingTier[]> {
   // { x: 1 }, not {} — an empty-body POST is rejected by the host WAF with a 403 (see the
   // empty-body WAF fix); every other no-argument call in this app carries the same filler.
   const r = await post<AdPricingTier[]>("fetchAdPricingTiers", { x: 1 });
-  if (!r.status) throw new Error(r.message ?? "Couldn't load ad pricing.");
+  if (!r.status) throw new Error(r.message ?? tt("couldn_t_load_ad_pricing"));
   return (r.data ?? []).map((t) => ({
     ...t,
     advertiser_monthly_price: Number(t.advertiser_monthly_price),
@@ -71,7 +72,7 @@ export async function fetchAdPricingTiers(): Promise<AdPricingTier[]> {
  *  the target row. Unknown combinations come back as an empty list, not an error. */
 export async function fetchCitiesForState(countryCode: string, stateCode: string): Promise<string[]> {
   const r = await post<string[]>("fetchCitiesForState", { country_code: countryCode, state_code: stateCode });
-  if (!r.status) throw new Error(r.message ?? "Couldn't load cities for that state.");
+  if (!r.status) throw new Error(r.message ?? tt("couldn_t_load_cities_for_that_state"));
   return r.data ?? [];
 }
 
@@ -146,7 +147,7 @@ export function createVideoAd(args: {
       // review and a bad referral code are all things the member can act on.
       else reject(new Error(uploadErrorMessage(xhr.status, body.message)));
     };
-    xhr.onerror = () => reject(new Error("Network error while uploading your ad."));
+    xhr.onerror = () => reject(new Error(tt("network_error_while_uploading_your_ad")));
     xhr.send(form);
   });
 }

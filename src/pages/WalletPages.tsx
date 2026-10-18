@@ -11,7 +11,7 @@ import { useToast } from "../components/GoldToast";
 import { PostCard } from "../components/PostCard";
 import { GoldSelect } from "../components/GoldSelect";
 import { downloadStatement, printStatement, type StatementDoc } from "../lib/statementDoc";
-import { useT, type StringKey } from "../lib/i18n";
+import { tt, useT, type StringKey  } from "../lib/i18n";
 
 const money = (v: unknown, sym = "$") => `${sym}${Number(v ?? 0).toFixed(2)}`;
 
@@ -122,7 +122,7 @@ function MoveToCashAccount({ userId, onMoved, cashAccount, setCashAccount }: {
       );
       // The server's own message carries the real figures when it refuses — most often that
       // the earnings don't cover it — so it has to reach the member word for word.
-      if (!r.status) throw new Error(r.message ?? "Couldn't move that.");
+      if (!r.status) throw new Error(r.message ?? tt("couldn_t_move_that"));
       setNote(r.message ?? "Moved.");
       setAmount("");
       if (r.data?.cash_account !== undefined) setCashAccount(Number(r.data.cash_account));
@@ -235,19 +235,19 @@ export function RedeemPage() {
     setBusy(true);
     try {
       const r = await post("saveWisePayoutProfile", { user_id: user!.id, ...wf });
-      if (!r.status) throw new Error(r.message ?? "Couldn't save your Wise details.");
-      setToast("Wise details saved."); setEditWise(false); loadWise();
+      if (!r.status) throw new Error(r.message ?? tt("couldn_t_save_your_wise_details"));
+      setToast(tt("wise_details_saved_2")); setEditWise(false); loadWise();
     } catch (e) { setToast((e as Error).message); } finally { setBusy(false); }
   }
   async function redeem() {
     const cash = Number(amount);
-    if (!cash || cash <= 0) { setToast("Enter the amount to withdraw."); return; }
+    if (!cash || cash <= 0) { setToast(tt("enter_the_amount_to_withdraw")); return; }
     if (gateway !== "Wise" && !account.trim()) { setToast(`Enter your ${pretty(gateway)} account (email or mobile).`); return; }
     setBusy(true);
     try {
       const r = await post("submitRedeem", { user_id: user!.id, gateway, account: gateway === "Wise" ? "wise" : account.trim(), cash_amount: cash });
-      if (!r.status) throw new Error(r.message ?? "Couldn't submit the request.");
-      setToast("Withdrawal requested. You'll see it in Payout history."); setAmount(""); refresh();
+      if (!r.status) throw new Error(r.message ?? tt("couldn_t_submit_the_request"));
+      setToast(tt("withdrawal_requested_you_ll_see_it_in_pa")); setAmount(""); refresh();
     } catch (e) { setToast((e as Error).message); } finally { setBusy(false); }
   }
   return (

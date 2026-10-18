@@ -6,7 +6,7 @@ import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice } from "../components/Common";
 import { GiftFlash, PostGiftButton } from "../components/GiftSheet";
 import { appendToFeed, fetchMoreFeed, getFeed } from "../lib/feed";
-import { useT } from "../lib/i18n";
+import { tt, useT  } from "../lib/i18n";
 
 const AUTO_KEY = "bb.autoplayNext";
 
@@ -52,7 +52,7 @@ export function VideoPage() {
       try {
         const res = await post<Post | Post[]>("fetchPostById", { post_id: id, ...(user ? { my_user_id: user.id, user_id: user.id } : {}) });
         const data = Array.isArray(res.data) ? res.data[0] : res.data;
-        if (!res.status || !data) throw new Error(res.message ?? "That video isn't available.");
+        if (!res.status || !data) throw new Error(res.message ?? tt("that_video_isn_t_available"));
         setItem(data);
         setLiked(!!data.is_post_liked);
         if (!fromFeed) setFeedState(appendToFeed([data]));

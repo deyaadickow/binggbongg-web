@@ -13,7 +13,7 @@ import {
 } from "../lib/photos";
 import { Loading, Notice } from "../components/Common";
 import { GoldSelect } from "../components/GoldSelect";
-import { useT } from "../lib/i18n";
+import { tt, useT  } from "../lib/i18n";
 
 export function UploadPhotosPage() {
   const { t } = useT();
@@ -53,7 +53,7 @@ export function UploadPhotosPage() {
     try {
       await createFolder(user.id, newFolder.trim());
       setNewFolder("");
-      setToast("Folder created.");
+      setToast(tt("folder_created"));
       load();
     } catch (e) {
       setError((e as Error).message);
@@ -64,7 +64,7 @@ export function UploadPhotosPage() {
 
   async function uploadAll() {
     if (!user || !queue.length || busy) return;
-    if (!folderId) { setError("Pick a folder first."); return; }
+    if (!folderId) { setError(tt("pick_a_folder_first")); return; }
     setBusy(true);
     setError("");
     setDoneCount(0);

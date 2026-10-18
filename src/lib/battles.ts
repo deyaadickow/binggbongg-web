@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { post } from "./api";
 import { parseServerDate, type BoxingWindow } from "./battle";
+import { tt } from "./i18n";
 
 const STATUS_POLL_MS = 3000;
 const INVITE_POLL_MS = 4000;
@@ -143,17 +144,17 @@ export interface VirtualMember { user_id: number; fullname?: string | null; user
 
 export async function startVirtualBattle(myUserId: number, roomName: string, participantUserIds: number[]): Promise<VirtualBattleData> {
   const res = await post<VirtualBattleData>("startVirtualBattle", { my_user_id: myUserId, room_name: roomName, participant_user_ids: participantUserIds.join(",") });
-  if (!res.status || !res.data) throw new Error(res.message ?? "Couldn't start the Virtual Battle.");
+  if (!res.status || !res.data) throw new Error(res.message ?? tt("couldn_t_start_the_virtual_battle"));
   return res.data;
 }
 export async function fetchVirtualGiftRecord(myUserId: number, battleId: number): Promise<VirtualGiftRecord> {
   const res = await post<VirtualGiftRecord>("fetchVirtualBattleGiftRecord", { my_user_id: myUserId, virtual_battle_id: battleId });
-  if (!res.status || !res.data) throw new Error(res.message ?? "Couldn't load this battle's gifts.");
+  if (!res.status || !res.data) throw new Error(res.message ?? tt("couldn_t_load_this_battle_s_gifts"));
   return res.data;
 }
 export async function sendVirtualThankYou(myUserId: number, battleId: number, toUserIds: (number | "all")[], message: string): Promise<string> {
   const res = await post("sendVirtualBattleThankYou", { my_user_id: myUserId, virtual_battle_id: battleId, to_user_ids: toUserIds.join(","), message });
-  if (!res.status) throw new Error(res.message ?? "Couldn't send that.");
+  if (!res.status) throw new Error(res.message ?? tt("couldn_t_send_that"));
   return res.message ?? "Thanks sent.";
 }
 export async function fetchMyVirtualBattles(myUserId: number): Promise<VirtualBattleData[]> {
@@ -297,7 +298,7 @@ export function useEngine<TData extends { status: EngineStatus }, TInvite>(
     if (!myUserId) return;
     setInvite(null);
     const res = await post<TData>(cfg.respondEndpoint, { user_id: myUserId, [cfg.respondIdParam]: id, approve });
-    if (!res.status) throw new Error(res.message ?? "Couldn't answer that invite.");
+    if (!res.status) throw new Error(res.message ?? tt("couldn_t_answer_that_invite"));
     if (res.data && typeof res.data === "object" && "status" in res.data) absorb(res.data);
   }, [cfg, myUserId, absorb]);
 

@@ -8,6 +8,7 @@
 // board verified as solvable silently stops being so and the player meets an impossible level
 // that merely looks hard. Keeping them free of React is what lets them be checked on their own.
 import { post } from "./api";
+import { tt } from "./i18n";
 
 export type BlockEscapePiece = { x: number; y: number; w: number; h: number; c: string };
 export type BlockEscapeGate = { edge: string; lo: number; hi: number; c: string };
@@ -35,7 +36,7 @@ function num(v: unknown, fallback = 0): number {
 
 export async function fetchBlockEscapeLevels(): Promise<BlockEscapeLevel[]> {
   const res = await post<unknown[]>("fetchBlockEscapeLevels", { x: 1 });
-  if (!res.status) throw new Error(res.message ?? "Couldn't load the boards.");
+  if (!res.status) throw new Error(res.message ?? tt("couldn_t_load_the_boards"));
   const rows: unknown[] = Array.isArray(res.data) ? res.data : [];
   return rows.map((r) => {
     const row = r as Record<string, unknown>;

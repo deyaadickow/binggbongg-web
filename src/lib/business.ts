@@ -1,5 +1,6 @@
 import { currentAuthHeaders, post, type UserSummary } from "./api";
 import { API_BASE, uploadErrorMessage } from "./upload";
+import { tt } from "./i18n";
 
 // Bingg Bongg Business (Steve, 2026-10-01) — mirrors BusinessController.php. Paid business
 // pages: "$1.99/day Payments every 90 days ... cancel anytime no refund", searched by country /
@@ -102,13 +103,13 @@ export interface BusinessFilters { country_code?: string; state_code?: string; c
 
 export async function fetchBusinesses(filters: BusinessFilters): Promise<{ data: Business[]; near: Near | null }> {
   const r = await post<Business[]>("fetchBusinesses", { ...filters, limit: 100 });
-  if (!r.status) throw new Error(r.message ?? "Couldn't load businesses.");
+  if (!r.status) throw new Error(r.message ?? tt("couldn_t_load_businesses"));
   return { data: r.data ?? [], near: ((r as unknown as { near?: Near | null }).near) ?? null };
 }
 
 export async function fetchBusinessDetail(businessId: number, myUserId?: number): Promise<Business> {
   const r = await post<Business>("fetchBusinessDetail", { business_id: businessId, my_user_id: myUserId });
-  if (!r.status || !r.data) throw new Error(r.message ?? "This business page is no longer available.");
+  if (!r.status || !r.data) throw new Error(r.message ?? tt("this_business_page_is_no_longer_availabl"));
   return r.data;
 }
 
@@ -124,26 +125,26 @@ export interface MyBusinesses {
 
 export async function fetchMyBusinesses(myUserId: number): Promise<MyBusinesses> {
   const r = await post<Business[]>("fetchMyBusinesses", { my_user_id: myUserId });
-  if (!r.status) throw new Error(r.message ?? "Couldn't load your businesses.");
+  if (!r.status) throw new Error(r.message ?? tt("couldn_t_load_your_businesses"));
   const extra = r as unknown as Omit<MyBusinesses, "data">;
   return { data: r.data ?? [], pricing: extra.pricing, cash_balance: extra.cash_balance ?? 0, referral_code: extra.referral_code, referral_fee: extra.referral_fee ?? 0, referral_earned: extra.referral_earned ?? 0, referral_count: extra.referral_count ?? 0 };
 }
 
 export async function renewBusiness(myUserId: number, businessId: number): Promise<string> {
   const r = await post("renewBusiness", { my_user_id: myUserId, business_id: businessId });
-  if (!r.status) throw new Error(r.message ?? "Couldn't renew.");
+  if (!r.status) throw new Error(r.message ?? tt("couldn_t_renew"));
   return r.message ?? "Renewed.";
 }
 
 export async function cancelBusiness(myUserId: number, businessId: number): Promise<string> {
   const r = await post("cancelBusiness", { my_user_id: myUserId, business_id: businessId });
-  if (!r.status) throw new Error(r.message ?? "Couldn't do that.");
+  if (!r.status) throw new Error(r.message ?? tt("couldn_t_do_that"));
   return r.message ?? "Taken down.";
 }
 
 export async function deleteBusinessMedia(myUserId: number, mediaId: number): Promise<void> {
   const r = await post("deleteBusinessMedia", { my_user_id: myUserId, media_id: mediaId });
-  if (!r.status) throw new Error(r.message ?? "Couldn't delete.");
+  if (!r.status) throw new Error(r.message ?? tt("couldn_t_delete"));
 }
 
 /** Multipart POST — the create/update/media endpoints take real files, like uploadPhoto. */
@@ -245,18 +246,18 @@ export async function fetchCities(countryCode: string, stateCode: string): Promi
 
 export async function createBusinessFolder(myUserId: number, businessId: number, name: string): Promise<number> {
   const r = await post<BusinessMediaFolder>("createBusinessFolder", { my_user_id: myUserId, business_id: businessId, name });
-  if (!r.status || !r.data) throw new Error(r.message ?? "Couldn't add that folder.");
+  if (!r.status || !r.data) throw new Error(r.message ?? tt("couldn_t_add_that_folder"));
   return r.data.id;
 }
 
 export async function renameBusinessFolder(myUserId: number, folderId: number, name: string): Promise<void> {
   const r = await post("renameBusinessFolder", { my_user_id: myUserId, folder_id: folderId, name });
-  if (!r.status) throw new Error(r.message ?? "Couldn't rename that folder.");
+  if (!r.status) throw new Error(r.message ?? tt("couldn_t_rename_that_folder"));
 }
 
 export async function deleteBusinessFolder(myUserId: number, folderId: number): Promise<string> {
   const r = await post("deleteBusinessFolder", { my_user_id: myUserId, folder_id: folderId });
-  if (!r.status) throw new Error(r.message ?? "Couldn't delete that folder.");
+  if (!r.status) throw new Error(r.message ?? tt("couldn_t_delete_that_folder"));
   return r.message ?? "Folder deleted.";
 }
 
@@ -299,7 +300,7 @@ export async function uploadFlyerAsset(myUserId: number, businessId: number, typ
   form.append("file", file, name);
   const r = await multipart<unknown>("uploadFlyerAsset", form, onProgress);
   const path = (r as unknown as { path?: string } | null)?.path;
-  if (!path) throw new Error("Couldn't upload that file.");
+  if (!path) throw new Error(tt("couldn_t_upload_that_file"));
   return path;
 }
 
@@ -307,12 +308,12 @@ export interface FlyerClipUpload { video_path: string; x: number; y: number; w: 
 
 export async function saveBusinessFlyer(myUserId: number, businessId: number, imagePath: string, clips: FlyerClipUpload[]): Promise<string> {
   const r = await post("saveBusinessFlyer", { my_user_id: myUserId, business_id: businessId, image_path: imagePath, clips: JSON.stringify(clips) });
-  if (!r.status) throw new Error(r.message ?? "Couldn't save the flyer.");
+  if (!r.status) throw new Error(r.message ?? tt("couldn_t_save_the_flyer"));
   return r.message ?? "On your business page.";
 }
 
 export async function deleteBusinessFlyer(myUserId: number, flyerId: number): Promise<string> {
   const r = await post("deleteBusinessFlyer", { my_user_id: myUserId, flyer_id: flyerId });
-  if (!r.status) throw new Error(r.message ?? "Couldn't remove that flyer.");
+  if (!r.status) throw new Error(r.message ?? tt("couldn_t_remove_that_flyer"));
   return r.message ?? "Flyer removed.";
 }

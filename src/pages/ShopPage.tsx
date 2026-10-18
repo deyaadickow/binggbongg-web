@@ -8,7 +8,7 @@ import {
   requestShopEarningsPayout, requestShopSample, saveShopAddress, startStripeConnect, type ShopAddress, type ShopEarnings, type ShopOrder,
   type ShopProduct, type ShopReturn, type ShopSampleRequest, type ShopSettings,
 } from "../lib/shop";
-import { useT } from "../lib/i18n";
+import { tt, useT  } from "../lib/i18n";
 
 // Bingg Bongg Shop — the marketplace on the web (Steve, 2026-10-15). /shop (catalogue, Showcase,
 // Orders, Earnings), /shop/product/:id, /shop/showcase/:userId (a member's Showcase). Buying goes
@@ -138,7 +138,7 @@ export function ShopPage({ tab: initialTab }: { tab?: "shop" | "showcase" | "ord
               {o.items.map((i) => <div key={i.shop_product_id} style={{ fontSize: 13 }}>{i.title} ×{i.quantity}  {money(i.line_cents)}</div>)}
               <div className="muted" style={{ fontSize: 12 }}>{t("order_total", money(o.total_cents))}{(o.refunded_cents ?? 0) > 0 ? t("refunded_suffix", money(o.refunded_cents)) : ""}{o.created_at ? ` · ${o.created_at.slice(0, 10)}` : ""}</div>
               {o.tracking_number && (o.tracking_url ? <a href={o.tracking_url} target="_blank" rel="noreferrer" style={{ color: "var(--gold)", fontSize: 13 }}>{t("tracking_line", o.carrier ?? "", o.tracking_number)}</a> : <div style={{ color: "var(--gold)", fontSize: 13 }}>{t("tracking_line", o.carrier ?? "", o.tracking_number)}</div>)}
-              {(o.status === "paid" || o.status === "processing") && <button type="button" className="btn small ghost" style={{ marginTop: 6 }} onClick={() => { if (confirm("Cancel this order? You'll be refunded in full.")) cancelShopOrder(user.id, o.order_number).then((r) => { setToast(r.message ?? ""); load(); }); }}>{t("cancel_order")}</button>}
+              {(o.status === "paid" || o.status === "processing") && <button type="button" className="btn small ghost" style={{ marginTop: 6 }} onClick={() => { if (confirm(tt("cancel_this_order_you_ll_be_refunded_in"))) cancelShopOrder(user.id, o.order_number).then((r) => { setToast(r.message ?? ""); load(); }); }}>{t("cancel_order")}</button>}
               {(() => {
                 const ret = returns.find((r) => r.order_number === o.order_number);
                 // Nothing open yet, and it has arrived: offer to send it back.
@@ -228,16 +228,16 @@ export function ShopProductPage() {
   async function saveAddress() {
     if (!user) return;
     const r = await saveShopAddress(user.id, form);
-    if (!r.status) { setStatus(r.message ?? "Couldn't save."); return; }
+    if (!r.status) { setStatus(r.message ?? tt("couldn_t_save")); return; }
     const a = await fetchShopAddresses(user.id); setAddresses(a); setAddressId(r.data?.id ?? a[0]?.id ?? 0); setShowForm(false);
   }
   async function pay() {
     if (!user) { navigate("/login", { state: { from: window.location.pathname + window.location.search } }); return; }
-    if (!addressId) { setStatus("Choose a shipping address."); return; }
-    setBusy(true); setStatus("Taking you to Stripe…");
+    if (!addressId) { setStatus(tt("choose_a_shipping_address")); return; }
+    setBusy(true); setStatus(tt("taking_you_to_stripe"));
     const r = await createShopOrder(user.id, p!.id, qty, addressId, streamerUserId, roomName).catch(() => null);
     const url = (r?.payment as { checkout_url?: string } | undefined)?.checkout_url;
-    if (!r?.status || !url) { setBusy(false); setStatus(r?.message ?? "Couldn't start the payment."); return; }
+    if (!r?.status || !url) { setBusy(false); setStatus(r?.message ?? tt("couldn_t_start_the_payment")); return; }
     window.location.href = url;
   }
 
@@ -276,7 +276,7 @@ export function ShopProductPage() {
       <div className="row" style={{ gap: 8, marginTop: 10, flexWrap: "wrap" }}>
         <button type="button" className="btn" disabled={busy || p.in_stock === false} onClick={pay}>{p.in_stock === false ? "Sold out" : `Pay ${money(sub + ship)} with Stripe`}</button>
         {isLoggedIn && user && streamerUserId !== user.id && <button type="button" className="btn ghost" onClick={() => addToShowcase(user.id, p.id).then((r) => setStatus(r.message ?? ""))}>{t("add_to_my_showcase")}</button>}
-        {isLoggedIn && user && p.samples_enabled && <button type="button" className="btn ghost" onClick={() => { const a = addresses.find((x) => x.is_default) ?? addresses[0]; if (!a) { setStatus("Add a shipping address first."); return; } const msg = prompt("Why you? (optional — your audience, what you'd show)") ?? ""; requestShopSample(user.id, p.id, a.id, msg).then((r) => setStatus(r.message ?? "")); }}>{t("request_a_free_sample")}</button>}
+        {isLoggedIn && user && p.samples_enabled && <button type="button" className="btn ghost" onClick={() => { const a = addresses.find((x) => x.is_default) ?? addresses[0]; if (!a) { setStatus(tt("add_a_shipping_address_first")); return; } const msg = prompt("Why you? (optional — your audience, what you'd show)") ?? ""; requestShopSample(user.id, p.id, a.id, msg).then((r) => setStatus(r.message ?? "")); }}>{t("request_a_free_sample")}</button>}
       </div>
       <p className="muted" style={{ fontSize: 12, marginTop: 10 }}>{t("paid_securely_on_stripe_s_own_page_bingg")}</p>
     </div>

@@ -6,6 +6,7 @@
 // (ExcitingNewsController::fetchExcitingNews) the Android app uses — the country-first sort and
 // search-by-description-or-country both happen server-side, this file just calls it.
 import { mediaUrl, post } from "./api";
+import { tt } from "./i18n";
 
 export type ExcitingNewsType = "photo" | "video";
 
@@ -89,7 +90,7 @@ export async function fetchExcitingNews(
     count,
     language,
   });
-  if (!res.status) throw new Error(res.message ?? "Couldn't load Exciting News.");
+  if (!res.status) throw new Error(res.message ?? tt("couldn_t_load_exciting_news"));
   return {
     flyers: (res.data ?? []).map((f) => ({ ...f, file: mediaUrl(f.file) })),
     areas: (res.text_areas as TextAreas | undefined) ?? DEFAULT_TEXT_AREAS,

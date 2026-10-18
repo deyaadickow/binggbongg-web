@@ -2,7 +2,7 @@ import { useEffect, useState, type CSSProperties } from "react";
 import { Link } from "react-router-dom";
 import { useSession } from "../lib/session";
 import { fetchDailyFortune, type DailyFortune } from "../lib/api";
-import { useT } from "../lib/i18n";
+import { tt, useT  } from "../lib/i18n";
 
 /**
  * Lucky numbers + daily horoscope (Steve, 2026-10-09): "for entertainment only so we can bring
@@ -29,14 +29,14 @@ export function DailyFortunePage() {
     try {
       const res = await fetchDailyFortune(me.id, dateOfBirth);
       if (!res.status) {
-        setError(res.message ?? "Could not load that right now.");
+        setError(res.message ?? tt("could_not_load_that_right_now"));
         return;
       }
       setFortune(res);
       setEditingBirthday(false);
       if (res.date_of_birth) setBirthday(res.date_of_birth.slice(0, 10));
     } catch {
-      setError("Could not load that right now.");
+      setError(tt("could_not_load_that_right_now"));
     } finally {
       setLoading(false);
     }

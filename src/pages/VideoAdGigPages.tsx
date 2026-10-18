@@ -20,7 +20,7 @@ import {
   respondVideoAdGigOrder,
   type GigCard, type GigOffer, type GigOrder,
 } from "../lib/videoAdGigs";
-import { useT } from "../lib/i18n";
+import { tt, useT  } from "../lib/i18n";
 
 const money = (v: number) => "$" + Number(v ?? 0).toFixed(2);
 const gold = { background: "var(--gold-border)", color: "#000", borderColor: "var(--gold-border)" };
@@ -46,7 +46,7 @@ export function VideoAdGigPage() {
     const t = setTimeout(() => {
       fetchVideoAdGigs(query.trim())
         .then((r) => { if (!live) return; setRows(r.rows); setEnabled(r.enabled); if (r.offer) setOffer(r.offer); setError(""); })
-        .catch(() => { if (live) { setRows([]); setError("Couldn't load the Video Ad Gig page."); } });
+        .catch(() => { if (live) { setRows([]); setError(tt("gig_load_failed")); } });
     }, query ? 350 : 0);
     return () => { live = false; clearTimeout(t); };
   }, [query]);

@@ -10,7 +10,7 @@ import { useSession } from "../lib/session";
 import { createUploadUrls, putToSignedUrl, videoDuration, videoThumbnail } from "../lib/upload";
 import { Notice } from "../components/Common";
 import { GoldSelect } from "../components/GoldSelect";
-import { useT } from "../lib/i18n";
+import { tt, useT  } from "../lib/i18n";
 
 interface ContestCat { id: number; name?: string | null }
 interface CountryRow { name?: string | null; states?: { name?: string | null }[] }
@@ -84,7 +84,7 @@ export function UploadVideoPage() {
 
   async function upload() {
     if (!user || !file || busy) return;
-    if (!catId) { setError("Pick a category."); return; }
+    if (!catId) { setError(tt("pick_a_category")); return; }
     setBusy(true);
     setError("");
     try {
@@ -98,7 +98,7 @@ export function UploadVideoPage() {
         { file_name: safe.replace(/\.[^.]+$/, "") + "-thumb.jpg", content_type: "image/jpeg" },
       ]);
       const [videoSlot, thumbSlot] = slots;
-      if (!videoSlot || !thumbSlot) throw new Error("Couldn't prepare the upload. Please try again.");
+      if (!videoSlot || !thumbSlot) throw new Error(tt("couldn_t_prepare_the_upload_please_try_a"));
 
       setStage("Uploading your video…");
       await putToSignedUrl(videoSlot, file, setProgress);
@@ -122,7 +122,7 @@ export function UploadVideoPage() {
         ...(country ? { country } : {}),
         ...(state ? { state } : {}),
       });
-      if (!res.status) throw new Error(res.message ?? "Couldn't publish that video.");
+      if (!res.status) throw new Error(res.message ?? tt("couldn_t_publish_that_video"));
       setDone(true);
     } catch (e) {
       setError((e as Error).message);

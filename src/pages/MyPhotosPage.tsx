@@ -31,7 +31,7 @@ import {
 import { Loading, Notice } from "../components/Common";
 import { GoldSelect } from "../components/GoldSelect";
 import { showGoldAlert } from "../components/GoldToast";
-import { useT } from "../lib/i18n";
+import { tt, useT  } from "../lib/i18n";
 
 const THUMB_BORDER = "1.5px solid var(--gold-border)";
 
@@ -116,7 +116,7 @@ export function MyPhotosPage() {
     const r = await post<unknown>("startAdCashDepositSession", { my_user_id: user.id }).catch(() => null);
     const url = (r as { url?: string } | null)?.url;
     if (url) window.open(url, "_blank", "noopener");
-    else showGoldAlert((r as { message?: string } | null)?.message ?? "Couldn't open the funding page.");
+    else showGoldAlert((r as { message?: string } | null)?.message ?? tt("couldn_t_open_the_funding_page"));
   }
 
   if (!isLoggedIn || !user) {

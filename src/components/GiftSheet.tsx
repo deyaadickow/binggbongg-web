@@ -4,7 +4,7 @@ import { giftPrice, mediaUrl, post, type Gift, type Post, type UserSummary } fro
 import { useSession } from "../lib/session";
 import { loadGifts } from "../lib/gifts";
 import { TapTapBurst, isTapTapGift, tapTapBurstDuration, burstLabel } from "./TapTapBurst";
-import { useT } from "../lib/i18n";
+import { tt, useT  } from "../lib/i18n";
 
 /**
  * The gift button on a video, and the gift page it opens.
@@ -117,7 +117,7 @@ function GiftSheet({ post: item, onClose, onSent }: { post: Post; onClose: () =>
     setBusy(gift.id);
     try {
       const res = await post("sendCoinsToPost", { my_user_id: user.id, coins: price, post_id: item.id });
-      if (!res.status) throw new Error(res.message ?? "Couldn't send that gift.");
+      if (!res.status) throw new Error(res.message ?? tt("couldn_t_send_that_gift"));
       await refresh();
       // Close straight away so the gift shows over the video, as the phones do.
       onClose();

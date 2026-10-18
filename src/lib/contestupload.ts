@@ -11,6 +11,7 @@
 // its entry appears for the right members on its own; end it and the entry goes.
 import { API_BASE, post } from "./api";
 import { uploadErrorMessage } from "./upload";
+import { tt } from "./i18n";
 
 export interface OpenContest {
   id: number;
@@ -41,7 +42,7 @@ export async function enterWithExistingVideo(userId: number, contestId: number, 
     official_contest_id: contestId,
     post_id: postId,
   });
-  if (!res.status) throw new Error(res.message ?? "Couldn't enter that contest.");
+  if (!res.status) throw new Error(res.message ?? tt("couldn_t_enter_that_contest"));
 }
 
 /**

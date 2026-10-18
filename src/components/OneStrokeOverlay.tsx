@@ -15,7 +15,7 @@
 // coordinates that the phones have to convert by hand are simply the drawing instructions here.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { fetchOneStrokeLevels, type OneStrokeLevel } from "../lib/onestroke";
-import { useT } from "../lib/i18n";
+import { tt, useT  } from "../lib/i18n";
 
 // The board's viewBox is inset beyond 0..1 so a thick stroke on an edge node is not clipped in
 // half. These two constants exist because that inset ALSO has to be undone when a pointer
@@ -162,7 +162,7 @@ export function OneStrokeOverlay({ onClose }: { onClose: () => void }) {
       drawing.current = false;
       setFinger(null);
       setIq((v) => v + IQ_PER_LEVEL);
-      setMessage("Solved in one stroke!");
+      setMessage(tt("solved_in_one_stroke"));
     }
   }
 

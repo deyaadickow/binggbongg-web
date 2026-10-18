@@ -9,7 +9,7 @@ import { fetchUserPhotos, type Photo } from "../lib/photos";
 import { MemberBusinessesPanel, MyBusinessesPanel } from "./BusinessPages";
 import { ScheduleSection } from "../components/ScheduleSection";
 import { showGoldAlert } from "../components/GoldToast";
-import { useT } from "../lib/i18n";
+import { tt, useT  } from "../lib/i18n";
 
 interface ProfileUser extends UserSummary {
   refer_code?: string;
@@ -256,7 +256,7 @@ function CreatePlaylistDialog({ userId, onClose, onCreated }: { userId: number; 
     setErr("");
     try {
       const r = await post<Playlist>("createPlaylist", { user_id: userId, name: name.trim() });
-      if (!r.status) throw new Error(r.message ?? "Failed to create");
+      if (!r.status) throw new Error(r.message ?? tt("failed_to_create"));
       onCreated(r.data ?? { id: Date.now(), name: name.trim() });
       onClose();
     } catch (e) {
@@ -337,7 +337,7 @@ export function ProfilePage() {
           user_id: id,
           ...(me ? { my_user_id: me.id } : {}),
         });
-        if (!res.status || !res.data) throw new Error(res.message ?? "Member not found.");
+        if (!res.status || !res.data) throw new Error(res.message ?? tt("member_not_found"));
         setProfile(res.data);
         setFollowing(!!res.data.is_following);
       } catch (e) {
@@ -478,7 +478,7 @@ export function ProfilePage() {
     if (!me || !profile) return;
     setShowOptions(false);
     await post("reportUser", { user_id: me.id, to_user_id: profile.id, reason: "Reported from web" }).catch(() => {});
-    showGoldAlert("Report submitted. Thank you.");
+    showGoldAlert(tt("report_submitted_thank_you"));
   }
 
   async function copyReferCode() {

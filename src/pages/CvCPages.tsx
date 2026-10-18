@@ -12,7 +12,7 @@ import {
   fetchCountryChallenge, fetchCountryChallenges, flagOf,
   type CvCComingSoon, type CvCDetail, type CvCPlayer, type CvCRow, type CvCSupporter,
 } from "../lib/countryChallenges";
-import { useT } from "../lib/i18n";
+import { tt, useT  } from "../lib/i18n";
 
 const gold = "var(--gold)";
 
@@ -29,7 +29,7 @@ export function CvCPage() {
   useEffect(() => {
     fetchCountryChallenges()
       .then((r) => { setRows(r.rows); setUpcoming(r.upcoming); setComingSoon(r.comingSoon); setEnabled(r.enabled); })
-      .catch(() => { setRows([]); setError("Couldn't load the board."); });
+      .catch(() => { setRows([]); setError(tt("cvc_load_failed")); });
   }, []);
 
   // Steve, 2026-10-17: "shut it off for now... When turned off, the tab will disappear as well."

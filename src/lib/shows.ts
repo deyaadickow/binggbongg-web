@@ -7,6 +7,7 @@
 // The whole feature is behind shows_enabled, off until he opens it — every screen here has to
 // handle that being false rather than assuming a show can be had.
 import { post } from "./api";
+import { tt } from "./i18n";
 
 export type ShowStatus =
   | "pending_review" | "approved" | "active" | "past_due" | "suspended" | "rejected" | "cancelled";
@@ -85,7 +86,7 @@ export async function fetchMyShow(myUserId: number): Promise<MyShowResponse> {
 
 export async function applyForShow(myUserId: number, f: { name: string; tagline: string; description: string }) {
   const r = await post<MyShow>("applyForShow", { user_id: myUserId, ...f });
-  if (!r.status) throw new Error(r.message ?? "Couldn't send that.");
+  if (!r.status) throw new Error(r.message ?? tt("couldn_t_send_that"));
   return { message: r.message ?? "Sent for review.", show: (r.data as MyShow | null) ?? null };
 }
 
@@ -93,13 +94,13 @@ export async function startShow(myUserId: number) {
   const r = await post<MyShow>("startShow", { user_id: myUserId });
   // The server's message carries the real reason — most often that earnings don't cover the
   // first month, with both figures in it. It has to reach the host word for word.
-  if (!r.status) throw new Error(r.message ?? "Couldn't start your show.");
+  if (!r.status) throw new Error(r.message ?? tt("couldn_t_start_your_show"));
   return { message: r.message ?? "Your show is on the air.", show: (r.data as MyShow | null) ?? null };
 }
 
 export async function cancelShow(myUserId: number) {
   const r = await post<MyShow>("cancelShow", { user_id: myUserId });
-  if (!r.status) throw new Error(r.message ?? "Couldn't stop your show.");
+  if (!r.status) throw new Error(r.message ?? tt("couldn_t_stop_your_show"));
   return { message: r.message ?? "Your show has been stopped.", show: (r.data as MyShow | null) ?? null };
 }
 

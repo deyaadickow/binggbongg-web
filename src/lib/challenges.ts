@@ -4,6 +4,7 @@
 // None of these needed backend work — every endpoint here already exists and is already what the
 // phones call. The web was simply the only client that never grew the screens.
 import { post } from "./api";
+import { tt } from "./i18n";
 
 // ---- 31 Day Battle Challenge ----------------------------------------------------------------
 //
@@ -37,7 +38,7 @@ export async function fetchChallengeStatus(userId: number): Promise<ChallengeSta
 
 export async function startChallenge(userId: number): Promise<void> {
   const res = await post("startBattleChallenge", { user_id: userId });
-  if (!res.status) throw new Error(res.message ?? "Couldn't start the challenge.");
+  if (!res.status) throw new Error(res.message ?? tt("couldn_t_start_the_challenge"));
 }
 
 /** The tier ladder, for rendering it without hardcoding the numbers in three places. */
@@ -175,7 +176,7 @@ export async function fetchPkContestStandings(contestId: number, userId: number)
     "fetchPkBattleContestStandingsApp",
     { id: contestId, user_id: userId },
   );
-  if (!res.status) throw new Error(res.message ?? "Couldn't load that contest.");
+  if (!res.status) throw new Error(res.message ?? tt("couldn_t_load_that_contest"));
   return {
     contest: res.data?.contest ?? null,
     standings: res.data?.standings ?? [],

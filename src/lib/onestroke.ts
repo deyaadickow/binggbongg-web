@@ -4,6 +4,7 @@
 // through `via` points; that only shapes the drawn line and never changes which two nodes it
 // joins — to the puzzle logic a curved edge is just an edge.
 import { post } from "./api";
+import { tt } from "./i18n";
 
 export type OneStrokeEdge = { a: number; b: number; via?: number[][] };
 export type OneStrokeLevel = {
@@ -24,7 +25,7 @@ function num(v: unknown): number {
 
 export async function fetchOneStrokeLevels(): Promise<OneStrokeLevel[]> {
   const res = await post<unknown[]>("fetchOneStrokeLevels", { x: 1 });
-  if (!res.status) throw new Error(res.message ?? "Couldn't load the shapes.");
+  if (!res.status) throw new Error(res.message ?? tt("couldn_t_load_the_shapes"));
   const rows: unknown[] = Array.isArray(res.data) ? res.data : [];
   return rows.map((r) => {
     const row = r as Record<string, unknown>;

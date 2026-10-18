@@ -157,7 +157,7 @@ async function write(
 ): Promise<void> {
   const myIdentity = me.identity ?? "";
   const theirIdentity = partner.identity ?? "";
-  if (!myIdentity || !theirIdentity) throw new Error("Missing identity");
+  if (!myIdentity || !theirIdentity) throw new Error(tt("missing_identity"));
 
   await ensureFirebaseSignIn();
   const db = getFirestore(firebaseApp());
@@ -210,7 +210,7 @@ export async function sendMediaMessage(
   kind: "image" | "video",
   caption: string,
 ): Promise<void> {
-  if (!key) throw new Error("Nothing uploaded");
+  if (!key) throw new Error(tt("nothing_uploaded"));
   await write(me, partner, { msg: caption.trim(), msgType: kind, image: key });
 }
 
@@ -242,6 +242,7 @@ export async function markConversationRead(myIdentity: string, theirIdentity: st
 
 import { createUploadUrls, putToSignedUrl, videoThumbnail } from "./upload";
 import { post } from "./api";
+import { tt } from "./i18n";
 
 export const DM_MAX_IMAGE_BYTES = 12 * 1024 * 1024;
 export const DM_MAX_VIDEO_BYTES = 80 * 1024 * 1024;
@@ -294,7 +295,7 @@ export async function uploadChatMedia(
   }
 
   const [slot] = await createUploadUrls(userId, [{ file_name: file.name, content_type: file.type || "application/octet-stream" }]);
-  if (!slot) throw new Error("Couldn't prepare the upload.");
+  if (!slot) throw new Error(tt("couldn_t_prepare_the_upload"));
   await putToSignedUrl(slot, file, onProgress);
 
   // A video goes up with a still from its first frame: PhotoDNA hashes stills only, so the

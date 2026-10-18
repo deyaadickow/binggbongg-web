@@ -6,7 +6,7 @@ interface WebCoinPlan { id: number; coins: number; bonus_coins: number; total_co
 import { useSession } from "../lib/session";
 import { Loading, Notice } from "../components/Common";
 import { WALLET_LINKS } from "./WalletPages";
-import { useT } from "../lib/i18n";
+import { tt, useT  } from "../lib/i18n";
 
 export function WalletPage() {
   const { t, tn } = useT();
@@ -43,7 +43,7 @@ export function WalletPage() {
     try {
       const res = await post<unknown>("startWebCoinsBuySession", { user_id: user.id });
       const token = (res as { token?: string }).token ?? (res.data as { token?: string } | undefined)?.token;
-      if (!res.status || !token) throw new Error(res.message ?? "Couldn't open the coin store.");
+      if (!res.status || !token) throw new Error(res.message ?? tt("couldn_t_open_the_coin_store"));
       window.open(`${WEB_BASE}buyCoins/${token}`, "_blank", "noopener");
     } catch (e) {
       setError((e as Error).message);

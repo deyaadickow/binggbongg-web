@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { post } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Notice } from "../components/Common";
-import { useT } from "../lib/i18n";
+import { tt, useT  } from "../lib/i18n";
 
 /** Camera preview + one button — same startLive endpoint the phones call, then the room page as host. */
 export function GoLivePage() {
@@ -40,7 +40,7 @@ export function GoLivePage() {
     try {
       const res = await post<unknown>("startLive", { user_id: user.id });
       const roomName = (res as { room_name?: string }).room_name;
-      if (!res.status || !roomName) throw new Error(res.message ?? "Couldn't start the stream.");
+      if (!res.status || !roomName) throw new Error(res.message ?? tt("couldn_t_start_the_stream"));
       streamRef.current?.getTracks().forEach((t) => t.stop()); // the room takes the camera over
       navigate(`/live/${encodeURIComponent(roomName)}?host=1`, { replace: true });
     } catch (e) {

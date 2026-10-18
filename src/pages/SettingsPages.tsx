@@ -11,7 +11,7 @@ import { SideLinkItem, SiteFooter, sidebarSections } from "../components/Sidebar
 import { fetchMyVirtualBattles, fetchVirtualGiftRecord, sendVirtualThankYou, type VirtualBattleData, type VirtualGiftRecord } from "../lib/battles";
 import { VirtualGiftRecordOverlay, personName } from "../components/BattleEngines";
 import { GoldSelect } from "../components/GoldSelect";
-import { useT, type StringKey } from "../lib/i18n";
+import { tt, useT, type StringKey  } from "../lib/i18n";
 
 const SITE = "https://www.binggbongg.com";
 
@@ -101,7 +101,7 @@ export function AccountSettingsPage() {
     setBusy(true);
     try {
       const r = await post<MyUser>("updateUserDetails", { user_id: user.id, ...fields });
-      if (!r.status) throw new Error(r.message ?? "Couldn't save.");
+      if (!r.status) throw new Error(r.message ?? tt("couldn_t_save"));
       setMe((m) => ({ ...(m ?? {} as MyUser), ...(r.data ?? {}), ...fields } as MyUser));
       setToast("Saved.");
       refresh();
@@ -144,7 +144,7 @@ export function ShareProfilePage() {
   const { setToast, el } = useToast();
   if (!isLoggedIn || !user) return <NeedLogin />;
   const link = `${SITE}/profile/${user.id}`;
-  const copy = () => navigator.clipboard.writeText(link).then(() => setToast("Link copied.")).catch(() => setToast("Couldn't copy — select the link and copy it."));
+  const copy = () => navigator.clipboard.writeText(link).then(() => setToast(tt("link_copied"))).catch(() => setToast(tt("couldn_t_copy_select_the_link_and_copy_i")));
   return (
     <Page title={t("share_profile")}>
       <div className="card pad">
@@ -242,7 +242,7 @@ export function BlockedProfilesPage() {
     const remaining = list.filter((u) => u.id !== id).map((u) => u.id).join(",");
     try {
       const r = await post("updateUserBlockList", { user_id: user.id, blocked_users: remaining || "0" });
-      if (!r.status) throw new Error(r.message ?? "Couldn't unblock.");
+      if (!r.status) throw new Error(r.message ?? tt("couldn_t_unblock"));
       setToast("Unblocked."); load();
     } catch (e) { setToast((e as Error).message); }
   }
@@ -281,7 +281,7 @@ export function ModeratorsPage() {
     if (!user) return;
     try {
       const r = await post(endpoint, { my_user_id: user.id, moderator_user_id: id });
-      if (!r.status) throw new Error(r.message ?? "Couldn't update moderators.");
+      if (!r.status) throw new Error(r.message ?? tt("couldn_t_update_moderators"));
       setToast(endpoint === "addPersonalModerator" ? "Moderator added." : "Moderator removed."); setQ(""); load();
     } catch (e) { setToast((e as Error).message); }
   }
@@ -319,14 +319,14 @@ export function SimulcastPage() {
   async function save(platform: string, enabled: boolean) {
     try {
       const r = await post("saveSimulcastDestination", { platform, rtmp_url: rtmp, stream_key: key, is_enabled: enabled ? 1 : 0 });
-      if (!r.status) throw new Error(r.message ?? "Couldn't save.");
+      if (!r.status) throw new Error(r.message ?? tt("couldn_t_save"));
       setToast("Saved."); setEditing(null); setKey(""); load();
     } catch (e) { setToast((e as Error).message); }
   }
   async function remove(platform: string) {
     try {
       const r = await post("deleteSimulcastDestination", { platform });
-      if (!r.status) throw new Error(r.message ?? "Couldn't remove.");
+      if (!r.status) throw new Error(r.message ?? tt("couldn_t_remove"));
       setToast("Removed."); load();
     } catch (e) { setToast((e as Error).message); }
   }
@@ -335,14 +335,14 @@ export function SimulcastPage() {
   async function toggleTiles(on: boolean) {
     try {
       const r = await post("saveSimulcastOptions", { user_id: user?.id, show_platform_tiles: on ? 1 : 0 });
-      if (!r.status) throw new Error(r.message ?? "Couldn't save.");
+      if (!r.status) throw new Error(r.message ?? tt("couldn_t_save"));
       load();
     } catch (e) { setToast((e as Error).message); }
   }
   async function toggle(d: SimDest, enabled: boolean) {
     try {
       const r = await post("saveSimulcastDestination", { platform: d.platform, is_enabled: enabled ? 1 : 0 });
-      if (!r.status) throw new Error(r.message ?? "Couldn't update.");
+      if (!r.status) throw new Error(r.message ?? tt("couldn_t_update"));
       load();
     } catch (e) { setToast((e as Error).message); }
   }
@@ -472,7 +472,7 @@ export function AdvertisePage() {
           // Same flow as the app: a 30-minute deposit session whose token opens the Fund page.
           const r = await post<unknown>("startAdCashDepositSession", { my_user_id: user.id }).catch(() => null);
           const url = (r as { url?: string } | null)?.url;
-          if (url) window.open(url, "_blank", "noopener"); else showGoldAlert(r?.message ?? "Couldn't open the funding page.");
+          if (url) window.open(url, "_blank", "noopener"); else showGoldAlert(r?.message ?? tt("couldn_t_open_the_funding_page"));
         }}>{t("add_money_to_your_cash_account")}</button>
         {/* The apps pair that capsule with a "+ Create Ad" one — Steve, 2026-09-30: "Build it the
             same way it works on ios". Same flow now lives at /settings/advertise/new. */}
@@ -599,8 +599,8 @@ export function ContestRequestsPage() {
     if (!user) return;
     try {
       const r = await post("rejectTalentContestInvite", { user_id: user.id, invite_id: inviteId });
-      if (!r.status) throw new Error(r.message ?? "Couldn't reject invite.");
-      setToast("Invite removed."); load();
+      if (!r.status) throw new Error(r.message ?? tt("couldn_t_reject_invite"));
+      setToast(tt("invite_removed")); load();
     } catch (e) { setToast((e as Error).message); }
   }
   return (
@@ -679,7 +679,7 @@ export function SupportPage() {
       if (r.data?.reply) { setReply(r.data); setAskedForPerson(false); }
       setSent(true);
     } catch {
-      setError("Failed to send message. Please try again.");
+      setError(tt("failed_to_send_message_please_try_again"));
     } finally {
       setBusy(false);
     }
@@ -909,7 +909,7 @@ export function DeleteAccountPage() {
     setBusy(true);
     try {
       const r = await post("deleteMyAccount", { user_id: user.id });
-      if (!r.status) throw new Error(r.message ?? "Couldn't delete the account.");
+      if (!r.status) throw new Error(r.message ?? tt("couldn_t_delete_the_account"));
       signOut(); navigate("/", { replace: true });
     } catch (e) { setToast((e as Error).message); setBusy(false); }
   }
@@ -948,7 +948,7 @@ export function VirtualLookPage() {
       form.append("media", file);
       const res = await fetch(API_BASE + "saveVirtualBattleLook", { method: "POST", headers: currentAuthHeaders(), body: form });
       const body = await res.json() as { status?: boolean; message?: string; data?: VirtualLook };
-      if (!body.status) throw new Error(body.message ?? "Couldn't upload that.");
+      if (!body.status) throw new Error(body.message ?? tt("couldn_t_upload_that"));
       setLook(body.data ?? {});
       setNote("Saved — this is your virtual battle look.");
       refresh();
@@ -958,7 +958,7 @@ export function VirtualLookPage() {
     setBusy(true);
     try {
       const res = await post("removeVirtualBattleLook", { my_user_id: user!.id });
-      if (!res.status) throw new Error(res.message ?? "Couldn't do that right now.");
+      if (!res.status) throw new Error(res.message ?? tt("couldn_t_do_that_right_now"));
       setLook({}); setNote("Removed — your profile photo will be used."); refresh();
     } catch (e) { setNote((e as Error).message); } finally { setBusy(false); }
   }

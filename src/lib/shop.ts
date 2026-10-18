@@ -3,6 +3,7 @@
 // payment_mode=checkout hands back checkout_url, the browser goes there, and Stripe sends the
 // buyer back to /shop/orders. post() resolves to the server JSON itself — `data` IS the list.
 import { post } from "./api";
+import { tt } from "./i18n";
 
 export interface ShopSettings { shop_enabled?: boolean; samples_enabled?: boolean; sellers_enabled?: boolean; streamer_commission_rate?: number }
 export interface ShopProduct {
@@ -82,7 +83,7 @@ export interface ShopReturn {
 
 export async function requestShopReturn(myUserId: number, orderNumber: string, reason: string) {
   const r = await post("requestShopReturn", { my_user_id: myUserId, order_number: orderNumber, reason });
-  if (!r.status) throw new Error(r.message ?? "Couldn't request that return.");
+  if (!r.status) throw new Error(r.message ?? tt("couldn_t_request_that_return"));
   return r.message ?? "Return requested.";
 }
 

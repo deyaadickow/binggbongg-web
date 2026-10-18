@@ -21,7 +21,7 @@ import {
 import { mediaUrl } from "../lib/api";
 import { useSession } from "../lib/session";
 import { TRANSLATION_LANGUAGES, translateChatMessage } from "../lib/translate";
-import { useT } from "../lib/i18n";
+import { tt, useT  } from "../lib/i18n";
 
 function dayLabel(ms: number): string {
   const d = new Date(ms);
@@ -64,7 +64,7 @@ export function ChatPage() {
     void (async () => {
       try {
         const res = await post<UserSummary>("fetchUserDetails", { user_id: id, ...(user ? { my_user_id: user.id } : {}) });
-        if (!res.status || !res.data) throw new Error(res.message ?? "Member not found.");
+        if (!res.status || !res.data) throw new Error(res.message ?? tt("member_not_found"));
         setPartner(res.data);
       } catch (e) {
         setError((e as Error).message);

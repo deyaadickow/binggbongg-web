@@ -22,7 +22,7 @@ import { Avatar, Notice } from "../components/Common";
 import { InviteOverlay, WhosPlayingOverlay } from "../components/RoomPeople";
 import { PickerSheet } from "../components/PickerSheet";
 import { TRANSLATION_LANGUAGES, defaultTargetLanguage, languageName, translateChatMessage, type TranslationResult } from "../lib/translate";
-import { useT } from "../lib/i18n";
+import { tt, useT  } from "../lib/i18n";
 
 interface Member { user_id: number; fullname?: string; username?: string; profile_image?: string; country?: string }
 interface RoomMembers { host_user_id: number; host_fullname?: string; host_username?: string; host_profile_image?: string; host_country?: string; guests: Member[] }
@@ -139,10 +139,10 @@ export function LiveViewerPage() {
         setIsFavourite(Boolean((res as { is_favourite?: boolean }).is_favourite));
         setToast(res.message ?? "");
       } else {
-        setToast(res.message ?? "Couldn't save that — try again.");
+        setToast(res.message ?? tt("couldn_t_save_that_try_again"));
       }
     } catch {
-      setToast("Couldn't save that — try again.");
+      setToast(tt("couldn_t_save_that_try_again"));
     } finally {
       setFavBusy(false);
     }
@@ -154,16 +154,16 @@ export function LiveViewerPage() {
       // The engines have separate id spaces, so the id alone is ambiguous to the server.
       const res = await post<{ share_url?: string; share_text?: string }>("fetchBattleRecap", { battle_id: battleId, engine });
       const url = res.data?.share_url;
-      if (!res.status || !url) throw new Error("No recap yet");
+      if (!res.status || !url) throw new Error(tt("no_recap_yet"));
       const text = [res.data?.share_text, url].filter(Boolean).join("\n");
       if (navigator.share) {
         await navigator.share({ text, url });
       } else {
         await navigator.clipboard.writeText(text);
-        setToast("Link copied — paste it anywhere.");
+        setToast(tt("link_copied_paste_it_anywhere"));
       }
     } catch (e) {
-      if ((e as Error)?.name !== "AbortError") setToast("Couldn't get the recap. Try again in a moment.");
+      if ((e as Error)?.name !== "AbortError") setToast(tt("couldn_t_get_the_recap_try_again_in_a_mo"));
     } finally {
       setSharingRecap(false);
     }
@@ -328,11 +328,11 @@ export function LiveViewerPage() {
 
   // Tap games: the host activates one from the phone (or later, here); everyone gets a Play button.
   async function startSolo() {
-    if (role !== "host" || !user) { setToast("Only the host can start a Solo Battle With Unlimited Players."); return; }
+    if (role !== "host" || !user) { setToast(tt("only_the_host_can_start_a_solo_battle_wi")); return; }
     try {
       const b = await startSoloBattle(user.id);
       setSoloBattle(b);
-      setToast("Solo Battle With Unlimited Players started — viewers have a couple of minutes to join.");
+      setToast(tt("solo_battle_with_unlimited_players_start"));
     } catch (e) {
       setToast((e as Error).message);
     }
@@ -451,7 +451,7 @@ export function LiveViewerPage() {
 
   function openBingo() {
     if (bingoGame && bingoGame.status === "active") { setBingoOpen(true); return; }
-    if (role !== "host") { setToast("No bingo game is running — the host starts it."); return; }
+    if (role !== "host") { setToast(tt("no_bingo_game_is_running_the_host_starts")); return; }
     setBingoStartOpen(true);
   }
   broadcastersRef.current = broadcasters;
@@ -609,7 +609,7 @@ export function LiveViewerPage() {
       else if (b555.data?.status === "active" && accepted(b555.data.participants)) tag.battle_555_id = b555.data.battle_555_id;
       else if (virtual.data?.status === "active" && virtual.data.participants.some((p) => p.user_id === giftTarget)) tag.virtual_battle_id = virtual.data.virtual_battle_id;
       const res = await post("sendCoinsToUser", { my_user_id: user.id, user_id: giftTarget, coins: giftPrice(gift), gift_id: gift.id, room_name: roomName, ...tag });
-      if (!res.status) throw new Error(res.message ?? "Couldn't send that gift.");
+      if (!res.status) throw new Error(res.message ?? tt("couldn_t_send_that_gift"));
       setToast(`Sent ${gift.name ?? "a gift"} (${giftPrice(gift)} coins) to ${nameOfId(giftTarget) || (virtualGiftTarget ? personName(virtualGiftTarget) : "")}`);
       setGiftTarget(null);
       setVirtualGiftTarget(null);
@@ -621,7 +621,7 @@ export function LiveViewerPage() {
     if (!user) return;
     try {
       const res = await post<unknown>("requestToJoinLive", { user_id: user.id, room_name: roomName });
-      if (!res.status) throw new Error(res.message ?? "Couldn't send the request.");
+      if (!res.status) throw new Error(res.message ?? tt("couldn_t_send_the_request"));
       const st = (res as { member_status?: string }).member_status;
       setJoinState(st === "approved" ? "approved" : "requested");
       setToast(st === "approved" ? "You're in — joining as a guest." : "Request sent. The host will see it in a moment.");
@@ -632,7 +632,7 @@ export function LiveViewerPage() {
     if (!user) return;
     try {
       const res = await post("respondToJoinRequest", { user_id: user.id, request_id: r.request_id, approve });
-      if (!res.status) throw new Error(res.message ?? "Couldn't answer that request.");
+      if (!res.status) throw new Error(res.message ?? tt("couldn_t_answer_that_request"));
       setJoinRequests((prev) => prev.filter((x) => x.request_id !== r.request_id));
       setToast(approve ? `${displayName(r as Partial<UserSummary>)} is joining.` : "Declined.");
     } catch (err) { setToast((err as Error).message); }
@@ -1025,7 +1025,7 @@ export function LiveViewerPage() {
               )}
               {role === "host" && (
                 <button className="btn small" title={t("invite_someone_you_follow_into_an_open_s")}
-                  onClick={() => { if (live.tiles.length >= 4) setToast("The room is full."); else setInviteOpen(true); }}>{t("invite_2")}</button>
+                  onClick={() => { if (live.tiles.length >= 4) setToast(tt("the_room_is_full")); else setInviteOpen(true); }}>{t("invite_2")}</button>
               )}
               {role === "host" && (
                 <button
@@ -1195,7 +1195,7 @@ export function LiveViewerPage() {
           }}
           onEndGame={async () => {
             const problem = await cancelBingoBattle(myId, bingoGame.bingo_game_id);
-            setToast(problem ?? "Bingo game ended.");
+            setToast(problem ?? tt("bingo_game_ended"));
             await refreshBingo();
           }}
           onClose={() => setBingoOpen(false)}
@@ -1213,7 +1213,7 @@ export function LiveViewerPage() {
           onStart={async (others, price) => {
             setBingoStartOpen(false);
             const { game, message } = await startBingoBattle(myId, roomName, others, price);
-            if (!game) { setToast(message ?? "Couldn't start the bingo game."); return; }
+            if (!game) { setToast(message ?? tt("couldn_t_start_the_bingo_game")); return; }
             bingoAutoOpened.current = game.bingo_game_id;
             setBingoGame(game);
             setBingoOpen(true);
@@ -1223,7 +1223,7 @@ export function LiveViewerPage() {
       {menuOpen && (
         <BattleMenu peopleOnScreen={broadcasters.length} onClose={() => setMenuOpen(false)} onNotice={setToast} onPick={(k) => {
           setMenuOpen(false);
-          if (k === "virtual") { if (role === "host") setPicker("virtual"); else setToast("Only the live host can start a Virtual Battle."); return; }
+          if (k === "virtual") { if (role === "host") setPicker("virtual"); else setToast(tt("only_the_live_host_can_start_a_virtual_b")); return; }
           if (k === "1v1") setBattlePicker(true);
           else if (k === "gameLimit") setGameLimitPicker(true);
           else if (k === "hideSeek") setHideSeekMode("choose");
@@ -1263,14 +1263,14 @@ export function LiveViewerPage() {
         <MultiPicker title={`🙈 Hide & Seek · ${hideSeekMode === 1 ? "1v1" : `${hideSeekMode + 1} members`}`} blurb={t("one_5_minute_round_scores_hidden_until_t")} exact={hideSeekMode}
           people={broadcasters.filter((b) => b.user_id !== myId)} onClose={() => setHideSeekMode(null)}
           onSubmit={async (ids) => {
-            try { await createSeries(myId, roomName, 1, ids, true); setHideSeekMode(null); setToast("Hide & Seek invites sent."); }
+            try { await createSeries(myId, roomName, 1, ids, true); setHideSeekMode(null); setToast(tt("hide_seek_invites_sent")); }
             catch (e) { setToast((e as Error).message); }
           }} />
       )}
       {hideSeekMode === "2v2" && myId && (
         <TwoVTwoPicker people={broadcasters.filter((b) => b.user_id !== myId)} onClose={() => setHideSeekMode(null)}
           onSubmit={async (teammate, o1, o2) => {
-            try { await invite2v2(myId, roomName, teammate, o1, o2, true); setHideSeekMode(null); setToast("Hide & Seek 2v2 invites sent."); }
+            try { await invite2v2(myId, roomName, teammate, o1, o2, true); setHideSeekMode(null); setToast(tt("hide_seek_2v2_invites_sent")); }
             catch (e) { setToast((e as Error).message); }
           }} />
       )}
@@ -1285,7 +1285,7 @@ export function LiveViewerPage() {
       {picker === "virtual" && myId && (
         <VirtualPicker myUserId={myId} guests={broadcasters.filter((b) => b.user_id !== myId)} onClose={() => setPicker(null)}
           onSubmit={async (ids) => {
-            await startVirtualBattle(myId, roomName, ids); setPicker(null); setToast("Virtual Battle started — 5 minutes on the clock!");
+            await startVirtualBattle(myId, roomName, ids); setPicker(null); setToast(tt("virtual_battle_started_5_minutes_on_the"));
           }} />
       )}
       {virtualRecord && (
@@ -1299,7 +1299,7 @@ export function LiveViewerPage() {
       {picker === "2v2" && myId && (
         <TwoVTwoPicker people={broadcasters.filter((b) => b.user_id !== myId)} onClose={() => setPicker(null)}
           onSubmit={async (teammate, o1, o2) => {
-            try { await invite2v2(myId, roomName, teammate, o1, o2); setPicker(null); setToast("2v2 invites sent."); }
+            try { await invite2v2(myId, roomName, teammate, o1, o2); setPicker(null); setToast(tt("n2v2_invites_sent")); }
             catch (e) { setToast((e as Error).message); }
           }} />
       )}
@@ -1307,7 +1307,7 @@ export function LiveViewerPage() {
         <MultiPicker title={t("no_time_limit")} blurb={t("no_clock_the_first_player_to_reach_100_0")}
           people={broadcasters.filter((b) => b.user_id !== myId)} onClose={() => setPicker(null)}
           onSubmit={async (ids) => {
-            try { await inviteMarathon(myId, roomName, ids); setPicker(null); setToast("No Time Limit invites sent."); }
+            try { await inviteMarathon(myId, roomName, ids); setPicker(null); setToast(tt("no_time_limit_invites_sent")); }
             catch (e) { setToast((e as Error).message); }
           }} />
       )}
@@ -1315,7 +1315,7 @@ export function LiveViewerPage() {
         <MultiPicker title="5-5-5" blurb={t("n5_games_5_minutes_reach_5000_coins_and_w")}
           people={broadcasters.filter((b) => b.user_id !== myId)} onClose={() => setPicker(null)}
           onSubmit={async (ids) => {
-            try { await invite555(myId, roomName, ids); setPicker(null); setToast("5-5-5 invites sent."); }
+            try { await invite555(myId, roomName, ids); setPicker(null); setToast(tt("n5_5_5_invites_sent")); }
             catch (e) { setToast((e as Error).message); }
           }} />
       )}
@@ -1366,7 +1366,7 @@ export function LiveViewerPage() {
           {broadcasters.filter((b) => b.user_id !== user?.id).map((b) => (
             <button key={b.user_id} className="btn block" style={{ marginBottom: 8 }} onClick={async () => {
               const target = Number(gameLimitTarget);
-              if (!target || target <= 0) { setToast("Enter how many coins wins it."); return; }
+              if (!target || target <= 0) { setToast(tt("enter_how_many_coins_wins_it")); return; }
               setGameLimitPicker(false);
               setGameLimitTarget("");
               try { await battle.inviteOpponent(b.user_id, target); setToast(`Game Limit invite sent to ${displayName(b as Partial<UserSummary>)} — first to ${target.toLocaleString()} coins.`); }

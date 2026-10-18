@@ -7,6 +7,7 @@
 //
 // Nothing here ever sees a credential — the signed url IS the permission, and it expires.
 import { API_BASE, post } from "./api";
+import { tt } from "./i18n";
 
 /**
  * What to tell a member when an upload fails.
@@ -54,7 +55,7 @@ export async function createUploadUrls(
     user_id: userId,
     files: JSON.stringify(files),
   });
-  if (!res.status || !res.data) throw new Error(res.message ?? "Couldn't prepare the upload.");
+  if (!res.status || !res.data) throw new Error(res.message ?? tt("couldn_t_prepare_the_upload"));
   return res.data;
 }
 
@@ -76,7 +77,7 @@ export function putToSignedUrl(slot: UploadSlot, file: File, onProgress?: (fract
       else reject(new Error(uploadErrorMessage(xhr.status)));
     };
     xhr.onerror = () => reject(new Error(uploadErrorMessage(0)));
-    xhr.onabort = () => reject(new Error("Upload cancelled."));
+    xhr.onabort = () => reject(new Error(tt("upload_cancelled")));
     xhr.send(file);
   });
 }
@@ -93,7 +94,7 @@ export function videoDuration(file: File): Promise<number> {
     };
     video.onerror = () => {
       URL.revokeObjectURL(url);
-      reject(new Error("That file doesn't look like a video we can read."));
+      reject(new Error(tt("that_file_doesn_t_look_like_a_video_we_c")));
     };
     video.src = url;
   });
@@ -128,7 +129,7 @@ export function videoThumbnail(file: File, atSeconds = 1): Promise<Blob> {
       canvas.toBlob((blob) => {
         URL.revokeObjectURL(url);
         if (blob) resolve(blob);
-        else reject(new Error("Couldn't create a thumbnail for that video."));
+        else reject(new Error(tt("couldn_t_create_a_thumbnail_for_that_vid")));
       }, "image/jpeg", 0.8);
     };
     video.onerror = () => fail("That file doesn't look like a video we can read.");

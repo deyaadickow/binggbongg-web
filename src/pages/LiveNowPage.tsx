@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { post, type LiveStream } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice } from "../components/Common";
-import { useT } from "../lib/i18n";
+import { tt, useT  } from "../lib/i18n";
 
 /** Daily Live Badge (Steve, 2026-10-16) — the badge a host earns for the day by streaming to
  *  people who are actually watching. Ring colour per tier, gold text throughout, so it reads
@@ -50,7 +50,7 @@ export function LiveNowPage() {
         ]);
         if (!alive) return;
         setTopToday(top?.status ? (top.data ?? []) : []);
-        if (!res.status) throw new Error(res.message ?? "Couldn't load who's live.");
+        if (!res.status) throw new Error(res.message ?? tt("couldn_t_load_who_s_live"));
         // One card per room — the API lists every broadcaster in a room, host first.
         //
         // But PREFER a favourited broadcaster over the host when both are in the same room.
@@ -89,7 +89,7 @@ export function LiveNowPage() {
           onClick={() => setFavouritesOnly((v) => !v)}
           title={t("show_only_my_favourite_streamers")}
         >
-          {favouritesOnly ? "♥ Favourites" : "♡ Favourites"}
+          {favouritesOnly ? "♥" : "♡"} {t("favourites")}
         </button>
       </div>
       {error && <Notice error>{error}</Notice>}

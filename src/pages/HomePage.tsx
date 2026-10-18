@@ -5,7 +5,7 @@ import { PostCard } from "../components/PostCard";
 import { Loading, Notice, StoreBadges } from "../components/Common";
 import { setFeed } from "../lib/feed";
 import { FeedPhotoCard } from "../components/FeedPhotoCard";
-import { useT } from "../lib/i18n";
+import { tt, useT  } from "../lib/i18n";
 
 export function HomePage() {
   const { t } = useT();
@@ -19,7 +19,7 @@ export function HomePage() {
     setError(null);
     try {
       const res = await post<Post[]>("fetchPosts", user ? { my_user_id: user.id } : {});
-      if (!res.status) throw new Error(res.message ?? "Couldn't load the feed.");
+      if (!res.status) throw new Error(res.message ?? tt("couldn_t_load_the_feed"));
       setPosts((prev) => {
         const seen = new Set(prev.map((p) => p.id));
         const next = [...prev, ...(res.data ?? []).filter((p) => !seen.has(p.id))];

@@ -9,6 +9,7 @@
 // tells the member where they stand before they hit that wall.
 import { API_BASE, post } from "./api";
 import { uploadErrorMessage } from "./upload";
+import { tt } from "./i18n";
 
 export interface PhotoFolder {
   id: number;
@@ -48,7 +49,7 @@ export async function fetchMyFolders(myUserId: number): Promise<PhotoFolder[]> {
 
 export async function createFolder(myUserId: number, name: string): Promise<void> {
   const res = await post("createFolder", { my_user_id: myUserId, name });
-  if (!res.status) throw new Error(res.message ?? "Couldn't create that folder.");
+  if (!res.status) throw new Error(res.message ?? tt("couldn_t_create_that_folder"));
 }
 
 export async function fetchPhotoStorageStatus(myUserId: number): Promise<PhotoStorageStatus | null> {
@@ -144,7 +145,7 @@ export function makeCartoon(
         reject(new Error(body.message || uploadErrorMessage(xhr.status)));
       }
     };
-    xhr.ontimeout = () => reject(new Error("That took too long. If you were charged, your coins are put back automatically — please try again."));
+    xhr.ontimeout = () => reject(new Error(tt("that_took_too_long_if_you_were_charged_y")));
     xhr.onerror = () => reject(new Error(uploadErrorMessage(0)));
     xhr.send(form);
   });
@@ -173,33 +174,33 @@ export async function fetchFolderPhotos(myUserId: number, folderId: number): Pro
     my_user_id: myUserId,
     folder_id: folderId,
   });
-  if (!res.status) throw new Error(res.message ?? "Couldn't open that folder.");
+  if (!res.status) throw new Error(res.message ?? tt("couldn_t_open_that_folder"));
   return { folder: res.data?.folder ?? null, photos: res.data?.photos ?? [] };
 }
 
 export async function togglePhotoFavourite(myUserId: number, photoId: number): Promise<void> {
   const res = await post("togglePhotoFavorite", { my_user_id: myUserId, photo_id: photoId });
-  if (!res.status) throw new Error(res.message ?? "Couldn't update that photo.");
+  if (!res.status) throw new Error(res.message ?? tt("couldn_t_update_that_photo"));
 }
 
 export async function movePhoto(myUserId: number, photoId: number, targetFolderId: number): Promise<void> {
   const res = await post("movePhoto", { my_user_id: myUserId, photo_id: photoId, target_folder_id: targetFolderId });
-  if (!res.status) throw new Error(res.message ?? "Couldn't move that photo.");
+  if (!res.status) throw new Error(res.message ?? tt("couldn_t_move_that_photo"));
 }
 
 export async function deletePhoto(myUserId: number, photoId: number): Promise<void> {
   const res = await post("deletePhoto", { my_user_id: myUserId, photo_id: photoId });
-  if (!res.status) throw new Error(res.message ?? "Couldn't delete that photo.");
+  if (!res.status) throw new Error(res.message ?? tt("couldn_t_delete_that_photo"));
 }
 
 export async function renameFolder(myUserId: number, folderId: number, name: string): Promise<void> {
   const res = await post("renameFolder", { my_user_id: myUserId, folder_id: folderId, name });
-  if (!res.status) throw new Error(res.message ?? "Couldn't rename that folder.");
+  if (!res.status) throw new Error(res.message ?? tt("couldn_t_rename_that_folder"));
 }
 
 export async function deleteFolder(myUserId: number, folderId: number): Promise<void> {
   const res = await post("deleteFolder", { my_user_id: myUserId, folder_id: folderId });
-  if (!res.status) throw new Error(res.message ?? "Couldn't delete that folder.");
+  if (!res.status) throw new Error(res.message ?? tt("couldn_t_delete_that_folder"));
 }
 
 // ---- Public surfaces: the directory and the feed --------------------------------------------
@@ -249,7 +250,7 @@ export async function fetchUserPhotos(myUserId: number, userId: number): Promise
     my_user_id: myUserId,
     user_id: userId,
   });
-  if (!res.status) throw new Error(res.message ?? "Couldn't open that album.");
+  if (!res.status) throw new Error(res.message ?? tt("couldn_t_open_that_album"));
   const photos = res.data?.photos ?? [];
   return { user: res.data?.user ?? null, photos, count: res.data?.photo_count ?? photos.length };
 }

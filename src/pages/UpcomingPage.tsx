@@ -6,7 +6,7 @@ import {
   fetchUpcomingSchedules, formatScheduleTime, mediaUrl,
   type ScheduleItem, type ScheduleKind,
 } from "../lib/api";
-import { useT } from "../lib/i18n";
+import { tt, useT  } from "../lib/i18n";
 
 /**
  * Everything coming up across the app — Steve's "for all the members to see and maybe they will
@@ -32,7 +32,7 @@ export function UpcomingPage() {
       try {
         setItems(await fetchUpcomingSchedules(me.id, filter === "all" ? undefined : filter));
       } catch {
-        setError("Could not load what's coming up.");
+        setError(tt("could_not_load_what_s_coming_up"));
       } finally {
         setLoading(false);
       }

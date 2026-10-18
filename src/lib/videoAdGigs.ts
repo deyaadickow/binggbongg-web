@@ -10,6 +10,7 @@
 // lengths and every window come down with the listing, so admin is the only place they live.
 import { post } from "./api";
 import { createUploadUrls, uploadErrorMessage } from "./upload";
+import { tt } from "./i18n";
 
 export type GigStatus = "pending_review" | "approved" | "rejected" | "suspended";
 export type GigOrderStatus =
@@ -110,7 +111,7 @@ export async function orderVideoAdGig(myUserId: number, f: {
   const body = r as unknown as Record<string, unknown>;
   // The server's refusal carries the real figures — "you have $40 and this gig is $89" — so it
   // has to reach the buyer word for word rather than becoming a generic failure.
-  if (!r.status) throw new Error(r.message ?? "Couldn't place that order.");
+  if (!r.status) throw new Error(r.message ?? tt("couldn_t_place_that_order"));
   return {
     message: r.message ?? "Ordered.",
     order: (r.data as GigOrder | null) ?? null,
@@ -120,19 +121,19 @@ export async function orderVideoAdGig(myUserId: number, f: {
 
 export async function acceptVideoAdGigOrder(myUserId: number, orderId: number) {
   const r = await post("acceptVideoAdGigOrder", { user_id: myUserId, order_id: orderId });
-  if (!r.status) throw new Error(r.message ?? "Couldn't accept that.");
+  if (!r.status) throw new Error(r.message ?? tt("couldn_t_accept_that"));
   return r.message ?? "Accepted.";
 }
 
 export async function cancelVideoAdGigOrder(myUserId: number, orderId: number) {
   const r = await post("cancelVideoAdGigOrder", { user_id: myUserId, order_id: orderId });
-  if (!r.status) throw new Error(r.message ?? "Couldn't cancel that.");
+  if (!r.status) throw new Error(r.message ?? tt("couldn_t_cancel_that"));
   return r.message ?? "Cancelled.";
 }
 
 export async function respondVideoAdGigOrder(myUserId: number, orderId: number, action: "accept" | "decline", reason = "") {
   const r = await post("respondVideoAdGigOrder", { user_id: myUserId, order_id: orderId, action, reason });
-  if (!r.status) throw new Error(r.message ?? "Couldn't send that.");
+  if (!r.status) throw new Error(r.message ?? tt("couldn_t_send_that"));
   return r.message ?? "Sent.";
 }
 
@@ -151,7 +152,7 @@ async function putToS3(myUserId: number, file: File, onProgress?: (f: number) =>
     file_name: `${Date.now()}_${file.name.replace(/[^\w.\-]+/g, "_")}`,
     content_type: file.type || "video/mp4",
   }]);
-  if (!slot) throw new Error("Couldn't prepare the upload.");
+  if (!slot) throw new Error(tt("couldn_t_prepare_the_upload"));
 
   await new Promise<void>((resolve, reject) => {
     const xhr = new XMLHttpRequest();
@@ -176,7 +177,7 @@ export async function applyForVideoAdGig(myUserId: number, f: {
   const r = await post<GigCard>("applyForVideoAdGig", params);
   // A pitch the moderation check flagged comes back as status false with the reason in the
   // message — a real answer, not a transport failure, so show it as it is.
-  if (!r.status) throw new Error(r.message ?? "Couldn't send that.");
+  if (!r.status) throw new Error(r.message ?? tt("couldn_t_send_that"));
   return { message: r.message ?? "Sent for review.", gig: (r.data as GigCard | null) ?? null };
 }
 
@@ -184,6 +185,6 @@ export async function applyForVideoAdGig(myUserId: number, f: {
 export async function deliverVideoAdGigOrder(myUserId: number, orderId: number, video: File, onProgress?: (fraction: number) => void) {
   const key = await putToS3(myUserId, video, onProgress);
   const r = await post("deliverVideoAdGigOrder", { user_id: myUserId, order_id: orderId, video_key: key });
-  if (!r.status) throw new Error(r.message ?? "Couldn't deliver that.");
+  if (!r.status) throw new Error(r.message ?? tt("couldn_t_deliver_that"));
   return r.message ?? "Delivered.";
 }

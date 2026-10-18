@@ -13,7 +13,7 @@ import {
   EXITED, blockColour, fetchBlockEscapeLevels, remaining, slide,
   type BEBlock, type BlockEscapeLevel,
 } from "../lib/blockescape";
-import { useT } from "../lib/i18n";
+import { tt, useT  } from "../lib/i18n";
 
 export function BlockEscapeOverlay({ onClose }: { onClose: () => void }) {
   const { t } = useT();
@@ -33,7 +33,7 @@ export function BlockEscapeOverlay({ onClose }: { onClose: () => void }) {
   useEffect(() => {
     fetchBlockEscapeLevels()
       .then((rows) => {
-        if (rows.length === 0) setError("No boards yet — try again in a moment.");
+        if (rows.length === 0) setError(tt("no_boards_yet_try_again_in_a_moment"));
         setLevels(rows);
       })
       // A failed fetch is not an empty game: say so, rather than showing a blank board that

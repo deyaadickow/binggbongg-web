@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { post, setAuthHeaders, type UserSummary } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Notice, StoreBadges } from "../components/Common";
-import { useT } from "../lib/i18n";
+import { tt, useT  } from "../lib/i18n";
 
 // Google Identity Services. The web client id must be added to the backend's
 // GOOGLE_SIGNIN_CLIENT_IDS (registration verifies the ID token) — see README.
@@ -71,9 +71,9 @@ export function LoginPage() {
         username: email.split("@")[0],
         provider_token: credential,
       });
-      if (!res.status || !res.data) throw new Error(res.message ?? "Sign-in was refused.");
+      if (!res.status || !res.data) throw new Error(res.message ?? tt("sign_in_was_refused"));
       const token = res.data.auth_token;
-      if (!token) throw new Error("No session token came back.");
+      if (!token) throw new Error(tt("no_session_token_came_back"));
       signIn({ ...res.data, auth_token: undefined }, token);
       navigate(from, { replace: true });
     } catch (e) {
@@ -112,7 +112,7 @@ export function LoginPage() {
       const id = Number(devUserId);
       setAuthHeaders(devToken.trim(), id);
       const res = await post<UserSummary>("fetchMyUserDetails", { my_user_id: id });
-      if (!res.status || !res.data) throw new Error(res.message ?? "That session is not valid.");
+      if (!res.status || !res.data) throw new Error(res.message ?? tt("that_session_is_not_valid"));
       signIn({ ...res.data, auth_token: undefined }, devToken.trim());
       navigate(from, { replace: true });
     } catch (e) {

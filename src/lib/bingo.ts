@@ -10,6 +10,7 @@
 // resolves it there — this client sends only which card and which square, which is what stops
 // a modified client buying squares for a coin.
 import { post } from "./api";
+import { tt } from "./i18n";
 
 /** Steve, 2026-10-11: "Give the host the ability to change the coin cost settings for each
  *  square. Minimum 50 coins."
@@ -227,7 +228,7 @@ export type BingoWinners = {
 
 export async function fetchBingoBoard(): Promise<BingoBoard> {
   const res = await post<Record<string, unknown>>("fetchBingoBoard", { start: 0, count: 50 });
-  if (!res.status) throw new Error(res.message ?? "Couldn't load the board.");
+  if (!res.status) throw new Error(res.message ?? tt("cvc_load_failed"));
   const d = (res.data ?? {}) as Record<string, unknown>;
   return {
     total_games: num(d.total_games) ?? 0,
@@ -249,7 +250,7 @@ export async function fetchBingoBoard(): Promise<BingoBoard> {
 
 export async function fetchBingoGameWinners(bingoGameId: number): Promise<BingoWinners> {
   const res = await post<Record<string, unknown>>("fetchBingoGameWinners", { bingo_game_id: bingoGameId });
-  if (!res.status) throw new Error(res.message ?? "Couldn't load that game.");
+  if (!res.status) throw new Error(res.message ?? tt("couldn_t_load_that_game"));
   const d = (res.data ?? {}) as Record<string, unknown>;
   return {
     game_no: num(d.game_no) ?? 0,
