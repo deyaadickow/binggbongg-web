@@ -17,6 +17,7 @@ import { VideoPage } from "./pages/VideoPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { UpcomingPage } from "./pages/UpcomingPage";
 import { MessagesPage } from "./pages/MessagesPage";
+import { NotificationsPage } from "./pages/NotificationsPage";
 import { ChatPage } from "./pages/ChatPage";
 import { DailyFortunePage } from "./pages/DailyFortunePage";
 import { SupporterBreakdownPage, SupportersPage } from "./pages/SupportersPage";
@@ -59,6 +60,8 @@ export default function App() {
           <Route path="/upcoming" element={<UpcomingPage />} />
           {/* Steve, 2026-10-11: direct messages — the same Firestore conversations the phones use. */}
           <Route path="/messages" element={<MessagesPage />} />
+          {/* Steve, 2026-10-18: "Add the notification record so members can read it later." */}
+          <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/messages/:id" element={<ChatPage />} />
           {/* Lucky numbers + daily horoscope (Steve, 2026-10-09). */}
           <Route path="/lucky" element={<DailyFortunePage />} />
