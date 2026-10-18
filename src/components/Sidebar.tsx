@@ -42,6 +42,9 @@ export function sidebarSections(userId: number | null): SideSection[] {
       // the Home chip on the phones. There is a second one under Account, matching their
       // Settings row; Steve asked for both.
       { to: "/lucky", label: "Lucky Numbers", icon: "🔮", needsLogin: true },
+      // Steve, 2026-10-18: "add a tab for 'App Features' next to the end on main feed as well."
+      // Last entry in the main list, matching where the chip sits on the phones.
+      { to: "/settings/app-features", label: "App Features", icon: "📖" },
     ] },
     { title: "Account", links: [
       { to: userId ? `/profile/${userId}` : "/login", label: "My Profile", icon: "👤", needsLogin: true },
