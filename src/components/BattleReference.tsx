@@ -12,9 +12,11 @@ import {
   type ChallengeStatus, type LifetimeRow, type PkContest, type StandingRow,
 } from "../lib/challenges";
 import { Overlay } from "./BattleEngines";
+import { useT } from "../lib/i18n";
 
 function Loading() {
-  return <p className="muted" style={{ textAlign: "center", padding: "24px 0", margin: 0 }}>Loading…</p>;
+  const { t } = useT();
+  return <p className="muted" style={{ textAlign: "center", padding: "24px 0", margin: 0 }}>{t("imagePickerLoading")}</p>;
 }
 
 function Empty({ children }: { children: React.ReactNode }) {
@@ -51,6 +53,7 @@ function MemberRow({ rank, image, name, sub, value, valueLabel }: {
 // ---- 31 Day Battle Challenge ------------------------------------------------------------------
 
 export function Challenge31Overlay({ userId, onClose, onNotice }: { userId: number; onClose: () => void; onNotice: (m: string) => void }) {
+  const { t } = useT();
   const [status, setStatus] = useState<ChallengeStatus | null | "loading">("loading");
   const [busy, setBusy] = useState(false);
 
@@ -75,7 +78,7 @@ export function Challenge31Overlay({ userId, onClose, onNotice }: { userId: numb
 
   const tiers = (
     <div style={{ marginTop: 12 }}>
-      <div className="muted" style={{ fontSize: 12, marginBottom: 6 }}>Daily tiers</div>
+      <div className="muted" style={{ fontSize: 12, marginBottom: 6 }}>{t("daily_tiers")}</div>
       {CHALLENGE_TIERS.map((t) => (
         <div key={t.percent} className="row" style={{ justifyContent: "space-between", padding: "5px 0", fontSize: 13 }}>
           <span>{t.battles === 3 ? "3 or more" : t.battles} qualifying battle{t.battles === 1 ? "" : "s"} in a day</span>
@@ -83,14 +86,14 @@ export function Challenge31Overlay({ userId, onClose, onNotice }: { userId: numb
         </div>
       ))}
       <p className="muted" style={{ fontSize: 12, marginTop: 8, marginBottom: 0 }}>
-        Your bonus for the whole 31 days is your <b>lowest</b> day, not your average — one quiet day
+        Your bonus for the whole 31 days is your <b>{t("lowest")}</b> day, not your average — one quiet day
         sets the rate for all of it. Miss a day completely and the challenge restarts from day 1.
       </p>
     </div>
   );
 
   return (
-    <Overlay title="#5 31 Day Battle Challenge" onClose={onClose} width={520}>
+    <Overlay title={t("n5_31_day_battle_challenge")} onClose={onClose} width={520}>
       {status === "loading" ? <Loading /> : status?.has_active_challenge ? (
         <>
           <div className="card pad" style={{ marginBottom: 10, textAlign: "center" }}>
@@ -105,20 +108,19 @@ export function Challenge31Overlay({ userId, onClose, onNotice }: { userId: numb
           <div className="row" style={{ gap: 8 }}>
             <div className="card pad" style={{ flex: 1, textAlign: "center" }}>
               <div style={{ fontSize: 22, fontWeight: 800 }}>{status.today_battle_count ?? 0}</div>
-              <div className="muted" style={{ fontSize: 12 }}>battles today</div>
+              <div className="muted" style={{ fontSize: 12 }}>{t("battles_today")}</div>
               <div style={{ color: "var(--gold)", fontWeight: 700, fontSize: 13 }}>{status.today_tier_percent ?? 0}% tier</div>
             </div>
             <div className="card pad" style={{ flex: 1, textAlign: "center" }}>
               <div style={{ fontSize: 22, fontWeight: 800, color: "var(--gold)" }}>{status.running_lowest_tier_percent ?? 0}%</div>
-              <div className="muted" style={{ fontSize: 12 }}>on track for</div>
-              <div className="muted" style={{ fontSize: 11 }}>your lowest day so far</div>
+              <div className="muted" style={{ fontSize: 12 }}>{t("on_track_for")}</div>
+              <div className="muted" style={{ fontSize: 11 }}>{t("your_lowest_day_so_far")}</div>
             </div>
           </div>
 
           {(status.today_battle_count ?? 0) === 0 && (
             <p style={{ color: "#f5a623", fontSize: 13, marginBottom: 0 }}>
-              You haven't battled yet today. A day with zero battles restarts the whole challenge.
-            </p>
+              {t("you_haven_t_battled_yet_today_a_day_with")}</p>
           )}
           {tiers}
         </>
@@ -126,8 +128,7 @@ export function Challenge31Overlay({ userId, onClose, onNotice }: { userId: numb
         <>
           {status?.just_restarted && (
             <p style={{ color: "#f55", fontSize: 13, marginTop: 0 }}>
-              Your last challenge ended — a day went by with no qualifying battles. You can start again now.
-            </p>
+              {t("your_last_challenge_ended_a_day_went_by")}</p>
           )}
           {status?.just_completed && (
             <p style={{ color: "var(--gold)", fontSize: 14, marginTop: 0 }}>
@@ -136,9 +137,7 @@ export function Challenge31Overlay({ userId, onClose, onNotice }: { userId: numb
             </p>
           )}
           <p className="soft" style={{ marginTop: 0 }}>
-            A personal 31-day streak that starts the day you opt in — not the calendar month.
-            Battle at least once a day to keep it alive.
-          </p>
+            {t("a_personal_31_day_streak_that_starts_the")}</p>
           {tiers}
           <button className="btn block" disabled={busy} onClick={optIn} style={{ marginTop: 12 }}>
             {busy ? "Starting…" : "Start my 31 days"}
@@ -152,6 +151,7 @@ export function Challenge31Overlay({ userId, onClose, onNotice }: { userId: numb
 // ---- PK Battle Contests ------------------------------------------------------------------------
 
 export function PkContestsOverlay({ userId, onClose }: { userId: number; onClose: () => void }) {
+  const { t } = useT();
   const [rows, setRows] = useState<PkContest[] | null>(null);
   const [open, setOpen] = useState<PkContest | null>(null);
 
@@ -162,9 +162,9 @@ export function PkContestsOverlay({ userId, onClose }: { userId: number; onClose
   if (open) return <ContestStandingsOverlay contest={open} userId={userId} onClose={() => setOpen(null)} />;
 
   return (
-    <Overlay title="PK Battle Contests" onClose={onClose} width={560}>
+    <Overlay title={t("pk_battle_contests")} onClose={onClose} width={560}>
       {rows === null ? <Loading /> : rows.length === 0 ? (
-        <Empty>No contests running right now.</Empty>
+        <Empty>{t("no_contests_running_right_now")}</Empty>
       ) : rows.map((c) => (
         <button key={c.id} className="btn block" onClick={() => setOpen(c)}
           style={{
@@ -186,6 +186,7 @@ export function PkContestsOverlay({ userId, onClose }: { userId: number; onClose
 }
 
 function ContestStandingsOverlay({ contest, userId, onClose }: { contest: PkContest; userId: number; onClose: () => void }) {
+  const { t } = useT();
   const [rows, setRows] = useState<StandingRow[] | null>(null);
   const [live, setLive] = useState<PkContest>(contest);
   const [error, setError] = useState("");
@@ -210,7 +211,7 @@ function ContestStandingsOverlay({ contest, userId, onClose }: { contest: PkCont
 
       {prizes.length > 0 && (
         <div className="card pad" style={{ marginBottom: 10 }}>
-          <div className="muted" style={{ fontSize: 12, marginBottom: 6 }}>Prizes</div>
+          <div className="muted" style={{ fontSize: 12, marginBottom: 6 }}>{t("prizes")}</div>
           {prizes.map((t) => (
             <div key={t.rank} className="row" style={{ justifyContent: "space-between", fontSize: 13, padding: "3px 0" }}>
               <span>#{t.rank}</span>
@@ -221,7 +222,7 @@ function ContestStandingsOverlay({ contest, userId, onClose }: { contest: PkCont
       )}
 
       {rows === null ? <Loading /> : rows.length === 0 ? (
-        <Empty>No scores yet.</Empty>
+        <Empty>{t("no_scores_yet")}</Empty>
       ) : rows.map((r, i) => (
         <MemberRow key={`${r.user_id ?? r.label}-${i}`}
           rank={i + 1}
@@ -238,6 +239,7 @@ function ContestStandingsOverlay({ contest, userId, onClose }: { contest: PkCont
 // ---- Lifetime Battle Board ---------------------------------------------------------------------
 
 export function LifetimeBoardOverlay({ onClose }: { onClose: () => void }) {
+  const { t } = useT();
   const [rows, setRows] = useState<LifetimeRow[] | null>(null);
 
   useEffect(() => {
@@ -245,12 +247,11 @@ export function LifetimeBoardOverlay({ onClose }: { onClose: () => void }) {
   }, []);
 
   return (
-    <Overlay title="Lifetime Battle Board" onClose={onClose} width={560}>
+    <Overlay title={t("lifetime_battle_board_2")} onClose={onClose} width={560}>
       <p className="muted" style={{ fontSize: 12, marginTop: 0 }}>
-        Every Talent Contest ever run, all time. Top 100.
-      </p>
+        {t("every_talent_contest_ever_run_all_time_t")}</p>
       {rows === null ? <Loading /> : rows.length === 0 ? (
-        <Empty>No contest results yet.</Empty>
+        <Empty>{t("no_contest_results_yet")}</Empty>
       ) : rows.map((r) => (
         <MemberRow key={r.user_id}
           rank={r.rank}
@@ -268,6 +269,7 @@ export function LifetimeBoardOverlay({ onClose }: { onClose: () => void }) {
 // ---- Friendly Punishment Suggestions -----------------------------------------------------------
 
 export function PunishmentsOverlay({ onClose }: { onClose: () => void }) {
+  const { t } = useT();
   const [rows, setRows] = useState<string[] | null>(null);
   const [picked, setPicked] = useState<string | null>(null);
 
@@ -286,25 +288,23 @@ export function PunishmentsOverlay({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <Overlay title="Friendly Punishment Suggestions" onClose={onClose} width={520}>
+    <Overlay title={t("friendly_punishment_suggestions")} onClose={onClose} width={520}>
       <p className="soft" style={{ marginTop: 0 }}>
-        Battling for fun? Agree what the loser does before you start.
-      </p>
+        {t("battling_for_fun_agree_what_the_loser_do")}</p>
 
       {picked && (
         <div className="card pad" style={{ marginBottom: 10, textAlign: "center", borderColor: "var(--gold)" }}>
-          <div className="muted" style={{ fontSize: 12 }}>Your random pick</div>
+          <div className="muted" style={{ fontSize: 12 }}>{t("your_random_pick")}</div>
           <div style={{ fontSize: 17, fontWeight: 700, color: "var(--gold)", marginTop: 4 }}>{picked}</div>
         </div>
       )}
 
       {rows === null ? <Loading /> : rows.length === 0 ? (
-        <Empty>No suggestions have been added yet.</Empty>
+        <Empty>{t("no_suggestions_have_been_added_yet")}</Empty>
       ) : (
         <>
           <button className="btn block" onClick={pickRandom} style={{ marginBottom: 10 }}>
-            🎲 Pick one at random
-          </button>
+            {t("pick_one_at_random")}</button>
           <div className="muted" style={{ fontSize: 12, marginBottom: 6 }}>All {rows.length} suggestions</div>
           {rows.map((r, i) => (
             <div key={i} style={{ padding: "8px 4px", borderBottom: "1px solid var(--line)", fontSize: 14 }}>{r}</div>

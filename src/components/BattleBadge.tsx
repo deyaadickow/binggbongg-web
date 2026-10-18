@@ -1,4 +1,5 @@
 import type { MouseEvent } from "react";
+import { useT } from "../lib/i18n";
 
 /**
  * Steve, 2026-10-05: "(BBBB) Bingg Bongg Battle Badge — The more you battle the bigger the badge
@@ -147,6 +148,7 @@ export function BattleInfoPopup({
   body,
   onClose,
 }: { title: string; body: string; onClose: () => void }) {
+  const { t } = useT();
   return (
     <div
       onClick={onClose}
@@ -198,8 +200,7 @@ export function BattleInfoPopup({
             cursor: "pointer",
           }}
         >
-          OK
-        </button>
+          {t("ok")}</button>
       </div>
     </div>
   );

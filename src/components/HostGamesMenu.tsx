@@ -6,6 +6,7 @@ import {
   GAME_COIN_VALUES, GAME_DURATIONS, clearActiveTapGame, fetchTapGameTypes, gameTitle,
   needsCoinValue, needsDuration, setActiveTapGame, type TapGameType,
 } from "../lib/tapgame";
+import { useT } from "../lib/i18n";
 
 const MODE_FILTERS = [
   { key: "all", label: "All" },
@@ -30,6 +31,7 @@ export function HostGamesMenu({ userId, roomName, activeGame, onClose, onChanged
   onChanged: () => void;
   onToast: (m: string) => void;
 }) {
+  const { t } = useT();
   const [games, setGames] = useState<TapGameType[] | null>(null);
   const [picked, setPicked] = useState<TapGameType | null>(null);
   const [coinValue, setCoinValue] = useState(1);
@@ -90,28 +92,26 @@ export function HostGamesMenu({ userId, roomName, activeGame, onClose, onChanged
     <div style={{ position: "fixed", inset: 0, zIndex: 60, background: "rgba(0,0,0,0.65)", display: "grid", placeItems: "center", padding: 16 }}>
       <div className="card pad" style={{ width: "min(460px, 100%)", maxHeight: "86vh", overflowY: "auto" }}>
         <div className="row" style={{ marginBottom: 10 }}>
-          <b style={{ color: "var(--gold)", flex: 1, fontSize: 18 }}>🎮 Games</b>
-          <button className="btn small ghost" onClick={onClose}>Close</button>
+          <b style={{ color: "var(--gold)", flex: 1, fontSize: 18 }}>{t("games")}</b>
+          <button className="btn small ghost" onClick={onClose}>{t("close")}</button>
         </div>
 
         {activeGame && !picked && (
           <div className="card pad" style={{ marginBottom: 12 }}>
-            <div className="muted" style={{ fontSize: 12 }}>Running now</div>
+            <div className="muted" style={{ fontSize: 12 }}>{t("running_now")}</div>
             <b style={{ color: "var(--gold)" }}>{gameTitle(activeGame)}</b>
             <button className="btn ghost block" style={{ marginTop: 10 }} disabled={busy} onClick={turnOff}>
-              Turn this game off
-            </button>
+              {t("turn_this_game_off")}</button>
           </div>
         )}
 
         {!picked && (
-          games === null ? <p className="muted">Loading games…</p>
+          games === null ? <p className="muted">{t("loading_games")}</p>
           : games.length === 0 ? <p className="muted">{loadFailed ? "Couldn't load the games — check your connection and try again." : "No games are available right now."}</p>
           : (
             <>
               <p className="muted" style={{ fontSize: 13, marginTop: 0 }}>
-                Pick a game for your room. Viewers pay 50 coins to join, and their score becomes a gift to you.
-              </p>
+                {t("pick_a_game_for_your_room_viewers_pay_50")}</p>
               {/* There are ~77 games, so browsing the raw list is impractical. */}
               <input className="input" value={query} onChange={(e) => setQuery(e.target.value)}
                 placeholder={`Search ${games.length} games…`} style={{ width: "100%", marginBottom: 8 }} />
@@ -121,7 +121,7 @@ export function HostGamesMenu({ userId, roomName, activeGame, onClose, onChanged
                     style={{ marginRight: 6, marginBottom: 6 }} onClick={() => setMode(f.key)}>{f.label}</button>
                 ))}
               </div>
-              {shown.length === 0 && <p className="muted">No games match that.</p>}
+              {shown.length === 0 && <p className="muted">{t("no_games_match_that")}</p>}
               {/* Not .btn here: that is a pill, and a game with a long description (Color Balls)
                   spills straight out of the rounded shape. A squared-off row holds both lines. */}
               {shown.map((g) => (
@@ -148,12 +148,12 @@ export function HostGamesMenu({ userId, roomName, activeGame, onClose, onChanged
           <>
             <div className="row" style={{ marginBottom: 12 }}>
               <b style={{ flex: 1, color: "var(--gold)" }}>{gameTitle(picked)}</b>
-              <button className="btn small ghost" onClick={() => setPicked(null)}>Back</button>
+              <button className="btn small ghost" onClick={() => setPicked(null)}>{t("back")}</button>
             </div>
 
             {needsCoinValue(picked) && (
               <>
-                <div className="muted" style={{ fontSize: 13, marginBottom: 6 }}>Coins per catch</div>
+                <div className="muted" style={{ fontSize: 13, marginBottom: 6 }}>{t("coins_per_catch")}</div>
                 <div className="row" style={{ flexWrap: "wrap", marginBottom: 14 }}>
                   {GAME_COIN_VALUES.map((v) => (
                     <button key={v} className={v === coinValue ? "btn small" : "btn small ghost"}
@@ -167,7 +167,7 @@ export function HostGamesMenu({ userId, roomName, activeGame, onClose, onChanged
 
             {needsDuration(picked) && (
               <>
-                <div className="muted" style={{ fontSize: 13, marginBottom: 6 }}>Game length</div>
+                <div className="muted" style={{ fontSize: 13, marginBottom: 6 }}>{t("game_length")}</div>
                 <div className="row" style={{ flexWrap: "wrap", marginBottom: 14 }}>
                   {GAME_DURATIONS.map((s) => (
                     <button key={s} className={s === duration ? "btn small" : "btn small ghost"}

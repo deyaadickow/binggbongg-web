@@ -7,6 +7,7 @@ import { useSession } from "../lib/session";
 import { fetchOpenContests, uploadContestVideo, type OpenContest } from "../lib/contestupload";
 import { videoDuration } from "../lib/upload";
 import { Loading, Notice } from "../components/Common";
+import { useT } from "../lib/i18n";
 
 function prizeLine(c: OpenContest): string | null {
   const tiers = (c.prize_tiers ?? []).filter((t) => t.prize_amount != null);
@@ -17,6 +18,7 @@ function prizeLine(c: OpenContest): string | null {
 }
 
 function ContestCard({ contest, userId, onDone }: { contest: OpenContest; userId: number; onDone: () => void }) {
+  const { t } = useT();
   const fileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -77,7 +79,7 @@ function ContestCard({ contest, userId, onDone }: { contest: OpenContest; userId
       )}
 
       {error && <p style={{ color: "#f55", fontSize: 13 }}>{error}</p>}
-      {sent && <p className="soft" style={{ fontSize: 13 }}>Entered. Good luck.</p>}
+      {sent && <p className="soft" style={{ fontSize: 13 }}>{t("entered_good_luck")}</p>}
 
       {busy && (
         <div style={{ height: 8, background: "var(--panel)", borderRadius: 999, overflow: "hidden", margin: "10px 0" }}>
@@ -96,6 +98,7 @@ function ContestCard({ contest, userId, onDone }: { contest: OpenContest; userId
 }
 
 export function ContestUploadPage() {
+  const { t } = useT();
   const { user, isLoggedIn } = useSession();
   const [contests, setContests] = useState<OpenContest[] | null>(null);
 
@@ -107,18 +110,17 @@ export function ContestUploadPage() {
   useEffect(() => { load(); }, [load]);
 
   if (!isLoggedIn || !user) {
-    return <div className="page"><Notice>Sign in to enter a contest.</Notice></div>;
+    return <div className="page"><Notice>{t("sign_in_to_enter_a_contest")}</Notice></div>;
   }
 
   return (
     <div className="page" style={{ maxWidth: 720 }}>
-      <h1 className="page-title">Enter a contest</h1>
+      <h1 className="page-title">{t("enter_a_contest")}</h1>
       {contests === null ? <Loading /> : contests.length === 0 ? (
         <div className="card pad">
-          <p className="soft" style={{ marginTop: 0 }}>There's no contest open for your country right now.</p>
+          <p className="soft" style={{ marginTop: 0 }}>{t("there_s_no_contest_open_for_your_country")}</p>
           <p className="muted" style={{ fontSize: 13, marginBottom: 0 }}>
-            Contests run for a set period and are open to particular countries. When one opens for yours, it appears here by name.
-          </p>
+            {t("contests_run_for_a_set_period_and_are_op")}</p>
         </div>
       ) : (
         contests.map((c) => <ContestCard key={c.id} contest={c} userId={user.id} onDone={load} />)

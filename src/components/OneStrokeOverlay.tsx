@@ -15,6 +15,7 @@
 // coordinates that the phones have to convert by hand are simply the drawing instructions here.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { fetchOneStrokeLevels, type OneStrokeLevel } from "../lib/onestroke";
+import { useT } from "../lib/i18n";
 
 // The board's viewBox is inset beyond 0..1 so a thick stroke on an edge node is not clipped in
 // half. These two constants exist because that inset ALSO has to be undone when a pointer
@@ -29,6 +30,7 @@ const IQ_PER_EDGE = 3;
 const IQ_PER_LEVEL = 11;
 
 export function OneStrokeOverlay({ onClose }: { onClose: () => void }) {
+  const { t } = useT();
   const [levels, setLevels] = useState<OneStrokeLevel[] | null>(null);
   const [failed, setFailed] = useState(false);
   const [index, setIndex] = useState(0);
@@ -185,8 +187,8 @@ export function OneStrokeOverlay({ onClose }: { onClose: () => void }) {
     <div className="onestroke-overlay">
       <div className="onestroke-inner">
         <div className="onestroke-top">
-          <button className="btn ghost" onClick={onClose}>✕ Close</button>
-          <span className="onestroke-iq"><b>IQ</b> {iq}</span>
+          <button className="btn ghost" onClick={onClose}>{t("close_2")}</button>
+          <span className="onestroke-iq"><b>{t("iq")}</b> {iq}</span>
         </div>
 
         {level ? (
@@ -219,18 +221,17 @@ export function OneStrokeOverlay({ onClose }: { onClose: () => void }) {
               ))}
             </svg>
             <div className="onestroke-actions">
-              <button className="btn ghost" onClick={restart}>Start Again</button>
+              <button className="btn ghost" onClick={restart}>{t("start_again")}</button>
               {solved && (
                 <button className="btn" onClick={() => setIndex((i) => (levels && i + 1 < levels.length ? i + 1 : 0))}>
-                  Next Shape
-                </button>
+                  {t("next_shape")}</button>
               )}
             </div>
           </>
         ) : failed ? (
-          <p className="soft">Couldn't load the shapes. Check your connection and open the game again.</p>
+          <p className="soft">{t("couldn_t_load_the_shapes_check_your_conn")}</p>
         ) : (
-          <p className="soft">Loading…</p>
+          <p className="soft">{t("imagePickerLoading")}</p>
         )}
       </div>
     </div>

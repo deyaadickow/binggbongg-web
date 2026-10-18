@@ -127,6 +127,7 @@ export function SiteFooter() {
   return (
     <div className="site-footer">
       <div>© {new Date().getFullYear()} Bingg Bongg Inc.</div>
+      {/* i18n-exempt: a postal address is not translated. */}
       <div>Sterling Heights, Michigan, USA</div>
       <div className="site-footer-links">
         <NavLink to="/settings/about">{t("about")}</NavLink>

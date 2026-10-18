@@ -130,7 +130,7 @@ export default function App() {
           <Route path="/shop/showcase/:userId" element={<ShopPage />} />
           <Route path="/shop/product/:id" element={<ShopProductPage />} />
           <Route path="/settings/shop" element={<ShopPage tab="shop" />} />
-          <Route path="/settings/verification" element={<ComingSoonPage title="Request verification" note="Send your ID and a selfie to get the verified badge." />} />
+          <Route path="/settings/verification" element={<ComingSoonPage titleKey="request_verification" noteKey="verification_note" />} />
           <Route path="/settings/language" element={<LanguagePage />} />
           <Route path="/settings/support" element={<SupportPage />} />
           <Route path="/settings/support/archive" element={<SupportArchivePage />} />

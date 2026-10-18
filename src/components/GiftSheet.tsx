@@ -4,6 +4,7 @@ import { giftPrice, mediaUrl, post, type Gift, type Post, type UserSummary } fro
 import { useSession } from "../lib/session";
 import { loadGifts } from "../lib/gifts";
 import { TapTapBurst, isTapTapGift, tapTapBurstDuration, burstLabel } from "./TapTapBurst";
+import { useT } from "../lib/i18n";
 
 /**
  * The gift button on a video, and the gift page it opens.
@@ -19,6 +20,7 @@ import { TapTapBurst, isTapTapGift, tapTapBurstDuration, burstLabel } from "./Ta
  * first so the member gets a plain message rather than a round trip.
  */
 export function PostGiftButton({ post: item, className = "btn small", onSent, onOpenChange }: { post: Post; className?: string; onSent?: (gift: Gift) => void; onOpenChange?: (open: boolean) => void }) {
+  const { t } = useT();
   const { user, isLoggedIn } = useSession();
   const navigate = useNavigate();
   const location = useLocation();
@@ -37,8 +39,7 @@ export function PostGiftButton({ post: item, className = "btn small", onSent, on
           setOpen(true);
           onOpenChange?.(true);
         }}>
-        🎁 Gift
-      </button>
+        {t("gift")}</button>
       {open && <GiftSheet post={item} onClose={() => { setOpen(false); onOpenChange?.(false); }} onSent={onSent} />}
     </>
   );
@@ -51,6 +52,7 @@ export function PostGiftButton({ post: item, className = "btn small", onSent, on
  * positioned box (the card thumbnail or the video stage), where it fills it.
  */
 export function GiftFlash({ gift, onDone }: { gift: Gift; onDone: () => void }) {
+  const { t } = useT();
   // Eddie, 2026-09-19 / Steve, 2026-10-06: a TapTap gift bursts one icon per coin instead of
   // showing the single card — and now does so everywhere a gift is given, not just live rooms.
   const burst = isTapTapGift(gift);
@@ -65,7 +67,7 @@ export function GiftFlash({ gift, onDone }: { gift: Gift; onDone: () => void }) 
   return (
     <div className="gift-flash" aria-live="polite">
       <div className="gift-flash-card">
-        <div className="gift-flash-title">You have sent</div>
+        <div className="gift-flash-title">{t("you_have_sent")}</div>
         {gift.image ? <img src={mediaUrl(gift.image)} alt="" /> : <span style={{ fontSize: 64 }}>🎁</span>}
         <b>{giftPrice(gift)}</b>
         <span>{gift.name ?? "Gift"}</span>
@@ -75,6 +77,7 @@ export function GiftFlash({ gift, onDone }: { gift: Gift; onDone: () => void }) 
 }
 
 function GiftSheet({ post: item, onClose, onSent }: { post: Post; onClose: () => void; onSent?: (gift: Gift) => void }) {
+  const { t } = useT();
   const { user, refresh } = useSession();
   const [gifts, setGifts] = useState<Gift[]>([]);
   const [busy, setBusy] = useState<number | null>(null);
@@ -128,21 +131,21 @@ function GiftSheet({ post: item, onClose, onSent }: { post: Post; onClose: () =>
 
   return (
     <div className="modal-backdrop gift-backdrop" onClick={onClose}>
-      <div className="modal-sheet gift-sheet" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Send a gift">
+      <div className="modal-sheet gift-sheet" onClick={(e) => e.stopPropagation()} role="dialog" aria-label={t("send_a_gift")}>
         <div className="row" style={{ marginBottom: 12 }}>
-          <h3 style={{ margin: 0, textAlign: "left" }}>Send a gift</h3>
+          <h3 style={{ margin: 0, textAlign: "left" }}>{t("send_a_gift")}</h3>
           <span className="spacer" />
-          <button className="btn small ghost" onClick={onClose}>Close</button>
+          <button className="btn small ghost" onClick={onClose}>{t("close")}</button>
         </div>
         <Link to="/wallet" className="gift-purchase">
-          <span>Purchase Coins</span>
+          <span>{t("purchase_votes")}</span>
           <span className="coin" aria-hidden>🪙</span>
           <span className="spacer" />
           <b>{coins}</b>
         </Link>
         {notice && (
           <div className="gift-notice">
-            {notice.text}{notice.wallet && <> <Link to="/wallet">Buy coins</Link></>}
+            {notice.text}{notice.wallet && <> <Link to="/wallet">{t("buy_coins")}</Link></>}
           </div>
         )}
         <div className="gift-grid">
@@ -154,7 +157,7 @@ function GiftSheet({ post: item, onClose, onSent }: { post: Post; onClose: () =>
               {burstLabel(g) && <em className="gift-burst-badge">{burstLabel(g)}</em>}
             </button>
           ))}
-          {gifts.length === 0 && !notice && <div className="muted" style={{ gridColumn: "1 / -1", textAlign: "center" }}>Loading gifts…</div>}
+          {gifts.length === 0 && !notice && <div className="muted" style={{ gridColumn: "1 / -1", textAlign: "center" }}>{t("loading_gifts")}</div>}
         </div>
       </div>
     </div>

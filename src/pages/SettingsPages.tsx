@@ -11,7 +11,7 @@ import { SideLinkItem, SiteFooter, sidebarSections } from "../components/Sidebar
 import { fetchMyVirtualBattles, fetchVirtualGiftRecord, sendVirtualThankYou, type VirtualBattleData, type VirtualGiftRecord } from "../lib/battles";
 import { VirtualGiftRecordOverlay, personName } from "../components/BattleEngines";
 import { GoldSelect } from "../components/GoldSelect";
-import { useT } from "../lib/i18n";
+import { useT, type StringKey } from "../lib/i18n";
 
 const SITE = "https://www.binggbongg.com";
 
@@ -49,12 +49,15 @@ export function SettingsHubPage() {
   );
 }
 
-export function ComingSoonPage({ title, note }: { title: string; note: string }) {
+export function ComingSoonPage({ titleKey, noteKey }: { titleKey: StringKey; noteKey: StringKey }) {
+  // Keys, not text: this is rendered from App, which is where the LanguageProvider itself lives,
+  // so a t() called up there would read the context from above the provider and always answer in
+  // English. Translating here keeps it under the provider.
   const { t } = useT();
   return (
-    <Page title={title}>
+    <Page title={t(titleKey)}>
       <div className="card pad">
-        <p className="soft" style={{ marginTop: 0 }}>{note}</p>
+        <p className="soft" style={{ marginTop: 0 }}>{t(noteKey)}</p>
         <p className="muted" style={{ fontSize: 13, marginBottom: 0 }}>{t("this_page_is_on_the_way_for_the_web_it_a")}</p>
       </div>
     </Page>

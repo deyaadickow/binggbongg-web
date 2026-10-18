@@ -13,8 +13,10 @@ import {
 } from "../lib/photos";
 import { Loading, Notice } from "../components/Common";
 import { GoldSelect } from "../components/GoldSelect";
+import { useT } from "../lib/i18n";
 
 export function UploadPhotosPage() {
+  const { t } = useT();
   const { user, isLoggedIn } = useSession();
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -87,14 +89,14 @@ export function UploadPhotosPage() {
   }
 
   if (!isLoggedIn || !user) {
-    return <div className="page"><Notice>Sign in to upload photos.</Notice></div>;
+    return <div className="page"><Notice>{t("sign_in_to_upload_photos")}</Notice></div>;
   }
 
   const uploadable = (folders ?? []).filter((f) => !isFavouritesFolder(f));
 
   return (
     <div className="page" style={{ maxWidth: 720 }}>
-      <h1 className="page-title">Upload photos</h1>
+      <h1 className="page-title">{t("upload_photos")}</h1>
 
       {storage && (
         <div className="card pad" style={{ marginBottom: 12 }}>
@@ -106,12 +108,12 @@ export function UploadPhotosPage() {
       )}
 
       <div className="card pad" style={{ marginBottom: 12 }}>
-        <label className="soft" style={{ fontSize: 13 }}>Folder</label>
+        <label className="soft" style={{ fontSize: 13 }}>{t("folder_2")}</label>
         {folders === null ? <Loading /> : (
           <>
             <GoldSelect
               ariaLabel="Folder"
-              placeholder="Choose a folder…"
+              placeholder={t("choose_a_folder")}
               searchable
               value={folderId}
               options={uploadable.map((f) => ({ value: String(f.id), label: `${f.name}${f.photo_count ? ` (${f.photo_count})` : ""}` }))}
@@ -120,12 +122,11 @@ export function UploadPhotosPage() {
             />
             {uploadable.length === 0 && (
               <p className="muted" style={{ fontSize: 13, marginTop: 0 }}>
-                You don't have a folder yet — make one below. Favourites doesn't count: you star photos into it rather than uploading there.
-              </p>
+                {t("you_don_t_have_a_folder_yet_make_one_bel")}</p>
             )}
             <div className="row" style={{ gap: 8 }}>
               <input className="input" value={newFolder} onChange={(e) => setNewFolder(e.target.value)}
-                placeholder="New folder name" maxLength={100} style={{ flex: 1 }} />
+                placeholder={t("new_folder_name")} maxLength={100} style={{ flex: 1 }} />
               <button className="btn ghost" disabled={creating || !newFolder.trim()} onClick={addFolder}>
                 {creating ? "Creating…" : "Create"}
               </button>
@@ -139,14 +140,14 @@ export function UploadPhotosPage() {
           onChange={(e) => { setQueue([...(e.target.files ?? [])]); setError(""); }} />
         {queue.length === 0 ? (
           <>
-            <p className="soft" style={{ marginTop: 0 }}>Choose one or more photos from this device.</p>
-            <button className="btn" onClick={() => fileRef.current?.click()}>Choose photos</button>
+            <p className="soft" style={{ marginTop: 0 }}>{t("choose_one_or_more_photos_from_this_devi")}</p>
+            <button className="btn" onClick={() => fileRef.current?.click()}>{t("choose_photos")}</button>
           </>
         ) : (
           <>
             <div className="row" style={{ marginBottom: 10 }}>
               <b style={{ flex: 1 }}>{queue.length} photo{queue.length === 1 ? "" : "s"} ready</b>
-              <button className="btn small ghost" disabled={busy} onClick={() => fileRef.current?.click()}>Change</button>
+              <button className="btn small ghost" disabled={busy} onClick={() => fileRef.current?.click()}>{t("change")}</button>
             </div>
             <div className="row" style={{ flexWrap: "wrap", gap: 8 }}>
               {queue.slice(0, 12).map((f, i) => (
@@ -179,7 +180,7 @@ export function UploadPhotosPage() {
 
       {(folders ?? []).some((f) => (f.preview_thumbs ?? []).length > 0) && (
         <div className="card pad" style={{ marginTop: 12 }}>
-          <b style={{ color: "var(--gold)" }}>Your folders</b>
+          <b style={{ color: "var(--gold)" }}>{t("your_folders")}</b>
           {(folders ?? []).map((f) => (
             <div key={f.id} className="row" style={{ padding: "8px 0", borderBottom: "1px solid var(--line)", alignItems: "center" }}>
               <div style={{ flex: 1 }}>

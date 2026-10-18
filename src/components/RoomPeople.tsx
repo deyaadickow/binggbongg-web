@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { post, type UserSummary } from "../lib/api";
 import { Avatar } from "./Common";
 import { Overlay, personName, type Person } from "./BattleEngines";
+import { useT } from "../lib/i18n";
 
 export interface CurrentPlayer extends Person { game_emoji?: string | null; game_name?: string | null }
 
@@ -51,19 +52,21 @@ function row(p: Person, right: React.ReactNode, sub?: string) {
 }
 
 export function WhosPlayingOverlay({ roomName, onClose }: { roomName: string; onClose: () => void }) {
+  const { t } = useT();
   const [players, setPlayers] = useState<CurrentPlayer[] | null>(null);
   useEffect(() => { fetchCurrentTapGamePlayers(roomName).then(setPlayers).catch(() => setPlayers([])); }, [roomName]);
   return (
-    <Overlay title="Who's Playing" onClose={onClose}>
-      <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>Everyone playing a game in your room right now.</p>
-      {players === null ? <p className="muted">Loading…</p>
-        : players.length === 0 ? <p className="muted">No one is playing a game right now.</p>
+    <Overlay title={t("who_s_playing_2")} onClose={onClose}>
+      <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>{t("everyone_playing_a_game_in_your_room_rig")}</p>
+      {players === null ? <p className="muted">{t("imagePickerLoading")}</p>
+        : players.length === 0 ? <p className="muted">{t("no_one_is_playing_a_game_right_now")}</p>
         : <div style={{ display: "grid", gap: 6 }}>{players.map((p) => row(p, null, `${p.game_emoji ?? "🎮"} ${p.game_name ?? "Playing"}`))}</div>}
     </Overlay>
   );
 }
 
 export function InviteOverlay({ myUserId, roomName, excludeIds, onToast, onClose }: { myUserId: number; roomName: string; excludeIds: Set<number>; onToast: (s: string) => void; onClose: () => void }) {
+  const { t } = useT();
   const [people, setPeople] = useState<Person[] | null>(null);
   const [invited, setInvited] = useState<Set<number>>(new Set());
   const [query, setQuery] = useState("");
@@ -86,22 +89,22 @@ export function InviteOverlay({ myUserId, roomName, excludeIds, onToast, onClose
     } catch (e) { onToast((e as Error).message); }
   }
   return (
-    <Overlay title="Invite to the Room" onClose={onClose}>
-      <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>People you follow who are online right now — they get a push that opens your room as a guest.</p>
+    <Overlay title={t("invite_to_the_room")} onClose={onClose}>
+      <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>{t("people_you_follow_who_are_online_right_n")}</p>
       <input
         className="input"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search by name"
-        aria-label="Search the people you follow"
+        placeholder={t("search_by_name")}
+        aria-label={t("search_the_people_you_follow")}
         style={{ width: "100%", marginBottom: 10 }}
       />
-      {people === null ? <p className="muted">Loading…</p>
+      {people === null ? <p className="muted">{t("imagePickerLoading")}</p>
         : people.length === 0 ? <p className="muted">{query.trim() ? "No one online matches that name." : "No one you follow is online right now."}</p>
         : <div style={{ display: "grid", gap: 6, maxHeight: 360, overflowY: "auto" }}>
             {people.map((p) => row(p, invited.has(p.user_id)
-              ? <span className="pill" style={{ color: "var(--gold)" }}>✓ Invited</span>
-              : <button className="btn small" style={{ background: "var(--gold-border)", color: "#000", borderColor: "#000" }} onClick={() => invite(p)}>Invite</button>))}
+              ? <span className="pill" style={{ color: "var(--gold)" }}>{t("invited")}</span>
+              : <button className="btn small" style={{ background: "var(--gold-border)", color: "#000", borderColor: "#000" }} onClick={() => invite(p)}>{t("invite")}</button>))}
           </div>}
     </Overlay>
   );

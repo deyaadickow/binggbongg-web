@@ -13,8 +13,10 @@ import {
   EXITED, blockColour, fetchBlockEscapeLevels, remaining, slide,
   type BEBlock, type BlockEscapeLevel,
 } from "../lib/blockescape";
+import { useT } from "../lib/i18n";
 
 export function BlockEscapeOverlay({ onClose }: { onClose: () => void }) {
+  const { t } = useT();
   const [levels, setLevels] = useState<BlockEscapeLevel[] | null>(null);
   const [error, setError] = useState("");
   const [index, setIndex] = useState(0);
@@ -119,7 +121,7 @@ export function BlockEscapeOverlay({ onClose }: { onClose: () => void }) {
             {level ? `${level.level_no}. ${level.name}` : error ? "Couldn't load" : "Loading…"}
           </h2>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ background: "var(--gold)", color: "#000", fontWeight: 800, fontSize: 11, padding: "2px 9px", borderRadius: 999 }}>MOVES</span>
+            <span style={{ background: "var(--gold)", color: "#000", fontWeight: 800, fontSize: 11, padding: "2px 9px", borderRadius: 999 }}>{t("moves")}</span>
             <b style={{ color: "var(--gold)", fontSize: 20 }}>{moves}</b>
           </div>
         </div>
@@ -176,12 +178,12 @@ export function BlockEscapeOverlay({ onClose }: { onClose: () => void }) {
             // Undo earns its place: a block that cannot leave still moves, so a careless drag can
             // wall a board in permanently. Without it the only way out is a restart, which reads
             // as the game being broken rather than the player having made a mistake.
-            <button className="btn small" onClick={undo}>Undo</button>
+            <button className="btn small" onClick={undo}>{t("undo")}</button>
           )}
           {!solved
-            ? <button className="btn small" onClick={() => show(index)}>Start Again</button>
-            : <button className="btn small primary" onClick={() => show(index + 1)}>Next Board</button>}
-          <button className="btn small ghost" onClick={onClose}>Close</button>
+            ? <button className="btn small" onClick={() => show(index)}>{t("start_again")}</button>
+            : <button className="btn small primary" onClick={() => show(index + 1)}>{t("next_board")}</button>}
+          <button className="btn small ghost" onClick={onClose}>{t("close")}</button>
         </div>
       </div>
     </div>

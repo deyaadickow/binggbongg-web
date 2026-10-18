@@ -6,8 +6,10 @@ import { Link } from "react-router-dom";
 import { mediaUrl } from "../lib/api";
 import { useSession } from "../lib/session";
 import { fetchRandomFeedPhoto, type FeedPhoto } from "../lib/photos";
+import { useT } from "../lib/i18n";
 
 export function FeedPhotoCard() {
+  const { t } = useT();
   const { user } = useSession();
   const [photo, setPhoto] = useState<FeedPhoto | null>(null);
 
@@ -24,7 +26,7 @@ export function FeedPhotoCard() {
   return (
     <div className="card" style={{ marginBottom: 14, overflow: "hidden" }}>
       <div className="row" style={{ padding: "10px 12px", alignItems: "center", gap: 8 }}>
-        <span style={{ color: "var(--gold)", fontWeight: 700, fontSize: 13 }}>📷 Photo</span>
+        <span style={{ color: "var(--gold)", fontWeight: 700, fontSize: 13 }}>{t("photo")}</span>
         <span className="spacer" />
         {photo.user?.id && (
           <Link to={`/profile/${photo.user.id}`} style={{ fontSize: 13, fontWeight: 700 }}>
@@ -34,7 +36,7 @@ export function FeedPhotoCard() {
       </div>
       <img src={src} alt="" loading="lazy" style={{ width: "100%", display: "block", maxHeight: 520, objectFit: "cover" }} />
       <div className="row" style={{ padding: "8px 12px" }}>
-        <Link className="btn small ghost" to="/photos-directory">Browse photos</Link>
+        <Link className="btn small ghost" to="/photos-directory">{t("browse_photos")}</Link>
       </div>
     </div>
   );

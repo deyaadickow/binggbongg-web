@@ -19,6 +19,7 @@ export function Nav() {
   useEffect(() => { fetchCountryChallenges().then((r) => setCvcOn(r.enabled)).catch(() => setCvcOn(false)); }, []);
   return (
     <header className="nav">
+      {/* i18n-exempt: the brand name is the same in every language. */}
       <Link to="/" className="brand">Bingg Bongg</Link>
       <nav className="links">
         <NavLink to="/" end>{t("for_you")}</NavLink>

@@ -10,6 +10,7 @@ import { useSession } from "../lib/session";
 import { createUploadUrls, putToSignedUrl, videoDuration, videoThumbnail } from "../lib/upload";
 import { Notice } from "../components/Common";
 import { GoldSelect } from "../components/GoldSelect";
+import { useT } from "../lib/i18n";
 
 interface ContestCat { id: number; name?: string | null }
 interface CountryRow { name?: string | null; states?: { name?: string | null }[] }
@@ -18,6 +19,7 @@ interface CountryRow { name?: string | null; states?: { name?: string | null }[]
 const MAX_MB = 512;
 
 export function UploadVideoPage() {
+  const { t } = useT();
   const { user, isLoggedIn } = useSession();
   const navigate = useNavigate();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -132,18 +134,18 @@ export function UploadVideoPage() {
   }
 
   if (!isLoggedIn || !user) {
-    return <div className="page"><Notice>Sign in to upload a video.</Notice></div>;
+    return <div className="page"><Notice>{t("sign_in_to_upload_a_video")}</Notice></div>;
   }
 
   if (done) {
     return (
       <div className="page" style={{ maxWidth: 720 }}>
-        <h1 className="page-title">Upload video</h1>
+        <h1 className="page-title">{t("upload_video")}</h1>
         <div className="card pad">
-          <p className="soft" style={{ marginTop: 0 }}>Uploaded. It will appear on your profile and in the feed.</p>
+          <p className="soft" style={{ marginTop: 0 }}>{t("uploaded_it_will_appear_on_your_profile")}</p>
           <div className="row">
-            <button className="btn" onClick={() => navigate(`/profile/${user.id}`)}>See my profile</button>
-            <button className="btn ghost" onClick={() => { setDone(false); setFile(null); setDuration(null); setDescription(""); setLinkedUrl(""); }}>Upload another</button>
+            <button className="btn" onClick={() => navigate(`/profile/${user.id}`)}>{t("see_my_profile")}</button>
+            <button className="btn ghost" onClick={() => { setDone(false); setFile(null); setDuration(null); setDescription(""); setLinkedUrl(""); }}>{t("upload_another")}</button>
           </div>
         </div>
       </div>
@@ -152,7 +154,7 @@ export function UploadVideoPage() {
 
   return (
     <div className="page" style={{ maxWidth: 720 }}>
-      <h1 className="page-title">Upload video</h1>
+      <h1 className="page-title">{t("upload_video")}</h1>
 
       <div className="card pad" style={{ marginBottom: 12 }}>
         <input ref={fileRef} type="file" accept="video/*" style={{ display: "none" }}
@@ -160,7 +162,7 @@ export function UploadVideoPage() {
         {!file ? (
           <>
             <p className="soft" style={{ marginTop: 0 }}>Choose a video from this device. Up to {MAX_MB}MB.</p>
-            <button className="btn" onClick={() => fileRef.current?.click()}>Choose video</button>
+            <button className="btn" onClick={() => fileRef.current?.click()}>{t("choose_video")}</button>
           </>
         ) : (
           <div className="row" style={{ alignItems: "center" }}>
@@ -170,16 +172,16 @@ export function UploadVideoPage() {
                 {(file.size / 1024 / 1024).toFixed(1)}MB{duration ? ` · ${Math.round(duration)}s` : ""}
               </span>
             </div>
-            <button className="btn small ghost" disabled={busy} onClick={() => fileRef.current?.click()}>Change</button>
+            <button className="btn small ghost" disabled={busy} onClick={() => fileRef.current?.click()}>{t("change")}</button>
           </div>
         )}
       </div>
 
       <div className="card pad" style={{ marginBottom: 12 }}>
-        <label className="soft" style={{ fontSize: 13 }}>Category</label>
+        <label className="soft" style={{ fontSize: 13 }}>{t("category")}</label>
         <GoldSelect
           ariaLabel="Category"
-          placeholder="Choose a category…"
+          placeholder={t("choose_a_category")}
           searchable
           value={catId}
           options={cats.map((c) => ({ value: String(c.id), label: c.name ?? "" }))}
@@ -187,20 +189,20 @@ export function UploadVideoPage() {
           style={{ marginBottom: 10 }}
         />
 
-        <label className="soft" style={{ fontSize: 13 }}>Description</label>
+        <label className="soft" style={{ fontSize: 13 }}>{t("_description")}</label>
         <textarea className="input" rows={3} value={description} onChange={(e) => setDescription(e.target.value)}
-          placeholder="Say something about this video…" style={{ width: "100%", marginBottom: 10 }} />
+          placeholder={t("say_something_about_this_video")} style={{ width: "100%", marginBottom: 10 }} />
 
         {/* Steve, 2026-10-13: paste a link copied with (C) and this video carries a "Link" tab
             straight to the one you pasted. */}
-        <label className="soft" style={{ fontSize: 13 }}>Linked video</label>
+        <label className="soft" style={{ fontSize: 13 }}>{t("linked_video")}</label>
         <input className="input" value={linkedUrl} onChange={(e) => setLinkedUrl(e.target.value)}
-          placeholder="Paste a copied video link (optional)"
+          placeholder={t("paste_a_copied_video_link")}
           style={{ width: "100%", marginBottom: 10, textAlign: "center" }} />
 
         <div className="row" style={{ gap: 10 }}>
           <div style={{ flex: 1 }}>
-            <label className="soft" style={{ fontSize: 13 }}>Country</label>
+            <label className="soft" style={{ fontSize: 13 }}>{t("battle_tab_country")}</label>
             <GoldSelect
               ariaLabel="Country"
               placeholder="—"
@@ -211,7 +213,7 @@ export function UploadVideoPage() {
             />
           </div>
           <div style={{ flex: 1 }}>
-            <label className="soft" style={{ fontSize: 13 }}>State</label>
+            <label className="soft" style={{ fontSize: 13 }}>{t("state")}</label>
             <GoldSelect
               ariaLabel="State"
               placeholder="—"

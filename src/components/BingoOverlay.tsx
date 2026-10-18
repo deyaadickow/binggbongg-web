@@ -21,12 +21,14 @@ import {
   type BingoBoard, type BingoCard, type BingoGame, type BingoWinners,
 } from "../lib/bingo";
 import { Overlay } from "./BattleEngines";
+import { useT } from "../lib/i18n";
 
 export function BingoCardArt({ card, onBuy }: {
   card: BingoCard | null;
   /** Absent makes the card read-only — a finished game, or a card nobody may buy into. */
   onBuy?: (cell: string) => void;
 }) {
+  const { t } = useT();
   const cells = useMemo(() => {
     const out: { key: string; cell: string; number: number; left: string; top: string; gifter: string | null }[] = [];
     if (!card) return out;
@@ -52,7 +54,7 @@ export function BingoCardArt({ card, onBuy }: {
 
   return (
     <div className="bingo-card" style={{ aspectRatio: String(BINGO_ASPECT) }}>
-      <img src="/bingo_card_frame.webp" alt="Bingg Bongg bingo card" />
+      <img src="/bingo_card_frame.webp" alt={t("bingg_bongg_bingo_card")} />
       {cells.map((c) => (
         <div
           key={c.key}
@@ -85,6 +87,7 @@ export function BingoOverlay({ game, myUserId, isHost, strip, onBuy, onEndGame, 
   onEndGame: () => void;
   onClose: () => void;
 }) {
+  const { t } = useT();
   // "Mine if I have one, else the first" — resolved on every render rather than stored, so it
   // stays right if the game's player list is not what this browser last saw.
   const [pickedUserId, setPickedUserId] = useState<number | null>(null);
@@ -109,8 +112,8 @@ export function BingoOverlay({ game, myUserId, isHost, strip, onBuy, onEndGame, 
     <div className="bingo-overlay">
       <div className="bingo-inner">
         <div className="bingo-top">
-          <button className="btn ghost" onClick={onClose}>✕ Close</button>
-          {isHost && active && <button className="btn" onClick={onEndGame}>End Game</button>}
+          <button className="btn ghost" onClick={onClose}>{t("close_2")}</button>
+          {isHost && active && <button className="btn" onClick={onEndGame}>{t("end_game")}</button>}
         </div>
 
         {/* One face is the host looking at their own card, which the room behind already
@@ -173,6 +176,7 @@ export function BingoStartDialog({ defaultPrice, candidates, onStart, onClose }:
   onStart: (otherPlayerIds: number[], price: number) => void;
   onClose: () => void;
 }) {
+  const { t } = useT();
   const [price, setPrice] = useState(() => bingoClamp(defaultPrice > 0 ? defaultPrice : BINGO_FALLBACK));
   const [typed, setTyped] = useState("");
   const [picked, setPicked] = useState<number[]>([]);
@@ -189,10 +193,10 @@ export function BingoStartDialog({ defaultPrice, candidates, onStart, onClose }:
   }
 
   return (
-    <Overlay title="🎱 Start Bingo" onClose={onClose} width={480}>
+    <Overlay title={t("start_bingo")} onClose={onClose} width={480}>
       {candidates.length > 0 && (
         <>
-          <p className="soft" style={{ marginTop: 0 }}>Who gets a card? Pick nobody to play it on your own — you always get one.</p>
+          <p className="soft" style={{ marginTop: 0 }}>{t("who_gets_a_card_pick_nobody_to_play_it_o")}</p>
           <div className="bingo-players">
             {candidates.map((c) => (
               <button key={c.userId} className={`btn block ${picked.includes(c.userId) ? "" : "ghost"}`} onClick={() => toggle(c.userId)}>
@@ -221,17 +225,17 @@ export function BingoStartDialog({ defaultPrice, candidates, onStart, onClose }:
         ))}
       </div>
 
-      <input className="input block" inputMode="numeric" placeholder="Type a price"
+      <input className="input block" inputMode="numeric" placeholder={t("type_a_price")}
              value={typed} onChange={(e) => setTyped(e.target.value.replace(/[^0-9]/g, ""))} />
 
       <div className="bingo-actions">
-        <button className="btn ghost" onClick={onClose}>Cancel</button>
+        <button className="btn ghost" onClick={onClose}>{t("cancel")}</button>
         <button className="btn" onClick={() => {
           // A typed value wins over the stepper, and is CLAMPED rather than refused: a host
           // who types 10 watches it become 50 instead of dismissing an error.
           const chosen = typed.trim() === "" ? price : bingoClamp(Number(typed));
           onStart(picked, chosen);
-        }}>Start Bingo</button>
+        }}>{t("start_bingo_2")}</button>
       </div>
     </Overlay>
   );
@@ -244,6 +248,7 @@ export function BingoStartDialog({ defaultPrice, candidates, onStart, onClose }:
  *  when a game was over i did not see any of them." Android had both screens built and then
  *  never linked from anywhere; iOS and web had neither. */
 export function BingoBoardOverlay({ onClose }: { onClose: () => void }) {
+  const { t } = useT();
   const [board, setBoard] = useState<BingoBoard | null>(null);
   // A failed fetch is NOT an empty board. Collapsing the two is what tells somebody "no games
   // yet" while the network is down, which reads as the feature being broken.
@@ -263,18 +268,18 @@ export function BingoBoardOverlay({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <Overlay title="🎱 Bingo Battle Board" onClose={onClose} width={520}>
+    <Overlay title={t("bingo_battle_board")} onClose={onClose} width={520}>
       {board && (
         <div className="bingo-stats">
-          <div><b>{board.total_games}</b><span>games</span></div>
-          <div><b>{board.total_wins}</b><span>wins</span></div>
-          <div><b>{board.total_members}</b><span>members</span></div>
+          <div><b>{board.total_games}</b><span>{t("games_2")}</span></div>
+          <div><b>{board.total_wins}</b><span>{t("wins")}</span></div>
+          <div><b>{board.total_members}</b><span>{t("members")}</span></div>
         </div>
       )}
-      {!board && failed && <p className="soft">Couldn't load the board — check your connection and try again.</p>}
-      {!board && !failed && <p className="soft">Loading…</p>}
+      {!board && failed && <p className="soft">{t("couldn_t_load_the_board_check_your_conne")}</p>}
+      {!board && !failed && <p className="soft">{t("imagePickerLoading")}</p>}
       {board && board.games.length === 0 && (
-        <p className="soft">No games yet. The first one played will be #1, and it stays on this board for good.</p>
+        <p className="soft">{t("no_games_yet_the_first_one_played_will_b")}</p>
       )}
       {board?.games.map((g) => (
         <button key={g.bingo_game_id} className="btn block bingo-board-row" onClick={() => setOpenGameId(g.bingo_game_id)}>
@@ -296,6 +301,7 @@ export function BingoBoardOverlay({ onClose }: { onClose: () => void }) {
  *  different names, and showing only the whole-card winner would throw away five results that
  *  people paid real coins for. */
 export function BingoWinnersOverlay({ bingoGameId, onClose }: { bingoGameId: number; onClose: () => void }) {
+  const { t } = useT();
   const [data, setData] = useState<BingoWinners | null>(null);
   const [failed, setFailed] = useState(false);
 
@@ -314,9 +320,9 @@ export function BingoWinnersOverlay({ bingoGameId, onClose }: { bingoGameId: num
           {bingoPlayedOn(data.played_at)} · {data.players} player{data.players === 1 ? "" : "s"} · {data.squares_gifted} squares gifted
         </p>
       )}
-      {!data && failed && <p className="soft">Couldn't load this game — try again.</p>}
-      {!data && !failed && <p className="soft">Loading…</p>}
-      {data && data.winners.length === 0 && <p className="soft">Nobody completed a pattern in this game.</p>}
+      {!data && failed && <p className="soft">{t("couldn_t_load_this_game_try_again")}</p>}
+      {!data && !failed && <p className="soft">{t("imagePickerLoading")}</p>}
+      {data && data.winners.length === 0 && <p className="soft">{t("nobody_completed_a_pattern_in_this_game")}</p>}
       {data?.winners.map((w, i) => (
         <div key={i} className="bingo-winner-row">
           <span className="bingo-pattern">{winLabel(w.pattern)}</span>

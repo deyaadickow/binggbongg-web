@@ -5,6 +5,7 @@ import {
   formatScheduleTime, localInputToUtc, respondToBattleRequest, sendBattleRequest,
   type BattleRequestItem, type ScheduleItem, type ScheduleKind,
 } from "../lib/api";
+import { useT } from "../lib/i18n";
 
 /**
  * "My Live/Battle Schedule" — Steve, 2026-10-06.
@@ -17,6 +18,7 @@ import {
  * Manila and a member in Miami each see the same moment in their own clock.
  */
 export function ScheduleSection({ profileId, myId }: { profileId: number; myId?: number }) {
+  const { t } = useT();
   const isMine = myId != null && myId === profileId;
 
   const [items, setItems] = useState<ScheduleItem[]>([]);
@@ -114,23 +116,19 @@ export function ScheduleSection({ profileId, myId }: { profileId: number; myId?:
         {isMine && (
           <>
             <button className="btn wide" onClick={() => { setKind("live"); setShowAdd(true); setShowRequest(false); }}>
-              Schedule a Live
-            </button>
+              {t("schedule_a_live")}</button>
             <button className="btn wide" onClick={() => { setKind("battle"); setShowAdd(true); setShowRequest(false); }}>
-              Schedule a Battle
-            </button>
+              {t("schedule_a_battle")}</button>
           </>
         )}
         {!isMine && myId != null && (
           <button className="btn wide" onClick={() => { setShowRequest(true); setShowAdd(false); }}>
-            Request a Battle
-          </button>
+            {t("request_a_battle")}</button>
         )}
-        <Link to="/upcoming" className="btn wide">Scheduled Lives and Battles</Link>
+        <Link to="/upcoming" className="btn wide">{t("scheduled_lives_and_battles")}</Link>
         {(showAdd || showRequest) && (
           <button className="btn wide ghost" onClick={() => { setShowAdd(false); setShowRequest(false); }}>
-            Cancel
-          </button>
+            {t("cancel")}</button>
         )}
       </div>
 
@@ -141,7 +139,7 @@ export function ScheduleSection({ profileId, myId }: { profileId: number; myId?:
           {(showRequest || kind === "battle") && (
             <>
               <div className="schedule-field">
-                <span>Battle type</span>
+                <span>{t("battle_type")}</span>
                 {/* Steve, 2026-10-11: a dropdown here and a scroll wheel on the phones both
                     showed one type at a time. Pills show all nine at once, the chosen one
                     filled solid gold — the same control all three platforms now use. */}
@@ -159,14 +157,14 @@ export function ScheduleSection({ profileId, myId }: { profileId: number; myId?:
             </>
           )}
           <label className="schedule-field">
-            <span>When (your time)</span>
+            <span>{t("when_your_time")}</span>
             <input type="datetime-local" value={when} onChange={(e) => setWhen(e.target.value)} />
           </label>
           <div className="schedule-rule" />
           <label className="schedule-field">
-            <span>Note (optional)</span>
+            <span>{t("note_optional")}</span>
             <input type="text" maxLength={191} value={note} onChange={(e) => setNote(e.target.value)}
-              placeholder="What are you doing?" />
+              placeholder={t("what_are_you_doing")} />
           </label>
           <button className="btn" disabled={busy || !when}
             onClick={() => (showAdd ? void submitAdd() : void submitRequest())}>
@@ -177,7 +175,7 @@ export function ScheduleSection({ profileId, myId }: { profileId: number; myId?:
 
       {isMine && incoming.length > 0 && (
         <div className="schedule-requests">
-          <h4>Battle requests</h4>
+          <h4>{t("battle_requests")}</h4>
           {incoming.map((req) => (
             <div key={req.id} className="schedule-row">
               <div>
@@ -186,15 +184,15 @@ export function ScheduleSection({ profileId, myId }: { profileId: number; myId?:
                 {req.note && <div className="muted">{req.note}</div>}
               </div>
               <span className="spacer" />
-              <button className="btn small" disabled={busy} onClick={() => void answer(req, true)}>Accept</button>
-              <button className="btn small ghost" disabled={busy} onClick={() => void answer(req, false)}>Deny</button>
+              <button className="btn small" disabled={busy} onClick={() => void answer(req, true)}>{t("accept")}</button>
+              <button className="btn small ghost" disabled={busy} onClick={() => void answer(req, false)}>{t("deny")}</button>
             </div>
           ))}
         </div>
       )}
 
       {loading ? (
-        <div className="lb-bar">Loading…</div>
+        <div className="lb-bar">{t("imagePickerLoading")}</div>
       ) : items.length === 0 ? (
         <div className="lb-bar">
           {isMine ? "Nothing scheduled yet. Add a live or a battle so your followers can plan to join."
@@ -210,7 +208,7 @@ export function ScheduleSection({ profileId, myId }: { profileId: number; myId?:
             </div>
             <span className="spacer" />
             {isMine && (
-              <button className="btn small ghost" disabled={busy} onClick={() => void remove(item)}>Remove</button>
+              <button className="btn small ghost" disabled={busy} onClick={() => void remove(item)}>{t("remove")}</button>
             )}
           </div>
         ))

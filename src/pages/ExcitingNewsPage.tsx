@@ -5,6 +5,7 @@ import { PickerSheet } from "../components/PickerSheet";
 import { TRANSLATION_LANGUAGES, languageName, defaultTargetLanguage } from "../lib/translate";
 import { DEFAULT_TEXT_AREAS, cssAspectRatio, fetchExcitingNews, type ExcitingNewsFlyer, type ExcitingNewsType, type TextAreas } from "../lib/excitingnews";
 import { FlyerOverlay } from "../components/FlyerOverlay";
+import { useT } from "../lib/i18n";
 
 // Steve, 2026-10-02: "we should upload one flyer at a time so the first flyer will upload right
 // away and by the time they scroll to the second flyer, it's already there." The server translates
@@ -36,6 +37,7 @@ const PAGE_SIZE = 6;
  * when a flyer's own aspect ratio doesn't match the card's.
  */
 export function ExcitingNewsPage() {
+  const { t } = useT();
   const { user } = useSession();
   const [type, setType] = useState<ExcitingNewsType>("photo");
   const [search, setSearch] = useState("");
@@ -123,10 +125,10 @@ export function ExcitingNewsPage() {
   return (
     <div className="page">
       <div className="row" style={{ marginBottom: 14, flexWrap: "wrap", gap: 10 }}>
-        <h1 className="page-title" style={{ margin: 0 }}>Exciting News</h1>
+        <h1 className="page-title" style={{ margin: 0 }}>{t("exciting_news")}</h1>
         <span className="spacer" />
-        <button className={`btn small ${type === "photo" ? "" : "ghost"}`} onClick={() => setType("photo")}>Photos</button>
-        <button className={`btn small ${type === "video" ? "" : "ghost"}`} onClick={() => setType("video")}>Video</button>
+        <button className={`btn small ${type === "photo" ? "" : "ghost"}`} onClick={() => setType("photo")}>{t("photos")}</button>
+        <button className={`btn small ${type === "video" ? "" : "ghost"}`} onClick={() => setType("video")}>{t("video")}</button>
       </div>
       {/* This translates the description AND the words drawn on the flyer. The picture itself is
           never touched — anything Steve bakes into the artwork stays in whatever language he drew
@@ -140,13 +142,13 @@ export function ExcitingNewsPage() {
       <div className="row" style={{ gap: 8, marginBottom: 18 }}>
         <input
           className="input"
-          placeholder="Search a country or word…"
+          placeholder={t("exciting_news_search_hint")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter") runSearch(); }}
           style={{ flex: 1 }}
         />
-        <button className="btn small" onClick={runSearch}>Search</button>
+        <button className="btn small" onClick={runSearch}>{t("search")}</button>
       </div>
       {error && <Notice error>{error}</Notice>}
       {!loading && flyers.length === 0 && !error && (
@@ -165,12 +167,12 @@ export function ExcitingNewsPage() {
       </div>
       {loading ? <Loading /> : !reachedEnd && flyers.length > 0 && (
         <div className="center" style={{ marginTop: 20 }}>
-          <button className="btn" onClick={() => load(false)}>Show more</button>
+          <button className="btn" onClick={() => load(false)}>{t("show_more")}</button>
         </div>
       )}
       {langOpen && (
         <PickerSheet
-          title="Translate all flyers"
+          title={t("translate_all_flyers_title")}
           noun="language"
           selected={language}
           items={[{ code: "original", name: "As written — don't translate" },
@@ -304,6 +306,7 @@ function readableFlyerText(flyer: ExcitingNewsFlyer): string | null {
  * the bottom of the screen.
  */
 function FlyerTextDialog({ text, onClose }: { text: string; onClose: () => void }) {
+  const { t } = useT();
   return (
     <div
       role="dialog"
@@ -333,11 +336,11 @@ function FlyerTextDialog({ text, onClose }: { text: string; onClose: () => void 
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
-          <strong style={{ color: "#F0C420", fontSize: 16, flex: 1 }}>What this flyer says</strong>
+          <strong style={{ color: "#F0C420", fontSize: 16, flex: 1 }}>{t("what_this_flyer_says")}</strong>
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t("close")}
             style={{ background: "none", border: "none", color: "#bdbdc7", fontSize: 20, cursor: "pointer" }}
           >
             {"\u00d7"}

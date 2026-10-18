@@ -12,12 +12,14 @@ import {
   fetchCountryChallenge, fetchCountryChallenges, flagOf,
   type CvCComingSoon, type CvCDetail, type CvCPlayer, type CvCRow, type CvCSupporter,
 } from "../lib/countryChallenges";
+import { useT } from "../lib/i18n";
 
 const gold = "var(--gold)";
 
 // ---- The board ------------------------------------------------------------------------------
 
 export function CvCPage() {
+  const { t } = useT();
   const [rows, setRows] = useState<CvCRow[] | null>(null);
   const [upcoming, setUpcoming] = useState<CvCRow[]>([]);
   const [comingSoon, setComingSoon] = useState<CvCComingSoon[]>([]);
@@ -34,8 +36,8 @@ export function CvCPage() {
   if (!enabled) {
     return (
       <div className="page" style={{ maxWidth: 900 }}>
-        <h1 className="page-title">Country VS Country</h1>
-        <p className="soft">This isn't open yet. Check back soon.</p>
+        <h1 className="page-title">{t("cvc_page_title")}</h1>
+        <p className="soft">{t("this_isn_t_open_yet_check_back_soon")}</p>
       </div>
     );
   }
@@ -43,16 +45,15 @@ export function CvCPage() {
   return (
     <div className="page" style={{ maxWidth: 900 }}>
       {/* The tab says CvC; the page says what it means. */}
-      <h1 className="page-title">Country VS Country</h1>
+      <h1 className="page-title">{t("cvc_page_title")}</h1>
       <p className="soft" style={{ marginTop: -6 }}>
-        Every country battle ever fought, and who won it.
-      </p>
+        {t("every_country_battle_ever_fought_and_who")}</p>
 
       {error && <Notice error>{error}</Notice>}
 
       {upcoming.length > 0 && (
         <>
-          <h2 style={{ fontSize: 16, color: gold, marginTop: 18 }}>Coming up</h2>
+          <h2 style={{ fontSize: 16, color: gold, marginTop: 18 }}>{t("cvc_coming_up")}</h2>
           <div style={{ display: "grid", gap: 10 }}>
             {upcoming.map((c) => <UpcomingCard key={c.id} row={c} />)}
           </div>
@@ -64,7 +65,7 @@ export function CvCPage() {
           point of the page, so it sits above the board. */}
       {comingSoon.length > 0 && (
         <>
-          <h2 style={{ fontSize: 16, color: gold, marginTop: 18 }}>Coming soon</h2>
+          <h2 style={{ fontSize: 16, color: gold, marginTop: 18 }}>{t("cvc_coming_soon")}</h2>
           <div style={{ display: "grid", gap: 10 }}>
             {comingSoon.map((m) => <ComingSoonCard key={m.id} matchup={m} />)}
           </div>
@@ -72,10 +73,10 @@ export function CvCPage() {
         </>
       )}
 
-      <h2 style={{ fontSize: 16, color: gold, marginTop: 22 }}>Bragging rights</h2>
+      <h2 style={{ fontSize: 16, color: gold, marginTop: 22 }}>{t("cvc_bragging_rights")}</h2>
       {rows === null && <Loading />}
       {rows !== null && rows.length === 0 && !error && (
-        <p className="soft">No country battles yet. The first one goes on this board the moment it ends.</p>
+        <p className="soft">{t("cvc_empty")}</p>
       )}
 
       <div style={{ display: "grid", gap: 10 }}>
@@ -86,13 +87,14 @@ export function CvCPage() {
 }
 
 function ComingSoonCard({ matchup }: { matchup: CvCComingSoon }) {
+  const { t } = useT();
   return (
     // Steve, 2026-10-18: "Please center the text to the box."
     <div className="card pad" style={{ borderColor: "var(--gold-border)", textAlign: "center" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, flexWrap: "wrap" }}>
         <span style={{ fontSize: 20 }}>{flagOf(matchup.country_a_code)}</span>
         <span style={{ fontWeight: 700 }}>{matchup.country_a_name}</span>
-        <span className="muted" style={{ fontWeight: 900 }}>VS</span>
+        <span className="muted" style={{ fontWeight: 900 }}>{t("vs")}</span>
         <span style={{ fontSize: 20 }}>{flagOf(matchup.country_b_code)}</span>
         <span style={{ fontWeight: 700 }}>{matchup.country_b_name}</span>
       </div>
@@ -106,18 +108,19 @@ function ComingSoonCard({ matchup }: { matchup: CvCComingSoon }) {
 /** Steve, 2026-10-18: "or make a country Battle suggestion in our support section." The reason
  *  is a row in the support dropdown, so this only has to point at Support. */
 function SuggestABattle() {
+  const { t } = useT();
   return (
     <p className="soft" style={{ marginTop: 10, fontSize: 13 }}>
       Want to see your country here?{" "}
       <Link to="/settings/support?reason=Suggest%20a%20country%20battle" style={{ color: gold, fontWeight: 700 }}>
-        Suggest a country battle
-      </Link>{" "}
+        {t("cvc_suggest_a_battle")}</Link>{" "}
       and tell us which two.
     </p>
   );
 }
 
 function BoardRow({ row }: { row: CvCRow }) {
+  const { t } = useT();
   const aWon = row.winner_country_code && row.winner_country_code === row.country_a_code;
   const bWon = row.winner_country_code && row.winner_country_code === row.country_b_code;
 
@@ -125,7 +128,7 @@ function BoardRow({ row }: { row: CvCRow }) {
     <Link to={`/cvc/${row.id}`} className="card pad" style={{ display: "block", textDecoration: "none" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
         <Side name={row.country_a_name} code={row.country_a_code} score={row.score_a} won={!!aWon} />
-        <span className="muted" style={{ fontWeight: 900 }}>VS</span>
+        <span className="muted" style={{ fontWeight: 900 }}>{t("vs")}</span>
         <Side name={row.country_b_name} code={row.country_b_code} score={row.score_b} won={!!bWon} />
         <span style={{ flex: 1 }} />
         <span className="muted" style={{ fontSize: 12 }}>{row.date}</span>
@@ -165,6 +168,7 @@ function UpcomingCard({ row }: { row: CvCRow }) {
 // ---- One battle -----------------------------------------------------------------------------
 
 export function CvCBattlePage() {
+  const { t } = useT();
   const { id } = useParams();
   const [data, setData] = useState<CvCDetail | null>(null);
   const [error, setError] = useState("");
@@ -183,8 +187,8 @@ export function CvCBattlePage() {
   return (
     <div className="page" style={{ maxWidth: 820 }}>
       <div className="row" style={{ marginBottom: 14 }}>
-        <Link to="/cvc" className="btn small ghost">‹ CvC</Link>
-        <h1 className="page-title" style={{ margin: 0 }}>Country VS Country</h1>
+        <Link to="/cvc" className="btn small ghost">{t("cvc_2")}</Link>
+        <h1 className="page-title" style={{ margin: 0 }}>{t("cvc_page_title")}</h1>
       </div>
 
       <div className="card pad" style={{ borderColor: "var(--gold-border)" }}>
@@ -224,6 +228,7 @@ export function CvCBattlePage() {
 }
 
 function PlayerCard({ player, code, supporters }: { player: CvCPlayer; code?: string | null; supporters: CvCSupporter[] }) {
+  const { t } = useT();
   return (
     <div className="card pad">
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -244,7 +249,7 @@ function PlayerCard({ player, code, supporters }: { player: CvCPlayer; code?: st
 
       {supporters.length > 0 && (
         <>
-          <div className="muted" style={{ fontSize: 12, marginTop: 10 }}>Who backed them</div>
+          <div className="muted" style={{ fontSize: 12, marginTop: 10 }}>{t("cvc_who_backed")}</div>
           <div style={{ display: "grid", gap: 4, marginTop: 4 }}>
             {supporters.map((s) => (
               <div key={s.user_id} style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>

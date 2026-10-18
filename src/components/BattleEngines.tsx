@@ -6,6 +6,7 @@ import { searchVirtualMembers, secondsUntil as vbSecondsUntil, clock as vbClock,
 import { useEffect as useEffectVB, useRef as useRefVB, useState as useStateVB } from "react";
 import { displayName, type UserSummary } from "../lib/api";
 import { clock, secondsUntil, type B555Data, type Battle2v2Data, type Invite2v2, type MarathonData, type SeriesData } from "../lib/battles";
+import { useT } from "../lib/i18n";
 
 export interface Person { user_id: number; fullname?: string | null; username?: string | null; profile_image?: string | null }
 export type NameOf = (id: number | null | undefined) => string;
@@ -94,20 +95,21 @@ export const BATTLE_KINDS: {
  *  matching the phones (Steve, 2026-09-08: "Please add the (i) for information for every
  *  game" — the same treatment the Battle menu carries there). */
 export function BattleMenu({ peopleOnScreen, onPick, onClose, onNotice }: { peopleOnScreen: number; onPick: (k: BattleKind) => void; onClose: () => void; onNotice: (msg: string) => void }) {
+  const { t } = useT();
   const [info, setInfo] = useState<(typeof BATTLE_KINDS)[number] | null>(null);
 
   if (info) {
     return (
       <Overlay title={info.title} onClose={() => setInfo(null)} width={560}>
         <p className="soft" style={{ marginTop: 0, whiteSpace: "pre-line" }}>{info.info}</p>
-        <button className="btn ghost block" onClick={() => setInfo(null)}>Back</button>
+        <button className="btn ghost block" onClick={() => setInfo(null)}>{t("back")}</button>
       </Overlay>
     );
   }
 
   return (
-    <Overlay title="⚔️ Start a battle" onClose={onClose} width={560}>
-      {peopleOnScreen < 2 && <p className="muted" style={{ fontSize: 13, marginTop: 0 }}>You're the only one on screen. Accept a viewer's "Ask to join" request first — battles are between the people streaming together. The rows further down open on their own.</p>}
+    <Overlay title={t("start_a_battle")} onClose={onClose} width={560}>
+      {peopleOnScreen < 2 && <p className="muted" style={{ fontSize: 13, marginTop: 0 }}>{t("you_re_the_only_one_on_screen_accept_a_v")}</p>}
       {BATTLE_KINDS.map((k) => {
         // A reference row opens a screen or an explanation, so who's on screen is irrelevant to
         // it — gating those on headcount would hide the Lifetime Board from anyone alone.
@@ -155,6 +157,7 @@ export function MultiPicker({ title, blurb, people, lengths, exact, onSubmit, on
   exact?: number;
   onSubmit: (ids: number[], length?: number) => Promise<void>; onClose: () => void;
 }) {
+  const { t } = useT();
   const [picked, setPicked] = useState<number[]>(people.length === 1 ? [people[0].user_id] : []);
   const exactOk = exact === undefined || picked.length === exact;
   const [length, setLength] = useState<number>(lengths?.[1] ?? lengths?.[0] ?? 0);
@@ -165,13 +168,13 @@ export function MultiPicker({ title, blurb, people, lengths, exact, onSubmit, on
       <p className="muted" style={{ fontSize: 12, marginTop: 0 }}>{blurb}</p>
       {lengths && (
         <div className="row" style={{ marginBottom: 10, flexWrap: "wrap" }}>
-          <span className="soft" style={{ fontSize: 13 }}>Best of</span>
+          <span className="soft" style={{ fontSize: 13 }}>{t("best_of")}</span>
           {lengths.map((n) => (
             <button key={n} className={`btn small${length === n ? "" : " ghost"}`} onClick={() => setLength(n)}>{n}</button>
           ))}
         </div>
       )}
-      <div className="soft" style={{ fontSize: 13, marginBottom: 6 }}>Who's in?</div>
+      <div className="soft" style={{ fontSize: 13, marginBottom: 6 }}>{t("who_s_in")}</div>
       {people.map((p) => (
         <label key={p.user_id} className="row" style={{ padding: "8px 10px", border: "1px solid var(--line)", borderRadius: 10, marginBottom: 6, cursor: "pointer" }}>
           <input type="checkbox" checked={picked.includes(p.user_id)} onChange={() => toggle(p.user_id)} />
@@ -189,12 +192,13 @@ export function MultiPicker({ title, blurb, people, lengths, exact, onSubmit, on
 
 /** 2v2: pick your teammate; the other two on screen are the opposing team. */
 export function TwoVTwoPicker({ people, onSubmit, onClose }: { people: Person[]; onSubmit: (teammate: number, opp1: number, opp2: number) => Promise<void>; onClose: () => void }) {
+  const { t } = useT();
   const [teammate, setTeammate] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
   const opponents = people.filter((p) => p.user_id !== teammate);
   return (
-    <Overlay title="2v2 Battle — pick your teammate" onClose={onClose}>
-      <p className="muted" style={{ fontSize: 12, marginTop: 0 }}>You + your teammate vs. the other two on screen. 5 minutes, the team with more gift coins wins.</p>
+    <Overlay title={t("n2v2_battle_pick_your_teammate")} onClose={onClose}>
+      <p className="muted" style={{ fontSize: 12, marginTop: 0 }}>{t("you_your_teammate_vs_the_other_two_on_sc")}</p>
       {people.map((p) => (
         <button key={p.user_id} className={`btn block${teammate === p.user_id ? "" : " ghost"}`} style={{ marginBottom: 6 }} onClick={() => setTeammate(p.user_id)}>{personName(p)}</button>
       ))}
@@ -212,12 +216,13 @@ export function TwoVTwoPicker({ people, onSubmit, onClose }: { people: Person[];
 
 // ---- invite cards -----------------------------------------------------------------------
 export function InviteCard({ title, body, onAnswer, onClose }: { title: string; body: React.ReactNode; onAnswer: (approve: boolean) => void; onClose: () => void }) {
+  const { t } = useT();
   return (
     <Overlay title={title} onClose={onClose}>
       <p className="soft">{body}</p>
       <div className="row" style={{ marginTop: 12 }}>
-        <button className="btn" style={{ flex: 1 }} onClick={() => onAnswer(true)}>Accept</button>
-        <button className="btn ghost" style={{ flex: 1 }} onClick={() => onAnswer(false)}>Decline</button>
+        <button className="btn" style={{ flex: 1 }} onClick={() => onAnswer(true)}>{t("accept")}</button>
+        <button className="btn ghost" style={{ flex: 1 }} onClick={() => onAnswer(false)}>{t("decline")}</button>
       </div>
     </Overlay>
   );
@@ -252,6 +257,7 @@ const waiting = (accepted: number, total: number) => <span className="pill">Wait
 const BLINK_CSS = `@keyframes bbBlink { 0%,100% { opacity: 1 } 50% { opacity: .15 } } .bb-blink { animation: bbBlink .5s steps(1) infinite }`;
 
 export function SeriesStrip({ d, now, nameOf }: { d: SeriesData; now: number; nameOf: NameOf }) {
+  const { t } = useT();
   const accepted = d.participants.filter((p) => p.invite_status === "accepted");
   const secs = d.status === "active" ? secondsUntil(d.current_round_ends_at, now) : null;
   const done = d.status === "completed";
@@ -259,13 +265,13 @@ export function SeriesStrip({ d, now, nameOf }: { d: SeriesData; now: number; na
     : `Best Out Of ${d.length}${done ? " — FINAL" : d.status === "active" && d.current_round_number ? ` · Round ${d.current_round_number}` : ""}`;
   return (
     <Strip title={title}
-      right={d.status === "pending_invites" ? waiting(accepted.length, d.participants.length) : done ? <span className="pill" style={{ color: "var(--gold)" }}>Final</span> : <span className="pill">{clock(secs)}</span>}>
+      right={d.status === "pending_invites" ? waiting(accepted.length, d.participants.length) : done ? <span className="pill" style={{ color: "var(--gold)" }}>{t("final")}</span> : <span className="pill">{clock(secs)}</span>}>
       <style>{BLINK_CSS}</style>
       <div className="muted" style={{ fontSize: 11, marginTop: 4 }}>{d.hide_scores ? "Scores stay hidden until the end — then everyone's revealed at once." : `First to ${d.rounds_needed_to_win} rounds. Each round is 5 minutes.`}</div>
       {(d.status === "active" || done ? accepted : d.participants).map((p) => (
         <div key={p.user_id} className={`row${done && p.user_id === d.winner_user_id ? " bb-blink" : ""}`} style={{ justifyContent: "space-between", marginTop: 4, fontSize: 13 }}>
           <span><b>{nameOf(p.user_id) || personName(p)}</b>{p.invite_status !== "accepted" ? <span className="muted"> · {p.invite_status}</span> : null}</span>
-          <span>{!d.hide_scores && <span title="rounds won">{"★".repeat(p.rounds_won ?? 0)}</span>} <span style={{ color: "var(--gold)" }}>{d.hide_scores && d.status === "active" ? "🙈 ?" : (p.current_round_score ?? 0).toLocaleString()}{done && p.user_id === d.winner_user_id ? " 🏆" : ""}</span></span>
+          <span>{!d.hide_scores && <span title={t("rounds_won")}>{"★".repeat(p.rounds_won ?? 0)}</span>} <span style={{ color: "var(--gold)" }}>{d.hide_scores && d.status === "active" ? "🙈 ?" : (p.current_round_score ?? 0).toLocaleString()}{done && p.user_id === d.winner_user_id ? " 🏆" : ""}</span></span>
         </div>
       ))}
     </Strip>
@@ -273,6 +279,7 @@ export function SeriesStrip({ d, now, nameOf }: { d: SeriesData; now: number; na
 }
 
 export function TwoVTwoStrip({ d, now, nameOf }: { d: Battle2v2Data; now: number; nameOf: NameOf }) {
+  const { t } = useT();
   const team = (t: "A" | "B") => d.participants.filter((p) => p.team === t);
   const names = (t: "A" | "B") => team(t).map((p) => nameOf(p.user_id) || personName(p)).join(" & ");
   const hidden = !!d.hide_scores && d.status === "active";
@@ -282,27 +289,28 @@ export function TwoVTwoStrip({ d, now, nameOf }: { d: Battle2v2Data; now: number
   const accepted = d.participants.filter((p) => p.invite_status === "accepted").length;
   const secs = d.status === "active" ? secondsUntil(d.ends_at, now) : null;
   return (
-    <Strip title={d.hide_scores ? (done ? "🙈 Hide & Seek 2v2 — REVEALED!" : "🙈 Hide & Seek 2v2") : (done ? "2v2 Battle — FINAL" : "2v2 Battle")} right={d.status === "pending_invites" ? waiting(accepted, d.participants.length) : done ? <span className="pill" style={{ color: "var(--gold)" }}>Final</span> : <span className="pill">{clock(secs)}</span>}>
+    <Strip title={d.hide_scores ? (done ? "🙈 Hide & Seek 2v2 — REVEALED!" : "🙈 Hide & Seek 2v2") : (done ? "2v2 Battle — FINAL" : "2v2 Battle")} right={d.status === "pending_invites" ? waiting(accepted, d.participants.length) : done ? <span className="pill" style={{ color: "var(--gold)" }}>{t("final")}</span> : <span className="pill">{clock(secs)}</span>}>
       <style>{BLINK_CSS}</style>
       <div className="row" style={{ justifyContent: "space-between", marginTop: 6, fontSize: 13 }}>
         <span className={done && d.winning_team === "A" ? "bb-blink" : ""}><b>{names("A")}</b> <span style={{ color: "var(--gold)" }}>{hidden ? "?" : a.toLocaleString()}{done && d.winning_team === "A" ? " 🏆" : ""}</span></span>
         <span className={done && d.winning_team === "B" ? "bb-blink" : ""}><span style={{ color: "var(--gold)" }}>{hidden ? "?" : b.toLocaleString()}{done && d.winning_team === "B" ? " 🏆" : ""}</span> <b>{names("B")}</b></span>
       </div>
-      {hidden ? <div className="muted" style={{ fontSize: 11, marginTop: 4 }}>Scores stay hidden until the end.</div> : <Bar pct={total > 0 ? (a / total) * 100 : 50} />}
+      {hidden ? <div className="muted" style={{ fontSize: 11, marginTop: 4 }}>{t("scores_stay_hidden_until_the_end")}</div> : <Bar pct={total > 0 ? (a / total) * 100 : 50} />}
     </Strip>
   );
 }
 
 export function MarathonStrip({ d, myUserId, nameOf, onVote }: { d: MarathonData; myUserId: number | null; nameOf: NameOf; onVote: (approve: boolean) => void }) {
+  const { t } = useT();
   const accepted = d.participants.filter((p) => p.invite_status === "accepted");
   const me = accepted.find((p) => p.user_id === myUserId);
   const leader = Math.max(1, ...accepted.map((p) => p.current_score ?? 0));
   return (
-    <Strip title="No Time Limit" right={d.status === "pending_invites" ? waiting(accepted.length, d.participants.length) : <span className="pill">First to {d.target_points.toLocaleString()}</span>}>
+    <Strip title={t("no_time_limit")} right={d.status === "pending_invites" ? waiting(accepted.length, d.participants.length) : <span className="pill">First to {d.target_points.toLocaleString()}</span>}>
       {(d.status === "active" ? accepted : d.participants).map((p) => (
         <div key={p.user_id} style={{ marginTop: 6, fontSize: 13 }}>
           <div className="row" style={{ justifyContent: "space-between" }}>
-            <span><b>{nameOf(p.user_id) || personName(p)}</b>{p.invite_status !== "accepted" ? <span className="muted"> · {p.invite_status}</span> : null}{p.cancel_vote ? <span className="muted"> · voted to end</span> : null}</span>
+            <span><b>{nameOf(p.user_id) || personName(p)}</b>{p.invite_status !== "accepted" ? <span className="muted"> · {p.invite_status}</span> : null}{p.cancel_vote ? <span className="muted"> {t("voted_to_end")}</span> : null}</span>
             <span style={{ color: "var(--gold)" }}>{(p.current_score ?? 0).toLocaleString()}</span>
           </div>
           {d.status === "active" && <Bar pct={((p.current_score ?? 0) / Math.max(leader, d.target_points)) * 100} />}
@@ -313,8 +321,8 @@ export function MarathonStrip({ d, myUserId, nameOf, onVote }: { d: MarathonData
           <span className="muted">End early: {d.cancel_vote_count}/{d.accepted_count} agree</span>
           <span className="spacer" />
           {me.cancel_vote
-            ? <button className="btn small ghost" onClick={() => onVote(false)}>Withdraw my vote</button>
-            : <button className="btn small ghost" onClick={() => onVote(true)}>Vote to end</button>}
+            ? <button className="btn small ghost" onClick={() => onVote(false)}>{t("withdraw_my_vote")}</button>
+            : <button className="btn small ghost" onClick={() => onVote(true)}>{t("vote_to_end")}</button>}
         </div>
       )}
     </Strip>
@@ -322,6 +330,7 @@ export function MarathonStrip({ d, myUserId, nameOf, onVote }: { d: MarathonData
 }
 
 export function B555Strip({ d, myUserId, nameOf, onCancel }: { d: B555Data; myUserId: number | null; nameOf: NameOf; onCancel?: () => void }) {
+  const { t } = useT();
   const accepted = d.participants.filter((p) => p.invite_status === "accepted");
   const k = Math.round(d.coins_per_game / 1000);
   return (
@@ -345,7 +354,7 @@ export function B555Strip({ d, myUserId, nameOf, onCancel }: { d: B555Data; myUs
         );
       })}
       {d.status === "pending_invites" && onCancel && myUserId === d.host_user_id && (
-        <div className="row" style={{ marginTop: 8 }}><span className="spacer" /><button className="btn small ghost" onClick={onCancel}>Cancel</button></div>
+        <div className="row" style={{ marginTop: 8 }}><span className="spacer" /><button className="btn small ghost" onClick={onCancel}>{t("cancel")}</button></div>
       )}
     </Strip>
   );
@@ -367,6 +376,7 @@ export function ResultOverlay({ title, rows, onClose, onShare, sharing }: {
   onShare?: () => void;
   sharing?: boolean;
 }) {
+  const { t } = useT();
   return (
     <Overlay title={title} onClose={onClose}>
       {rows.map((r, i) => (
@@ -380,7 +390,7 @@ export function ResultOverlay({ title, rows, onClose, onShare, sharing }: {
           {sharing ? "Getting your recap…" : "Share this result"}
         </button>
       )}
-      <button className={onShare ? "btn block ghost" : "btn block"} style={{ marginTop: 8 }} onClick={onClose}>Close</button>
+      <button className={onShare ? "btn block ghost" : "btn block"} style={{ marginTop: 8 }} onClick={onClose}>{t("close")}</button>
     </Overlay>
   );
 }
@@ -408,6 +418,7 @@ export function VirtualLook({ p, size = 96 }: { p: { virtual_media_url?: string 
 
 /** Host only: guests in the room + member search, up to 3. */
 export function VirtualPicker({ myUserId, guests, onSubmit, onClose }: { myUserId: number; guests: Person[]; onSubmit: (ids: number[]) => Promise<void>; onClose: () => void }) {
+  const { t } = useT();
   const [selected, setSelected] = useStateVB<Map<number, string>>(new Map());
   const [query, setQuery] = useStateVB("");
   const [results, setResults] = useStateVB<VirtualMember[]>([]);
@@ -446,15 +457,15 @@ export function VirtualPicker({ myUserId, guests, onSubmit, onClose }: { myUserI
     </label>
   );
   return (
-    <Overlay title="Virtual Battle" onClose={onClose}>
-      <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>Pick up to 3 — guests in your room, members who aren't live, or search any member. Members who aren't live show their virtual look. 5 minutes, most coins wins.</p>
+    <Overlay title={t("virtual_battle")} onClose={onClose}>
+      <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>{t("pick_up_to_3_guests_in_your_room_members")}</p>
       {guests.length > 0 && <>
-        <div style={{ fontSize: 12, fontWeight: 800, color: "var(--gold)", margin: "8px 0 6px" }}>In your room</div>
+        <div style={{ fontSize: 12, fontWeight: 800, color: "var(--gold)", margin: "8px 0 6px" }}>{t("in_your_room")}</div>
         <div style={{ display: "grid", gap: 6 }}>{guests.map((g) => row(g.user_id, personName(g), "guest", g))}</div>
       </>}
-      <div style={{ fontSize: 12, fontWeight: 800, color: "var(--gold)", margin: "12px 0 6px" }}>Search members</div>
+      <div style={{ fontSize: 12, fontWeight: 800, color: "var(--gold)", margin: "12px 0 6px" }}>{t("search_members")}</div>
       <div className="row" style={{ gap: 8 }}>
-        <input className="input" placeholder="Name or username" value={query} onChange={(e) => setQuery(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") search(); }} style={{ flex: 1 }} />
+        <input className="input" placeholder={t("name_or_username")} value={query} onChange={(e) => setQuery(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") search(); }} style={{ flex: 1 }} />
         <button className="btn small" onClick={() => search()} disabled={busy}>{busy ? "…" : "Search"}</button>
       </div>
       <div style={{ fontSize: 12, fontWeight: 800, color: "var(--gold)", margin: "12px 0 6px" }}>{query.trim() ? "Search results" : "Members not live right now"}</div>
@@ -466,14 +477,14 @@ export function VirtualPicker({ myUserId, guests, onSubmit, onClose }: { myUserI
       <div className="muted" style={{ fontSize: 12, margin: "10px 0" }}>Selected: {selected.size} / 3{selected.size ? " — " + Array.from(selected.values()).join(", ") : ""}</div>
       <button className="btn" style={{ width: "100%", background: "var(--gold-border)", color: "#000", borderColor: "#000" }} disabled={busy || selected.size === 0}
         onClick={async () => { setBusy(true); try { await onSubmit(Array.from(selected.keys())); } catch (e) { setNote((e as Error).message); } finally { setBusy(false); } }}>
-        Start Battle
-      </button>
+        {t("start_battle")}</button>
     </Overlay>
   );
 }
 
 /** The battle strip: clock plus one card per participant (virtual ones with their look), gift buttons. */
 export function VirtualStrip({ d, now, myUserId, onGift }: { d: VirtualBattleData; now: number; myUserId: number | null; onGift: (p: VirtualParticipant) => void }) {
+  const { t } = useT();
   const secs = d.status === "active" ? vbSecondsUntil(d.ends_at, now) : null;
   const sorted = [...d.participants].sort((a, b) => (b.current_score ?? 0) - (a.current_score ?? 0));
   // Steve, 2026-09-27: "When sending a gift to the virtual member remove his avatar and show the
@@ -509,7 +520,7 @@ export function VirtualStrip({ d, now, myUserId, onGift }: { d: VirtualBattleDat
     }
   }, [d]);
   return (
-    <Strip title="Virtual Battle" right={<span className="pill">{vbClock(secs)}</span>}>
+    <Strip title={t("virtual_battle")} right={<span className="pill">{vbClock(secs)}</span>}>
       <div className="row" style={{ gap: 8, marginTop: 8, flexWrap: "wrap" }}>
         {sorted.map((p) => (
           <div key={p.user_id} style={{ display: "grid", gap: 4, justifyItems: "center", padding: 6, border: "1px solid var(--gold-border)", borderRadius: 10, background: "#000" }}>
@@ -520,7 +531,7 @@ export function VirtualStrip({ d, now, myUserId, onGift }: { d: VirtualBattleDat
             <span className="muted" style={{ fontSize: 11 }}>{p.kind}</span>
             <span style={{ color: "var(--gold)", fontWeight: 800 }}>{(p.current_score ?? 0).toLocaleString()}</span>
             {myUserId !== p.user_id && d.status === "active" && (
-              <button className="btn small" style={{ background: "var(--gold-border)", color: "#000", borderColor: "#000" }} onClick={() => onGift(p)}>🎁 Gift</button>
+              <button className="btn small" style={{ background: "var(--gold-border)", color: "#000", borderColor: "#000" }} onClick={() => onGift(p)}>{t("gift")}</button>
             )}
           </div>
         ))}
@@ -531,6 +542,7 @@ export function VirtualStrip({ d, now, myUserId, onGift }: { d: VirtualBattleDat
 
 /** Who gifted each participant, totals, and the one-click / bulk Thank You (Steve, 2026-09-01). */
 export function VirtualGiftRecordOverlay({ record, myUserId, onThank, onClose }: { record: VirtualGiftRecord; myUserId: number | null; onThank: (to: (number | "all")[], message: string) => Promise<void>; onClose: () => void }) {
+  const { t } = useT();
   const [thanked, setThanked] = useStateVB<Set<number>>(new Set());
   const [editing, setEditing] = useStateVB<{ to: (number | "all")[]; who: string } | null>(null);
   const [draft, setDraft] = useStateVB(record.default_thank_you);
@@ -550,7 +562,7 @@ export function VirtualGiftRecordOverlay({ record, myUserId, onThank, onClose }:
     setThanked((cur) => new Set([...cur, ...ids]));
   }
   return (
-    <Overlay title="Virtual Battle Gifts" onClose={onClose} width={520}>
+    <Overlay title={t("virtual_battle_gifts")} onClose={onClose} width={520}>
       <div className="card pad" style={{ marginBottom: 10, borderColor: "var(--gold-border)" }}>
         <div style={{ fontSize: 12, fontWeight: 800, color: "var(--gold)" }}>{record.battle.status === "completed" ? "Final score" : "Live score"}</div>
         <div style={{ fontSize: 13 }}>{standings}</div>
@@ -585,12 +597,12 @@ export function VirtualGiftRecordOverlay({ record, myUserId, onThank, onClose }:
                     </div>
                     {g.user_id !== myUserId && (
                       <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
-                        <input className="input" value={rowDraft(g.user_id)} placeholder="Your message" style={{ width: 170, fontSize: 12, padding: "5px 8px" }}
+                        <input className="input" value={rowDraft(g.user_id)} placeholder={t("your_message")} style={{ width: 170, fontSize: 12, padding: "5px 8px" }}
                           onChange={(e) => setRowDrafts((cur) => new Map(cur).set(g.user_id, e.target.value))}
                           onKeyDown={(e) => { if (e.key === "Enter") send([g.user_id], rowDraft(g.user_id), [g.user_id]); }} />
                         {thanked.has(g.user_id)
-                          ? <span className="pill" style={{ color: "var(--gold)" }}>✓ Sent</span>
-                          : <button className="btn small" style={{ background: "var(--gold-border)", color: "#000", borderColor: "#000" }} onClick={() => send([g.user_id], rowDraft(g.user_id), [g.user_id])}>Send</button>}
+                          ? <span className="pill" style={{ color: "var(--gold)" }}>{t("sent")}</span>
+                          : <button className="btn small" style={{ background: "var(--gold-border)", color: "#000", borderColor: "#000" }} onClick={() => send([g.user_id], rowDraft(g.user_id), [g.user_id])}>{t("send")}</button>}
                       </div>
                     )}
                   </div>
@@ -605,11 +617,11 @@ export function VirtualGiftRecordOverlay({ record, myUserId, onThank, onClose }:
           <b style={{ color: "var(--gold)" }}>Thank {editing.who}</b>
           <textarea className="input" rows={3} value={draft} onChange={(e) => setDraft(e.target.value)} style={{ width: "100%", marginTop: 8 }} />
           <div className="row" style={{ justifyContent: "flex-end", gap: 8, marginTop: 8 }}>
-            <button className="btn small ghost" onClick={() => setEditing(null)}>Cancel</button>
+            <button className="btn small ghost" onClick={() => setEditing(null)}>{t("cancel")}</button>
             <button className="btn small" style={{ background: "var(--gold-border)", color: "#000", borderColor: "#000" }} onClick={async () => {
               const ids = editing.to[0] === "all" ? (mine[0]?.gifters ?? []).map((g) => g.user_id) : editing.to.filter((t): t is number => typeof t === "number");
               await send(editing.to, draft, ids); setEditing(null);
-            }}>Send</button>
+            }}>{t("send")}</button>
           </div>
         </div>
       )}

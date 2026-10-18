@@ -18,8 +18,10 @@ import { currentAuthHeaders } from "../lib/api";
 import { useSession } from "../lib/session";
 import { fetchCartoonSettings, makeCartoon } from "../lib/photos";
 import { Notice } from "../components/Common";
+import { useT } from "../lib/i18n";
 
 export function CartoonPage() {
+  const { t } = useT();
   const { user, isLoggedIn } = useSession();
   const cameraRef = useRef<HTMLInputElement>(null);
   const galleryRef = useRef<HTMLInputElement>(null);
@@ -77,24 +79,24 @@ export function CartoonPage() {
   if (!isLoggedIn) {
     return (
       <div className="page">
-        <h1 className="page-title">Cartoon Me</h1>
-        <Notice>Please <Link to="/login">sign in</Link> to make a cartoon.</Notice>
+        <h1 className="page-title">{t("cartoon_me")}</h1>
+        <Notice>Please <Link to="/login">{t("sign_in_2")}</Link> to make a cartoon.</Notice>
       </div>
     );
   }
 
   return (
     <div className="page" style={{ maxWidth: 720 }}>
-      <h1 className="page-title">Cartoon Me</h1>
-      <p className="soft">Take a selfie or pick a photo, and get yourself back as a cartoon character.</p>
+      <h1 className="page-title">{t("cartoon_me")}</h1>
+      <p className="soft">{t("take_a_selfie_or_pick_a_photo_and_get_yo")}</p>
 
       <div style={{ background: "#000", border: "1.5px solid var(--gold-border)", borderRadius: "var(--radius)", display: "flex", alignItems: "center", justifyContent: "center", minHeight: 280, overflow: "hidden" }}>
         {cartoonUrl ? (
-          <img src={cartoonUrl} alt="Your cartoon" style={{ width: "100%", maxHeight: 460, objectFit: "contain", display: "block" }} />
+          <img src={cartoonUrl} alt={t("your_cartoon")} style={{ width: "100%", maxHeight: 460, objectFit: "contain", display: "block" }} />
         ) : pickedUrl ? (
           <img src={pickedUrl} alt="" style={{ width: "100%", maxHeight: 460, objectFit: "contain", display: "block" }} />
         ) : (
-          <span className="muted">No photo chosen yet.</span>
+          <span className="muted">{t("no_photo_chosen_yet")}</span>
         )}
       </div>
 
@@ -104,8 +106,8 @@ export function CartoonPage() {
              onChange={(e) => choose(e.target.files?.[0])} />
 
       <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
-        <button className="btn" style={{ flex: 1 }} onClick={() => cameraRef.current?.click()} disabled={busy}>Take a selfie</button>
-        <button className="btn" style={{ flex: 1 }} onClick={() => galleryRef.current?.click()} disabled={busy}>Choose a photo</button>
+        <button className="btn" style={{ flex: 1 }} onClick={() => cameraRef.current?.click()} disabled={busy}>{t("take_a_selfie")}</button>
+        <button className="btn" style={{ flex: 1 }} onClick={() => galleryRef.current?.click()} disabled={busy}>{t("choose_a_photo")}</button>
       </div>
 
       {enabled ? (
@@ -114,15 +116,14 @@ export function CartoonPage() {
           {busy ? "Drawing your cartoon…" : `Make my cartoon · ${coins} coins`}
         </button>
       ) : (
-        <div style={{ marginTop: 12 }}><Notice>Cartoons aren't switched on yet. Please check back soon.</Notice></div>
+        <div style={{ marginTop: 12 }}><Notice>{t("cartoons_aren_t_switched_on_yet_please_c")}</Notice></div>
       )}
 
       {/* Steve, 2026-10-12: "we need a message to let them know while the wheel is turning."
           A real number, not "a few seconds" — a silent wait reads as a hang. */}
       {busy && (
         <div className="muted" style={{ textAlign: "center", marginTop: 8 }}>
-          This cartoon image creation will take between 30 to 60 seconds to complete.
-        </div>
+          {t("this_cartoon_image_creation_will_take_be")}</div>
       )}
 
       {error && <div style={{ marginTop: 12 }}><Notice error>{error}</Notice></div>}
@@ -130,11 +131,10 @@ export function CartoonPage() {
       {cartoonUrl && (
         <div style={{ marginTop: 12 }}>
           <div style={{ color: "var(--gold)", fontWeight: 700, textAlign: "center" }}>
-            Saved to your <Link to="/photos">Photos</Link> ▸ {folderName}
+            Saved to your <Link to="/photos">{t("photos")}</Link> ▸ {folderName}
           </div>
           <a className="btn" href={cartoonUrl} download style={{ display: "block", textAlign: "center", marginTop: 10 }}>
-            Save to my computer
-          </a>
+            {t("save_to_my_computer")}</a>
         </div>
       )}
 
