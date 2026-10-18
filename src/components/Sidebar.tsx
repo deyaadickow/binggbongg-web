@@ -20,6 +20,11 @@ export function sidebarSections(userId: number | null): SideSection[] {
       { to: "/shows", label: "Shows", icon: "📺" },
       // Video Ad Gig (Steve, 2026-10-17).
       { to: "/gigs", label: "Video Ad Gig", icon: "🎥" },
+      // Steve, 2026-10-18: "add a tab on main feed for 'Go live on 6 platforms' and when tapped
+      // link them right to that page on their settings." The phones put a chip on the feed; the
+      // web's feed-level navigation is this list, so it goes here — pointing at the same
+      // Simulcast page that already sits under Account.
+      { to: "/settings/simulcast", label: "Go live on 6 platforms", icon: "📡", needsLogin: true },
       { to: "/search", label: "Search", icon: "🔍" },
       // Steve, 2026-10-11: "Yes please start the direct messages on the web."
       { to: "/messages", label: "Messages", icon: "💬", needsLogin: true },
