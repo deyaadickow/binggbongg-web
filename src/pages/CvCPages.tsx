@@ -99,7 +99,7 @@ function ComingSoonCard({ matchup }: { matchup: CvCComingSoon }) {
         <span style={{ fontWeight: 700 }}>{matchup.country_b_name}</span>
       </div>
       <p className="muted" style={{ margin: "6px 0 0", fontSize: 13 }}>
-        {matchup.is_running ? "STARTING" : "COMING SOON"} · A {matchup.minutes} minute battle. Help your country win it.
+        {t(matchup.is_running ? "cvc_starting_badge" : "cvc_coming_soon_badge")} · {t("a_n_minute_battle_help_win", matchup.minutes)}
       </p>
     </div>
   );
@@ -108,13 +108,12 @@ function ComingSoonCard({ matchup }: { matchup: CvCComingSoon }) {
 /** Steve, 2026-10-18: "or make a country Battle suggestion in our support section." The reason
  *  is a row in the support dropdown, so this only has to point at Support. */
 function SuggestABattle() {
-  const { t } = useT();
+  const { t, tn } = useT();
   return (
     <p className="soft" style={{ marginTop: 10, fontSize: 13 }}>
-      Want to see your country here?{" "}
-      <Link to="/settings/support?reason=Suggest%20a%20country%20battle" style={{ color: gold, fontWeight: 700 }}>
-        {t("cvc_suggest_a_battle")}</Link>{" "}
-      and tell us which two.
+      {tn("cvc_want_your_country_here",
+        <Link to="/settings/support?reason=Suggest%20a%20country%20battle" style={{ color: gold, fontWeight: 700 }}>
+          {t("cvc_suggest_a_battle")}</Link>)}
     </p>
   );
 }
@@ -135,7 +134,7 @@ function BoardRow({ row }: { row: CvCRow }) {
       </div>
       <div style={{ marginTop: 6, fontSize: 13, color: row.is_draw ? "var(--text)" : gold, fontWeight: 700 }}>
         {row.is_draw ? "Draw" : row.winner_country_name ? `${row.winner_country_name} won` : ""}
-        <span className="muted" style={{ fontWeight: 400 }}> · {row.minutes} minutes</span>
+        <span className="muted" style={{ fontWeight: 400 }}>{t("dot_n_minutes", row.minutes)}</span>
       </div>
     </Link>
   );
@@ -152,14 +151,15 @@ function Side({ name, code, score, won }: { name: string; code?: string | null; 
 }
 
 function UpcomingCard({ row }: { row: CvCRow }) {
+  const { t } = useT();
   return (
     <div className="card pad" style={{ borderColor: "var(--gold-border)" }}>
       <div style={{ fontWeight: 900, color: gold }}>
         {flagOf(row.country_a_code)} {row.title} {flagOf(row.country_b_code)}
       </div>
       <div className="muted" style={{ fontSize: 13, marginTop: 4 }}>
-        {String(row.scheduled_at ?? "").slice(0, 16).replace("T", " ")} · {row.minutes} minutes
-        {row.status === "accepted" ? " · both accepted" : row.status === "live" ? " · on now" : " · waiting for them to accept"}
+        {t("date_and_n_minutes", String(row.scheduled_at ?? "").slice(0, 16).replace("T", " "), row.minutes)}
+        {row.status === "accepted" ? t("dot_both_accepted") : row.status === "live" ? t("dot_on_now") : t("dot_waiting_to_accept")}
       </div>
     </div>
   );
@@ -196,7 +196,7 @@ export function CvCBattlePage() {
           {flagOf(data.country_a_code)} {data.title} {flagOf(data.country_b_code)}
         </div>
         <div className="muted" style={{ textAlign: "center", fontSize: 13, marginTop: 4 }}>
-          {data.date} · {data.minutes} minutes
+          {t("date_and_n_minutes", data.date, data.minutes)}
         </div>
         <div style={{ textAlign: "center", fontSize: 30, fontWeight: 900, marginTop: 12, fontVariantNumeric: "tabular-nums" }}>
           {data.score_a.toLocaleString()} <span className="muted" style={{ fontSize: 18 }}>–</span> {data.score_b.toLocaleString()}
@@ -215,12 +215,12 @@ export function CvCBattlePage() {
           between them is the part that makes it bragging rights rather than one scoreline. */}
       <div className="card pad" style={{ marginTop: 12 }}>
         <div style={{ fontWeight: 900, color: gold, marginBottom: 6 }}>
-          Lifetime: {data.country_a_name} v {data.country_b_name}
+          {t("lifetime_a_v_b", data.country_a_name, data.country_b_name)}
         </div>
         <p className="soft" style={{ margin: 0 }}>
-          {h.played} battle{h.played === 1 ? "" : "s"} · {data.country_a_name} {h.wins_a} ·{" "}
-          {data.country_b_name} {h.wins_b}
-          {h.draws > 0 ? ` · ${h.draws} draw${h.draws === 1 ? "" : "s"}` : ""}
+          {t(h.played === 1 ? "cvc_record_one_battle" : "cvc_record_n_battles",
+             h.played, data.country_a_name, h.wins_a, data.country_b_name, h.wins_b)}
+          {h.draws > 0 ? t(h.draws === 1 ? "dot_one_draw" : "dot_n_draws", h.draws) : ""}
         </p>
       </div>
     </div>
@@ -239,7 +239,7 @@ function PlayerCard({ player, code, supporters }: { player: CvCPlayer; code?: st
         <div>
           <div style={{ fontWeight: 800 }}>{player.name ?? "—"}</div>
           <div className="muted" style={{ fontSize: 12 }}>
-            {flagOf(code)} {player.country} · {player.followers.toLocaleString()} followers
+            {t("flag_country_and_followers", flagOf(code), player.country, player.followers.toLocaleString())}
           </div>
         </div>
       </div>

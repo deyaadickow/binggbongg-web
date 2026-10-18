@@ -111,7 +111,9 @@ export function SellerPage() {
           <div className="row" style={{ gap: 8, margin: "16px 0", flexWrap: "wrap" }}>
             <button type="button" className={tab === "products" ? "btn" : "btn ghost"} onClick={() => setTab("products")}>{t("products")}</button>
             <button type="button" className={tab === "orders" ? "btn" : "btn ghost"} onClick={() => setTab("orders")}>
-              Orders{orders && orders.some((o) => o.status === "paid" || o.status === "processing") ? ` (${orders.filter((o) => o.status === "paid" || o.status === "processing").length} to ship)` : ""}
+              {orders && orders.some((o) => o.status === "paid" || o.status === "processing")
+                ? t("orders_n_to_ship", orders.filter((o) => o.status === "paid" || o.status === "processing").length)
+                : t("orders")}
             </button>
             <button type="button" className={tab === "samples" ? "btn" : "btn ghost"} onClick={() => setTab("samples")}>{t("samples")}</button>
           </div>
@@ -227,7 +229,7 @@ function SellerProducts({ myUserId, products, onChanged, onNotice, onError }: {
   return (
     <>
       <div className="row" style={{ alignItems: "center", marginBottom: 12 }}>
-        <div style={{ fontWeight: 800 }}>{products.length} product{products.length === 1 ? "" : "s"}</div>
+        <div style={{ fontWeight: 800 }}>{t(products.length === 1 ? "one_product" : "n_products", products.length)}</div>
         <span style={{ flex: 1 }} />
         <button type="button" className={adding ? "btn ghost" : "btn"} onClick={() => setAdding((v) => !v)}>
           {adding ? "Cancel" : "Add a product"}
@@ -339,11 +341,11 @@ function NewProduct({ myUserId, onDone, onError }: { myUserId: number; onDone: (
       <Field label={t("photos")} hint={`Up to ${MAX_PRODUCT_IMAGES}. The first one is the main picture.`}>
         <input type="file" accept="image/*" multiple onChange={(e) => setImages(Array.from(e.target.files ?? []).slice(0, MAX_PRODUCT_IMAGES))} />
       </Field>
-      {images.length > 0 && <div className="muted" style={{ fontSize: 12 }}>{images.length} photo{images.length === 1 ? "" : "s"} chosen</div>}
+      {images.length > 0 && <div className="muted" style={{ fontSize: 12 }}>{t(images.length === 1 ? "one_photo_chosen" : "n_photos_chosen", images.length)}</div>}
       <Field label={t("video")} hint={t("optional")}>
         <input type="file" accept="video/mp4,video/quicktime" onChange={(e) => setVideo(e.target.files?.[0] ?? null)} />
       </Field>
-      {busy && progress > 0 && <div className="muted" style={{ fontSize: 13 }}>Uploading… {Math.round(progress * 100)}%</div>}
+      {busy && progress > 0 && <div className="muted" style={{ fontSize: 13 }}>{t("uploading_percent", Math.round(progress * 100))}</div>}
       <button type="submit" className="btn" disabled={busy}>{busy ? "Sending…" : "Submit for review"}</button>
       <div className="muted" style={{ fontSize: 12 }}>
         {t("every_photo_is_checked_automatically_bef")}</div>
@@ -385,8 +387,8 @@ function SellerOrderCard({ myUserId, order, onChanged, onNotice, onError }: {
           <ul style={{ margin: "8px 0 0", paddingLeft: 18 }}>
             {order.items.map((it, i) => <li key={i}>{it.quantity} × {it.title}</li>)}
           </ul>
-          {order.ship_to && <div className="muted" style={{ fontSize: 13, marginTop: 6 }}>Ship to: {addressLine(order.ship_to)}</div>}
-          {order.tracking_number && <div className="muted" style={{ fontSize: 13 }}>Tracking: {order.carrier} {order.tracking_number}</div>}
+          {order.ship_to && <div className="muted" style={{ fontSize: 13, marginTop: 6 }}>{t("ship_to_address", addressLine(order.ship_to))}</div>}
+          {order.tracking_number && <div className="muted" style={{ fontSize: 13 }}>{t("tracking_line", order.carrier ?? "", order.tracking_number ?? "")}</div>}
         </div>
         {needsShipping && (
           <button type="button" className={open ? "btn ghost" : "btn"} onClick={() => setOpen((v) => !v)}>

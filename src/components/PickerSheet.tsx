@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useT } from "../lib/i18n";
 
 /**
  * The web's version of the apps' picker sheets (GoldPickerSheet on iOS, MultiSelectListSheet on
@@ -26,6 +27,7 @@ export function PickerSheet({ title, noun, items, pinned = [], pinnedLabel, rest
   /** Cities add several targets in a row, so that sheet stays open after each tap. */
   stayOpen?: boolean;
 }) {
+  const { t } = useT();
   const [query, setQuery] = useState("");
   const q = query.trim().toLowerCase();
   const match = (c: { code: string; name: string }) => !q || c.name.toLowerCase().includes(q) || c.code.toLowerCase() === q;
@@ -84,7 +86,7 @@ export function PickerSheet({ title, noun, items, pinned = [], pinnedLabel, rest
           {shownRest.length > 0 && !filtering && restLabel && shownPinned.length > 0 && caption(restLabel)}
           {shownRest.map(row)}
           {shownPinned.length + shownRest.length === 0 && (
-            <p className="muted" style={{ fontSize: 13, textAlign: "center", padding: "24px 0" }}>Nothing matches “{query}”.</p>
+            <p className="muted" style={{ fontSize: 13, textAlign: "center", padding: "24px 0" }}>{t("nothing_matches_query", query)}</p>
           )}
         </div>
         <button className="btn ghost" onClick={onClose} style={{ marginTop: 12, flex: "0 0 auto" }}>

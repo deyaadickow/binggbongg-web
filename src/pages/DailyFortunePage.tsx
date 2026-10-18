@@ -14,7 +14,7 @@ import { useT } from "../lib/i18n";
  * correct, not a caching bug.
  */
 export function DailyFortunePage() {
-  const { t } = useT();
+  const { t, tn } = useT();
   const { user: me } = useSession();
   const [fortune, setFortune] = useState<DailyFortune | null>(null);
   const [loading, setLoading] = useState(true);
@@ -45,7 +45,7 @@ export function DailyFortunePage() {
   useEffect(() => { void load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [me]);
 
   if (!me) {
-    return <div className="page"><div className="notice">Sign in to see your lucky numbers. <Link to="/login">{t("sign_in")}</Link></div></div>;
+    return <div className="page"><div className="notice">{tn("sign_in_to_see_lucky_numbers", <Link to="/login">{t("sign_in")}</Link>)}</div></div>;
   }
 
   // Numeric order: sorting the keys as strings would put "10" before "3".
@@ -93,7 +93,7 @@ export function DailyFortunePage() {
             >
               {/* Same size and weight as the number beside it — a small grey caption made the
                   row read as one number with a note, not as "this is the 3-digit one". */}
-              <span style={{ fontSize: 24, fontWeight: 700, color: "var(--gold)" }}>{n.length} digits</span>
+              <span style={{ fontSize: 24, fontWeight: 700, color: "var(--gold)" }}>{t("n_digits", n.length)}</span>
               {/* Monospace so the digits do not jiggle between draws, and rendered as the
                   string we were given — Number() here would eat the leading zero. */}
               <span style={{ fontFamily: "ui-monospace, monospace", fontSize: 24, fontWeight: 700, letterSpacing: 2, color: "var(--gold)" }}>

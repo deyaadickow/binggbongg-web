@@ -9,7 +9,7 @@ import { WALLET_LINKS } from "./WalletPages";
 import { useT } from "../lib/i18n";
 
 export function WalletPage() {
-  const { t } = useT();
+  const { t, tn } = useT();
   const { user, isLoggedIn, refresh } = useSession();
   const [plans, setPlans] = useState<WebCoinPlan[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -52,7 +52,7 @@ export function WalletPage() {
     }
   }
 
-  if (!isLoggedIn || !user) return <div className="page"><Notice>Sign in to see your wallet. <Link to="/login">{t("sign_in")}</Link></Notice></div>;
+  if (!isLoggedIn || !user) return <div className="page"><Notice>{tn("sign_in_to_see_your_wallet", <Link to="/login">{t("sign_in")}</Link>)}</Notice></div>;
 
 
   return (
@@ -82,8 +82,8 @@ export function WalletPage() {
         <div className="grid">
           {plans.map((p) => (
             <div key={p.id} className="card pad center">
-              <div style={{ fontSize: 24, fontWeight: 800, color: "var(--gold)" }}>{p.total_coins.toLocaleString()} coins</div>
-              {p.bonus_coins > 0 && <div className="muted" style={{ fontSize: 12 }}>{p.coins.toLocaleString()} + {p.bonus_coins.toLocaleString()} bonus</div>}
+              <div style={{ fontSize: 24, fontWeight: 800, color: "var(--gold)" }}>{t("n_coins", p.total_coins.toLocaleString())}</div>
+              {p.bonus_coins > 0 && <div className="muted" style={{ fontSize: 12 }}>{t("n_plus_n_bonus", p.coins.toLocaleString(), p.bonus_coins.toLocaleString())}</div>}
               <div className="soft" style={{ marginTop: 4 }}>${Number(p.price).toFixed(2)}</div>
             </div>
           ))}

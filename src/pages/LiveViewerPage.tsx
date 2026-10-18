@@ -33,7 +33,7 @@ const MEMBERS_POLL_MS = 5000;
 
 /** One page for every role: viewer (default), guest (after the host approves), host (?host=1). */
 export function LiveViewerPage() {
-  const { t } = useT();
+  const { t, tn } = useT();
   const { room: roomParam } = useParams();
   const [search] = useSearchParams();
   const navigate = useNavigate();
@@ -659,7 +659,7 @@ export function LiveViewerPage() {
   const statusLabel = roomClosed || live.status === "ended" ? "ENDED" : live.status === "live" ? "● LIVE" : live.status === "error" ? "ERROR" : "CONNECTING";
 
   if (!isLoggedIn) {
-    return <div className="page"><Notice>Sign in to watch this live, chat and send gifts. <Link to="/login">{t("sign_in")}</Link></Notice></div>;
+    return <div className="page"><Notice>{tn("sign_in_to_watch_this_live", <Link to="/login">{t("sign_in")}</Link>)}</Notice></div>;
   }
 
   // ---- Taps on the live (Steve, 2026-10-14) ------------------------------------------------
@@ -799,7 +799,7 @@ export function LiveViewerPage() {
       </div>
       {live.error && <Notice error>{live.error}</Notice>}
       {live.publishError && <Notice error>{live.publishError}</Notice>}
-      {(roomClosed || live.status === "ended") && <Notice>This live has ended. <Link to="/live">{t("see_who_else_is_live")}</Link></Notice>}
+      {(roomClosed || live.status === "ended") && <Notice>{tn("this_live_has_ended", <Link to="/live">{t("see_who_else_is_live")}</Link>)}</Notice>}
 
       <div className="live-layout">
         <div>
@@ -896,13 +896,15 @@ export function LiveViewerPage() {
             <div className="modal-backdrop" onClick={() => setTapSenders(null)}>
               <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
                 <h3 style={{ color: "var(--gold)", marginTop: 0 }}>
-                  ❤️ Hearts for {hostCard ? displayName(hostCard) : "the host"}{tapSendersTotal > 0 ? ` (${tapSendersTotal.toLocaleString()})` : ""}
+                  {tapSendersTotal > 0
+                    ? t("hearts_for_count", hostCard ? displayName(hostCard) : t("the_host"), tapSendersTotal.toLocaleString())
+                    : t("hearts_for", hostCard ? displayName(hostCard) : t("the_host"))}
                 </h3>
                 {/* Steve, 2026-10-14: "Please add this text on top of the page that when I see the
                     total tap taps." Verbatim, his line break kept. True, if modest: taps are one
                     term in the Live Now ranking (LivestreamController::liveHeatScores). */}
                 <p style={{ color: "var(--gold)", textAlign: "center", fontWeight: 600, fontSize: 13, margin: "0 0 12px", whiteSpace: "pre-line" }}>
-                  {"The more Tap Tap hearts you send me,\nthe more my live will be pushed to other members."}
+                  {t("tap_tap_hearts_note")}
                 </p>
                 {tapSendersLoading ? (
                   <p className="muted">{t("imagePickerLoading")}</p>
@@ -951,7 +953,9 @@ export function LiveViewerPage() {
                     {lbSelected && (
                       <>
                         <h4 style={{ color: "var(--gold)", margin: "14px 0 8px", textAlign: "center" }}>
-                          Gifts for {displayName({ fullname: lbSelected.fullname, username: lbSelected.username } as Partial<UserSummary>)}{lbTotal > 0 ? ` (${lbTotal.toLocaleString()})` : ""}
+                          {lbTotal > 0
+                            ? t("gifts_for_count", displayName({ fullname: lbSelected.fullname, username: lbSelected.username } as Partial<UserSummary>), lbTotal.toLocaleString())
+                            : t("gifts_for", displayName({ fullname: lbSelected.fullname, username: lbSelected.username } as Partial<UserSummary>))}
                         </h4>
                         {lbSenders === null ? (
                           <p className="muted">{t("imagePickerLoading")}</p>
@@ -1076,16 +1080,16 @@ export function LiveViewerPage() {
                 : <button className="btn small" onClick={requestToJoin}>{t("ask_to_join")}</button>
             )}
             {broadcasters.filter((b) => b.user_id !== user?.id).map((b) => (
-              <button key={b.user_id} className="btn small" onClick={() => setGiftTarget(b.user_id)}>🎁 Gift {displayName(b as Partial<UserSummary>)}</button>
+              <button key={b.user_id} className="btn small" onClick={() => setGiftTarget(b.user_id)}>{t("gift_someone", displayName(b as Partial<UserSummary>))}</button>
             ))}
             <span className="spacer" />
-            <span className="muted" style={{ fontSize: 13 }}>Your coins: <b style={{ color: "var(--gold)" }}>{user?.no_redeem_wallet ?? 0}</b> · <Link to="/wallet">{t("buy_more")}</Link></span>
+            <span className="muted" style={{ fontSize: 13 }}>{tn("your_coins_and_buy_more", <b style={{ color: "var(--gold)" }}>{user?.no_redeem_wallet ?? 0}</b>, <Link to="/wallet">{t("buy_more")}</Link>)}</span>
           </div>
 
           {giftTarget && (
             <div className="card" style={{ marginTop: 12 }}>
               <div className="row" style={{ padding: "10px 12px", borderBottom: "1px solid var(--line)" }}>
-                <b style={{ color: "var(--gold)" }}>Send a gift to {nameOfId(giftTarget) || (virtualGiftTarget ? personName(virtualGiftTarget) : "")}</b>
+                <b style={{ color: "var(--gold)" }}>{t("send_a_gift_to", nameOfId(giftTarget) || (virtualGiftTarget ? personName(virtualGiftTarget) : ""))}</b>
                 <span className="spacer" />
                 <button className="btn small ghost" onClick={() => setGiftTarget(null)}>{t("close")}</button>
               </div>
@@ -1374,7 +1378,9 @@ export function LiveViewerPage() {
       )}
       {battle.invite && (
         <Overlay title={t("bingg_bongg_battle")} onClose={battle.dismissInvite}>
-          <p className="soft">{battle.invite.opponent_fullname ?? battle.invite.opponent_username ?? "A streamer"} challenges you to a 5-minute battle{battle.invite.target_coins ? ` — first to ${battle.invite.target_coins} coins` : ""}.</p>
+          <p className="soft">{battle.invite.target_coins
+    ? t("challenges_you_target", battle.invite.opponent_fullname ?? battle.invite.opponent_username ?? t("a_streamer"), battle.invite.target_coins)
+    : t("challenges_you", battle.invite.opponent_fullname ?? battle.invite.opponent_username ?? t("a_streamer"))}</p>
           <div className="row" style={{ marginTop: 12 }}>
             <button className="btn" style={{ flex: 1 }} onClick={() => battle.respond(battle.invite!.battle_id, true).catch((e) => setToast((e as Error).message))}>{t("accept")}</button>
             <button className="btn ghost" style={{ flex: 1 }} onClick={() => battle.respond(battle.invite!.battle_id, false).catch((e) => setToast((e as Error).message))}>{t("decline")}</button>

@@ -66,8 +66,8 @@ function DateDivider({ label }: { label: string }) {
 }
 
 function NeedLogin() {
-  const { t } = useT();
-  return <div className="page"><Notice>Sign in to see who supported you. <Link to="/login">{t("sign_in")}</Link></Notice></div>;
+  const { t, tn } = useT();
+  return <div className="page"><Notice>{tn("sign_in_to_see_who_supported_you", <Link to="/login">{t("sign_in")}</Link>)}</Notice></div>;
 }
 
 export function SupportersPage() {
@@ -190,7 +190,7 @@ export function SupporterBreakdownPage() {
               <div key={r.period} className="card row" style={{ padding: "10px 14px" }}>
                 <div style={{ flex: 1, fontWeight: 700 }}>{r.label}</div>
                 <GiftCount count={r.gift_count} />
-                <div style={{ flex: 1, fontWeight: 800, textAlign: "right" }}>{n(r.total_coins)} coins</div>
+                <div style={{ flex: 1, fontWeight: 800, textAlign: "right" }}>{t("n_coins", n(r.total_coins))}</div>
               </div>
             ))}
           </div>

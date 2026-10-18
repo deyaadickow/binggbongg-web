@@ -120,13 +120,13 @@ function AgentHeader({ myUserId, agent, suppliers, products, onError }: {
         <div style={{ flex: 1, minWidth: 220 }}>
           <div style={{ fontWeight: 800, fontSize: 18 }}>{agent.name}</div>
           <div className="muted" style={{ fontSize: 13 }}>
-            {suppliers} supplier{suppliers === 1 ? "" : "s"} · {products} product{products === 1 ? "" : "s"}
+            {t(suppliers === 1 ? "one_supplier" : "n_suppliers", suppliers)} · {t(products === 1 ? "one_product" : "n_products", products)}
           </div>
           {/* The signup referral is what most agents are actually recruited on, so it gets its
               own line rather than being buried in a total. */}
           {(agent.referral_earned_cents ?? 0) > 0 && (
             <div className="muted" style={{ fontSize: 13 }}>
-              {money(agent.referral_earned_cents)} earned from signing suppliers up
+              {t("earned_from_signing_suppliers", money(agent.referral_earned_cents))}
             </div>
           )}
         </div>
@@ -221,7 +221,7 @@ function AgentProducts({ products }: { products: AgentProduct[] | null }) {
 
   return (
     <>
-      <div className="muted" style={{ marginBottom: 10 }}>{products.length} products · {sold} sold in total</div>
+      <div className="muted" style={{ marginBottom: 10 }}>{t("n_products_n_sold_total", products.length, sold)}</div>
       <div className="table-wrap" style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>

@@ -161,7 +161,7 @@ export function UploadVideoPage() {
           onChange={(e) => { const f = e.target.files?.[0]; if (f) void pick(f); }} />
         {!file ? (
           <>
-            <p className="soft" style={{ marginTop: 0 }}>Choose a video from this device. Up to {MAX_MB}MB.</p>
+            <p className="soft" style={{ marginTop: 0 }}>{t("choose_a_video_up_to_mb", MAX_MB)}</p>
             <button className="btn" onClick={() => fileRef.current?.click()}>{t("choose_video")}</button>
           </>
         ) : (
@@ -169,7 +169,7 @@ export function UploadVideoPage() {
             <div style={{ flex: 1, minWidth: 0 }}>
               <b style={{ display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{file.name}</b>
               <span className="muted" style={{ fontSize: 12 }}>
-                {(file.size / 1024 / 1024).toFixed(1)}MB{duration ? ` · ${Math.round(duration)}s` : ""}
+                {t("n_mb", (file.size / 1024 / 1024).toFixed(1))}{duration ? ` · ${Math.round(duration)}s` : ""}
               </span>
             </div>
             <button className="btn small ghost" disabled={busy} onClick={() => fileRef.current?.click()}>{t("change")}</button>

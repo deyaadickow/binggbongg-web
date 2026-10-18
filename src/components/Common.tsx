@@ -50,8 +50,10 @@ export function StoreBadges({ compact }: { compact?: boolean }) {
   return (
     <div className="store-badges">
       {!compact && <span className="muted" style={{ fontSize: 13 }}>{t("get_the_bingg_bongg_app")}</span>}
-      <a className="store-badge" href={APP_STORE_URL} target="_blank" rel="noreferrer"><span className="logo"></span><span><small>{t("download_on_the")}</small>App Store</span></a>
-      <a className="store-badge" href={PLAY_STORE_URL} target="_blank" rel="noreferrer"><span className="logo">▶</span><span><small>{t("get_it_on")}</small>Google Play</span></a>
+      <a className="store-badge" href={APP_STORE_URL} target="_blank" rel="noreferrer"><span className="logo"></span>{/* i18n-exempt: store names. */}
+        <span><small>{t("download_on_the")}</small>App Store</span></a>
+      <a className="store-badge" href={PLAY_STORE_URL} target="_blank" rel="noreferrer"><span className="logo">▶</span>{/* i18n-exempt: store names. */}
+        <span><small>{t("get_it_on")}</small>Google Play</span></a>
     </div>
   );
 }

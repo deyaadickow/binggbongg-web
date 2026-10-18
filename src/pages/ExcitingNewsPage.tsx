@@ -135,7 +135,7 @@ export function ExcitingNewsPage() {
           it, which is why the words live in the boxes instead. */}
       <div className="row" style={{ marginBottom: 14 }}>
         <button className="btn small block" onClick={() => setLangOpen(true)} style={{ justifyContent: "space-between" }}>
-          <span>🌐 Translate all flyers in {TRANSLATION_LANGUAGES.length} different languages</span>
+          <span>{t("translate_all_flyers_in_n_languages", TRANSLATION_LANGUAGES.length)}</span>
           <span style={{ color: "var(--gold-bright)" }}>{languageLabel}</span>
         </button>
       </div>

@@ -148,7 +148,7 @@ export function MyPhotosPage() {
           </div>
 
           <div style={{ color: "var(--gold)", fontSize: 12, marginTop: 4 }}>
-            Cash Account balance: ${Number(storage.ad_cash_balance ?? 0).toFixed(2)}
+            {t("cash_account_balance_is", `$${Number(storage.ad_cash_balance ?? 0).toFixed(2)}`)}
           </div>
 
           <button onClick={() => void startAdCashDeposit()}
@@ -204,7 +204,7 @@ export function MyPhotosPage() {
                         {isFavouritesFolder(f) ? "⭐ " : ""}{f.name}
                       </span>
                       <span className="muted" style={{ display: "block", fontSize: 12 }}>
-                        {f.photo_count ?? 0} photo{f.photo_count === 1 ? "" : "s"}
+                        {t(f.photo_count === 1 ? "one_photo" : "n_photos", f.photo_count ?? 0)}
                       </span>
                     </div>
                   </button>

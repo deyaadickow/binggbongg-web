@@ -7,7 +7,7 @@ import { useT } from "../lib/i18n";
 
 /** Camera preview + one button — same startLive endpoint the phones call, then the room page as host. */
 export function GoLivePage() {
-  const { t } = useT();
+  const { t, tn } = useT();
   const { user, isLoggedIn } = useSession();
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -49,7 +49,7 @@ export function GoLivePage() {
     }
   }
 
-  if (!isLoggedIn) return <div className="page"><Notice>Sign in to go live. <Link to="/login">{t("sign_in")}</Link></Notice></div>;
+  if (!isLoggedIn) return <div className="page"><Notice>{tn("sign_in_to_go_live", <Link to="/login">{t("sign_in")}</Link>)}</Notice></div>;
 
   return (
     <div className="page" style={{ maxWidth: 560 }}>
@@ -66,7 +66,7 @@ export function GoLivePage() {
       {/* Steve, 2026-10-03 — the gamers' route in. Someone with a capture card and OBS is not
           going to find this under Settings, so it sits next to the camera button they came for. */}
       <p className="center" style={{ fontSize: 13, marginTop: 14 }}>
-        Playing a game on your computer? <Link to="/go-live/computer">{t("go_live_from_your_pc_with_obs")}</Link>
+        {tn("playing_a_game_on_your_computer", <Link to="/go-live/computer">{t("go_live_from_your_pc_with_obs")}</Link>)}
       </p>
     </div>
   );

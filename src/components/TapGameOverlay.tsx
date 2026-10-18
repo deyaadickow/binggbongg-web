@@ -284,7 +284,7 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
               {phase === "attention" && start && (
                 <>
                   <h2 className="card-title" style={{ fontSize: 22 }}>{t("attention")}</h2>
-                  <p className="soft" style={{ marginTop: 8 }}>When you start playing any of these games that means you agree to gift the host {start.entry_fee_coins} coins to start — every time you play, not just this once.</p>
+                  <p className="soft" style={{ marginTop: 8 }}>{t("tap_game_entry_agreement", start.entry_fee_coins)}</p>
                   <div className="row" style={{ marginTop: 14 }}>
                     <button className="btn ghost" style={{ flex: 1 }} onClick={onClose}>{t("gig_cancel")}</button>
                     <button className="btn" style={{ flex: 1 }} onClick={agree}>{t("agree")}</button>
@@ -310,7 +310,7 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
                       still has the final say and its refusal is shown as-is. */}
                   {!gifted && result.coins_earned > 0 && (
                     <>
-                      <p style={{ marginTop: 12, fontSize: 15, color: "var(--gold)" }}>Gift these to {result.host_name || "the host"}?</p>
+                      <p style={{ marginTop: 12, fontSize: 15, color: "var(--gold)" }}>{t("gift_these_to", result.host_name || t("the_host"))}</p>
                       {giftError && <p style={{ marginTop: 8, fontSize: 13, color: "var(--red)" }}>{giftError}</p>}
                       <div className="row" style={{ marginTop: 10 }}>
                         <button className="btn ghost" style={{ flex: 1 }} onClick={onClose} disabled={gifting}>{t("no")}</button>

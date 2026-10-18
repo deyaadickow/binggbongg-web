@@ -158,7 +158,7 @@ export function HostGamesMenu({ userId, roomName, activeGame, onClose, onChanged
                   {GAME_COIN_VALUES.map((v) => (
                     <button key={v} className={v === coinValue ? "btn small" : "btn small ghost"}
                       style={{ marginRight: 6, marginBottom: 6 }} onClick={() => setCoinValue(v)}>
-                      {v} coin{v === 1 ? "" : "s"}
+                      {t(v === 1 ? "n_coin" : "n_coins", v)}
                     </button>
                   ))}
                 </div>

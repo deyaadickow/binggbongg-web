@@ -242,7 +242,7 @@ export function VideoPage() {
           <Link to={`/profile/${item.user_id}`} style={{ fontWeight: 800, color: "var(--text)" }}>{displayName(item.user)}</Link>
           <div className="soft">{item.description}</div>
           {item.hashtags && <div className="muted" style={{ fontSize: 13 }}>{item.hashtags}</div>}
-          <div className="muted" style={{ fontSize: 12, marginTop: 6 }}>{index >= 0 ? `${index + 1} of ${feed.length}${loadingMore ? " · loading more…" : ""}` : ""} · {auto ? "Auto-plays the next video" : "Repeats this video"} · ↑ ↓ keys or scroll to move</div>
+          <div className="muted" style={{ fontSize: 12, marginTop: 6 }}>{index >= 0 ? `${t("n_of_m", index + 1, feed.length)}${loadingMore ? t("dot_loading_more") : ""}` : ""} · {auto ? t("auto_plays_the_next_video") : t("repeats_this_video")} · {t("arrow_keys_or_scroll_to_move")}</div>
         </div>
         <button className="btn small" title={isLoggedIn ? "" : "Sign in to like"}
           onClick={() => {

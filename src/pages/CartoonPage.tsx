@@ -21,7 +21,7 @@ import { Notice } from "../components/Common";
 import { useT } from "../lib/i18n";
 
 export function CartoonPage() {
-  const { t } = useT();
+  const { t, tn } = useT();
   const { user, isLoggedIn } = useSession();
   const cameraRef = useRef<HTMLInputElement>(null);
   const galleryRef = useRef<HTMLInputElement>(null);
@@ -80,7 +80,7 @@ export function CartoonPage() {
     return (
       <div className="page">
         <h1 className="page-title">{t("cartoon_me")}</h1>
-        <Notice>Please <Link to="/login">{t("sign_in_2")}</Link> to make a cartoon.</Notice>
+        <Notice>{tn("please_sign_in_to_make_a_cartoon", <Link to="/login">{t("sign_in_2")}</Link>)}</Notice>
       </div>
     );
   }
@@ -131,7 +131,7 @@ export function CartoonPage() {
       {cartoonUrl && (
         <div style={{ marginTop: 12 }}>
           <div style={{ color: "var(--gold)", fontWeight: 700, textAlign: "center" }}>
-            Saved to your <Link to="/photos">{t("photos")}</Link> ▸ {folderName}
+            {tn("saved_to_your_photos_folder", <Link to="/photos">{t("photos")}</Link>, folderName)}
           </div>
           <a className="btn" href={cartoonUrl} download style={{ display: "block", textAlign: "center", marginTop: 10 }}>
             {t("save_to_my_computer")}</a>
@@ -139,8 +139,7 @@ export function CartoonPage() {
       )}
 
       <div className="muted" style={{ fontSize: 12, marginTop: 18 }}>
-        Each try costs {coins} coins, including trying again. Your cartoon is saved in Photos ▸ Cartoons,
-        and you can delete it there whenever you like.
+        {t("cartoon_cost_note", coins)}
       </div>
     </div>
   );

@@ -29,7 +29,7 @@ function Page({ title, children }: { title: string; children: React.ReactNode })
   );
 }
 function NeedLogin() {
-                       const { t } = useT(); return <div className="page"><Notice>Sign in to open this page. <Link to="/login">{t("sign_in")}</Link></Notice></div>; }
+                       const { t, tn } = useT(); return <div className="page"><Notice>{tn("sign_in_to_open_this_page", <Link to="/login">{t("sign_in")}</Link>)}</Notice></div>; }
 
 export const WALLET_LINKS: { to: string; icon: string; label: string; hint: string }[] = [
   { to: "/wallet/redeem", icon: "💸", label: "Redeem", hint: "Withdraw your cash balance by PayPal, Wise and more" },
@@ -356,8 +356,8 @@ export function PayoutHistoryPage() {
         {rows === null ? <Loading /> : rows.length === 0 ? <p className="muted" style={{ padding: 14 }}>{t("no_withdrawals_yet")}</p> : rows.map((r) => (
           <div key={r.id} className="row" style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)" }}>
             <div style={{ flex: 1 }}>
-              <b style={{ color: "var(--gold)" }}>{money(r.amount, sym)}</b> <span className="muted">via {r.gateway ?? "—"}</span>
-              <div className="muted" style={{ fontSize: 12 }}>Requested {String(r.date ?? "").slice(0, 10)}{r.completed_date ? ` · paid ${String(r.completed_date).slice(0, 10)}` : ""}{r.reference ? ` · ref ${r.reference}` : ""}</div>
+              <b style={{ color: "var(--gold)" }}>{money(r.amount, sym)}</b> <span className="muted">{t("via_gateway", r.gateway ?? "—")}</span>
+              <div className="muted" style={{ fontSize: 12 }}>{t("requested_on", String(r.date ?? "").slice(0, 10))}{r.completed_date ? t("dot_paid_on", String(r.completed_date).slice(0, 10)) : ""}{r.reference ? t("dot_ref", r.reference) : ""}</div>
             </div>
             <span className="pill">{label(r.status)}</span>
           </div>
@@ -437,7 +437,7 @@ export function StatementsPage() {
           <div className="card">
             {days === null ? <Loading /> : days.length === 0 ? <p className="muted" style={{ padding: 14 }}>{t("nothing_earned_this_month")}</p> : days.map((d, i) => (
               <div key={i} className="row" style={{ padding: "8px 14px", borderBottom: "1px solid var(--line)" }}>
-                <span style={{ flex: 1 }}>Day {d.day}{d.entry_count ? <span className="muted"> · {d.entry_count} entries</span> : null}</span>
+                <span style={{ flex: 1 }}>{t("day_n", d.day)}{d.entry_count ? <span className="muted">{t("dot_n_entries", d.entry_count)}</span> : null}</span>
                 <b style={{ color: "var(--gold)" }}>{money(d.total_earned, sym)}</b>
               </div>
             ))}

@@ -63,7 +63,7 @@ function ContestCard({ contest, userId, onDone }: { contest: OpenContest; userId
         {(contest.countries ?? []).join(", ") || contest.country_name}
         {contest.start_date && contest.end_date && ` · ${contest.start_date} to ${contest.end_date}`}
       </div>
-      {prizes && <div className="soft" style={{ fontSize: 13, marginTop: 6 }}>Prizes: {prizes}</div>}
+      {prizes && <div className="soft" style={{ fontSize: 13, marginTop: 6 }}>{t("prizes_are", prizes)}</div>}
 
       <div className="muted" style={{ fontSize: 12, marginTop: 6 }}>
         {maxSecs ? `Up to ${maxSecs}s per video. ` : ""}

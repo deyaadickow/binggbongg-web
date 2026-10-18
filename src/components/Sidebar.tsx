@@ -126,6 +126,7 @@ export function SiteFooter() {
   const { t } = useT();
   return (
     <div className="site-footer">
+      {/* i18n-exempt: a legal entity name and a year. */}
       <div>© {new Date().getFullYear()} Bingg Bongg Inc.</div>
       {/* i18n-exempt: a postal address is not translated. */}
       <div>Sterling Heights, Michigan, USA</div>

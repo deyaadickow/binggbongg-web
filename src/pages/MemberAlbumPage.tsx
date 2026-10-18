@@ -40,7 +40,7 @@ export function MemberAlbumPage() {
         {owner?.profile_image && (
           <img src={mediaUrl(owner.profile_image)} alt="" style={{ width: 34, height: 34, borderRadius: 17, objectFit: "cover" }} />
         )}
-        <h1 className="page-title" style={{ flex: 1, marginBottom: 0 }}>{name}'s photos</h1>
+        <h1 className="page-title" style={{ flex: 1, marginBottom: 0 }}>{t("someones_photos", name)}</h1>
         <Link className="btn small ghost" to={`/profile/${ownerId}`}>{t("profile")}</Link>
       </div>
 

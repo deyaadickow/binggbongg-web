@@ -101,8 +101,8 @@ export function UploadPhotosPage() {
       {storage && (
         <div className="card pad" style={{ marginBottom: 12 }}>
           <div className="muted" style={{ fontSize: 13 }}>
-            {Number(storage.total_photos ?? 0).toLocaleString()} photo{storage.total_photos === 1 ? "" : "s"} stored
-            {storage.free_limit != null && ` · first ${Number(storage.free_limit).toLocaleString()} are free`}
+            {t(storage.total_photos === 1 ? "one_photo_stored" : "n_photos_stored", Number(storage.total_photos ?? 0).toLocaleString())}
+            {storage.free_limit != null && t("dot_first_n_are_free", Number(storage.free_limit).toLocaleString())}
           </div>
         </div>
       )}
@@ -146,14 +146,14 @@ export function UploadPhotosPage() {
         ) : (
           <>
             <div className="row" style={{ marginBottom: 10 }}>
-              <b style={{ flex: 1 }}>{queue.length} photo{queue.length === 1 ? "" : "s"} ready</b>
+              <b style={{ flex: 1 }}>{t(queue.length === 1 ? "one_photo_ready" : "n_photos_ready", queue.length)}</b>
               <button className="btn small ghost" disabled={busy} onClick={() => fileRef.current?.click()}>{t("change")}</button>
             </div>
             <div className="row" style={{ flexWrap: "wrap", gap: 8 }}>
               {queue.slice(0, 12).map((f, i) => (
                 <img key={i} src={URL.createObjectURL(f)} alt="" style={{ width: 64, height: 64, objectFit: "cover", borderRadius: 8, border: "1px solid var(--line)" }} />
               ))}
-              {queue.length > 12 && <span className="muted" style={{ alignSelf: "center" }}>+{queue.length - 12} more</span>}
+              {queue.length > 12 && <span className="muted" style={{ alignSelf: "center" }}>{t("plus_n_more", queue.length - 12)}</span>}
             </div>
           </>
         )}
@@ -165,7 +165,7 @@ export function UploadPhotosPage() {
       {busy && (
         <div className="card pad" style={{ marginBottom: 12 }}>
           <div className="muted" style={{ fontSize: 13, marginBottom: 6 }}>
-            Uploading {doneCount + 1} of {queue.length}…
+            {t("uploading_n_of_m", doneCount + 1, queue.length)}
           </div>
           <div style={{ height: 8, background: "var(--panel)", borderRadius: 999, overflow: "hidden" }}>
             <div style={{ width: `${Math.round(progress * 100)}%`, height: "100%", background: "var(--gold-border)", transition: "width .2s" }} />
@@ -185,7 +185,7 @@ export function UploadPhotosPage() {
             <div key={f.id} className="row" style={{ padding: "8px 0", borderBottom: "1px solid var(--line)", alignItems: "center" }}>
               <div style={{ flex: 1 }}>
                 <b>{f.name}</b>
-                <div className="muted" style={{ fontSize: 12 }}>{f.photo_count ?? 0} photo{f.photo_count === 1 ? "" : "s"}</div>
+                <div className="muted" style={{ fontSize: 12 }}>{t(f.photo_count === 1 ? "one_photo" : "n_photos", f.photo_count ?? 0)}</div>
               </div>
               <div className="row" style={{ gap: 4 }}>
                 {(f.preview_thumbs ?? []).slice(0, 3).map((t, i) => (

@@ -163,7 +163,7 @@ export function GoldSelect({
           })}
           {shown.length === 0 && (
             <p className="muted" style={{ fontSize: 13, textAlign: "center", padding: "16px 0", margin: 0 }}>
-              Nothing matches “{query}”.
+              {t("nothing_matches_query", query)}
             </p>
           )}
         </div>,

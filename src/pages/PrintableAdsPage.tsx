@@ -537,7 +537,7 @@ function FlyerEditor({ flyer, onBack, startWithAssistantFor }: { flyer: Printabl
         <button className="btn" onClick={addText}>{t("add_text")}</button>
         <button className="btn" onClick={openStickers}>{t("add_sticker")}</button>
         <label className="btn" style={{ cursor: "pointer" }}>
-          Add Photo / Video
+          {t("add_photo_or_video")}
           <input type="file" accept="image/*,video/*" onChange={onPickFile} style={{ display: "none" }} />
         </label>
         <button className="btn" onClick={download}>{t("download")}</button>

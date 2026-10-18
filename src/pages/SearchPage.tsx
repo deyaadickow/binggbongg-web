@@ -46,8 +46,8 @@ export function SearchPage() {
         <button className="btn" type="submit">{t("search")}</button>
       </form>
       <div className="tabs">
-        <button className={tab === "members" ? "active" : ""} onClick={() => setTab("members")}>Members ({users.length})</button>
-        <button className={tab === "videos" ? "active" : ""} onClick={() => setTab("videos")}>Videos ({posts.length})</button>
+        <button className={tab === "members" ? "active" : ""} onClick={() => setTab("members")}>{t("members_count", users.length)}</button>
+        <button className={tab === "videos" ? "active" : ""} onClick={() => setTab("videos")}>{t("videos_count", posts.length)}</button>
       </div>
       {error && <Notice error>{error}</Notice>}
       {loading ? <Loading text="Searching…" /> : tab === "members" ? (

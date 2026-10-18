@@ -214,7 +214,7 @@ function BattleBoardModal({ userId, onClose }: { userId: number; onClose: () => 
             </div>
             {(career?.total_games ?? 0) > 0 && (
               <div style={{ textAlign: "center", color: "var(--text-dim)", fontSize: 12, marginBottom: 14 }}>
-                {career!.total_games} total battle{career!.total_games !== 1 ? "s" : ""}
+                {t(career!.total_games === 1 ? "one_total_battle" : "n_total_battles", career!.total_games ?? 0)}
               </div>
             )}
             {(career?.opponents?.length ?? 0) > 0 && (
@@ -576,16 +576,19 @@ export function ProfilePage() {
               <div className="social-links">
                 {isValidUrl(profile.fb_url) && (
                   <a href={profile.fb_url!} target="_blank" rel="noopener noreferrer" className="social-link">
+                    {/* i18n-exempt: brand names. */}
                     <span>f</span> Facebook
                   </a>
                 )}
                 {isValidUrl(profile.insta_url) && (
                   <a href={profile.insta_url!} target="_blank" rel="noopener noreferrer" className="social-link">
+                    {/* i18n-exempt: brand names. */}
                     <span>◉</span> Instagram
                   </a>
                 )}
                 {isValidUrl(profile.youtube_url) && (
                   <a href={profile.youtube_url!} target="_blank" rel="noopener noreferrer" className="social-link">
+                    {/* i18n-exempt: brand names. */}
                     <span>▶</span> YouTube
                   </a>
                 )}
@@ -702,7 +705,7 @@ export function ProfilePage() {
                   </div>
                   <div className="playlist-item-name">{pl.name || "Playlist"}</div>
                   {pl.video_count != null && (
-                    <div style={{ fontSize: 10, color: "var(--text-dim)", textAlign: "center" }}>{pl.video_count} videos</div>
+                    <div style={{ fontSize: 10, color: "var(--text-dim)", textAlign: "center" }}>{t("n_videos", pl.video_count)}</div>
                   )}
                 </div>
               ))}
