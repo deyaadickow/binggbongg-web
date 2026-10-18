@@ -21,7 +21,7 @@ const money = (v: number) => "$" + Number(v ?? 0).toFixed(2);
 // ---- The Shows tab --------------------------------------------------------------------------
 
 export function ShowsPage() {
-  const { t } = useT();
+  const { t, tn } = useT();
   const [rows, setRows] = useState<ShowListing[] | null>(null);
   const [offer, setOffer] = useState<ShowOffer | null>(null);
   const [error, setError] = useState("");
@@ -72,8 +72,8 @@ export function ShowsPage() {
       {rows === null && <Loading />}
       {rows !== null && rows.length === 0 && !error && (
         query.trim()
-          ? <p className="soft">Nothing matches “{query.trim()}”.</p>
-          : <p className="soft">No shows yet. <Link to="/my-show" style={{ color: "var(--gold)" }}>{t("start_your_own")}</Link></p>
+          ? <p className="soft">{t("nothing_matches_query", query.trim())}</p>
+          : <p className="soft">{tn("no_shows_yet", <Link to="/my-show" style={{ color: "var(--gold)" }}>{t("start_your_own")}</Link>)}</p>
       )}
 
       <div style={{ display: "grid", gap: 10 }}>
@@ -133,8 +133,7 @@ function ShowOfferCard({ offer }: { offer: ShowOffer }) {
         ))}
       </div>
       <p className="muted" style={{ fontSize: 12, marginTop: 12, marginBottom: 0 }}>
-        The fee comes out of your earnings first, then your Cash Account. If neither covers it we'll
-        ask you to top up, and the show pauses after {offer.grace_days} days if it stays unpaid.
+        {t("show_fee_note", t(offer.grace_days === 1 ? "n_day" : "n_days", offer.grace_days))}
       </p>
       <Link to="/my-show" state={{ from: "shows" }} className="btn small"
             style={{ marginTop: 12, background: "var(--gold-border)", color: "#000", borderColor: "var(--gold-border)" }}>
@@ -146,7 +145,7 @@ function ShowOfferCard({ offer }: { offer: ShowOffer }) {
 // ---- My Show --------------------------------------------------------------------------------
 
 export function MyShowPage() {
-  const { t } = useT();
+  const { t, tn } = useT();
   const { user } = useSession();
   const [data, setData] = useState<MyShowResponse | null>(null);
   const [busy, setBusy] = useState(false);
@@ -198,15 +197,14 @@ export function MyShowPage() {
     <div className="card pad" style={{ marginBottom: 12, borderColor: "var(--gold-border)" }}>
       <div style={{ fontWeight: 900, color: "var(--gold)", marginBottom: 8 }}>{t("your_own_live_bingg_bongg_show")}</div>
       <ul className="soft" style={{ margin: 0, paddingLeft: 18, lineHeight: 1.7 }}>
-        <li>{money(data.monthly_price)} a month, for as many hours a day as you want.</li>
-        <li>Minimum {data.min_hours_per_day} hours a day.</li>
-        <li>Bring your own advertisers and earn {data.ad_share_percent}% of what they pay — every month they stay.</li>
-        <li>Earn an extra {data.gift_bonus_percent}% on every gift you receive on your show.</li>
-        <li><strong>{t("nothing_to_pay_to_start")}</strong> The first month comes out of your earnings as you earn it.</li>
+        <li>{t("show_price_a_month", money(data.monthly_price))}</li>
+        <li>{t("show_minimum_hours", data.min_hours_per_day)}</li>
+        <li>{t("show_bring_advertisers", data.ad_share_percent)}</li>
+        <li>{t("show_extra_on_gifts", data.gift_bonus_percent)}</li>
+        <li>{tn("show_nothing_to_pay", <strong>{t("nothing_to_pay_to_start")}</strong>)}</li>
       </ul>
       <p className="muted" style={{ fontSize: 12, marginTop: 10, marginBottom: 0 }}>
-        The fee comes out of your earnings first, then your Cash Account. If neither covers it we'll
-        ask you to top up, and the show pauses after {data.grace_days} days if it stays unpaid.
+        {t("show_fee_note", t(data.grace_days === 1 ? "n_day" : "n_days", data.grace_days))}
       </p>
     </div>
   );
@@ -228,7 +226,7 @@ export function MyShowPage() {
       {show === null || show.status === "rejected" || show.status === "cancelled" ? (
         <div className="card pad">
           {show?.status === "rejected" && show.rejected_reason && (
-            <p style={{ color: "#f55", fontSize: 13 }}>Your last application wasn't approved: {show.rejected_reason}</p>
+            <p style={{ color: "#f55", fontSize: 13 }}>{t("show_application_not_approved", show.rejected_reason)}</p>
           )}
           <label className="soft" style={{ fontSize: 13 }}>{t("what_is_your_show_called")}</label>
           <input className="input" value={form.name} maxLength={120} placeholder={t("the_name_of_your_show")}
@@ -257,7 +255,7 @@ export function MyShowPage() {
 function ShowDashboard({ data, busy, onStart, onCancel }: {
   data: MyShowResponse; busy: boolean; onStart: () => void; onCancel: () => void;
 }) {
-  const { t } = useT();
+  const { t, tn } = useT();
   const show = data.show!;
   const onAir = show.status === "active" || show.status === "past_due";
   const metToday = show.hours_today >= show.min_hours_per_day;
@@ -288,7 +286,7 @@ function ShowDashboard({ data, busy, onStart, onCancel }: {
               {busy ? "Starting…" : "Put my show on the air — nothing to pay now"}
             </button>
             <p className="muted" style={{ fontSize: 12, marginTop: 8, marginBottom: 0 }}>
-              The first month ({money(show.monthly_price)}) comes out of your earnings as you earn it.
+              {t("show_first_month_from_earnings", money(show.monthly_price))}
             </p>
           </div>
         )}
@@ -300,8 +298,7 @@ function ShowDashboard({ data, busy, onStart, onCancel }: {
               {busy ? "Starting…" : `Start it up again — ${money(show.monthly_price + show.balance_due)}`}
             </button>
             <p className="muted" style={{ fontSize: 12, marginTop: 8, marginBottom: 0 }}>
-              {money(show.balance_due)} owed plus one month in advance. You have {money(data.available)}
-              {" "}between your earnings and your Cash Account.
+              {t("show_owed_plus_month", money(show.balance_due), money(data.available))}
             </p>
           </div>
         )}
@@ -313,7 +310,7 @@ function ShowDashboard({ data, busy, onStart, onCancel }: {
             <div style={{ fontWeight: 800, marginBottom: 8 }}>{t("today")}</div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
               <span style={{ fontSize: 30, fontWeight: 900, color: metToday ? "var(--gold)" : "#f55" }}>{show.hours_today}</span>
-              <span className="muted" style={{ fontSize: 13 }}>of {show.min_hours_per_day} hours</span>
+              <span className="muted" style={{ fontSize: 13 }}>{t("of_n_hours", show.min_hours_per_day)}</span>
             </div>
             {show.last_7_days.length > 0 && (
               <div style={{ display: "flex", gap: 6, marginTop: 12, flexWrap: "wrap" }}>
@@ -334,18 +331,19 @@ function ShowDashboard({ data, busy, onStart, onCancel }: {
             <div style={{ fontWeight: 800, marginBottom: 8 }}>{t("what_the_show_has_earned_you")}</div>
             <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
               <div>
-                <div className="muted" style={{ fontSize: 12 }}>Your advertisers ({data.ad_share_percent}%)</div>
+                <div className="muted" style={{ fontSize: 12 }}>{t("your_advertisers_pct", data.ad_share_percent)}</div>
                 <div style={{ fontSize: 22, fontWeight: 900, color: "var(--gold)" }}>{money(show.ad_earnings_total)}</div>
               </div>
               <div>
-                <div className="muted" style={{ fontSize: 12 }}>Extra on gifts ({data.gift_bonus_percent}%)</div>
+                <div className="muted" style={{ fontSize: 12 }}>{t("extra_on_gifts_pct", data.gift_bonus_percent)}</div>
                 <div style={{ fontSize: 22, fontWeight: 900, color: "var(--gold)" }}>{money(show.gift_bonus_total)}</div>
               </div>
             </div>
             {data.my_referral_code && (
               <p className="soft" style={{ fontSize: 13, marginTop: 12, marginBottom: 0 }}>
-                Give an advertiser your code <strong style={{ color: "var(--gold)" }}>{data.my_referral_code}</strong> when
-                they buy their ad and you earn {data.ad_share_percent}% of what they pay, every month they stay.
+                {tn("show_give_advertiser_your_code",
+                   <strong style={{ color: "var(--gold)" }}>{data.my_referral_code}</strong>,
+                   data.ad_share_percent)}
               </p>
             )}
           </div>
@@ -353,11 +351,9 @@ function ShowDashboard({ data, busy, onStart, onCancel }: {
           <div className="card pad" style={{ marginBottom: 12 }}>
             <div style={{ fontWeight: 800, marginBottom: 8 }}>{t("the_fee")}</div>
             <p className="soft" style={{ margin: 0, fontSize: 13 }}>
-              {money(show.monthly_price)} a month, out of your earnings first and then your Cash Account.
-              {show.paid_until ? ` Covers you to ${show.paid_until}.` : ""}
-              {show.balance_due > 0
-                ? ` ${money(show.balance_due)} owing — it comes out as you earn. Top up your Cash Account if you'd rather clear it now.`
-                : ""}
+              {t("show_monthly_from_earnings", money(show.monthly_price))}
+              {show.paid_until ? ` ${t("show_covers_you_to", show.paid_until)}` : ""}
+              {show.balance_due > 0 ? ` ${t("show_balance_owing", money(show.balance_due))}` : ""}
             </p>
             {show.charges.length > 0 && (
               <div style={{ marginTop: 10 }}>

@@ -17,7 +17,7 @@
 // `en` is the source of truth for what keys exist: StringKey is derived from it, so a typo in a
 // key is a compile error rather than a blank space on the page. That is the one thing this has
 // over the phones' version, where a mistyped key silently shows nothing.
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, Fragment, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { en } from "./strings/en";
 import { es } from "./strings/es";
 import { fil } from "./strings/fil";
@@ -101,10 +101,43 @@ function initialLang(): Lang {
   return found ? found.code : "en";
 }
 
+/**
+ * Substitute REACT NODES into a translation, for a sentence with something inside it.
+ *
+ * This is what the explainer paragraphs need. "Simulcast for free. 3 referrals in a month make
+ * your next month free. See your Simulcast status." is one sentence with a bold lead-in and a
+ * link in it, which JSX stores as several text nodes with elements between them. Translating
+ * those shards separately is the one thing that cannot work: Spanish and Filipino both move the
+ * pieces, so the link has to be free to land somewhere else in the sentence. Keeping the whole
+ * sentence as one translation with %1$s where the link goes is the only arrangement that lets a
+ * translator put it in the right place.
+ *
+ * Returns an array of strings and nodes for JSX to render; each node is given a key so React
+ * does not warn about the list.
+ */
+export function formatNodes(template: string, nodes: ReactNode[]): ReactNode[] {
+  const out: ReactNode[] = [];
+  let text = "";
+  for (let i = 0; i < template.length; i++) {
+    if (template[i] !== "%") { text += template[i]; continue; }
+    if (template[i + 1] === "%") { text += "%"; i++; continue; }
+    const m = /^%(\d)\$s/.exec(template.slice(i));
+    if (!m) { text += "%"; continue; }
+    if (text) { out.push(text); text = ""; }
+    const node = nodes[Number(m[1]) - 1];
+    out.push(<Fragment key={`n${m[1]}-${i}`}>{node}</Fragment>);
+    i += m[0].length - 1;
+  }
+  if (text) out.push(text);
+  return out;
+}
+
 interface I18n {
   lang: Lang;
   setLang: (l: Lang) => void;
   t: (key: StringKey, ...args: (string | number)[]) => string;
+  /** Same as `t`, but the arguments are React nodes rather than text. */
+  tn: (key: StringKey, ...nodes: ReactNode[]) => ReactNode[];
 }
 
 const I18nContext = createContext<I18n | null>(null);
@@ -126,7 +159,12 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     (key: StringKey, ...args: (string | number)[]) => translate(lang, key, ...args),
     [lang],
   );
-  const value = useMemo(() => ({ lang, setLang: setLangState, t }), [lang, t]);
+  const tn = useCallback(
+    (key: StringKey, ...nodes: ReactNode[]) =>
+      formatNodes(DICTS[lang]?.[key] ?? en[key] ?? "", nodes),
+    [lang],
+  );
+  const value = useMemo(() => ({ lang, setLang: setLangState, t, tn }), [lang, t, tn]);
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
 
@@ -139,5 +177,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 export function useT(): I18n {
   const ctx = useContext(I18nContext);
   if (ctx) return ctx;
-  return { lang: "en", setLang: () => {}, t: (k, ...a) => translate("en", k, ...a) };
+  return {
+    lang: "en",
+    setLang: () => {},
+    t: (k, ...a) => translate("en", k, ...a),
+    tn: (k, ...n) => formatNodes(en[k] ?? "", n),
+  };
 }

@@ -26,8 +26,8 @@ function Page({ title, children, wide }: { title: string; children: React.ReactN
 }
 
 function NeedLogin() {
-  const { t } = useT();
-  return <div className="page"><Notice>Sign in to open this page. <Link to="/login">{t("sign_in")}</Link></Notice></div>;
+  const { t, tn } = useT();
+  return <div className="page"><Notice>{tn("sign_in_to_open_this_page", <Link to="/login">{t("sign_in")}</Link>)}</Notice></div>;
 }
 
 /** The whole Settings list as a page — what phones and narrow screens use instead of the sidebar. */
@@ -184,7 +184,7 @@ export function QrCodePage() {
 // referral commissions and Share & Earn 10% — so no earnings boxes here, just the code and list.
 interface Referral { id: number; user?: UserSummary; created_at?: string }
 export function ReferralsPage() {
-  const { t } = useT();
+  const { t, tn } = useT();
   const { user, isLoggedIn } = useSession();
   const [list, setList] = useState<Referral[] | null>(null);
   const [code, setCode] = useState<string | null>(null);
@@ -205,19 +205,19 @@ export function ReferralsPage() {
         <div className="row" style={{ marginTop: 8, flexWrap: "wrap" }}>
           <span className="pill" style={{ fontSize: 15 }}>{code ?? "…"}</span>
           <button className="btn small ghost" disabled={!code} onClick={() => navigator.clipboard.writeText(code ?? "").then(() => setToast("Copied.")).catch(() => undefined)}>{t("copy")}</button>
-          <span className="muted" style={{ fontSize: 12 }}>Your username <b>@{user.username}</b> works for sign-ups too.</span>
+          <span className="muted" style={{ fontSize: 12 }}>{tn("your_username_works_for_signups", <b>@{user.username}</b>)}</span>
         </div>
       </div>
       <div className="card pad" style={{ marginBottom: 12 }}>
         <b style={{ color: "var(--gold)" }}>{t("what_referrals_earn_you")}</b>
         <ul className="soft" style={{ fontSize: 14, margin: "8px 0 0", paddingLeft: 18 }}>
-          <li><b>{t("simulcast_for_free")}</b> 3 referrals in a month make your next month free. 36 lifetime referrals earn a free year. <Link to="/settings/simulcast">{t("see_your_simulcast_status")}</Link>.</li>
-          <li><b>{t("video_ad_commission")}</b> An advertiser can enter your referral code only while uploading their ad. You then get a one-time commission for that ad.</li>
-          <li><b>{t("share_earn_10")}</b> Share a live room with the button in the room. Gifts sent by the people who came through your link pay you 10%.</li>
+          <li>{tn("referral_perk_simulcast", <b>{t("simulcast_for_free")}</b>, <Link to="/settings/simulcast">{t("see_your_simulcast_status")}</Link>)}</li>
+          <li>{tn("referral_perk_video_ad", <b>{t("video_ad_commission")}</b>)}</li>
+          <li>{tn("referral_perk_share_and_earn", <b>{t("share_earn_10")}</b>)}</li>
         </ul>
       </div>
       <div className="card">
-        <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)" }}><b style={{ color: "var(--gold)" }}>People you referred{list ? ` (${list.length})` : ""}</b></div>
+        <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)" }}><b style={{ color: "var(--gold)" }}>{list ? t("people_you_referred_count", list.length) : t("people_you_referred")}</b></div>
         {list === null ? <Loading /> : list.length === 0 ? <p className="muted" style={{ padding: 14 }}>{t("nobody_yet")}</p> : list.map((r) => r.user ? <UserRow key={r.id} user={r.user} /> : null)}
       </div>
       {el}
@@ -293,7 +293,7 @@ export function ModeratorsPage() {
         {results.map((u) => <UserRow key={u.id} user={u} trailing={<button className="btn small" onClick={() => change("addPersonalModerator", u.id)}>{t("add")}</button>} />)}
       </div>
       <div className="card">
-        <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)" }}><b style={{ color: "var(--gold)" }}>Your moderators{list ? ` (${list.length})` : ""}</b></div>
+        <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)" }}><b style={{ color: "var(--gold)" }}>{list ? t("your_moderators_count", list.length) : t("your_moderators")}</b></div>
         {list === null ? <Loading /> : list.length === 0 ? <p className="muted" style={{ padding: 14 }}>{t("no_moderators_yet")}</p>
           : list.map((m) => m.moderator ? <UserRow key={m.id} user={m.moderator} trailing={<button className="btn small ghost" onClick={() => change("removePersonalModerator", m.moderator_user_id)}>{t("remove")}</button>} /> : null)}
       </div>
@@ -366,7 +366,7 @@ export function SimulcastPage() {
           <div className="card pad" style={{ marginBottom: 12 }}>
             <div className="row" style={{ flexWrap: "wrap", gap: 16 }}>
               <div><div className="muted" style={{ fontSize: 12 }}>{t("status")}</div><div style={{ fontWeight: 800, color: "var(--gold)" }}>{ov.is_entitled ? "Active" : ov.status}</div></div>
-              <div><div className="muted" style={{ fontSize: 12 }}>{t("price")}</div><div style={{ fontWeight: 800 }}>${Number(ov.daily_price).toFixed(2)}/day · ${Number(ov.monthly_price).toFixed(2)}/month</div></div>
+              <div><div className="muted" style={{ fontSize: 12 }}>{t("price")}</div><div style={{ fontWeight: 800 }}>{t("price_per_day_and_month", Number(ov.daily_price).toFixed(2), Number(ov.monthly_price).toFixed(2))}</div></div>
               {ov.paid_until && <div><div className="muted" style={{ fontSize: 12 }}>{t("paid_until")}</div><div style={{ fontWeight: 800 }}>{String(ov.paid_until).slice(0, 10)}</div></div>}
               <div><div className="muted" style={{ fontSize: 12 }}>{t("referrals_this_month")}</div><div style={{ fontWeight: 800 }}>{ov.referrals_this_month} / {ov.referrals_needed_for_free_month}{ov.next_month_free ? " · next month free!" : ""}</div></div>
               <label className="row" style={{ gap: 8, cursor: "pointer", width: "100%" }}>
@@ -375,7 +375,8 @@ export function SimulcastPage() {
               </label>
             </div>
             <div className="soft" style={{ fontSize: 13, marginTop: 10 }}>
-              Every {ov.referrals_needed_for_free_month} referrals to this Simulcast get you a free month.{ov.free_year_referrals ? ` ${ov.free_year_referrals} lifetime referrals get you a free year.` : ""}
+              {t("every_n_referrals_free_month", ov.referrals_needed_for_free_month)}
+              {ov.free_year_referrals ? ` ${t("n_lifetime_referrals_free_year", ov.free_year_referrals)}` : ""}
             </div>
           </div>
           {ov.destinations.map((d) => (
@@ -460,7 +461,8 @@ export function AdvertisePage() {
             </div>
             <div style={{ color: "var(--gold)", fontSize: 13, marginTop: 2 }}>{t("advertising_credit")}</div>
             <div className="muted" style={{ fontSize: 12, marginTop: 4 }}>
-              For video ads only{cash?.ad_credit_expires_at ? ` · expires ${longDate(cash.ad_credit_expires_at)}` : ""}
+              {t("for_video_ads_only")}
+              {cash?.ad_credit_expires_at ? t("expires_on_suffix", longDate(cash.ad_credit_expires_at)) : ""}
             </div>
           </div>
         )}
@@ -477,7 +479,7 @@ export function AdvertisePage() {
         <div style={{ marginTop: 10 }}><Link className="btn" to="/settings/advertise/new">{t("create_ad")}</Link></div>
       </div>
       <div className="card">
-        <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)" }}><b style={{ color: "var(--gold)" }}>My ads{ads ? ` (${ads.length})` : ""}</b></div>
+        <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)" }}><b style={{ color: "var(--gold)" }}>{ads ? t("my_ads_count", ads.length) : t("my_ads")}</b></div>
         {ads === null ? <Loading /> : ads.length === 0 ? <p className="muted" style={{ padding: 14 }}>{t("no_ads_yet")}</p> : ads.map((a) => (
           <div key={a.id} className="row" style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)" }}>
             <div style={{ flex: 1 }}><b>{a.company_name ?? `Ad #${a.id}`}</b><div className="muted" style={{ fontSize: 12 }}>{a.status ?? ""}{a.advertiser_monthly_price ? ` · $${Number(a.advertiser_monthly_price).toFixed(2)}/month` : ""}{a.next_billing_date ? ` · next bill ${String(a.next_billing_date).slice(0, 10)}` : ""}</div></div>
@@ -502,7 +504,7 @@ interface BattleSearchResult { status: boolean; active?: boolean; eligible?: boo
 interface CountryRow { country: string; flag: string; count: number; is_mine: boolean }
 
 export function FindABattlePage() {
-  const { t } = useT();
+  const { t, tn } = useT();
   const { user, isLoggedIn } = useSession();
   const [tab, setTab] = useState<"country" | "global">("country");
   const [countries, setCountries] = useState<CountryRow[]>([]);
@@ -543,7 +545,7 @@ export function FindABattlePage() {
 
   return (
     <Page title={t("find_a_battle")}>
-      <p className="muted" style={{ fontSize: 13 }}>Members who want to battle right now. Turn on "I want someone to battle with" in <a href="/settings/account" style={{ color: "var(--gold)" }}>{t("account_settings")}</a> to appear here yourself.</p>
+      <p className="muted" style={{ fontSize: 13 }}>{tn("find_a_battle_explainer", <a href="/settings/account" style={{ color: "var(--gold)" }}>{t("account_settings")}</a>)}</p>
       <div className="row" style={{ gap: 8, marginBottom: 12 }}>
         {(["country", "global"] as const).map((t) => (
           <button key={t} className={`btn small${tab === t ? "" : " ghost"}`} onClick={() => setTab(t)}>{t === "country" ? "By Country" : "Global"}</button>
@@ -612,7 +614,7 @@ export function ContestRequestsPage() {
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontWeight: 700 }}>{inv.talent_contest?.name ?? `Contest #${inv.talent_contest_id}`}</div>
                 {inv.talent_contest?.description && <div className="muted" style={{ fontSize: 12, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{inv.talent_contest.description}</div>}
-                {inv.invited_by && <div className="muted" style={{ fontSize: 12 }}>Invited by {inv.invited_by.fullname ?? `@${inv.invited_by.username}`}</div>}
+                {inv.invited_by && <div className="muted" style={{ fontSize: 12 }}>{t("invited_by", inv.invited_by.fullname ?? `@${inv.invited_by.username}`)}</div>}
               </div>
               <button className="btn small ghost" style={{ color: "var(--red)", borderColor: "var(--red)" }} onClick={() => reject(inv.id)}>{t("remove")}</button>
             </div>
@@ -632,7 +634,7 @@ interface SupportReply { id: number; reply?: string | null; replied_by?: string 
  *  reason from the admin panel without a release on any platform. */
 interface SupportReasonRow { id: number; label: string }
 export function SupportPage() {
-  const { t } = useT();
+  const { t, tn } = useT();
   const [msg, setMsg] = useState("");
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -730,7 +732,7 @@ export function SupportPage() {
           {/* Steve, 2026-10-17: black plate, white border, gold text, centred — the dimmed
               grey was hard to read. */}
           <p style={{ marginTop: 0, marginBottom: 12, fontSize: 13, textAlign: "center", color: "var(--gold)", background: "#000", border: "1.5px solid #fff", borderRadius: 12, padding: 12 }}>
-            Have a question or issue? Bingg Bongg Assistant answers right away, and a team member steps in when needed. Your earlier questions and their answers are in <Link to="/settings/support/archive" style={{ color: "var(--gold)", textDecoration: "underline" }}>{t("archive")}</Link>.
+            {tn("support_intro", <Link to="/settings/support/archive" style={{ color: "var(--gold)", textDecoration: "underline" }}>{t("archive")}</Link>)}
           </p>
           {/* Steve, 2026-10-17: "In between the boxes add another drop-down box that says
               'Reason For This Support'." */}
@@ -788,7 +790,7 @@ export function SupportArchivePage() {
         const byAssistant = row.replied_by === "assistant";
         return (
           <div key={row.id} className="card pad" style={{ marginBottom: 12, borderColor: "var(--gold-border)" }}>
-            <div style={{ fontSize: 12, fontWeight: 800, color: "var(--gold)", marginBottom: 4 }}>You · {prettyDate(row.created_at)}</div>
+            <div style={{ fontSize: 12, fontWeight: 800, color: "var(--gold)", marginBottom: 4 }}>{t("you_and_date", prettyDate(row.created_at))}</div>
             <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{row.message}</p>
             <div style={{ height: 1, background: "var(--gold-border)", opacity: 0.35, margin: "10px 0" }} />
             {row.reply ? (
@@ -839,16 +841,16 @@ function LegalPage({ title, endpoint }: { title: string; endpoint: string }) {
     <Page title={title}>
       <div className="card pad">
         {failed ? (
-          <p className="muted" style={{ margin: 0 }}>Could not load the {title}. Please try again.</p>
+          <p className="muted" style={{ margin: 0 }}>{t("could_not_load_the_page", title)}</p>
         ) : html === null ? (
           <p className="muted" style={{ margin: 0 }}>{t("imagePickerLoading")}</p>
         ) : html.trim() === "" ? (
-          <p className="muted" style={{ margin: 0 }}>The {title} has not been published yet.</p>
+          <p className="muted" style={{ margin: 0 }}>{t("page_not_published_yet", title)}</p>
         ) : (
           <>
             {updated && (
               <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>
-                Last updated {new Date(updated).toLocaleDateString()}
+                {t("last_updated", new Date(updated).toLocaleDateString())}
               </p>
             )}
             <div className="terms-content" dangerouslySetInnerHTML={{ __html: html }} />
@@ -894,7 +896,7 @@ export function AppFeaturesPage() {
 
 // ---- Delete account -------------------------------------------------------------------------
 export function DeleteAccountPage() {
-  const { t } = useT();
+  const { t, tn } = useT();
   const { user, isLoggedIn, signOut } = useSession();
   const [typed, setTyped] = useState("");
   const [busy, setBusy] = useState(false);
@@ -915,7 +917,7 @@ export function DeleteAccountPage() {
     <Page title={t("delete_account")}>
       <div className="card pad">
         <p className="soft" style={{ marginTop: 0 }}>{t("this_permanently_deletes_your_profile_vi")}</p>
-        <label className="soft" style={{ fontSize: 13 }}>Type <b>{t("delete_confirm_word")}</b> to confirm</label>
+        <label className="soft" style={{ fontSize: 13 }}>{tn("type_word_to_confirm", <b>{t("delete_confirm_word")}</b>)}</label>
         <input className="input" value={typed} onChange={(e) => setTyped(e.target.value)} style={{ width: "100%", margin: "6px 0 12px" }} />
         <button className="btn" style={{ borderColor: "var(--red)", color: "var(--red)" }} disabled={typed !== t("delete_confirm_word") || busy} onClick={del}>{t("delete_my_account")}</button>
       </div>
@@ -983,7 +985,7 @@ export function VirtualLookPage() {
 // ---- My Virtual Battles (Steve, 2026-09-27: "where does the judge see who battled with him
 // and how many gift he got and from who?") — every battle I was in; a row opens its gift record.
 export function MyVirtualBattlesPage() {
-  const { t } = useT();
+  const { t, tn } = useT();
   const { user } = useSession();
   const [battles, setBattles] = useState<VirtualBattleData[] | null>(null);
   const [record, setRecord] = useState<VirtualGiftRecord | null>(null);
@@ -1008,8 +1010,8 @@ export function MyVirtualBattlesPage() {
             <div className="row" style={{ justifyContent: "space-between", fontSize: 12, color: "var(--gold)", fontWeight: 800 }}>
               <span>{b.started_at ? new Date(b.started_at).toLocaleString() : ""}</span><span>{outcome}</span>
             </div>
-            <div style={{ marginTop: 4 }}>With <b>{others || "—"}</b></div>
-            <div className="muted" style={{ fontSize: 13 }}>You received {(me?.current_score ?? 0).toLocaleString()} coins</div>
+            <div style={{ marginTop: 4 }}>{tn("with_people", <b>{others || "—"}</b>)}</div>
+            <div className="muted" style={{ fontSize: 13 }}>{t("you_received_n_coins", (me?.current_score ?? 0).toLocaleString())}</div>
           </button>
         );
       })}

@@ -29,7 +29,7 @@ const ghost = { background: "transparent", color: "var(--gold)", borderColor: "v
 // ---- The feed tab ---------------------------------------------------------------------------
 
 export function VideoAdGigPage() {
-  const { t } = useT();
+  const { t, tn } = useT();
   const { user, isLoggedIn } = useSession();
   const [rows, setRows] = useState<GigCard[] | null>(null);
   const [offer, setOffer] = useState<GigOffer | null>(null);
@@ -78,8 +78,8 @@ export function VideoAdGigPage() {
       {enabled && rows === null && <Loading />}
       {enabled && rows !== null && rows.length === 0 && !error && (
         query.trim()
-          ? <p className="soft">Nobody matches “{query.trim()}”.</p>
-          : <p className="soft">No influencers yet. {isLoggedIn && <Link to="/my-gigs" style={{ color: "var(--gold)" }}>{t("put_your_own_video_up")}</Link>}</p>
+          ? <p className="soft">{t("nobody_matches_query", query.trim())}</p>
+          : <p className="soft">{tn("no_influencers_yet", isLoggedIn && <Link to="/my-gigs" style={{ color: "var(--gold)" }}>{t("put_your_own_video_up")}</Link>)}</p>
       )}
 
       <div style={{ display: "grid", gap: 12 }}>
@@ -112,13 +112,15 @@ function GigOfferCard({ offer }: { offer: GigOffer }) {
         {offer.prices.map((p) => (
           <div key={p.seconds} className="card pad" style={{ padding: "8px 14px", textAlign: "center", borderColor: "var(--gold-border)" }}>
             <div style={{ fontWeight: 900, color: "var(--gold)" }}>{money(p.price)}</div>
-            <div className="muted" style={{ fontSize: 12 }}>{p.seconds} seconds</div>
+            <div className="muted" style={{ fontSize: 12 }}>{t("n_seconds", p.seconds)}</div>
           </div>
         ))}
       </div>
       <p className="muted" style={{ fontSize: 12, marginTop: 10, marginBottom: 0 }}>
-        Influencers earn {offer.influencer_share_percent}% of the gig, paid when you accept the
-        finished ad — or automatically after {offer.accept_days} day{offer.accept_days === 1 ? "" : "s"} if you don't.
+        {/* The day count is its own key pair, not an "s" glued on: an English plural rule does
+            not survive translation, and Indonesian and Filipino do not inflect the noun at all. */}
+        {t("gig_offer_share", offer.influencer_share_percent,
+           t(offer.accept_days === 1 ? "n_day" : "n_days", offer.accept_days))}
       </p>
     </div>
   );
@@ -150,7 +152,7 @@ function GigRow({ gig, onOrder, canOrder }: { gig: GigCard; onOrder: () => void;
         {gig.headline && <div style={{ marginTop: 6, fontWeight: 700 }}>{gig.headline}</div>}
         {gig.about && <p className="soft" style={{ fontSize: 13, marginTop: 6, whiteSpace: "pre-wrap" }}>{gig.about}</p>}
         <div className="muted" style={{ fontSize: 12, marginTop: 6 }}>
-          {gig.completed_count} ad{gig.completed_count === 1 ? "" : "s"} finished
+          {t(gig.completed_count === 1 ? "n_ad_finished" : "n_ads_finished", gig.completed_count)}
         </div>
         {canOrder && (
           <button className="btn small" style={{ ...gold, marginTop: 10 }} onClick={onOrder}>
@@ -194,7 +196,7 @@ function OrderDialog({ gig, offer, myUserId, onClose }: {
       <div className="card pad" onClick={(e) => e.stopPropagation()}
            style={{ maxWidth: 480, width: "100%", maxHeight: "86vh", overflowY: "auto", borderColor: "var(--gold-border)" }}>
         <div style={{ fontWeight: 900, color: "var(--gold)", fontSize: 18, marginBottom: 4 }}>
-          Order from {gig.influencer_name ?? "this influencer"}
+          {t("order_from", gig.influencer_name ?? t("this_influencer"))}
         </div>
 
         {done ? (
@@ -225,9 +227,9 @@ function OrderDialog({ gig, offer, myUserId, onClose }: {
             {error && <Notice error>{error}</Notice>}
 
             <p className="muted" style={{ fontSize: 12 }}>
-              {money(price)} comes out of your Spending Cash Account now and we hold it. The
-              influencer has {offer.response_days} day{offer.response_days === 1 ? "" : "s"} to take it
-              on and {offer.delivery_days} to deliver. You get it all back if neither happens.
+              {t("gig_order_hold_note", money(price),
+                 t(offer.response_days === 1 ? "n_day" : "n_days", offer.response_days),
+                 offer.delivery_days)}
             </p>
 
             <div style={{ display: "flex", gap: 8 }}>
@@ -309,7 +311,7 @@ export function MyVideoAdGigsPage() {
       {bought !== null && bought.length > 0 && (
         <>
           <h2 style={{ fontSize: 16, marginTop: 24, color: "var(--gold)" }}>{t("gig_tab_bought")}</h2>
-          <p className="muted" style={{ fontSize: 12 }}>Spending Cash Account: {money(cashAccount)}</p>
+          <p className="muted" style={{ fontSize: 12 }}>{t("spending_cash_account_is", money(cashAccount))}</p>
           <div style={{ display: "grid", gap: 10 }}>
             {(bought ?? []).map((o) => (
               <OrderRow key={o.id} order={o}
@@ -329,7 +331,7 @@ function OrderRow({ order, onAccept, onCancel }: { order: GigOrder; onAccept: ()
     <div className="card pad">
       <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
         <div>
-          <div style={{ fontWeight: 800 }}>{order.seconds}-second ad · {money(order.price)}</div>
+          <div style={{ fontWeight: 800 }}>{t("n_second_ad_price", order.seconds, money(order.price))}</div>
           <div className="muted" style={{ fontSize: 12 }}>
             {order.other_name ?? "—"} · {order.order_number}
           </div>
@@ -357,12 +359,14 @@ function OrderRow({ order, onAccept, onCancel }: { order: GigOrder; onAccept: ()
 
       {order.status === "delivered" && order.auto_accept_at && (
         <p className="muted" style={{ fontSize: 12, marginTop: 8, marginBottom: 0 }}>
-          If you don't accept it, this accepts itself on {String(order.auto_accept_at).slice(0, 10)}.
+          {t("auto_accepts_itself_on", String(order.auto_accept_at).slice(0, 10))}
         </p>
       )}
       {order.refund_amount > 0 && (
         <p className="muted" style={{ fontSize: 12, marginTop: 8, marginBottom: 0 }}>
-          {money(order.refund_amount)} was put back in your Cash Account{order.cancel_reason ? ` — ${order.cancel_reason}` : ""}.
+          {order.cancel_reason
+            ? t("refund_put_back_because", money(order.refund_amount), order.cancel_reason)
+            : t("refund_put_back", money(order.refund_amount))}
         </p>
       )}
     </div>
@@ -396,10 +400,11 @@ function WorkRow({ order, userId, onRespond, onDelivered }: {
       <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
         <div>
           <div style={{ fontWeight: 800 }}>
-            {order.seconds}-second ad · you earn {money(order.influencer_amount)}
+            {t("n_second_ad_you_earn", order.seconds, money(order.influencer_amount))}
           </div>
           <div className="muted" style={{ fontSize: 12 }}>
-            For {order.other_name ?? "—"}{order.business_name ? ` · ${order.business_name}` : ""} · {order.order_number}
+            {t("gig_order_for_line", order.other_name ?? "—",
+               order.business_name ? ` · ${order.business_name}` : "", order.order_number)}
           </div>
         </div>
         <div className="soft" style={{ fontSize: 13 }}>{order.is_late ? "Late" : order.status_label}</div>
@@ -423,7 +428,7 @@ function WorkRow({ order, userId, onRespond, onDelivered }: {
           {error && <Notice error>{error}</Notice>}
           {order.due_at && order.status === "accepted" && (
             <p className="muted" style={{ fontSize: 12, marginTop: 6, marginBottom: 0 }}>
-              Due {String(order.due_at).slice(0, 10)}.
+              {t("due_on", String(order.due_at).slice(0, 10))}
             </p>
           )}
         </div>
@@ -431,7 +436,7 @@ function WorkRow({ order, userId, onRespond, onDelivered }: {
 
       {order.status === "completed" && (
         <p className="muted" style={{ fontSize: 12, marginTop: 8, marginBottom: 0 }}>
-          Paid — {money(order.influencer_amount)} is in your earnings.
+          {t("paid_is_in_your_earnings", money(order.influencer_amount))}
         </p>
       )}
     </div>
@@ -490,8 +495,8 @@ function MyListing({ gig, offer, userId, onSaved }: {
                  style={{ width: "100%", maxWidth: 240, borderRadius: 10, background: "#000" }} />
         )}
         <div className="muted" style={{ fontSize: 12, marginTop: 8 }}>
-          {gig.completed_count} ad{gig.completed_count === 1 ? "" : "s"} finished
-          {offer ? ` · you earn ${offer.influencer_share_percent}% of every gig` : ""}
+          {t(gig.completed_count === 1 ? "n_ad_finished" : "n_ads_finished", gig.completed_count)}
+          {offer ? t("you_earn_pct_of_every_gig", offer.influencer_share_percent) : ""}
         </div>
         <button className="btn small" style={{ ...ghost, marginTop: 10 }} onClick={() => setEditing(true)}>{t("change_my_video_or_pitch")}</button>
       </div>
@@ -505,10 +510,9 @@ function MyListing({ gig, offer, userId, onSaved }: {
       </div>
       {!gig && offer && (
         <p className="soft" style={{ fontSize: 13 }}>
-          Put up a short video telling buyers why they should pick you. You earn{" "}
-          {offer.influencer_share_percent}% of every gig — that's{" "}
-          {offer.prices.map((p) => money(p.price * offer.influencer_share_percent / 100)).join(" / ")}{" "}
-          for a {offer.prices.map((p) => p.seconds).join(" / ")}-second ad.
+          {t("gig_pitch_explainer", offer.influencer_share_percent,
+             offer.prices.map((p) => money(p.price * offer.influencer_share_percent / 100)).join(" / "),
+             offer.prices.map((p) => p.seconds).join(" / "))}
         </p>
       )}
 
