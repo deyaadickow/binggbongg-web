@@ -271,7 +271,7 @@ export function CreateVideoAdPage() {
             {level === "city" && stateName && (
               <>
                 <label style={{ marginTop: 12 }}>{t("city")}</label>
-                {cities === null ? <Loading text="Loading cities…" />
+                {cities === null ? <Loading text={t("loading_cities")} />
                   : cities.length === 0 ? <p className="muted" style={{ fontSize: 12 }}>{citiesError ?? `No cities listed for ${stateName}.`}</p>
                   : (
                     <button className="input" style={pickerFieldStyle} onClick={() => setOpenSheet("city")}>
@@ -343,8 +343,8 @@ export function CreateVideoAdPage() {
               noun="countries"
               items={otherCountries}
               pinned={mainMarkets}
-              pinnedLabel="Main markets"
-              restLabel="All countries"
+              pinnedLabel={t("main_markets")}
+              restLabel={t("all_countries")}
               selected={countryCode}
               onPick={(code) => { setCountryCode(code); setStateName(""); setCities(null); }}
               onClose={() => setOpenSheet(null)}

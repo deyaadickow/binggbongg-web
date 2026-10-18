@@ -290,7 +290,7 @@ export function MyPhotosPage() {
 
                 {moveTargets.length > 0 && (
                   <GoldSelect
-                    ariaLabel="Move to"
+                    ariaLabel={t("move_to_2")}
                     placeholder={t("move_to")}
                     searchable
                     disabled={busy}

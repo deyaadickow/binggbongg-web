@@ -64,7 +64,7 @@ function CopyRow({ label, value, secret }: { label: string; value: string; secre
 }
 
 export function StreamFromPcPage() {
-  const { t } = useT();
+  const { t, tn } = useT();
   const { isLoggedIn } = useSession();
   const [key, setKey] = useState<IngressKey | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -90,7 +90,7 @@ export function StreamFromPcPage() {
     return (
       <div className="pad">
         <h1 className="page-title">{t("go_live_from_your_computer")}</h1>
-        <Notice>Please <Link to="/login">{t("sign_in_2")}</Link> to get your stream key.</Notice>
+        <Notice>{tn("please_sign_in_for_stream_key", <Link to="/login">{t("sign_in_2")}</Link>)}</Notice>
       </div>
     );
   }
@@ -116,20 +116,18 @@ export function StreamFromPcPage() {
           <div className="card pad" style={{ marginBottom: 16 }}>
             <h2 className="card-title" style={{ marginTop: 0 }}>{t("setting_up_obs")}</h2>
             <ol className="muted" style={{ paddingLeft: 18, marginBottom: 0, lineHeight: 1.7 }}>
-              <li>In OBS open <b>{t("settings_stream")}</b>.</li>
-              <li>Set <b>{t("service")}</b> to <b>{t("custom")}</b></li>
-              <li>Paste the <b>{t("server")}</b> and <b>{t("simulcast_key_hint")}</b> from above.</li>
+              <li>{tn("obs_step_open_settings_stream", <b>{t("settings_stream")}</b>)}</li>
+              <li>{tn("obs_step_set_service", <b>{t("service")}</b>, <b>{t("custom")}</b>)}</li>
+              <li>{tn("obs_step_paste_server_and_key", <b>{t("server")}</b>, <b>{t("simulcast_key_hint")}</b>)}</li>
               <li>
-                Under <b>{t("settings_output")}</b>, set the video bitrate to about <b>{t("n2500_kbps")}</b> and
-                keyframe interval to <b>{t("n2_seconds")}</b>. Higher looks sharper but costs your viewers
-                more data, and a long keyframe interval makes people wait to see your first frame.
+                {tn("obs_step_output_settings", <b>{t("settings_output")}</b>,
+                   <b>{t("n2500_kbps")}</b>, <b>{t("n2_seconds")}</b>)}
               </li>
               <li>
-                Add a <b>{t("display_capture")}</b> or <b>{t("game_capture")}</b> source, then add your webcam as
-                a <b>{t("video_capture_device")}</b> on top. Arrange them however you like — most gamers
-                put the camera across the top and the game underneath.
+                {tn("obs_step_add_sources", <b>{t("display_capture")}</b>,
+                   <b>{t("game_capture")}</b>, <b>{t("video_capture_device")}</b>)}
               </li>
-              <li>Click <b>{t("start_streaming")}</b>. You will appear in Live within a few seconds.</li>
+              <li>{tn("obs_step_click_start", <b>{t("start_streaming")}</b>)}</li>
             </ol>
           </div>
 

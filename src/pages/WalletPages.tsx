@@ -167,6 +167,7 @@ function useEarnings(userId: number | undefined, year: number) {
   return earn;
 }
 function EarningsRow({ earn, year, onYear }: { earn: Earnings | null; year: number; onYear: (y: number) => void }) {
+  const { t } = useT();
   const thisYear = new Date().getFullYear();
   return (
     <div className="row" style={{ flexWrap: "wrap", gap: 18 }}>
@@ -177,7 +178,7 @@ function EarningsRow({ earn, year, onYear }: { earn: Earnings | null; year: numb
         {/* Steve, 2026-10-06: "Please make these into our black and gold design" — the native
             list opened as the operating system's grey menu with a red highlight. */}
         <GoldSelect
-          ariaLabel="Year"
+          ariaLabel={t("year")}
           style={{ minWidth: 92 }}
           value={String(year)}
           options={[0, 1, 2, 3].map((i) => ({ value: String(thisYear - i), label: String(thisYear - i) }))}
@@ -295,7 +296,7 @@ export function RedeemPage() {
                 <b style={{ color: "var(--gold)" }}>{t("your_wise_payout_details")}</b>
                 <div className="grid" style={{ marginTop: 8, gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                   <GoldSelect
-                    ariaLabel="Country"
+                    ariaLabel={t("battle_tab_country")}
                     placeholder={t("battle_tab_country")}
                     searchable
                     value={wf.country}
@@ -304,7 +305,7 @@ export function RedeemPage() {
                   />
                   {provs.length > 0
                     ? <GoldSelect
-                        ariaLabel="Wallet or bank"
+                        ariaLabel={t("wallet_or_bank")}
                         placeholder={t("wallet_bank")}
                         searchable
                         value={wf.provider}

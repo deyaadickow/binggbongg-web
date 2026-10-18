@@ -207,7 +207,7 @@ function SellerApplication({ myUserId, onDone, onError }: { myUserId: number; on
       <Field label={t("contact_email")}>
         <input className="input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={190} required />
       </Field>
-      <Field label={t("country_code")} hint="Two letters, like PH or US.">
+      <Field label={t("country_code")} hint={t("two_letters_like_ph_or_us")}>
         <input className="input" value={country} onChange={(e) => setCountry(e.target.value.toUpperCase())} maxLength={2} minLength={2} required style={{ textTransform: "uppercase" }} />
       </Field>
       <button type="submit" className="btn" disabled={busy || !name.trim() || !email.trim() || country.trim().length !== 2}>
@@ -320,7 +320,7 @@ function NewProduct({ myUserId, onDone, onError }: { myUserId: number; onDone: (
         <div style={{ flex: 1, minWidth: 150 }}><Field label={t("shipping")}>
           <input className="input" type="number" step="0.01" min="0" value={shipping} onChange={(e) => setShipping(e.target.value)} />
         </Field></div>
-        <div style={{ flex: 1, minWidth: 150 }}><Field label={t("stock")} hint="Leave blank if you never run out.">
+        <div style={{ flex: 1, minWidth: 150 }}><Field label={t("stock")} hint={t("leave_blank_if_you_never_run_out")}>
           <input className="input" type="number" min="0" value={f.stock} onChange={(e) => setF({ ...f, stock: e.target.value })} placeholder={t("unlimited")} />
         </Field></div>
 
@@ -332,7 +332,7 @@ function NewProduct({ myUserId, onDone, onError }: { myUserId: number; onDone: (
       {/* Only asked once they've said yes, and it is a ceiling rather than a promise: an
           expensive product can offer samples without an open-ended bill. */}
       {f.samples_enabled && (
-        <Field label={t("free_samples_a_month")} hint="Your limit for this product. Blank uses the shop's usual number. Products offering samples are listed ahead of those that don't.">
+        <Field label={t("free_samples_a_month")} hint={t("your_limit_for_this_product_blank_uses_t")}>
           <input className="input" type="number" min="0" value={f.sample_monthly_limit} onChange={(e) => setF({ ...f, sample_monthly_limit: e.target.value })} placeholder={t("shop_default")} />
         </Field>
       )}
@@ -340,7 +340,7 @@ function NewProduct({ myUserId, onDone, onError }: { myUserId: number; onDone: (
         <input type="file" accept="image/*" multiple onChange={(e) => setImages(Array.from(e.target.files ?? []).slice(0, MAX_PRODUCT_IMAGES))} />
       </Field>
       {images.length > 0 && <div className="muted" style={{ fontSize: 12 }}>{images.length} photo{images.length === 1 ? "" : "s"} chosen</div>}
-      <Field label={t("video")} hint="Optional.">
+      <Field label={t("video")} hint={t("optional")}>
         <input type="file" accept="video/mp4,video/quicktime" onChange={(e) => setVideo(e.target.files?.[0] ?? null)} />
       </Field>
       {busy && progress > 0 && <div className="muted" style={{ fontSize: 13 }}>Uploading… {Math.round(progress * 100)}%</div>}
@@ -416,7 +416,7 @@ function SellerOrderCard({ myUserId, order, onChanged, onNotice, onError }: {
             <div style={{ flex: 1, minWidth: 150 }}><Field label={t("courier")}>
               <input className="input" value={carrier} onChange={(e) => setCarrier(e.target.value)} placeholder={t("courier_examples")} />
             </Field></div>
-            <div style={{ flex: 1, minWidth: 190 }}><Field label={t("tracking_link")} hint="Optional.">
+            <div style={{ flex: 1, minWidth: 190 }}><Field label={t("tracking_link")} hint={t("optional")}>
               <input className="input" type="url" value={url} onChange={(e) => setUrl(e.target.value)} />
             </Field></div>
           </div>

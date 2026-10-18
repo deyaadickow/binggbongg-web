@@ -202,7 +202,7 @@ function AgentApplication({ myUserId, onDone, onError }: { myUserId: number; onD
       <Field label={t("phone_or_whatsapp")}>
         <input className="input" value={phone} onChange={(e) => setPhone(e.target.value)} maxLength={40} />
       </Field>
-      <Field label={t("country_code")} hint="Two letters, like PH or CN.">
+      <Field label={t("country_code")} hint={t("two_letters_like_ph_or_cn")}>
         <input className="input" value={country} onChange={(e) => setCountry(e.target.value.toUpperCase())} maxLength={2} style={{ textTransform: "uppercase" }} />
       </Field>
       <button type="submit" className="btn" disabled={busy || !name.trim()}>{busy ? "Sending…" : "Apply to be an agent"}</button>
@@ -268,7 +268,7 @@ function AgentEarningsPanel({ myUserId, earnings, onChanged, onNotice, onError }
   return (
     <>
       <div className="grid wide" style={{ marginBottom: 14 }}>
-        <Figure label={t("still_settling")} value={money(earnings.pending_cents)} hint="Earned, but held until the buyer's return window closes." />
+        <Figure label={t("still_settling")} value={money(earnings.pending_cents)} hint={t("earned_but_held_until_the_buyer_s_return")} />
         <Figure label={t("ready_to_pay_out")} value={money(earnings.payable_cents)} gold />
         <Figure label={t("paid_so_far")} value={money(earnings.paid_cents)} />
       </div>

@@ -1256,7 +1256,7 @@ export function LiveViewerPage() {
         </Overlay>
       )}
       {typeof hideSeekMode === "number" && myId && (
-        <MultiPicker title={`🙈 Hide & Seek · ${hideSeekMode === 1 ? "1v1" : `${hideSeekMode + 1} members`}`} blurb="One 5-minute round, scores hidden until the end, most gift coins wins." exact={hideSeekMode}
+        <MultiPicker title={`🙈 Hide & Seek · ${hideSeekMode === 1 ? "1v1" : `${hideSeekMode + 1} members`}`} blurb={t("one_5_minute_round_scores_hidden_until_t")} exact={hideSeekMode}
           people={broadcasters.filter((b) => b.user_id !== myId)} onClose={() => setHideSeekMode(null)}
           onSubmit={async (ids) => {
             try { await createSeries(myId, roomName, 1, ids, true); setHideSeekMode(null); setToast("Hide & Seek invites sent."); }
@@ -1271,7 +1271,7 @@ export function LiveViewerPage() {
           }} />
       )}
       {picker === "series" && myId && (
-        <MultiPicker title={t("best_out_of")} blurb="5-minute rounds. First to win more than half the rounds takes the series." lengths={[3, 5, 7, 9, 11]}
+        <MultiPicker title={t("best_out_of")} blurb={t("n5_minute_rounds_first_to_win_more_than_h")} lengths={[3, 5, 7, 9, 11]}
           people={broadcasters.filter((b) => b.user_id !== myId)} onClose={() => setPicker(null)}
           onSubmit={async (ids, length) => {
             try { await createSeries(myId, roomName, length ?? 5, ids); setPicker(null); setToast(`Best Out Of ${length} invites sent.`); }
@@ -1300,7 +1300,7 @@ export function LiveViewerPage() {
           }} />
       )}
       {picker === "marathon" && myId && (
-        <MultiPicker title={t("no_time_limit")} blurb="No clock. The first player to reach 100,000 gift coins wins. Everyone in the battle can vote to end it early."
+        <MultiPicker title={t("no_time_limit")} blurb={t("no_clock_the_first_player_to_reach_100_0")}
           people={broadcasters.filter((b) => b.user_id !== myId)} onClose={() => setPicker(null)}
           onSubmit={async (ids) => {
             try { await inviteMarathon(myId, roomName, ids); setPicker(null); setToast("No Time Limit invites sent."); }
@@ -1308,7 +1308,7 @@ export function LiveViewerPage() {
           }} />
       )}
       {picker === "555" && myId && (
-        <MultiPicker title="5-5-5" blurb="5 Games / 5 Minutes / Reach 5000 coins and win. Each game ends at 5,000 coins or when its 5 minutes run out; first to finish 5 games wins."
+        <MultiPicker title="5-5-5" blurb={t("n5_games_5_minutes_reach_5000_coins_and_w")}
           people={broadcasters.filter((b) => b.user_id !== myId)} onClose={() => setPicker(null)}
           onSubmit={async (ids) => {
             try { await invite555(myId, roomName, ids); setPicker(null); setToast("5-5-5 invites sent."); }

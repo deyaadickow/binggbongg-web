@@ -554,7 +554,7 @@ export function FindABattlePage() {
       {tab === "country" && (
         <div className="card pad" style={{ marginBottom: 10 }}>
           <GoldSelect
-            ariaLabel="Country"
+            ariaLabel={t("battle_tab_country")}
             placeholder={t("battle_tab_country")}
             searchable
             value={selectedCountry ?? ""}
@@ -743,7 +743,7 @@ export function SupportPage() {
                 options={reasons.map((r) => ({ value: r.label, label: r.label }))}
                 onChange={setReason}
                 placeholder={t("reason_for_this_support")}
-                ariaLabel="Reason For This Support"
+                ariaLabel={t("reason_for_this_support")}
               />
             </div>
           )}

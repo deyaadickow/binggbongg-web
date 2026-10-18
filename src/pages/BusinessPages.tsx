@@ -140,12 +140,12 @@ export function BusinessTabPage() {
         <PickerPill label={categoryId ? (categories.find((c) => c.id === categoryId)?.name ?? "Category") : "Category"} active={!!categoryId} onClick={() => setSheet("category")} />
         {(countryCode || categoryId || q) && <button className="btn small ghost" onClick={() => { setCountryCode(""); setStateCode(""); setCity(""); setCategoryId(0); setQ(""); setQuery(""); }}>{t("clear")}</button>}
       </div>
-      {sheet === "country" && <PickerSheet title={t("battle_tab_country")} noun="countries" items={splitMain(countries).rest} pinned={splitMain(countries).main} pinnedLabel="Main markets" restLabel="All countries" selected={countryCode} onPick={(code) => { setCountryCode(code); setStateCode(""); setCity(""); }} onClose={() => setSheet(null)} />}
+      {sheet === "country" && <PickerSheet title={t("battle_tab_country")} noun="countries" items={splitMain(countries).rest} pinned={splitMain(countries).main} pinnedLabel={t("main_markets")} restLabel={t("all_countries")} selected={countryCode} onPick={(code) => { setCountryCode(code); setStateCode(""); setCity(""); }} onClose={() => setSheet(null)} />}
       {sheet === "state" && <PickerSheet title={t("state")} noun="states" items={states.map((st) => ({ code: st.state_code!, name: st.name! }))} selected={stateCode} onPick={(code) => { setStateCode(code); setCity(""); }} onClose={() => setSheet(null)} />}
       {sheet === "city" && <PickerSheet title={t("city")} noun="cities" items={cities.map((c) => ({ code: c, name: c }))} selected={city} onPick={setCity} onClose={() => setSheet(null)} />}
       {sheet === "category" && <PickerSheet title={t("category")} noun="categories" items={[{ code: "0", name: "All categories" }, ...categories.map((c) => ({ code: String(c.id), name: c.name }))]} selected={String(categoryId)} onPick={(code) => setCategoryId(Number(code))} onClose={() => setSheet(null)} />}
 
-      {nearText && items && items.length > 0 && <p className="muted" style={{ fontSize: 13, color: "var(--gold)" }}>Showing businesses near you first — {nearText}</p>}
+      {nearText && items && items.length > 0 && <p className="muted" style={{ fontSize: 13, color: "var(--gold)" }}>{t("showing_businesses_near_you", nearText)}</p>}
       {error && <Notice error>{error}</Notice>}
       {items === null ? <Loading /> : items.length === 0 ? (
         <Notice>{t("no_businesses_here_yet_be_the_first_add")}</Notice>
@@ -284,7 +284,7 @@ export function BusinessPage() {
           <div className="row" style={{ gap: 8, flexWrap: "wrap", marginTop: 10 }}>
             <span className="muted">{t("upload_into")}</span>
             <GoldSelect
-              ariaLabel="Upload into"
+              ariaLabel={t("upload_into_2")}
               style={{ maxWidth: 220, flex: "1 1 180px" }}
               value={activeFolder === null ? (showVideos ? "videos" : "photos") : String(activeFolder)}
               options={[
@@ -300,13 +300,13 @@ export function BusinessPage() {
             />
           </div>
           <div className="row" style={{ gap: 8, flexWrap: "wrap", marginTop: 8 }}>
-            <label className="btn small">Upload Photos<input type="file" accept="image/*" hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) upload("photo", f); e.target.value = ""; }} /></label>
-            <label className="btn small">Upload Video<input type="file" accept="video/*" hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) upload("video", f); e.target.value = ""; }} /></label>
+            <label className="btn small">{t("upload_photos_2")}<input type="file" accept="image/*" hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) upload("photo", f); e.target.value = ""; }} /></label>
+            <label className="btn small">{t("upload_video")}<input type="file" accept="video/*" hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) upload("video", f); e.target.value = ""; }} /></label>
             <button className="btn small" onClick={() => navigate(`/settings/business/edit/${b.id}`)}>{t("edit")}</button>
             <button className="btn small" onClick={renew} disabled={!pricing}>{t("renew")}</button>
             {b.is_live && <button className="btn small ghost" onClick={takeDown}>{t("take_down")}</button>}
           </div>
-          {progress !== null && <div className="muted" style={{ marginTop: 8 }}>Uploading… {Math.round(progress * 100)}%</div>}
+          {progress !== null && <div className="muted" style={{ marginTop: 8 }}>{t("uploading_percent", Math.round(progress * 100))}</div>}
         </div>
       )}
 
@@ -509,7 +509,7 @@ export function MemberBusinessesPanel({ userId }: { userId: number }) {
  * /settings/business.
  */
 export function MyBusinessesPanel() {
-  const { t } = useT();
+  const { t, tn } = useT();
   const { user, isLoggedIn } = useSession();
   const [mine, setMine] = useState<MyBusinesses | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -520,7 +520,7 @@ export function MyBusinessesPanel() {
     fetchMyBusinesses(user.id).then(setMine).catch((e) => setError((e as Error).message));
   }, [user]);
 
-  if (!isLoggedIn) return <Notice>Sign in to list your business. <Link to="/login">{t("sign_in")}</Link></Notice>;
+  if (!isLoggedIn) return <Notice>{tn("sign_in_to_list_your_business", <Link to="/login">{t("sign_in")}</Link>)}</Notice>;
   if (error) return <Notice error>{error}</Notice>;
   if (!mine) return <Loading />;
   const p = mine.pricing;
@@ -529,8 +529,8 @@ export function MyBusinessesPanel() {
     <>
       <div className="card pad" style={{ textAlign: "center" }}>
         <b style={{ color: "var(--gold)", fontSize: 18 }}>{t("your_business_page")}</b>
-        {p && <div style={{ color: "var(--gold)", marginTop: 6 }}>{usd(p.price_per_day)}/day · {usd(p.term_price)} for {p.term_days} days, paid up front</div>}
-        <div style={{ color: "var(--gold)", marginTop: 4 }}>Cash Account balance: {usd(mine.cash_balance)}</div>
+        {p && <div style={{ color: "var(--gold)", marginTop: 6 }}>{t("business_price_terms", usd(p.price_per_day), usd(p.term_price), p.term_days)}</div>}
+        <div style={{ color: "var(--gold)", marginTop: 4 }}>{t("cash_account_balance_is", usd(mine.cash_balance))}</div>
         <div className="muted" style={{ fontSize: 12, marginTop: 6 }}>{t("cancel_anytime_no_refunds_your_page_show")}</div>
         <div className="row" style={{ gap: 8, justifyContent: "center", flexWrap: "wrap", marginTop: 12 }}>
           <Link className="btn small" to="/settings/advertise">{t("fund_ad_cash_account")}</Link>
@@ -540,10 +540,10 @@ export function MyBusinessesPanel() {
 
       {mine.referral_code && (
         <div className="card pad" style={{ textAlign: "center", marginTop: 12 }}>
-          <b style={{ color: "var(--gold)", fontSize: 16 }}>Refer a business, earn {usd(mine.referral_fee)}</b>
-          <div className="muted" style={{ fontSize: 12, marginTop: 4 }}>When a business signs up with your code you get {usd(mine.referral_fee)}, one time, straight into your wallet.</div>
+          <b style={{ color: "var(--gold)", fontSize: 16 }}>{t("refer_a_business_earn", usd(mine.referral_fee))}</b>
+          <div className="muted" style={{ fontSize: 12, marginTop: 4 }}>{t("business_referral_note", usd(mine.referral_fee))}</div>
           <div style={{ fontSize: 22, fontWeight: 800, marginTop: 8, letterSpacing: "0.08em" }}>{mine.referral_code}</div>
-          <div style={{ color: "var(--gold)", fontSize: 13, marginTop: 4 }}>Earned so far: {usd(mine.referral_earned)} from {mine.referral_count} business{mine.referral_count === 1 ? "" : "es"}</div>
+          <div style={{ color: "var(--gold)", fontSize: 13, marginTop: 4 }}>{t(mine.referral_count === 1 ? "earned_so_far_from_one_business" : "earned_so_far_from_n_businesses", usd(mine.referral_earned), mine.referral_count)}</div>
           <button className="btn small" style={{ marginTop: 10 }} onClick={() => { navigator.clipboard?.writeText(`List your business on Bingg Bongg and use my referral code ${mine.referral_code} when you sign up. https://www.binggbongg.com`).then(() => setCopied(true)).catch(() => undefined); }}>{copied ? "Copied!" : "Copy your invite"}</button>
         </div>
       )}
@@ -555,7 +555,7 @@ export function MyBusinessesPanel() {
               <Banner url={b.banner_url} maxHeight={240} />
               <div style={{ padding: "10px 12px 12px" }}>
                 <div style={{ display: "flex", alignItems: "center" }}><b style={{ color: "var(--gold)", fontSize: 16 }}>{b.name}</b>{b.is_verified && <VerifiedCheck />}</div>
-                <div className="muted" style={{ fontSize: 13, color: b.is_live ? undefined : "#FF8A80" }}>{statusText(b)} · {b.views} views</div>
+                <div className="muted" style={{ fontSize: 13, color: b.is_live ? undefined : "#FF8A80" }}>{t("status_and_views", statusText(b), b.views)}</div>
                 <div className="row" style={{ gap: 8, marginTop: 10 }}>
                   <Link className="btn small" to={`/business/${b.id}`}>{t("open_page")}</Link>
                   {!b.is_live && b.status !== "suspended" && <Link className="btn small" style={{ background: "var(--gold)", color: "#0d0d0d" }} to={`/business/${b.id}`}>{t("renew")}</Link>}
@@ -572,7 +572,7 @@ export function MyBusinessesPanel() {
 export function MyBusinessesPage() {
   return (
     <div className="page" style={{ maxWidth: 760 }}>
-      <TitlePlate text="Bingg Bongg Business" />
+      <TitlePlate /* i18n-exempt: the brand name. */ text="Bingg Bongg Business" />
       <MyBusinessesPanel />
     </div>
   );
@@ -581,7 +581,7 @@ export function MyBusinessesPage() {
 // ---- Create / edit --------------------------------------------------------------------------
 
 export function CreateBusinessPage() {
-  const { t } = useT();
+  const { t, tn } = useT();
   const { user, isLoggedIn } = useSession();
   const { id } = useParams();
   const [params] = useSearchParams();
@@ -633,7 +633,7 @@ export function CreateBusinessPage() {
     } catch (err) { setError((err as Error).message); } finally { setBusy(false); setProgress(null); }
   }
 
-  if (!isLoggedIn) return <div className="page"><Notice>Sign in to list your business. <Link to="/login">{t("sign_in")}</Link></Notice></div>;
+  if (!isLoggedIn) return <div className="page"><Notice>{tn("sign_in_to_list_your_business", <Link to="/login">{t("sign_in")}</Link>)}</Notice></div>;
   if (!loaded) return <div className="page">{error ? <Notice error>{error}</Notice> : <Loading />}</div>;
 
   return (
@@ -662,7 +662,7 @@ export function CreateBusinessPage() {
         <div className="card pad" style={{ display: "grid", gap: 8 }}>
           <b style={{ color: "var(--gold)" }}>{t("where")}</b>
           <div className="muted" style={{ fontSize: 12 }}>{t("people_find_you_by_country_state_and_cit")}</div>
-          <label className="row" style={{ gap: 8 }}><input type="checkbox" checked={form.is_online} onChange={(e) => set("is_online", e.target.checked)} /> Online service</label>
+          <label className="row" style={{ gap: 8 }}><input type="checkbox" checked={form.is_online} onChange={(e) => set("is_online", e.target.checked)} /> {t("online_service")}</label>
           <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
             <PickerPill label={form.country_code ? (countries.find((c) => c.iso2 === form.country_code)?.name ?? form.country_code) : "Country"} active={!!form.country_code} onClick={() => setSheet("country")} />
             {form.country_code && <PickerPill label={form.state_code ? (states.find((s) => s.state_code === form.state_code)?.name ?? form.state_code) : "State"} active={!!form.state_code} onClick={() => setSheet("state")} />}
@@ -710,7 +710,7 @@ export function CreateBusinessPage() {
           {!editingId && <div className="muted" style={{ fontSize: 12, marginTop: 8 }}>{t("charged_from_your_cash_account_once_you")}</div>}
         </div>
       </form>
-      {sheet === "country" && <PickerSheet title={t("battle_tab_country")} noun="countries" items={splitMain(countries).rest} pinned={splitMain(countries).main} pinnedLabel="Main markets" restLabel="All countries" selected={form.country_code} onPick={(code) => { set("country_code", code); set("state_code", ""); set("city", ""); }} onClose={() => setSheet(null)} />}
+      {sheet === "country" && <PickerSheet title={t("battle_tab_country")} noun="countries" items={splitMain(countries).rest} pinned={splitMain(countries).main} pinnedLabel={t("main_markets")} restLabel={t("all_countries")} selected={form.country_code} onPick={(code) => { set("country_code", code); set("state_code", ""); set("city", ""); }} onClose={() => setSheet(null)} />}
       {sheet === "state" && <PickerSheet title={t("state")} noun="states" items={states.map((st) => ({ code: st.state_code!, name: st.name! }))} selected={form.state_code} onPick={(code) => { set("state_code", code); set("city", ""); }} onClose={() => setSheet(null)} />}
       {sheet === "city" && <PickerSheet title={t("city")} noun="cities" items={cities.map((c) => ({ code: c, name: c }))} selected={form.city} onPick={(c) => set("city", c)} onClose={() => setSheet(null)} />}
       {sheet === "category" && <PickerSheet title={t("category")} noun="categories" items={categories.map((c) => ({ code: String(c.id), name: c.name }))} selected={String(form.category_id)} onPick={(code) => set("category_id", Number(code))} onClose={() => setSheet(null)} />}
