@@ -87,20 +87,17 @@ export function CvCPage() {
 
 function ComingSoonCard({ matchup }: { matchup: CvCComingSoon }) {
   return (
-    <div className="card pad" style={{ borderColor: "var(--gold-border)" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+    // Steve, 2026-10-18: "Please center the text to the box."
+    <div className="card pad" style={{ borderColor: "var(--gold-border)", textAlign: "center" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, flexWrap: "wrap" }}>
         <span style={{ fontSize: 20 }}>{flagOf(matchup.country_a_code)}</span>
         <span style={{ fontWeight: 700 }}>{matchup.country_a_name}</span>
         <span className="muted" style={{ fontWeight: 900 }}>VS</span>
         <span style={{ fontSize: 20 }}>{flagOf(matchup.country_b_code)}</span>
         <span style={{ fontWeight: 700 }}>{matchup.country_b_name}</span>
-        <span style={{ flex: 1 }} />
-        <span style={{ fontSize: 12, fontWeight: 800, color: gold, letterSpacing: 0.5 }}>
-          {matchup.is_running ? "STARTING" : "COMING SOON"}
-        </span>
       </div>
       <p className="muted" style={{ margin: "6px 0 0", fontSize: 13 }}>
-        A {matchup.minutes} minute battle. Help your country win it.
+        {matchup.is_running ? "STARTING" : "COMING SOON"} · A {matchup.minutes} minute battle. Help your country win it.
       </p>
     </div>
   );
