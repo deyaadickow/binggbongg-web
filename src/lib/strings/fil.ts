@@ -753,6 +753,7 @@ export const fil = {
   phone_or_whatsapp: "Telepono o WhatsApp",
   photo: "📷 Larawan",
   photo_storage: "Photo Storage",
+  photo_styles: "Mga Photo Style",
   photos: "Mga Larawan",
   photos_appear_here_once_members_build_up: "Lilitaw ang mga larawan dito kapag may album nang naitayo ang mga miyembro.",
   pick_a_category: "Pumili ng kategorya.",

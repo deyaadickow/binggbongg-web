@@ -753,6 +753,7 @@ export const id = {
   phone_or_whatsapp: "Telepon atau WhatsApp",
   photo: "📷 Foto",
   photo_storage: "Penyimpanan Foto",
+  photo_styles: "Gaya Foto",
   photos: "Foto",
   photos_appear_here_once_members_build_up: "Foto muncul di sini setelah anggota membangun album.",
   pick_a_category: "Pilih kategori.",

@@ -37,6 +37,9 @@ export function sidebarSections(userId: number | null): SideSection[] {
       { to: "/upload", label: "upload_video", icon: "🎬", needsLogin: true },
       { to: "/photos-directory", label: "photos", icon: "📷", needsLogin: true },
       { to: "/photos", label: "my_photos", icon: "🖼️", needsLogin: true },
+      // Steve, 2026-10-18: "Add photo style tab on main feed". Next to Photos, because every
+      // style files its result into the member's own photo folders.
+      { to: "/cartoon", label: "photo_styles", icon: "✨", needsLogin: true },
       { to: "/upload-photos", label: "upload_photos", icon: "⬆️", needsLogin: true },
       { to: "/enter-contest", label: "enter_a_contest", icon: "🏆", needsLogin: true },
       { to: "/go-live", label: "go_live", icon: "📡", needsLogin: true },

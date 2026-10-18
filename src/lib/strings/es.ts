@@ -753,6 +753,7 @@ export const es = {
   phone_or_whatsapp: "Teléfono o WhatsApp",
   photo: "📷 Foto",
   photo_storage: "Almacenamiento de fotos",
+  photo_styles: "Estilos de foto",
   photos: "Fotos",
   photos_appear_here_once_members_build_up: "Las fotos aparecen aquí cuando los miembros arman un álbum.",
   pick_a_category: "Elige una categoría.",
