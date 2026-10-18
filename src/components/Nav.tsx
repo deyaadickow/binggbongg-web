@@ -1,6 +1,7 @@
 import { NavLink, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { fetchShopSettings } from "../lib/shop";
+import { fetchCountryChallenges } from "../lib/countryChallenges";
 import { useSession } from "../lib/session";
 import { Avatar } from "./Common";
 
@@ -8,8 +9,12 @@ export function Nav() {
   // Bingg Bongg Shop (2026-10-15): the link exists only while the admin has the shop on, and
   // only for signed-in members (the settings call needs a session).
   const [shopOn, setShopOn] = useState(false);
+  // CvC hides its own link while the switch is off (Steve, 2026-10-17). The board endpoint is
+  // public and answers `enabled`, so this needs no session — unlike the shop check below.
+  const [cvcOn, setCvcOn] = useState(false);
   const { user, isLoggedIn, signOut } = useSession();
   useEffect(() => { if (!isLoggedIn) { setShopOn(false); return; } fetchShopSettings().then((s) => setShopOn(!!s.shop_enabled)).catch(() => setShopOn(false)); }, [isLoggedIn]);
+  useEffect(() => { fetchCountryChallenges().then((r) => setCvcOn(r.enabled)).catch(() => setCvcOn(false)); }, []);
   return (
     <header className="nav">
       <Link to="/" className="brand">Bingg Bongg</Link>
@@ -25,6 +30,9 @@ export function Nav() {
         {/* Steve, 2026-10-17: "a new page on main feed called 'Video Ad Gig'" — influencers
             pitching to make your ad, right after All Shows, the same slot as both phones. */}
         <NavLink to="/gigs">Video Ad Gig</NavLink>
+        {/* Steve, 2026-10-17: "I want the bragging rights board/page to be called 'CvC'" —
+            country vs country, right after Video Ad Gig as on both phones. */}
+        {cvcOn && <NavLink to="/cvc">CvC</NavLink>}
         <NavLink to="/business">Business</NavLink>
         <NavLink to="/live">Live Now</NavLink>
         <NavLink to="/search">Search</NavLink>

@@ -24,6 +24,7 @@ import { SearchPage } from "./pages/SearchPage";
 import { LiveNowPage } from "./pages/LiveNowPage";
 import { MyShowPage, ShowsPage } from "./pages/ShowsPages";
 import { VideoAdGigPage, MyVideoAdGigsPage } from "./pages/VideoAdGigPages";
+import { CvCPage, CvCBattlePage } from "./pages/CvCPages";
 import { LiveViewerPage } from "./pages/LiveViewerPage";
 import { WalletPage } from "./pages/WalletPage";
 import { GoLivePage } from "./pages/GoLivePage";
@@ -71,6 +72,9 @@ export default function App() {
           {/* Video Ad Gig (Steve, 2026-10-17) — the feed tab, and both sides of a gig. */}
           <Route path="/gigs" element={<VideoAdGigPage />} />
           <Route path="/my-gigs" element={<MyVideoAdGigsPage />} />
+          {/* CvC — country vs country (Steve, 2026-10-17). The board, and one battle. */}
+          <Route path="/cvc" element={<CvCPage />} />
+          <Route path="/cvc/:id" element={<CvCBattlePage />} />
           <Route path="/live/:room" element={<LiveViewerPage />} />
           <Route path="/wallet" element={<WalletPage />} />
           <Route path="/wallet/redeem" element={<RedeemPage />} />
