@@ -12,13 +12,13 @@
 // "Take a selfie" is capture="user" on the file input: on a phone browser that opens the camera
 // straight onto the front lens, and on a desktop it falls back to the normal file picker, which
 // is the right thing there — a laptop user picking a photo is the same action.
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { currentAuthHeaders } from "../lib/api";
 import { useSession } from "../lib/session";
-import { fetchCartoonSettings, makeCartoon } from "../lib/photos";
+import { fetchCartoonSettings, makeCartoon, type CartoonStyle } from "../lib/photos";
 import { Notice } from "../components/Common";
-import { useT } from "../lib/i18n";
+import { tt, useT } from "../lib/i18n";
 
 export function CartoonPage() {
   const { t, tn } = useT();
@@ -27,6 +27,11 @@ export function CartoonPage() {
   const galleryRef = useRef<HTMLInputElement>(null);
 
   const [coins, setCoins] = useState(25);
+  // The style shelf comes from the server, so a style Steve adds in admin shows up here with no
+  // deploy. Until it answers there is nothing to pick, which is why the grid renders off `styles`
+  // rather than a hardcoded list.
+  const [styles, setStyles] = useState<CartoonStyle[]>([]);
+  const [styleId, setStyleId] = useState<number | null>(null);
   const [enabled, setEnabled] = useState(true);
   const [picked, setPicked] = useState<File | null>(null);
   const [pickedUrl, setPickedUrl] = useState("");
@@ -40,8 +45,19 @@ export function CartoonPage() {
     fetchCartoonSettings(user.id).then((s) => {
       setCoins(s.coins ?? 25);
       setEnabled(s.enabled !== false);
+      const shelf = s.styles ?? [];
+      setStyles(shelf);
+      // Pre-select the first style so the button is never "make what?", and so a member who
+      // ignores the grid entirely gets the same thing this page did before styles existed.
+      setStyleId((prev) => prev ?? shelf[0]?.id ?? null);
     });
   }, [user]);
+
+  // Price follows the chosen style, because a style may carry its own. Everything that quotes
+  // a number — the confirm, the button, the footnote — reads this one value, so they cannot
+  // disagree with each other or with what the server actually charges.
+  const chosenStyle = useMemo(() => styles.find((s) => s.id === styleId) ?? null, [styles, styleId]);
+  const price = chosenStyle?.coins ?? coins;
 
   // An object URL is a live handle to the file; letting them pile up leaks memory on a page
   // somebody might make several cartoons from.
@@ -60,11 +76,11 @@ export function CartoonPage() {
 
   async function run() {
     if (!user || !picked || busy) return;
-    if (!window.confirm(`This costs ${coins} coins. If you try again later, that's another ${coins} coins.`)) return;
+    if (!window.confirm(tt("cartoon_confirm_cost", price, price))) return;
     setBusy(true);
     setError("");
     try {
-      const result = await makeCartoon(user.id, picked, currentAuthHeaders());
+      const result = await makeCartoon(user.id, picked, currentAuthHeaders(), styleId ?? undefined);
       setCartoonUrl(result.downloadUrl);
       setFolderName(result.folderName);
       // They pick again to pay again — the button must not stay live on a finished cartoon.
@@ -110,10 +126,41 @@ export function CartoonPage() {
         <button className="btn" style={{ flex: 1 }} onClick={() => galleryRef.current?.click()} disabled={busy}>{t("choose_a_photo")}</button>
       </div>
 
+      {/* The shelf. Scrolls rather than paginates: the whole point is that Steve can keep
+          adding, so this must not need redesigning at the twentieth style. */}
+      {styles.length > 1 && (
+        <div style={{ marginTop: 14 }}>
+          <div className="muted" style={{ fontSize: 13, marginBottom: 6 }}>{t("pick_a_style")}</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(104px, 1fr))", gap: 8 }}>
+            {styles.map((s) => {
+              const chosen = s.id === styleId;
+              return (
+                <button key={s.id} onClick={() => setStyleId(s.id)} disabled={busy}
+                        aria-pressed={chosen}
+                        style={{
+                          padding: "10px 6px", borderRadius: 12, cursor: busy ? "default" : "pointer",
+                          background: chosen ? "rgba(212,175,55,0.16)" : "transparent",
+                          border: `1.5px solid ${chosen ? "var(--gold)" : "var(--gold-border)"}`,
+                          color: "var(--gold)", font: "inherit", textAlign: "center",
+                        }}>
+                  <div style={{ fontSize: 22, lineHeight: 1.1 }} aria-hidden>{s.icon}</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, marginTop: 4 }}>{s.name}</div>
+                  {/* Only shown when this style is not the usual price, so 30 identical
+                      "25 coins" labels do not become noise. */}
+                  {s.coins !== coins && (
+                    <div className="muted" style={{ fontSize: 11 }}>{t("n_coins", s.coins)}</div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {enabled ? (
         <button className="btn primary" style={{ width: "100%", marginTop: 12 }}
                 onClick={run} disabled={!picked || busy}>
-          {busy ? "Drawing your cartoon…" : `Make my cartoon · ${coins} coins`}
+          {busy ? t("drawing_your_picture") : t("make_my_picture_for_coins", chosenStyle?.name ?? t("cartoon_me"), price)}
         </button>
       ) : (
         <div style={{ marginTop: 12 }}><Notice>{t("cartoons_aren_t_switched_on_yet_please_c")}</Notice></div>
@@ -139,7 +186,7 @@ export function CartoonPage() {
       )}
 
       <div className="muted" style={{ fontSize: 12, marginTop: 18 }}>
-        {t("cartoon_cost_note", coins)}
+        {t("cartoon_cost_note", price)}
       </div>
     </div>
   );

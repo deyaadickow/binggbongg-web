@@ -100,6 +100,15 @@ export interface CartoonSettings {
   enabled?: boolean;
   coins?: number;
   image_size?: string;
+  /** The style shelf, straight from the server — a style added in admin appears with no deploy. */
+  styles?: CartoonStyle[];
+}
+
+export interface CartoonStyle {
+  id: number;
+  name: string;
+  icon: string;
+  coins: number;
 }
 
 /** Price and on/off come from the server so 25 can change without a deploy of three clients. */
@@ -123,11 +132,13 @@ export function makeCartoon(
   myUserId: number,
   file: File,
   headers: Record<string, string>,
+  styleId?: number,
 ): Promise<CartoonResult> {
   return new Promise((resolve, reject) => {
     const form = new FormData();
     form.append("my_user_id", String(myUserId));
     form.append("photo", file);
+    if (styleId) form.append("style_id", String(styleId));
 
     const xhr = new XMLHttpRequest();
     xhr.open("POST", API_BASE + "makeCartoon", true);
