@@ -6,6 +6,7 @@ import {
   fetchUpcomingSchedules, formatScheduleTime, mediaUrl,
   type ScheduleItem, type ScheduleKind,
 } from "../lib/api";
+import { useT } from "../lib/i18n";
 
 /**
  * Everything coming up across the app — Steve's "for all the members to see and maybe they will
@@ -13,6 +14,7 @@ import {
  * would ever find your schedule.
  */
 export function UpcomingPage() {
+  const { t } = useT();
   const { user: me } = useSession();
   const navigate = useNavigate();
   const [items, setItems] = useState<ScheduleItem[]>([]);
@@ -37,15 +39,15 @@ export function UpcomingPage() {
     })();
   }, [me, filter]);
 
-  if (!me) return <div className="notice">Sign in to see what's coming up.</div>;
+  if (!me) return <div className="notice">{t("sign_in_to_see_what_s_coming_up")}</div>;
 
   return (
     <div className="page cosmic-page">
       <div className="cosmic-head">
-        <button className="back-circle" onClick={() => navigate(-1)} aria-label="Back">‹</button>
+        <button className="back-circle" onClick={() => navigate(-1)} aria-label={t("back")}>‹</button>
         {/* Steve, 2026-10-07: the chip is "L & B"; the page it opens is headed with his own
             wording. */}
-        <h2 className="lb-bar title">Scheduled Lives and Battles</h2>
+        <h2 className="lb-bar title">{t("scheduled_lives_and_battles")}</h2>
       </div>
       {/* Steve, 2026-10-07: "Everything is still sitting in my profile." A button that bounced
           him to his profile was barely better than telling him to go there — the scheduler itself
@@ -66,9 +68,9 @@ export function UpcomingPage() {
       {error && <div className="notice">{error}</div>}
 
       {loading ? (
-        <div className="lb-bar">Loading…</div>
+        <div className="lb-bar">{t("imagePickerLoading")}</div>
       ) : items.length === 0 ? (
-        <div className="lb-bar">Nothing scheduled yet. Be the first — add one on your profile.</div>
+        <div className="lb-bar">{t("nothing_scheduled_yet_be_the_first_add_o")}</div>
       ) : (
         items.map((item) => (
           <Link key={item.id} to={`/profile/${item.user_id}`} className="card schedule-row upcoming-row">

@@ -61,6 +61,22 @@ export function format(template: string, args: (string | number)[]): string {
   return out;
 }
 
+/**
+ * The active language, readable without React.
+ *
+ * Needed for the handful of places that render OUTSIDE the React tree -- showGoldToast() mounts
+ * its own root imperatively, so there is no provider above it and no hook it may legally call.
+ * The provider keeps this in step; `tt` is the plain-function translator those places use.
+ *
+ * Components must still use useT(): reading this would not re-render them when the language
+ * changes, because nothing they consume would have changed.
+ */
+let activeLang: Lang = "en";
+export const currentLang = (): Lang => activeLang;
+export function tt(key: StringKey, ...args: (string | number)[]): string {
+  return translate(activeLang, key, ...args);
+}
+
 /** Translate outside a component (lib code, event handlers that have no hook in scope). */
 export function translate(lang: Lang, key: StringKey, ...args: (string | number)[]): string {
   const raw = DICTS[lang]?.[key] ?? en[key] ?? "";
@@ -92,6 +108,9 @@ const I18nContext = createContext<I18n | null>(null);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>(initialLang);
+  // Set during render, not in the effect: a tt() call from an imperative toast fired in
+  // the same tick as the change would otherwise still read the previous language.
+  activeLang = lang;
 
   useEffect(() => {
     try { localStorage.setItem(STORAGE_KEY, lang); } catch { /* private mode */ }

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { post, type LiveStream } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice } from "../components/Common";
+import { useT } from "../lib/i18n";
 
 /** Daily Live Badge (Steve, 2026-10-16) — the badge a host earns for the day by streaming to
  *  people who are actually watching. Ring colour per tier, gold text throughout, so it reads
@@ -24,6 +25,7 @@ function LiveBadge({ tier, name, minutes }: { tier?: number; name?: string; minu
 }
 
 export function LiveNowPage() {
+  const { t } = useT();
   const { user } = useSession();
   const [streams, setStreams] = useState<LiveStream[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -77,7 +79,7 @@ export function LiveNowPage() {
   return (
     <div className="page">
       <div className="row" style={{ alignItems: "center", gap: 12 }}>
-        <h1 className="page-title" style={{ margin: 0 }}>Live Now</h1>
+        <h1 className="page-title" style={{ margin: 0 }}>{t("live_now")}</h1>
         <span style={{ flex: 1 }} />
         {/* Filled when ON. Without that, an empty filtered list looks identical to
             "nobody is live", which is the confusion worth avoiding. */}
@@ -85,7 +87,7 @@ export function LiveNowPage() {
           type="button"
           className={favouritesOnly ? "btn" : "btn ghost"}
           onClick={() => setFavouritesOnly((v) => !v)}
-          title="Show only my favourite streamers"
+          title={t("show_only_my_favourite_streamers")}
         >
           {favouritesOnly ? "♥ Favourites" : "♡ Favourites"}
         </button>
@@ -97,7 +99,7 @@ export function LiveNowPage() {
           list and this row is not it. */}
       {!favouritesOnly && topToday.length > 0 && (
         <div style={{ marginBottom: 18 }}>
-          <h2 style={{ fontSize: 16, fontWeight: 800, margin: "0 0 8px" }}>Top Live Today</h2>
+          <h2 style={{ fontSize: 16, fontWeight: 800, margin: "0 0 8px" }}>{t("top_live_today")}</h2>
           <div className="row" style={{ gap: 10, overflowX: "auto", paddingBottom: 4 }}>
             {topToday.map((s) => (
               <Link
@@ -135,11 +137,11 @@ export function LiveNowPage() {
                 <div style={{ fontWeight: 800, fontSize: 16 }}>{s.host_fullname || s.host_username || "Member"}</div>
                 <div className="muted" style={{ fontSize: 13 }}>@{s.host_username ?? ""}</div>
                 <div className="row" style={{ marginTop: 6, gap: 6, flexWrap: "wrap" }}>
-                  <span className="pill live">● LIVE</span>
+                  <span className="pill live">{t("live")}</span>
                   <LiveBadge tier={s.live_badge_tier} name={s.live_badge_tier_name} minutes={s.live_badge_minutes} />
                 </div>
               </div>
-              <span className="btn small">Watch</span>
+              <span className="btn small">{t("watch")}</span>
             </Link>
           ))}
         </div>

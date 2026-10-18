@@ -6,8 +6,10 @@ interface WebCoinPlan { id: number; coins: number; bonus_coins: number; total_co
 import { useSession } from "../lib/session";
 import { Loading, Notice } from "../components/Common";
 import { WALLET_LINKS } from "./WalletPages";
+import { useT } from "../lib/i18n";
 
 export function WalletPage() {
+  const { t } = useT();
   const { user, isLoggedIn, refresh } = useSession();
   const [plans, setPlans] = useState<WebCoinPlan[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -50,16 +52,16 @@ export function WalletPage() {
     }
   }
 
-  if (!isLoggedIn || !user) return <div className="page"><Notice>Sign in to see your wallet. <Link to="/login">Sign in</Link></Notice></div>;
+  if (!isLoggedIn || !user) return <div className="page"><Notice>Sign in to see your wallet. <Link to="/login">{t("sign_in")}</Link></Notice></div>;
 
 
   return (
     <div className="page">
-      <h1 className="page-title">Wallet</h1>
+      <h1 className="page-title">{t("wallet")}</h1>
       <div className="grid">
-        <div className="card pad"><div className="muted">Coins to gift</div><div style={{ fontSize: 28, fontWeight: 800, color: "var(--gold)" }}>{user.no_redeem_wallet ?? 0}</div></div>
-        <div className="card pad"><div className="muted">Earned coins</div><div style={{ fontSize: 28, fontWeight: 800, color: "var(--gold)" }}>{user.redeem_wallet ?? 0}</div></div>
-        <div className="card pad"><div className="muted">Cash balance</div><div style={{ fontSize: 28, fontWeight: 800, color: "var(--gold)" }}>${Number(user.cash_wallet ?? 0).toFixed(2)}</div></div>
+        <div className="card pad"><div className="muted">{t("coins_to_gift")}</div><div style={{ fontSize: 28, fontWeight: 800, color: "var(--gold)" }}>{user.no_redeem_wallet ?? 0}</div></div>
+        <div className="card pad"><div className="muted">{t("earned_coins")}</div><div style={{ fontSize: 28, fontWeight: 800, color: "var(--gold)" }}>{user.redeem_wallet ?? 0}</div></div>
+        <div className="card pad"><div className="muted">{t("cash_balance")}</div><div style={{ fontSize: 28, fontWeight: 800, color: "var(--gold)" }}>${Number(user.cash_wallet ?? 0).toFixed(2)}</div></div>
       </div>
       {/* Steve, 2026-09-24: the seven links under the phones' Wallet screen, as gold bullet boxes. */}
       <div className="grid wide" style={{ marginTop: 14 }}>
@@ -74,7 +76,7 @@ export function WalletPage() {
           </Link>
         ))}
       </div>
-      <h2 className="page-title" style={{ marginTop: 22, fontSize: 18 }}>Buy coins</h2>
+      <h2 className="page-title" style={{ marginTop: 22, fontSize: 18 }}>{t("buy_coins")}</h2>
       {error && <Notice error>{error}</Notice>}
       {plans === null ? <Loading /> : (
         <div className="grid">
@@ -89,7 +91,7 @@ export function WalletPage() {
       )}
       <div className="center" style={{ marginTop: 18 }}>
         <button className="btn" onClick={buy} disabled={busy}>{busy ? "Opening…" : "Buy coins"}</button>
-        <p className="muted" style={{ fontSize: 13, marginTop: 8 }}>Opens the secure Bingg Bongg checkout with PayPal or card. Your balance updates here when you come back.</p>
+        <p className="muted" style={{ fontSize: 13, marginTop: 8 }}>{t("opens_the_secure_bingg_bongg_checkout_wi")}</p>
       </div>
     </div>
   );

@@ -2,6 +2,7 @@ import { useEffect, useState, type CSSProperties } from "react";
 import { Link } from "react-router-dom";
 import { useSession } from "../lib/session";
 import { fetchDailyFortune, type DailyFortune } from "../lib/api";
+import { useT } from "../lib/i18n";
 
 /**
  * Lucky numbers + daily horoscope (Steve, 2026-10-09): "for entertainment only so we can bring
@@ -13,6 +14,7 @@ import { fetchDailyFortune, type DailyFortune } from "../lib/api";
  * correct, not a caching bug.
  */
 export function DailyFortunePage() {
+  const { t } = useT();
   const { user: me } = useSession();
   const [fortune, setFortune] = useState<DailyFortune | null>(null);
   const [loading, setLoading] = useState(true);
@@ -43,7 +45,7 @@ export function DailyFortunePage() {
   useEffect(() => { void load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [me]);
 
   if (!me) {
-    return <div className="page"><div className="notice">Sign in to see your lucky numbers. <Link to="/login">Sign in</Link></div></div>;
+    return <div className="page"><div className="notice">Sign in to see your lucky numbers. <Link to="/login">{t("sign_in")}</Link></div></div>;
   }
 
   // Numeric order: sorting the keys as strings would put "10" before "3".
@@ -67,15 +69,15 @@ export function DailyFortunePage() {
 
   return (
     <div className="page">
-      <h2>Lucky Numbers &amp; Horoscope</h2>
+      <h2>{t("lucky_numbers_horoscope")}</h2>
 
       {/* Steve, 2026-10-13: "Put the 'Your Lucky Numbers' and 'Your Daily Horoscope' in a gold
           box with bold black text. Add a black border to the rest of the boxes. All text should
           be in gold. Make the 3 digit, 4 digit ... text the same size as the numbers." Same on
           Android and iOS. */}
-      <div style={headingPlate}>Your lucky numbers</div>
+      <div style={headingPlate}>{t("your_lucky_numbers")}</div>
       {loading && !fortune ? (
-        <p className="muted">Loading…</p>
+        <p className="muted">{t("imagePickerLoading")}</p>
       ) : (
         <div style={{ display: "grid", gap: 10 }}>
           {numbers.map((n) => (
@@ -105,7 +107,7 @@ export function DailyFortunePage() {
         {loading ? "…" : "Give me new numbers"}
       </button>
 
-      <div style={{ ...headingPlate, marginTop: 30 }}>Your daily horoscope</div>
+      <div style={{ ...headingPlate, marginTop: 30 }}>{t("your_daily_horoscope")}</div>
       {error && <div className="notice">{error}</div>}
 
       {hasSign && !editingBirthday ? (
@@ -118,16 +120,13 @@ export function DailyFortunePage() {
           </p>
           <button className="btn small" style={{ marginTop: 14, background: "transparent", color: "var(--gold)", borderColor: "var(--gold-border)" }}
                   onClick={() => setEditingBirthday(true)}>
-            Change my birthday
-          </button>
+            {t("change_my_birthday")}</button>
         </div>
       ) : (
         // No birth date: the numbers above still work, so this asks rather than blocks.
         <div style={plainPlate}>
           <p style={{ marginTop: 0, color: "var(--gold)" }}>
-            Tell us your birthday and we will show your star sign and today&apos;s reading.
-            We only need the day and month — we keep it for next time.
-          </p>
+            {t("horoscope_needs_birthday")}</p>
           <input
             type="date"
             className="input"
@@ -137,8 +136,7 @@ export function DailyFortunePage() {
           />
           <button className="btn" style={{ marginTop: 12 }} disabled={!birthday || loading}
                   onClick={() => void load(birthday)}>
-            Save
-          </button>
+            {t("save_address")}</button>
         </div>
       )}
 

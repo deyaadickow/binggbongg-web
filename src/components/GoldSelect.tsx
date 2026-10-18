@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useT } from "../lib/i18n";
 
 /**
  * Steve, 2026-10-06: "Please make these into our black and gold design" — about the dropdowns on
@@ -22,7 +23,7 @@ export function GoldSelect({
   value,
   options,
   onChange,
-  placeholder = "Select",
+  placeholder,
   searchable,
   disabled,
   style,
@@ -38,6 +39,7 @@ export function GoldSelect({
   style?: React.CSSProperties;
   ariaLabel?: string;
 }) {
+  const { t } = useT();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [box, setBox] = useState<{ left: number; top: number; width: number; drop: "down" | "up"; room: number } | null>(null);
@@ -111,7 +113,7 @@ export function GoldSelect({
         }}
       >
         <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-          {current?.label ?? placeholder}
+          {current?.label ?? placeholder ?? t("select")}
         </span>
         <span style={{ color: "var(--gold)", flex: "0 0 auto" }}>{open ? "▴" : "▾"}</span>
       </button>
@@ -137,7 +139,7 @@ export function GoldSelect({
               autoFocus
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder={`Search ${options.length}…`}
+              placeholder={t("search_count", options.length)}
               style={{ marginBottom: 6 }}
             />
           )}

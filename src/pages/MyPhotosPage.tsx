@@ -31,6 +31,7 @@ import {
 import { Loading, Notice } from "../components/Common";
 import { GoldSelect } from "../components/GoldSelect";
 import { showGoldAlert } from "../components/GoldToast";
+import { useT } from "../lib/i18n";
 
 const THUMB_BORDER = "1.5px solid var(--gold-border)";
 
@@ -41,6 +42,7 @@ function findAllPhotosFolder(folders: PhotoFolder[]): PhotoFolder | null {
 }
 
 export function MyPhotosPage() {
+  const { t } = useT();
   const { user, isLoggedIn } = useSession();
 
   const [folders, setFolders] = useState<PhotoFolder[] | null>(null);
@@ -118,25 +120,25 @@ export function MyPhotosPage() {
   }
 
   if (!isLoggedIn || !user) {
-    return <div className="page"><Notice>Sign in to see your photos.</Notice></div>;
+    return <div className="page"><Notice>{t("sign_in_to_see_your_photos")}</Notice></div>;
   }
 
   return (
     <div className="page" style={{ maxWidth: 980 }}>
       <div className="row" style={{ alignItems: "center", marginBottom: 8 }}>
-        <h1 className="page-title" style={{ flex: 1, marginBottom: 0 }}>My photos</h1>
-        <Link className="btn small" to="/upload-photos">Upload photos</Link>
+        <h1 className="page-title" style={{ flex: 1, marginBottom: 0 }}>{t("my_photos")}</h1>
+        <Link className="btn small" to="/upload-photos">{t("upload_photos")}</Link>
       </div>
 
       {storage && (
         <div className="card pad" style={{ marginBottom: 14, textAlign: "center" }}>
-          <div style={{ fontWeight: 800, color: "var(--gold)", fontSize: 15 }}>Photo Storage</div>
+          <div style={{ fontWeight: 800, color: "var(--gold)", fontSize: 15 }}>{t("photo_storage")}</div>
 
           {isPhotoStoragePaused(storage) && (
             <span style={{
               display: "inline-block", marginTop: 6, padding: "3px 10px", borderRadius: 6,
               background: "rgba(255,60,60,.9)", color: "#fff", fontWeight: 800, fontSize: 11,
-            }}>PAUSED</span>
+            }}>{t("paused")}</span>
           )}
 
           <div style={{ color: "var(--gold)", fontSize: 12, marginTop: 6 }}>
@@ -154,13 +156,11 @@ export function MyPhotosPage() {
               marginTop: 10, background: "transparent", borderRadius: 999, border: THUMB_BORDER,
               color: "var(--gold)", padding: "6px 16px", fontSize: 12, fontWeight: 700, cursor: "pointer",
             }}>
-            Add money to your cash account
-          </button>
+            {t("fund_ad_cash_account")}</button>
 
           {isPhotoStoragePaused(storage) && (
             <div style={{ color: "#f55", fontSize: 12, marginTop: 8 }}>
-              Uploads are paused until you add funds — your existing photos are safe and still visible.
-            </div>
+              {t("uploads_are_paused_until_you_add_funds_y")}</div>
           )}
         </div>
       )}
@@ -169,8 +169,8 @@ export function MyPhotosPage() {
 
       {folders === null ? <Loading /> : folders.length === 0 ? (
         <div className="card pad">
-          <p className="soft" style={{ marginTop: 0 }}>You haven't uploaded any photos yet.</p>
-          <Link className="btn" to="/upload-photos">Upload your first photo</Link>
+          <p className="soft" style={{ marginTop: 0 }}>{t("you_haven_t_uploaded_any_photos_yet")}</p>
+          <Link className="btn" to="/upload-photos">{t("upload_your_first_photo")}</Link>
         </div>
       ) : (
         <>
@@ -219,7 +219,7 @@ export function MyPhotosPage() {
                 <button className="btn small ghost" disabled={busy} onClick={() => {
                   const name = window.prompt("Rename folder", openFolder.name ?? "");
                   if (name && name.trim()) void act(() => renameFolder(user.id, openFolder.id, name.trim()), "all");
-                }}>Rename</button>
+                }}>{t("rename")}</button>
                 <button className="btn small ghost" disabled={busy} onClick={() => {
                   // Steve, 2026-09-28: the old copy said "and everything in it," implying this
                   // button also deletes the folder's photos — it doesn't. The server
@@ -232,7 +232,7 @@ export function MyPhotosPage() {
                     await deleteFolder(user.id, openFolder.id);
                     setOpenId(null);
                   }, "all");
-                }} style={{ color: "#f55", borderColor: "#f55" }}>Delete folder</button>
+                }} style={{ color: "#f55", borderColor: "#f55" }}>{t("delete_folder")}</button>
               </div>
             )}
 
@@ -291,7 +291,7 @@ export function MyPhotosPage() {
                 {moveTargets.length > 0 && (
                   <GoldSelect
                     ariaLabel="Move to"
-                    placeholder="Move to…"
+                    placeholder={t("move_to")}
                     searchable
                     disabled={busy}
                     // An action menu rather than a value: picking a folder moves the photo and
@@ -317,9 +317,9 @@ export function MyPhotosPage() {
                       await deletePhoto(user.id, viewing.id);
                       setViewing(null);
                     }, "all");
-                  }}>Delete</button>
+                  }}>{t("delete")}</button>
 
-                <button className="btn small ghost" onClick={() => setViewing(null)}>Close</button>
+                <button className="btn small ghost" onClick={() => setViewing(null)}>{t("close")}</button>
               </div>
             </div>
           </div>

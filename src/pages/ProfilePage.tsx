@@ -9,6 +9,7 @@ import { fetchUserPhotos, type Photo } from "../lib/photos";
 import { MemberBusinessesPanel, MyBusinessesPanel } from "./BusinessPages";
 import { ScheduleSection } from "../components/ScheduleSection";
 import { showGoldAlert } from "../components/GoldToast";
+import { useT } from "../lib/i18n";
 
 interface ProfileUser extends UserSummary {
   refer_code?: string;
@@ -77,6 +78,7 @@ function isValidUrl(url?: string | null): boolean {
 }
 
 function ProfileThumb({ p, isMe, onClick }: { p: ProfilePost; isMe: boolean; onClick: () => void }) {
+  const { t } = useT();
   const thumb = mediaUrl(p.thumbnail);
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
@@ -115,7 +117,7 @@ function ProfileThumb({ p, isMe, onClick }: { p: ProfilePost; isMe: boolean; onC
         {isMe && (
           <button
             className="p-ad"
-            title="Advertise this video"
+            title={t("advertise_this_video")}
             onClick={(e) => {
               e.stopPropagation();
               // The video goes with it, so the ad page doesn't ask for a file he already uploaded.
@@ -127,7 +129,7 @@ function ProfileThumb({ p, isMe, onClick }: { p: ProfilePost; isMe: boolean; onC
         )}
         <button
           className="p-copy"
-          title="Copy this video's link"
+          title={t("copy_this_video_s_link")}
           onClick={(e) => void copyLink(e)}
         >
           {copied ? "✓" : "C"}
@@ -172,6 +174,7 @@ function UserCard({ user, myId, isLoggedIn }: { user: UserSummary; myId?: number
 }
 
 function BattleBoardModal({ userId, onClose }: { userId: number; onClose: () => void }) {
+  const { t } = useT();
   const [career, setCareer] = useState<BattleCareer | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -194,7 +197,7 @@ function BattleBoardModal({ userId, onClose }: { userId: number; onClose: () => 
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
-        <h3>⚔️ Lifetime Battle Board</h3>
+        <h3>{t("lifetime_battle_board")}</h3>
         {loading ? <Loading /> : (
           <>
             <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
@@ -217,8 +220,7 @@ function BattleBoardModal({ userId, onClose }: { userId: number; onClose: () => 
             {(career?.opponents?.length ?? 0) > 0 && (
               <>
                 <div style={{ fontSize: 12, fontWeight: 800, color: "var(--gold)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 }}>
-                  Recent Opponents
-                </div>
+                  {t("recent_opponents")}</div>
                 <div className="profile-user-list">
                   {career!.opponents!.slice(0, 10).map((op, i) => (
                     <div className="p-ucard" key={op.user_id ?? i}>
@@ -236,13 +238,14 @@ function BattleBoardModal({ userId, onClose }: { userId: number; onClose: () => 
             )}
           </>
         )}
-        <button className="btn small ghost" style={{ marginTop: 16, width: "100%" }} onClick={onClose}>Close</button>
+        <button className="btn small ghost" style={{ marginTop: 16, width: "100%" }} onClick={onClose}>{t("close")}</button>
       </div>
     </div>
   );
 }
 
 function CreatePlaylistDialog({ userId, onClose, onCreated }: { userId: number; onClose: () => void; onCreated: (pl: Playlist) => void }) {
+  const { t } = useT();
   const [name, setName] = useState("");
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState("");
@@ -265,10 +268,10 @@ function CreatePlaylistDialog({ userId, onClose, onCreated }: { userId: number; 
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
-        <h3>Create Playlist</h3>
+        <h3>{t("create_playlist")}</h3>
         <input
           style={{ width: "100%", background: "#0a0a0a", border: "1.5px solid var(--gold-border)", borderRadius: 8, padding: "10px 12px", color: "#fff", fontSize: 15, marginBottom: 8, outline: "none", boxSizing: "border-box" }}
-          placeholder="Playlist name"
+          placeholder={t("playlist_name")}
           value={name}
           onChange={(e) => setName(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && save()}
@@ -279,7 +282,7 @@ function CreatePlaylistDialog({ userId, onClose, onCreated }: { userId: number; 
           <button className="btn" style={{ flex: 1 }} onClick={save} disabled={saving}>
             {saving ? "Creating…" : "Create"}
           </button>
-          <button className="btn ghost small" onClick={onClose}>Cancel</button>
+          <button className="btn ghost small" onClick={onClose}>{t("cancel")}</button>
         </div>
       </div>
     </div>
@@ -287,6 +290,7 @@ function CreatePlaylistDialog({ userId, onClose, onCreated }: { userId: number; 
 }
 
 export function ProfilePage() {
+  const { t } = useT();
   const { id } = useParams();
   const navigate = useNavigate();
   const { user: me, isLoggedIn } = useSession();
@@ -552,7 +556,7 @@ export function ProfilePage() {
                 })}
               />
               {profile.is_verified === 2 && (
-                <span title="Verified" style={{ color: "#4af", fontSize: 16 }}>✓</span>
+                <span title={t("verified")} style={{ color: "#4af", fontSize: 16 }}>✓</span>
               )}
               {profile.profile_category?.name && (
                 <span className="pill" style={{ fontSize: 11 }}>{profile.profile_category.name}</span>
@@ -595,20 +599,17 @@ export function ProfilePage() {
                 className="btn ghost small"
                 onClick={() => setShowOptions((v) => !v)}
                 style={{ padding: "4px 8px", fontSize: 18 }}
-                title="Options"
+                title={t("options")}
               >⋮</button>
               {showOptions && (
                 <div style={{ position: "absolute", right: 0, top: "100%", background: "var(--panel)", border: "1.5px solid var(--gold-border)", borderRadius: 10, minWidth: 140, zIndex: 20, padding: 4 }}>
                   <button className="btn ghost small" style={{ width: "100%", textAlign: "left", borderRadius: 6 }}
                     onClick={() => { navigator.share?.({ url: `${window.location.origin}/profile/${profile.id}`, title: displayName(profile) }).catch(() => {}); setShowOptions(false); }}>
-                    Share Profile
-                  </button>
+                    {t("share_profile_2")}</button>
                   <button className="btn ghost small" style={{ width: "100%", textAlign: "left", borderRadius: 6 }} onClick={handleReport}>
-                    Report
-                  </button>
+                    {t("report")}</button>
                   <button className="btn ghost small" style={{ width: "100%", textAlign: "left", borderRadius: 6, color: "#f84" }} onClick={handleBlock}>
-                    Block
-                  </button>
+                    {t("block")}</button>
                 </div>
               )}
             </div>
@@ -640,7 +641,7 @@ export function ProfilePage() {
         {/* Referral code (own profile) */}
         {isMe && profile.refer_code && (
           <div className="refer-row">
-            <div style={{ fontSize: 11, color: "var(--text-dim)", marginRight: 4 }}>Referral Code</div>
+            <div style={{ fontSize: 11, color: "var(--text-dim)", marginRight: 4 }}>{t("referral_code")}</div>
             <div className="refer-code">{profile.refer_code}</div>
             <button className="btn small" onClick={copyReferCode} style={{ flexShrink: 0 }}>
               {copiedRefer ? "Copied!" : "Copy"}
@@ -661,15 +662,12 @@ export function ProfilePage() {
               follow, same as the phones. */}
           {isMutualFollow && (
             <Link to={`/messages/${profile.id}`} className="btn ghost" style={{ flex: 1, textAlign: "center" }}>
-              Chat
-            </Link>
+              {t("chat")}</Link>
           )}
           <button className="btn ghost small" onClick={() => setShowBattleBoard(true)}>
-            ⚔️ Battle Board
-          </button>
+            {t("battle_board")}</button>
           <button className="btn ghost small" onClick={() => navigate("/settings/find-a-battle")}>
-            🔍 Find Battle
-          </button>
+            {t("find_battle")}</button>
           {/* Steve, 2026-10-07: "My account is the good judge and i don't see it there" — it used
               to sit below the playlists, far down the page. Next to Battle Board / Find Battle it
               is where someone actually looks for it. */}
@@ -681,13 +679,11 @@ export function ProfilePage() {
             // 'Support' but inside the link page call it, 'Who Supported Me'." Own profile only —
             // it lists the gifts sent to the signed-in member.
             <button className="btn ghost small" onClick={() => navigate("/support")}>
-              💝 Support
-            </button>
+              {t("support_2")}</button>
           )}
           {isMe && (
             <button className="btn ghost small" onClick={() => setShowCreatePlaylist(true)}>
-              + Playlist
-            </button>
+              {t("playlist")}</button>
           )}
         </div>
 
@@ -697,8 +693,7 @@ export function ProfilePage() {
         {isMe && playlists.length > 0 && (
           <div style={{ marginTop: 14 }}>
             <div style={{ fontSize: 12, fontWeight: 800, color: "var(--gold)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 6 }}>
-              Playlists
-            </div>
+              {t("playlists")}</div>
             <div className="playlist-scroll">
               {playlists.map((pl) => (
                 <div key={pl.id} className="playlist-item">
@@ -757,7 +752,7 @@ export function ProfilePage() {
           )
         ) : USER_TABS.includes(tab) ? (
           tabUsers.length === 0 ? (
-            <p className="muted" style={{ padding: "24px 0", textAlign: "center" }}>No members yet.</p>
+            <p className="muted" style={{ padding: "24px 0", textAlign: "center" }}>{t("no_members_yet")}</p>
           ) : (
             <div className="profile-user-list">
               {tabUsers.map((u) => (
@@ -767,7 +762,7 @@ export function ProfilePage() {
           )
         ) : (
           tabVideos.length === 0 ? (
-            <p className="muted" style={{ padding: "24px 0", textAlign: "center" }}>No videos yet.</p>
+            <p className="muted" style={{ padding: "24px 0", textAlign: "center" }}>{t("no_videos_yet")}</p>
           ) : (
             <div className="profile-vid-grid">
               {tabVideos.map((p) => (

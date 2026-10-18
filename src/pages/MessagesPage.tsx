@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import { Avatar, Loading, Notice } from "../components/Common";
 import { observeConversations, type DmConversation } from "../lib/dm";
 import { useSession } from "../lib/session";
+import { useT } from "../lib/i18n";
 
 function whenLabel(ms: number): string {
   if (!ms) return "";
@@ -20,6 +21,7 @@ function whenLabel(ms: number): string {
 }
 
 export function MessagesPage() {
+  const { t } = useT();
   const { user } = useSession();
   const myIdentity = user?.identity ?? "";
   const [rows, setRows] = useState<DmConversation[] | null>(null);
@@ -38,18 +40,18 @@ export function MessagesPage() {
     return () => { dead = true; stop?.(); };
   }, [myIdentity]);
 
-  if (!user) return <Notice>Sign in to see your messages.</Notice>;
+  if (!user) return <Notice>{t("sign_in_to_see_your_messages")}</Notice>;
   if (!myIdentity) {
     // Older stored sessions predate `identity` being kept — signing in again fills it in.
-    return <Notice error>Your session is missing its chat identity. Please sign out and sign in again.</Notice>;
+    return <Notice error>{t("your_session_is_missing_its_chat_identit")}</Notice>;
   }
 
   return (
     <div className="page">
-      <h2 className="lb-bar title">Messages</h2>
+      <h2 className="lb-bar title">{t("messages")}</h2>
       {error && <Notice error>{error}</Notice>}
       {rows === null && !error && <Loading />}
-      {rows?.length === 0 && <Notice>No messages yet. Open a member's profile and say hello.</Notice>}
+      {rows?.length === 0 && <Notice>{t("no_messages_yet_open_a_member_s_profile")}</Notice>}
       {rows && rows.length > 0 && (
         <div className="dm-list">
           {rows.map((c) => (
@@ -61,7 +63,7 @@ export function MessagesPage() {
               </div>
               <div className="dm-row-when">
                 {whenLabel(c.time)}
-                {c.unread && <span className="dm-unread" aria-label="Unread" />}
+                {c.unread && <span className="dm-unread" aria-label={t("unread")} />}
               </div>
             </Link>
           ))}

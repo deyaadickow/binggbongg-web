@@ -4,6 +4,7 @@
 import { NavLink } from "react-router-dom";
 import { useSession } from "../lib/session";
 import { APP_STORE_URL, PLAY_STORE_URL } from "./Common";
+import { useT } from "../lib/i18n";
 
 export interface SideLink { to: string; label: string; icon: string; external?: boolean; needsLogin?: boolean; action?: "signout" }
 export interface SideSection { title?: string; links: SideLink[] }
@@ -122,15 +123,16 @@ export function Sidebar() {
  * City and state, no street: the registered office is a home address.
  */
 export function SiteFooter() {
+  const { t } = useT();
   return (
     <div className="site-footer">
       <div>© {new Date().getFullYear()} Bingg Bongg Inc.</div>
       <div>Sterling Heights, Michigan, USA</div>
       <div className="site-footer-links">
-        <NavLink to="/settings/about">About</NavLink>
-        <NavLink to="/settings/contact">Contact</NavLink>
-        <NavLink to="/settings/terms">Terms</NavLink>
-        <NavLink to="/settings/privacy">Privacy</NavLink>
+        <NavLink to="/settings/about">{t("about")}</NavLink>
+        <NavLink to="/settings/contact">{t("contact")}</NavLink>
+        <NavLink to="/settings/terms">{t("terms")}</NavLink>
+        <NavLink to="/settings/privacy">{t("privacy")}</NavLink>
       </div>
     </div>
   );

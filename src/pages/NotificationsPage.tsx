@@ -14,6 +14,7 @@ import { Link } from "react-router-dom";
 import { displayName, post, type UserSummary } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice } from "../components/Common";
+import { useT } from "../lib/i18n";
 
 interface NotificationRow {
   id: number;
@@ -85,6 +86,7 @@ function Row({ row }: { row: NotificationRow }) {
 }
 
 export function NotificationsPage() {
+  const { t } = useT();
   const { user, isLoggedIn } = useSession();
   // user?.id, never `user` — the session object is replaced on every refresh (a gift, a wallet
   // change), and an effect keyed on the object re-runs and re-fetches the whole list each time.
@@ -117,21 +119,21 @@ export function NotificationsPage() {
   useEffect(() => { if (userId) { setLoading(true); load(0); } }, [userId, load]);
 
   if (!isLoggedIn) {
-    return <div className="page"><p className="soft">Please sign in to see your notifications.</p></div>;
+    return <div className="page"><p className="soft">{t("please_sign_in_to_see_your_notifications")}</p></div>;
   }
 
   return (
     <div className="page" style={{ maxWidth: 720 }}>
-      <h1 className="page-title">Notifications</h1>
+      <h1 className="page-title">{t("notifications")}</h1>
       {error && <Notice error>{error}</Notice>}
       {loading && rows.length === 0 && <Loading />}
       {!loading && rows.length === 0 && !error && (
-        <p className="soft">Nothing yet. Anything Bingg Bongg tells you will be kept here.</p>
+        <p className="soft">{t("nothing_yet_anything_bingg_bongg_tells_y")}</p>
       )}
       {rows.map((row) => <Row key={row.id} row={row} />)}
       {!done && rows.length > 0 && (
         <button className="btn" style={{ marginTop: 6 }} disabled={busy.current}
-                onClick={() => load(rows.length)}>Show more</button>
+                onClick={() => load(rows.length)}>{t("show_more")}</button>
       )}
     </div>
   );

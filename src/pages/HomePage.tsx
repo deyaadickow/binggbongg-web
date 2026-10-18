@@ -5,8 +5,10 @@ import { PostCard } from "../components/PostCard";
 import { Loading, Notice, StoreBadges } from "../components/Common";
 import { setFeed } from "../lib/feed";
 import { FeedPhotoCard } from "../components/FeedPhotoCard";
+import { useT } from "../lib/i18n";
 
 export function HomePage() {
+  const { t } = useT();
   const { user } = useSession();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
@@ -45,7 +47,7 @@ export function HomePage() {
   return (
     <div className="page">
       <div className="row" style={{ marginBottom: 14, flexWrap: "wrap" }}>
-        <h1 className="page-title" style={{ margin: 0 }}>For You</h1>
+        <h1 className="page-title" style={{ margin: 0 }}>{t("for_you")}</h1>
         <span className="spacer" />
         <StoreBadges compact />
       </div>
@@ -58,7 +60,7 @@ export function HomePage() {
       </div>
       {loading ? <Loading /> : (
         <div className="center" style={{ marginTop: 20 }}>
-          <button className="btn" onClick={loadMore}>Show more</button>
+          <button className="btn" onClick={loadMore}>{t("show_more")}</button>
         </div>
       )}
     </div>

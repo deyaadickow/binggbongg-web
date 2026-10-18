@@ -9,6 +9,7 @@ import { Link, useParams } from "react-router-dom";
 import { displayName, post, type UserSummary } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice } from "../components/Common";
+import { useT } from "../lib/i18n";
 
 interface Supporter { user: UserSummary; total_coins: number; gift_count: number; last_gift_at?: string | null }
 interface SupportersData { total_coins: number; gift_count: number; supporter_count: number; supporters: Supporter[] }
@@ -65,10 +66,12 @@ function DateDivider({ label }: { label: string }) {
 }
 
 function NeedLogin() {
-  return <div className="page"><Notice>Sign in to see who supported you. <Link to="/login">Sign in</Link></Notice></div>;
+  const { t } = useT();
+  return <div className="page"><Notice>Sign in to see who supported you. <Link to="/login">{t("sign_in")}</Link></Notice></div>;
 }
 
 export function SupportersPage() {
+  const { t } = useT();
   const { user, isLoggedIn } = useSession();
   const [data, setData] = useState<SupportersData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -88,18 +91,18 @@ export function SupportersPage() {
   return (
     <div className="page" style={{ maxWidth: 720 }}>
       <div className="row" style={{ marginBottom: 14 }}>
-        <Link to={`/profile/${user.id}`} className="btn small ghost">‹ Profile</Link>
-        <h1 className="page-title" style={{ margin: 0 }}>Who Supported Me</h1>
+        <Link to={`/profile/${user.id}`} className="btn small ghost">{t("profile_2")}</Link>
+        <h1 className="page-title" style={{ margin: 0 }}>{t("who_supported_me")}</h1>
       </div>
       {loading ? <Loading /> : error ? <Notice>{error}</Notice> : data && (
         <>
           <div className="card row" style={{ padding: 14, marginBottom: 12, justifyContent: "space-between" }}>
-            <div><div className="muted" style={{ fontSize: 12 }}>SUPPORTERS</div><div style={{ fontWeight: 800, fontSize: 20 }}>{n(data.supporter_count)}</div></div>
-            <div><div className="muted" style={{ fontSize: 12 }}>GIFTS</div><div style={{ fontWeight: 800, fontSize: 20 }}>{n(data.gift_count)}</div></div>
-            <div style={{ textAlign: "right" }}><div className="muted" style={{ fontSize: 12 }}>TOTAL COINS</div><div style={{ fontWeight: 800, fontSize: 20 }}>{n(data.total_coins)}</div></div>
+            <div><div className="muted" style={{ fontSize: 12 }}>{t("supporters")}</div><div style={{ fontWeight: 800, fontSize: 20 }}>{n(data.supporter_count)}</div></div>
+            <div><div className="muted" style={{ fontSize: 12 }}>{t("gifts")}</div><div style={{ fontWeight: 800, fontSize: 20 }}>{n(data.gift_count)}</div></div>
+            <div style={{ textAlign: "right" }}><div className="muted" style={{ fontSize: 12 }}>{t("total_coins")}</div><div style={{ fontWeight: 800, fontSize: 20 }}>{n(data.total_coins)}</div></div>
           </div>
           {data.supporters.length === 0 ? (
-            <p className="muted" style={{ padding: "24px 0", textAlign: "center" }}>No one has sent you a gift yet.</p>
+            <p className="muted" style={{ padding: "24px 0", textAlign: "center" }}>{t("no_one_has_sent_you_a_gift_yet")}</p>
           ) : (
             <div style={{ display: "grid", gap: 8 }}>
               {groupByLastGift(data.supporters).map((g) => [
@@ -114,7 +117,7 @@ export function SupportersPage() {
                   <GiftCount count={s.gift_count} />
                   <div style={{ textAlign: "right", flexShrink: 0, minWidth: 72 }}>
                     <div style={{ fontWeight: 800 }}>{n(s.total_coins)}</div>
-                    <div className="muted" style={{ fontSize: 12 }}>coins</div>
+                    <div className="muted" style={{ fontSize: 12 }}>{t("coins")}</div>
                   </div>
                 </Link>
                 )),
@@ -128,6 +131,7 @@ export function SupportersPage() {
 }
 
 export function SupporterBreakdownPage() {
+  const { t } = useT();
   const { id } = useParams();
   const { user, isLoggedIn } = useSession();
   const [period, setPeriod] = useState<Period>("day");
@@ -151,7 +155,7 @@ export function SupporterBreakdownPage() {
   return (
     <div className="page" style={{ maxWidth: 720 }}>
       <div className="row" style={{ marginBottom: 14 }}>
-        <Link to="/support" className="btn small ghost">‹ Who Supported Me</Link>
+        <Link to="/support" className="btn small ghost">{t("who_supported_me_2")}</Link>
       </div>
       {data && (
         <div className="card row" style={{ padding: 14, marginBottom: 12 }}>
@@ -163,7 +167,7 @@ export function SupporterBreakdownPage() {
           <GiftCount count={data.gift_count} />
           <div style={{ textAlign: "right", minWidth: 72 }}>
             <div style={{ fontWeight: 800, fontSize: 20 }}>{n(data.total_coins)}</div>
-            <div className="muted" style={{ fontSize: 12 }}>total coins</div>
+            <div className="muted" style={{ fontSize: 12 }}>{t("total_coins_2")}</div>
           </div>
         </div>
       )}
@@ -179,7 +183,7 @@ export function SupporterBreakdownPage() {
       </div>
       {loading ? <Loading /> : error ? <Notice>{error}</Notice> : data && (
         data.rows.length === 0 ? (
-          <p className="muted" style={{ padding: "24px 0", textAlign: "center" }}>No gifts from this member yet.</p>
+          <p className="muted" style={{ padding: "24px 0", textAlign: "center" }}>{t("no_gifts_from_this_member_yet")}</p>
         ) : (
           <div style={{ display: "grid", gap: 6 }}>
             {data.rows.map((r) => (

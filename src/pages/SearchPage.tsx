@@ -3,8 +3,10 @@ import { post, type Post, type UserSummary } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Loading, Notice, UserRow } from "../components/Common";
 import { PostCard } from "../components/PostCard";
+import { useT } from "../lib/i18n";
 
 export function SearchPage() {
+  const { t } = useT();
   const { user } = useSession();
   const [keyword, setKeyword] = useState("");
   const [tab, setTab] = useState<"members" | "videos">("members");
@@ -38,10 +40,10 @@ export function SearchPage() {
 
   return (
     <div className="page">
-      <h1 className="page-title">Search</h1>
+      <h1 className="page-title">{t("search")}</h1>
       <form onSubmit={run} className="row" style={{ marginBottom: 14 }}>
-        <input className="input" placeholder="Members, videos, hashtags…" value={keyword} onChange={(e) => setKeyword(e.target.value)} />
-        <button className="btn" type="submit">Search</button>
+        <input className="input" placeholder={t("members_videos_hashtags")} value={keyword} onChange={(e) => setKeyword(e.target.value)} />
+        <button className="btn" type="submit">{t("search")}</button>
       </form>
       <div className="tabs">
         <button className={tab === "members" ? "active" : ""} onClick={() => setTab("members")}>Members ({users.length})</button>
@@ -51,12 +53,12 @@ export function SearchPage() {
       {loading ? <Loading text="Searching…" /> : tab === "members" ? (
         <div style={{ display: "grid", gap: 10 }}>
           {users.map((u) => <UserRow key={u.id} user={u} />)}
-          {searched && users.length === 0 && <p className="muted">No members match.</p>}
+          {searched && users.length === 0 && <p className="muted">{t("no_members_match")}</p>}
         </div>
       ) : (
         <>
           <div className="grid">{posts.map((p) => <PostCard key={p.id} post={p} />)}</div>
-          {searched && posts.length === 0 && <p className="muted">No videos match.</p>}
+          {searched && posts.length === 0 && <p className="muted">{t("no_videos_match")}</p>}
         </>
       )}
     </div>

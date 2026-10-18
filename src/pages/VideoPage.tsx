@@ -6,12 +6,14 @@ import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice } from "../components/Common";
 import { GiftFlash, PostGiftButton } from "../components/GiftSheet";
 import { appendToFeed, fetchMoreFeed, getFeed } from "../lib/feed";
+import { useT } from "../lib/i18n";
 
 const AUTO_KEY = "bb.autoplayNext";
 
 /** One video, with the For You feed as the queue: ▲/▼ buttons, arrow keys, the scroll wheel and
  *  auto-advance when a video ends — the web version of the app's vertical swipe (Steve, 2026-09-24). */
 export function VideoPage() {
+  const { t } = useT();
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -218,20 +220,19 @@ export function VideoPage() {
               className="btn small"
               onClick={() => navigate(`/video/${item.linked_video!.id}`)}
               style={{ background: "#000", color: "var(--gold)", borderColor: "var(--gold)" }}>
-              🔗 Link
-            </button>
+              {t("link")}</button>
           )}
           <button
             className="btn small"
-            title="Copy this video's link"
+            title={t("copy_this_video_s_link")}
             onClick={() => void copyLink()}
             style={{ background: "#000", color: "var(--gold)", borderColor: "var(--gold)" }}>
             {copied ? "Copied" : "C"}
           </button>
         </div>
         <div className="video-arrows">
-          <button className="arrow" onClick={goPrev} disabled={!prev} title="Previous (↑)">▲</button>
-          <button className="arrow" onClick={goNext} disabled={!next} title="Next (↓)">▼</button>
+          <button className="arrow" onClick={goPrev} disabled={!prev} title={t("previous")}>▲</button>
+          <button className="arrow" onClick={goNext} disabled={!next} title={t("next")}>▼</button>
           <button className={`arrow auto${auto ? " on" : ""}`} onClick={toggleAuto} title={auto ? "Auto-play next: on" : "Auto-play next: off"}>{auto ? "⏭" : "⟳"}</button>
         </div>
       </div>

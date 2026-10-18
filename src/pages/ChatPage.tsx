@@ -21,6 +21,7 @@ import {
 import { mediaUrl } from "../lib/api";
 import { useSession } from "../lib/session";
 import { TRANSLATION_LANGUAGES, translateChatMessage } from "../lib/translate";
+import { useT } from "../lib/i18n";
 
 function dayLabel(ms: number): string {
   const d = new Date(ms);
@@ -32,6 +33,7 @@ function dayLabel(ms: number): string {
 }
 
 export function ChatPage() {
+  const { t } = useT();
   const { id } = useParams();
   const { user } = useSession();
   const myIdentity = user?.identity ?? "";
@@ -157,8 +159,8 @@ export function ChatPage() {
     }
   }
 
-  if (!user) return <Notice>Sign in to send messages.</Notice>;
-  if (!myIdentity) return <Notice error>Your session is missing its chat identity. Please sign out and sign in again.</Notice>;
+  if (!user) return <Notice>{t("sign_in_to_send_messages")}</Notice>;
+  if (!myIdentity) return <Notice error>{t("your_session_is_missing_its_chat_identit")}</Notice>;
 
   let lastDay = "";
 
@@ -171,10 +173,10 @@ export function ChatPage() {
           <div className="dm-row-name">{partner?.fullname ?? "…"}</div>
           {partner?.username && <div className="dm-handle">@{partner.username}</div>}
         </div>
-        <label className="dm-translate" title="Translate this conversation">
+        <label className="dm-translate" title={t("translate_this_conversation")}>
           <span aria-hidden>🌐</span>
           <select value={target} onChange={(e) => setTarget(e.target.value)}>
-            <option value="">None</option>
+            <option value="">{t("none")}</option>
             {TRANSLATION_LANGUAGES.map((l) => <option key={l.code} value={l.code}>{l.native}</option>)}
           </select>
         </label>
@@ -184,7 +186,7 @@ export function ChatPage() {
 
       <div className="dm-thread">
         {messages === null && !error && <Loading />}
-        {messages?.length === 0 && <p className="muted center">No messages yet — say hello.</p>}
+        {messages?.length === 0 && <p className="muted center">{t("no_messages_yet_say_hello")}</p>}
         {messages?.map((m) => {
           const mine = m.senderIdentity === myIdentity;
           const day = dayLabel(m.time);
@@ -231,7 +233,7 @@ export function ChatPage() {
                 : "Add a caption if you like, then Send."}
             </div>
           </div>
-          <button className="btn ghost small" onClick={clearPending} disabled={sending}>Remove</button>
+          <button className="btn ghost small" onClick={clearPending} disabled={sending}>{t("remove")}</button>
         </div>
       )}
 
@@ -245,7 +247,7 @@ export function ChatPage() {
         />
         <button
           className="btn ghost dm-attach"
-          title="Send a photo or a video"
+          title={t("send_a_photo_or_a_video")}
           disabled={sending}
           onClick={() => filePicker.current?.click()}
         >+</button>
@@ -257,7 +259,7 @@ export function ChatPage() {
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter") void send(); }}
         />
-        <button className="btn" disabled={(!draft.trim() && !pending) || sending} onClick={() => void send()}>Send</button>
+        <button className="btn" disabled={(!draft.trim() && !pending) || sending} onClick={() => void send()}>{t("send")}</button>
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { createRoot } from "react-dom/client";
+import { tt, useT } from "../lib/i18n";
 
 /**
  * The app's notification banner — black card, gold border, dead centre of the page, with an OK
@@ -18,6 +19,7 @@ import { createRoot } from "react-dom/client";
  * rather than writing a third.
  */
 export function useToast() {
+  const { t } = useT();
   const [toast, setToast] = useState<string | null>(null);
 
   const el = toast ? (
@@ -45,7 +47,7 @@ export function useToast() {
           style={{ background: "var(--gold-border)", color: "#000", borderColor: "var(--gold-border)", minWidth: 140 }}
           autoFocus
         >
-          OK
+          {t("ok")}
         </button>
       </div>
     </div>
@@ -93,7 +95,7 @@ export function showGoldAlert(message: string) {
           style={{ background: "var(--gold-border)", color: "#000", borderColor: "var(--gold-border)", minWidth: 140 }}
           autoFocus
         >
-          OK
+          {tt("ok")}
         </button>
       </div>
     </div>,
