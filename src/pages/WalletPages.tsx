@@ -11,7 +11,7 @@ import { useToast } from "../components/GoldToast";
 import { PostCard } from "../components/PostCard";
 import { GoldSelect } from "../components/GoldSelect";
 import { downloadStatement, printStatement, type StatementDoc } from "../lib/statementDoc";
-import { useT } from "../lib/i18n";
+import { useT, type StringKey } from "../lib/i18n";
 
 const money = (v: unknown, sym = "$") => `${sym}${Number(v ?? 0).toFixed(2)}`;
 
@@ -31,12 +31,12 @@ function Page({ title, children }: { title: string; children: React.ReactNode })
 function NeedLogin() {
                        const { t, tn } = useT(); return <div className="page"><Notice>{tn("sign_in_to_open_this_page", <Link to="/login">{t("sign_in")}</Link>)}</Notice></div>; }
 
-export const WALLET_LINKS: { to: string; icon: string; label: string; hint: string }[] = [
-  { to: "/wallet/redeem", icon: "💸", label: "Redeem", hint: "Withdraw your cash balance by PayPal, Wise and more" },
-  { to: "/wallet/payout-history", icon: "🧾", label: "Payout history", hint: "Every withdrawal you've requested and its status" },
-  { to: "/wallet/statements", icon: "📅", label: "Monthly earnings statement", hint: "What you earned, month by month, day by day" },
-  { to: "/wallet/ad-referrals", icon: "📣", label: "Money earned from ad referrals", hint: "Commissions from video ads uploaded with your code" },
-  { to: "/wallet/all-videos", icon: "🎬", label: "Money earned from all videos", hint: "Earnings from your uploaded videos" },
+export const WALLET_LINKS: { to: string; icon: string; label: StringKey; hint: StringKey }[] = [
+  { to: "/wallet/redeem", icon: "💸", label: "redeem", hint: "withdraw_your_cash_balance_by_paypal_wis" },
+  { to: "/wallet/payout-history", icon: "🧾", label: "payout_history", hint: "every_withdrawal_you_ve_requested_and_it" },
+  { to: "/wallet/statements", icon: "📅", label: "monthly_earnings_statement", hint: "what_you_earned_month_by_month_day_by_da" },
+  { to: "/wallet/ad-referrals", icon: "📣", label: "money_earned_from_ad_referrals", hint: "commissions_from_video_ads_uploaded_with" },
+  { to: "/wallet/all-videos", icon: "🎬", label: "money_earned_from_all_videos", hint: "earnings_from_your_uploaded_videos" },
   // Money earned from reposting videos: removed from the list (Steve, 2026-09-27) — the page still
   // exists at /wallet/reposts so it's one line to bring back.
   // Rewarding actions: removed from the list for now (Steve, 2026-09-24) — the page still exists

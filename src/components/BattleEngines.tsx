@@ -6,7 +6,7 @@ import { searchVirtualMembers, secondsUntil as vbSecondsUntil, clock as vbClock,
 import { useEffect as useEffectVB, useRef as useRefVB, useState as useStateVB } from "react";
 import { displayName, type UserSummary } from "../lib/api";
 import { clock, secondsUntil, type B555Data, type Battle2v2Data, type Invite2v2, type MarathonData, type SeriesData } from "../lib/battles";
-import { tt, useT } from "../lib/i18n";
+import { tt, useT, type StringKey } from "../lib/i18n";
 
 export interface Person { user_id: number; fullname?: string | null; username?: string | null; profile_image?: string | null }
 export type NameOf = (id: number | null | undefined) => string;
@@ -42,53 +42,55 @@ export type BattleKind =
  *  type that exists on the phones but has no web engine yet; it stays visible with its
  *  explanation rather than silently missing, and says so on tap. */
 export const BATTLE_KINDS: {
-  kind: BattleKind; title: string; blurb: string; minPeople: number;
+  // title/blurb/info are translation KEYS: this is module-level data with no hook, so the
+  // data carries keys and whatever renders it translates them.
+  kind: BattleKind; title: StringKey; blurb: StringKey; minPeople: number;
   /** Absent on the reference rows — the phones leave those unnumbered too. */
-  number?: string; info: string; built?: boolean;
+  number?: string; info: StringKey; built?: boolean;
   /** Opens a screen or an explanation instead of starting a battle: never people-gated. */
   reference?: boolean;
 }[] = [
-  { kind: "1v1", number: "#1", title: "Bingg Bongg Battle", blurb: "1v1 · 5 minutes · most coins wins", minPeople: 2,
-    info: "Challenge another live streamer to a real-time, gift-scored battle. A 5-minute countdown starts the moment both sides accept — whoever's received the most gifts when time runs out wins." },
-  { kind: "gameLimit", number: "#2", title: "Game Limit", blurb: "1v1 · first to your coin target", minPeople: 2,
-    info: "Same as Bingg Bongg Battle, but you and your opponent agree on a custom coin target before starting. First to reach it wins instantly — if neither gets there in 5 minutes, whoever has the most coins wins." },
-  { kind: "virtual", number: "#3", title: "Virtual Battle", blurb: "Host live, battle members who aren't", minPeople: 1,
-    info: "You go live, then pick up to 3 members to battle with — any mix of guests already in your room and virtual members who aren't live, shown by the photo or looping video they chose. Everyone's followers get notified so they can jump in and gift — every gift is logged with the sender's name so you know exactly who to thank." },
-  { kind: "series", number: "#4", title: "Best Out Of", blurb: "Best of 3 to 11 · 5-minute rounds", minPeople: 2,
-    info: "A best-of series (3, 5, 7, 9, or 11 rounds), with up to 4 players in the battle. Each round is its own Bingg Bongg Battle — whoever wins the majority of rounds wins the series." },
-  { kind: "challenge31", number: "#5", title: "31 Day Battle Challenge", blurb: "Battle daily for 31 days · up to 15% bonus", minPeople: 1, reference: true,
-    info: "A personal 31-day streak, starting whenever you opt in. Battle at least once a day to keep your streak alive — hit 1, 2, or 3+ qualifying battles a day for a 5%, 10%, or 15% bonus on everything you earn that month. Miss a day and the streak restarts." },
-  { kind: "555", number: "#6", title: "5-5-5", blurb: "5 games · 5 minutes · 5,000 coins", minPeople: 2,
-    info: "Race to finish 5 games first, against up to 3 other players. Each game: first to 5000 coins wins, on your own 5-minute clock — you can start your next game the moment you finish one, even if others are still on theirs. Whoever completes all 5 games first wins the whole battle." },
-  { kind: "marathon", number: "#7", title: "No Time Limit", blurb: "First to 100,000 coins wins", minPeople: 2,
-    info: "Race to 100,000 points against up to 4 players — no time limit at all. Play as much or as little as you want and pick it back up anytime; the battle stays open until someone reaches 100,000. Everyone gets paid for whatever they've earned, even if all players agree to cancel it before it's won." },
-  { kind: "2v2", number: "#8", title: "2v2 Battle", blurb: "Two teams of two · 5 minutes", minPeople: 4,
-    info: "2 hosts team up against 2 other hosts, all 4 in this same live room. Pick a teammate, then 2 opponents — a 5-minute countdown starts once everyone accepts, and whichever TEAM'S combined gifts are highest when time runs out wins." },
+  { kind: "1v1", number: "#1", title: "bingg_bongg_battle", blurb: "n1v1_5_minutes_most_coins_wins", minPeople: 2,
+    info: "challenge_another_live_streamer_to_a_rea" },
+  { kind: "gameLimit", number: "#2", title: "game_limit", blurb: "n1v1_first_to_your_coin_target", minPeople: 2,
+    info: "same_as_bingg_bongg_battle_but_you_and_y" },
+  { kind: "virtual", number: "#3", title: "virtual_battle", blurb: "host_live_battle_members_who_aren_t", minPeople: 1,
+    info: "you_go_live_then_pick_up_to_3_members_to" },
+  { kind: "series", number: "#4", title: "best_out_of", blurb: "best_of_3_to_11_5_minute_rounds", minPeople: 2,
+    info: "a_best_of_series_3_5_7_9_or_11_rounds_wi" },
+  { kind: "challenge31", number: "#5", title: "n31_day_battle_challenge", blurb: "battle_daily_for_31_days_up_to_15_bonus", minPeople: 1, reference: true,
+    info: "a_personal_31_day_streak_starting_whenev" },
+  { kind: "555", number: "#6", title: "n5_5_5", blurb: "n5_games_5_minutes_5_000_coins", minPeople: 2,
+    info: "race_to_finish_5_games_first_against_up" },
+  { kind: "marathon", number: "#7", title: "no_time_limit", blurb: "first_to_100_000_coins_wins", minPeople: 2,
+    info: "race_to_100_000_points_against_up_to_4_p" },
+  { kind: "2v2", number: "#8", title: "n2v2_battle", blurb: "two_teams_of_two_5_minutes", minPeople: 4,
+    info: "n2_hosts_team_up_against_2_other_hosts_al" },
   // Solo Battle needs nobody else on screen — the room's viewers are the entrants, so
   // minPeople is 1. Starting one is host-only, gated at the call site like the phones do.
-  { kind: "solo", number: "#9", title: "Solo Battle With Unlimited Players", blurb: "Anyone watching can join and compete", minPeople: 1,
-    info: "Start one instantly, no admin needed. Everyone watching gets 2 minutes to go live and join — whoever's received the most gifts when it ends wins. Tap any name on the leaderboard to jump straight to their live." },
+  { kind: "solo", number: "#9", title: "solo_battle_with_unlimited_players_2", blurb: "anyone_watching_can_join_and_compete", minPeople: 1,
+    info: "start_one_instantly_no_admin_needed_ever" },
   // Steve, 2026-09-27: "Hide & Seek" — 5 minutes, scores hidden until the end, 2-4 players free
   // for all or 2v2 teams. Runs on the Best Out Of (single round) and 2v2 engines with hide_scores.
-  { kind: "hideSeek", number: "#10", title: "Hide & Seek", blurb: "5 minutes · scores hidden until the end", minPeople: 2,
-    info: "A 5-minute battle where nobody can see the scores — not the players, not the room — until the clock runs out and both sides are revealed at once. Play it 1v1, with 3 or 4 players free for all, or as 2v2 teams. Most gift coins wins; fun and nerve-wracking to the last second." },
+  { kind: "hideSeek", number: "#10", title: "hide_seek_2", blurb: "n5_minutes_scores_hidden_until_the_end", minPeople: 2,
+    info: "a_5_minute_battle_where_nobody_can_see_t" },
   // Steve, 2026-10-11: "Bingg Bongg Bingo Battle". minPeople is 1 because a solo game is real
   // — the host always gets a card and the room's VIEWERS are the ones who buy squares, so
   // there is nobody who has to be on screen for it to work.
-  { kind: "bingo", number: "#11", title: "Bingg Bongg Bingo", blurb: "Viewers buy squares on your card", minPeople: 1,
-    info: "Everyone in the room gets a bingo card — play it on your own or with up to 3 others, each on a different card. Viewers double-click any number to gift it, and that square goes under a gold cover carrying THEIR name, so the card fills up with the people who paid for it. Vertical, horizontal, diagonal, 4 corners, X and the whole card all count, and the game keeps going until somebody covers a whole card — so one game can have six different winners. The host sets what a square costs." },
+  { kind: "bingo", number: "#11", title: "bingg_bongg_bingo", blurb: "viewers_buy_squares_on_your_card", minPeople: 1,
+    info: "everyone_in_the_room_gets_a_bingo_card_p" },
   // Unnumbered from here down, exactly as on the phones: these aren't battles you can start, so
   // they carry no "#n" and never check how many people are on screen.
-  { kind: "pkContests", title: "PK Battle Contests", blurb: "Admin-run · scored by gift coins", minPeople: 1, reference: true,
-    info: "Admin-run contests, scored by total gift coins received while they're running. Geographic contests pit real member locations against each other (e.g. USA vs Canada); Member contests are a curated list (e.g. \"top 20\"). Free to enter, no charge to battle — whoever's highest when it ends gets lifetime bragging rights." },
-  { kind: "gamesExplained", title: "Games Explained", blurb: "Play games while you battle", minPeople: 1, reference: true,
-    info: "You can play any of our games — Balloon Pop, Fishing, Deer Hunting, and more — anytime, even while you're in a battle. Every member in the room can jump into a game whenever they want, battling or not." },
-  { kind: "lifetimeBoard", title: "Lifetime Battle Board", blurb: "Every contest, all time", minPeople: 1, reference: true,
-    info: "Your full battle history, going back to day one — browse it day by day within a month, or month by month across a year. Tap into your history with any one member to see your total wins, lifetime score, and trash talk with them. Visible on your own profile and everyone else's." },
-  { kind: "bingoBoard", title: "Bingo Battle Board", blurb: "Every bingo game ever played", minPeople: 1, reference: true,
-    info: "Every Bingg Bongg Bingo game ever played, numbered from 1 and never reset, newest first. Tap any game to see who won it and which pattern each of them got — vertical, horizontal, diagonal, 4 corners, X or the whole card. A game can have six different winners, and they all stay on the board for good." },
-  { kind: "punishments", title: "Friendly Punishment Suggestions", blurb: "Agree a forfeit before you start", minPeople: 1, reference: true,
-    info: "Battling just for fun? Agree on a friendly punishment for whoever loses before you start — tap in for a random pick, or browse the full list together. Admin-managed, so the list keeps growing." },
+  { kind: "pkContests", title: "pk_battle_contests", blurb: "admin_run_scored_by_gift_coins", minPeople: 1, reference: true,
+    info: "admin_run_contests_scored_by_total_gift" },
+  { kind: "gamesExplained", title: "games_explained", blurb: "play_games_while_you_battle", minPeople: 1, reference: true,
+    info: "you_can_play_any_of_our_games_balloon_po" },
+  { kind: "lifetimeBoard", title: "lifetime_battle_board_2", blurb: "every_contest_all_time", minPeople: 1, reference: true,
+    info: "your_full_battle_history_going_back_to_d" },
+  { kind: "bingoBoard", title: "bingo_battle_board_2", blurb: "every_bingo_game_ever_played", minPeople: 1, reference: true,
+    info: "every_bingg_bongg_bingo_game_ever_played" },
+  { kind: "punishments", title: "friendly_punishment_suggestions", blurb: "agree_a_forfeit_before_you_start", minPeople: 1, reference: true,
+    info: "battling_just_for_fun_agree_on_a_friendl" },
 ];
 
 /** Step 1 of the Battle button: which kind of battle. Numbered and with an (i) per row,
@@ -100,8 +102,8 @@ export function BattleMenu({ peopleOnScreen, onPick, onClose, onNotice }: { peop
 
   if (info) {
     return (
-      <Overlay title={info.title} onClose={() => setInfo(null)} width={560}>
-        <p className="soft" style={{ marginTop: 0, whiteSpace: "pre-line" }}>{info.info}</p>
+      <Overlay title={t(info.title)} onClose={() => setInfo(null)} width={560}>
+        <p className="soft" style={{ marginTop: 0, whiteSpace: "pre-line" }}>{t(info.info)}</p>
         <button className="btn ghost block" onClick={() => setInfo(null)}>{t("back")}</button>
       </Overlay>
     );
@@ -121,16 +123,16 @@ export function BattleMenu({ peopleOnScreen, onPick, onClose, onNotice }: { peop
           <div key={k.kind} className="battle-row">
             <button className="btn block battle-kind"
               onClick={() => {
-                if (k.built === false) { onNotice(`${k.title} is coming soon.`); return; }
-                if (!ok) { onNotice(`${k.title} needs ${k.minPeople} people on screen — you have ${peopleOnScreen}.`); return; }
+                if (k.built === false) { onNotice(t("x_is_coming_soon", t(k.title))); return; }
+                if (!ok) { onNotice(t("x_needs_n_people_on_screen", t(k.title), k.minPeople, peopleOnScreen)); return; }
                 // Games Explained has nothing to select — it IS the explanation — so tapping the
                 // row opens the same popup its (i) does, rather than a dead "coming soon". Same
                 // exception the phones make for this one row.
                 if (k.kind === "gamesExplained") { setInfo(k); return; }
                 onPick(k.kind);
               }}>
-              <span className="kind-title">{k.number ? `${k.number} ` : ""}{k.title}</span>
-              <span className="kind-blurb muted">{k.blurb}</span>
+              <span className="kind-title">{k.number ? `${k.number} ` : ""}{t(k.title)}</span>
+              <span className="kind-blurb muted">{t(k.blurb)}</span>
               {ok && k.built !== false ? <span className="kind-go">›</span> : (
                 // Two spellings of the same pill: CSS shows the long one normally and the short
                 // one on a phone. Truncating the TITLE to keep "Needs 2 people" whole gets the
@@ -142,7 +144,7 @@ export function BattleMenu({ peopleOnScreen, onPick, onClose, onNotice }: { peop
                 </span>
               )}
             </button>
-            <button className="btn ghost battle-info" title={`About ${k.title}`} onClick={() => setInfo(k)}>i</button>
+            <button className="btn ghost battle-info" title={t("about_x", t(k.title))} onClick={() => setInfo(k)}>i</button>
           </div>
         );
       })}

@@ -69,8 +69,8 @@ export function WalletPage() {
           <Link key={l.to} to={l.to} className="card pad wallet-link">
             <span className="ico">{l.icon}</span>
             <span style={{ flex: 1, minWidth: 0 }}>
-              <b style={{ color: "var(--gold)" }}>{l.label}</b>
-              <span className="muted" style={{ display: "block", fontSize: 12 }}>{l.hint}</span>
+              <b style={{ color: "var(--gold)" }}>{t(l.label)}</b>
+              <span className="muted" style={{ display: "block", fontSize: 12 }}>{t(l.hint)}</span>
             </span>
             <span style={{ color: "var(--gold)", fontSize: 22 }}>›</span>
           </Link>

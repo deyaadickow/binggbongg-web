@@ -4,94 +4,98 @@
 import { NavLink } from "react-router-dom";
 import { useSession } from "../lib/session";
 import { APP_STORE_URL, PLAY_STORE_URL } from "./Common";
-import { useT } from "../lib/i18n";
+import { useT, type StringKey } from "../lib/i18n";
 
-export interface SideLink { to: string; label: string; icon: string; external?: boolean; needsLogin?: boolean; action?: "signout" }
-export interface SideSection { title?: string; links: SideLink[] }
+// `label` is a translation KEY, not text. sidebarSections() is a plain function with no hook,
+// so the data carries the key and the view translates it; typing it as StringKey means a
+// consumer that forgets to translate is a compile error rather than an English label.
+export interface SideLink { to: string; label: StringKey; icon: string; external?: boolean; needsLogin?: boolean; action?: "signout" }
+export interface SideSection { title?: StringKey; links: SideLink[] }
 
 export function sidebarSections(userId: number | null): SideSection[] {
   return [
     { links: [
-      { to: "/", label: "For You", icon: "🏠" },
-      { to: "/exciting-news", label: "Exciting News", icon: "📣" },
-      { to: "/upcoming", label: "L & B", icon: "🗓" },
-      { to: "/business", label: "Business", icon: "🏪" },
-      { to: "/live", label: "Live Now", icon: "🔴" },
+      { to: "/", label: "for_you", icon: "🏠" },
+      { to: "/exciting-news", label: "exciting_news", icon: "📣" },
+      { to: "/upcoming", label: "l_and_b", icon: "🗓" },
+      { to: "/business", label: "business", icon: "🏪" },
+      { to: "/live", label: "live_now", icon: "🔴" },
       // Your own live Bingg Bongg show (Steve, 2026-10-17).
-      { to: "/shows", label: "Shows", icon: "📺" },
+      { to: "/shows", label: "shows", icon: "📺" },
       // Video Ad Gig (Steve, 2026-10-17).
-      { to: "/gigs", label: "Video Ad Gig", icon: "🎥" },
+      { to: "/gigs", label: "video_ad_gig", icon: "🎥" },
       // Steve, 2026-10-18: "add a tab on main feed for 'Go live on 6 platforms' and when tapped
       // link them right to that page on their settings." The phones put a chip on the feed; the
       // web's feed-level navigation is this list, so it goes here — pointing at the same
       // Simulcast page that already sits under Account.
-      { to: "/settings/simulcast", label: "Go live on 6 platforms", icon: "📡", needsLogin: true },
-      { to: "/search", label: "Search", icon: "🔍" },
+      { to: "/settings/simulcast", label: "go_live_on_6_platforms", icon: "📡", needsLogin: true },
+      { to: "/search", label: "search", icon: "🔍" },
       // Steve, 2026-10-11: "Yes please start the direct messages on the web."
-      { to: "/messages", label: "Messages", icon: "💬", needsLogin: true },
+      { to: "/messages", label: "messages", icon: "💬", needsLogin: true },
       // Steve, 2026-10-18: "Add the notification record so members can read it later."
-      { to: "/notifications", label: "Notifications", icon: "🔔", needsLogin: true },
-      { to: "/upload", label: "Upload video", icon: "🎬", needsLogin: true },
-      { to: "/photos-directory", label: "Photos", icon: "📷", needsLogin: true },
-      { to: "/photos", label: "My photos", icon: "🖼️", needsLogin: true },
-      { to: "/upload-photos", label: "Upload photos", icon: "⬆️", needsLogin: true },
-      { to: "/enter-contest", label: "Enter a contest", icon: "🏆", needsLogin: true },
-      { to: "/go-live", label: "Go Live", icon: "📡", needsLogin: true },
-      { to: "/my-show", label: "My Show", icon: "🎙", needsLogin: true },
-      { to: "/my-gigs", label: "My Gigs", icon: "🎬", needsLogin: true },
+      { to: "/notifications", label: "notifications", icon: "🔔", needsLogin: true },
+      { to: "/upload", label: "upload_video", icon: "🎬", needsLogin: true },
+      { to: "/photos-directory", label: "photos", icon: "📷", needsLogin: true },
+      { to: "/photos", label: "my_photos", icon: "🖼️", needsLogin: true },
+      { to: "/upload-photos", label: "upload_photos", icon: "⬆️", needsLogin: true },
+      { to: "/enter-contest", label: "enter_a_contest", icon: "🏆", needsLogin: true },
+      { to: "/go-live", label: "go_live", icon: "📡", needsLogin: true },
+      { to: "/my-show", label: "my_show", icon: "🎙", needsLogin: true },
+      { to: "/my-gigs", label: "gig_my_gigs", icon: "🎬", needsLogin: true },
       // Lucky numbers + daily horoscope (Steve, 2026-10-09) — the feed-level door, matching
       // the Home chip on the phones. There is a second one under Account, matching their
       // Settings row; Steve asked for both.
-      { to: "/lucky", label: "Lucky Numbers", icon: "🔮", needsLogin: true },
+      { to: "/lucky", label: "lucky_numbers", icon: "🔮", needsLogin: true },
       // Steve, 2026-10-18: "add a tab for 'App Features' next to the end on main feed as well."
       // Last entry in the main list, matching where the chip sits on the phones.
-      { to: "/settings/app-features", label: "App Features", icon: "📖" },
+      { to: "/settings/app-features", label: "app_features", icon: "📖" },
     ] },
-    { title: "Account", links: [
-      { to: userId ? `/profile/${userId}` : "/login", label: "My Profile", icon: "👤", needsLogin: true },
+    { title: "account", links: [
+      { to: userId ? `/profile/${userId}` : "/login", label: "my_profile", icon: "👤", needsLogin: true },
       // Steve, 2026-09-26: "Where is support on the web?" — the 💝 Support button lives on the
       // member's own profile page; this puts Who Supported Me one click away from anywhere too.
-      { to: "/support", label: "Who Supported Me", icon: "💝", needsLogin: true },
-      { to: "/settings/account", label: "Account settings", icon: "⚙️", needsLogin: true },
-      { to: "/settings/share", label: "Share profile", icon: "🔗", needsLogin: true },
-      { to: "/settings/qr", label: "My QR code", icon: "▦", needsLogin: true },
-      { to: "/wallet", label: "Wallet", icon: "💰", needsLogin: true },
-      { to: "/settings/referrals", label: "Referrals", icon: "🤝", needsLogin: true },
-      { to: "/settings/contest-requests", label: "Contest pending requests", icon: "🏆", needsLogin: true },
-      { to: "/settings/blocked", label: "Blocked profiles", icon: "🚫", needsLogin: true },
-      { to: "/settings/moderators", label: "My Moderators", icon: "🛡️", needsLogin: true },
-      { to: "/settings/find-a-battle", label: "Find a Battle", icon: "⚔️", needsLogin: true },
-      { to: "/settings/simulcast", label: "Simulcast", icon: "📺", needsLogin: true },
-      { to: "/settings/virtual-look", label: "My Virtual Battle Look", icon: "🪞", needsLogin: true },
-      { to: "/settings/virtual-battles", label: "My Virtual Battles", icon: "🥊", needsLogin: true },
-      { to: "/settings/advertise", label: "Advertise", icon: "📣", needsLogin: true },
-      { to: "/settings/printable-ads", label: "Create Your Own Ads", icon: "🖨️", needsLogin: true },
-      { to: "/settings/business", label: "Bingg Bongg Business", icon: "💼", needsLogin: true },
-      { to: "/settings/shop", label: "Bingg Bongg Shop", icon: "🛍️", needsLogin: true },
-      { to: "/lucky", label: "Lucky Numbers & Horoscope", icon: "🔮", needsLogin: true },
-      { to: "/settings/verification", label: "Request verification", icon: "✅", needsLogin: true },
+      { to: "/support", label: "who_supported_me", icon: "💝", needsLogin: true },
+      { to: "/settings/account", label: "account_settings", icon: "⚙️", needsLogin: true },
+      { to: "/settings/share", label: "share_profile", icon: "🔗", needsLogin: true },
+      { to: "/settings/qr", label: "my_qr_code", icon: "▦", needsLogin: true },
+      { to: "/wallet", label: "wallet", icon: "💰", needsLogin: true },
+      { to: "/settings/referrals", label: "referrals", icon: "🤝", needsLogin: true },
+      { to: "/settings/contest-requests", label: "contest_pending_requests", icon: "🏆", needsLogin: true },
+      { to: "/settings/blocked", label: "blocked_profiles", icon: "🚫", needsLogin: true },
+      { to: "/settings/moderators", label: "my_moderators", icon: "🛡️", needsLogin: true },
+      { to: "/settings/find-a-battle", label: "find_a_battle", icon: "⚔️", needsLogin: true },
+      { to: "/settings/simulcast", label: "simulcast", icon: "📺", needsLogin: true },
+      { to: "/settings/virtual-look", label: "my_virtual_battle_look", icon: "🪞", needsLogin: true },
+      { to: "/settings/virtual-battles", label: "my_virtual_battles", icon: "🥊", needsLogin: true },
+      { to: "/settings/advertise", label: "advertise", icon: "📣", needsLogin: true },
+      { to: "/settings/printable-ads", label: "ads_you_can_print", icon: "🖨️", needsLogin: true },
+      { to: "/settings/business", label: "bingg_bongg_business", icon: "💼", needsLogin: true },
+      { to: "/settings/shop", label: "bingg_bongg_shop", icon: "🛍️", needsLogin: true },
+      { to: "/lucky", label: "lucky_numbers_horoscope", icon: "🔮", needsLogin: true },
+      { to: "/settings/verification", label: "request_verification", icon: "✅", needsLogin: true },
     ] },
-    { title: "General", links: [
-      { to: "/settings/language", label: "Change language", icon: "🌐" },
-      { to: "/settings/support", label: "Support", icon: "💬" },
-      { to: "/settings/terms", label: "Terms of Use", icon: "📄" },
-      { to: "/settings/privacy", label: "Privacy Policy", icon: "🔒" },
-      { to: "/settings/contact", label: "Contact Us", icon: "✉️" },
-      { to: "/settings/about", label: "About Us", icon: "ℹ️" },
-      { to: "/settings/app-features", label: "App Features Explainer", icon: "📖" },
-      { to: "/settings/faq", label: "FAQ", icon: "❓" },
-{ to: "/settings/delete-account", label: "Delete account", icon: "🗑️", needsLogin: true },
-      { to: "#signout", label: "Log out", icon: "🚪", needsLogin: true, action: "signout" },
+    { title: "general", links: [
+      { to: "/settings/language", label: "change_language", icon: "🌐" },
+      { to: "/settings/support", label: "customer_support", icon: "💬" },
+      { to: "/settings/terms", label: "terms_of_use", icon: "📄" },
+      { to: "/settings/privacy", label: "privacy_policy", icon: "🔒" },
+      { to: "/settings/contact", label: "contact_us", icon: "✉️" },
+      { to: "/settings/about", label: "about_us", icon: "ℹ️" },
+      { to: "/settings/app-features", label: "app_features_explainer", icon: "📖" },
+      { to: "/settings/faq", label: "faq", icon: "❓" },
+{ to: "/settings/delete-account", label: "delete_account", icon: "🗑️", needsLogin: true },
+      { to: "#signout", label: "log_out", icon: "🚪", needsLogin: true, action: "signout" },
     ] },
-    { title: "Get the app", links: [
-      { to: APP_STORE_URL, label: "App Store", icon: "", external: true },
-      { to: PLAY_STORE_URL, label: "Google Play", icon: "▶", external: true },
+    { title: "get_the_app", links: [
+      { to: APP_STORE_URL, label: "app_store", icon: "", external: true },
+      { to: PLAY_STORE_URL, label: "google_play", icon: "▶", external: true },
     ] },
   ];
 }
 
 /** Desktop left column. Hidden under 900px — the same links live on the Settings page then. */
 export function Sidebar() {
+  const { t } = useT();
   const { user, isLoggedIn, signOut } = useSession();
   return (
     <aside className="sidebar">
@@ -102,7 +106,7 @@ export function Sidebar() {
         if (links.length === 0) return null;
         return (
           <div key={i} className="side-section">
-            {sec.title && <div className="side-title">{sec.title}</div>}
+            {sec.title && <div className="side-title">{t(sec.title)}</div>}
             {links.map((l) => <SideLinkItem key={l.label} link={l} onSignOut={signOut} />)}
           </div>
         );
@@ -141,8 +145,9 @@ export function SiteFooter() {
 }
 
 export function SideLinkItem({ link, onSignOut, big }: { link: SideLink; onSignOut: () => void; big?: boolean }) {
+  const { t } = useT();
   const cls = `side-link${big ? " big" : ""}`;
-  if (link.action === "signout") return <button className={cls} onClick={onSignOut}><span className="ico">{link.icon}</span>{link.label}</button>;
-  if (link.external) return <a className={cls} href={link.to} target="_blank" rel="noreferrer"><span className="ico">{link.icon}</span>{link.label}<span className="ext">↗</span></a>;
-  return <NavLink className={({ isActive }) => `${cls}${isActive ? " active" : ""}`} to={link.to} end={link.to === "/"}><span className="ico">{link.icon}</span>{link.label}</NavLink>;
+  if (link.action === "signout") return <button className={cls} onClick={onSignOut}><span className="ico">{link.icon}</span>{t(link.label)}</button>;
+  if (link.external) return <a className={cls} href={link.to} target="_blank" rel="noreferrer"><span className="ico">{link.icon}</span>{t(link.label)}<span className="ext">↗</span></a>;
+  return <NavLink className={({ isActive }) => `${cls}${isActive ? " active" : ""}`} to={link.to} end={link.to === "/"}><span className="ico">{link.icon}</span>{t(link.label)}</NavLink>;
 }
