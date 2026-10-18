@@ -63,10 +63,29 @@ export interface CvCDetail extends CvCRow {
   head_to_head: CvCHeadToHead;
 }
 
-export async function fetchCountryChallenges(): Promise<{ upcoming: CvCRow[]; rows: CvCRow[]; enabled: boolean }> {
+/** A matchup that is advertised but has not started (Steve, 2026-10-18: "you can put Coming
+ *  Soon, philippines VS Indonesia…"). It is a FIXTURE, not a battle — there is no date yet. */
+export interface CvCComingSoon {
+  id: number;
+  title: string;
+  country_a_name: string;
+  country_a_code?: string | null;
+  country_b_name: string;
+  country_b_code?: string | null;
+  minutes: number;
+  /** Already running, so real battles will start appearing for it. */
+  is_running: boolean;
+}
+
+export async function fetchCountryChallenges(): Promise<{ upcoming: CvCRow[]; comingSoon: CvCComingSoon[]; rows: CvCRow[]; enabled: boolean }> {
   const r = await post<CvCRow[]>("fetchCountryChallenges", {});
-  const body = r as unknown as { upcoming?: CvCRow[]; enabled?: boolean };
-  return { upcoming: body.upcoming ?? [], rows: r.data ?? [], enabled: Boolean(body.enabled) };
+  const body = r as unknown as { upcoming?: CvCRow[]; coming_soon?: CvCComingSoon[]; enabled?: boolean };
+  return {
+    upcoming: body.upcoming ?? [],
+    comingSoon: body.coming_soon ?? [],
+    rows: r.data ?? [],
+    enabled: Boolean(body.enabled),
+  };
 }
 
 export async function fetchCountryChallenge(id: number): Promise<CvCDetail> {

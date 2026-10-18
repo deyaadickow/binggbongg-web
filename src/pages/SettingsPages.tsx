@@ -630,7 +630,19 @@ export function SupportPage() {
   useEffect(() => {
     let live = true;
     post<SupportReasonRow[]>("fetchSupportReasons", {})
-      .then((r) => { if (live) setReasons(r.data ?? []); })
+      .then((r) => {
+        if (!live) return;
+        const list = r.data ?? [];
+        setReasons(list);
+        // Arrived from somewhere that knows what this is about — the CvC page's "Suggest a
+        // country battle", for one. The reason is matched against the live list rather than
+        // trusted, so a label that has since been renamed or removed simply does not preselect.
+        const wanted = new URLSearchParams(window.location.search).get("reason");
+        if (wanted) {
+          const hit = list.find((x) => x.label.toLowerCase() === wanted.toLowerCase());
+          if (hit) setReason(hit.label);
+        }
+      })
       .catch(() => undefined);
     return () => { live = false; };
   }, []);

@@ -10,7 +10,7 @@ import { Loading, Notice } from "../components/Common";
 import { mediaUrl } from "../lib/api";
 import {
   fetchCountryChallenge, fetchCountryChallenges, flagOf,
-  type CvCDetail, type CvCPlayer, type CvCRow, type CvCSupporter,
+  type CvCComingSoon, type CvCDetail, type CvCPlayer, type CvCRow, type CvCSupporter,
 } from "../lib/countryChallenges";
 
 const gold = "var(--gold)";
@@ -20,12 +20,13 @@ const gold = "var(--gold)";
 export function CvCPage() {
   const [rows, setRows] = useState<CvCRow[] | null>(null);
   const [upcoming, setUpcoming] = useState<CvCRow[]>([]);
+  const [comingSoon, setComingSoon] = useState<CvCComingSoon[]>([]);
   const [enabled, setEnabled] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     fetchCountryChallenges()
-      .then((r) => { setRows(r.rows); setUpcoming(r.upcoming); setEnabled(r.enabled); })
+      .then((r) => { setRows(r.rows); setUpcoming(r.upcoming); setComingSoon(r.comingSoon); setEnabled(r.enabled); })
       .catch(() => { setRows([]); setError("Couldn't load the board."); });
   }, []);
 
@@ -58,6 +59,19 @@ export function CvCPage() {
         </>
       )}
 
+      {/* Steve, 2026-10-18: "keep the tab on for CvC for advertising our battles coming soon
+          between different countries." Before a single battle has been fought this is the whole
+          point of the page, so it sits above the board. */}
+      {comingSoon.length > 0 && (
+        <>
+          <h2 style={{ fontSize: 16, color: gold, marginTop: 18 }}>Coming soon</h2>
+          <div style={{ display: "grid", gap: 10 }}>
+            {comingSoon.map((m) => <ComingSoonCard key={m.id} matchup={m} />)}
+          </div>
+          <SuggestABattle />
+        </>
+      )}
+
       <h2 style={{ fontSize: 16, color: gold, marginTop: 22 }}>Bragging rights</h2>
       {rows === null && <Loading />}
       {rows !== null && rows.length === 0 && !error && (
@@ -68,6 +82,41 @@ export function CvCPage() {
         {(rows ?? []).map((c) => <BoardRow key={c.id} row={c} />)}
       </div>
     </div>
+  );
+}
+
+function ComingSoonCard({ matchup }: { matchup: CvCComingSoon }) {
+  return (
+    <div className="card pad" style={{ borderColor: "var(--gold-border)" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+        <span style={{ fontSize: 20 }}>{flagOf(matchup.country_a_code)}</span>
+        <span style={{ fontWeight: 700 }}>{matchup.country_a_name}</span>
+        <span className="muted" style={{ fontWeight: 900 }}>VS</span>
+        <span style={{ fontSize: 20 }}>{flagOf(matchup.country_b_code)}</span>
+        <span style={{ fontWeight: 700 }}>{matchup.country_b_name}</span>
+        <span style={{ flex: 1 }} />
+        <span style={{ fontSize: 12, fontWeight: 800, color: gold, letterSpacing: 0.5 }}>
+          {matchup.is_running ? "STARTING" : "COMING SOON"}
+        </span>
+      </div>
+      <p className="muted" style={{ margin: "6px 0 0", fontSize: 13 }}>
+        A {matchup.minutes} minute battle. Help your country win it.
+      </p>
+    </div>
+  );
+}
+
+/** Steve, 2026-10-18: "or make a country Battle suggestion in our support section." The reason
+ *  is a row in the support dropdown, so this only has to point at Support. */
+function SuggestABattle() {
+  return (
+    <p className="soft" style={{ marginTop: 10, fontSize: 13 }}>
+      Want to see your country here?{" "}
+      <Link to="/settings/support?reason=Suggest%20a%20country%20battle" style={{ color: gold, fontWeight: 700 }}>
+        Suggest a country battle
+      </Link>{" "}
+      and tell us which two.
+    </p>
   );
 }
 
