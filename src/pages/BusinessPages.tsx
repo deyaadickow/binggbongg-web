@@ -25,6 +25,7 @@ import {
   fetchBusinessFlyers, deleteBusinessFlyer, type BusinessFlyer
 } from "../lib/business";
 import { showGoldAlert } from "../components/GoldToast";
+import { useT } from "../lib/i18n";
 
 // Steve, 2026-10-01: "Make the countries into our design" — the native <select> is gone; every
 // dropdown is the black/gold searchable PickerSheet the Create Ad page uses, opened from a pill.
@@ -51,7 +52,8 @@ function TitlePlate({ text }: { text: string }) {
 }
 
 function VerifiedCheck() {
-  return <span title="Verified business" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 20, height: 20, borderRadius: 999, background: "var(--gold)", color: "#0d0d0d", fontSize: 12, fontWeight: 800, marginLeft: 8 }}>✓</span>;
+  const { t } = useT();
+  return <span title={t("verified_business")} style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 20, height: 20, borderRadius: 999, background: "var(--gold)", color: "#0d0d0d", fontSize: 12, fontWeight: 800, marginLeft: 8 }}>✓</span>;
 }
 
 // Steve, 2026-10-12: "The main banner please make it longer because their heads are cut off."
@@ -86,6 +88,7 @@ function BusinessCard({ b }: { b: Business }) {
 // ---- The Business tab ---------------------------------------------------------------------
 
 export function BusinessTabPage() {
+  const { t } = useT();
   const { user } = useSession();
   const [countries, setCountries] = useState<CountryRow[]>([]);
   const [categories, setCategories] = useState<BusinessCategory[]>([]);
@@ -123,11 +126,11 @@ export function BusinessTabPage() {
     <div className="page">
       {/* Steve, 2026-10-01: "remove the link + your business page from main page" — a member adds
           their own business from the Business tab on their profile page instead. */}
-      <h1 className="page-title">Business</h1>
+      <h1 className="page-title">{t("business")}</h1>
 
       <form className="row" style={{ gap: 8, marginBottom: 10 }} onSubmit={(e) => { e.preventDefault(); setQ(query.trim()); }}>
-        <input className="input" style={{ flex: 1 }} placeholder="Search businesses" value={query} onChange={(e) => setQuery(e.target.value)} />
-        <button className="btn small" type="submit">Search</button>
+        <input className="input" style={{ flex: 1 }} placeholder={t("search_businesses")} value={query} onChange={(e) => setQuery(e.target.value)} />
+        <button className="btn small" type="submit">{t("search")}</button>
       </form>
 
       <div className="row" style={{ gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
@@ -135,17 +138,17 @@ export function BusinessTabPage() {
         {countryCode && <PickerPill label={stateCode ? (states.find((s) => s.state_code === stateCode)?.name ?? stateCode) : "State"} active={!!stateCode} onClick={() => setSheet("state")} />}
         {stateCode && <PickerPill label={city || "City"} active={!!city} onClick={() => setSheet("city")} />}
         <PickerPill label={categoryId ? (categories.find((c) => c.id === categoryId)?.name ?? "Category") : "Category"} active={!!categoryId} onClick={() => setSheet("category")} />
-        {(countryCode || categoryId || q) && <button className="btn small ghost" onClick={() => { setCountryCode(""); setStateCode(""); setCity(""); setCategoryId(0); setQ(""); setQuery(""); }}>Clear</button>}
+        {(countryCode || categoryId || q) && <button className="btn small ghost" onClick={() => { setCountryCode(""); setStateCode(""); setCity(""); setCategoryId(0); setQ(""); setQuery(""); }}>{t("clear")}</button>}
       </div>
-      {sheet === "country" && <PickerSheet title="Country" noun="countries" items={splitMain(countries).rest} pinned={splitMain(countries).main} pinnedLabel="Main markets" restLabel="All countries" selected={countryCode} onPick={(code) => { setCountryCode(code); setStateCode(""); setCity(""); }} onClose={() => setSheet(null)} />}
-      {sheet === "state" && <PickerSheet title="State" noun="states" items={states.map((st) => ({ code: st.state_code!, name: st.name! }))} selected={stateCode} onPick={(code) => { setStateCode(code); setCity(""); }} onClose={() => setSheet(null)} />}
-      {sheet === "city" && <PickerSheet title="City" noun="cities" items={cities.map((c) => ({ code: c, name: c }))} selected={city} onPick={setCity} onClose={() => setSheet(null)} />}
-      {sheet === "category" && <PickerSheet title="Category" noun="categories" items={[{ code: "0", name: "All categories" }, ...categories.map((c) => ({ code: String(c.id), name: c.name }))]} selected={String(categoryId)} onPick={(code) => setCategoryId(Number(code))} onClose={() => setSheet(null)} />}
+      {sheet === "country" && <PickerSheet title={t("battle_tab_country")} noun="countries" items={splitMain(countries).rest} pinned={splitMain(countries).main} pinnedLabel="Main markets" restLabel="All countries" selected={countryCode} onPick={(code) => { setCountryCode(code); setStateCode(""); setCity(""); }} onClose={() => setSheet(null)} />}
+      {sheet === "state" && <PickerSheet title={t("state")} noun="states" items={states.map((st) => ({ code: st.state_code!, name: st.name! }))} selected={stateCode} onPick={(code) => { setStateCode(code); setCity(""); }} onClose={() => setSheet(null)} />}
+      {sheet === "city" && <PickerSheet title={t("city")} noun="cities" items={cities.map((c) => ({ code: c, name: c }))} selected={city} onPick={setCity} onClose={() => setSheet(null)} />}
+      {sheet === "category" && <PickerSheet title={t("category")} noun="categories" items={[{ code: "0", name: "All categories" }, ...categories.map((c) => ({ code: String(c.id), name: c.name }))]} selected={String(categoryId)} onPick={(code) => setCategoryId(Number(code))} onClose={() => setSheet(null)} />}
 
       {nearText && items && items.length > 0 && <p className="muted" style={{ fontSize: 13, color: "var(--gold)" }}>Showing businesses near you first — {nearText}</p>}
       {error && <Notice error>{error}</Notice>}
       {items === null ? <Loading /> : items.length === 0 ? (
-        <Notice>No businesses here yet. Be the first — add a business page from the Business tab on your profile.</Notice>
+        <Notice>{t("no_businesses_here_yet_be_the_first_add")}</Notice>
       ) : (
         <div className="grid wide">{items.map((b) => <BusinessCard key={b.id} b={b} />)}</div>
       )}
@@ -156,6 +159,7 @@ export function BusinessTabPage() {
 // ---- A business's page --------------------------------------------------------------------
 
 export function BusinessPage() {
+  const { t } = useT();
   const { id } = useParams();
   const { user } = useSession();
   const navigate = useNavigate();
@@ -278,7 +282,7 @@ export function BusinessPage() {
               you pick the folder before uploading, so say plainly where an upload is going and
               let it be changed here, rather than leaving it implied by the open tab. */}
           <div className="row" style={{ gap: 8, flexWrap: "wrap", marginTop: 10 }}>
-            <span className="muted">Upload into:</span>
+            <span className="muted">{t("upload_into")}</span>
             <GoldSelect
               ariaLabel="Upload into"
               style={{ maxWidth: 220, flex: "1 1 180px" }}
@@ -298,9 +302,9 @@ export function BusinessPage() {
           <div className="row" style={{ gap: 8, flexWrap: "wrap", marginTop: 8 }}>
             <label className="btn small">Upload Photos<input type="file" accept="image/*" hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) upload("photo", f); e.target.value = ""; }} /></label>
             <label className="btn small">Upload Video<input type="file" accept="video/*" hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) upload("video", f); e.target.value = ""; }} /></label>
-            <button className="btn small" onClick={() => navigate(`/settings/business/edit/${b.id}`)}>Edit</button>
-            <button className="btn small" onClick={renew} disabled={!pricing}>Renew</button>
-            {b.is_live && <button className="btn small ghost" onClick={takeDown}>Take down</button>}
+            <button className="btn small" onClick={() => navigate(`/settings/business/edit/${b.id}`)}>{t("edit")}</button>
+            <button className="btn small" onClick={renew} disabled={!pricing}>{t("renew")}</button>
+            {b.is_live && <button className="btn small ghost" onClick={takeDown}>{t("take_down")}</button>}
           </div>
           {progress !== null && <div className="muted" style={{ marginTop: 8 }}>Uploading… {Math.round(progress * 100)}%</div>}
         </div>
@@ -338,10 +342,10 @@ export function BusinessPage() {
         )}
 
         <div className="row" style={{ gap: 8, flexWrap: "wrap", marginTop: 14 }}>
-          {b.phone && <a className="btn small" href={`tel:${b.phone}`}>Call</a>}
-          {address && <a className="btn small" href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`} target="_blank" rel="noreferrer">Directions</a>}
-          {address && <a className="btn small" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destination)}`} target="_blank" rel="noreferrer">Maps</a>}
-          {site && <a className="btn small" href={site} target="_blank" rel="noreferrer">Visit Website</a>}
+          {b.phone && <a className="btn small" href={`tel:${b.phone}`}>{t("call")}</a>}
+          {address && <a className="btn small" href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`} target="_blank" rel="noreferrer">{t("directions")}</a>}
+          {address && <a className="btn small" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destination)}`} target="_blank" rel="noreferrer">{t("maps")}</a>}
+          {site && <a className="btn small" href={site} target="_blank" rel="noreferrer">{t("visit_website")}</a>}
         </div>
       </div>
 
@@ -349,15 +353,15 @@ export function BusinessPage() {
           the button that makes one (Steve, 2026-10-05). */}
       {(flyers.length > 0 || isOwner) && (
         <div className="card pad" style={{ marginTop: 12 }}>
-          <b style={{ color: "var(--gold)", fontSize: 16 }}>Flyers</b>
+          <b style={{ color: "var(--gold)", fontSize: 16 }}>{t("flyers")}</b>
           {flyers.map((flyer) => (
             <div key={flyer.id} style={{ position: "relative", marginTop: 10 }}>
-              <img src={flyer.image_url ?? ""} alt="Flyer" style={{ width: "100%", display: "block", borderRadius: 8 }} />
+              <img src={flyer.image_url ?? ""} alt={t("flyer")} style={{ width: "100%", display: "block", borderRadius: 8 }} />
               {(flyer.clips ?? []).map((clip) => (
                 <button
                   key={clip.id}
                   onClick={() => clip.video_url && setPlayingClip(clip.video_url)}
-                  title="Watch this video"
+                  title={t("watch_this_video")}
                   style={{
                     position: "absolute",
                     left: `${clip.x * 100}%`,
@@ -387,8 +391,7 @@ export function BusinessPage() {
                     } catch (e) { setToast((e as Error).message); }
                   }}
                 >
-                  Remove this flyer
-                </button>
+                  {t("remove_this_flyer")}</button>
               )}
             </div>
           ))}
@@ -399,8 +402,7 @@ export function BusinessPage() {
               style={{ width: "100%", marginTop: 12, padding: "12px 0", fontWeight: 700 }}
               onClick={() => navigate(`/settings/printable-ads?assistant=${businessId}`)}
             >
-              ✨  Ask Bingg Bongg Assistant to make my ad
-            </button>
+              {t("ask_bingg_bongg_assistant_to_make_my_ad")}</button>
           )}
           <div className="muted" style={{ fontSize: 12, marginTop: 8 }}>
             {flyers.length === 0 ? "No flyers on this page yet." : "Click a video on the flyer to watch it."}
@@ -416,7 +418,7 @@ export function BusinessPage() {
           <video src={playingClip} controls autoPlay style={{ maxWidth: "100%", maxHeight: "100%" }} onClick={(e) => e.stopPropagation()} />
           <button
             onClick={() => setPlayingClip(null)}
-            aria-label="Close"
+            aria-label={t("close")}
             style={{ position: "absolute", top: 20, right: 20, width: 42, height: 42, borderRadius: 21, background: "rgba(0,0,0,.6)", color: "#fff", border: "1px solid #fff", fontSize: 20, cursor: "pointer" }}
           >
             ✕
@@ -426,7 +428,7 @@ export function BusinessPage() {
 
       {Object.values(hours).some(Boolean) && (
         <div className="card pad" style={{ marginTop: 12 }}>
-          <b style={{ color: "var(--gold)", fontSize: 16 }}>Hours</b>
+          <b style={{ color: "var(--gold)", fontSize: 16 }}>{t("hours")}</b>
           <table style={{ marginTop: 8, borderCollapse: "collapse" }}><tbody>
             {DAYS.map(([k, label]) => <tr key={k}><td className="muted" style={{ paddingRight: 24, paddingBottom: 4 }}>{label}</td><td>{hours[k] || "—"}</td></tr>)}
           </tbody></table>
@@ -435,17 +437,17 @@ export function BusinessPage() {
 
       <div className="card pad" style={{ marginTop: 12 }}>
         <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
-          <button className={`btn small${activeFolder === null && !showVideos ? "" : " ghost"}`} onClick={() => { setFolderId(null); setShowVideos(false); }}>Photos</button>
-          <button className={`btn small${activeFolder === null && showVideos ? "" : " ghost"}`} onClick={() => { setFolderId(null); setShowVideos(true); }}>Videos</button>
+          <button className={`btn small${activeFolder === null && !showVideos ? "" : " ghost"}`} onClick={() => { setFolderId(null); setShowVideos(false); }}>{t("photos")}</button>
+          <button className={`btn small${activeFolder === null && showVideos ? "" : " ghost"}`} onClick={() => { setFolderId(null); setShowVideos(true); }}>{t("videos")}</button>
           {folders.map((f) => (
             <button key={f.id} className={`btn small${activeFolder === f.id ? "" : " ghost"}`} onClick={() => setFolderId(f.id)}>{f.name}</button>
           ))}
-          {isOwner && <button className="btn small ghost" onClick={addFolder}>+ Folder</button>}
+          {isOwner && <button className="btn small ghost" onClick={addFolder}>{t("folder")}</button>}
         </div>
         {isOwner && activeFolder !== null && (
           <div className="row" style={{ gap: 8, marginTop: 8 }}>
-            <button className="btn small ghost" onClick={renameFolder}>Rename</button>
-            <button className="btn small ghost" onClick={removeFolder}>Delete folder</button>
+            <button className="btn small ghost" onClick={renameFolder}>{t("rename")}</button>
+            <button className="btn small ghost" onClick={removeFolder}>{t("delete_folder")}</button>
           </div>
         )}
         {media.length === 0 ? <p className="muted" style={{ marginTop: 10 }}>{activeFolder !== null ? "Nothing in this folder yet." : showVideos ? "No videos yet." : "No photos yet."}</p> : (
@@ -465,8 +467,8 @@ export function BusinessPage() {
           <div onClick={(e) => e.stopPropagation()} style={{ maxWidth: "92vw", maxHeight: "90vh" }}>
             {viewing.type === "video" ? <video src={viewing.file_url} controls autoPlay style={{ maxWidth: "92vw", maxHeight: "80vh" }} /> : <img src={viewing.file_url} alt="" style={{ maxWidth: "92vw", maxHeight: "80vh", objectFit: "contain" }} />}
             <div className="row" style={{ gap: 8, justifyContent: "center", marginTop: 10 }}>
-              {isOwner && <button className="btn small ghost" onClick={() => remove(viewing)}>Delete</button>}
-              <button className="btn small" onClick={() => setViewing(null)}>Close</button>
+              {isOwner && <button className="btn small ghost" onClick={() => remove(viewing)}>{t("delete")}</button>}
+              <button className="btn small" onClick={() => setViewing(null)}>{t("close")}</button>
             </div>
           </div>
         </div>
@@ -481,6 +483,7 @@ export function BusinessPage() {
  * "Add a business tab in the public profile page for everyone to see his business."
  */
 export function MemberBusinessesPanel({ userId }: { userId: number }) {
+  const { t } = useT();
   const [items, setItems] = useState<Business[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -493,7 +496,7 @@ export function MemberBusinessesPanel({ userId }: { userId: number }) {
 
   if (error) return <Notice error>{error}</Notice>;
   if (items === null) return <Loading />;
-  if (items.length === 0) return <p className="muted" style={{ padding: "24px 0", textAlign: "center" }}>No business pages yet.</p>;
+  if (items.length === 0) return <p className="muted" style={{ padding: "24px 0", textAlign: "center" }}>{t("no_business_pages_yet")}</p>;
   return <div className="grid wide">{items.map((b) => <BusinessCard key={b.id} b={b} />)}</div>;
 }
 
@@ -506,6 +509,7 @@ export function MemberBusinessesPanel({ userId }: { userId: number }) {
  * /settings/business.
  */
 export function MyBusinessesPanel() {
+  const { t } = useT();
   const { user, isLoggedIn } = useSession();
   const [mine, setMine] = useState<MyBusinesses | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -516,7 +520,7 @@ export function MyBusinessesPanel() {
     fetchMyBusinesses(user.id).then(setMine).catch((e) => setError((e as Error).message));
   }, [user]);
 
-  if (!isLoggedIn) return <Notice>Sign in to list your business. <Link to="/login">Sign in</Link></Notice>;
+  if (!isLoggedIn) return <Notice>Sign in to list your business. <Link to="/login">{t("sign_in")}</Link></Notice>;
   if (error) return <Notice error>{error}</Notice>;
   if (!mine) return <Loading />;
   const p = mine.pricing;
@@ -524,13 +528,13 @@ export function MyBusinessesPanel() {
   return (
     <>
       <div className="card pad" style={{ textAlign: "center" }}>
-        <b style={{ color: "var(--gold)", fontSize: 18 }}>Your Business Page</b>
+        <b style={{ color: "var(--gold)", fontSize: 18 }}>{t("your_business_page")}</b>
         {p && <div style={{ color: "var(--gold)", marginTop: 6 }}>{usd(p.price_per_day)}/day · {usd(p.term_price)} for {p.term_days} days, paid up front</div>}
         <div style={{ color: "var(--gold)", marginTop: 4 }}>Cash Account balance: {usd(mine.cash_balance)}</div>
-        <div className="muted" style={{ fontSize: 12, marginTop: 6 }}>Cancel anytime. No refunds. Your page shows a gold verified check while it is paid up.</div>
+        <div className="muted" style={{ fontSize: 12, marginTop: 6 }}>{t("cancel_anytime_no_refunds_your_page_show")}</div>
         <div className="row" style={{ gap: 8, justifyContent: "center", flexWrap: "wrap", marginTop: 12 }}>
-          <Link className="btn small" to="/settings/advertise">Add money to your cash account</Link>
-          {p?.enabled !== false && <Link className="btn small" style={{ background: "var(--gold)", color: "#0d0d0d" }} to="/settings/business/new">+ Create a business page</Link>}
+          <Link className="btn small" to="/settings/advertise">{t("fund_ad_cash_account")}</Link>
+          {p?.enabled !== false && <Link className="btn small" style={{ background: "var(--gold)", color: "#0d0d0d" }} to="/settings/business/new">{t("create_a_business_page")}</Link>}
         </div>
       </div>
 
@@ -544,7 +548,7 @@ export function MyBusinessesPanel() {
         </div>
       )}
 
-      {mine.data.length === 0 ? <Notice>You don't have a business page yet.</Notice> : (
+      {mine.data.length === 0 ? <Notice>{t("you_don_t_have_a_business_page_yet")}</Notice> : (
         <div className="grid wide" style={{ marginTop: 12 }}>
           {mine.data.map((b) => (
             <div key={b.id} className="card">
@@ -553,8 +557,8 @@ export function MyBusinessesPanel() {
                 <div style={{ display: "flex", alignItems: "center" }}><b style={{ color: "var(--gold)", fontSize: 16 }}>{b.name}</b>{b.is_verified && <VerifiedCheck />}</div>
                 <div className="muted" style={{ fontSize: 13, color: b.is_live ? undefined : "#FF8A80" }}>{statusText(b)} · {b.views} views</div>
                 <div className="row" style={{ gap: 8, marginTop: 10 }}>
-                  <Link className="btn small" to={`/business/${b.id}`}>Open page</Link>
-                  {!b.is_live && b.status !== "suspended" && <Link className="btn small" style={{ background: "var(--gold)", color: "#0d0d0d" }} to={`/business/${b.id}`}>Renew</Link>}
+                  <Link className="btn small" to={`/business/${b.id}`}>{t("open_page")}</Link>
+                  {!b.is_live && b.status !== "suspended" && <Link className="btn small" style={{ background: "var(--gold)", color: "#0d0d0d" }} to={`/business/${b.id}`}>{t("renew")}</Link>}
                 </div>
               </div>
             </div>
@@ -577,6 +581,7 @@ export function MyBusinessesPage() {
 // ---- Create / edit --------------------------------------------------------------------------
 
 export function CreateBusinessPage() {
+  const { t } = useT();
   const { user, isLoggedIn } = useSession();
   const { id } = useParams();
   const [params] = useSearchParams();
@@ -628,7 +633,7 @@ export function CreateBusinessPage() {
     } catch (err) { setError((err as Error).message); } finally { setBusy(false); setProgress(null); }
   }
 
-  if (!isLoggedIn) return <div className="page"><Notice>Sign in to list your business. <Link to="/login">Sign in</Link></Notice></div>;
+  if (!isLoggedIn) return <div className="page"><Notice>Sign in to list your business. <Link to="/login">{t("sign_in")}</Link></Notice></div>;
   if (!loaded) return <div className="page">{error ? <Notice error>{error}</Notice> : <Loading />}</div>;
 
   return (
@@ -636,8 +641,8 @@ export function CreateBusinessPage() {
       <TitlePlate text={editingId ? "Edit business page" : "Create a business page"} />
       <form onSubmit={submit} style={{ display: "grid", gap: 12 }}>
         <div className="card pad">
-          <b style={{ color: "var(--gold)" }}>Banner</b>
-          <div className="muted" style={{ fontSize: 12 }}>Shows side to side across the top of your page.</div>
+          <b style={{ color: "var(--gold)" }}>{t("banner")}</b>
+          <div className="muted" style={{ fontSize: 12 }}>{t("shows_side_to_side_across_the_top_of_you")}</div>
           <div style={{ aspectRatio: "16 / 6", background: "#000", border: "1.5px solid var(--gold-border)", borderRadius: 10, overflow: "hidden", marginTop: 8 }}>
             {(banner || bannerUrl) && <img src={banner ? URL.createObjectURL(banner) : bannerUrl!} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />}
           </div>
@@ -645,18 +650,18 @@ export function CreateBusinessPage() {
         </div>
 
         <div className="card pad" style={{ display: "grid", gap: 8 }}>
-          <b style={{ color: "var(--gold)" }}>Business</b>
-          <input className="input" placeholder="Business name" value={form.name} onChange={(e) => set("name", e.target.value)} required />
+          <b style={{ color: "var(--gold)" }}>{t("business")}</b>
+          <input className="input" placeholder={t("business_name")} value={form.name} onChange={(e) => set("name", e.target.value)} required />
           <div><PickerPill label={form.category_id ? (categories.find((c) => c.id === form.category_id)?.name ?? "Category") : "Category"} active={!!form.category_id} onClick={() => setSheet("category")} /></div>
-          <textarea className="input" rows={4} placeholder="Describe your business" value={form.description} onChange={(e) => set("description", e.target.value)} />
-          <input className="input" placeholder="Phone" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
-          <input className="input" placeholder="Email" type="email" value={form.email} onChange={(e) => set("email", e.target.value)} />
-          <input className="input" placeholder="Website or any link" value={form.website} onChange={(e) => set("website", e.target.value)} />
+          <textarea className="input" rows={4} placeholder={t("describe_your_business")} value={form.description} onChange={(e) => set("description", e.target.value)} />
+          <input className="input" placeholder={t("phone")} value={form.phone} onChange={(e) => set("phone", e.target.value)} />
+          <input className="input" placeholder={t("email")} type="email" value={form.email} onChange={(e) => set("email", e.target.value)} />
+          <input className="input" placeholder={t("website_or_any_link")} value={form.website} onChange={(e) => set("website", e.target.value)} />
         </div>
 
         <div className="card pad" style={{ display: "grid", gap: 8 }}>
-          <b style={{ color: "var(--gold)" }}>Where</b>
-          <div className="muted" style={{ fontSize: 12 }}>People find you by country, state and city.</div>
+          <b style={{ color: "var(--gold)" }}>{t("where")}</b>
+          <div className="muted" style={{ fontSize: 12 }}>{t("people_find_you_by_country_state_and_cit")}</div>
           <label className="row" style={{ gap: 8 }}><input type="checkbox" checked={form.is_online} onChange={(e) => set("is_online", e.target.checked)} /> Online service</label>
           <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
             <PickerPill label={form.country_code ? (countries.find((c) => c.iso2 === form.country_code)?.name ?? form.country_code) : "Country"} active={!!form.country_code} onClick={() => setSheet("country")} />
@@ -667,7 +672,7 @@ export function CreateBusinessPage() {
           {/* Steve, 2026-10-04: a map pin, so a stall or a unit inside a mall is found exactly
               rather than searched for by street name. The server pulls coordinates out of a
               pasted map link, and falls back to the address when it can't. */}
-          <input className="input" placeholder="Map pin (optional) — paste a map link or 30.2672,-97.7431" value={form.pin ?? ""} onChange={(e) => set("pin", e.target.value)} />
+          <input className="input" placeholder={t("map_pin_optional_paste_a_map_link_or_30")} value={form.pin ?? ""} onChange={(e) => set("pin", e.target.value)} />
           {/* Steve, 2026-10-04: the easiest pin of all — the owner is at the shop and taps this.
               The browser asks for permission itself; no key or library involved. */}
           <button type="button" className="btn small" onClick={() => {
@@ -676,25 +681,25 @@ export function CreateBusinessPage() {
               (position) => set("pin", `${position.coords.latitude.toFixed(6)},${position.coords.longitude.toFixed(6)}`),
               () => showGoldAlert("Couldn't find you just now. Try again, or paste a map link.")
             );
-          }}>Use My Current Location</button>
+          }}>{t("use_my_current_location")}</button>
         </div>
 
         <div className="card pad" style={{ display: "grid", gap: 6 }}>
-          <b style={{ color: "var(--gold)" }}>Hours</b>
-          <div className="muted" style={{ fontSize: 12 }}>For example 9:00 AM - 5:00 PM, or Closed. Leave blank to hide.</div>
+          <b style={{ color: "var(--gold)" }}>{t("hours")}</b>
+          <div className="muted" style={{ fontSize: 12 }}>{t("for_example_9_00_am_5_00_pm_or_closed_le")}</div>
           {DAYS.map(([k, label]) => (
             <div key={k} className="row" style={{ gap: 8 }}>
               <span className="muted" style={{ width: 90 }}>{label}</span>
-              <input className="input" style={{ flex: 1 }} placeholder="Closed" value={form.hours[k] ?? ""} onChange={(e) => set("hours", { ...form.hours, [k]: e.target.value })} />
+              <input className="input" style={{ flex: 1 }} placeholder={t("closed")} value={form.hours[k] ?? ""} onChange={(e) => set("hours", { ...form.hours, [k]: e.target.value })} />
             </div>
           ))}
         </div>
 
         {!editingId && (
           <div className="card pad" style={{ display: "grid", gap: 6 }}>
-            <b style={{ color: "var(--gold)" }}>Referred by a member?</b>
-            <div className="muted" style={{ fontSize: 12 }}>Enter their referral code and they earn a one-time thank-you from Bingg Bongg. It costs you nothing.</div>
-            <input className="input" placeholder="Referral code (optional)" value={form.referral_code ?? ""} onChange={(e) => set("referral_code", e.target.value.toUpperCase())} />
+            <b style={{ color: "var(--gold)" }}>{t("referred_by_a_member")}</b>
+            <div className="muted" style={{ fontSize: 12 }}>{t("enter_their_referral_code_and_they_earn")}</div>
+            <input className="input" placeholder={t("referral_code_optional_2")} value={form.referral_code ?? ""} onChange={(e) => set("referral_code", e.target.value.toUpperCase())} />
           </div>
         )}
 
@@ -702,13 +707,13 @@ export function CreateBusinessPage() {
           <div style={{ color: "var(--gold)" }}>{editingId ? "Edits are free — your paid days are unchanged." : pricing ? `${usd(pricing.term_price)} for ${pricing.term_days} days (${usd(pricing.price_per_day)}/day)` : "Loading price…"}</div>
           {error && <Notice error>{error}</Notice>}
           <button className="btn" type="submit" disabled={busy} style={{ marginTop: 10, background: "var(--gold)", color: "#0d0d0d" }}>{busy ? (progress !== null ? `Uploading… ${Math.round(progress * 100)}%` : "Working…") : editingId ? "Save changes" : "Pay & publish"}</button>
-          {!editingId && <div className="muted" style={{ fontSize: 12, marginTop: 8 }}>Charged from your Cash Account. Once you pay, your page is live and you can start uploading your photos, videos and specials. Cancel anytime, no refunds.</div>}
+          {!editingId && <div className="muted" style={{ fontSize: 12, marginTop: 8 }}>{t("charged_from_your_cash_account_once_you")}</div>}
         </div>
       </form>
-      {sheet === "country" && <PickerSheet title="Country" noun="countries" items={splitMain(countries).rest} pinned={splitMain(countries).main} pinnedLabel="Main markets" restLabel="All countries" selected={form.country_code} onPick={(code) => { set("country_code", code); set("state_code", ""); set("city", ""); }} onClose={() => setSheet(null)} />}
-      {sheet === "state" && <PickerSheet title="State" noun="states" items={states.map((st) => ({ code: st.state_code!, name: st.name! }))} selected={form.state_code} onPick={(code) => { set("state_code", code); set("city", ""); }} onClose={() => setSheet(null)} />}
-      {sheet === "city" && <PickerSheet title="City" noun="cities" items={cities.map((c) => ({ code: c, name: c }))} selected={form.city} onPick={(c) => set("city", c)} onClose={() => setSheet(null)} />}
-      {sheet === "category" && <PickerSheet title="Category" noun="categories" items={categories.map((c) => ({ code: String(c.id), name: c.name }))} selected={String(form.category_id)} onPick={(code) => set("category_id", Number(code))} onClose={() => setSheet(null)} />}
+      {sheet === "country" && <PickerSheet title={t("battle_tab_country")} noun="countries" items={splitMain(countries).rest} pinned={splitMain(countries).main} pinnedLabel="Main markets" restLabel="All countries" selected={form.country_code} onPick={(code) => { set("country_code", code); set("state_code", ""); set("city", ""); }} onClose={() => setSheet(null)} />}
+      {sheet === "state" && <PickerSheet title={t("state")} noun="states" items={states.map((st) => ({ code: st.state_code!, name: st.name! }))} selected={form.state_code} onPick={(code) => { set("state_code", code); set("city", ""); }} onClose={() => setSheet(null)} />}
+      {sheet === "city" && <PickerSheet title={t("city")} noun="cities" items={cities.map((c) => ({ code: c, name: c }))} selected={form.city} onPick={(c) => set("city", c)} onClose={() => setSheet(null)} />}
+      {sheet === "category" && <PickerSheet title={t("category")} noun="categories" items={categories.map((c) => ({ code: String(c.id), name: c.name }))} selected={String(form.category_id)} onPick={(code) => set("category_id", Number(code))} onClose={() => setSheet(null)} />}
     </div>
   );
 }

@@ -80,7 +80,10 @@ export function tt(key: StringKey, ...args: (string | number)[]): string {
 /** Translate outside a component (lib code, event handlers that have no hook in scope). */
 export function translate(lang: Lang, key: StringKey, ...args: (string | number)[]): string {
   const raw = DICTS[lang]?.[key] ?? en[key] ?? "";
-  return args.length ? format(raw, args) : raw;
+  // Always formatted, even with no arguments: otherwise a string containing %% would render as
+  // two literal percent signs whenever nothing was passed, and the same text would read
+  // differently depending on the call site.
+  return format(raw, args);
 }
 
 function initialLang(): Lang {
