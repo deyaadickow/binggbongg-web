@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { SessionProvider } from "./lib/session";
+import { LanguageProvider } from "./lib/i18n";
 import { Nav } from "./components/Nav";
 import { UploadVideoPage } from "./pages/UploadVideoPage";
 import { CreateVideoAdPage } from "./pages/CreateVideoAdPage";
@@ -10,6 +11,7 @@ import { PhotosDirectoryPage } from "./pages/PhotosDirectoryPage";
 import { MemberAlbumPage } from "./pages/MemberAlbumPage";
 import { ContestUploadPage } from "./pages/ContestUploadPage";
 import { HomePage } from "./pages/HomePage";
+import { LanguagePage } from "./pages/LanguagePage";
 import { ExcitingNewsPage } from "./pages/ExcitingNewsPage";
 import { BusinessPage, BusinessTabPage, CreateBusinessPage, MyBusinessesPage } from "./pages/BusinessPages";
 import { LoginPage } from "./pages/LoginPage";
@@ -41,6 +43,7 @@ import { AgentPage } from "./pages/AgentPage";
 export default function App() {
   return (
     <SessionProvider>
+      <LanguageProvider>
       <BrowserRouter>
         <Nav />
         <div className="shell">
@@ -128,7 +131,7 @@ export default function App() {
           <Route path="/shop/product/:id" element={<ShopProductPage />} />
           <Route path="/settings/shop" element={<ShopPage tab="shop" />} />
           <Route path="/settings/verification" element={<ComingSoonPage title="Request verification" note="Send your ID and a selfie to get the verified badge." />} />
-          <Route path="/settings/language" element={<ComingSoonPage title="Change language" note="The web app is in English for now. The phone apps speak 53 languages." />} />
+          <Route path="/settings/language" element={<LanguagePage />} />
           <Route path="/settings/support" element={<SupportPage />} />
           <Route path="/settings/support/archive" element={<SupportArchivePage />} />
           <Route path="/settings/terms" element={<TermsOfUsePage />} />
@@ -143,6 +146,7 @@ export default function App() {
         </main>
         </div>
       </BrowserRouter>
+      </LanguageProvider>
     </SessionProvider>
   );
 }
