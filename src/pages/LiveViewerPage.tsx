@@ -180,7 +180,7 @@ export function LiveViewerPage() {
   const [soloStandingsOpen, setSoloStandingsOpen] = useState(false);
   const onBattleCompleted = useCallback((b: BattleData) => {
     if (user && (b.player_one_user_id === user.id || b.player_two_user_id === user.id)) setBattleResult(b);
-    else setToast(b.winner_user_id ? "Battle over!" : "Battle over — it's a tie!");
+    else setToast(b.winner_user_id ? tt("battle_over") : tt("battle_over_a_tie"));
     refresh();
   }, [user, refresh]);
   // Steve, 2026-09-06 (phones) / 2026-09-24 (web): the battle-start clip plays for everyone in
@@ -254,7 +254,7 @@ export function LiveViewerPage() {
     const team = (t: "A" | "B") => d.participants.filter((p) => p.team === t).map((p) => nameOfId(p.user_id) || personName(p)).join(" & ");
     setResult({
       recap: d.status === "completed" ? { id: d.battle_id, engine: "2v2" } : undefined,
-      title: d.status === "cancelled" ? "Battle cancelled" : !d.winning_team ? "It's a tie" : !iPlayed ? "Battle over!" : iWon ? "🏆 Your team won!" : "Your team lost this one",
+      title: d.status === "cancelled" ? tt("battle_cancelled") : !d.winning_team ? tt("it_s_a_tie") : !iPlayed ? tt("battle_over") : iWon ? tt("your_team_won") : tt("your_team_lost_this_one"),
       rows: [
         { label: team("A"), value: (d.team_a_score ?? 0).toLocaleString(), win: d.winning_team === "A" },
         { label: team("B"), value: (d.team_b_score ?? 0).toLocaleString(), win: d.winning_team === "B" },
@@ -1320,21 +1320,21 @@ export function LiveViewerPage() {
           }} />
       )}
       {series.invite && (
-        <InviteCard title={series.invite.hide_scores ? "🙈 Hide & Seek" : "Best Out Of"} onClose={series.dismissInvite} onAnswer={(ok) => series.respond(series.invite!.series_id, ok).catch((e) => setToast((e as Error).message))}
+        <InviteCard title={series.invite.hide_scores ? t("hide_seek") : t("best_out_of")} onClose={series.dismissInvite} onAnswer={(ok) => series.respond(series.invite!.series_id, ok).catch((e) => setToast((e as Error).message))}
           body={series.invite.hide_scores
-            ? `${displayName({ fullname: series.invite.host_fullname, username: series.invite.host_username } as Partial<UserSummary>)} invites you to Hide & Seek — 5 minutes, most gift coins wins, and nobody sees the scores until the end.`
-            : `${displayName({ fullname: series.invite.host_fullname, username: series.invite.host_username } as Partial<UserSummary>)} invites you to a Best Out Of ${series.invite.length} battle — 5-minute rounds, most gift coins wins each round.`} />
+            ? t("invites_you_to_hide_and_seek", displayName({ fullname: series.invite.host_fullname, username: series.invite.host_username } as Partial<UserSummary>))
+            : t("invites_you_to_best_out_of", displayName({ fullname: series.invite.host_fullname, username: series.invite.host_username } as Partial<UserSummary>), series.invite.length)} />
       )}
       {two.invite && (
-        <InviteCard title={two.invite.hide_scores ? "🙈 Hide & Seek 2v2" : "2v2 Battle"} onClose={two.dismissInvite} onAnswer={(ok) => two.respond(two.invite!.battle_id, ok).catch((e) => setToast((e as Error).message))} body={`${describe2v2Invite(two.invite)}${two.invite.hide_scores ? " Hide & Seek: nobody sees the scores until the end." : ""}`} />
+        <InviteCard title={two.invite.hide_scores ? t("hide_seek_2v2") : t("n2v2_battle")} onClose={two.dismissInvite} onAnswer={(ok) => two.respond(two.invite!.battle_id, ok).catch((e) => setToast((e as Error).message))} body={`${describe2v2Invite(two.invite)}${two.invite.hide_scores ? ` ${t("hide_seek_nobody_sees_scores")}` : ""}`} />
       )}
       {marathon.invite && (
         <InviteCard title={t("no_time_limit")} onClose={marathon.dismissInvite} onAnswer={(ok) => marathon.respond(marathon.invite!.marathon_id, ok).catch((e) => setToast((e as Error).message))}
-          body={`${displayName({ fullname: marathon.invite.host_fullname, username: marathon.invite.host_username } as Partial<UserSummary>)} invites you to a No Time Limit battle — first to ${marathon.invite.target_points.toLocaleString()} gift coins wins.`} />
+          body={t("invites_you_to_no_time_limit", displayName({ fullname: marathon.invite.host_fullname, username: marathon.invite.host_username } as Partial<UserSummary>), marathon.invite.target_points.toLocaleString())} />
       )}
       {b555.invite && (
-        <InviteCard title="5-5-5" onClose={b555.dismissInvite} onAnswer={(ok) => b555.respond(b555.invite!.battle_555_id, ok).catch((e) => setToast((e as Error).message))}
-          body={`${displayName({ fullname: b555.invite.host_fullname, username: b555.invite.host_username } as Partial<UserSummary>)} invites you to 5-5-5 — 5 Games / 5 Minutes / Reach ${b555.invite.coins_per_game.toLocaleString()} coins and win.`} />
+        <InviteCard title={t("n5_5_5")} onClose={b555.dismissInvite} onAnswer={(ok) => b555.respond(b555.invite!.battle_555_id, ok).catch((e) => setToast((e as Error).message))}
+          body={t("invites_you_to_555", displayName({ fullname: b555.invite.host_fullname, username: b555.invite.host_username } as Partial<UserSummary>), b555.invite.coins_per_game.toLocaleString())} />
       )}
       {result && (
         <ResultOverlay

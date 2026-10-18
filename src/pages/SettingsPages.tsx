@@ -72,12 +72,13 @@ interface MyUser extends UserSummary {
   allow_virtual_games?: number | string | null;
   wants_to_battle?: number | string | null;
 }
-const TOGGLES: { key: keyof MyUser; label: string; hint: string }[] = [
-  { key: "is_notification", label: "Notify me", hint: "Push notifications from the app." },
-  { key: "show_liked_videos", label: "Show your liked videos to users", hint: "Others can see the videos you liked on your profile." },
-  { key: "show_following_list", label: "Show your following list to users", hint: "Others can see who you follow." },
-  { key: "allow_virtual_games", label: "Allow virtual games", hint: "Let hosts invite you to virtual games." },
-  { key: "wants_to_battle", label: "I want someone to battle with", hint: "Show you in Find a Battle so hosts can challenge you." },
+// label/hint are translation KEYS: module-level data, translated where it is rendered.
+const TOGGLES: { key: keyof MyUser; label: StringKey; hint: StringKey }[] = [
+  { key: "is_notification", label: "notify_me", hint: "push_notifications_from_the_app" },
+  { key: "show_liked_videos", label: "show_your_liked_videos_to_users", hint: "others_can_see_the_videos_you_liked_on_y" },
+  { key: "show_following_list", label: "show_your_following_list_to_users", hint: "others_can_see_who_you_follow" },
+  { key: "allow_virtual_games", label: "allow_virtual_games", hint: "let_hosts_invite_you_to_virtual_games" },
+  { key: "wants_to_battle", label: "i_want_someone_to_battle_with", hint: "show_you_in_find_a_battle_so_hosts_can_c" },
 ];
 const on = (v: unknown) => v === 1 || v === "1" || v === true;
 
@@ -112,13 +113,13 @@ export function AccountSettingsPage() {
       {!me ? <Loading /> : (
         <>
           <div className="card" style={{ marginBottom: 12 }}>
-            {TOGGLES.map((t) => (
-              <label key={t.key} className="row" style={{ padding: "12px 14px", borderBottom: "1px solid var(--line)", cursor: "pointer" }}>
+            {TOGGLES.map((tog) => (
+              <label key={tog.key} className="row" style={{ padding: "12px 14px", borderBottom: "1px solid var(--line)", cursor: "pointer" }}>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 700 }}>{t.label}</div>
-                  <div className="muted" style={{ fontSize: 12 }}>{t.hint}</div>
+                  <div style={{ fontWeight: 700 }}>{t(tog.label)}</div>
+                  <div className="muted" style={{ fontSize: 12 }}>{t(tog.hint)}</div>
                 </div>
-                <input type="checkbox" className="switch" disabled={busy} checked={on(me[t.key])} onChange={(e) => save({ [t.key]: e.target.checked ? 1 : 0 })} />
+                <input type="checkbox" className="switch" disabled={busy} checked={on(me[tog.key])} onChange={(e) => save({ [tog.key]: e.target.checked ? 1 : 0 })} />
               </label>
             ))}
           </div>
@@ -383,11 +384,11 @@ export function SimulcastPage() {
             <div key={d.platform} className="card pad" style={{ marginBottom: 10 }}>
               <div className="row">
                 <div style={{ flex: 1 }}>
-                  <b>{d.label}</b>{!d.guaranteed && <span className="muted" style={{ fontSize: 12 }}> · {d.note ?? "may need a third-party RTMP bridge"}</span>}
-                  <div className="muted" style={{ fontSize: 12 }}>{d.has_key ? (d.is_enabled ? "Key saved · sending" : "Key saved · paused") : "No stream key yet"}</div>
+                  <b>{d.label}</b>{!d.guaranteed && <span className="muted" style={{ fontSize: 12 }}> · {d.note ?? t("may_need_rtmp_bridge")}</span>}
+                  <div className="muted" style={{ fontSize: 12 }}>{d.has_key ? (d.is_enabled ? t("key_saved_sending") : t("key_saved_paused")) : t("no_stream_key_yet")}</div>
                 </div>
                 {d.has_key && <input type="checkbox" className="switch" checked={d.is_enabled} onChange={(e) => toggle(d, e.target.checked)} />}
-                <button className="btn small ghost" onClick={() => { setEditing(editing === d.platform ? null : d.platform); setRtmp(d.rtmp_url ?? d.default_rtmp_url ?? ""); setKey(""); }}>{d.has_key ? "Change" : "Set up"}</button>
+                <button className="btn small ghost" onClick={() => { setEditing(editing === d.platform ? null : d.platform); setRtmp(d.rtmp_url ?? d.default_rtmp_url ?? ""); setKey(""); }}>{d.has_key ? t("change") : t("set_up")}</button>
                 {d.has_key && <button className="btn small ghost" style={{ color: "var(--red)", borderColor: "var(--red)" }} onClick={() => remove(d.platform)}>{t("remove")}</button>}
               </div>
               {editing === d.platform && (
