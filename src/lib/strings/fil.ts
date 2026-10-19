@@ -1356,4 +1356,7 @@ export const fil = {
   repost: "I-repost",
   something_went_wrong: "May nangyaring mali.",
   copied: "Nakopya",
+  fname_to_do_list: "To Do List",
+  fblurb_to_do_list: "Sarili mong notepad. Isulat ang anumang gusto mong tandaan — sa iyo lang ito, at nandito sa telepono mo at sa website.",
+  fwhere_settings: "Settings",
 };

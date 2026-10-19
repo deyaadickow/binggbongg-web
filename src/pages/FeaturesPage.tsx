@@ -126,6 +126,7 @@ const FEATURES: Section[] = [
       { icon: "💬", nameKey: "fname_direct_messages", blurbKey: "fblurb_direct_messages", to: "/messages" },
       { icon: "🔔", nameKey: "fname_notifications_kept", blurbKey: "fblurb_notifications_kept", to: "/notifications" },
       { icon: "🗣️", nameKey: "fname_n53_languages", blurbKey: "fblurb_n53_languages", to: "/settings/language" },
+      { icon: "📝", nameKey: "fname_to_do_list", blurbKey: "fblurb_to_do_list", to: "/settings/todo", whereKey: "fwhere_settings" },
       { icon: "🆘", nameKey: "fname_support", blurbKey: "fblurb_support", to: "/settings/support" },
     ],
   },

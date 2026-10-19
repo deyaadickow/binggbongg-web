@@ -1357,4 +1357,7 @@ export const en = {
   repost: "Repost",
   something_went_wrong: "Something went wrong.",
   copied: "Copied",
+  fname_to_do_list: "To Do List",
+  fblurb_to_do_list: "Your own notepad. Write anything you want to remember — it is only yours, and it is on your phone and the website.",
+  fwhere_settings: "Settings",
 } as const;

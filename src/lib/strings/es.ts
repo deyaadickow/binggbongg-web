@@ -1356,4 +1356,7 @@ export const es = {
   repost: "Republicar",
   something_went_wrong: "Algo salió mal.",
   copied: "Copiado",
+  fname_to_do_list: "Lista de tareas",
+  fblurb_to_do_list: "Tu propio bloc de notas. Escribe lo que quieras recordar: es solo tuyo y está en tu teléfono y en la web.",
+  fwhere_settings: "Ajustes",
 };

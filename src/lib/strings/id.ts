@@ -1356,4 +1356,7 @@ export const id = {
   repost: "Posting ulang",
   something_went_wrong: "Terjadi kesalahan.",
   copied: "Tersalin",
+  fname_to_do_list: "Daftar Tugas",
+  fblurb_to_do_list: "Notepad milikmu sendiri. Tulis apa pun yang ingin kamu ingat — hanya milikmu, ada di ponsel dan di situs web.",
+  fwhere_settings: "Pengaturan",
 };
