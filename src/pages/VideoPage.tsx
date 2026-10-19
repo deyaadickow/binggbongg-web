@@ -255,7 +255,6 @@ export function VideoPage() {
           .catch(() => showGoldAlert(tt("something_went_wrong")));
       },
     },
-    { label: t("clear_the_screen"), onPick: () => { setChromeHidden((v) => !v); closeMenu(); } },
     {
       label: t("report"),
       onPick: () => {
@@ -342,6 +341,21 @@ export function VideoPage() {
               {t("link")}</button>
           )}
         </div>
+        {/* Steve, 2026-10-19: "add a small Bullseye on main page right under the share icon in
+            the corner." Same job the Clear the screen row had, and deliberately NOT hidden with
+            everything else — something has to stay on screen to bring it all back. */}
+        <button
+          onClick={() => setChromeHidden((v) => !v)}
+          title={t("clear_the_screen")}
+          style={{ position: "absolute", right: 14, bottom: 14, zIndex: 4, width: 30, height: 30,
+                   padding: 0, borderRadius: "50%", border: "none", background: "transparent",
+                   cursor: "pointer", lineHeight: 0 }}>
+          <svg viewBox="0 0 24 24" width="30" height="30" aria-hidden>
+            <circle cx="12" cy="12" r="9" fill="none" stroke="#fff" strokeWidth="1.8" />
+            <circle cx="12" cy="12" r="5.2" fill="none" stroke="#fff" strokeWidth="1.5" />
+            <circle cx="12" cy="12" r="2.6" fill="#F0C420" />
+          </svg>
+        </button>
         <div className="video-arrows" style={chromeHidden ? { display: "none" } : undefined}>
           <button className="arrow" onClick={goPrev} disabled={!prev} title={t("previous")}>▲</button>
           <button className="arrow" onClick={goNext} disabled={!next} title={t("next")}>▼</button>
