@@ -1335,4 +1335,7 @@ export const id = {
   your_username_works_for_signups: "Nama penggunamu %1$s juga berlaku untuk pendaftaran.",
   your_usual_rate: "Tarif biasamu",
   your_wise_payout_details: "Detail pembayaran Wise kamu",
+  fname_purchase_coins: "Beli Koin",
+  fblurb_purchase_coins: "Isi ulang koin untuk hadiah, game, dan boost.",
+  fwhere_on_the_website: "Di situs web Bingg Bongg",
 };

@@ -22,6 +22,7 @@ import { Link } from "react-router-dom";
 import { useT, type StringKey } from "../lib/i18n";
 import { PageTitle } from "../components/PageTitle";
 import { useSession } from "../lib/session";
+import { useState } from "react";
 
 interface Feature {
   icon: string;
@@ -47,7 +48,7 @@ const FEATURES: Section[] = [
       { icon: "🔴", nameKey: "fname_go_live", blurbKey: "fblurb_go_live", to: "/go-live" },
       { icon: "🖥️", nameKey: "fname_go_live_from_your_computer", blurbKey: "fblurb_go_live_from_your_computer", to: "/go-live/computer" },
       { icon: "📺", nameKey: "fname_live_now", blurbKey: "fblurb_live_now", to: "/live" },
-      { icon: "👀", nameKey: "fname_watch_up_to_6_lives_at_once", blurbKey: "fblurb_watch_up_to_6_lives_at_once", whereKey: "fwhere_live_now_in_the_phone_app" },
+      { icon: "👀", nameKey: "fname_watch_up_to_6_lives_at_once", blurbKey: "fblurb_watch_up_to_6_lives_at_once", to: "/live", whereKey: "fwhere_the_phone_app" },
       { icon: "🚪", nameKey: "fname_private_rooms", blurbKey: "fblurb_private_rooms", whereKey: "fwhere_the_phone_app" },
       { icon: "📡", nameKey: "fname_go_live_on_6_platforms", blurbKey: "fblurb_go_live_on_6_platforms", to: "/settings/simulcast" },
       { icon: "🎙️", nameKey: "fname_text_to_voice", blurbKey: "fblurb_text_to_voice", whereKey: "fwhere_the_phone_app" },
@@ -97,6 +98,9 @@ const FEATURES: Section[] = [
     titleKey: "fsec_money",
     features: [
       { icon: "🪙", nameKey: "fname_coins_and_gifts", blurbKey: "fblurb_coins_and_gifts", to: "/wallet" },
+      // Steve, 2026-10-19: "Add another box for Purchase Coins and link them to the website."
+      // On the web the website IS here, so it goes to the Wallet, where the checkout lives.
+      { icon: "💳", nameKey: "fname_purchase_coins", blurbKey: "fblurb_purchase_coins", to: "/wallet" },
       { icon: "💸", nameKey: "fname_getting_paid_out", blurbKey: "fblurb_getting_paid_out", to: "/wallet/redeem" },
       { icon: "📅", nameKey: "fname_monthly_statement", blurbKey: "fblurb_monthly_statement", to: "/wallet/statements" },
       { icon: "🤝", nameKey: "fname_share_earn_10", blurbKey: "fblurb_share_earn_10", to: "/settings/referrals" },
@@ -177,7 +181,20 @@ function Tile({ f }: { f: Feature }) {
 
 export function FeaturesPage() {
   const { t } = useT();
-  const total = FEATURES.reduce((n, s) => n + s.features.length, 0);
+  // Steve, 2026-10-19: "Please add search on top of this page." Fifty-seven tiles is a lot to
+  // scroll past when you already know what you are looking for. Matches the NAME and the
+  // DESCRIPTION, both translated, so "coins" finds tiles that only mention coins in their blurb.
+  const [query, setQuery] = useState("");
+  const q = query.trim().toLowerCase();
+  const sections = q
+    ? FEATURES.map((s) => ({
+        ...s,
+        features: s.features.filter(
+          (f) => t(f.nameKey).toLowerCase().includes(q) || t(f.blurbKey).toLowerCase().includes(q),
+        ),
+      })).filter((s) => s.features.length > 0)
+    : FEATURES;
+  const total = sections.reduce((n, s) => n + s.features.length, 0);
 
   return (
     // Steve, 2026-10-18: "Please make it one banner at a time and not a 2 image thumbnail."
@@ -186,11 +203,31 @@ export function FeaturesPage() {
     <div className="page" style={{ maxWidth: 760 }}>
       <PageTitle>{t("everything_bingg_bongg_does")}</PageTitle>
       {/* The plate comes from the stylesheet — see .cosmic-page .page > p.muted. */}
+      <div style={{ position: "relative", marginBottom: 12 }}>
+        <input
+          className="input"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={t("search")}
+          aria-label={t("search")}
+          style={{ width: "100%", paddingRight: 36 }}
+        />
+        {query && (
+          <button
+            onClick={() => setQuery("")}
+            aria-label={t("close")}
+            style={{
+              position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)",
+              background: "none", border: 0, color: "var(--gold)", fontSize: 18, cursor: "pointer",
+            }}
+          >×</button>
+        )}
+      </div>
       <p className="muted" style={{ marginTop: -4 }}>
         {t("features_count_blurb", total)}
       </p>
 
-      {FEATURES.map((section) => (
+      {sections.map((section) => (
         <div key={section.titleKey} style={{ marginTop: 22 }}>
           <h2 style={{ color: "var(--gold)", fontSize: 17, margin: "0 0 10px" }}>{t(section.titleKey)}</h2>
           <div style={{

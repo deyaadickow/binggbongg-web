@@ -1335,4 +1335,7 @@ export const fil = {
   your_username_works_for_signups: "Gumagana rin ang username mong %1$s para sa mga sign-up.",
   your_usual_rate: "Ang karaniwang rate mo",
   your_wise_payout_details: "Ang Wise payout details mo",
+  fname_purchase_coins: "Bumili ng Barya",
+  fblurb_purchase_coins: "Mag-top up ng barya para sa regalo, laro at boost.",
+  fwhere_on_the_website: "Sa website ng Bingg Bongg",
 };

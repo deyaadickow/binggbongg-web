@@ -1336,4 +1336,7 @@ export const en = {
   your_username_works_for_signups: "Your username %1$s works for sign-ups too.",
   your_usual_rate: "Your usual rate",
   your_wise_payout_details: "Your Wise payout details",
+  fname_purchase_coins: "Purchase Coins",
+  fblurb_purchase_coins: "Top up your coins for gifts, games and boosts.",
+  fwhere_on_the_website: "On the Bingg Bongg website",
 } as const;

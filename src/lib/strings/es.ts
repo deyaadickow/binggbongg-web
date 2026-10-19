@@ -1335,4 +1335,7 @@ export const es = {
   your_username_works_for_signups: "Tu usuario %1$s también sirve para los registros.",
   your_usual_rate: "Tu tarifa habitual",
   your_wise_payout_details: "Tus datos de pago de Wise",
+  fname_purchase_coins: "Comprar monedas",
+  fblurb_purchase_coins: "Recarga tus monedas para regalos, juegos y promociones.",
+  fwhere_on_the_website: "En el sitio web de Bingg Bongg",
 };
