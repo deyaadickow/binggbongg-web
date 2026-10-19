@@ -51,6 +51,7 @@ export function sidebarSections(userId: number | null): SideSection[] {
       { to: "/lucky", label: "lucky_numbers", icon: "🔮", needsLogin: true },
       // Steve, 2026-10-18: "add a tab for 'App Features' next to the end on main feed as well."
       // Last entry in the main list, matching where the chip sits on the phones.
+      { to: "/features", label: "everything_bingg_bongg_does", icon: "✨" },
       { to: "/settings/app-features", label: "app_features", icon: "📖" },
     ] },
     { title: "account", links: [

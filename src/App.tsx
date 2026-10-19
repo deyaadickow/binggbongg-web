@@ -12,6 +12,7 @@ import { MemberAlbumPage } from "./pages/MemberAlbumPage";
 import { ContestUploadPage } from "./pages/ContestUploadPage";
 import { HomePage } from "./pages/HomePage";
 import { LanguagePage } from "./pages/LanguagePage";
+import { FeaturesPage } from "./pages/FeaturesPage";
 import { ExcitingNewsPage } from "./pages/ExcitingNewsPage";
 import { BusinessPage, BusinessTabPage, CreateBusinessPage, MyBusinessesPage } from "./pages/BusinessPages";
 import { LoginPage } from "./pages/LoginPage";
@@ -132,6 +133,8 @@ export default function App() {
           <Route path="/settings/shop" element={<ShopPage tab="shop" />} />
           <Route path="/settings/verification" element={<ComingSoonPage titleKey="request_verification" noteKey="verification_note" />} />
           <Route path="/settings/language" element={<LanguagePage />} />
+          {/* The feature directory (Steve, 2026-10-18) — one tile per feature, grouped. */}
+          <Route path="/features" element={<FeaturesPage />} />
           <Route path="/settings/support" element={<SupportPage />} />
           <Route path="/settings/support/archive" element={<SupportArchivePage />} />
           <Route path="/settings/terms" element={<TermsOfUsePage />} />
