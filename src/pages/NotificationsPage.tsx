@@ -15,6 +15,7 @@ import { displayName, post, type UserSummary } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice } from "../components/Common";
 import { useT } from "../lib/i18n";
+import { PageTitle } from "../components/PageTitle";
 
 interface NotificationRow {
   id: number;
@@ -124,7 +125,7 @@ export function NotificationsPage() {
 
   return (
     <div className="page" style={{ maxWidth: 720 }}>
-      <h1 className="page-title">{t("notifications")}</h1>
+      <PageTitle>{t("notifications")}</PageTitle>
       {error && <Notice error>{error}</Notice>}
       {loading && rows.length === 0 && <Loading />}
       {!loading && rows.length === 0 && !error && (

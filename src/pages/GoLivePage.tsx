@@ -4,6 +4,7 @@ import { post } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Notice } from "../components/Common";
 import { tt, useT  } from "../lib/i18n";
+import { PageTitle } from "../components/PageTitle";
 
 /** Camera preview + one button — same startLive endpoint the phones call, then the room page as host. */
 export function GoLivePage() {
@@ -53,7 +54,7 @@ export function GoLivePage() {
 
   return (
     <div className="page" style={{ maxWidth: 560 }}>
-      <h1 className="page-title">{t("go_live")}</h1>
+      <PageTitle>{t("go_live")}</PageTitle>
       <div className="card" style={{ aspectRatio: "9 / 12", background: "#000", display: "grid", placeItems: "center" }}>
         {previewError ? <p className="muted center" style={{ padding: 20 }}>{previewError}</p> : <video ref={videoRef} autoPlay muted playsInline style={{ width: "100%", height: "100%", objectFit: "cover" }} />}
       </div>

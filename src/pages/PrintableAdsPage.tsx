@@ -5,6 +5,7 @@ import { useSession } from "../lib/session";
 import { fetchMyBusinesses, uploadFlyerAsset, saveBusinessFlyer, type Business } from "../lib/business";
 import { Loading } from "../components/Common";
 import { tt, useT  } from "../lib/i18n";
+import { PageTitle } from "../components/PageTitle";
 
 /**
  * Steve, 2026-10-04: "add a page called 'Create Your Own Ads' where admin can add a flyer that
@@ -53,7 +54,7 @@ const full = (path?: string) => mediaUrl(path);
 function Page({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="page" style={{ maxWidth: 720 }}>
-      <h1 className="page-title">{title}</h1>
+      <PageTitle>{title}</PageTitle>
       {children}
     </div>
   );

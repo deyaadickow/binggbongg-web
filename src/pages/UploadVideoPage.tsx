@@ -11,6 +11,7 @@ import { createUploadUrls, putToSignedUrl, videoDuration, videoThumbnail } from 
 import { Notice } from "../components/Common";
 import { GoldSelect } from "../components/GoldSelect";
 import { tt, useT  } from "../lib/i18n";
+import { PageTitle } from "../components/PageTitle";
 
 interface ContestCat { id: number; name?: string | null }
 interface CountryRow { name?: string | null; states?: { name?: string | null }[] }
@@ -140,7 +141,7 @@ export function UploadVideoPage() {
   if (done) {
     return (
       <div className="page" style={{ maxWidth: 720 }}>
-        <h1 className="page-title">{t("upload_video")}</h1>
+        <PageTitle>{t("upload_video")}</PageTitle>
         <div className="card pad">
           <p className="soft" style={{ marginTop: 0 }}>{t("uploaded_it_will_appear_on_your_profile")}</p>
           <div className="row">
@@ -154,7 +155,7 @@ export function UploadVideoPage() {
 
   return (
     <div className="page" style={{ maxWidth: 720 }}>
-      <h1 className="page-title">{t("upload_video")}</h1>
+      <PageTitle>{t("upload_video")}</PageTitle>
 
       <div className="card pad" style={{ marginBottom: 12 }}>
         <input ref={fileRef} type="file" accept="video/*" style={{ display: "none" }}

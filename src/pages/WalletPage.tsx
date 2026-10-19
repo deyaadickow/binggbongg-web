@@ -7,6 +7,7 @@ import { useSession } from "../lib/session";
 import { Loading, Notice } from "../components/Common";
 import { WALLET_LINKS } from "./WalletPages";
 import { tt, useT  } from "../lib/i18n";
+import { PageTitle } from "../components/PageTitle";
 
 export function WalletPage() {
   const { t, tn } = useT();
@@ -57,7 +58,7 @@ export function WalletPage() {
 
   return (
     <div className="page">
-      <h1 className="page-title">{t("wallet")}</h1>
+      <PageTitle>{t("wallet")}</PageTitle>
       <div className="grid">
         <div className="card pad"><div className="muted">{t("coins_to_gift")}</div><div style={{ fontSize: 28, fontWeight: 800, color: "var(--gold)" }}>{user.no_redeem_wallet ?? 0}</div></div>
         <div className="card pad"><div className="muted">{t("earned_coins")}</div><div style={{ fontSize: 28, fontWeight: 800, color: "var(--gold)" }}>{user.redeem_wallet ?? 0}</div></div>

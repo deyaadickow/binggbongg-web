@@ -9,6 +9,7 @@ import {
   type NewProductForm, type SellerStatus,
 } from "../lib/sellerAgent";
 import { useT } from "../lib/i18n";
+import { PageTitle } from "../components/PageTitle";
 
 // The supplier's own portal. Suppliers set their own prices and ship their own orders; Bingg
 // Bongg takes its cut at checkout and the streamer who sold the item takes theirs.
@@ -76,14 +77,14 @@ export function SellerPage() {
   useEffect(() => { void reload(); }, [reload]);
 
   if (!isLoggedIn) {
-    return <div className="page"><h1 className="page-title">{t("sell_on_bingg_bongg")}</h1><Notice>{t("please_sign_in_to_apply")}</Notice></div>;
+    return <div className="page"><PageTitle>{t("sell_on_bingg_bongg")}</PageTitle><Notice>{t("please_sign_in_to_apply")}</Notice></div>;
   }
   if (loading) return <div className="page"><Loading /></div>;
 
   if (!sellersEnabled && !seller) {
     return (
       <div className="page">
-        <h1 className="page-title">{t("sell_on_bingg_bongg")}</h1>
+        <PageTitle>{t("sell_on_bingg_bongg")}</PageTitle>
         <Notice>{t("seller_sign_up_isn_t_open_yet_check_back")}</Notice>
       </div>
     );

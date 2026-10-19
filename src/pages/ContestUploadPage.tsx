@@ -8,6 +8,7 @@ import { fetchOpenContests, uploadContestVideo, type OpenContest } from "../lib/
 import { videoDuration } from "../lib/upload";
 import { Loading, Notice } from "../components/Common";
 import { useT } from "../lib/i18n";
+import { PageTitle } from "../components/PageTitle";
 
 function prizeLine(c: OpenContest): string | null {
   const tiers = (c.prize_tiers ?? []).filter((t) => t.prize_amount != null);
@@ -115,7 +116,7 @@ export function ContestUploadPage() {
 
   return (
     <div className="page" style={{ maxWidth: 720 }}>
-      <h1 className="page-title">{t("enter_a_contest")}</h1>
+      <PageTitle>{t("enter_a_contest")}</PageTitle>
       {contests === null ? <Loading /> : contests.length === 0 ? (
         <div className="card pad">
           <p className="soft" style={{ marginTop: 0 }}>{t("there_s_no_contest_open_for_your_country")}</p>

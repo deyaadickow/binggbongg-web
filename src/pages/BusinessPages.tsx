@@ -26,6 +26,7 @@ import {
 } from "../lib/business";
 import { showGoldAlert } from "../components/GoldToast";
 import { tt, useT  } from "../lib/i18n";
+import { PageTitle } from "../components/PageTitle";
 
 // Steve, 2026-10-01: "Make the countries into our design" — the native <select> is gone; every
 // dropdown is the black/gold searchable PickerSheet the Create Ad page uses, opened from a pill.
@@ -126,7 +127,7 @@ export function BusinessTabPage() {
     <div className="page">
       {/* Steve, 2026-10-01: "remove the link + your business page from main page" — a member adds
           their own business from the Business tab on their profile page instead. */}
-      <h1 className="page-title">{t("business")}</h1>
+      <PageTitle>{t("business")}</PageTitle>
 
       <form className="row" style={{ gap: 8, marginBottom: 10 }} onSubmit={(e) => { e.preventDefault(); setQ(query.trim()); }}>
         <input className="input" style={{ flex: 1 }} placeholder={t("search_businesses")} value={query} onChange={(e) => setQuery(e.target.value)} />

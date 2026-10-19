@@ -15,6 +15,7 @@ import {
   type MyShowResponse, type ShowListing, type ShowOffer,
 } from "../lib/shows";
 import { tt, useT  } from "../lib/i18n";
+import { PageTitle } from "../components/PageTitle";
 
 const money = (v: number) => "$" + Number(v ?? 0).toFixed(2);
 
@@ -47,7 +48,7 @@ export function ShowsPage() {
   return (
     <div className="page" style={{ maxWidth: 900 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-        <h1 className="page-title">{t("shows")}</h1>
+        <PageTitle>{t("shows")}</PageTitle>
         {!cameFromMyShow && (
           <Link to="/my-show" state={{ from: "shows" }} className="btn small" style={{ background: "transparent", color: "var(--gold)", borderColor: "var(--gold-border)" }}>
             {t("my_show")}</Link>
@@ -172,7 +173,7 @@ export function MyShowPage() {
   if (!data.shows_enabled) {
     return (
       <div className="page" style={{ maxWidth: 720 }}>
-        <h1 className="page-title">{t("my_show")}</h1>
+        <PageTitle>{t("my_show")}</PageTitle>
         <p className="soft">{t("shows_aren_t_open_yet_check_back_soon")}</p>
       </div>
     );
@@ -212,7 +213,7 @@ export function MyShowPage() {
   return (
     <div className="page" style={{ maxWidth: 720 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-        <h1 className="page-title">{t("my_show")}</h1>
+        <PageTitle>{t("my_show")}</PageTitle>
         {!cameFromShows && (
           <Link to="/shows" state={{ from: "my-show" }} className="btn small" style={{ background: "transparent", color: "var(--gold)", borderColor: "var(--gold-border)" }}>{t("all_shows_2")}</Link>
         )}

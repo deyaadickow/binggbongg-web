@@ -388,6 +388,21 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
   font-size: 18px; line-height: 1; cursor: pointer; padding: 0;
 }
 .back-circle:hover { border-color: var(--gold-bright); }
+/* Steve has flagged this on the phones three times (the earnings statement, 2026-10-05: "add
+   a black background to these numbers so they can show"), and it is the same here: a line of
+   grey text straight on the cosmic backdrop is lost wherever it crosses a star or the moon.
+   Only for text that sits on the PAGE — text inside a .card already has black behind it. */
+.text-plate,
+/* A dim paragraph that is a DIRECT child of .page is loose on the backdrop — anything inside a
+   .card already has black behind it and is left alone. One rule instead of plating a hundred
+   and thirty-eight call sites by hand, and it covers the pages nobody has looked at yet. */
+.cosmic-page .page > p.muted,
+.cosmic-page .page > p.soft {
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+.text-plate { display: inline-block; }
 .cosmic-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
 .cosmic-head h2 { margin: 0; color: var(--gold); font-size: 20px; }
 

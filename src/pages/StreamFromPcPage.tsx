@@ -18,6 +18,7 @@ import { tokenServer } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Notice } from "../components/Common";
 import { useT } from "../lib/i18n";
+import { PageTitle } from "../components/PageTitle";
 
 interface IngressKey {
   url: string;
@@ -89,7 +90,7 @@ export function StreamFromPcPage() {
   if (!isLoggedIn) {
     return (
       <div className="pad">
-        <h1 className="page-title">{t("go_live_from_your_computer")}</h1>
+        <PageTitle>{t("go_live_from_your_computer")}</PageTitle>
         <Notice>{tn("please_sign_in_for_stream_key", <Link to="/login">{t("sign_in_2")}</Link>)}</Notice>
       </div>
     );
@@ -97,7 +98,7 @@ export function StreamFromPcPage() {
 
   return (
     <div className="pad">
-      <h1 className="page-title">{t("go_live_from_your_computer")}</h1>
+      <PageTitle>{t("go_live_from_your_computer")}</PageTitle>
       <p className="muted" style={{ marginTop: 0 }}>
         {t("stream_your_game_from_a_pc_with_obs_stre")}</p>
 

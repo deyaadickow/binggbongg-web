@@ -20,6 +20,7 @@
 // dictionary, so a feature's wording is written once and lands on all three.
 import { Link } from "react-router-dom";
 import { useT, type StringKey } from "../lib/i18n";
+import { PageTitle } from "../components/PageTitle";
 
 interface Feature {
   icon: string;
@@ -169,7 +170,8 @@ export function FeaturesPage() {
     // One column, and narrow enough that a banner still reads as a line of text rather than
     // stretching a dozen words across a desktop monitor. Same shape as the phones.
     <div className="page" style={{ maxWidth: 760 }}>
-      <h1 className="page-title">{t("everything_bingg_bongg_does")}</h1>
+      <PageTitle>{t("everything_bingg_bongg_does")}</PageTitle>
+      {/* The plate comes from the stylesheet — see .cosmic-page .page > p.muted. */}
       <p className="muted" style={{ marginTop: -4 }}>
         {t("features_count_blurb", total)}
       </p>

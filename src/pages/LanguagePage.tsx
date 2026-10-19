@@ -9,6 +9,7 @@
 // land, four at a time.
 import { LANGUAGES, useT } from "../lib/i18n";
 import { useSession } from "../lib/session";
+import { PageTitle } from "../components/PageTitle";
 
 export function LanguagePage() {
   const { lang, setLang, t } = useT();
@@ -16,7 +17,7 @@ export function LanguagePage() {
 
   return (
     <div className="page" style={{ maxWidth: 560 }}>
-      <h1 className="page-title">{t("change_language")}</h1>
+      <PageTitle>{t("change_language")}</PageTitle>
       <p className="muted" style={{ marginTop: -4 }}>{t("language_note")}</p>
 
       <div className="card" style={{ borderColor: "var(--gold-border)", overflow: "hidden" }}>

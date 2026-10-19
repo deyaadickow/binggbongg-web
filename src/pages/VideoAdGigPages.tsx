@@ -21,6 +21,7 @@ import {
   type GigCard, type GigOffer, type GigOrder,
 } from "../lib/videoAdGigs";
 import { tt, useT  } from "../lib/i18n";
+import { PageTitle } from "../components/PageTitle";
 
 const money = (v: number) => "$" + Number(v ?? 0).toFixed(2);
 const gold = { background: "var(--gold-border)", color: "#000", borderColor: "var(--gold-border)" };
@@ -54,7 +55,7 @@ export function VideoAdGigPage() {
   return (
     <div className="page" style={{ maxWidth: 900 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-        <h1 className="page-title">{t("video_ad_gig")}</h1>
+        <PageTitle>{t("video_ad_gig")}</PageTitle>
         {isLoggedIn && !cameFromMine && (
           <Link to="/my-gigs" state={{ from: "gigs" }} className="btn small" style={ghost}>{t("gig_my_gigs")}</Link>
         )}
@@ -285,7 +286,7 @@ export function MyVideoAdGigsPage() {
   return (
     <div className="page" style={{ maxWidth: 820 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-        <h1 className="page-title">{t("gig_my_gigs")}</h1>
+        <PageTitle>{t("gig_my_gigs")}</PageTitle>
         {!cameFromGigs && <Link to="/gigs" state={{ from: "my-gigs" }} className="btn small" style={ghost}>{t("video_ad_gig")}</Link>}
       </div>
 

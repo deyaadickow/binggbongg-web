@@ -14,6 +14,7 @@ import {
 import { Loading, Notice } from "../components/Common";
 import { GoldSelect } from "../components/GoldSelect";
 import { tt, useT  } from "../lib/i18n";
+import { PageTitle } from "../components/PageTitle";
 
 export function UploadPhotosPage() {
   const { t } = useT();
@@ -96,7 +97,7 @@ export function UploadPhotosPage() {
 
   return (
     <div className="page" style={{ maxWidth: 720 }}>
-      <h1 className="page-title">{t("upload_photos")}</h1>
+      <PageTitle>{t("upload_photos")}</PageTitle>
 
       {storage && (
         <div className="card pad" style={{ marginBottom: 12 }}>

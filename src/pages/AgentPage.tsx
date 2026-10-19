@@ -8,6 +8,7 @@ import {
   type AgentEarnings, type AgentProduct, type AgentStatus,
 } from "../lib/sellerAgent";
 import { useT } from "../lib/i18n";
+import { PageTitle } from "../components/PageTitle";
 
 // The agent's own portal (Steve, 2026-10-16): "I'm going to hire multiple agents so each agent
 // can bring us more items."
@@ -60,7 +61,7 @@ export function AgentPage() {
   useEffect(() => { void reload(); }, [reload]);
 
   if (!isLoggedIn) {
-    return <div className="page"><h1 className="page-title">{t("become_an_agent")}</h1><Notice>{t("please_sign_in_to_apply")}</Notice></div>;
+    return <div className="page"><PageTitle>{t("become_an_agent")}</PageTitle><Notice>{t("please_sign_in_to_apply")}</Notice></div>;
   }
   if (loading) return <div className="page"><Loading /></div>;
 

@@ -13,6 +13,7 @@ import {
   type CvCComingSoon, type CvCDetail, type CvCPlayer, type CvCRow, type CvCSupporter,
 } from "../lib/countryChallenges";
 import { tt, useT  } from "../lib/i18n";
+import { PageTitle } from "../components/PageTitle";
 
 const gold = "var(--gold)";
 
@@ -36,7 +37,7 @@ export function CvCPage() {
   if (!enabled) {
     return (
       <div className="page" style={{ maxWidth: 900 }}>
-        <h1 className="page-title">{t("cvc_page_title")}</h1>
+        <PageTitle>{t("cvc_page_title")}</PageTitle>
         <p className="soft">{t("this_isn_t_open_yet_check_back_soon")}</p>
       </div>
     );
@@ -45,7 +46,7 @@ export function CvCPage() {
   return (
     <div className="page" style={{ maxWidth: 900 }}>
       {/* The tab says CvC; the page says what it means. */}
-      <h1 className="page-title">{t("cvc_page_title")}</h1>
+      <PageTitle>{t("cvc_page_title")}</PageTitle>
       <p className="soft" style={{ marginTop: -6 }}>
         {t("every_country_battle_ever_fought_and_who")}</p>
 

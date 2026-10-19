@@ -24,6 +24,7 @@ import {
   type AdPricingTier, type GeoLevel, type PendingTarget,
 } from "../lib/videoads";
 import { useT } from "../lib/i18n";
+import { PageTitle } from "../components/PageTitle";
 
 /** countryStates.json rows. iso2 and state_code are both in the payload — UploadVideoPage just
  *  never needed them; the ad targeter does, to match tier country_code and look up cities. */
@@ -212,7 +213,7 @@ export function CreateVideoAdPage() {
 
   return (
     <div className="page" style={{ maxWidth: 720 }}>
-      <h1 className="page-title">{t("create_a_video_ad")}</h1>
+      <PageTitle>{t("create_a_video_ad")}</PageTitle>
 
       {tiers === null ? <Loading /> : (
         <>

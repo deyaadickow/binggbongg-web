@@ -4,6 +4,7 @@ import { useSession } from "../lib/session";
 import { Loading, Notice, UserRow } from "../components/Common";
 import { PostCard } from "../components/PostCard";
 import { useT } from "../lib/i18n";
+import { PageTitle } from "../components/PageTitle";
 
 export function SearchPage() {
   const { t } = useT();
@@ -40,7 +41,7 @@ export function SearchPage() {
 
   return (
     <div className="page">
-      <h1 className="page-title">{t("search")}</h1>
+      <PageTitle>{t("search")}</PageTitle>
       <form onSubmit={run} className="row" style={{ marginBottom: 14 }}>
         <input className="input" placeholder={t("members_videos_hashtags")} value={keyword} onChange={(e) => setKeyword(e.target.value)} />
         <button className="btn" type="submit">{t("search")}</button>

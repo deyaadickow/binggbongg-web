@@ -19,6 +19,7 @@ import { useSession } from "../lib/session";
 import { fetchCartoonSettings, makeCartoon, type CartoonStyle } from "../lib/photos";
 import { Notice } from "../components/Common";
 import { tt, useT } from "../lib/i18n";
+import { PageTitle } from "../components/PageTitle";
 
 export function CartoonPage() {
   const { t, tn } = useT();
@@ -95,7 +96,7 @@ export function CartoonPage() {
   if (!isLoggedIn) {
     return (
       <div className="page">
-        <h1 className="page-title">{t("cartoon_me")}</h1>
+        <PageTitle>{t("cartoon_me")}</PageTitle>
         <Notice>{tn("please_sign_in_to_make_a_cartoon", <Link to="/login">{t("sign_in_2")}</Link>)}</Notice>
       </div>
     );
@@ -103,7 +104,7 @@ export function CartoonPage() {
 
   return (
     <div className="page" style={{ maxWidth: 720 }}>
-      <h1 className="page-title">{t("cartoon_me")}</h1>
+      <PageTitle>{t("cartoon_me")}</PageTitle>
       <p className="soft">{t("take_a_selfie_or_pick_a_photo_and_get_yo")}</p>
 
       <div style={{ background: "#000", border: "1.5px solid var(--gold-border)", borderRadius: "var(--radius)", display: "flex", alignItems: "center", justifyContent: "center", minHeight: 280, overflow: "hidden" }}>

@@ -12,6 +12,7 @@ import { fetchMyVirtualBattles, fetchVirtualGiftRecord, sendVirtualThankYou, typ
 import { VirtualGiftRecordOverlay, personName } from "../components/BattleEngines";
 import { GoldSelect } from "../components/GoldSelect";
 import { tt, useT, type StringKey  } from "../lib/i18n";
+import { PageTitle } from "../components/PageTitle";
 
 const SITE = "https://www.binggbongg.com";
 
@@ -19,7 +20,7 @@ const SITE = "https://www.binggbongg.com";
 function Page({ title, children, wide }: { title: string; children: React.ReactNode; wide?: boolean }) {
   return (
     <div className="page" style={wide ? undefined : { maxWidth: 720 }}>
-      <h1 className="page-title">{title}</h1>
+      <PageTitle>{title}</PageTitle>
       {children}
     </div>
   );
@@ -38,7 +39,10 @@ export function SettingsHubPage() {
     <Page title={t("settings")}>
       {sidebarSections(user?.id ?? null).map((sec, i) => (
         <div key={i} className="card" style={{ marginBottom: 12, overflow: "hidden" }}>
-          {sec.title && <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)" }}><b style={{ color: "var(--gold)" }}>{sec.title}</b></div>}
+          {/* t(), not the bare key. The sidebar has always translated these; this page printed
+              them raw, so every language saw "account" / "general" / "get_the_app". The type
+              only checks that a key EXISTS, not that anybody translated it before rendering. */}
+          {sec.title && <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)" }}><b style={{ color: "var(--gold)" }}>{t(sec.title)}</b></div>}
           {sec.links.filter((l) => !l.needsLogin || isLoggedIn).map((l) => <SideLinkItem key={l.label} link={l} onSignOut={signOut} big />)}
         </div>
       ))}
@@ -717,7 +721,7 @@ export function SupportPage() {
       {/* Steve, 2026-09-26: "on top next to support text on the right side add the text 'Archive'
           ... when they click on Archive they will see all the old messages and their answers." */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-        <h1 className="page-title">{t("support")}</h1>
+        <PageTitle>{t("support")}</PageTitle>
         <Link to="/settings/support/archive" className="btn small" style={{ background: "transparent", color: "var(--gold)", borderColor: "var(--gold-border)" }}>{t("archive")}</Link>
       </div>
       {sent && replyCard}
