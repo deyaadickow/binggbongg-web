@@ -121,6 +121,18 @@ const FEATURES: Section[] = [
       { icon: "🆘", nameKey: "fname_support", blurbKey: "fblurb_support", to: "/settings/support" },
     ],
   },
+  {
+    titleKey: "fsec_browse_the_feed",
+    features: [
+      { icon: "📺", nameKey: "fname_all_shows", blurbKey: "fblurb_all_shows", to: "/shows" },
+      { icon: "📣", nameKey: "fname_advertisers", blurbKey: "fblurb_advertisers", whereKey: "fwhere_the_phone_app" },
+      { icon: "🗂", nameKey: "fname_categories_browse", blurbKey: "fblurb_categories_browse", whereKey: "fwhere_on_the_main_feed" },
+      { icon: "⭐", nameKey: "fname_fav_categories_browse", blurbKey: "fblurb_fav_categories_browse", whereKey: "fwhere_on_the_main_feed" },
+      { icon: "🗣", nameKey: "fname_by_language", blurbKey: "fblurb_by_language", whereKey: "fwhere_on_the_main_feed" },
+      { icon: "🎂", nameKey: "fname_by_age_group", blurbKey: "fblurb_by_age_group", whereKey: "fwhere_on_the_main_feed" },
+      { icon: "📍", nameKey: "fname_by_location", blurbKey: "fblurb_by_location", whereKey: "fwhere_on_the_main_feed" },
+    ],
+  },
 ];
 
 function Tile({ f }: { f: Feature }) {
