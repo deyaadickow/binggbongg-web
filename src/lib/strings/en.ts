@@ -386,7 +386,7 @@ export const en = {
   everyone_in_the_room_gets_a_bingo_card_p: "Everyone in the room gets a bingo card — play it on your own or with up to 3 others, each on a different card. Viewers double-click any number to gift it, and that square goes under a gold cover carrying THEIR name, so the card fills up with the people who paid for it. Vertical, horizontal, diagonal, 4 corners, X and the whole card all count, and the game keeps going until somebody covers a whole card — so one game can have six different winners. The host sets what a square costs.",
   everyone_playing_a_game_in_your_room_rig: "Everyone playing a game in your room right now.",
   everyone_who_gifted_you: "everyone who gifted you",
-  everything_bingg_bongg_does: "Everything Bingg Bongg Does",
+  everything_bingg_bongg_does: "Bingg Bongg Features",
   exciting_news: "Exciting News",
   exciting_news_empty: "Nothing here yet.",
   exciting_news_search_hint: "Search a country or word…",

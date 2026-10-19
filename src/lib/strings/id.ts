@@ -385,7 +385,7 @@ export const id = {
   everyone_in_the_room_gets_a_bingo_card_p: "Semua orang di room mendapat kartu bingo — mainkan sendiri atau bersama hingga 3 orang lain, masing-masing di kartu berbeda. Penonton klik dua kali angka mana pun untuk menghadiahkannya, dan kotak itu tertutup penutup emas bertuliskan NAMA MEREKA, jadi kartunya terisi oleh orang-orang yang membayarnya. Vertikal, horizontal, diagonal, 4 sudut, X dan kartu penuh semuanya dihitung, dan game berlanjut sampai seseorang menutup satu kartu penuh — jadi satu game bisa punya enam pemenang berbeda. Host menentukan harga satu kotak.",
   everyone_playing_a_game_in_your_room_rig: "Semua yang sedang bermain di room-mu sekarang.",
   everyone_who_gifted_you: "semua yang memberimu hadiah",
-  everything_bingg_bongg_does: "Semua yang Bisa Bingg Bongg Lakukan",
+  everything_bingg_bongg_does: "Fitur Bingg Bongg",
   exciting_news: "Berita Seru",
   exciting_news_empty: "Belum ada apa-apa di sini.",
   exciting_news_search_hint: "Cari negara atau kata…",

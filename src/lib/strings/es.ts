@@ -385,7 +385,7 @@ export const es = {
   everyone_in_the_room_gets_a_bingo_card_p: "Todos los de la sala reciben un cartón de bingo: juega solo o con hasta 3 más, cada uno en un cartón distinto. Los espectadores hacen doble clic en cualquier número para regalarlo, y esa casilla queda bajo una tapa dorada con SU nombre, así que el cartón se llena con la gente que lo pagó. Vertical, horizontal, diagonal, 4 esquinas, X y el cartón completo cuentan todos, y el juego sigue hasta que alguien cubra un cartón entero, así que un solo juego puede tener seis ganadores distintos. El anfitrión fija lo que cuesta una casilla.",
   everyone_playing_a_game_in_your_room_rig: "Todos los que están jugando en tu sala ahora mismo.",
   everyone_who_gifted_you: "todos los que te hicieron regalos",
-  everything_bingg_bongg_does: "Todo lo que hace Bingg Bongg",
+  everything_bingg_bongg_does: "Funciones de Bingg Bongg",
   exciting_news: "Noticias Emocionantes",
   exciting_news_empty: "Aquí no hay nada todavía.",
   exciting_news_search_hint: "Busca un país o una palabra…",

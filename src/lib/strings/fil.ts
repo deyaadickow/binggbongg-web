@@ -385,7 +385,7 @@ export const fil = {
   everyone_in_the_room_gets_a_bingo_card_p: "Lahat ng nasa room ay may bingo card — maglaro nang mag-isa o kasama ang hanggang 3 pa, bawat isa sa magkaibang card. Dinodoble-click ng mga manonood ang kahit anong numero para iregalo ito, at ang kahong iyon ay matatakpan ng gintong takip na may PANGALAN NILA, kaya napupuno ang card ng mga taong nagbayad para dito. Bilang lahat ang vertical, horizontal, diagonal, 4 na sulok, X at ang buong card, at magpapatuloy ang game hangga't walang makatakip ng buong card — kaya ang isang game ay maaaring may anim na magkaibang panalo. Ang host ang nagtatakda ng halaga ng isang kahon.",
   everyone_playing_a_game_in_your_room_rig: "Lahat ng naglalaro sa room mo ngayon.",
   everyone_who_gifted_you: "lahat ng nagregalo sa iyo",
-  everything_bingg_bongg_does: "Lahat ng Ginagawa ng Bingg Bongg",
+  everything_bingg_bongg_does: "Mga Feature ng Bingg Bongg",
   exciting_news: "Exciting News",
   exciting_news_empty: "Wala pang laman dito.",
   exciting_news_search_hint: "Maghanap ng bansa o salita…",
