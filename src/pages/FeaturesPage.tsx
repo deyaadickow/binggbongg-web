@@ -165,7 +165,10 @@ export function FeaturesPage() {
   const total = FEATURES.reduce((n, s) => n + s.features.length, 0);
 
   return (
-    <div className="page" style={{ maxWidth: 1100 }}>
+    // Steve, 2026-10-18: "Please make it one banner at a time and not a 2 image thumbnail."
+    // One column, and narrow enough that a banner still reads as a line of text rather than
+    // stretching a dozen words across a desktop monitor. Same shape as the phones.
+    <div className="page" style={{ maxWidth: 760 }}>
       <h1 className="page-title">{t("everything_bingg_bongg_does")}</h1>
       <p className="muted" style={{ marginTop: -4 }}>
         {t("features_count_blurb", total)}
@@ -176,7 +179,7 @@ export function FeaturesPage() {
           <h2 style={{ color: "var(--gold)", fontSize: 17, margin: "0 0 10px" }}>{t(section.titleKey)}</h2>
           <div style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+            gridTemplateColumns: "1fr",
             gap: 10,
           }}>
             {section.features.map((f) => <Tile key={f.nameKey} f={f} />)}
