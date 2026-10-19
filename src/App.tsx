@@ -37,7 +37,7 @@ import { Sidebar } from "./components/Sidebar";
 import { AdReferralEarningsPage, AllVideosEarningsPage, PayoutHistoryPage, RedeemPage, RepostEarningsPage, RewardingActionsPage, StatementsPage } from "./pages/WalletPages";
 import { PrintableAdsPage } from "./pages/PrintableAdsPage";
 import { ShopPage, ShopProductPage } from "./pages/ShopPage";
-import { AccountSettingsPage, AdvertisePage, BlockedProfilesPage, ComingSoonPage, ContestRequestsPage, DeleteAccountPage, FindABattlePage, ModeratorsPage, QrCodePage, ReferralsPage, SettingsHubPage, ShareProfilePage, SimulcastPage, SupportArchivePage, SupportPage, VirtualLookPage, MyVirtualBattlesPage, TermsOfUsePage, PrivacyPolicyPage, ContactUsPage, AboutUsPage, FaqPage, AppFeaturesPage } from "./pages/SettingsPages";
+import { AccountSettingsPage, AdvertisePage, BlockedProfilesPage, ComingSoonPage, ContestRequestsPage, DeleteAccountPage, FindABattlePage, ModeratorsPage, QrCodePage, ReferralsPage, SettingsHubPage, ShareProfilePage, SimulcastPage, SupportArchivePage, SupportPage, VirtualLookPage, MyVirtualBattlesPage, TermsOfUsePage, PrivacyPolicyPage, ContactUsPage, AboutUsPage, FaqPage, AppFeaturesPage, ToDoListPage } from "./pages/SettingsPages";
 import { SellerPage } from "./pages/SellerPage";
 import { AgentPage } from "./pages/AgentPage";
 
@@ -135,6 +135,8 @@ export default function App() {
           <Route path="/settings/language" element={<LanguagePage />} />
           {/* The feature directory (Steve, 2026-10-18) — one tile per feature, grouped. */}
           <Route path="/features" element={<FeaturesPage />} />
+          {/* The member's own notepad (Steve, 2026-10-19). */}
+          <Route path="/settings/todo" element={<ToDoListPage />} />
           <Route path="/settings/support" element={<SupportPage />} />
           <Route path="/settings/support/archive" element={<SupportArchivePage />} />
           <Route path="/settings/terms" element={<TermsOfUsePage />} />

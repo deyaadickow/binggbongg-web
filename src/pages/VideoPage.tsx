@@ -7,6 +7,7 @@ import { Avatar, Loading, Notice } from "../components/Common";
 import { GiftFlash, PostGiftButton } from "../components/GiftSheet";
 import { appendToFeed, fetchMoreFeed, getFeed } from "../lib/feed";
 import { tt, useT  } from "../lib/i18n";
+import { showGoldAlert } from "../components/GoldToast";
 
 const AUTO_KEY = "bb.autoplayNext";
 
@@ -21,7 +22,6 @@ export function VideoPage() {
   const [item, setItem] = useState<Post | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [liked, setLiked] = useState(false);
-  const [copied, setCopied] = useState(false);
   const [feed, setFeedState] = useState<Post[]>(() => getFeed());
   const [auto, setAuto] = useState<boolean>(() => { try { return localStorage.getItem(AUTO_KEY) !== "0"; } catch { return true; } });
   const [loadingMore, setLoadingMore] = useState(false);
@@ -38,6 +38,13 @@ export function VideoPage() {
   const completedPlays = useRef(0);
   const watchReported = useRef(false);
   const wheelLock = useRef(0);
+  // Steve, 2026-10-19: "Hold the screen for 2 seconds and a popup will appear, Pause that video
+  // that is playing in case they want to copy it." The controls that sat on the video are rows
+  // in this menu now.
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [chromeHidden, setChromeHidden] = useState(false);
+  const holdTimer = useRef(0);
+  const holdFired = useRef(false);
 
   const index = feed.findIndex((p) => String(p.id) === String(id));
   const prev = index > 0 ? feed[index - 1] : null;
@@ -176,6 +183,34 @@ export function VideoPage() {
   // render") — a blank black page on every video. Every hook now runs before any return.
   // Falls back to building the URL from the id: share_url only arrives from a deployed
   // backend, and the link is the same either way.
+  // ---- hold-to-open menu (Steve, 2026-10-19) ---------------------------------------------
+  //
+  // Two seconds exactly, matched to the phones, and cancelled by a pointer that leaves or
+  // lifts first. A hold is not a click, so the browser's own context menu on a long press is
+  // suppressed for that gesture only.
+  function startHold() {
+    cancelHold();
+    holdFired.current = false;
+    holdTimer.current = window.setTimeout(() => {
+      holdFired.current = true;
+      videoRef.current?.pause();
+      setMenuOpen(true);
+    }, 2000);
+  }
+
+  function cancelHold() {
+    if (holdTimer.current) {
+      window.clearTimeout(holdTimer.current);
+      holdTimer.current = 0;
+    }
+  }
+
+  function closeMenu(resume = true) {
+    setMenuOpen(false);
+    holdFired.current = false;
+    if (resume) void videoRef.current?.play().catch(() => undefined);
+  }
+
   async function copyLink() {
     if (!item) return;
     const url = videoShareUrl(item);
@@ -190,17 +225,58 @@ export function VideoPage() {
       window.prompt("Copy this video's link:", url);
       return;
     }
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1600);
+    showGoldAlert(tt("copied"));
   }
 
   if (error) return <div className="page"><Notice error>{error}</Notice></div>;
   if (!item) return <div className="page"><Loading /></div>;
+
+  // The rows of the hold-to-open menu, in the order Steve listed them. Each one does what the
+  // control it replaced did; Auto Scroll is a switch, so it keeps the card up and its word
+  // changes in place.
+  const menuRows: { label: string; trailing?: string; onPick: () => void }[] = [
+    {
+      label: t("auto_scroll"),
+      trailing: auto ? t("switch_on") : t("switch_off"),
+      onPick: () => toggleAuto(),
+    },
+    {
+      label: t("the_turning_record"),
+      onPick: () => { closeMenu(false); navigate(`/search?q=${encodeURIComponent(item.sound?.sound_title ?? "")}`); },
+    },
+    { label: t("copy_this_video"), onPick: () => { void copyLink(); closeMenu(); } },
+    {
+      label: t("repost"),
+      onPick: () => {
+        closeMenu(false);
+        if (!isLoggedIn || !user) { navigate("/login", { state: { from: location.pathname } }); return; }
+        void post("repostUserPost", { user_id: user.id, post_id: item.id })
+          .then((r) => showGoldAlert(r.message ?? tt("done")))
+          .catch(() => showGoldAlert(tt("something_went_wrong")));
+      },
+    },
+    { label: t("clear_the_screen"), onPick: () => { setChromeHidden((v) => !v); closeMenu(); } },
+    {
+      label: t("report"),
+      onPick: () => {
+        closeMenu(false);
+        if (!isLoggedIn || !user) { navigate("/login", { state: { from: location.pathname } }); return; }
+        navigate(`/settings/support?reason=${encodeURIComponent(tt("report"))}&about=${encodeURIComponent(videoShareUrl(item))}`);
+      },
+    },
+    { label: t("support"), onPick: () => { closeMenu(false); navigate("/settings/support"); } },
+  ];
   const likes = (item.likes ?? 0) + (liked && !item.is_post_liked ? 1 : 0) - (!liked && item.is_post_liked ? 1 : 0);
 
   return (
     <div className="page video-page">
-      <div className="video-stage">
+      <div
+        className="video-stage"
+        onPointerDown={startHold}
+        onPointerUp={cancelHold}
+        onPointerLeave={cancelHold}
+        onPointerCancel={cancelHold}
+        onContextMenu={(e) => { if (holdFired.current) e.preventDefault(); }}>
         <video key={item.id} ref={videoRef} className="player" src={mediaUrl(item.video)} poster={mediaUrl(item.thumbnail)} controls autoPlay playsInline
           loop={!auto}
           onPlay={() => { if (watchStartedAt.current === 0) watchStartedAt.current = Date.now(); }}
@@ -212,9 +288,52 @@ export function VideoPage() {
             goNext();
           }} />
         {sentGift && <GiftFlash gift={sentGift} onDone={clearSentGift} />}
+
+        {menuOpen && (
+          // Steve, 2026-10-19: "Also add the Bingg Bongg logo on top of this popup." The same
+          // black-and-gold card the rest of the site uses, with the wordmark on the pill the
+          // apps put it on.
+          <div
+            onClick={() => closeMenu()}
+            style={{ position: "fixed", inset: 0, zIndex: 60, background: "rgba(0,0,0,.75)",
+                     display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+            <div
+              onClick={(e) => e.stopPropagation()}
+              style={{ width: "100%", maxWidth: 360, background: "#000",
+                       border: "1.5px solid var(--gold-border)", borderRadius: 16, padding: 16 }}>
+              <div style={{ textAlign: "center", marginBottom: 12 }}>
+                <img src="/logo_horizontal.png" alt="Bingg Bongg" style={{ height: 26, maxWidth: "100%",
+                     padding: "10px 20px", borderRadius: 999, border: "1.5px solid var(--gold-border)",
+                     background: "#000", boxSizing: "content-box" }} />
+              </div>
+              <div style={{ fontWeight: 800, fontSize: 17, color: "var(--gold)", textAlign: "center", marginBottom: 12 }}>
+                {t("this_video")}
+              </div>
+              {menuRows.map((r) => (
+                <button
+                  key={r.label}
+                  onClick={r.onPick}
+                  style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", cursor: "pointer",
+                           padding: "13px 14px", marginBottom: 8, borderRadius: 10, background: "#101010",
+                           color: "var(--gold)", border: "1.5px solid var(--gold-border)", fontSize: 15 }}>
+                  <span style={{ flex: 1, textAlign: "center" }}>{r.label}</span>
+                  <span style={{ fontWeight: 800 }}>{r.trailing ?? "\u203A"}</span>
+                </button>
+              ))}
+              <button className="btn ghost" style={{ width: "100%", marginTop: 4 }} onClick={() => closeMenu()}>
+                {t("close")}
+              </button>
+            </div>
+          </div>
+        )}
         {/* Steve, 2026-10-13: "(C) ... for any member to click and copy that video", and a
-            "Link" tab top-left for a video whose poster pasted a copied link. */}
-        <div style={{ position: "absolute", top: 12, left: 12, display: "flex", flexDirection: "column", gap: 8, zIndex: 3 }}>
+            "Link" tab top-left for a video whose poster pasted a copied link.
+
+            Steve, 2026-10-19: "Remove all these links from main page and add them to this
+            popup." The (C) is a row in the hold-to-open menu now; the Link tab stays, because
+            it is part of the video rather than a control. "Clear the screen" hides what is
+            left. */}
+        <div style={{ position: "absolute", top: 12, left: 12, display: chromeHidden ? "none" : "flex", flexDirection: "column", gap: 8, zIndex: 3 }}>
           {item.linked_video && (
             <button
               className="btn small"
@@ -222,15 +341,8 @@ export function VideoPage() {
               style={{ background: "#000", color: "var(--gold)", borderColor: "var(--gold)" }}>
               {t("link")}</button>
           )}
-          <button
-            className="btn small"
-            title={t("copy_this_video_s_link")}
-            onClick={() => void copyLink()}
-            style={{ background: "#000", color: "var(--gold)", borderColor: "var(--gold)" }}>
-            {copied ? "Copied" : "C"}
-          </button>
         </div>
-        <div className="video-arrows">
+        <div className="video-arrows" style={chromeHidden ? { display: "none" } : undefined}>
           <button className="arrow" onClick={goPrev} disabled={!prev} title={t("previous")}>▲</button>
           <button className="arrow" onClick={goNext} disabled={!next} title={t("next")}>▼</button>
           <button className={`arrow auto${auto ? " on" : ""}`} onClick={toggleAuto} title={auto ? "Auto-play next: on" : "Auto-play next: off"}>{auto ? "⏭" : "⟳"}</button>

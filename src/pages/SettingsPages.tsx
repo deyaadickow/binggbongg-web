@@ -1027,3 +1027,85 @@ export function MyVirtualBattlesPage() {
     </Page>
   );
 }
+
+// ---- To Do List --------------------------------------------------------------------------
+//
+// Steve, 2026-10-19: "In settings. Add a notepad for everyone. Call it 'To Do List' they can
+// edit the text."
+//
+// The same list as the phones — ToDoListController, one row per member — so somebody who writes
+// a note on their phone finds it here. Two rules, both the same as the apps':
+//
+//  - It saves when they leave the box as well as on Save, because a notepad that loses what you
+//    typed is not a notepad.
+//  - Nothing is posted until the fetch has answered. An empty box that has not been filled in
+//    yet would otherwise wipe a list written on a phone.
+export function ToDoListPage() {
+  const { t } = useT();
+  const { user, isLoggedIn } = useSession();
+  const [body, setBody] = useState("");
+  const [savedBody, setSavedBody] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [justSaved, setJustSaved] = useState(false);
+  const [error, setError] = useState("");
+  // user?.id, never `user` — the session object is replaced on every balance refresh, and an
+  // effect keyed on the object would re-fetch and stamp on what they are typing.
+  const userId = user?.id ?? 0;
+
+  useEffect(() => {
+    if (!userId) return;
+    let alive = true;
+    post<{ body?: string }>("fetchMyToDoList", { my_user_id: userId })
+      .then((r) => {
+        if (!alive) return;
+        const fetched = r.data?.body ?? "";
+        setSavedBody(fetched);
+        // Whatever they have already typed wins over a late response.
+        setBody((current) => (current === "" ? fetched : current));
+      })
+      .catch(() => { if (alive) setError(tt("couldn_t_load_your_to_do_list")); });
+    return () => { alive = false; };
+  }, [userId]);
+
+  const save = useCallback(async () => {
+    if (!userId || savedBody === null || body === savedBody) return;
+    setBusy(true);
+    setError("");
+    try {
+      const r = await post("saveMyToDoList", { my_user_id: userId, body });
+      if (!r.status) throw new Error(r.message ?? tt("couldn_t_save"));
+      setSavedBody(body);
+      setJustSaved(true);
+      window.setTimeout(() => setJustSaved(false), 2000);
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }, [body, savedBody, userId]);
+
+  if (!isLoggedIn) return <NeedLogin />;
+
+  return (
+    <Page title={t("to_do_list")}>
+      {error && <Notice error>{error}</Notice>}
+      <div className="card pad">
+        <textarea
+          className="input"
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+          onBlur={() => void save()}
+          placeholder={t("to_do_list_hint")}
+          rows={18}
+          style={{ width: "100%", resize: "vertical", lineHeight: 1.5 }}
+        />
+        <div className="row" style={{ marginTop: 10, alignItems: "center" }}>
+          <button className="btn" disabled={busy || savedBody === null || body === savedBody}
+                  onClick={() => void save()}>{t("save")}</button>
+          <span className="spacer" />
+          {justSaved && <span className="muted" style={{ fontSize: 13 }}>{t("to_do_list_saved")}</span>}
+        </div>
+      </div>
+    </Page>
+  );
+}

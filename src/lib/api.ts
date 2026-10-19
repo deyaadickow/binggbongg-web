@@ -176,6 +176,10 @@ export interface Post {
    *  The server also sends null when the linked video has since been deleted, so a tab is
    *  never drawn for something that would open nothing. */
   linked_video?: { id: number; thumbnail?: string; user_name?: string; url?: string } | null;
+  /** The song on this video. fetchPosts has always eager-loaded it; nothing on the web read it
+   *  until the feed's hold-to-open menu (Steve, 2026-10-19) needed somewhere for "the turning
+   *  record" to go. `sound` is the file, `sound_title` the name members see. */
+  sound?: { id?: number; sound_title?: string; sound?: string; singer?: string } | null;
 }
 
 export interface LiveStream {

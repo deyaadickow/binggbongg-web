@@ -80,6 +80,8 @@ export function sidebarSections(userId: number | null): SideSection[] {
     ] },
     { title: "general", links: [
       { to: "/settings/language", label: "change_language", icon: "🌐" },
+      // Steve, 2026-10-19: "In settings. Add a notepad for everyone."
+      { to: "/settings/todo", label: "to_do_list", icon: "📝", needsLogin: true },
       { to: "/settings/support", label: "customer_support", icon: "💬" },
       { to: "/settings/terms", label: "terms_of_use", icon: "📄" },
       { to: "/settings/privacy", label: "privacy_policy", icon: "🔒" },
