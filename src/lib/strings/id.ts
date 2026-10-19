@@ -1338,4 +1338,6 @@ export const id = {
   fname_purchase_coins: "Beli Koin",
   fblurb_purchase_coins: "Isi ulang koin untuk hadiah, game, dan boost.",
   fwhere_on_the_website: "Di situs web Bingg Bongg",
+  example: "Contoh",
+  f_make_my_cartoon_looking_photo: "Buat foto bergaya kartun saya: Biaya %1$s koin",
 };

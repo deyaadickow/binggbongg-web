@@ -109,6 +109,8 @@ export interface CartoonStyle {
   name: string;
   icon: string;
   coins: number;
+  /** An example of what this style does, uploaded by admin. Absent until there is one. */
+  sample?: string | null;
 }
 
 /** Price and on/off come from the server so 25 can change without a deploy of three clients. */

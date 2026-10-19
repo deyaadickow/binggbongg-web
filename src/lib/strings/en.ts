@@ -1339,4 +1339,6 @@ export const en = {
   fname_purchase_coins: "Purchase Coins",
   fblurb_purchase_coins: "Top up your coins for gifts, games and boosts.",
   fwhere_on_the_website: "On the Bingg Bongg website",
+  example: "Example",
+  f_make_my_cartoon_looking_photo: "Make my cartoon looking photo: Cost %1$s Coins",
 } as const;

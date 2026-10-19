@@ -1338,4 +1338,6 @@ export const es = {
   fname_purchase_coins: "Comprar monedas",
   fblurb_purchase_coins: "Recarga tus monedas para regalos, juegos y promociones.",
   fwhere_on_the_website: "En el sitio web de Bingg Bongg",
+  example: "Ejemplo",
+  f_make_my_cartoon_looking_photo: "Hacer mi foto estilo caricatura: Cuesta %1$s monedas",
 };

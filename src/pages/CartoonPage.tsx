@@ -96,7 +96,7 @@ export function CartoonPage() {
   if (!isLoggedIn) {
     return (
       <div className="page">
-        <PageTitle>{t("cartoon_me")}</PageTitle>
+        <PageTitle>{t("photo_styles")}</PageTitle>
         <Notice>{tn("please_sign_in_to_make_a_cartoon", <Link to="/login">{t("sign_in_2")}</Link>)}</Notice>
       </div>
     );
@@ -104,7 +104,7 @@ export function CartoonPage() {
 
   return (
     <div className="page" style={{ maxWidth: 720 }}>
-      <PageTitle>{t("cartoon_me")}</PageTitle>
+      <PageTitle>{t("photo_styles")}</PageTitle>
       <p className="soft">{t("take_a_selfie_or_pick_a_photo_and_get_yo")}</p>
 
       <div style={{ background: "#000", border: "1.5px solid var(--gold-border)", borderRadius: "var(--radius)", display: "flex", alignItems: "center", justifyContent: "center", minHeight: 280, overflow: "hidden" }}>
@@ -112,6 +112,18 @@ export function CartoonPage() {
           <img src={cartoonUrl} alt={t("your_cartoon")} style={{ width: "100%", maxHeight: 460, objectFit: "contain", display: "block" }} />
         ) : pickedUrl ? (
           <img src={pickedUrl} alt="" style={{ width: "100%", maxHeight: 460, objectFit: "contain", display: "block" }} />
+        ) : chosenStyle?.sample ? (
+          /* Steve, 2026-10-19: "give them an example of what that character will look like."
+             Thirty style NAMES mean nothing — "Tiny Planet" is a guess until you have seen one.
+             The example goes in the empty picture box and changes as you pick along the shelf. */
+          <div style={{ position: "relative", display: "inline-block" }}>
+            <img src={chosenStyle.sample} alt="" style={{ maxWidth: "100%", maxHeight: 420, borderRadius: 12 }} />
+            <span style={{
+              position: "absolute", bottom: 10, left: "50%", transform: "translateX(-50%)",
+              background: "var(--gold)", color: "#000", fontWeight: 700, fontSize: 12,
+              padding: "4px 12px", borderRadius: 999,
+            }}>{t("example")}</span>
+          </div>
         ) : (
           <span className="muted">{t("no_photo_chosen_yet")}</span>
         )}
@@ -161,7 +173,7 @@ export function CartoonPage() {
       {enabled ? (
         <button className="btn primary" style={{ width: "100%", marginTop: 12 }}
                 onClick={run} disabled={!picked || busy}>
-          {busy ? t("drawing_your_picture") : t("make_my_picture_for_coins", chosenStyle?.name ?? t("cartoon_me"), price)}
+          {busy ? t("drawing_your_picture") : t("f_make_my_cartoon_looking_photo", String(price))}
         </button>
       ) : (
         <div style={{ marginTop: 12 }}><Notice>{t("cartoons_aren_t_switched_on_yet_please_c")}</Notice></div>

@@ -1338,4 +1338,6 @@ export const fil = {
   fname_purchase_coins: "Bumili ng Barya",
   fblurb_purchase_coins: "Mag-top up ng barya para sa regalo, laro at boost.",
   fwhere_on_the_website: "Sa website ng Bingg Bongg",
+  example: "Halimbawa",
+  f_make_my_cartoon_looking_photo: "Gawin ang aking larawang parang cartoon: Halagang %1$s na barya",
 };
