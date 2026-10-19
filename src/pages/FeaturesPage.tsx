@@ -146,7 +146,10 @@ function Tile({ f }: { f: Feature }) {
       <span style={{ fontSize: 26, lineHeight: 1, flexShrink: 0 }} aria-hidden>{f.icon}</span>
       <span style={{ minWidth: 0 }}>
         <b style={{ color: "var(--gold)", display: "block", fontSize: 15 }}>{t(f.nameKey)}</b>
-        <span className="muted" style={{ fontSize: 13, display: "block", marginTop: 3 }}>{t(f.blurbKey)}</span>
+        {/* Steve, 2026-10-19: "Make the white text readable... a little bolder." The dim grey
+            was hardest to read on the phones, and the same line here was only a shade better
+            over the artwork. Explicit rather than .muted, which is used site-wide. */}
+        <span style={{ fontSize: 13, display: "block", marginTop: 3, color: "rgba(255,255,255,0.85)", fontWeight: 500 }}>{t(f.blurbKey)}</span>
         {/* A tile that cannot take you anywhere says so, rather than looking broken. */}
         {!f.to && f.whereKey && (
           <span style={{ fontSize: 12, color: "var(--gold)", opacity: 0.75, display: "block", marginTop: 6 }}>
