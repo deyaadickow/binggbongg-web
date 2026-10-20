@@ -153,6 +153,9 @@ export interface UserSummary {
   redeem_wallet?: number;
   cash_wallet?: number;
   is_following?: boolean | number;
+  /** The category ids this member marked as favourites, comma separated — the same CSV the
+   *  phones read off their own row (CategoryFragment.initFav). Only ever set on your own user. */
+  fav_cats?: string;
   auth_token?: string;
 }
 

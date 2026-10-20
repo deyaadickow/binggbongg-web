@@ -8,6 +8,11 @@ import { UploadPhotosPage } from "./pages/UploadPhotosPage";
 import { CartoonPage } from "./pages/CartoonPage";
 import { MyPhotosPage } from "./pages/MyPhotosPage";
 import { PhotosDirectoryPage } from "./pages/PhotosDirectoryPage";
+// The eight ways of browsing the feed the phones have always had (Steve, 2026-10-20).
+import {
+  AdvertisersPage, ByAgeGroupPage, ByLanguagePage, ByLocationPage, CategoriesPage,
+  CategoryVideosPage, FavouriteCategoriesPage, PrivateRoomsPage, VipVoterBadgesPage,
+} from "./pages/BrowsePages";
 import { MemberAlbumPage } from "./pages/MemberAlbumPage";
 import { ContestUploadPage } from "./pages/ContestUploadPage";
 import { HomePage } from "./pages/HomePage";
@@ -96,6 +101,19 @@ export default function App() {
           <Route path="/upload" element={<UploadVideoPage />} />
           <Route path="/photos" element={<MyPhotosPage />} />
           <Route path="/photos-directory" element={<PhotosDirectoryPage />} />
+
+          {/* Browsing the feed. Each of these is the web half of a chip on the phones' home
+              feed, so the Bingg Bongg Features tile that names it opens the same thing on
+              every platform. */}
+          <Route path="/browse/categories" element={<CategoriesPage />} />
+          <Route path="/browse/favourite-categories" element={<FavouriteCategoriesPage />} />
+          <Route path="/browse/category/:id" element={<CategoryVideosPage />} />
+          <Route path="/browse/language" element={<ByLanguagePage />} />
+          <Route path="/browse/age" element={<ByAgeGroupPage />} />
+          <Route path="/browse/location" element={<ByLocationPage />} />
+          <Route path="/browse/advertisers" element={<AdvertisersPage />} />
+          <Route path="/browse/vip-badges" element={<VipVoterBadgesPage />} />
+          <Route path="/browse/private-rooms" element={<PrivateRoomsPage />} />
           <Route path="/photos/:id" element={<MemberAlbumPage />} />
           <Route path="/upload-photos" element={<UploadPhotosPage />} />
           {/* Cartoon Me (Steve, 2026-10-12) */}

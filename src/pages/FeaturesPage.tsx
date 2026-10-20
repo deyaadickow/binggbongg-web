@@ -11,6 +11,11 @@
 //  1. EVERY TILE IS HONEST ABOUT WHERE THE FEATURE IS. A tile either links somewhere real on the
 //     web, or it says plainly that the feature is in the phone app. A grid of 40 tiles where a
 //     third do nothing when tapped would be worse than no grid.
+//     Steve, 2026-10-20: "Make all 8 tiles open the same as the phones. each tile will link to
+//     the same page as on the phones." The eight that still said "the phone app" were the feed
+//     filters — categories, favourites, language, age, location, advertisers, VIP badges — plus
+//     Private Rooms. They are now built on the web too (pages/BrowsePages.tsx), so EVERY tile
+//     in this directory opens something.
 //  2. IT IS DATA, NOT MARKUP. Adding a feature is one row in FEATURES below. The same reasoning
 //     as the Photo Styles table: the list is going to keep growing, and it must not need
 //     redesigning to do it.
@@ -49,7 +54,7 @@ const FEATURES: Section[] = [
       { icon: "🖥️", nameKey: "fname_go_live_from_your_computer", blurbKey: "fblurb_go_live_from_your_computer", to: "/go-live/computer" },
       { icon: "📺", nameKey: "fname_live_now", blurbKey: "fblurb_live_now", to: "/live" },
       { icon: "👀", nameKey: "fname_watch_up_to_6_lives_at_once", blurbKey: "fblurb_watch_up_to_6_lives_at_once", to: "/live", whereKey: "fwhere_the_phone_app" },
-      { icon: "🚪", nameKey: "fname_private_rooms", blurbKey: "fblurb_private_rooms", whereKey: "fwhere_the_phone_app" },
+      { icon: "🚪", nameKey: "fname_private_rooms", blurbKey: "fblurb_private_rooms", to: "/browse/private-rooms" },
       { icon: "📡", nameKey: "fname_go_live_on_6_platforms", blurbKey: "fblurb_go_live_on_6_platforms", to: "/settings/simulcast" },
       { icon: "🎙️", nameKey: "fname_text_to_voice", blurbKey: "fblurb_text_to_voice", to: "/live", whereKey: "fwhere_the_live_room" },
       { icon: "🌐", nameKey: "fname_live_translation", blurbKey: "fblurb_live_translation", to: "/live", whereKey: "fwhere_the_live_room" },
@@ -122,7 +127,7 @@ const FEATURES: Section[] = [
     titleKey: "fsec_everything_else",
     features: [
       { icon: "🏆", nameKey: "fname_talent_contests", blurbKey: "fblurb_talent_contests", to: "/enter-contest" },
-      { icon: "⭐", nameKey: "fname_vip_voter_badges", blurbKey: "fblurb_vip_voter_badges", whereKey: "fwhere_the_phone_app" },
+      { icon: "⭐", nameKey: "fname_vip_voter_badges", blurbKey: "fblurb_vip_voter_badges", to: "/browse/vip-badges" },
       { icon: "💬", nameKey: "fname_direct_messages", blurbKey: "fblurb_direct_messages", to: "/messages" },
       { icon: "🔔", nameKey: "fname_notifications_kept", blurbKey: "fblurb_notifications_kept", to: "/notifications" },
       { icon: "🗣️", nameKey: "fname_n53_languages", blurbKey: "fblurb_n53_languages", to: "/settings/language" },
@@ -134,12 +139,12 @@ const FEATURES: Section[] = [
     titleKey: "fsec_browse_the_feed",
     features: [
       { icon: "📺", nameKey: "fname_all_shows", blurbKey: "fblurb_all_shows", to: "/shows" },
-      { icon: "📣", nameKey: "fname_advertisers", blurbKey: "fblurb_advertisers", whereKey: "fwhere_the_phone_app" },
-      { icon: "🗂", nameKey: "fname_categories_browse", blurbKey: "fblurb_categories_browse", whereKey: "fwhere_the_phone_app" },
-      { icon: "⭐", nameKey: "fname_fav_categories_browse", blurbKey: "fblurb_fav_categories_browse", whereKey: "fwhere_the_phone_app" },
-      { icon: "🗣", nameKey: "fname_by_language", blurbKey: "fblurb_by_language", whereKey: "fwhere_the_phone_app" },
-      { icon: "🎂", nameKey: "fname_by_age_group", blurbKey: "fblurb_by_age_group", whereKey: "fwhere_the_phone_app" },
-      { icon: "📍", nameKey: "fname_by_location", blurbKey: "fblurb_by_location", whereKey: "fwhere_the_phone_app" },
+      { icon: "📣", nameKey: "fname_advertisers", blurbKey: "fblurb_advertisers", to: "/browse/advertisers" },
+      { icon: "🗂", nameKey: "fname_categories_browse", blurbKey: "fblurb_categories_browse", to: "/browse/categories" },
+      { icon: "⭐", nameKey: "fname_fav_categories_browse", blurbKey: "fblurb_fav_categories_browse", to: "/browse/favourite-categories" },
+      { icon: "🗣", nameKey: "fname_by_language", blurbKey: "fblurb_by_language", to: "/browse/language" },
+      { icon: "🎂", nameKey: "fname_by_age_group", blurbKey: "fblurb_by_age_group", to: "/browse/age" },
+      { icon: "📍", nameKey: "fname_by_location", blurbKey: "fblurb_by_location", to: "/browse/location" },
     ],
   },
 ];
