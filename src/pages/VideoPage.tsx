@@ -290,8 +290,9 @@ export function VideoPage() {
 
         {menuOpen && (
           // Steve, 2026-10-19: "Also add the Bingg Bongg logo on top of this popup." The same
-          // black-and-gold card the rest of the site uses, with the wordmark on the pill the
-          // apps put it on.
+          // black-and-gold card the rest of the site uses.
+          // Steve, 2026-10-20: the new rectangle logo is itself a black plaque in a gold
+          // frame, so the pill the thin wordmark sat on is now a border around a border.
           <div
             onClick={() => closeMenu()}
             style={{ position: "fixed", inset: 0, zIndex: 60, background: "rgba(0,0,0,.75)",
@@ -301,9 +302,7 @@ export function VideoPage() {
               style={{ width: "100%", maxWidth: 360, background: "#000",
                        border: "1.5px solid var(--gold-border)", borderRadius: 16, padding: 16 }}>
               <div style={{ textAlign: "center", marginBottom: 12 }}>
-                <img src="/logo_horizontal.png" alt="Bingg Bongg" style={{ height: 26, maxWidth: "100%",
-                     padding: "10px 20px", borderRadius: 999, border: "1.5px solid var(--gold-border)",
-                     background: "#000", boxSizing: "content-box" }} />
+                <img src="/logo_horizontal.png" alt="Bingg Bongg" style={{ height: 62, maxWidth: "100%" }} />
               </div>
               <div style={{ fontWeight: 800, fontSize: 17, color: "var(--gold)", textAlign: "center", marginBottom: 12 }}>
                 {t("this_video")}
