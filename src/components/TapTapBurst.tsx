@@ -45,6 +45,29 @@ export const SURPRISE = "Surprise";
  * and right." Not a direction of its own — each gift picks one of the four at random.
  */
 export const UNIVERSAL = "Universal";
+
+/**
+ * Steve, 2026-10-19: "add another one called 'Spot' — these gifts will appear all over the
+ * screen in one spot each for 3 to 5 seconds and disappear... if 100 coin gift every 15 to 20
+ * will appear at the same time, if 250 coin gift, 30 to 40."
+ *
+ * Like Surprise it travels nowhere; unlike Surprise the gift's price DOES decide how many.
+ * His two numbers give the rule exactly: 5 + coins/10 is the low end (100 -> 15, 250 -> 30)
+ * and a third more is the high end (-> 20 and 40).
+ */
+export const SPOT = "Spot";
+const SPOT_FADE_IN_MS = 400;
+const SPOT_FADE_OUT_MS = 500;
+const SPOT_HOLD_MIN_MS = 3000;
+const SPOT_HOLD_MAX_MS = 5000;
+/** Landed over this window rather than on one frame, so it reads as appearing, not blinking. */
+const SPOT_SPAWN_WINDOW_MS = 700;
+
+function spotCount(price: number): number {
+  const low = 5 + Math.floor(price / 10);
+  const high = low + Math.max(5, Math.floor(low / 3));
+  return Math.min(Math.max(low + Math.floor(Math.random() * (high - low + 1)), 1), MAX_ICONS);
+}
 const UNIVERSAL_SIDES: BurstDirection[] = ["up", "down", "left", "right"];
 /**
  * Icon size, ONE constant for both spawn paths. Steve, 2026-10-06: "Please make them all the same
@@ -63,7 +86,7 @@ const SURPRISE_BATCH_MS = 1500;
 const SURPRISE_LIFE_MS = 1700;
 
 /** Which way a burst's icons travel. The gift decides; no caller passes this in. */
-export type BurstDirection = "up" | "down" | "left" | "right" | "surprise" | "universal";
+export type BurstDirection = "up" | "down" | "left" | "right" | "surprise" | "universal" | "spot";
 
 /** null for an ordinary gift, which bursts not at all. */
 export function burstDirection(gift: Gift): BurstDirection | null {
@@ -73,6 +96,7 @@ export function burstDirection(gift: Gift): BurstDirection | null {
   if (gift.is_right_hander === true) return "left";  // enters at the RIGHT, travels left
   if (gift.is_surprise === true) return "surprise";
   if (gift.is_universal === true) return "universal";
+  if (gift.is_spot === true) return "spot";
   return null;
 }
 
@@ -110,6 +134,7 @@ export function burstLabel(gift: Gift): string | null {
     case "left": return RIGHT_HANDER;
     case "surprise": return SURPRISE;
     case "universal": return UNIVERSAL;
+    case "spot": return SPOT;
     default: return null;
   }
 }
@@ -118,6 +143,9 @@ export function burstLabel(gift: Gift): string | null {
 export function tapTapBurstDuration(gift: Gift): number {
   // Surprise runs for a fixed 5 seconds whatever the gift costs.
   if (burstDirection(gift) === "surprise") return SURPRISE_MS + SURPRISE_LIFE_MS;
+  // The longest any one Spot gift can be up, plus the time the last one takes to land.
+  if (burstDirection(gift) === "spot")
+    return SPOT_SPAWN_WINDOW_MS + SPOT_FADE_IN_MS + SPOT_HOLD_MAX_MS + SPOT_FADE_OUT_MS;
   const count = Math.min(Math.max(giftPrice(gift), 1), MAX_ICONS);
   return (count - 1) * staggerMs(count) + FLIGHT_MS + 200;
 }
@@ -130,8 +158,10 @@ interface Icon {
   risePct: number;
   size: number;
   spin: number;
-  /** Surprise only: it is the one effect placed in BOTH axes. */
+  /** Surprise and Spot: the two effects placed in BOTH axes. */
   topPct?: number;
+  /** Spot only: this icon's own hold, so they do not all vanish together. */
+  holdMs?: number;
   /** This icon's OWN direction. Same as the gift's for every effect except Universal, where each
    *  icon picks one of the four sides so a quarter arrive from each. */
   dir: BurstDirection;
@@ -168,6 +198,34 @@ export function TapTapBurst({ gift }: { gift: Gift }) {
         }
       }
       return out;
+    }
+
+    // Spot: one wave, every gift at once, each sitting in its own place for 3-5 seconds.
+    //
+    // "All over the screen" — so the places are a JITTERED GRID, not pure random. Twenty random
+    // points clump badly: half the screen ends up bare and the middle is a pile (seen on the
+    // iOS Simulator before this). One per cell, jittered inside it, keeps them spread while
+    // still looking scattered rather than laid out.
+    if (dir === "spot") {
+      const total = spotCount(giftPrice(gift));
+      const columns = Math.max(1, Math.ceil(Math.sqrt(total)));
+      const rows = Math.max(1, Math.ceil(total / columns));
+      const cells = Array.from({ length: columns * rows }, (_, i) => i)
+        .sort(() => Math.random() - 0.5)
+        .slice(0, total);
+      return cells.map((cell, n) => ({
+        key: n,
+        dir: "spot" as BurstDirection,
+        delayMs: (n / Math.max(total, 1)) * SPOT_SPAWN_WINDOW_MS + Math.random() * 120,
+        // 10..90 inside the cell keeps a gift off its neighbour and off the screen edge.
+        startLeftPct: ((cell % columns) + 0.1 + Math.random() * 0.8) * (100 / columns),
+        topPct: (Math.floor(cell / columns) + 0.1 + Math.random() * 0.8) * (100 / rows),
+        driftPx: 0,
+        risePct: 0,
+        size: ICON_SIZE_MIN + Math.random() * ICON_SIZE_RANGE,
+        spin: (Math.random() - 0.5) * 14,
+        holdMs: SPOT_HOLD_MIN_MS + Math.random() * (SPOT_HOLD_MAX_MS - SPOT_HOLD_MIN_MS),
+      }));
     }
 
     const count = Math.min(Math.max(giftPrice(gift), 1), MAX_ICONS);
@@ -251,6 +309,14 @@ export function TapTapBurst({ gift }: { gift: Gift }) {
           62%  { opacity: 1; }
           100% { opacity: 0; transform: scale(1) rotate(var(--bb-spin)); }
         }
+        /* Spot: fades in where it is put, holds its own 3-5 seconds, fades out. No bounce —
+           a few dozen of these arriving at once is a lot of movement already. */
+        @keyframes bb-taptap-spot {
+          0%   { opacity: 0; transform: scale(.75) rotate(var(--bb-spin)); }
+          10%  { opacity: 1; transform: scale(1) rotate(var(--bb-spin)); }
+          88%  { opacity: 1; transform: scale(1) rotate(var(--bb-spin)); }
+          100% { opacity: 0; transform: scale(1) rotate(var(--bb-spin)); }
+        }
         @media (prefers-reduced-motion: reduce) {
           .bb-taptap-icon { animation-duration: 1ms !important; opacity: .9; }
         }
@@ -277,7 +343,7 @@ export function TapTapBurst({ gift }: { gift: Gift }) {
             position: "absolute",
             // Each direction hangs just off its own entry edge, so no icon is ever seen
             // appearing out of nothing. The cross-axis percentage spreads them along that edge.
-            ...(icon.dir === "surprise"
+            ...(icon.dir === "surprise" || icon.dir === "spot"
               ? { left: `${icon.startLeftPct}%`, top: `${icon.topPct}%` }
               : icon.dir === "left" || icon.dir === "right"
               ? { top: `${icon.startLeftPct}%`, ...(icon.dir === "right"
@@ -295,7 +361,9 @@ export function TapTapBurst({ gift }: { gift: Gift }) {
             // Rising floats and slows (ease-out) because it fights gravity; falling ACCELERATES
             // like real rain (ease-in). A sideways sweep does neither — steady, so linear.
             animation:
-              icon.dir === "surprise"
+              icon.dir === "spot"
+                ? `bb-taptap-spot ${SPOT_FADE_IN_MS + (icon.holdMs ?? SPOT_HOLD_MIN_MS) + SPOT_FADE_OUT_MS}ms ease-out ${icon.delayMs}ms both`
+                : icon.dir === "surprise"
                 ? `bb-taptap-pop ${SURPRISE_LIFE_MS}ms ease-out ${icon.delayMs}ms both`
                 : icon.dir === "up"
                 ? `bb-taptap-rise ${FLIGHT_MS}ms ease-out ${icon.delayMs}ms both`

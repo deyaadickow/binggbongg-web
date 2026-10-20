@@ -223,6 +223,8 @@ export interface Gift {
   is_surprise?: boolean;
   /** Universal — each gift picks one of the four sides, so a quarter arrive from each. */
   is_universal?: boolean;
+  /** Steve, 2026-10-19: Spot — many at once, each holding one place for 3-5 seconds. */
+  is_spot?: boolean;
 }
 export function giftPrice(g: Gift): number {
   return Number(g.coin_price ?? g.votes ?? 0);
