@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { displayName, mediaUrl, post, type Post, type UserSummary } from "../lib/api";
 import { BattleBadge, BattleInfoPopup, BattleStreak, battleBadgeExplainer, battleStreakExplainer } from "../components/BattleBadge";
 import { useSession } from "../lib/session";
+import { ReportDialog } from "../components/ReportDialog";
 import { Avatar, Loading, Notice } from "../components/Common";
 import { fetchUserPhotos, type Photo } from "../lib/photos";
 import { MemberBusinessesPanel, MyBusinessesPanel } from "./BusinessPages";
@@ -316,6 +317,7 @@ export function ProfilePage() {
   const [showSchedule, setShowSchedule] = useState(true);
   const [showCreatePlaylist, setShowCreatePlaylist] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
+  const [showReport, setShowReport] = useState(false);
   const [copiedRefer, setCopiedRefer] = useState(false);
   const loadedTabs = useRef(new Set<TabKey>());
   const profileId = Number(id);
@@ -474,11 +476,16 @@ export function ProfilePage() {
     navigate(-1);
   }
 
-  async function handleReport() {
+  // Steve, 2026-10-20: "Please add explanation so they can explain exactly what is wrong."
+  //
+  // This was one click that sent reason "Reported from web", no description, and the SIGNED-IN
+  // member's id as user_id — which the endpoint reads as the person being reported. So a web
+  // report named the reporter, carried no explanation, was rejected by the server for the
+  // missing description, and thanked the member anyway. Nothing was ever filed.
+  function handleReport() {
     if (!me || !profile) return;
     setShowOptions(false);
-    await post("reportUser", { user_id: me.id, to_user_id: profile.id, reason: "Reported from web" }).catch(() => {});
-    showGoldAlert(tt("report_submitted_thank_you"));
+    setShowReport(true);
   }
 
   async function copyReferCode() {
@@ -803,6 +810,14 @@ export function ProfilePage() {
       )}
       {battleInfo && (
         <BattleInfoPopup title={battleInfo.title} body={battleInfo.body} onClose={() => setBattleInfo(null)} />
+      )}
+      {showReport && profile && (
+        <ReportDialog
+          reportedUserId={profile.id}
+          reportedName={displayName(profile)}
+          onClose={() => setShowReport(false)}
+          onDone={(message) => showGoldAlert(message)}
+        />
       )}
     </div>
   );

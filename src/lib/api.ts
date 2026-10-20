@@ -483,3 +483,48 @@ export async function fetchMyBirthdayWishes(myId: number) {
   });
   return res.data ?? null;
 }
+
+// --- Reporting (Steve, 2026-10-20) --------------------------------------------------------
+
+export type ReportReason = { id: number; reason: string };
+
+/**
+ * The reason list an admin maintains, straight off the settings payload the phones already
+ * read. Fetched rather than hardcoded so a reason added in the admin panel appears on the web
+ * without a deploy.
+ */
+export async function fetchReportReasons(): Promise<ReportReason[]> {
+  try {
+    const res = await post<unknown>("fetchSettings", {});
+    const data = (res as { data?: { report_reasons?: ReportReason[] } }).data;
+    return data?.report_reasons ?? [];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Report a member.
+ *
+ * `user_id` is the person being REPORTED — not the reporter. The web previously sent the
+ * signed-in member's own id here and the reported member as `to_user_id`, which the endpoint
+ * does not read at all, so every web report was filed against the person who clicked Report.
+ * It also sent no description, which the server requires, so the report was rejected and the
+ * member thanked anyway. Both fixed 2026-10-20.
+ *
+ * `post_id` is optional and names the video the complaint is about, so an admin can watch the
+ * thing being complained about instead of guessing.
+ */
+export async function reportUser(input: {
+  reportedUserId: number;
+  reason: string;
+  description: string;
+  postId?: number;
+}) {
+  return post("reportUser", {
+    user_id: input.reportedUserId,
+    reason: input.reason,
+    description: input.description,
+    ...(input.postId ? { post_id: input.postId } : {}),
+  });
+}
