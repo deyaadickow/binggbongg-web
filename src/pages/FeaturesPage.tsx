@@ -51,10 +51,10 @@ const FEATURES: Section[] = [
       { icon: "👀", nameKey: "fname_watch_up_to_6_lives_at_once", blurbKey: "fblurb_watch_up_to_6_lives_at_once", to: "/live", whereKey: "fwhere_the_phone_app" },
       { icon: "🚪", nameKey: "fname_private_rooms", blurbKey: "fblurb_private_rooms", whereKey: "fwhere_the_phone_app" },
       { icon: "📡", nameKey: "fname_go_live_on_6_platforms", blurbKey: "fblurb_go_live_on_6_platforms", to: "/settings/simulcast" },
-      { icon: "🎙️", nameKey: "fname_text_to_voice", blurbKey: "fblurb_text_to_voice", whereKey: "fwhere_the_phone_app" },
+      { icon: "🎙️", nameKey: "fname_text_to_voice", blurbKey: "fblurb_text_to_voice", to: "/live", whereKey: "fwhere_the_live_room" },
       { icon: "🌐", nameKey: "fname_live_translation", blurbKey: "fblurb_live_translation", to: "/live", whereKey: "fwhere_the_live_room" },
       { icon: "🛡️", nameKey: "fname_your_moderators", blurbKey: "fblurb_your_moderators", to: "/settings/moderators" },
-      { icon: "🔁", nameKey: "fname_a_message_that_repeats", blurbKey: "fblurb_a_message_that_repeats", whereKey: "fwhere_the_phone_app" },
+      { icon: "🔁", nameKey: "fname_a_message_that_repeats", blurbKey: "fblurb_a_message_that_repeats", to: "/live", whereKey: "fwhere_the_live_room" },
     ],
   },
   {
@@ -62,9 +62,9 @@ const FEATURES: Section[] = [
     features: [
       { icon: "⚔️", nameKey: "fname_n11_battle_modes", blurbKey: "fblurb_n11_battle_modes", to: "/live", whereKey: "fwhere_the_live_room" },
       { icon: "🏆", nameKey: "fname_pk_battle_contests", blurbKey: "fblurb_pk_battle_contests", to: "/live", whereKey: "fwhere_the_live_room" },
-      { icon: "💣", nameKey: "fname_power_ups", blurbKey: "fblurb_power_ups", whereKey: "fwhere_the_phone_app" },
+      { icon: "💣", nameKey: "fname_power_ups", blurbKey: "fblurb_power_ups", to: "/live", whereKey: "fwhere_the_live_room" },
       { icon: "🔍", nameKey: "fname_find_a_battle", blurbKey: "fblurb_find_a_battle", to: "/settings/find-a-battle" },
-      { icon: "📊", nameKey: "fname_battle_rankings", blurbKey: "fblurb_battle_rankings", whereKey: "fwhere_the_phone_app" },
+      { icon: "📊", nameKey: "fname_battle_rankings", blurbKey: "fblurb_battle_rankings", to: "/live", whereKey: "fwhere_the_live_room" },
       { icon: "🥇", nameKey: "fname_lifetime_battle_board", blurbKey: "fblurb_lifetime_battle_board", myProfile: true, whereKey: "fwhere_your_profile" },
       { icon: "🎖️", nameKey: "fname_battle_badge", blurbKey: "fblurb_battle_badge", myProfile: true, whereKey: "fwhere_your_profile" },
       { icon: "🔥", nameKey: "fname_streak_and_flames", blurbKey: "fblurb_streak_and_flames", myProfile: true, whereKey: "fwhere_your_profile" },
@@ -80,7 +80,7 @@ const FEATURES: Section[] = [
       { icon: "🎱", nameKey: "fname_bingg_bongg_bingo", blurbKey: "fblurb_bingg_bongg_bingo", to: "/live", whereKey: "fwhere_the_live_room" },
       { icon: "🏁", nameKey: "fname_race_games", blurbKey: "fblurb_race_games", to: "/live", whereKey: "fwhere_the_live_room" },
       { icon: "🧩", nameKey: "fname_one_stroke_and_block_escape", blurbKey: "fblurb_one_stroke_and_block_escape", to: "/live", whereKey: "fwhere_the_live_room" },
-      { icon: "🏅", nameKey: "fname_game_leaderboards", blurbKey: "fblurb_game_leaderboards", whereKey: "fwhere_the_phone_app" },
+      { icon: "🏅", nameKey: "fname_game_leaderboards", blurbKey: "fblurb_game_leaderboards", to: "/live", whereKey: "fwhere_the_live_room" },
     ],
   },
   {
