@@ -38,7 +38,11 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .nav { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; flex-wrap: wrap; gap: 10px 16px; padding: 10px 16px; background: var(--panel); border-bottom: 1px solid var(--gold-border); }
 .nav .links { order: 3; flex-basis: 100%; }
 @media (min-width: 700px) { .nav .links { order: 0; flex-basis: auto; } }
-.nav .brand { font-weight: 800; font-size: 24px; color: var(--gold); letter-spacing: 0.3px; }
+/* The brand is the rectangle logo (Steve, 2026-10-20), not type. display:flex keeps the
+   image from sitting on the text baseline and leaving a gap under the header. */
+.nav .brand { display: flex; align-items: center; }
+.nav .brand img { height: 44px; width: auto; display: block; }
+@media (max-width: 420px) { .nav .brand img { height: 36px; } }
 /* From the width the sidebar appears at, the brand sits centred over that column and the links
    start clear of it, rather than the first pill crowding the wordmark. */
 @media (min-width: 900px) {

@@ -11,8 +11,15 @@ export function Nav() {
   const { user, isLoggedIn, signOut } = useSession();
   return (
     <header className="nav">
-      {/* i18n-exempt: the brand name is the same in every language. */}
-      <Link to="/" className="brand">Bingg Bongg</Link>
+      {/* Steve, 2026-10-20: "We need to add the logo to the web." The site had the mark in
+          exactly two places — the tab icon and the feed's hold menu — and said its own name in
+          plain bold text at the top of every page. The rectangle logo IS the wordmark, so it
+          does the same job and carries the look the phones have.
+          i18n-exempt: the brand name is the same in every language, and the alt text is the
+          name, not a sentence. */}
+      <Link to="/" className="brand" aria-label="Bingg Bongg">
+        <img src="/logo_horizontal.png" alt="Bingg Bongg" />
+      </Link>
       <nav className="links">
         {/* Steve, 2026-10-18: "only leave, For you, Exciting News, and Everything Bingg Bongg
             Does" — the phones' chip row cut to the same three, and the web's top nav matches.
