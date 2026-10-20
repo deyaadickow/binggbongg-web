@@ -531,6 +531,8 @@ export const fil = {
   fname_share_earn_10: "Mag-share at Kumita ng 10%",
   fname_streak_and_flames: "Streak at flames",
   fname_support: "Support",
+  fname_birthdays: "Mga Kaarawan",
+  fblurb_birthdays: "Tingnan kung sino ang may kaarawan ngayon, at padalhan sila ng bulaklak.",
   fname_talent_contests: "Mga Talent Contest",
   fname_text_to_voice: "Text to Voice",
   fname_video_ad_gig: "Video Ad Gig",

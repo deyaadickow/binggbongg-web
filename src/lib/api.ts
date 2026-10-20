@@ -415,3 +415,71 @@ export async function respondToBattleRequest(myId: number, requestId: number, ac
     my_user_id: myId, user_id: myId, battle_request_id: requestId, accept: accept ? 1 : 0,
   });
 }
+
+// --- Birthday Page (Steve, 2026-10-20) --------------------------------------------------
+
+export type BirthdayMember = {
+  user_id: number;
+  fullname?: string;
+  username?: string;
+  profile_image?: string;
+  is_me?: boolean;
+  already_wished?: boolean;
+};
+
+export type BirthdayList = {
+  date?: string;
+  flower_coins?: number;
+  invite_text?: string;
+  /** The member's OWN birthday, or null when they have not saved one. */
+  my_birthday?: string | null;
+  members?: BirthdayMember[];
+};
+
+export type BirthdayWish = {
+  id: number;
+  /** "wish" (free) or "flower" (100 coins). */
+  kind?: string;
+  coins?: number;
+  sender_user_id?: number;
+  fullname?: string;
+  username?: string;
+  profile_image?: string;
+};
+
+export type BirthdayWishes = {
+  total_wishes?: number;
+  total_flowers?: number;
+  total_coins?: number;
+  wishes?: BirthdayWish[];
+};
+
+export async function fetchTodaysBirthdays(myId: number) {
+  const res = await post<BirthdayList>("fetchTodaysBirthdays", { my_user_id: myId });
+  return res.data ?? null;
+}
+
+/** Free, once per sender per birthday. The server enforces the once — this only reports. */
+export async function sendBirthdayWish(myId: number, recipientUserId: number) {
+  return post("sendBirthdayWish", { my_user_id: myId, recipient_user_id: recipientUserId });
+}
+
+/** 100 coins, uncapped — a member may send flowers as often as they want to pay for. */
+export async function sendBirthdayFlowers(myId: number, recipientUserId: number) {
+  return post("sendBirthdayFlowers", { my_user_id: myId, recipient_user_id: recipientUserId });
+}
+
+/**
+ * Who wished ME, and what they sent.
+ *
+ * markSeen is deliberately left off by the page: it must keep showing everything for ever.
+ * Only the (not yet built) login pop-ups should stamp them seen.
+ */
+export async function fetchMyBirthdayWishes(myId: number) {
+  const res = await post<BirthdayWishes>("fetchMyBirthdayWishes", {
+    my_user_id: myId,
+    unseen_only: 0,
+    mark_seen: 0,
+  });
+  return res.data ?? null;
+}

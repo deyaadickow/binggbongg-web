@@ -28,6 +28,7 @@ import { MessagesPage } from "./pages/MessagesPage";
 import { NotificationsPage } from "./pages/NotificationsPage";
 import { ChatPage } from "./pages/ChatPage";
 import { DailyFortunePage } from "./pages/DailyFortunePage";
+import { BirthdayPage } from "./pages/BirthdayPage";
 import { SupporterBreakdownPage, SupportersPage } from "./pages/SupportersPage";
 import { SearchPage } from "./pages/SearchPage";
 import { LiveNowPage } from "./pages/LiveNowPage";
@@ -74,6 +75,7 @@ export default function App() {
           <Route path="/messages/:id" element={<ChatPage />} />
           {/* Lucky numbers + daily horoscope (Steve, 2026-10-09). */}
           <Route path="/lucky" element={<DailyFortunePage />} />
+          <Route path="/birthdays" element={<BirthdayPage />} />
           <Route path="/support" element={<SupportersPage />} />
           <Route path="/support/:id" element={<SupporterBreakdownPage />} />
           <Route path="/search" element={<SearchPage />} />

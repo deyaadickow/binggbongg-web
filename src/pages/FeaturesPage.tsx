@@ -127,6 +127,7 @@ const FEATURES: Section[] = [
     titleKey: "fsec_everything_else",
     features: [
       { icon: "🏆", nameKey: "fname_talent_contests", blurbKey: "fblurb_talent_contests", to: "/enter-contest" },
+      { icon: "🎂", nameKey: "fname_birthdays", blurbKey: "fblurb_birthdays", to: "/birthdays" },
       { icon: "⭐", nameKey: "fname_vip_voter_badges", blurbKey: "fblurb_vip_voter_badges", to: "/browse/vip-badges" },
       { icon: "💬", nameKey: "fname_direct_messages", blurbKey: "fblurb_direct_messages", to: "/messages" },
       { icon: "🔔", nameKey: "fname_notifications_kept", blurbKey: "fblurb_notifications_kept", to: "/notifications" },

@@ -531,6 +531,8 @@ export const es = {
   fname_share_earn_10: "Comparte y gana 10%",
   fname_streak_and_flames: "Racha y llamas",
   fname_support: "Soporte",
+  fname_birthdays: "Cumpleaños",
+  fblurb_birthdays: "Mira quién cumple años hoy y envíale flores.",
   fname_talent_contests: "Concursos de talento",
   fname_text_to_voice: "Texto a voz",
   fname_video_ad_gig: "Video Ad Gig",

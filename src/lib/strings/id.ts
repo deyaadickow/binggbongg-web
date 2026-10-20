@@ -531,6 +531,8 @@ export const id = {
   fname_share_earn_10: "Bagikan & Dapatkan 10%",
   fname_streak_and_flames: "Rentetan dan api",
   fname_support: "Dukungan",
+  fname_birthdays: "Ulang Tahun",
+  fblurb_birthdays: "Lihat siapa yang berulang tahun hari ini, dan kirimi mereka bunga.",
   fname_talent_contests: "Kontes Bakat",
   fname_text_to_voice: "Teks ke Suara",
   fname_video_ad_gig: "Video Ad Gig",

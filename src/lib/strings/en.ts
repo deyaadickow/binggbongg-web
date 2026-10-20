@@ -532,6 +532,8 @@ export const en = {
   fname_share_earn_10: "Share & Earn 10%",
   fname_streak_and_flames: "Streak and flames",
   fname_support: "Support",
+  fname_birthdays: "Birthdays",
+  fblurb_birthdays: "See who's celebrating today, and send them flowers.",
   fname_talent_contests: "Talent Contests",
   fname_text_to_voice: "Text to Voice",
   fname_video_ad_gig: "Video Ad Gig",
