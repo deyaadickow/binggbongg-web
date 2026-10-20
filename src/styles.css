@@ -35,14 +35,21 @@ button, input, textarea, select { font: inherit; color: inherit; }
 img { display: block; max-width: 100%; }
 h1, h2, h3 { margin: 0; text-wrap: balance; }
 
+/* --nav-h is the header's real height: the logo plus its padding plus the bottom border. The
+   sidebar below hangs off it, so changing the logo size here moves the sidebar with it rather
+   than leaving it tucked under the header. */
+:root { --nav-h: 85px; }
+@media (max-width: 420px) { :root { --nav-h: 67px; } }
 .nav { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; flex-wrap: wrap; gap: 10px 16px; padding: 10px 16px; background: var(--panel); border-bottom: 1px solid var(--gold-border); }
 .nav .links { order: 3; flex-basis: 100%; }
 @media (min-width: 700px) { .nav .links { order: 0; flex-basis: auto; } }
 /* The brand is the rectangle logo (Steve, 2026-10-20), not type. display:flex keeps the
    image from sitting on the text baseline and leaving a gap under the header. */
 .nav .brand { display: flex; align-items: center; }
-.nav .brand img { height: 44px; width: auto; display: block; }
-@media (max-width: 420px) { .nav .brand img { height: 36px; } }
+/* Steve, 2026-10-20: "please make the logo bigger on the website." 44 -> 64. The header grows
+   with it rather than the mark overflowing, because .nav lays its row out with align-items. */
+.nav .brand img { height: 64px; width: auto; display: block; }
+@media (max-width: 420px) { .nav .brand img { height: 46px; } }
 /* From the width the sidebar appears at, the brand sits centred over that column and the links
    start clear of it, rather than the first pill crowding the wordmark. */
 @media (min-width: 900px) {
@@ -66,7 +73,7 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .sidebar { display: none; }
 .only-narrow { display: inline-flex; }
 @media (min-width: 900px) {
-  .sidebar { display: block; flex: 0 0 240px; position: sticky; top: 61px; height: calc(100vh - 61px); overflow-y: auto; padding: 12px 10px 24px; border-right: 1px solid var(--gold-border); background: var(--panel); }
+  .sidebar { display: block; flex: 0 0 240px; position: sticky; top: var(--nav-h); height: calc(100vh - var(--nav-h)); overflow-y: auto; padding: 12px 10px 24px; border-right: 1px solid var(--gold-border); background: var(--panel); }
   .only-narrow { display: none; }
 }
 .side-section { margin-bottom: 14px; }

@@ -108,37 +108,69 @@ export function fetchPrivateRooms(myId: number): Promise<PrivateRoomSummary[]> {
   return post<PrivateRoomSummary[]>("fetchPrivateRooms", { user_id: myId }).then((r) => r.data ?? []);
 }
 
-/** The languages a video can be tagged with — the same 35 Global.getLanguages() offers on Android.
- *  Each name is already in its own language, so nothing here goes through the dictionary. */
+/** The languages a video can be tagged with — what fetchPostsByLanguage filters on.
+ *
+ *  Steve, 2026-10-20, seeing this screen offer 35: "I thought it was 53 Languages." He was right
+ *  about the app — it is translated into 53 — but this was a different, shorter list, so twenty-
+ *  one languages a member could read the whole app in could not be used to label their own
+ *  video. "Yes add all 53 to the upload picker." It is now the union of the two: 56, keeping
+ *  Cebuano, Javanese, Khmer and Burmese, which were only ever on this side and already label
+ *  real videos.
+ *
+ *  Each name is already in its own language, so nothing here goes through the dictionary. The
+ *  same list is Global.getLanguages() on Android and postLanguages in PostLanguageModel.swift on
+ *  iOS — change one and change all three, or this screen offers a language nothing is tagged
+ *  with. */
 export const POST_LANGUAGES: { code: string; native: string }[] = [
   { code: "en", native: "English" },
+  { code: "af", native: "Afrikaans" },
+  { code: "am", native: "አማርኛ" },
   { code: "ar", native: "العربية" },
+  { code: "bg", native: "Български" },
   { code: "bn-IN", native: "বাঙ্গালি (ভারত)" },
+  { code: "ca", native: "Català" },
   { code: "ceb", native: "Cebuano (Pilipinas)" },
   { code: "cs-CZ", native: "Čeština (Česká republika)" },
+  { code: "da", native: "Dansk" },
   { code: "de", native: "Deutsch" },
   { code: "el-GR", native: "Ελληνικά (Ελλάδα)" },
   { code: "es", native: "Español" },
+  { code: "et", native: "Eesti" },
+  { code: "eu", native: "Euskara" },
   { code: "fi-FI", native: "Suomi (Suomi)" },
   { code: "fil", native: "Filipino (Pilipinas)" },
   { code: "fr", native: "Français" },
+  { code: "gl", native: "Galego" },
+  { code: "gu", native: "ગુજરાતી" },
   { code: "he-IL", native: "עברית (ישראל)" },
   { code: "hi", native: "हिंदी" },
   { code: "hu-HU", native: "Magyar (Magyarország)" },
   { code: "id", native: "Bahasa Indonesia (Indonesia)" },
+  { code: "is", native: "Íslenska" },
   { code: "it-IT", native: "Italiano (Italia)" },
   { code: "ja-JP", native: "日本語（日本）" },
   { code: "jv", native: "Basa Jawa (Indonesia)" },
   { code: "km-KH", native: "ខ្មែរ (កម្ពុជា)" },
+  { code: "kn", native: "ಕನ್ನಡ" },
   { code: "ko-KR", native: "한국어 (대한민국)" },
+  { code: "lt", native: "Lietuvių" },
+  { code: "lv", native: "Latviešu" },
+  { code: "ml", native: "മലയാളം" },
+  { code: "mr", native: "मराठी" },
   { code: "ms", native: "Bahasa Melayu (Malaysia)" },
   { code: "my", native: "မြန်မာ" },
+  { code: "nb", native: "Norsk bokmål" },
   { code: "nl-NL", native: "Nederlands (Nederland)" },
+  { code: "pa", native: "ਪੰਜਾਬੀ" },
   { code: "pl-PL", native: "Polski (Polska)" },
   { code: "pt-BR", native: "Português (Brasil)" },
   { code: "ro-RO", native: "Română (Romania)" },
   { code: "ru-RU", native: "Русский (Россия)" },
+  { code: "sk", native: "Slovenčina" },
+  { code: "sr", native: "Српски" },
   { code: "sv-SE", native: "Svenska (Sverige)" },
+  { code: "ta", native: "தமிழ்" },
+  { code: "te", native: "తెలుగు" },
   { code: "th", native: "ไทย" },
   { code: "tr-TR", native: "Türkçe (Türkiye)" },
   { code: "uk-UA", native: "Українська (Україна)" },
