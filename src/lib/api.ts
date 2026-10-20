@@ -528,3 +528,19 @@ export async function reportUser(input: {
     ...(input.postId ? { post_id: input.postId } : {}),
   });
 }
+
+/**
+ * Report a VIDEO.
+ *
+ * A post report, the same kind both phones file when a member reports from the feed — the
+ * reported clip is recorded against the report itself, so an admin watches the actual video
+ * rather than guessing. The web had no way to report a video at all until 2026-10-20; only a
+ * profile could be reported.
+ */
+export async function reportPost(input: { postId: number; reason: string; description: string }) {
+  return post("reportPost", {
+    post_id: input.postId,
+    reason: input.reason,
+    description: input.description,
+  });
+}

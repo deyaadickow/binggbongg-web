@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchReportReasons, reportUser, type ReportReason } from "../lib/api";
+import { fetchReportReasons, reportPost, reportUser, type ReportReason } from "../lib/api";
 
 /**
  * Reporting a member, with a reason and an explanation.
@@ -21,9 +21,14 @@ export function ReportDialog({
   onClose,
   onDone,
 }: {
-  reportedUserId: number;
+  /** The member being reported. Omitted when reporting a video — the post carries its author. */
+  reportedUserId?: number;
   reportedName: string;
-  /** The video the complaint is about, when the report started from one. */
+  /**
+   * The video the complaint is about. When this is set the report is filed as a POST report,
+   * the same kind both phones file from the feed, so the reported clip is recorded against the
+   * report and an admin can watch it.
+   */
   postId?: number;
   onClose: () => void;
   onDone: (message: string) => void;
@@ -50,12 +55,9 @@ export function ReportDialog({
     setSending(true);
     setError(null);
     try {
-      const res = await reportUser({
-        reportedUserId,
-        reason,
-        description: description.trim(),
-        postId,
-      });
+      const res = postId
+        ? await reportPost({ postId, reason, description: description.trim() })
+        : await reportUser({ reportedUserId: reportedUserId!, reason, description: description.trim() });
       // The server's own wording when it has one — it knows which rule was hit.
       onDone(res.message ?? "Thank you. Our team will look at this.");
       onClose();

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { ReportDialog } from "../components/ReportDialog";
 import { rememberCopiedLink, videoShareUrl } from "../lib/copiedLink";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { displayName, mediaUrl, post, type Gift, type Post } from "../lib/api";
@@ -43,6 +44,7 @@ export function VideoPage() {
   // in this menu now.
   const [menuOpen, setMenuOpen] = useState(false);
   const [chromeHidden, setChromeHidden] = useState(false);
+  const [showReport, setShowReport] = useState(false);
   const holdTimer = useRef(0);
   const holdFired = useRef(false);
 
@@ -339,6 +341,19 @@ export function VideoPage() {
               style={{ background: "#000", color: "var(--gold)", borderColor: "var(--gold)" }}>
               {t("link")}</button>
           )}
+          {/* Steve, 2026-10-20. The web had no way to report a VIDEO at all — only a profile —
+              so a member who saw something wrong here had to go to the uploader's page and
+              report the person instead, which told an admin nothing about which clip. This
+              files a post report, the same kind both phones file from the feed. */}
+          <button
+            className="btn small"
+            title="Report this video"
+            onClick={() => {
+              if (!isLoggedIn) { navigate("/login", { state: { from: location.pathname + location.search } }); return; }
+              setShowReport(true);
+            }}
+            style={{ background: "#000", color: "var(--gold)", borderColor: "var(--gold)" }}>
+            Report</button>
         </div>
         {/* Steve, 2026-10-19: "add a small Bullseye on main page right under the share icon in
             the corner." Same job the Clear the screen row had, and deliberately NOT hidden with
@@ -379,6 +394,14 @@ export function VideoPage() {
         </button>
         <PostGiftButton post={item} onSent={setSentGift} onOpenChange={onGiftSheetOpenChange} />
       </div>
+      {showReport && (
+        <ReportDialog
+          postId={item.id}
+          reportedName={displayName(item.user)}
+          onClose={() => setShowReport(false)}
+          onDone={(message) => showGoldAlert(message)}
+        />
+      )}
     </div>
   );
 }
