@@ -13,6 +13,8 @@ import { useSession } from "../lib/session";
 import { Avatar } from "./Common";
 import { GoldSelect } from "./GoldSelect";
 import { showGoldAlert } from "./GoldToast";
+import { StickerPicker } from "./StickerPicker";
+import type { Sticker } from "../lib/stickers";
 import { currentLang } from "../lib/i18n";
 import { TRANSLATION_LANGUAGES, translateChatMessage } from "../lib/translate";
 
@@ -48,6 +50,7 @@ export function CommentsPanel({ postId, totalComments }: { postId: number; total
   const [text, setText] = useState("");
   const [voice, setVoice] = useState("");
   const [sending, setSending] = useState(false);
+  const [stickerPickerOpen, setStickerPickerOpen] = useState(false);
   const [count, setCount] = useState(totalComments ?? 0);
 
   // Playback — ONE at a time on purpose: a list of comments all talking over each other is
@@ -151,6 +154,35 @@ export function CommentsPanel({ postId, totalComments }: { postId: number; total
     }
   }
 
+  /**
+   * Steve, 2026-10-21: "Add the sticker picker to the web." Picking one sends it immediately —
+   * no confirm step — the same as on the phones. A sticker has nothing to read out, so a picked
+   * voice never applies to one.
+   */
+  async function sendSticker(sticker: Sticker) {
+    setStickerPickerOpen(false);
+    if (!requireLogin() || !user || sending) return;
+    setSending(true);
+    try {
+      const res = await addCommentOnPost({
+        postId,
+        userId: user.id,
+        comment: "",
+        stickerUrl: sticker.file,
+      });
+      if (res.status && res.data) {
+        setComments((prev) => [res.data as VideoComment, ...prev]);
+        setCount((n) => n + 1);
+      } else if (res.message) {
+        showGoldAlert(res.message);
+      }
+    } catch {
+      showGoldAlert("Couldn't send that sticker.");
+    } finally {
+      setSending(false);
+    }
+  }
+
   async function remove(c: VideoComment) {
     if (!user || c.id == null) return;
     const keep = comments;
@@ -222,7 +254,7 @@ export function CommentsPanel({ postId, totalComments }: { postId: number; total
           onChange={setTarget}
           searchable
           ariaLabel="Message Translation"
-          style={{ minWidth: 170 }}
+          style={{ width: 200, flex: "0 0 auto" }}
           options={[
             { value: "", label: "◎ Translation: None" },
             ...TRANSLATION_LANGUAGES.map((l) => ({ value: l.code, label: `◎ ${l.native}` })),
@@ -233,6 +265,16 @@ export function CommentsPanel({ postId, totalComments }: { postId: number; total
       {/* Write a comment. The voice picker sits beside the box, so it is visible BEFORE the
           comment is sent that it is going to be spoken out loud. */}
       <div className="row" style={{ gap: 8, alignItems: "flex-start" }}>
+        {/* Left of the box, where the phones put it. */}
+        <button
+          className="btn ghost"
+          title="Send a sticker"
+          disabled={sending}
+          onClick={() => { if (requireLogin()) setStickerPickerOpen(true); }}
+          style={{ flex: "0 0 auto", fontSize: 18, padding: "10px 12px" }}
+        >
+          ☺
+        </button>
         <textarea
           className="input"
           rows={2}
@@ -326,6 +368,10 @@ export function CommentsPanel({ postId, totalComments }: { postId: number; total
           );
         })}
       </div>
+
+      {stickerPickerOpen && (
+        <StickerPicker onPick={(s) => void sendSticker(s)} onClose={() => setStickerPickerOpen(false)} />
+      )}
 
       {!loading && !noMore && comments.length > 0 && (
         <button

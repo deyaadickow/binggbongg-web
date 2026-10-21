@@ -606,11 +606,17 @@ export async function addCommentOnPost(input: {
   comment: string;
   voiceType?: string | null;
   language?: string;
+  /** Steve, 2026-10-21: "Add the sticker picker to the web." The picked sticker's stored path,
+   *  sent raw exactly as the phones send it. The server takes a comment with text, a sticker, or
+   *  both (`comment` is required_without:sticker_url), and a sticker has nothing to speak, so a
+   *  voice never rides along with one. */
+  stickerUrl?: string | null;
 }) {
   return post<VideoComment>("addCommentOnPost", {
     post_id: input.postId,
     user_id: input.userId,
-    comment: input.comment,
+    comment: input.comment || undefined,
+    sticker_url: input.stickerUrl || undefined,
     voice_type: input.voiceType || undefined,
     language: input.voiceType ? input.language || "en" : undefined,
   });
