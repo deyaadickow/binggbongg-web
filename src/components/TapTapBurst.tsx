@@ -63,10 +63,48 @@ const SPOT_HOLD_MAX_MS = 5000;
 /** Landed over this window rather than on one frame, so it reads as appearing, not blinking. */
 const SPOT_SPAWN_WINDOW_MS = 700;
 
-function spotCount(price: number): number {
-  const low = 5 + Math.floor(price / 10);
+/** The longest a Spot shower may run before the last gift is spawned — see spotIntervalMs.
+ *  Steve, 2026-10-21: "Yes make it faster, twice as many on screen" — halved from 20s. */
+const SPOT_MAX_RUN_MS = 10000;
+/** Twice as many standing at once as his original "15 to 20 for a 100 coin gift", which halves
+ *  how long the shower takes to get through one gift per coin. */
+const SPOT_CROWD = 2;
+
+/**
+ * How many Spot gifts stand on the screen AT ONCE.
+ *
+ * Steve, 2026-10-21: "I sent 100 coin gift of roses and only a few roses showed up. We need for
+ * the roses to keep appearing 5, 7, 10 or whatever as many at a time and before these disappear
+ * more will show up until all 100 of them show." So his original numbers were never the TOTAL —
+ * the total is one gift per coin, the same as every other effect, and this is how many are up
+ * together while they take their turns.
+ */
+function spotOnScreen(price: number): number {
+  const low = spotOnScreenMin(price);
   const high = low + Math.max(5, Math.floor(low / 3));
-  return Math.min(Math.max(low + Math.floor(Math.random() * (high - low + 1)), 1), MAX_ICONS);
+  return Math.max(low + Math.floor(Math.random() * (high - low + 1)), 1);
+}
+
+/** The LOW end of that range. Fewer on screen means a LONGER run, so anything that has to
+ *  out-last a run it did not schedule (tapTapBurstDuration) uses the worst case. */
+function spotOnScreenMin(price: number): number {
+  return Math.max((5 + Math.floor(price / 10)) * SPOT_CROWD, 1);
+}
+
+/** How long to leave between spawns so `onScreen` are standing at any moment and the run still
+ *  finishes. Past the cap the gifts simply arrive faster and more stand together — also what
+ *  Steve asked for ("the bigger the gift the more will appear"). */
+function spotIntervalMs(total: number, onScreen: number): number {
+  const averageHold = (SPOT_HOLD_MIN_MS + SPOT_HOLD_MAX_MS) / 2;
+  const keepingUp = averageHold / Math.max(onScreen, 1);
+  const withinCap = SPOT_MAX_RUN_MS / Math.max(total, 1);
+  return Math.max(Math.min(keepingUp, withinCap), 25);
+}
+
+/** When the last Spot gift of a run is spawned, from the start of the burst. */
+function spotLastLandsAt(total: number, onScreen: number): number {
+  if (total <= onScreen) return SPOT_SPAWN_WINDOW_MS;
+  return SPOT_SPAWN_WINDOW_MS + (total - onScreen) * spotIntervalMs(total, onScreen);
 }
 const UNIVERSAL_SIDES: BurstDirection[] = ["up", "down", "left", "right"];
 /**
@@ -143,9 +181,14 @@ export function burstLabel(gift: Gift): string | null {
 export function tapTapBurstDuration(gift: Gift): number {
   // Surprise runs for a fixed 5 seconds whatever the gift costs.
   if (burstDirection(gift) === "surprise") return SURPRISE_MS + SURPRISE_LIFE_MS;
-  // The longest any one Spot gift can be up, plus the time the last one takes to land.
-  if (burstDirection(gift) === "spot")
-    return SPOT_SPAWN_WINDOW_MS + SPOT_FADE_IN_MS + SPOT_HOLD_MAX_MS + SPOT_FADE_OUT_MS;
+  // Spot is a stream, so this is when the LAST one lands plus how long it can stay. The worst
+  // case (fewest on screen, longest run), because spotOnScreen is random and this must never
+  // end a burst before its last gift.
+  if (burstDirection(gift) === "spot") {
+    const total = Math.min(Math.max(giftPrice(gift), 1), MAX_ICONS);
+    return spotLastLandsAt(total, spotOnScreenMin(giftPrice(gift)))
+      + SPOT_FADE_IN_MS + SPOT_HOLD_MAX_MS + SPOT_FADE_OUT_MS;
+  }
   const count = Math.min(Math.max(giftPrice(gift), 1), MAX_ICONS);
   return (count - 1) * staggerMs(count) + FLIGHT_MS + 200;
 }
@@ -206,26 +249,41 @@ export function TapTapBurst({ gift }: { gift: Gift }) {
     // points clump badly: half the screen ends up bare and the middle is a pile (seen on the
     // iOS Simulator before this). One per cell, jittered inside it, keeps them spread while
     // still looking scattered rather than laid out.
+    // A STREAM, not a wave (Steve, 2026-10-21): `onScreen` stand at any moment and as each
+    // one's 3-5 seconds run out another takes its place, until all of them — one per coin, like
+    // every other effect — have been seen. The grid is sized to how many STAND at once and its
+    // cells are reshuffled each time round, so a long shower keeps covering the screen evenly
+    // instead of dropping gifts into the same cells in the same order.
     if (dir === "spot") {
-      const total = spotCount(giftPrice(gift));
-      const columns = Math.max(1, Math.ceil(Math.sqrt(total)));
-      const rows = Math.max(1, Math.ceil(total / columns));
-      const cells = Array.from({ length: columns * rows }, (_, i) => i)
-        .sort(() => Math.random() - 0.5)
-        .slice(0, total);
-      return cells.map((cell, n) => ({
-        key: n,
-        dir: "spot" as BurstDirection,
-        delayMs: (n / Math.max(total, 1)) * SPOT_SPAWN_WINDOW_MS + Math.random() * 120,
-        // 10..90 inside the cell keeps a gift off its neighbour and off the screen edge.
-        startLeftPct: ((cell % columns) + 0.1 + Math.random() * 0.8) * (100 / columns),
-        topPct: (Math.floor(cell / columns) + 0.1 + Math.random() * 0.8) * (100 / rows),
-        driftPx: 0,
-        risePct: 0,
-        size: ICON_SIZE_MIN + Math.random() * ICON_SIZE_RANGE,
-        spin: (Math.random() - 0.5) * 14,
-        holdMs: SPOT_HOLD_MIN_MS + Math.random() * (SPOT_HOLD_MAX_MS - SPOT_HOLD_MIN_MS),
-      }));
+      const total = Math.min(Math.max(giftPrice(gift), 1), MAX_ICONS);
+      const onScreen = spotOnScreen(giftPrice(gift));
+      const interval = spotIntervalMs(total, onScreen);
+      const columns = Math.max(1, Math.ceil(Math.sqrt(onScreen)));
+      const rows = Math.max(1, Math.ceil(onScreen / columns));
+      const cellCount = Math.max(columns * rows, 1);
+      let bag: number[] = [];
+      return Array.from({ length: total }, (_, n) => {
+        if (bag.length === 0) {
+          bag = Array.from({ length: cellCount }, (_, i) => i).sort(() => Math.random() - 0.5);
+        }
+        const cell = bag.pop() as number;
+        return {
+          key: n,
+          dir: "spot" as BurstDirection,
+          // The opening screenful lands together; the rest keep pace with the ones leaving.
+          delayMs: n < onScreen
+            ? (n / onScreen) * SPOT_SPAWN_WINDOW_MS + Math.random() * 120
+            : SPOT_SPAWN_WINDOW_MS + (n - onScreen + 1) * interval,
+          // 10..90 inside the cell keeps a gift off its neighbour and off the screen edge.
+          startLeftPct: ((cell % columns) + 0.1 + Math.random() * 0.8) * (100 / columns),
+          topPct: (Math.floor(cell / columns) + 0.1 + Math.random() * 0.8) * (100 / rows),
+          driftPx: 0,
+          risePct: 0,
+          size: ICON_SIZE_MIN + Math.random() * ICON_SIZE_RANGE,
+          spin: (Math.random() - 0.5) * 14,
+          holdMs: SPOT_HOLD_MIN_MS + Math.random() * (SPOT_HOLD_MAX_MS - SPOT_HOLD_MIN_MS),
+        };
+      });
     }
 
     const count = Math.min(Math.max(giftPrice(gift), 1), MAX_ICONS);
