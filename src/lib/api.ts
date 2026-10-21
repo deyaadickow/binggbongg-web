@@ -544,3 +544,78 @@ export async function reportPost(input: { postId: number; reason: string; descri
     description: input.description,
   });
 }
+
+// ---- Comments on a video (Steve, 2026-10-21) --------------------------------------------------
+// The web had no comments at all until now — no list, no box, nothing on a video — while both
+// phones have had them since the app shipped. Added here together with spoken comments ("Yes add
+// the web too"), so the three platforms finally show the same thing under a video.
+//
+// A comment row is a row of tbl_comments, which the server serialises with the SAME shape it uses
+// for a post (see FetchPosts.Data on Android — one class for both). Only the fields a comment
+// actually carries are typed here.
+export interface VideoComment {
+  id: number;
+  post_id?: number;
+  user_id?: number;
+  comment?: string;
+  created_at?: string;
+  user?: UserSummary;
+  /** A sticker comment: the row carries a sticker instead of (or beside) text. */
+  sticker_url?: string | null;
+  /** Steve, 2026-10-21: "build the text to speech comments" — set when the member picked a
+   *  voice and the server spoke their typed text with Google TTS. Already an absolute URL
+   *  (Comments::getVoiceUrlAttribute), so it is played as-is rather than through mediaUrl. */
+  voice_url?: string | null;
+  voice_type?: string | null;
+}
+
+/** The four voices a comment can be spoken in — the same presets Text to Voice ships, so a
+ *  member who has used that recognises them. `null` is "don't speak it", which is the default. */
+export const COMMENT_VOICES: { key: string; label: string }[] = [
+  { key: "male_deep", label: "🗣️ Man" },
+  { key: "female_soft", label: "🗣️ Woman" },
+  { key: "robot", label: "🤖 Robot" },
+  { key: "chipmunk", label: "🐿️ Chipmunk" },
+];
+
+export async function fetchPostComments(postId: number, start = 0, count = 20, myId?: number) {
+  const res = await post<VideoComment[]>("fetchPostComments", {
+    post_id: postId,
+    start,
+    count,
+    my_user_id: myId,
+  });
+  return Array.isArray(res.data) ? res.data : [];
+}
+
+/**
+ * Add a comment. With `voiceType` set the server runs the typed text through Google TTS and
+ * stores the mp3 alongside it, and the row comes back with a voice_url to play.
+ *
+ * `language` is the viewer's own app language as a BARE code ("en", "id", "fil") — the server
+ * resolves it to a full locale. Sending a region-qualified code instead makes it miss the voice
+ * table and fall back to an English voice, silently.
+ *
+ * The caller gets the whole response, not just the row: when the server refuses to SPEAK a
+ * comment (a banned word, or too long to read out) it answers status:false with the sentence
+ * meant to be shown, and the comment is not saved.
+ */
+export async function addCommentOnPost(input: {
+  postId: number;
+  userId: number;
+  comment: string;
+  voiceType?: string | null;
+  language?: string;
+}) {
+  return post<VideoComment>("addCommentOnPost", {
+    post_id: input.postId,
+    user_id: input.userId,
+    comment: input.comment,
+    voice_type: input.voiceType || undefined,
+    language: input.voiceType ? input.language || "en" : undefined,
+  });
+}
+
+export async function deleteComment(myId: number, commentId: number) {
+  return post("deleteComment", { user_id: myId, comment_id: commentId });
+}

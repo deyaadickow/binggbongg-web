@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ReportDialog } from "../components/ReportDialog";
+import { CommentsPanel } from "../components/CommentsPanel";
 import { rememberCopiedLink, videoShareUrl } from "../lib/copiedLink";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { displayName, mediaUrl, post, type Gift, type Post } from "../lib/api";
@@ -394,6 +395,10 @@ export function VideoPage() {
         </button>
         <PostGiftButton post={item} onSent={setSentGift} onOpenChange={onGiftSheetOpenChange} />
       </div>
+      {/* Steve, 2026-10-21: "Yes add the web too." The web had no comments at all until now —
+          see CommentsPanel. Keyed on the post so moving down the feed resets the list rather
+          than showing the previous video's comments under the new one. */}
+      <CommentsPanel key={item.id} postId={item.id} totalComments={item.total_comments} />
       {showReport && (
         <ReportDialog
           postId={item.id}
