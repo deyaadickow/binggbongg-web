@@ -15,6 +15,7 @@ import {
 } from "./pages/BrowsePages";
 import { MemberAlbumPage } from "./pages/MemberAlbumPage";
 import { ContestUploadPage } from "./pages/ContestUploadPage";
+import { ContestsPage, ContestBoardPage } from "./pages/ContestsPage";
 import { HomePage } from "./pages/HomePage";
 import { LanguagePage } from "./pages/LanguagePage";
 import { FeaturesPage } from "./pages/FeaturesPage";
@@ -121,6 +122,10 @@ export default function App() {
           {/* Cartoon Me (Steve, 2026-10-12) */}
           <Route path="/cartoon" element={<CartoonPage />} />
           <Route path="/enter-contest" element={<ContestUploadPage />} />
+          {/* The board the site never had. Open to everyone, every country — entering is the
+              only country-locked half, and that lives on /enter-contest. */}
+          <Route path="/contests" element={<ContestsPage />} />
+          <Route path="/contests/:id" element={<ContestBoardPage />} />
           <Route path="/settings" element={<SettingsHubPage />} />
           <Route path="/settings/account" element={<AccountSettingsPage />} />
           <Route path="/settings/share" element={<ShareProfilePage />} />
