@@ -388,6 +388,7 @@ export const en = {
   everyone_playing_a_game_in_your_room_rig: "Everyone playing a game in your room right now.",
   everyone_who_gifted_you: "everyone who gifted you",
   everything_bingg_bongg_does: "Bingg Bongg Features",
+  contests: "Contests",
   exciting_news: "Exciting News",
   exciting_news_empty: "Nothing here yet.",
   exciting_news_search_hint: "Search a country or word…",

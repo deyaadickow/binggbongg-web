@@ -29,6 +29,7 @@ export function Nav() {
             Settings keeps its narrow-screen link: it is not a feed destination, it is how a
             member reaches their own account when the sidebar is off screen. */}
         <NavLink to="/" end>{t("for_you")}</NavLink>
+        <NavLink to="/contests">{t("contests")}</NavLink>
         <NavLink to="/exciting-news">{t("exciting_news")}</NavLink>
         <NavLink to="/features">{t("everything_bingg_bongg_does")}</NavLink>
         <NavLink to="/settings" className="only-narrow">{t("settings")}</NavLink>
