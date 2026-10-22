@@ -188,7 +188,7 @@ export const en = {
   contact_email: "Contact email",
   contact_us: "Contact Us",
   contest_pending_requests: "Contest pending requests",
-  contests_run_for_a_set_period_and_are_op: "Contests run for a set period and are open to particular countries. When one opens for yours, it appears here by name.",
+  contests_run_for_a_set_period_and_are_op: "Contests run for a set period, and only members in those countries can enter them. You can still watch every contest and support the singers in the Bingg Bongg app.",
   copy: "Copy",
   copy_link: "Copy link",
   copy_this_video_s_link: "Copy this video's link",
