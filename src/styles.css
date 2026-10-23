@@ -41,8 +41,6 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 :root { --nav-h: 85px; }
 @media (max-width: 420px) { :root { --nav-h: 67px; } }
 .nav { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; flex-wrap: wrap; gap: 10px 16px; padding: 10px 16px; background: var(--panel); border-bottom: 1px solid var(--gold-border); }
-.nav .links { order: 3; flex-basis: 100%; }
-@media (min-width: 700px) { .nav .links { order: 0; flex-basis: auto; } }
 /* The brand is the rectangle logo (Steve, 2026-10-20), not type. display:flex keeps the
    image from sitting on the text baseline and leaving a gap under the header. */
 .nav .brand { display: flex; align-items: center; }
@@ -58,7 +56,17 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
   .nav .brand { flex: 0 0 240px; margin-left: -16px; text-align: center; }
   .nav .links { margin-left: 18px; }
 }
-.nav .links { display: flex; gap: 6px; flex: 1; overflow-x: auto; }
+/* The chip row. On a phone it takes a line of its own under the brand and scrolls
+   sideways; from 700px up it sits inline in the header row.
+   Steve, 23 Oct, on his phone: "the top part ... needs to be able to scroll to the left so
+   all the rest of the buttons can show". Contests and the two after it were unreachable —
+   not because scrolling was missing, but because `flex: 1` here is shorthand that resets
+   flex-basis to 0, silently cancelling the `flex-basis: 100%` set in an earlier block of the
+   same specificity. The chips stayed on row one and ran off the right edge. Keep every flex
+   property for this selector in THIS block; splitting them is what broke it. */
+.nav .links { display: flex; gap: 6px; overflow-x: auto; order: 3; flex: 1 1 100%; scrollbar-width: none; }
+.nav .links::-webkit-scrollbar { display: none; }
+@media (min-width: 700px) { .nav .links { order: 0; flex: 1 1 auto; } }
 /* Same bullets as the sidebar: a gold-bordered pill each, the current page filled gold. */
 .nav .links a { padding: 7px 14px; border-radius: 999px; border: 1px solid var(--gold-border); background: #0d0d0d; color: var(--text-soft); font-weight: 600; white-space: nowrap; transition: background .15s, color .15s; }
 .nav .links a:hover { color: var(--gold); background: #1a1a1a; }
