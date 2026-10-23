@@ -1393,4 +1393,7 @@ export const fil = {
   fname_to_do_list: "To Do List",
   fblurb_to_do_list: "Sarili mong notepad. Isulat ang anumang gusto mong tandaan — sa iyo lang ito, at nandito sa telepono mo at sa website.",
   fwhere_settings: "Settings",
+  // Steve, 23 Oct: this was the one key fil was missing, so the nav chip read
+  // "Contests" in English next to "Para ti" and "Noticias Emocionantes".
+  contests: "Mga Contest",
 };

@@ -22,19 +22,21 @@ import { en } from "./strings/en";
 import { es } from "./strings/es";
 import { fil } from "./strings/fil";
 import { id } from "./strings/id";
+import { tl } from "./strings/tl";
 
 export type StringKey = keyof typeof en;
-export type Lang = "en" | "es" | "fil" | "id";
+export type Lang = "en" | "es" | "fil" | "id" | "tl";
 
 /** Only languages with a real dictionary are offered; the picker is built from this list. */
 export const LANGUAGES: { code: Lang; native: string; english: string }[] = [
   { code: "en", native: "English", english: "English" },
   { code: "es", native: "Español", english: "Spanish" },
   { code: "fil", native: "Filipino", english: "Filipino" },
+  { code: "tl", native: "Tagalog", english: "Tagalog" },
   { code: "id", native: "Bahasa Indonesia", english: "Indonesian" },
 ];
 
-const DICTS: Record<Lang, Partial<Record<StringKey, string>>> = { en, es, fil, id };
+const DICTS: Record<Lang, Partial<Record<StringKey, string>>> = { en, es, fil, id, tl };
 const STORAGE_KEY = "bb.lang";
 
 /**
