@@ -7,6 +7,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSession } from "../lib/session";
 import { Loading, Notice } from "../components/Common";
+import { showGoldConfirm } from "../components/GoldToast";
 import { PageTitle } from "../components/PageTitle";
 import {
   VAULT_MIN_PASSCODE, type VaultEntry, type VaultStatus,
@@ -87,7 +88,13 @@ export function VaultPage() {
 
   async function doDelete(id?: number) {
     if (!id || !dataKey) return;
-    if (!confirm("Delete this entry? It cannot be brought back.")) return;
+    // The BB card, not the browser's grey confirm() — Steve, 2026-10-24: "Add our design on
+    // that popup on all platforms please."
+    const ok = await showGoldConfirm({
+      message: "Delete this entry? It cannot be brought back.",
+      confirmLabel: "Delete", cancelLabel: "Cancel", danger: true,
+    });
+    if (!ok) return;
     setBusy(true);
     try {
       await deleteVaultItem(user!.id, id);
@@ -96,8 +103,11 @@ export function VaultPage() {
   }
 
   async function doForget() {
-    const typed = prompt("This ERASES every password saved here. It cannot be undone and nobody can recover it.\n\nType ERASE to confirm.");
-    if (typed !== "ERASE") return;
+    const ok = await showGoldConfirm({
+      message: "This ERASES every password saved here.\n\nIt cannot be undone, and nobody — not support, not an administrator — can recover it.",
+      confirmLabel: "Erase", cancelLabel: "Cancel", confirmWord: "ERASE", danger: true,
+    });
+    if (!ok) return;
     setBusy(true);
     try {
       await forgetVault(user!.id);
