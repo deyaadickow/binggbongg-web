@@ -1399,6 +1399,8 @@ export const fil = {
   fsec_help: "Tulong",
   fname_help: "Tulong",
   fblurb_help: "Mga miyembrong dumaraan sa mahirap na panahon. Magpadala ng regalo para matulungan sila, tulad ng pagpapadala mo ng regalo kapag may mga miyembrong nagla-live stream.",
+  fname_vault: "Pahinang Protektado ng Password",
+  fblurb_vault: "Itago ang sarili mong mga password sa app, nakakandado sa passcode na ikaw lang ang nakakaalam.",
   help_title: "Tulong",
   vault_title: "Pahinang Protektado ng Password",
   help_ask_for_help: "Humingi ng tulong",
