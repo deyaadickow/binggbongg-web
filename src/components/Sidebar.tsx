@@ -77,15 +77,15 @@ export function sidebarSections(userId: number | null): SideSection[] {
       { to: "/settings/shop", label: "bingg_bongg_shop", icon: "🛍️", needsLogin: true },
       { to: "/lucky", label: "lucky_numbers_horoscope", icon: "🔮", needsLogin: true },
       { to: "/settings/verification", label: "request_verification", icon: "✅", needsLogin: true },
+      // Help (Steve, 2026-10-24): "remove it from there and add it to the account section."
+      // No needsLogin — the Help list is public, and the page itself decides whether this
+      // member may ASK, from the server's own blocked_reason.
+      { to: "/help", label: "help_title", icon: "🤝" },
     ] },
     { title: "general", links: [
       { to: "/settings/language", label: "change_language", icon: "🌐" },
       // Steve, 2026-10-19: "In settings. Add a notepad for everyone."
       { to: "/settings/todo", label: "to_do_list", icon: "📝", needsLogin: true },
-      // Help (Steve, 2026-10-24): "add the help button to settings/account as well. i want it to
-      // be visible to everyone." No needsLogin — the Help list is public, and the page itself
-      // decides whether this member may ASK, from the server's own blocked_reason.
-      { to: "/help", label: "help_title", icon: "🤝" },
       { to: "/settings/support", label: "customer_support", icon: "💬" },
       { to: "/settings/terms", label: "terms_of_use", icon: "📄" },
       { to: "/settings/privacy", label: "privacy_policy", icon: "🔒" },
