@@ -138,6 +138,11 @@ export interface UserSummary {
   fullname?: string;
   username?: string;
   profile_image?: string;
+  /** Steve, 2026-10-11 (direct messages): the chat identity string the phones key every
+   *  Firestore conversation off. Returned by the API for any member — it is NOT one of the
+   *  self-only hidden fields — and is what lib/dm.ts builds conversationId from. */
+  identity?: string;
+  is_verified?: number;
   bio?: string;
   country?: string;
   total_followers?: number;
@@ -148,6 +153,9 @@ export interface UserSummary {
   redeem_wallet?: number;
   cash_wallet?: number;
   is_following?: boolean | number;
+  /** The category ids this member marked as favourites, comma separated — the same CSV the
+   *  phones read off their own row (CategoryFragment.initFav). Only ever set on your own user. */
+  fav_cats?: string;
   auth_token?: string;
 }
 
@@ -165,6 +173,16 @@ export interface Post {
   is_post_liked?: boolean | number;
   created_at?: string;
   user?: UserSummary;
+  /** Steve, 2026-10-13: what the (C) button copies for this video. */
+  share_url?: string;
+  /** Non-null only when the poster pasted a link onto this video — drives the "Link" tab.
+   *  The server also sends null when the linked video has since been deleted, so a tab is
+   *  never drawn for something that would open nothing. */
+  linked_video?: { id: number; thumbnail?: string; user_name?: string; url?: string } | null;
+  /** The song on this video. fetchPosts has always eager-loaded it; nothing on the web read it
+   *  until the feed's hold-to-open menu (Steve, 2026-10-19) needed somewhere for "the turning
+   *  record" to go. `sound` is the file, `sound_title` the name members see. */
+  sound?: { id?: number; sound_title?: string; sound?: string; singer?: string } | null;
 }
 
 export interface LiveStream {
@@ -179,6 +197,12 @@ export interface LiveStream {
   /** Steve, 2026-10-07: favourites sort to the top of Live Now and the heart filters to them.
    *  The server sends this on every row. */
   is_favourite?: boolean;
+  /** Daily Live Badge (Steve, 2026-10-16). 0 none, 1 Bronze, 2 Silver, 3 Gold, 4 Diamond —
+   *  today's badge for THIS broadcaster, earned by hosting a live with real viewers in it.
+   *  The server also uses it to lift the row up this same list. */
+  live_badge_tier?: number;
+  live_badge_tier_name?: string;
+  live_badge_minutes?: number;
 }
 
 export interface Gift {
@@ -202,6 +226,8 @@ export interface Gift {
   is_surprise?: boolean;
   /** Universal — each gift picks one of the four sides, so a quarter arrive from each. */
   is_universal?: boolean;
+  /** Steve, 2026-10-19: Spot — many at once, each holding one place for 3-5 seconds. */
+  is_spot?: boolean;
 }
 export function giftPrice(g: Gift): number {
   return Number(g.coin_price ?? g.votes ?? 0);
@@ -282,6 +308,47 @@ export function formatScheduleTime(utc: string): string {
   });
 }
 
+/**
+ * Lucky numbers + daily horoscope (Steve, 2026-10-09): "for entertainment only so we can bring
+ * members to the app on a daily bases."
+ *
+ * The numbers are STRINGS and must stay strings: "048" is a three digit number and 48 is not,
+ * and roughly one draw in ten starts with a zero. Never Number() them.
+ *
+ * Pass `dateOfBirth` only to set or correct the member's own — the server stores it on the same
+ * column the age check reads, so there is nothing else to save.
+ */
+export type DailyFortune = {
+  status: boolean;
+  message?: string;
+  date?: string;
+  lucky_numbers?: Record<string, string>;
+  sign?: string | null;
+  date_of_birth?: string | null;
+  age?: number | null;
+  horoscope?: string | null;
+  /** Which language the reading actually came back in — "en" when translation was unavailable. */
+  horoscope_language?: string;
+  disclaimer?: string;
+};
+
+export async function fetchDailyFortune(userId: number, dateOfBirth?: string): Promise<DailyFortune> {
+  // This endpoint answers at the TOP level rather than nesting under `data`, so the response
+  // is read as a whole rather than via res.data.
+  //
+  // The web has no app-wide language setting — the UI is English only — so the READING is
+  // asked for in the BROWSER's language (Steve, 2026-10-10: translate the reading too). "fr-FR"
+  // becomes "fr"; Google wants the base code. If the server has no translate key it returns
+  // English and says so in horoscope_language.
+  const browserLanguage = (navigator.language || "en").split("-")[0].toLowerCase();
+  const res = await post("fetchDailyFortune", {
+    user_id: userId,
+    language: browserLanguage,
+    ...(dateOfBirth ? { date_of_birth: dateOfBirth } : {}),
+  });
+  return res as unknown as DailyFortune;
+}
+
 export async function fetchUserSchedule(userId: number, myId?: number) {
   const res = await post<ScheduleItem[]>("fetchUserSchedule", {
     user_id: userId,
@@ -347,4 +414,214 @@ export async function respondToBattleRequest(myId: number, requestId: number, ac
   return post("respondToBattleRequest", {
     my_user_id: myId, user_id: myId, battle_request_id: requestId, accept: accept ? 1 : 0,
   });
+}
+
+// --- Birthday Page (Steve, 2026-10-20) --------------------------------------------------
+
+export type BirthdayMember = {
+  user_id: number;
+  fullname?: string;
+  username?: string;
+  profile_image?: string;
+  is_me?: boolean;
+  already_wished?: boolean;
+};
+
+export type BirthdayList = {
+  date?: string;
+  flower_coins?: number;
+  invite_text?: string;
+  /** The member's OWN birthday, or null when they have not saved one. */
+  my_birthday?: string | null;
+  members?: BirthdayMember[];
+};
+
+export type BirthdayWish = {
+  id: number;
+  /** "wish" (free) or "flower" (100 coins). */
+  kind?: string;
+  coins?: number;
+  sender_user_id?: number;
+  fullname?: string;
+  username?: string;
+  profile_image?: string;
+};
+
+export type BirthdayWishes = {
+  total_wishes?: number;
+  total_flowers?: number;
+  total_coins?: number;
+  wishes?: BirthdayWish[];
+};
+
+export async function fetchTodaysBirthdays(myId: number) {
+  const res = await post<BirthdayList>("fetchTodaysBirthdays", { my_user_id: myId });
+  return res.data ?? null;
+}
+
+/** Free, once per sender per birthday. The server enforces the once — this only reports. */
+export async function sendBirthdayWish(myId: number, recipientUserId: number) {
+  return post("sendBirthdayWish", { my_user_id: myId, recipient_user_id: recipientUserId });
+}
+
+/** 100 coins, uncapped — a member may send flowers as often as they want to pay for. */
+export async function sendBirthdayFlowers(myId: number, recipientUserId: number) {
+  return post("sendBirthdayFlowers", { my_user_id: myId, recipient_user_id: recipientUserId });
+}
+
+/**
+ * Who wished ME, and what they sent.
+ *
+ * markSeen is deliberately left off by the page: it must keep showing everything for ever.
+ * Only the (not yet built) login pop-ups should stamp them seen.
+ */
+export async function fetchMyBirthdayWishes(myId: number) {
+  const res = await post<BirthdayWishes>("fetchMyBirthdayWishes", {
+    my_user_id: myId,
+    unseen_only: 0,
+    mark_seen: 0,
+  });
+  return res.data ?? null;
+}
+
+// --- Reporting (Steve, 2026-10-20) --------------------------------------------------------
+
+export type ReportReason = { id: number; reason: string };
+
+/**
+ * The reason list an admin maintains, straight off the settings payload the phones already
+ * read. Fetched rather than hardcoded so a reason added in the admin panel appears on the web
+ * without a deploy.
+ */
+export async function fetchReportReasons(): Promise<ReportReason[]> {
+  try {
+    const res = await post<unknown>("fetchSettings", {});
+    const data = (res as { data?: { report_reasons?: ReportReason[] } }).data;
+    return data?.report_reasons ?? [];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Report a member.
+ *
+ * `user_id` is the person being REPORTED — not the reporter. The web previously sent the
+ * signed-in member's own id here and the reported member as `to_user_id`, which the endpoint
+ * does not read at all, so every web report was filed against the person who clicked Report.
+ * It also sent no description, which the server requires, so the report was rejected and the
+ * member thanked anyway. Both fixed 2026-10-20.
+ *
+ * `post_id` is optional and names the video the complaint is about, so an admin can watch the
+ * thing being complained about instead of guessing.
+ */
+export async function reportUser(input: {
+  reportedUserId: number;
+  reason: string;
+  description: string;
+  postId?: number;
+}) {
+  return post("reportUser", {
+    user_id: input.reportedUserId,
+    reason: input.reason,
+    description: input.description,
+    ...(input.postId ? { post_id: input.postId } : {}),
+  });
+}
+
+/**
+ * Report a VIDEO.
+ *
+ * A post report, the same kind both phones file when a member reports from the feed — the
+ * reported clip is recorded against the report itself, so an admin watches the actual video
+ * rather than guessing. The web had no way to report a video at all until 2026-10-20; only a
+ * profile could be reported.
+ */
+export async function reportPost(input: { postId: number; reason: string; description: string }) {
+  return post("reportPost", {
+    post_id: input.postId,
+    reason: input.reason,
+    description: input.description,
+  });
+}
+
+// ---- Comments on a video (Steve, 2026-10-21) --------------------------------------------------
+// The web had no comments at all until now — no list, no box, nothing on a video — while both
+// phones have had them since the app shipped. Added here together with spoken comments ("Yes add
+// the web too"), so the three platforms finally show the same thing under a video.
+//
+// A comment row is a row of tbl_comments, which the server serialises with the SAME shape it uses
+// for a post (see FetchPosts.Data on Android — one class for both). Only the fields a comment
+// actually carries are typed here.
+export interface VideoComment {
+  id: number;
+  post_id?: number;
+  user_id?: number;
+  comment?: string;
+  created_at?: string;
+  user?: UserSummary;
+  /** A sticker comment: the row carries a sticker instead of (or beside) text. */
+  sticker_url?: string | null;
+  /** Steve, 2026-10-21: "build the text to speech comments" — set when the member picked a
+   *  voice and the server spoke their typed text with Google TTS. Already an absolute URL
+   *  (Comments::getVoiceUrlAttribute), so it is played as-is rather than through mediaUrl. */
+  voice_url?: string | null;
+  voice_type?: string | null;
+}
+
+/** The four voices a comment can be spoken in — the same presets Text to Voice ships, so a
+ *  member who has used that recognises them. `null` is "don't speak it", which is the default. */
+export const COMMENT_VOICES: { key: string; label: string }[] = [
+  { key: "male_deep", label: "🗣️ Man" },
+  { key: "female_soft", label: "🗣️ Woman" },
+  { key: "robot", label: "🤖 Robot" },
+  { key: "chipmunk", label: "🐿️ Chipmunk" },
+];
+
+export async function fetchPostComments(postId: number, start = 0, count = 20, myId?: number) {
+  const res = await post<VideoComment[]>("fetchPostComments", {
+    post_id: postId,
+    start,
+    count,
+    my_user_id: myId,
+  });
+  return Array.isArray(res.data) ? res.data : [];
+}
+
+/**
+ * Add a comment. With `voiceType` set the server runs the typed text through Google TTS and
+ * stores the mp3 alongside it, and the row comes back with a voice_url to play.
+ *
+ * `language` is the viewer's own app language as a BARE code ("en", "id", "fil") — the server
+ * resolves it to a full locale. Sending a region-qualified code instead makes it miss the voice
+ * table and fall back to an English voice, silently.
+ *
+ * The caller gets the whole response, not just the row: when the server refuses to SPEAK a
+ * comment (a banned word, or too long to read out) it answers status:false with the sentence
+ * meant to be shown, and the comment is not saved.
+ */
+export async function addCommentOnPost(input: {
+  postId: number;
+  userId: number;
+  comment: string;
+  voiceType?: string | null;
+  language?: string;
+  /** Steve, 2026-10-21: "Add the sticker picker to the web." The picked sticker's stored path,
+   *  sent raw exactly as the phones send it. The server takes a comment with text, a sticker, or
+   *  both (`comment` is required_without:sticker_url), and a sticker has nothing to speak, so a
+   *  voice never rides along with one. */
+  stickerUrl?: string | null;
+}) {
+  return post<VideoComment>("addCommentOnPost", {
+    post_id: input.postId,
+    user_id: input.userId,
+    comment: input.comment || undefined,
+    sticker_url: input.stickerUrl || undefined,
+    voice_type: input.voiceType || undefined,
+    language: input.voiceType ? input.language || "en" : undefined,
+  });
+}
+
+export async function deleteComment(myId: number, commentId: number) {
+  return post("deleteComment", { user_id: myId, comment_id: commentId });
 }

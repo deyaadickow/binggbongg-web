@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { mediaUrl } from "../lib/api";
 import { fetchSoloStandings, joinSoloBattle, type SoloBattle, type StandingRow } from "../lib/solobattle";
 import { clock, secondsUntil } from "../lib/battles";
+import { useT } from "../lib/i18n";
 
 /** Whether the join window is still open — the phones gate the Join button on exactly this. */
 export function isJoinWindowOpen(battle: SoloBattle, now: number): boolean {
@@ -20,6 +21,7 @@ export function SoloBattleStrip({ battle, myUserId, onOpenStandings, onToast, on
   onToast: (m: string) => void;
   onJoined: () => void;
 }) {
+  const { t } = useT();
   const [now, setNow] = useState(() => Date.now());
   const [busy, setBusy] = useState(false);
 
@@ -51,7 +53,7 @@ export function SoloBattleStrip({ battle, myUserId, onOpenStandings, onToast, on
     <div className="card pad" style={{ marginTop: 12, borderColor: "var(--gold-border)" }}>
       <div className="row" style={{ alignItems: "center" }}>
         <div style={{ flex: 1 }}>
-          <b style={{ color: "var(--gold)" }}>🏆 Solo Battle</b>
+          <b style={{ color: "var(--gold)" }}>{t("solo_battle_with_unlimited_players")}</b>
           <div className="muted" style={{ fontSize: 12 }}>
             {joinOpen
               ? `Anyone can join for the next ${clock(joinLeft)} — go live and the gifts you receive count.`
@@ -60,13 +62,13 @@ export function SoloBattleStrip({ battle, myUserId, onOpenStandings, onToast, on
               : "Finished."}
           </div>
         </div>
-        <button className="btn small ghost" onClick={onOpenStandings}>Leaderboard</button>
+        <button className="btn small ghost" onClick={onOpenStandings}>{t("leaderboard")}</button>
         {joinOpen && myUserId && !joined && (
           <button className="btn small" disabled={busy} onClick={join} style={{ marginLeft: 6 }}>
             {busy ? "Joining…" : "Join"}
           </button>
         )}
-        {joined && <span className="pill" style={{ marginLeft: 6 }}>You're in</span>}
+        {joined && <span className="pill" style={{ marginLeft: 6 }}>{t("you_re_in")}</span>}
       </div>
     </div>
   );
@@ -77,6 +79,7 @@ export function SoloBattleStandingsSheet({ battle, myUserId, onClose }: {
   myUserId: number | null;
   onClose: () => void;
 }) {
+  const { t } = useT();
   const [rows, setRows] = useState<StandingRow[] | null>(null);
 
   const load = useCallback(() => {
@@ -94,13 +97,13 @@ export function SoloBattleStandingsSheet({ battle, myUserId, onClose }: {
     <div style={{ position: "fixed", inset: 0, zIndex: 60, background: "rgba(0,0,0,0.65)", display: "grid", placeItems: "center", padding: 16 }}>
       <div className="card pad" style={{ width: "min(460px, 100%)", maxHeight: "86vh", overflowY: "auto" }}>
         <div className="row" style={{ marginBottom: 10 }}>
-          <b style={{ color: "var(--gold)", flex: 1, fontSize: 18 }}>🏆 Solo Battle</b>
-          <button className="btn small ghost" onClick={onClose}>Close</button>
+          <b style={{ color: "var(--gold)", flex: 1, fontSize: 18 }}>{t("solo_battle_with_unlimited_players")}</b>
+          <button className="btn small ghost" onClick={onClose}>{t("close")}</button>
         </div>
         {rows === null ? (
-          <p className="muted">Loading…</p>
+          <p className="muted">{t("imagePickerLoading")}</p>
         ) : rows.length === 0 ? (
-          <p className="muted">No one has scored yet.</p>
+          <p className="muted">{t("no_one_has_scored_yet")}</p>
         ) : (
           rows.map((r, i) => (
             <div key={`${r.user_id ?? i}`} className="row" style={{ padding: "8px 0", borderBottom: "1px solid var(--line)", alignItems: "center" }}>
@@ -120,8 +123,7 @@ export function SoloBattleStandingsSheet({ battle, myUserId, onClose }: {
           ))
         )}
         <p className="muted" style={{ fontSize: 12, marginTop: 10, marginBottom: 0 }}>
-          Scored by the gift coins each person receives while the battle runs.
-        </p>
+          {t("scored_by_the_gift_coins_each_person_rec")}</p>
       </div>
     </div>
   );

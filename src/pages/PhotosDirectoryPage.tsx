@@ -10,8 +10,10 @@ import { mediaUrl } from "../lib/api";
 import { useSession } from "../lib/session";
 import { fetchPhotosDirectory, type DirectoryEntry } from "../lib/photos";
 import { Loading, Notice } from "../components/Common";
+import { useT } from "../lib/i18n";
 
 export function PhotosDirectoryPage() {
+  const { t } = useT();
   const { user, isLoggedIn } = useSession();
   const [rows, setRows] = useState<DirectoryEntry[] | null>(null);
 
@@ -21,28 +23,35 @@ export function PhotosDirectoryPage() {
   }, [user]);
 
   if (!isLoggedIn || !user) {
-    return <div className="page"><Notice>Sign in to browse photos.</Notice></div>;
+    return <div className="page"><Notice>{t("sign_in_to_browse_photos")}</Notice></div>;
   }
 
   return (
     <div className="page" style={{ maxWidth: 980 }}>
       <div className="row" style={{ alignItems: "center", marginBottom: 8 }}>
-        <h1 className="page-title" style={{ flex: 1, marginBottom: 0 }}>Photos</h1>
-        <Link className="btn small ghost" to="/photos">My photos</Link>
+        <h1 className="page-title" style={{ flex: 1, marginBottom: 0 }}>{t("photos")}</h1>
+        <Link className="btn small ghost" to="/photos">{t("my_photos")}</Link>
       </div>
+
+      {/* Cartoon Me (Steve, 2026-10-12). Above the grid and outside the empty/loading branches,
+          so the way in is there even before anybody else's photos have loaded. */}
+      <Link to="/cartoon" className="card pad"
+            style={{ display: "block", textAlign: "center", color: "var(--gold)", fontWeight: 700, marginBottom: 12 }}>
+        {t("cartoon_me_turn_a_selfie_into_a_cartoon")}</Link>
 
       {rows === null ? <Loading /> : rows.length === 0 ? (
         <div className="card pad">
-          <p className="soft" style={{ marginTop: 0 }}>No photos to browse yet.</p>
+          <p className="soft" style={{ marginTop: 0 }}>{t("no_photos_to_browse_yet")}</p>
           <p className="muted" style={{ fontSize: 13, marginBottom: 0 }}>
-            Photos appear here once members build up an album.
-          </p>
+            {t("photos_appear_here_once_members_build_up")}</p>
         </div>
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 10 }}>
           {rows.map((r) => (
             <Link key={r.user_id} to={`/photos/${r.user_id}`}
-              style={{ display: "block", border: "1px solid var(--line)", borderRadius: 12, overflow: "hidden", background: "var(--panel)" }}>
+              /* Steve, 2026-10-13: "Add a border same as the cartoon border around the images."
+                 A 1px --line rim was invisible against the page; full gold, 2px. */
+              style={{ display: "block", border: "2px solid var(--gold)", borderRadius: 12, overflow: "hidden", background: "var(--panel)" }}>
               <div style={{ aspectRatio: "1", background: "#000" }}>
                 {r.preview_thumb && (
                   <img src={r.preview_thumb} alt="" loading="lazy"

@@ -1,4 +1,5 @@
 import type { MouseEvent } from "react";
+import { tt, useT } from "../lib/i18n";
 
 /**
  * Steve, 2026-10-05: "(BBBB) Bingg Bongg Battle Badge — The more you battle the bigger the badge
@@ -22,7 +23,7 @@ export function BattleBadge({
   return (
     <span
       onClick={onClick}
-      title={onClick ? "What is this?" : undefined}
+      title={onClick ? tt("what_is_this") : undefined}
       style={{
         display: "inline-flex",
         alignItems: "center",
@@ -48,16 +49,17 @@ export function BattleBadge({
 
 /** What the gold circle means, for anyone seeing it for the first time. */
 export function battleBadgeExplainer(name: string, badge: number): string {
-  const who = name.trim() === "" ? "This member" : name;
-  // "has battled 0 times" is not English, so a member with no battles gets their own line.
+  const who = name.trim() === "" ? tt("this_member") : name;
+  // "has battled 0 times" is not English, so a member with no battles gets their own line —
+  // and that same three-way split is what lets each language say it its own way.
   const played =
-    badge === 0 ? `${who} hasn't battled yet.`
-      : badge === 1 ? `${who} has battled once.`
-        : `${who} has battled ${badge} times.`;
+    badge === 0 ? tt("x_hasnt_battled_yet", who)
+      : badge === 1 ? tt("x_has_battled_once", who)
+        : tt("x_has_battled_n_times", who, badge);
   return (
     `${played}\n\n` +
-    "The circle counts every battle, one by one, and goes up the moment a battle finishes." +
-    (badge === 0 ? "\n\nBattle someone to start it." : "")
+    tt("the_circle_counts_every_battle") +
+    (badge === 0 ? `\n\n${tt("battle_someone_to_start_it")}` : "")
   );
 }
 
@@ -89,7 +91,7 @@ export function BattleStreak({
   return (
     <span
       onClick={onClick}
-      title={onClick ? "What is this?" : undefined}
+      title={onClick ? tt("what_is_this") : undefined}
       style={{
         display: "inline-flex",
         alignItems: "center",
@@ -119,21 +121,21 @@ export function BattleStreak({
 
 /** What the flames buy you, in the words Steve used. */
 export function battleStreakExplainer(name: string, streak: number, flames: number): string {
-  const who = name.trim() === "" ? "This member" : name;
+  const who = name.trim() === "" ? tt("this_member") : name;
   const banked =
     flames <= 0
-      ? "No free days saved up yet — keep the streak to 30 days and you earn your first flame."
+      ? tt("no_free_days_saved_up_yet")
       : flames === 1
-        ? "1 flame saved: one day off, and the streak keeps going."
-        : `${flames} flames saved: ${flames} days off, and the streak keeps going.`;
+        ? tt("one_flame_saved")
+        : tt("n_flames_saved", flames, flames);
   const run =
-    streak === 0 ? `${who} has no streak going. Battle someone today to start it.`
-      : streak === 1 ? `${who} has battled 1 day in a row.`
-        : `${who} has battled ${streak} days in a row.`;
+    streak === 0 ? tt("x_has_no_streak_going", who)
+      : streak === 1 ? tt("x_has_battled_one_day_in_a_row", who)
+        : tt("x_has_battled_n_days_in_a_row", who, streak);
   return (
     `${run}\n\n` +
-    "Battle at least once a day to keep it. Every 30 days in a row earns one flame 🔥 — 30 days is 1 flame, 60 days is 2, 90 days is 3.\n\n" +
-    "A flame is one free day. Miss a day and a flame is spent instead of losing the streak.\n\n" +
+    `${tt("battle_once_a_day_to_keep_it")}\n\n` +
+    `${tt("a_flame_is_one_free_day")}\n\n` +
     banked
   );
 }
@@ -147,6 +149,7 @@ export function BattleInfoPopup({
   body,
   onClose,
 }: { title: string; body: string; onClose: () => void }) {
+  const { t } = useT();
   return (
     <div
       onClick={onClose}
@@ -198,8 +201,7 @@ export function BattleInfoPopup({
             cursor: "pointer",
           }}
         >
-          OK
-        </button>
+          {t("ok")}</button>
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ import { PickerSheet } from "../components/PickerSheet";
 import { TRANSLATION_LANGUAGES, languageName, defaultTargetLanguage } from "../lib/translate";
 import { DEFAULT_TEXT_AREAS, cssAspectRatio, fetchExcitingNews, type ExcitingNewsFlyer, type ExcitingNewsType, type TextAreas } from "../lib/excitingnews";
 import { FlyerOverlay } from "../components/FlyerOverlay";
+import { useT } from "../lib/i18n";
 
 // Steve, 2026-10-02: "we should upload one flyer at a time so the first flyer will upload right
 // away and by the time they scroll to the second flyer, it's already there." The server translates
@@ -36,6 +37,7 @@ const PAGE_SIZE = 6;
  * when a flyer's own aspect ratio doesn't match the card's.
  */
 export function ExcitingNewsPage() {
+  const { t } = useT();
   const { user } = useSession();
   const [type, setType] = useState<ExcitingNewsType>("photo");
   const [search, setSearch] = useState("");
@@ -123,30 +125,30 @@ export function ExcitingNewsPage() {
   return (
     <div className="page">
       <div className="row" style={{ marginBottom: 14, flexWrap: "wrap", gap: 10 }}>
-        <h1 className="page-title" style={{ margin: 0 }}>Exciting News</h1>
+        <h1 className="page-title" style={{ margin: 0 }}>{t("exciting_news")}</h1>
         <span className="spacer" />
-        <button className={`btn small ${type === "photo" ? "" : "ghost"}`} onClick={() => setType("photo")}>Photos</button>
-        <button className={`btn small ${type === "video" ? "" : "ghost"}`} onClick={() => setType("video")}>Video</button>
+        <button className={`btn small ${type === "photo" ? "" : "ghost"}`} onClick={() => setType("photo")}>{t("photos")}</button>
+        <button className={`btn small ${type === "video" ? "" : "ghost"}`} onClick={() => setType("video")}>{t("video")}</button>
       </div>
       {/* This translates the description AND the words drawn on the flyer. The picture itself is
           never touched — anything Steve bakes into the artwork stays in whatever language he drew
           it, which is why the words live in the boxes instead. */}
       <div className="row" style={{ marginBottom: 14 }}>
         <button className="btn small block" onClick={() => setLangOpen(true)} style={{ justifyContent: "space-between" }}>
-          <span>🌐 Translate all flyers in {TRANSLATION_LANGUAGES.length} different languages</span>
+          <span>{t("translate_all_flyers_in_n_languages", TRANSLATION_LANGUAGES.length)}</span>
           <span style={{ color: "var(--gold-bright)" }}>{languageLabel}</span>
         </button>
       </div>
       <div className="row" style={{ gap: 8, marginBottom: 18 }}>
         <input
           className="input"
-          placeholder="Search a country or word…"
+          placeholder={t("exciting_news_search_hint")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter") runSearch(); }}
           style={{ flex: 1 }}
         />
-        <button className="btn small" onClick={runSearch}>Search</button>
+        <button className="btn small" onClick={runSearch}>{t("search")}</button>
       </div>
       {error && <Notice error>{error}</Notice>}
       {!loading && flyers.length === 0 && !error && (
@@ -165,12 +167,12 @@ export function ExcitingNewsPage() {
       </div>
       {loading ? <Loading /> : !reachedEnd && flyers.length > 0 && (
         <div className="center" style={{ marginTop: 20 }}>
-          <button className="btn" onClick={() => load(false)}>Show more</button>
+          <button className="btn" onClick={() => load(false)}>{t("show_more")}</button>
         </div>
       )}
       {langOpen && (
         <PickerSheet
-          title="Translate all flyers"
+          title={t("translate_all_flyers_title")}
           noun="language"
           selected={language}
           items={[{ code: "original", name: "As written — don't translate" },
@@ -198,6 +200,8 @@ export function ExcitingNewsPage() {
 function FlyerArt({ flyer, areas }: { flyer: ExcitingNewsFlyer; areas: TextAreas }) {
   const ref = useRef<HTMLDivElement>(null);
   const [box, setBox] = useState({ w: 0, h: 0 });
+  /** Steve, 2026-10-10: the bullseye's popup. */
+  const [reading, setReading] = useState(false);
   /** The artwork's own proportions, which decide where inside the card it actually lands. */
   const [natural, setNatural] = useState<{ w: number; h: number } | null>(null);
 
@@ -249,6 +253,106 @@ function FlyerArt({ flyer, areas }: { flyer: ExcitingNewsFlyer; areas: TextAreas
           <FlyerOverlay flyer={flyer} areas={areas} height={rect.h} />
         </div>
       )}
+      {/* Steve, 2026-10-10: "By tapping a Bullseye that you can add on the right side of the
+          message." Only on a flyer carrying a typed-out copy of its printed words — the older
+          flyers have theirs painted on by the page, already in the right language, so there is
+          nothing to read out. Pinned to the CARD rather than to the drawn rectangle: it is a
+          control, not part of the artwork, and it must stay reachable while a letterboxed flyer
+          is still measuring itself. */}
+      {readableFlyerText(flyer) && (
+        <button
+          type="button"
+          onClick={() => setReading(true)}
+          aria-label={READ_THIS_FLYER}
+          title={READ_THIS_FLYER}
+          style={{
+            position: "absolute",
+            right: 14,
+            top: "50%",
+            transform: "translateY(-50%)",
+            width: 40,
+            height: 40,
+            borderRadius: "50%",
+            background: "rgba(0,0,0,0.55)",
+            border: "1.5px solid #F0C420",
+            color: "#F0C420",
+            font: "bold 21px/1 system-ui, sans-serif",
+            cursor: "pointer",
+          }}
+        >
+          {"\u25CE"}
+        </button>
+      )}
+      {reading && <FlyerTextDialog text={readableFlyerText(flyer) ?? ""} onClose={() => setReading(false)} />}
+    </div>
+  );
+}
+
+const READ_THIS_FLYER = "Read this flyer in your language";
+
+/** The words printed on this flyer, typed out by the admin, or null when it has none. */
+function readableFlyerText(flyer: ExcitingNewsFlyer): string | null {
+  const t = (flyer.flyer_text ?? "").trim();
+  return t === "" ? null : t;
+}
+
+/**
+ * Steve, 2026-10-10: "A popup will appear with a black background and gold border translated into
+ * that language."
+ *
+ * The text arrives already translated — the server does it once per flyer per language and caches
+ * it — so this only has to show what it was given. It scrolls because a whole flyer's worth of
+ * copy, in a language that runs longer than English, would otherwise push the close button off
+ * the bottom of the screen.
+ */
+function FlyerTextDialog({ text, onClose }: { text: string; onClose: () => void }) {
+  const { t } = useT();
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      onClick={onClose}
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 60,
+        display: "grid",
+        placeItems: "center",
+        background: "rgba(0,0,0,0.7)",
+        padding: 16,
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          width: "min(520px, 100%)",
+          maxHeight: "80vh",
+          display: "flex",
+          flexDirection: "column",
+          background: "#000",
+          border: "1.5px solid #F0C420",
+          borderRadius: 14,
+          padding: 18,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+          <strong style={{ color: "#F0C420", fontSize: 16, flex: 1 }}>{t("what_this_flyer_says")}</strong>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label={t("close")}
+            style={{ background: "none", border: "none", color: "#bdbdc7", fontSize: 20, cursor: "pointer" }}
+          >
+            {"\u00d7"}
+          </button>
+        </div>
+        <div style={{ height: 1.5, background: "#F0C420", marginBottom: 14 }} />
+        {/* whiteSpace: pre-wrap — the admin types this as it reads on the picture, line breaks
+            and all, and reflowing it into one paragraph would lose that. */}
+        <div style={{ overflowY: "auto", color: "#fff", fontSize: 15, lineHeight: 1.55, whiteSpace: "pre-wrap" }}>
+          {text}
+        </div>
+      </div>
     </div>
   );
 }

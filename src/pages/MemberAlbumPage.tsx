@@ -8,8 +8,10 @@ import { mediaUrl } from "../lib/api";
 import { useSession } from "../lib/session";
 import { fetchUserPhotos, type DirectoryEntry, type Photo } from "../lib/photos";
 import { Loading, Notice } from "../components/Common";
+import { useT } from "../lib/i18n";
 
 export function MemberAlbumPage() {
+  const { t } = useT();
   const { id } = useParams();
   const { user, isLoggedIn } = useSession();
   const ownerId = Number(id);
@@ -27,7 +29,7 @@ export function MemberAlbumPage() {
   }, [user, ownerId]);
 
   if (!isLoggedIn || !user) {
-    return <div className="page"><Notice>Sign in to view this album.</Notice></div>;
+    return <div className="page"><Notice>{t("sign_in_to_view_this_album")}</Notice></div>;
   }
 
   const name = owner?.fullname || owner?.username || "Member";
@@ -38,14 +40,14 @@ export function MemberAlbumPage() {
         {owner?.profile_image && (
           <img src={mediaUrl(owner.profile_image)} alt="" style={{ width: 34, height: 34, borderRadius: 17, objectFit: "cover" }} />
         )}
-        <h1 className="page-title" style={{ flex: 1, marginBottom: 0 }}>{name}'s photos</h1>
-        <Link className="btn small ghost" to={`/profile/${ownerId}`}>Profile</Link>
+        <h1 className="page-title" style={{ flex: 1, marginBottom: 0 }}>{t("someones_photos", name)}</h1>
+        <Link className="btn small ghost" to={`/profile/${ownerId}`}>{t("profile")}</Link>
       </div>
 
       {error && <p style={{ color: "#f55", fontSize: 13 }}>{error}</p>}
 
       {photos === null ? <Loading /> : photos.length === 0 ? (
-        <div className="card pad"><p className="muted" style={{ margin: 0 }}>No photos to show.</p></div>
+        <div className="card pad"><p className="muted" style={{ margin: 0 }}>{t("no_photos_to_show")}</p></div>
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 8 }}>
           {photos.map((p) => (

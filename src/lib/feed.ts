@@ -3,6 +3,7 @@
 // still has the queue; fetchPosts hands back 10 random posts per call, so "more" means another
 // call with the ones we've already seen filtered out.
 import { post, type Post } from "./api";
+import { tt } from "./i18n";
 
 const KEY = "bb.feed";
 
@@ -21,6 +22,6 @@ export function appendToFeed(posts: Post[]): Post[] {
 }
 export async function fetchMoreFeed(userId: number | null): Promise<Post[]> {
   const res = await post<Post[]>("fetchPosts", userId ? { my_user_id: userId } : {});
-  if (!res.status) throw new Error(res.message ?? "Couldn't load more videos.");
+  if (!res.status) throw new Error(res.message ?? tt("couldn_t_load_more_videos"));
   return appendToFeed(res.data ?? []);
 }

@@ -13,8 +13,11 @@ import {
 } from "../lib/photos";
 import { Loading, Notice } from "../components/Common";
 import { GoldSelect } from "../components/GoldSelect";
+import { tt, useT  } from "../lib/i18n";
+import { PageTitle } from "../components/PageTitle";
 
 export function UploadPhotosPage() {
+  const { t } = useT();
   const { user, isLoggedIn } = useSession();
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -51,7 +54,7 @@ export function UploadPhotosPage() {
     try {
       await createFolder(user.id, newFolder.trim());
       setNewFolder("");
-      setToast("Folder created.");
+      setToast(tt("folder_created"));
       load();
     } catch (e) {
       setError((e as Error).message);
@@ -62,7 +65,7 @@ export function UploadPhotosPage() {
 
   async function uploadAll() {
     if (!user || !queue.length || busy) return;
-    if (!folderId) { setError("Pick a folder first."); return; }
+    if (!folderId) { setError(tt("pick_a_folder_first")); return; }
     setBusy(true);
     setError("");
     setDoneCount(0);
@@ -87,31 +90,31 @@ export function UploadPhotosPage() {
   }
 
   if (!isLoggedIn || !user) {
-    return <div className="page"><Notice>Sign in to upload photos.</Notice></div>;
+    return <div className="page"><Notice>{t("sign_in_to_upload_photos")}</Notice></div>;
   }
 
   const uploadable = (folders ?? []).filter((f) => !isFavouritesFolder(f));
 
   return (
     <div className="page" style={{ maxWidth: 720 }}>
-      <h1 className="page-title">Upload photos</h1>
+      <PageTitle>{t("upload_photos")}</PageTitle>
 
       {storage && (
         <div className="card pad" style={{ marginBottom: 12 }}>
           <div className="muted" style={{ fontSize: 13 }}>
-            {Number(storage.total_photos ?? 0).toLocaleString()} photo{storage.total_photos === 1 ? "" : "s"} stored
-            {storage.free_limit != null && ` · first ${Number(storage.free_limit).toLocaleString()} are free`}
+            {t(storage.total_photos === 1 ? "one_photo_stored" : "n_photos_stored", Number(storage.total_photos ?? 0).toLocaleString())}
+            {storage.free_limit != null && t("dot_first_n_are_free", Number(storage.free_limit).toLocaleString())}
           </div>
         </div>
       )}
 
       <div className="card pad" style={{ marginBottom: 12 }}>
-        <label className="soft" style={{ fontSize: 13 }}>Folder</label>
+        <label className="soft" style={{ fontSize: 13 }}>{t("folder_2")}</label>
         {folders === null ? <Loading /> : (
           <>
             <GoldSelect
               ariaLabel="Folder"
-              placeholder="Choose a folder…"
+              placeholder={t("choose_a_folder")}
               searchable
               value={folderId}
               options={uploadable.map((f) => ({ value: String(f.id), label: `${f.name}${f.photo_count ? ` (${f.photo_count})` : ""}` }))}
@@ -120,12 +123,11 @@ export function UploadPhotosPage() {
             />
             {uploadable.length === 0 && (
               <p className="muted" style={{ fontSize: 13, marginTop: 0 }}>
-                You don't have a folder yet — make one below. Favourites doesn't count: you star photos into it rather than uploading there.
-              </p>
+                {t("you_don_t_have_a_folder_yet_make_one_bel")}</p>
             )}
             <div className="row" style={{ gap: 8 }}>
               <input className="input" value={newFolder} onChange={(e) => setNewFolder(e.target.value)}
-                placeholder="New folder name" maxLength={100} style={{ flex: 1 }} />
+                placeholder={t("new_folder_name")} maxLength={100} style={{ flex: 1 }} />
               <button className="btn ghost" disabled={creating || !newFolder.trim()} onClick={addFolder}>
                 {creating ? "Creating…" : "Create"}
               </button>
@@ -139,20 +141,20 @@ export function UploadPhotosPage() {
           onChange={(e) => { setQueue([...(e.target.files ?? [])]); setError(""); }} />
         {queue.length === 0 ? (
           <>
-            <p className="soft" style={{ marginTop: 0 }}>Choose one or more photos from this device.</p>
-            <button className="btn" onClick={() => fileRef.current?.click()}>Choose photos</button>
+            <p className="soft" style={{ marginTop: 0 }}>{t("choose_one_or_more_photos_from_this_devi")}</p>
+            <button className="btn" onClick={() => fileRef.current?.click()}>{t("choose_photos")}</button>
           </>
         ) : (
           <>
             <div className="row" style={{ marginBottom: 10 }}>
-              <b style={{ flex: 1 }}>{queue.length} photo{queue.length === 1 ? "" : "s"} ready</b>
-              <button className="btn small ghost" disabled={busy} onClick={() => fileRef.current?.click()}>Change</button>
+              <b style={{ flex: 1 }}>{t(queue.length === 1 ? "one_photo_ready" : "n_photos_ready", queue.length)}</b>
+              <button className="btn small ghost" disabled={busy} onClick={() => fileRef.current?.click()}>{t("change")}</button>
             </div>
             <div className="row" style={{ flexWrap: "wrap", gap: 8 }}>
               {queue.slice(0, 12).map((f, i) => (
                 <img key={i} src={URL.createObjectURL(f)} alt="" style={{ width: 64, height: 64, objectFit: "cover", borderRadius: 8, border: "1px solid var(--line)" }} />
               ))}
-              {queue.length > 12 && <span className="muted" style={{ alignSelf: "center" }}>+{queue.length - 12} more</span>}
+              {queue.length > 12 && <span className="muted" style={{ alignSelf: "center" }}>{t("plus_n_more", queue.length - 12)}</span>}
             </div>
           </>
         )}
@@ -164,7 +166,7 @@ export function UploadPhotosPage() {
       {busy && (
         <div className="card pad" style={{ marginBottom: 12 }}>
           <div className="muted" style={{ fontSize: 13, marginBottom: 6 }}>
-            Uploading {doneCount + 1} of {queue.length}…
+            {t("uploading_n_of_m", doneCount + 1, queue.length)}
           </div>
           <div style={{ height: 8, background: "var(--panel)", borderRadius: 999, overflow: "hidden" }}>
             <div style={{ width: `${Math.round(progress * 100)}%`, height: "100%", background: "var(--gold-border)", transition: "width .2s" }} />
@@ -179,12 +181,12 @@ export function UploadPhotosPage() {
 
       {(folders ?? []).some((f) => (f.preview_thumbs ?? []).length > 0) && (
         <div className="card pad" style={{ marginTop: 12 }}>
-          <b style={{ color: "var(--gold)" }}>Your folders</b>
+          <b style={{ color: "var(--gold)" }}>{t("your_folders")}</b>
           {(folders ?? []).map((f) => (
             <div key={f.id} className="row" style={{ padding: "8px 0", borderBottom: "1px solid var(--line)", alignItems: "center" }}>
               <div style={{ flex: 1 }}>
                 <b>{f.name}</b>
-                <div className="muted" style={{ fontSize: 12 }}>{f.photo_count ?? 0} photo{f.photo_count === 1 ? "" : "s"}</div>
+                <div className="muted" style={{ fontSize: 12 }}>{t(f.photo_count === 1 ? "one_photo" : "n_photos", f.photo_count ?? 0)}</div>
               </div>
               <div className="row" style={{ gap: 4 }}>
                 {(f.preview_thumbs ?? []).slice(0, 3).map((t, i) => (

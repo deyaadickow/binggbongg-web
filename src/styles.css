@@ -15,7 +15,19 @@
   --radius: 12px;
 }
 * { box-sizing: border-box; }
-html, body, #root { margin: 0; min-height: 100%; background: var(--bg); color: var(--text); }
+html, body, #root { margin: 0; min-height: 100%; color: var(--text); }
+/* Steve, 2026-10-17: "Please add our cosmic backgrounds to all pages."
+   The backdrop goes HERE, on body, not on a z-index:-1 pseudo-element. The old .cosmic-page
+   rule below never actually showed: #root carried an opaque black background of its own, and a
+   negative z-index puts the layer behind the element's CONTENT but still behind that opaque
+   ancestor — so every page it was applied to, /upcoming included, has been plain black since
+   it was written. Painting body and leaving html/#root transparent is the thing that works.
+   `fixed` so it stays put while the page scrolls, the same as both apps. */
+html { background: var(--bg); }
+body {
+  background: var(--bg) url("/bg_vip_cosmic.webp") center / cover no-repeat fixed;
+}
+#root { background: transparent; }
 body { font-family: "Urbanist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; font-size: 15px; line-height: 1.4; }
 a { color: var(--gold); text-decoration: none; }
 a:hover { color: var(--gold-bright); }
@@ -23,10 +35,19 @@ button, input, textarea, select { font: inherit; color: inherit; }
 img { display: block; max-width: 100%; }
 h1, h2, h3 { margin: 0; text-wrap: balance; }
 
+/* --nav-h is the header's real height: the logo plus its padding plus the bottom border. The
+   sidebar below hangs off it, so changing the logo size here moves the sidebar with it rather
+   than leaving it tucked under the header. */
+:root { --nav-h: 85px; }
+@media (max-width: 420px) { :root { --nav-h: 67px; } }
 .nav { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; flex-wrap: wrap; gap: 10px 16px; padding: 10px 16px; background: var(--panel); border-bottom: 1px solid var(--gold-border); }
-.nav .links { order: 3; flex-basis: 100%; }
-@media (min-width: 700px) { .nav .links { order: 0; flex-basis: auto; } }
-.nav .brand { font-weight: 800; font-size: 24px; color: var(--gold); letter-spacing: 0.3px; }
+/* The brand is the rectangle logo (Steve, 2026-10-20), not type. display:flex keeps the
+   image from sitting on the text baseline and leaving a gap under the header. */
+.nav .brand { display: flex; align-items: center; }
+/* Steve, 2026-10-20: "please make the logo bigger on the website." 44 -> 64. The header grows
+   with it rather than the mark overflowing, because .nav lays its row out with align-items. */
+.nav .brand img { height: 64px; width: auto; display: block; }
+@media (max-width: 420px) { .nav .brand img { height: 46px; } }
 /* From the width the sidebar appears at, the brand sits centred over that column and the links
    start clear of it, rather than the first pill crowding the wordmark. */
 @media (min-width: 900px) {
@@ -35,7 +56,17 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
   .nav .brand { flex: 0 0 240px; margin-left: -16px; text-align: center; }
   .nav .links { margin-left: 18px; }
 }
-.nav .links { display: flex; gap: 6px; flex: 1; overflow-x: auto; }
+/* The chip row. On a phone it takes a line of its own under the brand and scrolls
+   sideways; from 700px up it sits inline in the header row.
+   Steve, 23 Oct, on his phone: "the top part ... needs to be able to scroll to the left so
+   all the rest of the buttons can show". Contests and the two after it were unreachable —
+   not because scrolling was missing, but because `flex: 1` here is shorthand that resets
+   flex-basis to 0, silently cancelling the `flex-basis: 100%` set in an earlier block of the
+   same specificity. The chips stayed on row one and ran off the right edge. Keep every flex
+   property for this selector in THIS block; splitting them is what broke it. */
+.nav .links { display: flex; gap: 6px; overflow-x: auto; order: 3; flex: 1 1 100%; scrollbar-width: none; }
+.nav .links::-webkit-scrollbar { display: none; }
+@media (min-width: 700px) { .nav .links { order: 0; flex: 1 1 auto; } }
 /* Same bullets as the sidebar: a gold-bordered pill each, the current page filled gold. */
 .nav .links a { padding: 7px 14px; border-radius: 999px; border: 1px solid var(--gold-border); background: #0d0d0d; color: var(--text-soft); font-weight: 600; white-space: nowrap; transition: background .15s, color .15s; }
 .nav .links a:hover { color: var(--gold); background: #1a1a1a; }
@@ -50,7 +81,7 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .sidebar { display: none; }
 .only-narrow { display: inline-flex; }
 @media (min-width: 900px) {
-  .sidebar { display: block; flex: 0 0 240px; position: sticky; top: 61px; height: calc(100vh - 61px); overflow-y: auto; padding: 12px 10px 24px; border-right: 1px solid var(--gold-border); background: var(--panel); }
+  .sidebar { display: block; flex: 0 0 240px; position: sticky; top: var(--nav-h); height: calc(100vh - var(--nav-h)); overflow-y: auto; padding: 12px 10px 24px; border-right: 1px solid var(--gold-border); background: var(--panel); }
   .only-narrow { display: none; }
 }
 .side-section { margin-bottom: 14px; }
@@ -147,6 +178,23 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .video-grid .tile::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 0 4px var(--gold-border); pointer-events: none; }
 .video-grid .tile.speaking::after { box-shadow: inset 0 0 0 4px #4CD964; }
 .video-grid { position: relative; }
+/* Steve, 2026-10-14: taps on a live send free hearts, like TikTok's. pointer-events:none is not
+   optional on either of these — the grid underneath owns every click. */
+.live-hearts { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 4; }
+.live-heart { position: absolute; transform: translate(-50%, -50%); animation: live-heart-rise 1.2s ease-out forwards; will-change: transform, opacity; }
+@keyframes live-heart-rise {
+  from { opacity: .95; transform: translate(-50%, -50%) scale(1); }
+  to   { opacity: 0;   transform: translate(calc(-50% + var(--drift, 0px)), calc(-50% - 190px)) scale(1.6); }
+}
+@media (prefers-reduced-motion: reduce) { .live-heart { animation-duration: .01ms; } }
+.live-tap-count { position: absolute; left: 10px; bottom: 10px; z-index: 5; pointer-events: auto; cursor: pointer; font: inherit; display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: rgba(0,0,0,.8); border: 1px solid var(--gold); color: var(--gold); font-weight: 800; font-size: 13px; }
+/* Steve, 2026-10-14: the (LB) Leader Board badge — bottom-right of the video, every role. */
+.live-lb { position: absolute; right: 10px; bottom: 10px; z-index: 5; pointer-events: auto; cursor: pointer; font: inherit; width: 34px; height: 34px; border-radius: 50%; background: rgba(0,0,0,.8); border: 1px solid var(--gold); color: var(--gold); font-weight: 800; font-size: 12px; display: grid; place-items: center; }
+.lb-members { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 8px; }
+.lb-member { font: inherit; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 4px; border-radius: 10px; background: #111; border: 1px solid var(--gold-border); color: #fff; min-width: 0; }
+.lb-member.selected { border-color: var(--gold); border-width: 2px; background: rgba(212,175,55,.18); }
+.lb-member .lb-name { font-weight: 600; font-size: 12px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lb-member .lb-coins { color: var(--gold); font-weight: 800; font-size: 12px; white-space: nowrap; }
 .battle-kind { justify-content: flex-start; text-align: left; margin-bottom: 8px; white-space: nowrap; overflow: hidden; gap: 12px; }
 .battle-kind .kind-title { font-weight: 800; flex: 0 0 auto; min-width: 140px; }
 .battle-kind .kind-blurb { font-size: 13px; font-weight: 400; flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
@@ -241,6 +289,13 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
    bolt, the same as the phones, instead of a solid gold disc with a black bolt. */
 .p-thumb .p-ad { position: absolute; bottom: 4px; right: 4px; background: rgba(0,0,0,.85); border: 1.5px solid var(--gold); border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--gold); font-weight: 800; cursor: pointer; padding: 0; line-height: 1; }
 .p-thumb .p-ad:hover { background: #000; }
+/* Steve, 2026-10-13: "Add it on the tiles too" — the (C) copy button, same black disc and gold
+   ring as the one over the video player. It shares a row with the advertise bolt because the
+   tile's other three corners already carry badges. */
+.p-thumb .p-actions { position: absolute; bottom: 4px; right: 4px; display: flex; gap: 4px; align-items: center; }
+.p-thumb .p-actions .p-ad { position: static; bottom: auto; right: auto; }
+.p-thumb .p-copy { background: rgba(0,0,0,.85); border: 1.5px solid var(--gold); border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--gold); font-weight: 800; cursor: pointer; padding: 0; line-height: 1; }
+.p-thumb .p-copy:hover { background: #000; }
 .p-thumb .p-views { position: absolute; top: 4px; left: 4px; background: rgba(0,0,0,.55); color: #fff; font-size: 10px; padding: 1px 5px; border-radius: 4px; }
 .p-thumb .p-votes { position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,.55); color: var(--gold); font-size: 10px; padding: 1px 5px; border-radius: 4px; font-weight: 700; }
 .profile-user-list .p-ucard { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
@@ -307,9 +362,23 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 /* My Live/Battle Schedule (Steve, 2026-10-06) */
 .schedule-card { margin: 12px 0; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
 .schedule-title { margin: 0; font-size: 16px; color: var(--gold); }
-.schedule-form { display: flex; flex-direction: column; gap: 8px; padding: 10px; border: 1px solid var(--gold-border); border-radius: 12px; background: #0d0d00; }
-.schedule-field { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--text-soft); }
-.schedule-field input, .schedule-field select { padding: 8px 10px; border-radius: 10px; border: 1px solid var(--gold-border); background: #000; color: #fff; font-size: 14px; }
+.schedule-form { display: flex; flex-direction: column; gap: 14px; padding: 16px; border: 2px solid var(--gold-border); border-radius: 16px; background: rgba(0,0,0,.92); }
+.schedule-field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 700; color: var(--gold); }
+.schedule-field input, .schedule-field select { padding: 10px 12px; border-radius: 12px; border: 1.5px solid var(--gold-border); background: rgba(0,0,0,.5); color: var(--gold); font-size: 14px; }
+.schedule-field input::placeholder { color: rgba(212,175,55,.45); }
+
+/* Steve, 2026-10-11, of the phones' version of this form: "please redesign it with all our
+   design, Black, gold and borders", then "Whatever you did today please do it for all three
+   platforms". The battle type was a dropdown here and a scroll wheel on the phones; on all
+   three it is now pills, every type visible at once, the chosen one filled solid gold. */
+.schedule-types { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.schedule-type { padding: 9px 6px; border-radius: 999px; border: 1.5px solid var(--gold-border); background: rgba(0,0,0,.5); color: var(--gold); font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.schedule-type.on { background: var(--gold-border); color: #000; }
+.schedule-rule { height: 1px; background: var(--gold-border); opacity: .35; }
+
+/* Steve, 2026-10-11: "add a black background with gold borders and make the white lettering
+   gold". Text that would otherwise sit straight on the page artwork gets its own plate. */
+.gold-plate { display: inline-block; padding: 4px 10px; border-radius: 10px; background: rgba(0,0,0,.85); border: 1.5px solid var(--gold-border); color: var(--gold); }
 .schedule-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid rgba(255,255,255,.08); }
 .schedule-row:first-of-type { border-top: 0; }
 .schedule-requests h4 { margin: 4px 0; font-size: 14px; color: var(--gold); }
@@ -322,12 +391,9 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
    cosmic background and black and gold on all the tabs." The image is the SAME bg_vip_cosmic the
    two apps use, copied into public/ rather than approximated with a gradient, so the three
    platforms actually match. */
+/* Kept as a no-op marker: the backdrop is on body now (see the top of this file), so pages
+   that still carry this class are unaffected either way. */
 .cosmic-page { position: relative; min-height: 100vh; }
-.cosmic-page::before {
-  content: "";
-  position: fixed; inset: 0; z-index: -1;
-  background: #000 url("/bg_vip_cosmic.webp") center / cover no-repeat;
-}
 /* Loose text over that backdrop is unreadable wherever it crosses the moon or a star — Steve has
    flagged the same thing on the earnings statement. Anything that is not already on a card sits
    on this plate. */
@@ -341,6 +407,21 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
   font-size: 18px; line-height: 1; cursor: pointer; padding: 0;
 }
 .back-circle:hover { border-color: var(--gold-bright); }
+/* Steve has flagged this on the phones three times (the earnings statement, 2026-10-05: "add
+   a black background to these numbers so they can show"), and it is the same here: a line of
+   grey text straight on the cosmic backdrop is lost wherever it crosses a star or the moon.
+   Only for text that sits on the PAGE — text inside a .card already has black behind it. */
+.text-plate,
+/* A dim paragraph that is a DIRECT child of .page is loose on the backdrop — anything inside a
+   .card already has black behind it and is left alone. One rule instead of plating a hundred
+   and thirty-eight call sites by hand, and it covers the pages nobody has looked at yet. */
+.cosmic-page .page > p.muted,
+.cosmic-page .page > p.soft {
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+.text-plate { display: inline-block; }
 .cosmic-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
 .cosmic-head h2 { margin: 0; color: var(--gold); font-size: 20px; }
 
@@ -371,3 +452,181 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .site-footer-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
 .site-footer-links a { color: var(--text-dim); text-decoration: none; border-bottom: 1px solid transparent; }
 .site-footer-links a:hover { color: var(--gold); border-bottom-color: var(--gold-border); }
+
+/* Direct messages — Steve, 2026-10-11: "Yes please start the direct messages on the web."
+   Mirrors the chat page the phones got the same day: both sides black with a gold ring (mine
+   full strength, theirs at half), gold lettering, a rule under every message, and the whole
+   conversation inside the gold frame with the header and the message bar outside it. */
+.dm-list { display: flex; flex-direction: column; gap: 8px; }
+.dm-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px;
+  background: rgba(0,0,0,.85); border: 1.5px solid var(--gold-border); color: inherit; text-decoration: none; }
+.dm-row-name { font-weight: 800; color: var(--gold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dm-row-last { font-size: 13px; color: var(--gold); opacity: .7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dm-handle { font-size: 12px; color: var(--gold); opacity: .75; }
+.dm-row-when { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--gold); opacity: .6; flex-shrink: 0; }
+.dm-unread { width: 9px; height: 9px; border-radius: 50%; background: var(--gold); display: inline-block; }
+
+.dm-page { display: flex; flex-direction: column; min-height: 70vh; }
+.dm-header { display: flex; align-items: center; gap: 10px; padding: 8px 0 10px; border-bottom: 1px solid rgba(212,175,55,.5); }
+.dm-translate { display: inline-flex; align-items: center; gap: 6px; }
+.dm-translate select { padding: 7px 10px; border-radius: 999px; border: 1.5px solid var(--gold-border);
+  background: rgba(0,0,0,.6); color: var(--gold); font-size: 13px; font-weight: 700; }
+
+.dm-thread { flex: 1; overflow-y: auto; max-height: 60vh; margin: 10px 0; padding: 10px;
+  border: 2px solid var(--gold-border); border-radius: 16px; background: rgba(0,0,0,.6); }
+.dm-day { text-align: center; margin: 10px 0; }
+.dm-day span { display: inline-block; padding: 5px 12px; border-radius: 10px; background: rgba(0,0,0,.85);
+  border: 1px solid rgba(212,175,55,.6); color: var(--gold); font-size: 13px; font-weight: 700; }
+.dm-msg-row { display: flex; align-items: flex-end; gap: 8px; padding: 6px 0; }
+.dm-msg-row.mine { justify-content: flex-end; }
+.dm-msg-row.theirs { flex-direction: row-reverse; justify-content: flex-end; }
+.dm-bubble { max-width: 72%; padding: 10px 12px; border-radius: 10px; color: var(--gold);
+  background: rgba(0,0,0,.9); border: 1.5px solid var(--gold-border); overflow-wrap: anywhere; }
+.dm-bubble.theirs { background: rgba(0,0,0,.6); border-color: rgba(212,175,55,.5); }
+.dm-bubble-rule { height: 1px; background: rgba(212,175,55,.35); margin: 6px 0; }
+.dm-translated { font-style: italic; font-size: 14px; color: var(--gold); opacity: .75; }
+.dm-time { font-size: 12px; color: var(--gold); opacity: .6; flex-shrink: 0; }
+.dm-rule { height: 1px; background: var(--gold-border); opacity: .45; }
+.dm-composer { display: flex; gap: 8px; align-items: center; }
+.dm-composer .input { flex: 1; }
+
+/* Photos and video in messages — Steve, 2026-10-11: "Add photos and video to the messages." */
+.dm-media { display: block; max-width: 240px; max-height: 300px; width: 100%; border-radius: 8px;
+  border: 1px solid rgba(212,175,55,.5); background: #000; }
+.dm-caption { margin-top: 8px; }
+.dm-attach { min-width: 44px; padding: 0 14px; font-size: 20px; line-height: 1; }
+.dm-pending { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; padding: 8px 10px;
+  border-radius: 12px; background: rgba(0,0,0,.85); border: 1.5px solid var(--gold-border); }
+.dm-pending-media { width: 54px; height: 54px; object-fit: cover; border-radius: 8px;
+  border: 1px solid rgba(212,175,55,.5); background: #000; }
+.dm-pending-name { color: var(--gold); font-weight: 700; font-size: 13px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dm-pending-hint { color: var(--gold); opacity: .7; font-size: 12px; }
+
+/* Bingg Bongg Bingo Battle (Steve, 2026-10-11) — battle engine #11.
+   The card is Steve's own artwork with the numbers laid into his empty boxes as PERCENTAGES
+   of the image, which is why the cells are absolutely positioned inside a position:relative
+   box rather than drawn: percentages mean the card scales as one piece, so a wide desktop
+   card and a narrow phone one stay aligned with no per-size arithmetic. */
+.bingo-overlay {
+  /* 100, matching .modal-backdrop rather than the 60 the battle-intro video uses: the nav is
+     sticky at z-index 20 but sits in its own stacking context, and at 60 it punched straight
+     through the scrim. Every other modal in this app is already at 100. */
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(0, 0, 0, 0.88);
+  overflow-y: auto;
+  display: flex; justify-content: center;
+}
+.bingo-inner {
+  width: min(560px, 100%);
+  padding: 14px 14px 32px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.bingo-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.bingo-strip { display: flex; gap: 6px; }
+.bingo-strip > div {
+  flex: 1 1 0; min-width: 0; height: 120px; overflow: hidden;
+  border: 1.5px solid var(--gold); border-radius: 10px; background: #000;
+}
+.bingo-strip video, .bingo-strip img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.bingo-title { text-align: center; color: var(--gold); font-weight: 800; font-size: 17px; }
+.bingo-price {
+  background: var(--gold); color: #000; font-weight: 800; font-size: 14px;
+  text-align: center; border-radius: 12px; padding: 9px 12px;
+}
+.bingo-pills { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.bingo-wins { color: var(--gold); opacity: 0.8; font-size: 12.5px; text-align: center; line-height: 1.45; }
+
+.bingo-card { position: relative; width: 100%; }
+.bingo-card > img { width: 100%; height: 100%; display: block; }
+.bingo-cell {
+  position: absolute; transform: translate(-50%, -50%);
+  display: flex; align-items: center; justify-content: center;
+  /* The whole box is the target, not just the glyph — a number is a few pixels wide and the
+     box around it is what a cursor aims at. */
+  cursor: pointer; user-select: none;
+  /* A double-click on a number must never select the text under it, which on a fast second
+     click is exactly what a browser does by default. */
+  -webkit-user-select: none;
+}
+.bingo-cell > span {
+  color: #141432; font-weight: 900; line-height: 1;
+  /* Sized off the cell rather than a fixed px so it tracks the card at any width. */
+  font-size: clamp(11px, 3.4vw, 34px);
+}
+.bingo-cell.covered {
+  /* Steve: "covered by a transparent Gold cover with Eddie's name in bold black on top".
+     Translucent on purpose — the box's own colour still reads through, so it stays his card
+     rather than becoming a grid of gold tiles. */
+  background: rgba(212, 175, 55, 0.80);
+  border: 2px solid #FFDD55; border-radius: 10px; box-sizing: border-box; padding: 2px;
+}
+.bingo-cell.covered > span {
+  font-size: clamp(7px, 1.5vw, 15px); text-align: center; overflow-wrap: anywhere; line-height: 1.05;
+}
+
+.bingo-players { display: flex; flex-direction: column; gap: 6px; max-height: 190px; overflow-y: auto; }
+.bingo-rule { border: 0; border-top: 1px solid rgba(212, 175, 55, 0.4); margin: 14px 0; }
+.bingo-stepper { display: flex; align-items: center; gap: 14px; justify-content: center; }
+.bingo-amount { color: var(--gold); font-weight: 800; font-size: 34px; min-width: 120px; text-align: center; }
+.bingo-quick { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-bottom: 10px; }
+.bingo-actions { display: flex; gap: 10px; justify-content: center; margin-top: 14px; }
+
+/* The bingo lifetime board and a game's winners. */
+.bingo-stats { display: flex; gap: 8px; margin-bottom: 12px; }
+.bingo-stats > div {
+  flex: 1; text-align: center; padding: 8px 4px;
+  border: 1.5px solid var(--gold); border-radius: 12px; background: rgba(0,0,0,.6);
+}
+.bingo-stats b { display: block; color: var(--gold); font-size: 19px; }
+.bingo-stats span { color: var(--muted); font-size: 11px; }
+.bingo-board-row, .bingo-winner-row {
+  display: flex; align-items: center; gap: 10px; text-align: left; margin-bottom: 8px;
+}
+.bingo-winner-row { padding: 10px 12px; border: 1.5px solid var(--gold); border-radius: 12px; background: rgba(0,0,0,.6); }
+.bingo-no, .bingo-pattern {
+  flex-shrink: 0; background: var(--gold); color: #000; font-weight: 900;
+  border-radius: 999px; padding: 3px 10px; font-size: 12px;
+}
+.bingo-row-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.bingo-row-main b { color: var(--gold); font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bingo-row-main .muted { font-size: 11px; }
+.bingo-row-wins { flex-shrink: 0; color: var(--gold); font-size: 12px; font-weight: 700; }
+
+/* "One Stroke" (Steve, 2026-10-12) — the fifth tap-game engine.
+   The board is an SVG with a 0..1 viewBox, because the levels are authored as fractions of a
+   square: the browser then does every bit of the scaling, and the same coordinates the phones
+   have to convert by hand are simply the drawing instructions here. The viewBox is inset
+   slightly beyond 0..1 so a thick stroke on an edge node is not clipped in half. */
+.onestroke-overlay {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex; justify-content: center; overflow-y: auto;
+}
+.onestroke-inner { width: min(520px, 100%); padding: 14px 14px 28px; display: flex; flex-direction: column; gap: 10px; }
+.onestroke-top { display: flex; justify-content: space-between; align-items: center; }
+.onestroke-iq {
+  color: var(--gold); font-size: 20px; font-weight: 800;
+  border: 1.5px solid var(--gold); border-radius: 12px; padding: 4px 12px;
+}
+.onestroke-iq b {
+  background: var(--gold); color: #000; border-radius: 999px;
+  padding: 1px 8px; font-size: 13px; margin-right: 8px;
+}
+.onestroke-title { text-align: center; color: var(--gold); font-weight: 800; font-size: 17px; }
+.onestroke-hint { text-align: center; color: var(--muted); font-size: 13px; min-height: 18px; }
+.onestroke-board {
+  /* flex-shrink off, or the column squashes it out of square and the browser letterboxes the
+     drawing inside a wider box — harmless to look at, and the reason two attempts at manual
+     pointer maths were wrong before getScreenCTM replaced them. */
+  width: 100%; aspect-ratio: 1; flex: 0 0 auto;
+  touch-action: none; user-select: none; -webkit-user-select: none;
+}
+.onestroke-track, .onestroke-done {
+  fill: none; stroke-width: 0.055; stroke-linecap: round; stroke-linejoin: round;
+}
+.onestroke-track { stroke: #5C3E24; }
+.onestroke-done { stroke: #E8A33C; }
+.onestroke-node { fill: var(--gold); }
+.onestroke-node.live { fill: #fff; }
+.onestroke-actions { display: flex; gap: 10px; justify-content: center; margin-top: 4px; }

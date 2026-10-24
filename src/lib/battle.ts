@@ -3,6 +3,7 @@
 // not on the web yet; scores here are the server's own live sums.
 import { useCallback, useEffect, useRef, useState } from "react";
 import { post } from "./api";
+import { tt } from "./i18n";
 
 export interface BattleData {
   battle_id: number;
@@ -135,16 +136,16 @@ export function useBattle(roomName: string, myUserId: number | null, isPublisher
   }, [battle, secondsLeft, iAmBattler]);
 
   const inviteOpponent = useCallback(async (opponentUserId: number, targetCoins?: number) => {
-    if (!myUserId) throw new Error("Sign in first.");
+    if (!myUserId) throw new Error(tt("sign_in_first"));
     const res = await post<unknown>("inviteToBattle", { my_user_id: myUserId, room_name: roomName, opponent_user_id: opponentUserId, ...(targetCoins ? { target_coins: targetCoins } : {}) });
-    if (!res.status) throw new Error(res.message ?? "Couldn't send the battle invite.");
+    if (!res.status) throw new Error(res.message ?? tt("couldn_t_send_the_battle_invite"));
   }, [myUserId, roomName]);
 
   const respond = useCallback(async (battleId: number, approve: boolean) => {
     if (!myUserId) return;
     setInvite(null);
     const res = await post<BattleData>("respondToBattleInvite", { user_id: myUserId, battle_id: battleId, approve });
-    if (!res.status) throw new Error(res.message ?? "Couldn't answer that invite.");
+    if (!res.status) throw new Error(res.message ?? tt("couldn_t_answer_that_invite"));
     if (res.data) {
       if (res.data.status === "active" && !startedIds.current.has(res.data.battle_id)) { startedIds.current.add(res.data.battle_id); onStarted?.(res.data); }
       setBattle(res.data);

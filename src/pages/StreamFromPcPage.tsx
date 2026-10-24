@@ -17,6 +17,8 @@ import { Link } from "react-router-dom";
 import { tokenServer } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Notice } from "../components/Common";
+import { useT } from "../lib/i18n";
+import { PageTitle } from "../components/PageTitle";
 
 interface IngressKey {
   url: string;
@@ -63,6 +65,7 @@ function CopyRow({ label, value, secret }: { label: string; value: string; secre
 }
 
 export function StreamFromPcPage() {
+  const { t, tn } = useT();
   const { isLoggedIn } = useSession();
   const [key, setKey] = useState<IngressKey | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -87,70 +90,61 @@ export function StreamFromPcPage() {
   if (!isLoggedIn) {
     return (
       <div className="pad">
-        <h1 className="page-title">Go Live From Your Computer</h1>
-        <Notice>Please <Link to="/login">sign in</Link> to get your stream key.</Notice>
+        <PageTitle>{t("go_live_from_your_computer")}</PageTitle>
+        <Notice>{tn("please_sign_in_for_stream_key", <Link to="/login">{t("sign_in_2")}</Link>)}</Notice>
       </div>
     );
   }
 
   return (
     <div className="pad">
-      <h1 className="page-title">Go Live From Your Computer</h1>
+      <PageTitle>{t("go_live_from_your_computer")}</PageTitle>
       <p className="muted" style={{ marginTop: 0 }}>
-        Stream your game from a PC with OBS, Streamlabs, or any software that sends RTMP. Put your
-        gameplay and your camera on screen together — your computer builds the picture, we send it
-        to your audience.
-      </p>
+        {t("stream_your_game_from_a_pc_with_obs_stre")}</p>
 
       {error && <Notice>{error}</Notice>}
-      {busy && !key && <p className="muted">Getting your stream key…</p>}
+      {busy && !key && <p className="muted">{t("getting_your_stream_key")}</p>}
 
       {key && (
         <>
           <div className="card pad" style={{ marginBottom: 16 }}>
-            <CopyRow label="Server" value={key.url} />
-            <CopyRow label="Stream key" value={key.streamKey} secret />
+            <CopyRow label={t("server")} value={key.url} />
+            <CopyRow label={t("simulcast_key_hint")} value={key.streamKey} secret />
             <p className="muted" style={{ fontSize: 12, marginBottom: 0 }}>
-              This key is yours and does not change. Paste it once and OBS will remember it.
-              Never share it or show it on stream — anyone who has it can broadcast as you.
-            </p>
+              {t("this_key_is_yours_and_does_not_change_pa")}</p>
           </div>
 
           <div className="card pad" style={{ marginBottom: 16 }}>
-            <h2 className="card-title" style={{ marginTop: 0 }}>Setting up OBS</h2>
+            <h2 className="card-title" style={{ marginTop: 0 }}>{t("setting_up_obs")}</h2>
             <ol className="muted" style={{ paddingLeft: 18, marginBottom: 0, lineHeight: 1.7 }}>
-              <li>In OBS open <b>Settings → Stream</b>.</li>
-              <li>Set <b>Service</b> to <b>Custom…</b></li>
-              <li>Paste the <b>Server</b> and <b>Stream key</b> from above.</li>
+              <li>{tn("obs_step_open_settings_stream", <b>{t("settings_stream")}</b>)}</li>
+              <li>{tn("obs_step_set_service", <b>{t("service")}</b>, <b>{t("custom")}</b>)}</li>
+              <li>{tn("obs_step_paste_server_and_key", <b>{t("server")}</b>, <b>{t("simulcast_key_hint")}</b>)}</li>
               <li>
-                Under <b>Settings → Output</b>, set the video bitrate to about <b>2500 kbps</b> and
-                keyframe interval to <b>2 seconds</b>. Higher looks sharper but costs your viewers
-                more data, and a long keyframe interval makes people wait to see your first frame.
+                {tn("obs_step_output_settings", <b>{t("settings_output")}</b>,
+                   <b>{t("n2500_kbps")}</b>, <b>{t("n2_seconds")}</b>)}
               </li>
               <li>
-                Add a <b>Display Capture</b> or <b>Game Capture</b> source, then add your webcam as
-                a <b>Video Capture Device</b> on top. Arrange them however you like — most gamers
-                put the camera across the top and the game underneath.
+                {tn("obs_step_add_sources", <b>{t("display_capture")}</b>,
+                   <b>{t("game_capture")}</b>, <b>{t("video_capture_device")}</b>)}
               </li>
-              <li>Click <b>Start Streaming</b>. You will appear in Live within a few seconds.</li>
+              <li>{tn("obs_step_click_start", <b>{t("start_streaming")}</b>)}</li>
             </ol>
           </div>
 
           <div className="card pad">
-            <h2 className="card-title" style={{ marginTop: 0 }}>Lost your key?</h2>
+            <h2 className="card-title" style={{ marginTop: 0 }}>{t("lost_your_key")}</h2>
             <p className="muted" style={{ fontSize: 13 }}>
-              If anyone else has seen your key, make a new one. The old key stops working
-              immediately, so you will need to paste the new one into OBS before you stream again.
-            </p>
+              {t("if_anyone_else_has_seen_your_key_make_a")}</p>
             {confirmingNewKey ? (
               <div className="row" style={{ gap: 8 }}>
                 <button className="btn" disabled={busy} onClick={() => void load(true)}>
                   {busy ? "Making a new key…" : "Yes, make a new key"}
                 </button>
-                <button className="btn small" disabled={busy} onClick={() => setConfirmingNewKey(false)}>Cancel</button>
+                <button className="btn small" disabled={busy} onClick={() => setConfirmingNewKey(false)}>{t("cancel")}</button>
               </div>
             ) : (
-              <button className="btn small" onClick={() => setConfirmingNewKey(true)}>Make a new key</button>
+              <button className="btn small" onClick={() => setConfirmingNewKey(true)}>{t("make_a_new_key")}</button>
             )}
           </div>
         </>

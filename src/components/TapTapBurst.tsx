@@ -45,6 +45,67 @@ export const SURPRISE = "Surprise";
  * and right." Not a direction of its own — each gift picks one of the four at random.
  */
 export const UNIVERSAL = "Universal";
+
+/**
+ * Steve, 2026-10-19: "add another one called 'Spot' — these gifts will appear all over the
+ * screen in one spot each for 3 to 5 seconds and disappear... if 100 coin gift every 15 to 20
+ * will appear at the same time, if 250 coin gift, 30 to 40."
+ *
+ * Like Surprise it travels nowhere; unlike Surprise the gift's price DOES decide how many.
+ * His two numbers give the rule exactly: 5 + coins/10 is the low end (100 -> 15, 250 -> 30)
+ * and a third more is the high end (-> 20 and 40).
+ */
+export const SPOT = "Spot";
+const SPOT_FADE_IN_MS = 400;
+const SPOT_FADE_OUT_MS = 500;
+const SPOT_HOLD_MIN_MS = 3000;
+const SPOT_HOLD_MAX_MS = 5000;
+/** Landed over this window rather than on one frame, so it reads as appearing, not blinking. */
+const SPOT_SPAWN_WINDOW_MS = 700;
+
+/** The longest a Spot shower may run before the last gift is spawned — see spotIntervalMs.
+ *  Steve, 2026-10-21: "Yes make it faster, twice as many on screen" — halved from 20s. */
+const SPOT_MAX_RUN_MS = 10000;
+/** Twice as many standing at once as his original "15 to 20 for a 100 coin gift", which halves
+ *  how long the shower takes to get through one gift per coin. */
+const SPOT_CROWD = 2;
+
+/**
+ * How many Spot gifts stand on the screen AT ONCE.
+ *
+ * Steve, 2026-10-21: "I sent 100 coin gift of roses and only a few roses showed up. We need for
+ * the roses to keep appearing 5, 7, 10 or whatever as many at a time and before these disappear
+ * more will show up until all 100 of them show." So his original numbers were never the TOTAL —
+ * the total is one gift per coin, the same as every other effect, and this is how many are up
+ * together while they take their turns.
+ */
+function spotOnScreen(price: number): number {
+  const low = spotOnScreenMin(price);
+  const high = low + Math.max(5, Math.floor(low / 3));
+  return Math.max(low + Math.floor(Math.random() * (high - low + 1)), 1);
+}
+
+/** The LOW end of that range. Fewer on screen means a LONGER run, so anything that has to
+ *  out-last a run it did not schedule (tapTapBurstDuration) uses the worst case. */
+function spotOnScreenMin(price: number): number {
+  return Math.max((5 + Math.floor(price / 10)) * SPOT_CROWD, 1);
+}
+
+/** How long to leave between spawns so `onScreen` are standing at any moment and the run still
+ *  finishes. Past the cap the gifts simply arrive faster and more stand together — also what
+ *  Steve asked for ("the bigger the gift the more will appear"). */
+function spotIntervalMs(total: number, onScreen: number): number {
+  const averageHold = (SPOT_HOLD_MIN_MS + SPOT_HOLD_MAX_MS) / 2;
+  const keepingUp = averageHold / Math.max(onScreen, 1);
+  const withinCap = SPOT_MAX_RUN_MS / Math.max(total, 1);
+  return Math.max(Math.min(keepingUp, withinCap), 25);
+}
+
+/** When the last Spot gift of a run is spawned, from the start of the burst. */
+function spotLastLandsAt(total: number, onScreen: number): number {
+  if (total <= onScreen) return SPOT_SPAWN_WINDOW_MS;
+  return SPOT_SPAWN_WINDOW_MS + (total - onScreen) * spotIntervalMs(total, onScreen);
+}
 const UNIVERSAL_SIDES: BurstDirection[] = ["up", "down", "left", "right"];
 /**
  * Icon size, ONE constant for both spawn paths. Steve, 2026-10-06: "Please make them all the same
@@ -63,7 +124,7 @@ const SURPRISE_BATCH_MS = 1500;
 const SURPRISE_LIFE_MS = 1700;
 
 /** Which way a burst's icons travel. The gift decides; no caller passes this in. */
-export type BurstDirection = "up" | "down" | "left" | "right" | "surprise" | "universal";
+export type BurstDirection = "up" | "down" | "left" | "right" | "surprise" | "universal" | "spot";
 
 /** null for an ordinary gift, which bursts not at all. */
 export function burstDirection(gift: Gift): BurstDirection | null {
@@ -73,6 +134,7 @@ export function burstDirection(gift: Gift): BurstDirection | null {
   if (gift.is_right_hander === true) return "left";  // enters at the RIGHT, travels left
   if (gift.is_surprise === true) return "surprise";
   if (gift.is_universal === true) return "universal";
+  if (gift.is_spot === true) return "spot";
   return null;
 }
 
@@ -110,6 +172,7 @@ export function burstLabel(gift: Gift): string | null {
     case "left": return RIGHT_HANDER;
     case "surprise": return SURPRISE;
     case "universal": return UNIVERSAL;
+    case "spot": return SPOT;
     default: return null;
   }
 }
@@ -118,6 +181,14 @@ export function burstLabel(gift: Gift): string | null {
 export function tapTapBurstDuration(gift: Gift): number {
   // Surprise runs for a fixed 5 seconds whatever the gift costs.
   if (burstDirection(gift) === "surprise") return SURPRISE_MS + SURPRISE_LIFE_MS;
+  // Spot is a stream, so this is when the LAST one lands plus how long it can stay. The worst
+  // case (fewest on screen, longest run), because spotOnScreen is random and this must never
+  // end a burst before its last gift.
+  if (burstDirection(gift) === "spot") {
+    const total = Math.min(Math.max(giftPrice(gift), 1), MAX_ICONS);
+    return spotLastLandsAt(total, spotOnScreenMin(giftPrice(gift)))
+      + SPOT_FADE_IN_MS + SPOT_HOLD_MAX_MS + SPOT_FADE_OUT_MS;
+  }
   const count = Math.min(Math.max(giftPrice(gift), 1), MAX_ICONS);
   return (count - 1) * staggerMs(count) + FLIGHT_MS + 200;
 }
@@ -130,8 +201,10 @@ interface Icon {
   risePct: number;
   size: number;
   spin: number;
-  /** Surprise only: it is the one effect placed in BOTH axes. */
+  /** Surprise and Spot: the two effects placed in BOTH axes. */
   topPct?: number;
+  /** Spot only: this icon's own hold, so they do not all vanish together. */
+  holdMs?: number;
   /** This icon's OWN direction. Same as the gift's for every effect except Universal, where each
    *  icon picks one of the four sides so a quarter arrive from each. */
   dir: BurstDirection;
@@ -168,6 +241,49 @@ export function TapTapBurst({ gift }: { gift: Gift }) {
         }
       }
       return out;
+    }
+
+    // Spot: one wave, every gift at once, each sitting in its own place for 3-5 seconds.
+    //
+    // "All over the screen" — so the places are a JITTERED GRID, not pure random. Twenty random
+    // points clump badly: half the screen ends up bare and the middle is a pile (seen on the
+    // iOS Simulator before this). One per cell, jittered inside it, keeps them spread while
+    // still looking scattered rather than laid out.
+    // A STREAM, not a wave (Steve, 2026-10-21): `onScreen` stand at any moment and as each
+    // one's 3-5 seconds run out another takes its place, until all of them — one per coin, like
+    // every other effect — have been seen. The grid is sized to how many STAND at once and its
+    // cells are reshuffled each time round, so a long shower keeps covering the screen evenly
+    // instead of dropping gifts into the same cells in the same order.
+    if (dir === "spot") {
+      const total = Math.min(Math.max(giftPrice(gift), 1), MAX_ICONS);
+      const onScreen = spotOnScreen(giftPrice(gift));
+      const interval = spotIntervalMs(total, onScreen);
+      const columns = Math.max(1, Math.ceil(Math.sqrt(onScreen)));
+      const rows = Math.max(1, Math.ceil(onScreen / columns));
+      const cellCount = Math.max(columns * rows, 1);
+      let bag: number[] = [];
+      return Array.from({ length: total }, (_, n) => {
+        if (bag.length === 0) {
+          bag = Array.from({ length: cellCount }, (_, i) => i).sort(() => Math.random() - 0.5);
+        }
+        const cell = bag.pop() as number;
+        return {
+          key: n,
+          dir: "spot" as BurstDirection,
+          // The opening screenful lands together; the rest keep pace with the ones leaving.
+          delayMs: n < onScreen
+            ? (n / onScreen) * SPOT_SPAWN_WINDOW_MS + Math.random() * 120
+            : SPOT_SPAWN_WINDOW_MS + (n - onScreen + 1) * interval,
+          // 10..90 inside the cell keeps a gift off its neighbour and off the screen edge.
+          startLeftPct: ((cell % columns) + 0.1 + Math.random() * 0.8) * (100 / columns),
+          topPct: (Math.floor(cell / columns) + 0.1 + Math.random() * 0.8) * (100 / rows),
+          driftPx: 0,
+          risePct: 0,
+          size: ICON_SIZE_MIN + Math.random() * ICON_SIZE_RANGE,
+          spin: (Math.random() - 0.5) * 14,
+          holdMs: SPOT_HOLD_MIN_MS + Math.random() * (SPOT_HOLD_MAX_MS - SPOT_HOLD_MIN_MS),
+        };
+      });
     }
 
     const count = Math.min(Math.max(giftPrice(gift), 1), MAX_ICONS);
@@ -251,6 +367,14 @@ export function TapTapBurst({ gift }: { gift: Gift }) {
           62%  { opacity: 1; }
           100% { opacity: 0; transform: scale(1) rotate(var(--bb-spin)); }
         }
+        /* Spot: fades in where it is put, holds its own 3-5 seconds, fades out. No bounce —
+           a few dozen of these arriving at once is a lot of movement already. */
+        @keyframes bb-taptap-spot {
+          0%   { opacity: 0; transform: scale(.75) rotate(var(--bb-spin)); }
+          10%  { opacity: 1; transform: scale(1) rotate(var(--bb-spin)); }
+          88%  { opacity: 1; transform: scale(1) rotate(var(--bb-spin)); }
+          100% { opacity: 0; transform: scale(1) rotate(var(--bb-spin)); }
+        }
         @media (prefers-reduced-motion: reduce) {
           .bb-taptap-icon { animation-duration: 1ms !important; opacity: .9; }
         }
@@ -277,7 +401,7 @@ export function TapTapBurst({ gift }: { gift: Gift }) {
             position: "absolute",
             // Each direction hangs just off its own entry edge, so no icon is ever seen
             // appearing out of nothing. The cross-axis percentage spreads them along that edge.
-            ...(icon.dir === "surprise"
+            ...(icon.dir === "surprise" || icon.dir === "spot"
               ? { left: `${icon.startLeftPct}%`, top: `${icon.topPct}%` }
               : icon.dir === "left" || icon.dir === "right"
               ? { top: `${icon.startLeftPct}%`, ...(icon.dir === "right"
@@ -295,7 +419,9 @@ export function TapTapBurst({ gift }: { gift: Gift }) {
             // Rising floats and slows (ease-out) because it fights gravity; falling ACCELERATES
             // like real rain (ease-in). A sideways sweep does neither — steady, so linear.
             animation:
-              icon.dir === "surprise"
+              icon.dir === "spot"
+                ? `bb-taptap-spot ${SPOT_FADE_IN_MS + (icon.holdMs ?? SPOT_HOLD_MIN_MS) + SPOT_FADE_OUT_MS}ms ease-out ${icon.delayMs}ms both`
+                : icon.dir === "surprise"
                 ? `bb-taptap-pop ${SURPRISE_LIFE_MS}ms ease-out ${icon.delayMs}ms both`
                 : icon.dir === "up"
                 ? `bb-taptap-rise ${FLIGHT_MS}ms ease-out ${icon.delayMs}ms both`

@@ -57,18 +57,28 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     if (!user) return;
     try {
       const res = await post<UserSummary>("fetchMyUserDetails", { my_user_id: user.id });
-      if (res.status && res.data) setUser({ ...res.data, auth_token: undefined });
+      if (res.status && res.data) {
+        const fresh = { ...res.data, auth_token: undefined };
+        // Same data, same object: every page that keys an effect on `user` would otherwise
+        // reload for nothing on each refresh.
+        setUser((cur) => (cur && JSON.stringify(cur) === JSON.stringify(fresh) ? cur : fresh));
+      }
     } catch (e) {
       if ((e as { status?: number }).status === 401) signOut();
     }
   }, [user, signOut]);
 
   // Fill in the profile (name, avatar, balances) on every app load — a stored session may
-  // hold only the id, and balances change while the tab is closed.
+  // hold only the id, and balances change while the tab is closed — AND whenever the signed-in
+  // member changes. Steve, 2026-10-15: "it tells me to buy coins and I already have over 12k
+  // coins." This used to run only on load; a sign-in made inside the page (the Gift button
+  // now sends a signed-out member to Sign in and straight back) set the session from the
+  // sign-in response, which carries no wallet, and nothing fetched it until a reload.
+  // Keyed on the id, not the object: refresh() itself replaces the object.
   useEffect(() => {
     if (user && token) refresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user?.id, token]);
 
   const value = useMemo<Session>(() => ({ user, token, isLoggedIn: !!(user && token), signIn, signOut, refresh }), [user, token, signIn, signOut, refresh]);
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
@@ -76,6 +86,6 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
 export function useSession(): Session {
   const ctx = useContext(SessionContext);
-  if (!ctx) throw new Error("useSession outside SessionProvider");
+  if (!ctx) throw new Error(/* i18n-exempt: a programming error, never shown to a member. */ "useSession outside SessionProvider");
   return ctx;
 }

@@ -1,6 +1,11 @@
 // Bingg Bongg web — LiveKit room session for every role (viewer, guest, host), same token
 // server and identities the phones use: `user_<id>` for publishers, random-suffixed for viewers.
 import { useCallback, useEffect, useRef, useState } from "react";
+/// Must match Android's LiveStreamManager.TOPIC_HEART and iOS's LiveStreamViewModel.heartTopic
+/// byte for byte — it is the literal topic on the wire, and a typo would just mean the web
+/// silently never sees anyone else's hearts.
+const HEART_TOPIC = "bb_heart";
+
 import { Room, RoomEvent, Track, type LocalTrackPublication, type RemoteParticipant, type RemoteTrack, type Participant } from "livekit-client";
 import { tokenServer } from "./api";
 
@@ -25,6 +30,12 @@ function userIdOf(p: Participant): number | null {
 
 export function useLiveRoom(roomName: string, role: LiveRole, enabled: boolean) {
   const roomRef = useRef<Room | null>(null);
+  // Steve, 2026-10-14: "the hearts should show on eddie's screen not my own screen." A heart
+  // somebody tapped, as {identity it is for, seq}. The seq is what makes two in a row register
+  // as two — the identity alone would not change, and a consumer watching the value would see
+  // one event.
+  const [incomingHeart, setIncomingHeart] = useState<{ identity: string; seq: number } | null>(null);
+  const heartSeq = useRef(0);
   const [status, setStatus] = useState<LiveStatus>("idle");
   const [error, setError] = useState<string | null>(null);
   const [tiles, setTiles] = useState<LiveTile[]>([]);
@@ -84,6 +95,13 @@ export function useLiveRoom(roomName: string, role: LiveRole, enabled: boolean) 
       .on(RoomEvent.ParticipantConnected, refresh)
       .on(RoomEvent.ParticipantDisconnected, refresh)
       .on(RoomEvent.ActiveSpeakersChanged, refresh)
+      .on(RoomEvent.DataReceived, (payload: Uint8Array, _p?: RemoteParticipant, _k?: unknown, topic?: string) => {
+        if (cancelled || topic !== HEART_TOPIC) return;
+        const identity = new TextDecoder().decode(payload);
+        if (!identity) return;
+        heartSeq.current += 1;
+        setIncomingHeart({ identity, seq: heartSeq.current });
+      })
       .on(RoomEvent.Disconnected, () => { if (!cancelled) setStatus("ended"); });
 
     (async () => {
@@ -162,5 +180,20 @@ export function useLiveRoom(roomName: string, role: LiveRole, enabled: boolean) 
 
   const disconnect = useCallback(() => { roomRef.current?.disconnect(); }, []);
 
-  return { status, error, publishError, tiles, cameraOn, micOn, grantedRole, toggleCamera, toggleMic, flipCamera, disconnect };
+  /// Fan a heart out to everyone in the room.
+  ///
+  /// A data message, not participant metadata: a heart is an EVENT — ten in a row are ten
+  /// hearts — and metadata is state that would collapse a burst. Lossy, because a dropped heart
+  /// is one missing petal in a shower and re-sending one that is seconds late is worse than
+  /// losing it. The payload is the identity the heart is FOR, so each receiver can tell which
+  /// tile it belongs to.
+  const sendHeart = useCallback((targetIdentity: string) => {
+    const room = roomRef.current;
+    if (!room || !targetIdentity) return;
+    room.localParticipant
+      .publishData(new TextEncoder().encode(targetIdentity), { reliable: false, topic: HEART_TOPIC })
+      .catch(() => { /* best-effort, same as the phones */ });
+  }, []);
+
+  return { status, error, publishError, tiles, cameraOn, micOn, grantedRole, toggleCamera, toggleMic, flipCamera, disconnect, sendHeart, incomingHeart };
 }

@@ -4,6 +4,8 @@ import { mediaUrl, post } from "../lib/api";
 import { useSession } from "../lib/session";
 import { fetchMyBusinesses, uploadFlyerAsset, saveBusinessFlyer, type Business } from "../lib/business";
 import { Loading } from "../components/Common";
+import { tt, useT  } from "../lib/i18n";
+import { PageTitle } from "../components/PageTitle";
 
 /**
  * Steve, 2026-10-04: "add a page called 'Create Your Own Ads' where admin can add a flyer that
@@ -52,13 +54,14 @@ const full = (path?: string) => mediaUrl(path);
 function Page({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="page" style={{ maxWidth: 720 }}>
-      <h1 className="page-title">{title}</h1>
+      <PageTitle>{title}</PageTitle>
       {children}
     </div>
   );
 }
 
 export function PrintableAdsPage() {
+  const { t } = useT();
   const [flyers, setFlyers] = useState<PrintableAd[] | null>(null);
   const [chosen, setChosen] = useState<PrintableAd | null>(null);
   // Steve, 2026-10-05: "Now add the same button to the business page flyers." Arriving from a
@@ -86,14 +89,13 @@ export function PrintableAdsPage() {
   if (chosen) return <FlyerEditor flyer={chosen} onBack={() => setChosen(null)} />;
 
   return (
-    <Page title="Create Your Own Ads">
+    <Page title={t("ads_you_can_print")}>
       <p className="muted" style={{ marginTop: 0 }}>
-        Pick a flyer, then add your own words, stickers and photos anywhere on it and download or print it.
-      </p>
+        {t("printable_ads_hint")}</p>
       {flyers === null ? (
         <Loading />
       ) : flyers.length === 0 ? (
-        <p className="muted">No flyers yet. Check back soon.</p>
+        <p className="muted">{t("no_printable_ads")}</p>
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(180px,1fr))", gap: 14 }}>
           {flyers.map((f) => (
@@ -102,7 +104,7 @@ export function PrintableAdsPage() {
               <img src={full(f.image_path)} alt={f.title ?? "Flyer"}
                 style={{ width: "100%", borderRadius: 6, display: "block" }} />
               {f.title && <b style={{ display: "block", marginTop: 6 }}>{f.title}</b>}
-              <span className="muted" style={{ fontSize: 12 }}>Click to add stickers and text</span>
+              <span className="muted" style={{ fontSize: 12 }}>{t("click_to_add_stickers_and_text")}</span>
             </button>
           ))}
         </div>
@@ -112,6 +114,7 @@ export function PrintableAdsPage() {
 }
 
 function FlyerEditor({ flyer, onBack, startWithAssistantFor }: { flyer: PrintableAd; onBack: () => void; startWithAssistantFor?: number | null }) {
+  const { t } = useT();
   const [overlays, setOverlays] = useState<Overlay[]>([]);
   const [selected, setSelected] = useState<number | null>(null);
   const [publishing, setPublishing] = useState<string | null>(null);
@@ -176,7 +179,7 @@ function FlyerEditor({ flyer, onBack, startWithAssistantFor }: { flyer: Printabl
         ...o.filter((x) => !(x.kind === "image" && x.video)),
         { id: Date.now(), kind: "image", url: c.toDataURL("image/png"), cx: 0.5, cy: 0.5, size: 0.4, video: file },
       ]);
-      setNotice("A printed page can't play a video, so its opening picture went on the flyer. Put the flyer on your business page and visitors can click it to watch.");
+      setNotice(tt("a_printed_page_can_t_play_a_video_so_its"));
       return;
     }
 
@@ -221,7 +224,7 @@ function FlyerEditor({ flyer, onBack, startWithAssistantFor }: { flyer: Printabl
       setAskOpen(false);
       setNotice(body.message || "Your ad is ready. Drag anything to move it.");
     } catch {
-      setNotice("Couldn't make your ad just now. Please try again.");
+      setNotice(tt("couldn_t_make_your_ad_just_now_please_tr"));
     } finally {
       setClaudeBusy(false);
     }
@@ -372,11 +375,11 @@ function FlyerEditor({ flyer, onBack, startWithAssistantFor }: { flyer: Printabl
     try {
       pages = (await fetchMyBusinesses(user.id)).data;
     } catch {
-      setNotice("Couldn't load your business pages.");
+      setNotice(tt("couldn_t_load_your_business_pages"));
       return;
     }
     if (pages.length === 0) {
-      setNotice("You don't have a business page yet. Create one from Bingg Bongg Business.");
+      setNotice(tt("no_business_page_yet"));
       return;
     }
 
@@ -388,7 +391,7 @@ function FlyerEditor({ flyer, onBack, startWithAssistantFor }: { flyer: Printabl
     if (!choice) return;
 
     const rendered = await renderPage();
-    if (!rendered) { setNotice("Couldn't read the flyer."); return; }
+    if (!rendered) { setNotice(tt("couldn_t_read_the_flyer")); return; }
 
     setPublishing("Uploading the flyer…");
     try {
@@ -436,8 +439,8 @@ function FlyerEditor({ flyer, onBack, startWithAssistantFor }: { flyer: Printabl
   };
 
   return (
-    <Page title="Create Your Own Ads">
-      <button className="btn" onClick={onBack} style={{ marginBottom: 12 }}>← Back to flyers</button>
+    <Page title={t("ads_you_can_print")}>
+      <button className="btn" onClick={onBack} style={{ marginBottom: 12 }}>{t("back_to_flyers")}</button>
 
       {/* Steve, 2026-10-05: "I wanna members to ask Claude to create an ad for them" and
           "Put it on top so they can see you." */}
@@ -446,8 +449,7 @@ function FlyerEditor({ flyer, onBack, startWithAssistantFor }: { flyer: Printabl
         onClick={() => setAskOpen(true)}
         style={{ width: "100%", marginBottom: 12, padding: "12px 0", fontWeight: 700 }}
       >
-        ✨  Ask Bingg Bongg Assistant to make my ad
-      </button>
+        {t("ask_bingg_bongg_assistant_to_make_my_ad")}</button>
 
       {notice && (
         <div
@@ -455,9 +457,9 @@ function FlyerEditor({ flyer, onBack, startWithAssistantFor }: { flyer: Printabl
           style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.9)", zIndex: 1100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
         >
           <div className="card pad" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 420, width: "100%", border: "2px solid var(--gold)", background: "#000" }}>
-            <div style={{ color: "var(--gold)", fontWeight: 800, fontSize: 17, textAlign: "center" }}>Bingg Bongg Assistant</div>
+            <div style={{ color: "var(--gold)", fontWeight: 800, fontSize: 17, textAlign: "center" }}>{t("bingg_bongg_assistant")}</div>
             <div style={{ color: "var(--gold)", fontSize: 14, textAlign: "center", margin: "12px 0 16px", whiteSpace: "pre-wrap" }}>{notice}</div>
-            <button className="btn" style={{ width: "100%" }} onClick={() => setNotice(null)}>OK</button>
+            <button className="btn" style={{ width: "100%" }} onClick={() => setNotice(null)}>{t("ok")}</button>
           </div>
         </div>
       )}
@@ -466,24 +468,22 @@ function FlyerEditor({ flyer, onBack, startWithAssistantFor }: { flyer: Printabl
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.9)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div className="card pad" style={{ maxWidth: 460, width: "100%", border: "2px solid var(--gold)" }}>
             <div style={{ color: "var(--gold)", fontWeight: 800, fontSize: 18, textAlign: "center" }}>
-              Ask Bingg Bongg Assistant to make your ad
-            </div>
+              {t("ask_claude_title")}</div>
             <div style={{ color: "var(--gold)", fontSize: 14, textAlign: "center", margin: "10px 0 14px" }}>
-              What would you like on your ad? Tell me in your own words and I will create it for you.
-            </div>
+              {t("ask_claude_prompt")}</div>
             <textarea
               className="input"
               rows={4}
               value={wish}
               onChange={(e) => setWish(e.target.value)}
-              placeholder="For example: Pizza shop called Tony's, two for one every Tuesday, open till 11, call 555 0199"
+              placeholder={t("ask_claude_hint")}
               style={{ width: "100%", resize: "vertical" }}
             />
             <div className="row" style={{ gap: 8, marginTop: 14 }}>
               <button className="btn" style={{ flex: 1 }} disabled={claudeBusy} onClick={askClaude}>
                 {claudeBusy ? "Making your ad…" : "Create my ad"}
               </button>
-              <button className="btn ghost" disabled={claudeBusy} onClick={() => setAskOpen(false)}>Not now</button>
+              <button className="btn ghost" disabled={claudeBusy} onClick={() => setAskOpen(false)}>{t("advertise_this_video_dismiss")}</button>
             </div>
           </div>
         </div>
@@ -530,22 +530,22 @@ function FlyerEditor({ flyer, onBack, startWithAssistantFor }: { flyer: Printabl
       <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", marginTop: 14 }}>
         {selected !== null && (
           <>
-            <button className="btn" onClick={() => resize(1 / 1.15)}>Smaller</button>
-            <button className="btn" onClick={() => resize(1.15)}>Bigger</button>
-            <button className="btn" onClick={removeSelected}>Delete</button>
+            <button className="btn" onClick={() => resize(1 / 1.15)}>{t("smaller")}</button>
+            <button className="btn" onClick={() => resize(1.15)}>{t("bigger")}</button>
+            <button className="btn" onClick={removeSelected}>{t("delete")}</button>
           </>
         )}
-        <button className="btn" onClick={addText}>Add Text</button>
-        <button className="btn" onClick={openStickers}>Add Sticker</button>
+        <button className="btn" onClick={addText}>{t("add_text")}</button>
+        <button className="btn" onClick={openStickers}>{t("add_sticker")}</button>
         <label className="btn" style={{ cursor: "pointer" }}>
-          Add Photo / Video
+          {t("add_photo_or_video")}
           <input type="file" accept="image/*,video/*" onChange={onPickFile} style={{ display: "none" }} />
         </label>
-        <button className="btn" onClick={download}>Download</button>
+        <button className="btn" onClick={download}>{t("download")}</button>
         <button className="btn" onClick={publish} disabled={!!publishing}>
           {publishing ?? "Put on My Business Page"}
         </button>
-        <button className="btn" onClick={printFlyer}>Print</button>
+        <button className="btn" onClick={printFlyer}>{t("print_flyer")}</button>
       </div>
 
       {(() => {
@@ -553,14 +553,14 @@ function FlyerEditor({ flyer, onBack, startWithAssistantFor }: { flyer: Printabl
         if (!current || current.kind !== "text") return null;
         return (
           <div className="card" style={{ marginTop: 12, padding: 12 }}>
-            <div className="muted" style={{ fontSize: 12, marginBottom: 6 }}>Colour</div>
+            <div className="muted" style={{ fontSize: 12, marginBottom: 6 }}>{t("text_colour")}</div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               {COLOURS.map((c) => (
                 <button key={c} onClick={() => restyle({ colour: c })} aria-label={c}
                   style={{ width: 26, height: 26, borderRadius: "50%", background: c, border: "1px solid #888", cursor: "pointer" }} />
               ))}
             </div>
-            <div className="muted" style={{ fontSize: 12, margin: "10px 0 6px" }}>Font</div>
+            <div className="muted" style={{ fontSize: 12, margin: "10px 0 6px" }}>{t("text_font")}</div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               {FONTS.map((f) => (
                 <button key={f.label} className="btn" style={{ fontFamily: f.css }}

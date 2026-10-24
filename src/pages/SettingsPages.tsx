@@ -6,44 +6,43 @@ import { Link, useNavigate } from "react-router-dom";
 import { API_BASE, currentAuthHeaders, displayName, mediaUrl, post, type UserSummary } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice, UserRow } from "../components/Common";
+import { useToast, showGoldAlert } from "../components/GoldToast";
 import { SideLinkItem, SiteFooter, sidebarSections } from "../components/Sidebar";
 import { fetchMyVirtualBattles, fetchVirtualGiftRecord, sendVirtualThankYou, type VirtualBattleData, type VirtualGiftRecord } from "../lib/battles";
 import { VirtualGiftRecordOverlay, personName } from "../components/BattleEngines";
 import { GoldSelect } from "../components/GoldSelect";
+import { tt, useT, type StringKey  } from "../lib/i18n";
+import { PageTitle } from "../components/PageTitle";
 
 const SITE = "https://www.binggbongg.com";
 
-function useToast() {
-  const [toast, setToast] = useState<string | null>(null);
-  useEffect(() => {
-    if (!toast) return;
-    const t = setTimeout(() => setToast(null), 4000);
-    return () => clearTimeout(t);
-  }, [toast]);
-  return { toast, setToast, el: toast ? <div className="notice" style={{ position: "fixed", left: 16, right: 16, bottom: 16, maxWidth: 480, margin: "0 auto", zIndex: 30 }}>{toast}</div> : null };
-}
 
 function Page({ title, children, wide }: { title: string; children: React.ReactNode; wide?: boolean }) {
   return (
     <div className="page" style={wide ? undefined : { maxWidth: 720 }}>
-      <h1 className="page-title">{title}</h1>
+      <PageTitle>{title}</PageTitle>
       {children}
     </div>
   );
 }
 
 function NeedLogin() {
-  return <div className="page"><Notice>Sign in to open this page. <Link to="/login">Sign in</Link></Notice></div>;
+  const { t, tn } = useT();
+  return <div className="page"><Notice>{tn("sign_in_to_open_this_page", <Link to="/login">{t("sign_in")}</Link>)}</Notice></div>;
 }
 
 /** The whole Settings list as a page — what phones and narrow screens use instead of the sidebar. */
 export function SettingsHubPage() {
+  const { t } = useT();
   const { user, isLoggedIn, signOut } = useSession();
   return (
-    <Page title="Settings">
+    <Page title={t("settings")}>
       {sidebarSections(user?.id ?? null).map((sec, i) => (
         <div key={i} className="card" style={{ marginBottom: 12, overflow: "hidden" }}>
-          {sec.title && <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)" }}><b style={{ color: "var(--gold)" }}>{sec.title}</b></div>}
+          {/* t(), not the bare key. The sidebar has always translated these; this page printed
+              them raw, so every language saw "account" / "general" / "get_the_app". The type
+              only checks that a key EXISTS, not that anybody translated it before rendering. */}
+          {sec.title && <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)" }}><b style={{ color: "var(--gold)" }}>{t(sec.title)}</b></div>}
           {sec.links.filter((l) => !l.needsLogin || isLoggedIn).map((l) => <SideLinkItem key={l.label} link={l} onSignOut={signOut} big />)}
         </div>
       ))}
@@ -54,12 +53,16 @@ export function SettingsHubPage() {
   );
 }
 
-export function ComingSoonPage({ title, note }: { title: string; note: string }) {
+export function ComingSoonPage({ titleKey, noteKey }: { titleKey: StringKey; noteKey: StringKey }) {
+  // Keys, not text: this is rendered from App, which is where the LanguageProvider itself lives,
+  // so a t() called up there would read the context from above the provider and always answer in
+  // English. Translating here keeps it under the provider.
+  const { t } = useT();
   return (
-    <Page title={title}>
+    <Page title={t(titleKey)}>
       <div className="card pad">
-        <p className="soft" style={{ marginTop: 0 }}>{note}</p>
-        <p className="muted" style={{ fontSize: 13, marginBottom: 0 }}>This page is on the way for the web. It already works in the Bingg Bongg app on your phone.</p>
+        <p className="soft" style={{ marginTop: 0 }}>{t(noteKey)}</p>
+        <p className="muted" style={{ fontSize: 13, marginBottom: 0 }}>{t("this_page_is_on_the_way_for_the_web_it_a")}</p>
       </div>
     </Page>
   );
@@ -73,16 +76,18 @@ interface MyUser extends UserSummary {
   allow_virtual_games?: number | string | null;
   wants_to_battle?: number | string | null;
 }
-const TOGGLES: { key: keyof MyUser; label: string; hint: string }[] = [
-  { key: "is_notification", label: "Notify me", hint: "Push notifications from the app." },
-  { key: "show_liked_videos", label: "Show your liked videos to users", hint: "Others can see the videos you liked on your profile." },
-  { key: "show_following_list", label: "Show your following list to users", hint: "Others can see who you follow." },
-  { key: "allow_virtual_games", label: "Allow virtual games", hint: "Let hosts invite you to virtual games." },
-  { key: "wants_to_battle", label: "I want someone to battle with", hint: "Show you in Find a Battle so hosts can challenge you." },
+// label/hint are translation KEYS: module-level data, translated where it is rendered.
+const TOGGLES: { key: keyof MyUser; label: StringKey; hint: StringKey }[] = [
+  { key: "is_notification", label: "notify_me", hint: "push_notifications_from_the_app" },
+  { key: "show_liked_videos", label: "show_your_liked_videos_to_users", hint: "others_can_see_the_videos_you_liked_on_y" },
+  { key: "show_following_list", label: "show_your_following_list_to_users", hint: "others_can_see_who_you_follow" },
+  { key: "allow_virtual_games", label: "allow_virtual_games", hint: "let_hosts_invite_you_to_virtual_games" },
+  { key: "wants_to_battle", label: "i_want_someone_to_battle_with", hint: "show_you_in_find_a_battle_so_hosts_can_c" },
 ];
 const on = (v: unknown) => v === 1 || v === "1" || v === true;
 
 export function AccountSettingsPage() {
+  const { t } = useT();
   const { user, isLoggedIn, refresh } = useSession();
   const [me, setMe] = useState<MyUser | null>(null);
   const [fullname, setFullname] = useState("");
@@ -101,34 +106,34 @@ export function AccountSettingsPage() {
     setBusy(true);
     try {
       const r = await post<MyUser>("updateUserDetails", { user_id: user.id, ...fields });
-      if (!r.status) throw new Error(r.message ?? "Couldn't save.");
+      if (!r.status) throw new Error(r.message ?? tt("couldn_t_save"));
       setMe((m) => ({ ...(m ?? {} as MyUser), ...(r.data ?? {}), ...fields } as MyUser));
       setToast("Saved.");
       refresh();
     } catch (e) { setToast((e as Error).message); } finally { setBusy(false); }
   }
   return (
-    <Page title="Account settings">
+    <Page title={t("account_settings")}>
       {!me ? <Loading /> : (
         <>
           <div className="card" style={{ marginBottom: 12 }}>
-            {TOGGLES.map((t) => (
-              <label key={t.key} className="row" style={{ padding: "12px 14px", borderBottom: "1px solid var(--line)", cursor: "pointer" }}>
+            {TOGGLES.map((tog) => (
+              <label key={tog.key} className="row" style={{ padding: "12px 14px", borderBottom: "1px solid var(--line)", cursor: "pointer" }}>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 700 }}>{t.label}</div>
-                  <div className="muted" style={{ fontSize: 12 }}>{t.hint}</div>
+                  <div style={{ fontWeight: 700 }}>{t(tog.label)}</div>
+                  <div className="muted" style={{ fontSize: 12 }}>{t(tog.hint)}</div>
                 </div>
-                <input type="checkbox" className="switch" disabled={busy} checked={on(me[t.key])} onChange={(e) => save({ [t.key]: e.target.checked ? 1 : 0 })} />
+                <input type="checkbox" className="switch" disabled={busy} checked={on(me[tog.key])} onChange={(e) => save({ [tog.key]: e.target.checked ? 1 : 0 })} />
               </label>
             ))}
           </div>
           <div className="card pad">
             <div className="row" style={{ marginBottom: 12 }}><Avatar user={me} size="lg" /><div><div style={{ fontWeight: 800 }}>{displayName(me)}</div><div className="muted">@{me.username}</div></div></div>
-            <label className="soft" style={{ fontSize: 13 }}>Name</label>
+            <label className="soft" style={{ fontSize: 13 }}>{t("name")}</label>
             <input className="input" value={fullname} onChange={(e) => setFullname(e.target.value)} maxLength={60} style={{ width: "100%", marginBottom: 10 }} />
-            <label className="soft" style={{ fontSize: 13 }}>Bio</label>
+            <label className="soft" style={{ fontSize: 13 }}>{t("bio")}</label>
             <textarea className="input" value={bio} onChange={(e) => setBio(e.target.value)} maxLength={200} rows={3} style={{ width: "100%", marginBottom: 10 }} />
-            <button className="btn" disabled={busy} onClick={() => save({ fullname, bio })}>Save profile</button>
+            <button className="btn" disabled={busy} onClick={() => save({ fullname, bio })}>{t("save_profile")}</button>
           </div>
         </>
       )}
@@ -139,19 +144,20 @@ export function AccountSettingsPage() {
 
 // ---- Share profile + QR --------------------------------------------------------------------
 export function ShareProfilePage() {
+  const { t } = useT();
   const { user, isLoggedIn } = useSession();
   const { setToast, el } = useToast();
   if (!isLoggedIn || !user) return <NeedLogin />;
   const link = `${SITE}/profile/${user.id}`;
-  const copy = () => navigator.clipboard.writeText(link).then(() => setToast("Link copied.")).catch(() => setToast("Couldn't copy — select the link and copy it."));
+  const copy = () => navigator.clipboard.writeText(link).then(() => setToast(tt("link_copied"))).catch(() => setToast(tt("couldn_t_copy_select_the_link_and_copy_i")));
   return (
-    <Page title="Share profile">
+    <Page title={t("share_profile")}>
       <div className="card pad">
         <div className="row" style={{ marginBottom: 12 }}><Avatar user={user} size="lg" /><div><div style={{ fontWeight: 800 }}>{displayName(user)}</div><div className="muted">@{user.username}</div></div></div>
         <input className="input" readOnly value={link} style={{ width: "100%", marginBottom: 10 }} onFocus={(e) => e.target.select()} />
         <div className="row">
-          <button className="btn" onClick={copy}>Copy link</button>
-          {typeof navigator.share === "function" && <button className="btn ghost" onClick={() => navigator.share({ title: displayName(user), url: link }).catch(() => undefined)}>Share…</button>}
+          <button className="btn" onClick={copy}>{t("copy_link")}</button>
+          {typeof navigator.share === "function" && <button className="btn ghost" onClick={() => navigator.share({ title: displayName(user), url: link }).catch(() => undefined)}>{t("share")}</button>}
         </div>
       </div>
       {el}
@@ -160,17 +166,18 @@ export function ShareProfilePage() {
 }
 
 export function QrCodePage() {
+  const { t } = useT();
   const { user, isLoggedIn } = useSession();
   if (!isLoggedIn || !user) return <NeedLogin />;
   const link = `${SITE}/profile/${user.id}`;
   // Public profile link only — rendered by a QR image service until a local generator lands.
   const img = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&color=F0C420&bgcolor=000000&data=${encodeURIComponent(link)}`;
   return (
-    <Page title="My QR code">
+    <Page title={t("my_qr_code")}>
       <div className="card pad" style={{ display: "grid", placeItems: "center", gap: 10 }}>
-        <img src={img} alt="QR code for your profile" width={240} height={240} style={{ border: "1.5px solid var(--gold-border)", borderRadius: 12 }} />
+        <img src={img} alt={t("qr_code_for_your_profile")} width={240} height={240} style={{ border: "1.5px solid var(--gold-border)", borderRadius: 12 }} />
         <div style={{ fontWeight: 800 }}>{displayName(user)}</div>
-        <div className="muted" style={{ fontSize: 13 }}>Scan to open your profile on Bingg Bongg.</div>
+        <div className="muted" style={{ fontSize: 13 }}>{t("scan_to_open_your_profile_on_bingg_bongg")}</div>
       </div>
     </Page>
   );
@@ -182,6 +189,7 @@ export function QrCodePage() {
 // referral commissions and Share & Earn 10% — so no earnings boxes here, just the code and list.
 interface Referral { id: number; user?: UserSummary; created_at?: string }
 export function ReferralsPage() {
+  const { t, tn } = useT();
   const { user, isLoggedIn } = useSession();
   const [list, setList] = useState<Referral[] | null>(null);
   const [code, setCode] = useState<string | null>(null);
@@ -196,26 +204,26 @@ export function ReferralsPage() {
   useEffect(load, [load]);
   if (!isLoggedIn || !user) return <NeedLogin />;
   return (
-    <Page title="Referrals">
+    <Page title={t("referrals")}>
       <div className="card pad" style={{ marginBottom: 12 }}>
-        <div className="muted" style={{ fontSize: 13 }}>Your referral code. Anyone who signs up with it, or enters it while uploading a video ad, becomes your referral.</div>
+        <div className="muted" style={{ fontSize: 13 }}>{t("your_referral_code_anyone_who_signs_up_w")}</div>
         <div className="row" style={{ marginTop: 8, flexWrap: "wrap" }}>
           <span className="pill" style={{ fontSize: 15 }}>{code ?? "…"}</span>
-          <button className="btn small ghost" disabled={!code} onClick={() => navigator.clipboard.writeText(code ?? "").then(() => setToast("Copied.")).catch(() => undefined)}>Copy</button>
-          <span className="muted" style={{ fontSize: 12 }}>Your username <b>@{user.username}</b> works for sign-ups too.</span>
+          <button className="btn small ghost" disabled={!code} onClick={() => navigator.clipboard.writeText(code ?? "").then(() => setToast("Copied.")).catch(() => undefined)}>{t("copy")}</button>
+          <span className="muted" style={{ fontSize: 12 }}>{tn("your_username_works_for_signups", <b>@{user.username}</b>)}</span>
         </div>
       </div>
       <div className="card pad" style={{ marginBottom: 12 }}>
-        <b style={{ color: "var(--gold)" }}>What referrals earn you</b>
+        <b style={{ color: "var(--gold)" }}>{t("what_referrals_earn_you")}</b>
         <ul className="soft" style={{ fontSize: 14, margin: "8px 0 0", paddingLeft: 18 }}>
-          <li><b>Simulcast for free.</b> 3 referrals in a month make your next month free. 36 lifetime referrals earn a free year. <Link to="/settings/simulcast">See your Simulcast status</Link>.</li>
-          <li><b>Video-ad commission.</b> An advertiser can enter your referral code only while uploading their ad. You then get a one-time commission for that ad.</li>
-          <li><b>Share &amp; Earn 10%.</b> Share a live room with the button in the room. Gifts sent by the people who came through your link pay you 10%.</li>
+          <li>{tn("referral_perk_simulcast", <b>{t("simulcast_for_free")}</b>, <Link to="/settings/simulcast">{t("see_your_simulcast_status")}</Link>)}</li>
+          <li>{tn("referral_perk_video_ad", <b>{t("video_ad_commission")}</b>)}</li>
+          <li>{tn("referral_perk_share_and_earn", <b>{t("share_earn_10")}</b>)}</li>
         </ul>
       </div>
       <div className="card">
-        <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)" }}><b style={{ color: "var(--gold)" }}>People you referred{list ? ` (${list.length})` : ""}</b></div>
-        {list === null ? <Loading /> : list.length === 0 ? <p className="muted" style={{ padding: 14 }}>Nobody yet.</p> : list.map((r) => r.user ? <UserRow key={r.id} user={r.user} /> : null)}
+        <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)" }}><b style={{ color: "var(--gold)" }}>{list ? t("people_you_referred_count", list.length) : t("people_you_referred")}</b></div>
+        {list === null ? <Loading /> : list.length === 0 ? <p className="muted" style={{ padding: 14 }}>{t("nobody_yet")}</p> : list.map((r) => r.user ? <UserRow key={r.id} user={r.user} /> : null)}
       </div>
       {el}
     </Page>
@@ -224,6 +232,7 @@ export function ReferralsPage() {
 
 // ---- Blocked profiles -----------------------------------------------------------------------
 export function BlockedProfilesPage() {
+  const { t } = useT();
   const { user, isLoggedIn } = useSession();
   const [list, setList] = useState<UserSummary[] | null>(null);
   const { setToast, el } = useToast();
@@ -238,15 +247,15 @@ export function BlockedProfilesPage() {
     const remaining = list.filter((u) => u.id !== id).map((u) => u.id).join(",");
     try {
       const r = await post("updateUserBlockList", { user_id: user.id, blocked_users: remaining || "0" });
-      if (!r.status) throw new Error(r.message ?? "Couldn't unblock.");
+      if (!r.status) throw new Error(r.message ?? tt("couldn_t_unblock"));
       setToast("Unblocked."); load();
     } catch (e) { setToast((e as Error).message); }
   }
   return (
-    <Page title="Blocked profiles">
+    <Page title={t("blocked_profiles")}>
       <div className="card">
-        {list === null ? <Loading /> : list.length === 0 ? <p className="muted" style={{ padding: 14 }}>You haven't blocked anyone.</p>
-          : list.map((u) => <UserRow key={u.id} user={u} trailing={<button className="btn small ghost" onClick={() => unblock(u.id)}>Unblock</button>} />)}
+        {list === null ? <Loading /> : list.length === 0 ? <p className="muted" style={{ padding: 14 }}>{t("you_haven_t_blocked_anyone")}</p>
+          : list.map((u) => <UserRow key={u.id} user={u} trailing={<button className="btn small ghost" onClick={() => unblock(u.id)}>{t("unblock")}</button>} />)}
       </div>
       {el}
     </Page>
@@ -256,6 +265,7 @@ export function BlockedProfilesPage() {
 // ---- My Moderators --------------------------------------------------------------------------
 interface ModRow { id: number; moderator_user_id: number; moderator?: UserSummary }
 export function ModeratorsPage() {
+  const { t } = useT();
   const { user, isLoggedIn } = useSession();
   const [list, setList] = useState<ModRow[] | null>(null);
   const [q, setQ] = useState("");
@@ -276,21 +286,21 @@ export function ModeratorsPage() {
     if (!user) return;
     try {
       const r = await post(endpoint, { my_user_id: user.id, moderator_user_id: id });
-      if (!r.status) throw new Error(r.message ?? "Couldn't update moderators.");
+      if (!r.status) throw new Error(r.message ?? tt("couldn_t_update_moderators"));
       setToast(endpoint === "addPersonalModerator" ? "Moderator added." : "Moderator removed."); setQ(""); load();
     } catch (e) { setToast((e as Error).message); }
   }
   return (
-    <Page title="My Moderators">
-      <p className="muted" style={{ fontSize: 13 }}>Moderators can pause chat and keep your live room in order. They get a shield badge in your room.</p>
+    <Page title={t("my_moderators")}>
+      <p className="muted" style={{ fontSize: 13 }}>{t("moderators_can_pause_chat_and_keep_your")}</p>
       <div className="card pad" style={{ marginBottom: 12 }}>
-        <input className="input" placeholder="Search a member to add" value={q} onChange={(e) => setQ(e.target.value)} style={{ width: "100%" }} />
-        {results.map((u) => <UserRow key={u.id} user={u} trailing={<button className="btn small" onClick={() => change("addPersonalModerator", u.id)}>Add</button>} />)}
+        <input className="input" placeholder={t("search_a_member_to_add")} value={q} onChange={(e) => setQ(e.target.value)} style={{ width: "100%" }} />
+        {results.map((u) => <UserRow key={u.id} user={u} trailing={<button className="btn small" onClick={() => change("addPersonalModerator", u.id)}>{t("add")}</button>} />)}
       </div>
       <div className="card">
-        <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)" }}><b style={{ color: "var(--gold)" }}>Your moderators{list ? ` (${list.length})` : ""}</b></div>
-        {list === null ? <Loading /> : list.length === 0 ? <p className="muted" style={{ padding: 14 }}>No moderators yet.</p>
-          : list.map((m) => m.moderator ? <UserRow key={m.id} user={m.moderator} trailing={<button className="btn small ghost" onClick={() => change("removePersonalModerator", m.moderator_user_id)}>Remove</button>} /> : null)}
+        <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)" }}><b style={{ color: "var(--gold)" }}>{list ? t("your_moderators_count", list.length) : t("your_moderators")}</b></div>
+        {list === null ? <Loading /> : list.length === 0 ? <p className="muted" style={{ padding: 14 }}>{t("no_moderators_yet")}</p>
+          : list.map((m) => m.moderator ? <UserRow key={m.id} user={m.moderator} trailing={<button className="btn small ghost" onClick={() => change("removePersonalModerator", m.moderator_user_id)}>{t("remove")}</button>} /> : null)}
       </div>
       {el}
     </Page>
@@ -301,6 +311,7 @@ export function ModeratorsPage() {
 interface SimDest { platform: string; label: string; guaranteed: boolean; note?: string; default_rtmp_url?: string; rtmp_url?: string; has_key: boolean; is_enabled: boolean }
 interface SimOverview { enabled: boolean; show_platform_tiles?: boolean; free_year_referrals?: number; lifetime_referrals?: number; daily_price: number; monthly_price: number; status: string; is_entitled: boolean; paid_until?: string | null; cash_wallet: number; referrals_this_month: number; referrals_needed_for_free_month: number; next_month_free: boolean; destinations: SimDest[] }
 export function SimulcastPage() {
+  const { t } = useT();
   const { user, isLoggedIn } = useSession();
   const [ov, setOv] = useState<SimOverview | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
@@ -313,14 +324,14 @@ export function SimulcastPage() {
   async function save(platform: string, enabled: boolean) {
     try {
       const r = await post("saveSimulcastDestination", { platform, rtmp_url: rtmp, stream_key: key, is_enabled: enabled ? 1 : 0 });
-      if (!r.status) throw new Error(r.message ?? "Couldn't save.");
+      if (!r.status) throw new Error(r.message ?? tt("couldn_t_save"));
       setToast("Saved."); setEditing(null); setKey(""); load();
     } catch (e) { setToast((e as Error).message); }
   }
   async function remove(platform: string) {
     try {
       const r = await post("deleteSimulcastDestination", { platform });
-      if (!r.status) throw new Error(r.message ?? "Couldn't remove.");
+      if (!r.status) throw new Error(r.message ?? tt("couldn_t_remove"));
       setToast("Removed."); load();
     } catch (e) { setToast((e as Error).message); }
   }
@@ -329,20 +340,20 @@ export function SimulcastPage() {
   async function toggleTiles(on: boolean) {
     try {
       const r = await post("saveSimulcastOptions", { user_id: user?.id, show_platform_tiles: on ? 1 : 0 });
-      if (!r.status) throw new Error(r.message ?? "Couldn't save.");
+      if (!r.status) throw new Error(r.message ?? tt("couldn_t_save"));
       load();
     } catch (e) { setToast((e as Error).message); }
   }
   async function toggle(d: SimDest, enabled: boolean) {
     try {
       const r = await post("saveSimulcastDestination", { platform: d.platform, is_enabled: enabled ? 1 : 0 });
-      if (!r.status) throw new Error(r.message ?? "Couldn't update.");
+      if (!r.status) throw new Error(r.message ?? tt("couldn_t_update"));
       load();
     } catch (e) { setToast((e as Error).message); }
   }
   return (
-    <Page title="Simulcast">
-      <p className="muted" style={{ fontSize: 13 }}>Go live once on Bingg Bongg and be live on YouTube, Facebook, Twitch, Instagram and TikTok at the same time. Paste each platform's stream key once; every live you start is sent there too.</p>
+    <Page title={t("simulcast")}>
+      <p className="muted" style={{ fontSize: 13 }}>{t("go_live_once_on_bingg_bongg_and_be_live")}</p>
       {!ov ? <Loading /> : (
         <>
           {/* Steve, 2026-09-24: "Bingg Bongg should be on top of the list … once you connect with
@@ -351,45 +362,46 @@ export function SimulcastPage() {
           <div className="card pad" style={{ marginBottom: 10, borderWidth: 2 }}>
             <div className="row">
               <div style={{ flex: 1 }}>
-                <b style={{ color: "var(--gold)", fontSize: 17 }}>Bingg Bongg Live</b>
-                <div className="soft" style={{ fontSize: 13 }}>Once you connect with Bingg Bongg we will be able to connect you to all these social media platforms at the same time.</div>
+                <b style={{ color: "var(--gold)", fontSize: 17 }}>{t("simulcast_bingg_bongg_live")}</b>
+                <div className="soft" style={{ fontSize: 13 }}>{t("simulcast_bingg_bongg_note")}</div>
               </div>
-              <span className="pill live">● CONNECTED</span>
+              <span className="pill live">{t("simulcast_connected")}</span>
             </div>
           </div>
           <div className="card pad" style={{ marginBottom: 12 }}>
             <div className="row" style={{ flexWrap: "wrap", gap: 16 }}>
-              <div><div className="muted" style={{ fontSize: 12 }}>Status</div><div style={{ fontWeight: 800, color: "var(--gold)" }}>{ov.is_entitled ? "Active" : ov.status}</div></div>
-              <div><div className="muted" style={{ fontSize: 12 }}>Price</div><div style={{ fontWeight: 800 }}>${Number(ov.daily_price).toFixed(2)}/day · ${Number(ov.monthly_price).toFixed(2)}/month</div></div>
-              {ov.paid_until && <div><div className="muted" style={{ fontSize: 12 }}>Paid until</div><div style={{ fontWeight: 800 }}>{String(ov.paid_until).slice(0, 10)}</div></div>}
-              <div><div className="muted" style={{ fontSize: 12 }}>Referrals this month</div><div style={{ fontWeight: 800 }}>{ov.referrals_this_month} / {ov.referrals_needed_for_free_month}{ov.next_month_free ? " · next month free!" : ""}</div></div>
+              <div><div className="muted" style={{ fontSize: 12 }}>{t("status")}</div><div style={{ fontWeight: 800, color: "var(--gold)" }}>{ov.is_entitled ? "Active" : ov.status}</div></div>
+              <div><div className="muted" style={{ fontSize: 12 }}>{t("price")}</div><div style={{ fontWeight: 800 }}>{t("price_per_day_and_month", Number(ov.daily_price).toFixed(2), Number(ov.monthly_price).toFixed(2))}</div></div>
+              {ov.paid_until && <div><div className="muted" style={{ fontSize: 12 }}>{t("paid_until")}</div><div style={{ fontWeight: 800 }}>{String(ov.paid_until).slice(0, 10)}</div></div>}
+              <div><div className="muted" style={{ fontSize: 12 }}>{t("referrals_this_month")}</div><div style={{ fontWeight: 800 }}>{ov.referrals_this_month} / {ov.referrals_needed_for_free_month}{ov.next_month_free ? " · next month free!" : ""}</div></div>
               <label className="row" style={{ gap: 8, cursor: "pointer", width: "100%" }}>
                 <input type="checkbox" checked={ov.show_platform_tiles ?? true} onChange={(e) => toggleTiles(e.target.checked)} />
-                <span style={{ fontSize: 13 }}>Show a tile for each platform while I'm live (in the phone apps' live room)</span>
+                <span style={{ fontSize: 13 }}>{t("show_a_tile_for_each_platform_while_i_m")}</span>
               </label>
             </div>
             <div className="soft" style={{ fontSize: 13, marginTop: 10 }}>
-              Every {ov.referrals_needed_for_free_month} referrals to this Simulcast get you a free month.{ov.free_year_referrals ? ` ${ov.free_year_referrals} lifetime referrals get you a free year.` : ""}
+              {t("every_n_referrals_free_month", ov.referrals_needed_for_free_month)}
+              {ov.free_year_referrals ? ` ${t("n_lifetime_referrals_free_year", ov.free_year_referrals)}` : ""}
             </div>
           </div>
           {ov.destinations.map((d) => (
             <div key={d.platform} className="card pad" style={{ marginBottom: 10 }}>
               <div className="row">
                 <div style={{ flex: 1 }}>
-                  <b>{d.label}</b>{!d.guaranteed && <span className="muted" style={{ fontSize: 12 }}> · {d.note ?? "may need a third-party RTMP bridge"}</span>}
-                  <div className="muted" style={{ fontSize: 12 }}>{d.has_key ? (d.is_enabled ? "Key saved · sending" : "Key saved · paused") : "No stream key yet"}</div>
+                  <b>{d.label}</b>{!d.guaranteed && <span className="muted" style={{ fontSize: 12 }}> · {d.note ?? t("may_need_rtmp_bridge")}</span>}
+                  <div className="muted" style={{ fontSize: 12 }}>{d.has_key ? (d.is_enabled ? t("key_saved_sending") : t("key_saved_paused")) : t("no_stream_key_yet")}</div>
                 </div>
                 {d.has_key && <input type="checkbox" className="switch" checked={d.is_enabled} onChange={(e) => toggle(d, e.target.checked)} />}
-                <button className="btn small ghost" onClick={() => { setEditing(editing === d.platform ? null : d.platform); setRtmp(d.rtmp_url ?? d.default_rtmp_url ?? ""); setKey(""); }}>{d.has_key ? "Change" : "Set up"}</button>
-                {d.has_key && <button className="btn small ghost" style={{ color: "var(--red)", borderColor: "var(--red)" }} onClick={() => remove(d.platform)}>Remove</button>}
+                <button className="btn small ghost" onClick={() => { setEditing(editing === d.platform ? null : d.platform); setRtmp(d.rtmp_url ?? d.default_rtmp_url ?? ""); setKey(""); }}>{d.has_key ? t("change") : t("set_up")}</button>
+                {d.has_key && <button className="btn small ghost" style={{ color: "var(--red)", borderColor: "var(--red)" }} onClick={() => remove(d.platform)}>{t("remove")}</button>}
               </div>
               {editing === d.platform && (
                 <div style={{ marginTop: 10 }}>
-                  <label className="soft" style={{ fontSize: 13 }}>Stream URL (rtmp:// or rtmps://)</label>
+                  <label className="soft" style={{ fontSize: 13 }}>{t("stream_url_rtmp_or_rtmps")}</label>
                   <input className="input" value={rtmp} onChange={(e) => setRtmp(e.target.value)} style={{ width: "100%", marginBottom: 8 }} />
-                  <label className="soft" style={{ fontSize: 13 }}>Stream key</label>
+                  <label className="soft" style={{ fontSize: 13 }}>{t("simulcast_key_hint")}</label>
                   <input className="input" type="password" value={key} onChange={(e) => setKey(e.target.value)} placeholder={d.has_key ? "Leave empty to keep the saved key" : ""} style={{ width: "100%", marginBottom: 8 }} />
-                  <div className="row"><button className="btn small" onClick={() => save(d.platform, true)}>Save</button><button className="btn small ghost" onClick={() => setEditing(null)}>Cancel</button></div>
+                  <div className="row"><button className="btn small" onClick={() => save(d.platform, true)}>{t("save_address")}</button><button className="btn small ghost" onClick={() => setEditing(null)}>{t("cancel")}</button></div>
                 </div>
               )}
             </div>
@@ -421,6 +433,7 @@ function longDate(iso: string): string {
 }
 
 export function AdvertisePage() {
+  const { t } = useT();
   const { user, isLoggedIn } = useSession();
   const [ads, setAds] = useState<VideoAd[] | null>(null);
   const [cash, setCash] = useState<AdCash | null>(null);
@@ -434,14 +447,14 @@ export function AdvertisePage() {
   }, [user]);
   if (!isLoggedIn || !user) return <NeedLogin />;
   return (
-    <Page title="Advertise">
+    <Page title={t("advertise")}>
       {/* Steve, 2026-09-30: "The same that you did for ios and android do it for the [web]" — both
           apps' Advertise pages are now a centred balance card (big gold amount, its label under
           it, no "Ad" in the wording) with the funding action as a gold-ringed capsule BELOW the
           card rather than a small button tucked inside it. Matched here. */}
       <div className="card pad center" style={{ marginBottom: 12 }}>
         <div style={{ fontWeight: 800, color: "var(--gold)", fontSize: 30, lineHeight: 1.1 }}>{usd(cash?.balance ?? 0)}</div>
-        <div style={{ color: "var(--gold)", fontSize: 13, marginTop: 2 }}>Cash Account Balance</div>
+        <div style={{ color: "var(--gold)", fontSize: 13, marginTop: 2 }}>{t("ad_cash_account_balance")}</div>
         {/* Steve, 2026-09-30: admin-granted advertising credit is a SEPARATE balance that can only
             buy video ads — never a Shop listing or Photos storage — and it can expire. Shown as its
             own line rather than added into the figure above, because merging them would tell a
@@ -451,9 +464,10 @@ export function AdvertisePage() {
             <div style={{ fontWeight: 800, color: "var(--gold-bright)", fontSize: 22, lineHeight: 1.1 }}>
               + {usd(cash?.ad_credit_balance ?? 0)}
             </div>
-            <div style={{ color: "var(--gold)", fontSize: 13, marginTop: 2 }}>Advertising Credit</div>
+            <div style={{ color: "var(--gold)", fontSize: 13, marginTop: 2 }}>{t("advertising_credit")}</div>
             <div className="muted" style={{ fontSize: 12, marginTop: 4 }}>
-              For video ads only{cash?.ad_credit_expires_at ? ` · expires ${longDate(cash.ad_credit_expires_at)}` : ""}
+              {t("for_video_ads_only")}
+              {cash?.ad_credit_expires_at ? t("expires_on_suffix", longDate(cash.ad_credit_expires_at)) : ""}
             </div>
           </div>
         )}
@@ -463,15 +477,15 @@ export function AdvertisePage() {
           // Same flow as the app: a 30-minute deposit session whose token opens the Fund page.
           const r = await post<unknown>("startAdCashDepositSession", { my_user_id: user.id }).catch(() => null);
           const url = (r as { url?: string } | null)?.url;
-          if (url) window.open(url, "_blank", "noopener"); else window.alert(r?.message ?? "Couldn't open the funding page.");
-        }}>Add money to your cash account ↗</button>
+          if (url) window.open(url, "_blank", "noopener"); else showGoldAlert(r?.message ?? tt("couldn_t_open_the_funding_page"));
+        }}>{t("add_money_to_your_cash_account")}</button>
         {/* The apps pair that capsule with a "+ Create Ad" one — Steve, 2026-09-30: "Build it the
             same way it works on ios". Same flow now lives at /settings/advertise/new. */}
-        <div style={{ marginTop: 10 }}><Link className="btn" to="/settings/advertise/new">+ Create Ad</Link></div>
+        <div style={{ marginTop: 10 }}><Link className="btn" to="/settings/advertise/new">{t("create_ad")}</Link></div>
       </div>
       <div className="card">
-        <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)" }}><b style={{ color: "var(--gold)" }}>My ads{ads ? ` (${ads.length})` : ""}</b></div>
-        {ads === null ? <Loading /> : ads.length === 0 ? <p className="muted" style={{ padding: 14 }}>No ads yet.</p> : ads.map((a) => (
+        <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)" }}><b style={{ color: "var(--gold)" }}>{ads ? t("my_ads_count", ads.length) : t("my_ads")}</b></div>
+        {ads === null ? <Loading /> : ads.length === 0 ? <p className="muted" style={{ padding: 14 }}>{t("no_ads_yet")}</p> : ads.map((a) => (
           <div key={a.id} className="row" style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)" }}>
             <div style={{ flex: 1 }}><b>{a.company_name ?? `Ad #${a.id}`}</b><div className="muted" style={{ fontSize: 12 }}>{a.status ?? ""}{a.advertiser_monthly_price ? ` · $${Number(a.advertiser_monthly_price).toFixed(2)}/month` : ""}{a.next_billing_date ? ` · next bill ${String(a.next_billing_date).slice(0, 10)}` : ""}</div></div>
             {a.stats?.summary_text && (
@@ -495,6 +509,7 @@ interface BattleSearchResult { status: boolean; active?: boolean; eligible?: boo
 interface CountryRow { country: string; flag: string; count: number; is_mine: boolean }
 
 export function FindABattlePage() {
+  const { t, tn } = useT();
   const { user, isLoggedIn } = useSession();
   const [tab, setTab] = useState<"country" | "global">("country");
   const [countries, setCountries] = useState<CountryRow[]>([]);
@@ -534,8 +549,8 @@ export function FindABattlePage() {
   const users = (result as unknown as { data?: BattleUser[] } | null)?.data ?? [];
 
   return (
-    <Page title="Find a Battle">
-      <p className="muted" style={{ fontSize: 13 }}>Members who want to battle right now. Turn on "I want someone to battle with" in <a href="/settings/account" style={{ color: "var(--gold)" }}>Account settings</a> to appear here yourself.</p>
+    <Page title={t("find_a_battle")}>
+      <p className="muted" style={{ fontSize: 13 }}>{tn("find_a_battle_explainer", <a href="/settings/account" style={{ color: "var(--gold)" }}>{t("account_settings")}</a>)}</p>
       <div className="row" style={{ gap: 8, marginBottom: 12 }}>
         {(["country", "global"] as const).map((t) => (
           <button key={t} className={`btn small${tab === t ? "" : " ghost"}`} onClick={() => setTab(t)}>{t === "country" ? "By Country" : "Global"}</button>
@@ -544,8 +559,8 @@ export function FindABattlePage() {
       {tab === "country" && (
         <div className="card pad" style={{ marginBottom: 10 }}>
           <GoldSelect
-            ariaLabel="Country"
-            placeholder="Country"
+            ariaLabel={t("battle_tab_country")}
+            placeholder={t("battle_tab_country")}
             searchable
             value={selectedCountry ?? ""}
             options={countries.map((c) => ({ value: c.country, label: `${c.flag} ${c.country} (${c.count})` }))}
@@ -555,7 +570,7 @@ export function FindABattlePage() {
       )}
       <div className="card">
         {loading ? <Loading /> : users.length === 0
-          ? <p className="muted" style={{ padding: 14 }}>Nobody here right now — check back in a few minutes.</p>
+          ? <p className="muted" style={{ padding: 14 }}>{t("nobody_here_right_now_check_back_in_a_fe")}</p>
           : users.map((u) => (
             <a key={u.id} href={`/profile/${u.id}`} className="row" style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)", textDecoration: "none", color: "inherit" }}>
               <Avatar user={{ ...u, profile_image: u.profile_image ?? undefined }} size="lg" />
@@ -575,6 +590,7 @@ export function FindABattlePage() {
 interface ContestInvite { id: number; talent_contest_id?: number; talent_contest?: { name?: string; description?: string }; invited_by?: { fullname?: string; username?: string; profile_image?: string } | null; created_at?: string }
 
 export function ContestRequestsPage() {
+  const { t } = useT();
   const { user, isLoggedIn } = useSession();
   const [list, setList] = useState<ContestInvite[] | null>(null);
   const { setToast, el } = useToast();
@@ -588,24 +604,24 @@ export function ContestRequestsPage() {
     if (!user) return;
     try {
       const r = await post("rejectTalentContestInvite", { user_id: user.id, invite_id: inviteId });
-      if (!r.status) throw new Error(r.message ?? "Couldn't reject invite.");
-      setToast("Invite removed."); load();
+      if (!r.status) throw new Error(r.message ?? tt("couldn_t_reject_invite"));
+      setToast(tt("invite_removed")); load();
     } catch (e) { setToast((e as Error).message); }
   }
   return (
-    <Page title="Contest pending requests">
-      <p className="muted" style={{ fontSize: 13 }}>Invitations to Talent Contests that are waiting for your answer.</p>
+    <Page title={t("contest_pending_requests")}>
+      <p className="muted" style={{ fontSize: 13 }}>{t("invitations_to_talent_contests_that_are")}</p>
       <div className="card">
         {list === null ? <Loading /> : list.length === 0
-          ? <p className="muted" style={{ padding: 14 }}>No pending invites.</p>
+          ? <p className="muted" style={{ padding: 14 }}>{t("no_pending_invites")}</p>
           : list.map((inv) => (
             <div key={inv.id} className="row" style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)", flexWrap: "wrap", gap: 8 }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontWeight: 700 }}>{inv.talent_contest?.name ?? `Contest #${inv.talent_contest_id}`}</div>
                 {inv.talent_contest?.description && <div className="muted" style={{ fontSize: 12, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{inv.talent_contest.description}</div>}
-                {inv.invited_by && <div className="muted" style={{ fontSize: 12 }}>Invited by {inv.invited_by.fullname ?? `@${inv.invited_by.username}`}</div>}
+                {inv.invited_by && <div className="muted" style={{ fontSize: 12 }}>{t("invited_by", inv.invited_by.fullname ?? `@${inv.invited_by.username}`)}</div>}
               </div>
-              <button className="btn small ghost" style={{ color: "var(--red)", borderColor: "var(--red)" }} onClick={() => reject(inv.id)}>Remove</button>
+              <button className="btn small ghost" style={{ color: "var(--red)", borderColor: "var(--red)" }} onClick={() => reject(inv.id)}>{t("remove")}</button>
             </div>
           ))}
       </div>
@@ -619,14 +635,42 @@ export function ContestRequestsPage() {
 // their language; money / account / safety topics are handed to a person). The reply comes back
 // on the send call itself (data.reply) and on getUserSupport for the latest message.
 interface SupportReply { id: number; reply?: string | null; replied_by?: string | null; needs_human?: boolean }
+/** "Reason For This Support" (Steve, 2026-10-17) — the list is the server's, so he can add a
+ *  reason from the admin panel without a release on any platform. */
+interface SupportReasonRow { id: number; label: string }
 export function SupportPage() {
+  const { t, tn } = useT();
   const [msg, setMsg] = useState("");
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [reply, setReply] = useState<SupportReply | null>(null);
   const [askedForPerson, setAskedForPerson] = useState(false);
+  const [reasons, setReasons] = useState<SupportReasonRow[]>([]);
+  const [reason, setReason] = useState("");
   const { user } = useSession();
+
+  // The dropdown only appears once the list arrives, so a backend without the endpoint yet
+  // leaves the page exactly as it was rather than showing an empty box.
+  useEffect(() => {
+    let live = true;
+    post<SupportReasonRow[]>("fetchSupportReasons", {})
+      .then((r) => {
+        if (!live) return;
+        const list = r.data ?? [];
+        setReasons(list);
+        // Arrived from somewhere that knows what this is about — the CvC page's "Suggest a
+        // country battle", for one. The reason is matched against the live list rather than
+        // trusted, so a label that has since been renamed or removed simply does not preselect.
+        const wanted = new URLSearchParams(window.location.search).get("reason");
+        if (wanted) {
+          const hit = list.find((x) => x.label.toLowerCase() === wanted.toLowerCase());
+          if (hit) setReason(hit.label);
+        }
+      })
+      .catch(() => undefined);
+    return () => { live = false; };
+  }, []);
 
   // Steve, 2026-09-27: the page opens fresh every time — the answer card only shows right after
   // sending; every earlier question and answer lives in Archive (no getUserSupport on load).
@@ -636,11 +680,11 @@ export function SupportPage() {
     setBusy(true);
     setError("");
     try {
-      const r = await post<SupportReply>("sendSupportMessage", { message: msg.trim(), user_id: user?.id ?? 0 });
+      const r = await post<SupportReply>("sendSupportMessage", { message: msg.trim(), reason, user_id: user?.id ?? 0 });
       if (r.data?.reply) { setReply(r.data); setAskedForPerson(false); }
       setSent(true);
     } catch {
-      setError("Failed to send message. Please try again.");
+      setError(tt("failed_to_send_message_please_try_again"));
     } finally {
       setBusy(false);
     }
@@ -662,11 +706,10 @@ export function SupportPage() {
       {byAssistant && (
         <div style={{ marginTop: 10 }}>
           {reply.needs_human || askedForPerson ? (
-            <p className="muted" style={{ margin: 0, fontSize: 13 }}>A Bingg Bongg team member will get back to you here.</p>
+            <p className="muted" style={{ margin: 0, fontSize: 13 }}>{t("a_bingg_bongg_team_member_will_get_back")}</p>
           ) : (
             <button className="btn small" onClick={askForPerson} style={{ background: "transparent", color: "var(--gold)" }}>
-              This didn't help — talk to a person
-            </button>
+              {t("this_didn_t_help_talk_to_a_person")}</button>
           )}
         </div>
       )}
@@ -678,8 +721,8 @@ export function SupportPage() {
       {/* Steve, 2026-09-26: "on top next to support text on the right side add the text 'Archive'
           ... when they click on Archive they will see all the old messages and their answers." */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-        <h1 className="page-title">Support</h1>
-        <Link to="/settings/support/archive" className="btn small" style={{ background: "transparent", color: "var(--gold)", borderColor: "var(--gold-border)" }}>Archive</Link>
+        <PageTitle>{t("support")}</PageTitle>
+        <Link to="/settings/support/archive" className="btn small" style={{ background: "transparent", color: "var(--gold)", borderColor: "var(--gold-border)" }}>{t("archive")}</Link>
       </div>
       {sent && replyCard}
       {sent ? (
@@ -687,12 +730,29 @@ export function SupportPage() {
           <p className="soft" style={{ margin: 0 }}>
             {reply?.reply ? "Message sent. Ask another question any time." : "Message sent. The Bingg Bongg team will get back to you."}
           </p>
-          <button className="btn small" onClick={() => { setSent(false); setMsg(""); }} style={{ marginTop: 10, background: "transparent", color: "var(--gold)" }}>Send another message</button>
+          <button className="btn small" onClick={() => { setSent(false); setMsg(""); }} style={{ marginTop: 10, background: "transparent", color: "var(--gold)" }}>{t("send_another_message")}</button>
         </div>
       ) : (
         <div className="card pad">
-          <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>Have a question or issue? Bingg Bongg Assistant answers right away, and a team member steps in when needed. Your earlier questions and their answers are in <Link to="/settings/support/archive" style={{ color: "var(--gold)" }}>Archive</Link>.</p>
-          <textarea className="input" rows={5} placeholder="Describe your issue…" value={msg} onChange={(e) => setMsg(e.target.value)} style={{ width: "100%", marginBottom: 10 }} />
+          {/* Steve, 2026-10-17: black plate, white border, gold text, centred — the dimmed
+              grey was hard to read. */}
+          <p style={{ marginTop: 0, marginBottom: 12, fontSize: 13, textAlign: "center", color: "var(--gold)", background: "#000", border: "1.5px solid #fff", borderRadius: 12, padding: 12 }}>
+            {tn("support_intro", <Link to="/settings/support/archive" style={{ color: "var(--gold)", textDecoration: "underline" }}>{t("archive")}</Link>)}
+          </p>
+          {/* Steve, 2026-10-17: "In between the boxes add another drop-down box that says
+              'Reason For This Support'." */}
+          {reasons.length > 0 && (
+            <div style={{ marginBottom: 10 }}>
+              <GoldSelect
+                value={reason}
+                options={reasons.map((r) => ({ value: r.label, label: r.label }))}
+                onChange={setReason}
+                placeholder={t("reason_for_this_support")}
+                ariaLabel={t("reason_for_this_support")}
+              />
+            </div>
+          )}
+          <textarea className="input" rows={5} placeholder={t("describe_your_issue")} value={msg} onChange={(e) => setMsg(e.target.value)} style={{ width: "100%", marginBottom: 10 }} />
           {error && <p style={{ color: "#f55", fontSize: 13, marginBottom: 8 }}>{error}</p>}
           <button className="btn" onClick={send} disabled={busy || !msg.trim()} style={{ background: "var(--gold-border)", color: "#000", borderColor: "var(--gold-border)" }}>
             {busy ? "Sending…" : "Send message"}
@@ -712,6 +772,7 @@ function prettyDate(iso?: string | null): string {
   return isNaN(d.getTime()) ? iso : d.toLocaleString(undefined, { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" });
 }
 export function SupportArchivePage() {
+  const { t } = useT();
   const { user } = useSession();
   const [rows, setRows] = useState<SupportHistoryRow[] | null>(null);
   const [failed, setFailed] = useState(false);
@@ -725,16 +786,16 @@ export function SupportArchivePage() {
 
   if (!user) return <NeedLogin />;
   return (
-    <Page title="Support · Archive">
-      <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>Every message you sent to Support, and the answer it got.</p>
-      {failed && <Notice>Couldn't load your archive. Please try again.</Notice>}
+    <Page title={t("support_archive")}>
+      <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>{t("every_message_you_sent_to_support_and_th")}</p>
+      {failed && <Notice>{t("couldn_t_load_your_archive_please_try_ag")}</Notice>}
       {!failed && rows === null && <Loading />}
-      {rows && rows.length === 0 && <p className="soft">No messages yet. Anything you send to Support will be kept here.</p>}
+      {rows && rows.length === 0 && <p className="soft">{t("no_messages_yet_anything_you_send_to_sup")}</p>}
       {rows?.map((row) => {
         const byAssistant = row.replied_by === "assistant";
         return (
           <div key={row.id} className="card pad" style={{ marginBottom: 12, borderColor: "var(--gold-border)" }}>
-            <div style={{ fontSize: 12, fontWeight: 800, color: "var(--gold)", marginBottom: 4 }}>You · {prettyDate(row.created_at)}</div>
+            <div style={{ fontSize: 12, fontWeight: 800, color: "var(--gold)", marginBottom: 4 }}>{t("you_and_date", prettyDate(row.created_at))}</div>
             <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{row.message}</p>
             <div style={{ height: 1, background: "var(--gold-border)", opacity: 0.35, margin: "10px 0" }} />
             {row.reply ? (
@@ -743,10 +804,10 @@ export function SupportArchivePage() {
                   {byAssistant ? "Bingg Bongg Assistant" : "Bingg Bongg Support"}{row.replied_at ? ` · ${prettyDate(row.replied_at)}` : ""}
                 </div>
                 <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{row.reply}</p>
-                {byAssistant && row.needs_human && <p className="muted" style={{ margin: "8px 0 0", fontSize: 13 }}>A Bingg Bongg team member will follow up here.</p>}
+                {byAssistant && row.needs_human && <p className="muted" style={{ margin: "8px 0 0", fontSize: 13 }}>{t("a_bingg_bongg_team_member_will_follow_up")}</p>}
               </>
             ) : (
-              <p className="muted" style={{ margin: 0, fontSize: 13 }}>Waiting for a reply from the Bingg Bongg team.</p>
+              <p className="muted" style={{ margin: 0, fontSize: 13 }}>{t("waiting_for_a_reply_from_the_bingg_bongg")}</p>
             )}
           </div>
         );
@@ -759,6 +820,7 @@ export function SupportArchivePage() {
 // Content comes from the admin panel, so an edit there shows here immediately with no web
 // deploy. Same single source the phone apps read.
 function LegalPage({ title, endpoint }: { title: string; endpoint: string }) {
+  const { t } = useT();
   const [html, setHtml] = useState<string | null>(null);
   const [updated, setUpdated] = useState("");
   const [failed, setFailed] = useState(false);
@@ -784,16 +846,16 @@ function LegalPage({ title, endpoint }: { title: string; endpoint: string }) {
     <Page title={title}>
       <div className="card pad">
         {failed ? (
-          <p className="muted" style={{ margin: 0 }}>Could not load the {title}. Please try again.</p>
+          <p className="muted" style={{ margin: 0 }}>{t("could_not_load_the_page", title)}</p>
         ) : html === null ? (
-          <p className="muted" style={{ margin: 0 }}>Loading…</p>
+          <p className="muted" style={{ margin: 0 }}>{t("imagePickerLoading")}</p>
         ) : html.trim() === "" ? (
-          <p className="muted" style={{ margin: 0 }}>The {title} has not been published yet.</p>
+          <p className="muted" style={{ margin: 0 }}>{t("page_not_published_yet", title)}</p>
         ) : (
           <>
             {updated && (
               <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>
-                Last updated {new Date(updated).toLocaleDateString()}
+                {t("last_updated", new Date(updated).toLocaleDateString())}
               </p>
             )}
             <div className="terms-content" dangerouslySetInnerHTML={{ __html: html }} />
@@ -805,34 +867,41 @@ function LegalPage({ title, endpoint }: { title: string; endpoint: string }) {
 }
 
 export function TermsOfUsePage() {
-  return <LegalPage title="Terms of Use" endpoint="fetchTermsOfUse" />;
+  const { t } = useT();
+  return <LegalPage title={t("terms_of_use")} endpoint="fetchTermsOfUse" />;
 }
 
 export function PrivacyPolicyPage() {
-  return <LegalPage title="Privacy Policy" endpoint="fetchPrivacyPolicy" />;
+  const { t } = useT();
+  return <LegalPage title={t("privacy_policy")} endpoint="fetchPrivacyPolicy" />;
 }
 
 export function ContactUsPage() {
-  return <LegalPage title="Contact Us" endpoint="fetchContactUs" />;
+  const { t } = useT();
+  return <LegalPage title={t("contact_us")} endpoint="fetchContactUs" />;
 }
 
 export function AboutUsPage() {
-  return <LegalPage title="About Us" endpoint="fetchAboutUs" />;
+  const { t } = useT();
+  return <LegalPage title={t("about_us")} endpoint="fetchAboutUs" />;
 }
 
 export function FaqPage() {
-  return <LegalPage title="FAQ" endpoint="fetchFaq" />;
+  const { t } = useT();
+  return <LegalPage title={t("faq")} endpoint="fetchFaq" />;
 }
 
 /** Steve, 2026-09-30: "Create a link in setting called 'App Features Explainer' — And we should
  *  explain every feature that we offer and how it works exactly." Admin-editable like the pages
  *  above, so it keeps up with the features with no redeploy. */
 export function AppFeaturesPage() {
-  return <LegalPage title="App Features Explainer" endpoint="fetchAppFeatures" />;
+  const { t } = useT();
+  return <LegalPage title={t("app_features_explainer")} endpoint="fetchAppFeatures" />;
 }
 
 // ---- Delete account -------------------------------------------------------------------------
 export function DeleteAccountPage() {
+  const { t, tn } = useT();
   const { user, isLoggedIn, signOut } = useSession();
   const [typed, setTyped] = useState("");
   const [busy, setBusy] = useState(false);
@@ -845,17 +914,17 @@ export function DeleteAccountPage() {
     setBusy(true);
     try {
       const r = await post("deleteMyAccount", { user_id: user.id });
-      if (!r.status) throw new Error(r.message ?? "Couldn't delete the account.");
+      if (!r.status) throw new Error(r.message ?? tt("couldn_t_delete_the_account"));
       signOut(); navigate("/", { replace: true });
     } catch (e) { setToast((e as Error).message); setBusy(false); }
   }
   return (
-    <Page title="Delete account">
+    <Page title={t("delete_account")}>
       <div className="card pad">
-        <p className="soft" style={{ marginTop: 0 }}>This permanently deletes your profile, videos, photos, followers and remaining coins. There is no way back.</p>
-        <label className="soft" style={{ fontSize: 13 }}>Type <b>DELETE</b> to confirm</label>
+        <p className="soft" style={{ marginTop: 0 }}>{t("this_permanently_deletes_your_profile_vi")}</p>
+        <label className="soft" style={{ fontSize: 13 }}>{tn("type_word_to_confirm", <b>{t("delete_confirm_word")}</b>)}</label>
         <input className="input" value={typed} onChange={(e) => setTyped(e.target.value)} style={{ width: "100%", margin: "6px 0 12px" }} />
-        <button className="btn" style={{ borderColor: "var(--red)", color: "var(--red)" }} disabled={typed !== "DELETE" || busy} onClick={del}>Delete my account</button>
+        <button className="btn" style={{ borderColor: "var(--red)", color: "var(--red)" }} disabled={typed !== t("delete_confirm_word") || busy} onClick={del}>{t("delete_my_account")}</button>
       </div>
       {el}
     </Page>
@@ -868,6 +937,7 @@ export function DeleteAccountPage() {
 // I'm not live. Profile photo is used until one is uploaded.
 interface VirtualLook { virtual_media_url?: string | null; virtual_media_type?: string | null }
 export function VirtualLookPage() {
+  const { t } = useT();
   const { user, refresh } = useSession();
   const [look, setLook] = useState<VirtualLook>({ virtual_media_url: (user as (UserSummary & VirtualLook) | null)?.virtual_media_url, virtual_media_type: (user as (UserSummary & VirtualLook) | null)?.virtual_media_type });
   const [busy, setBusy] = useState(false);
@@ -883,7 +953,7 @@ export function VirtualLookPage() {
       form.append("media", file);
       const res = await fetch(API_BASE + "saveVirtualBattleLook", { method: "POST", headers: currentAuthHeaders(), body: form });
       const body = await res.json() as { status?: boolean; message?: string; data?: VirtualLook };
-      if (!body.status) throw new Error(body.message ?? "Couldn't upload that.");
+      if (!body.status) throw new Error(body.message ?? tt("couldn_t_upload_that"));
       setLook(body.data ?? {});
       setNote("Saved — this is your virtual battle look.");
       refresh();
@@ -893,14 +963,14 @@ export function VirtualLookPage() {
     setBusy(true);
     try {
       const res = await post("removeVirtualBattleLook", { my_user_id: user!.id });
-      if (!res.status) throw new Error(res.message ?? "Couldn't do that right now.");
+      if (!res.status) throw new Error(res.message ?? tt("couldn_t_do_that_right_now"));
       setLook({}); setNote("Removed — your profile photo will be used."); refresh();
     } catch (e) { setNote((e as Error).message); } finally { setBusy(false); }
   }
   const url = look.virtual_media_url || "";
   return (
-    <Page title="My Virtual Battle Look">
-      <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>When a host puts you in a Virtual Battle and you're not live, this is what everyone sees on your card. A photo, or a short video that loops. Your profile photo is used until you add one.</p>
+    <Page title={t("my_virtual_battle_look")}>
+      <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>{t("when_a_host_puts_you_in_a_virtual_battle")}</p>
       <div className="card pad" style={{ display: "grid", gap: 12, justifyItems: "center", borderColor: "var(--gold-border)" }}>
         {url && look.virtual_media_type === "video"
           ? <video src={url} muted loop autoPlay playsInline style={{ width: 220, height: 220, objectFit: "cover", borderRadius: 14, border: "2px solid var(--gold-border)" }} />
@@ -910,7 +980,7 @@ export function VirtualLookPage() {
           {busy ? "Working…" : "Choose a photo or video"}
           <input type="file" accept="image/*,video/*" style={{ display: "none" }} disabled={busy} onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(f); e.target.value = ""; }} />
         </label>
-        <button className="btn ghost" disabled={busy} onClick={remove}>Remove and use my profile photo</button>
+        <button className="btn ghost" disabled={busy} onClick={remove}>{t("remove_and_use_my_profile_photo")}</button>
       </div>
     </Page>
   );
@@ -920,6 +990,7 @@ export function VirtualLookPage() {
 // ---- My Virtual Battles (Steve, 2026-09-27: "where does the judge see who battled with him
 // and how many gift he got and from who?") — every battle I was in; a row opens its gift record.
 export function MyVirtualBattlesPage() {
+  const { t, tn } = useT();
   const { user } = useSession();
   const [battles, setBattles] = useState<VirtualBattleData[] | null>(null);
   const [record, setRecord] = useState<VirtualGiftRecord | null>(null);
@@ -928,11 +999,11 @@ export function MyVirtualBattlesPage() {
   if (!user) return <NeedLogin />;
   const myId = user.id;
   return (
-    <Page title="My Virtual Battles">
-      <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>Every Virtual Battle you were in. Open one to see who gifted you and say thanks.</p>
+    <Page title={t("my_virtual_battles")}>
+      <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>{t("every_virtual_battle_you_were_in_open_on")}</p>
       {note && <Notice>{note}</Notice>}
       {battles === null && <Loading />}
-      {battles && battles.length === 0 && <p className="soft">No Virtual Battles yet.</p>}
+      {battles && battles.length === 0 && <p className="soft">{t("no_virtual_battles_yet")}</p>}
       {battles?.map((b) => {
         const me = b.participants.find((p) => p.user_id === myId);
         const others = b.participants.filter((p) => p.user_id !== myId).map((p) => personName(p)).join(", ");
@@ -944,8 +1015,8 @@ export function MyVirtualBattlesPage() {
             <div className="row" style={{ justifyContent: "space-between", fontSize: 12, color: "var(--gold)", fontWeight: 800 }}>
               <span>{b.started_at ? new Date(b.started_at).toLocaleString() : ""}</span><span>{outcome}</span>
             </div>
-            <div style={{ marginTop: 4 }}>With <b>{others || "—"}</b></div>
-            <div className="muted" style={{ fontSize: 13 }}>You received {(me?.current_score ?? 0).toLocaleString()} coins</div>
+            <div style={{ marginTop: 4 }}>{tn("with_people", <b>{others || "—"}</b>)}</div>
+            <div className="muted" style={{ fontSize: 13 }}>{t("you_received_n_coins", (me?.current_score ?? 0).toLocaleString())}</div>
           </button>
         );
       })}
@@ -953,6 +1024,88 @@ export function MyVirtualBattlesPage() {
         <VirtualGiftRecordOverlay record={record} myUserId={myId} onClose={() => setRecord(null)}
           onThank={async (to, message) => { try { setNote(await sendVirtualThankYou(myId, record.battle.virtual_battle_id, to, message)); } catch (e) { setNote((e as Error).message); } }} />
       )}
+    </Page>
+  );
+}
+
+// ---- To Do List --------------------------------------------------------------------------
+//
+// Steve, 2026-10-19: "In settings. Add a notepad for everyone. Call it 'To Do List' they can
+// edit the text."
+//
+// The same list as the phones — ToDoListController, one row per member — so somebody who writes
+// a note on their phone finds it here. Two rules, both the same as the apps':
+//
+//  - It saves when they leave the box as well as on Save, because a notepad that loses what you
+//    typed is not a notepad.
+//  - Nothing is posted until the fetch has answered. An empty box that has not been filled in
+//    yet would otherwise wipe a list written on a phone.
+export function ToDoListPage() {
+  const { t } = useT();
+  const { user, isLoggedIn } = useSession();
+  const [body, setBody] = useState("");
+  const [savedBody, setSavedBody] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [justSaved, setJustSaved] = useState(false);
+  const [error, setError] = useState("");
+  // user?.id, never `user` — the session object is replaced on every balance refresh, and an
+  // effect keyed on the object would re-fetch and stamp on what they are typing.
+  const userId = user?.id ?? 0;
+
+  useEffect(() => {
+    if (!userId) return;
+    let alive = true;
+    post<{ body?: string }>("fetchMyToDoList", { my_user_id: userId })
+      .then((r) => {
+        if (!alive) return;
+        const fetched = r.data?.body ?? "";
+        setSavedBody(fetched);
+        // Whatever they have already typed wins over a late response.
+        setBody((current) => (current === "" ? fetched : current));
+      })
+      .catch(() => { if (alive) setError(tt("couldn_t_load_your_to_do_list")); });
+    return () => { alive = false; };
+  }, [userId]);
+
+  const save = useCallback(async () => {
+    if (!userId || savedBody === null || body === savedBody) return;
+    setBusy(true);
+    setError("");
+    try {
+      const r = await post("saveMyToDoList", { my_user_id: userId, body });
+      if (!r.status) throw new Error(r.message ?? tt("couldn_t_save"));
+      setSavedBody(body);
+      setJustSaved(true);
+      window.setTimeout(() => setJustSaved(false), 2000);
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }, [body, savedBody, userId]);
+
+  if (!isLoggedIn) return <NeedLogin />;
+
+  return (
+    <Page title={t("to_do_list")}>
+      {error && <Notice error>{error}</Notice>}
+      <div className="card pad">
+        <textarea
+          className="input"
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+          onBlur={() => void save()}
+          placeholder={t("to_do_list_hint")}
+          rows={18}
+          style={{ width: "100%", resize: "vertical", lineHeight: 1.5 }}
+        />
+        <div className="row" style={{ marginTop: 10, alignItems: "center" }}>
+          <button className="btn" disabled={busy || savedBody === null || body === savedBody}
+                  onClick={() => void save()}>{t("save")}</button>
+          <span className="spacer" />
+          {justSaved && <span className="muted" style={{ fontSize: 13 }}>{t("to_do_list_saved")}</span>}
+        </div>
+      </div>
     </Page>
   );
 }

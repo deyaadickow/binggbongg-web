@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { mediaUrl } from "../lib/api";
 import { agreeToEntryFee, endTapGame, gameTitle, gameTitleWithRate, giftTapGameScore, isVideoUrl, sceneFor, speedProfile, startTapGame, type TapGameResult, type TapGameStart, type TapGameType } from "../lib/tapgame";
 import { useSession } from "../lib/session";
+import { useT } from "../lib/i18n";
 
 interface Target { id: number; x: number; y: number; bornAt: number; life: number }
 interface Balloon { id: number; lane: number; color: string }
@@ -26,6 +27,7 @@ const MAX_ON_SCREEN = 10;
  * catch mechanic (their exact phone layouts are a later pass).
  */
 export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: TapGameType; roomName: string; onClose: () => void; onToast: (m: string) => void }) {
+  const { t } = useT();
   const { user, refresh } = useSession();
   const isRace = game.game_mode === "race";
   const isLanes = game.game_mode === "falling_lanes";
@@ -220,7 +222,7 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
         <b style={{ color: "var(--gold)", flex: 1 }}>{gameTitleWithRate(game)}</b>
         {phase === "playing" && <span className="pill">{isRace ? `Station ${station}/${RACE_STATIONS} · ${clock(elapsed)}` : `${clock(secondsLeft)} left`}</span>}
         {phase === "playing" && <span className="pill" style={{ marginLeft: 8 }}>{isRace ? `${caught}/${RACE_FINISH}` : isLanes ? `Popped ${caught}` : `Caught ${caught}`}</span>}
-        {phase !== "playing" && <button className="btn small ghost" onClick={onClose}>Close</button>}
+        {phase !== "playing" && <button className="btn small ghost" onClick={onClose}>{t("close")}</button>}
       </div>
 
       <div ref={areaRef} style={{ flex: 1, position: "relative", overflow: "hidden", background: bg, touchAction: "manipulation", userSelect: "none" }}>
@@ -274,22 +276,22 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
                       : isRace ? `Tap as fast as you can: 5 stations, 20 taps each. Reach station 5 for 100 coins — your time goes on the leaderboard.`
                       : `Tap every ${game.catch_name || "character"} before it disappears. Each catch is worth ${coinsPer} coin${coinsPer === 1 ? "" : "s"}.`}
                   </p>
-                  <p className="muted" style={{ fontSize: 12, marginTop: 6 }}>Playing gifts the host 50 coins to start.</p>
-                  <button className="btn block" style={{ marginTop: 14 }} onClick={begin}>Play Now</button>
+                  <p className="muted" style={{ fontSize: 12, marginTop: 6 }}>{t("playing_gifts_the_host_50_coins_to_start")}</p>
+                  <button className="btn block" style={{ marginTop: 14 }} onClick={begin}>{t("play_now")}</button>
                 </>
               )}
-              {phase === "starting" && <p className="muted">Starting…</p>}
+              {phase === "starting" && <p className="muted">{t("starting")}</p>}
               {phase === "attention" && start && (
                 <>
-                  <h2 className="card-title" style={{ fontSize: 22 }}>Attention</h2>
-                  <p className="soft" style={{ marginTop: 8 }}>When you start playing any of these games that means you agree to gift the host {start.entry_fee_coins} coins to start — every time you play, not just this once.</p>
+                  <h2 className="card-title" style={{ fontSize: 22 }}>{t("attention")}</h2>
+                  <p className="soft" style={{ marginTop: 8 }}>{t("tap_game_entry_agreement", start.entry_fee_coins)}</p>
                   <div className="row" style={{ marginTop: 14 }}>
-                    <button className="btn ghost" style={{ flex: 1 }} onClick={onClose}>CANCEL</button>
-                    <button className="btn" style={{ flex: 1 }} onClick={agree}>AGREE</button>
+                    <button className="btn ghost" style={{ flex: 1 }} onClick={onClose}>{t("gig_cancel")}</button>
+                    <button className="btn" style={{ flex: 1 }} onClick={agree}>{t("agree")}</button>
                   </div>
                 </>
               )}
-              {phase === "finishing" && <p className="muted">Adding up your coins…</p>}
+              {phase === "finishing" && <p className="muted">{t("adding_up_your_coins")}</p>}
               {phase === "done" && result && (
                 <>
                   {/* The same sentence the phones show. The score is what you can gift to the
@@ -308,15 +310,15 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
                       still has the final say and its refusal is shown as-is. */}
                   {!gifted && result.coins_earned > 0 && (
                     <>
-                      <p style={{ marginTop: 12, fontSize: 15, color: "var(--gold)" }}>Gift these to {result.host_name || "the host"}?</p>
+                      <p style={{ marginTop: 12, fontSize: 15, color: "var(--gold)" }}>{t("gift_these_to", result.host_name || t("the_host"))}</p>
                       {giftError && <p style={{ marginTop: 8, fontSize: 13, color: "var(--red)" }}>{giftError}</p>}
                       <div className="row" style={{ marginTop: 10 }}>
-                        <button className="btn ghost" style={{ flex: 1 }} onClick={onClose} disabled={gifting}>NO</button>
+                        <button className="btn ghost" style={{ flex: 1 }} onClick={onClose} disabled={gifting}>{t("no")}</button>
                         <button className="btn" style={{ flex: 1 }} onClick={gift} disabled={gifting}>{gifting ? "Gifting…" : "YES, GIFT"}</button>
                       </div>
                     </>
                   )}
-                  {(gifted || !(result.coins_earned > 0)) && <button className="btn block" style={{ marginTop: 12 }} onClick={onClose}>Done</button>}
+                  {(gifted || !(result.coins_earned > 0)) && <button className="btn block" style={{ marginTop: 12 }} onClick={onClose}>{t("done")}</button>}
                 </>
               )}
               {phase === "error" && (
@@ -327,11 +329,11 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
                       screen. If a session already exists, offer the same retry the phones do. */}
                   {start ? (
                     <div className="row" style={{ marginTop: 12 }}>
-                      <button className="btn ghost" style={{ flex: 1 }} onClick={onClose}>CLOSE</button>
-                      <button className="btn" style={{ flex: 1 }} onClick={agree}>TRY AGAIN</button>
+                      <button className="btn ghost" style={{ flex: 1 }} onClick={onClose}>{t("close_3")}</button>
+                      <button className="btn" style={{ flex: 1 }} onClick={agree}>{t("try_again")}</button>
                     </div>
                   ) : (
-                    <button className="btn block" style={{ marginTop: 12 }} onClick={onClose}>Close</button>
+                    <button className="btn block" style={{ marginTop: 12 }} onClick={onClose}>{t("close")}</button>
                   )}
                 </>
               )}
@@ -345,13 +347,14 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
 
 /** One balloon: lane-positioned, falls with a CSS animation, popped on pointer-down, gone at the bottom. */
 function BalloonSprite({ b, onPop, onMiss }: { b: Balloon; onPop: () => void; onMiss: () => void }) {
+  const { t } = useT();
   const laneW = 100 / LANES;
   const dark = shade(b.color, -35);
   return (
     <button
       onPointerDown={(e) => { e.preventDefault(); onPop(); }}
       onAnimationEnd={onMiss}
-      aria-label="Pop"
+      aria-label={t("pop")}
       style={{
         position: "absolute", top: 0, left: `${b.lane * laneW + laneW * 0.14}%`, width: `${laneW * 0.72}%`, maxWidth: 84,
         background: "transparent", border: "none", padding: 0, cursor: "pointer",

@@ -9,6 +9,7 @@
 // tells the member where they stand before they hit that wall.
 import { API_BASE, post } from "./api";
 import { uploadErrorMessage } from "./upload";
+import { tt } from "./i18n";
 
 export interface PhotoFolder {
   id: number;
@@ -48,7 +49,7 @@ export async function fetchMyFolders(myUserId: number): Promise<PhotoFolder[]> {
 
 export async function createFolder(myUserId: number, name: string): Promise<void> {
   const res = await post("createFolder", { my_user_id: myUserId, name });
-  if (!res.status) throw new Error(res.message ?? "Couldn't create that folder.");
+  if (!res.status) throw new Error(res.message ?? tt("couldn_t_create_that_folder"));
 }
 
 export async function fetchPhotoStorageStatus(myUserId: number): Promise<PhotoStorageStatus | null> {
@@ -93,6 +94,76 @@ export function uploadPhoto(
   });
 }
 
+// ---- Cartoon Me (Steve, 2026-10-12) ---------------------------------------------------------
+
+export interface CartoonSettings {
+  enabled?: boolean;
+  coins?: number;
+  image_size?: string;
+  /** The style shelf, straight from the server — a style added in admin appears with no deploy. */
+  styles?: CartoonStyle[];
+}
+
+export interface CartoonStyle {
+  id: number;
+  name: string;
+  icon: string;
+  coins: number;
+  /** An example of what this style does, uploaded by admin. Absent until there is one. */
+  sample?: string | null;
+}
+
+/** Price and on/off come from the server so 25 can change without a deploy of three clients. */
+export async function fetchCartoonSettings(myUserId: number): Promise<CartoonSettings> {
+  const res = await post<CartoonSettings>("fetchCartoonSettings", { my_user_id: myUserId }).catch(() => null);
+  // Defaults match the server's own: hidden if we could not ask, priced at 25 if it answered oddly.
+  return res?.status ? (res.data ?? { enabled: false, coins: 25 }) : { enabled: false, coins: 25 };
+}
+
+export interface CartoonResult {
+  downloadUrl: string;
+  folderName: string;
+}
+
+/**
+ * Multipart, like uploadPhoto — makeCartoon takes a real file. No progress callback: the wait
+ * here is Google drawing the picture, not the upload, so a progress bar would sit at 100% for
+ * most of it and look broken.
+ */
+export function makeCartoon(
+  myUserId: number,
+  file: File,
+  headers: Record<string, string>,
+  styleId?: number,
+): Promise<CartoonResult> {
+  return new Promise((resolve, reject) => {
+    const form = new FormData();
+    form.append("my_user_id", String(myUserId));
+    form.append("photo", file);
+    if (styleId) form.append("style_id", String(styleId));
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", API_BASE + "makeCartoon", true);
+    for (const [k, v] of Object.entries(headers)) xhr.setRequestHeader(k, v);
+    // Generating at 2K takes a while; the browser default would give up too early.
+    xhr.timeout = 180000;
+    xhr.onload = () => {
+      let body: { status?: boolean; message?: string; download_url?: string; folder_name?: string } = {};
+      try { body = JSON.parse(xhr.responseText); } catch { /* falls through to the status check */ }
+      if (xhr.status >= 200 && xhr.status < 300 && body.status) {
+        resolve({ downloadUrl: body.download_url ?? "", folderName: body.folder_name ?? "Cartoons" });
+      } else {
+        // The server's own message carries the coin wording ("Top up your coins", "put back"),
+        // so it is preferred over anything invented here.
+        reject(new Error(body.message || uploadErrorMessage(xhr.status)));
+      }
+    };
+    xhr.ontimeout = () => reject(new Error(tt("that_took_too_long_if_you_were_charged_y")));
+    xhr.onerror = () => reject(new Error(uploadErrorMessage(0)));
+    xhr.send(form);
+  });
+}
+
 // ---- Viewing and managing what's already uploaded -------------------------------------------
 
 export interface Photo {
@@ -116,33 +187,33 @@ export async function fetchFolderPhotos(myUserId: number, folderId: number): Pro
     my_user_id: myUserId,
     folder_id: folderId,
   });
-  if (!res.status) throw new Error(res.message ?? "Couldn't open that folder.");
+  if (!res.status) throw new Error(res.message ?? tt("couldn_t_open_that_folder"));
   return { folder: res.data?.folder ?? null, photos: res.data?.photos ?? [] };
 }
 
 export async function togglePhotoFavourite(myUserId: number, photoId: number): Promise<void> {
   const res = await post("togglePhotoFavorite", { my_user_id: myUserId, photo_id: photoId });
-  if (!res.status) throw new Error(res.message ?? "Couldn't update that photo.");
+  if (!res.status) throw new Error(res.message ?? tt("couldn_t_update_that_photo"));
 }
 
 export async function movePhoto(myUserId: number, photoId: number, targetFolderId: number): Promise<void> {
   const res = await post("movePhoto", { my_user_id: myUserId, photo_id: photoId, target_folder_id: targetFolderId });
-  if (!res.status) throw new Error(res.message ?? "Couldn't move that photo.");
+  if (!res.status) throw new Error(res.message ?? tt("couldn_t_move_that_photo"));
 }
 
 export async function deletePhoto(myUserId: number, photoId: number): Promise<void> {
   const res = await post("deletePhoto", { my_user_id: myUserId, photo_id: photoId });
-  if (!res.status) throw new Error(res.message ?? "Couldn't delete that photo.");
+  if (!res.status) throw new Error(res.message ?? tt("couldn_t_delete_that_photo"));
 }
 
 export async function renameFolder(myUserId: number, folderId: number, name: string): Promise<void> {
   const res = await post("renameFolder", { my_user_id: myUserId, folder_id: folderId, name });
-  if (!res.status) throw new Error(res.message ?? "Couldn't rename that folder.");
+  if (!res.status) throw new Error(res.message ?? tt("couldn_t_rename_that_folder"));
 }
 
 export async function deleteFolder(myUserId: number, folderId: number): Promise<void> {
   const res = await post("deleteFolder", { my_user_id: myUserId, folder_id: folderId });
-  if (!res.status) throw new Error(res.message ?? "Couldn't delete that folder.");
+  if (!res.status) throw new Error(res.message ?? tt("couldn_t_delete_that_folder"));
 }
 
 // ---- Public surfaces: the directory and the feed --------------------------------------------
@@ -192,7 +263,7 @@ export async function fetchUserPhotos(myUserId: number, userId: number): Promise
     my_user_id: myUserId,
     user_id: userId,
   });
-  if (!res.status) throw new Error(res.message ?? "Couldn't open that album.");
+  if (!res.status) throw new Error(res.message ?? tt("couldn_t_open_that_album"));
   const photos = res.data?.photos ?? [];
   return { user: res.data?.user ?? null, photos, count: res.data?.photo_count ?? photos.length };
 }

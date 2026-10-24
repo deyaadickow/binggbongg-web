@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { post, setAuthHeaders, type UserSummary } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Notice, StoreBadges } from "../components/Common";
+import { tt, useT  } from "../lib/i18n";
 
 // Google Identity Services. The web client id must be added to the backend's
 // GOOGLE_SIGNIN_CLIENT_IDS (registration verifies the ID token) — see README.
@@ -30,17 +31,22 @@ function decodeJwt(token: string): Record<string, string> {
 }
 
 export function LoginPage() {
+  const { t } = useT();
   const { signIn, isLoggedIn } = useSession();
   const navigate = useNavigate();
   const buttonRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  // Where to go after signing in. A signed-out tap on Gift or the heart sends the member here
+  // with the video they were on; anything else lands on the feed as before.
+  const routerLocation = useLocation();
+  const from = (routerLocation.state as { from?: string } | null)?.from ?? "/";
   const devMode = new URLSearchParams(location.search).get("dev") === "1";
   const [devUserId, setDevUserId] = useState("");
   const [devToken, setDevToken] = useState("");
 
   useEffect(() => {
-    if (isLoggedIn) navigate("/", { replace: true });
+    if (isLoggedIn) navigate(from, { replace: true });
   }, [isLoggedIn, navigate]);
 
   async function register(credential: string) {
@@ -65,11 +71,11 @@ export function LoginPage() {
         username: email.split("@")[0],
         provider_token: credential,
       });
-      if (!res.status || !res.data) throw new Error(res.message ?? "Sign-in was refused.");
+      if (!res.status || !res.data) throw new Error(res.message ?? tt("sign_in_was_refused"));
       const token = res.data.auth_token;
-      if (!token) throw new Error("No session token came back.");
+      if (!token) throw new Error(tt("no_session_token_came_back"));
       signIn({ ...res.data, auth_token: undefined }, token);
-      navigate("/", { replace: true });
+      navigate(from, { replace: true });
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -106,9 +112,9 @@ export function LoginPage() {
       const id = Number(devUserId);
       setAuthHeaders(devToken.trim(), id);
       const res = await post<UserSummary>("fetchMyUserDetails", { my_user_id: id });
-      if (!res.status || !res.data) throw new Error(res.message ?? "That session is not valid.");
+      if (!res.status || !res.data) throw new Error(res.message ?? tt("that_session_is_not_valid"));
       signIn({ ...res.data, auth_token: undefined }, devToken.trim());
-      navigate("/", { replace: true });
+      navigate(from, { replace: true });
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -119,20 +125,20 @@ export function LoginPage() {
   return (
     <div className="page">
       <div className="card pad login-box">
-        <h1 className="card-title" style={{ fontSize: 22 }}>Sign in to Bingg Bongg</h1>
-        <p className="soft" style={{ marginTop: 6 }}>Use the same Google account you use in the app. Your coins, followers and videos are all here.</p>
+        <h1 className="card-title" style={{ fontSize: 22 }}>{t("sign_in_to_bingg_bongg")}</h1>
+        <p className="soft" style={{ marginTop: 6 }}>{t("use_the_same_google_account_you_use_in_t")}</p>
         <div style={{ marginTop: 20, display: "flex", justifyContent: "center" }}>
-          {GOOGLE_CLIENT_ID ? <div ref={buttonRef} /> : <Notice>Google sign-in isn't configured on this site yet.</Notice>}
+          {GOOGLE_CLIENT_ID ? <div ref={buttonRef} /> : <Notice>{t("google_sign_in_isn_t_configured_on_this")}</Notice>}
         </div>
-        {busy && <p className="muted center" style={{ marginTop: 12 }}>Signing you in…</p>}
+        {busy && <p className="muted center" style={{ marginTop: 12 }}>{t("signing_you_in")}</p>}
         {error && <div style={{ marginTop: 12 }}><Notice error>{error}</Notice></div>}
 
         {devMode && (
           <div style={{ marginTop: 24, display: "grid", gap: 8 }}>
-            <div className="muted" style={{ fontSize: 12 }}>Developer sign-in with an existing app session</div>
-            <input className="input" placeholder="User id" value={devUserId} onChange={(e) => setDevUserId(e.target.value)} />
-            <input className="input" placeholder="Session token" value={devToken} onChange={(e) => setDevToken(e.target.value)} />
-            <button className="btn" onClick={devSignIn} disabled={busy || !devUserId || !devToken}>Use this session</button>
+            <div className="muted" style={{ fontSize: 12 }}>{t("developer_sign_in_with_an_existing_app_s")}</div>
+            <input className="input" placeholder={t("user_id")} value={devUserId} onChange={(e) => setDevUserId(e.target.value)} />
+            <input className="input" placeholder={t("session_token")} value={devToken} onChange={(e) => setDevToken(e.target.value)} />
+            <button className="btn" onClick={devSignIn} disabled={busy || !devUserId || !devToken}>{t("use_this_session")}</button>
           </div>
         )}
       </div>
