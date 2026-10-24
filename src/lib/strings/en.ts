@@ -1395,4 +1395,7 @@ export const en = {
   fname_to_do_list: "To Do List",
   fblurb_to_do_list: "Your own notepad. Write anything you want to remember — it is only yours, and it is on your phone and the website.",
   fwhere_settings: "Settings",
+  fsec_help: "Help",
+  fname_help: "Help",
+  fblurb_help: "Members going through something hard, in their own words. Send a gift and it goes to them.",
 } as const;

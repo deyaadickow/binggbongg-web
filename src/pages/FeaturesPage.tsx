@@ -48,6 +48,14 @@ interface Section {
 
 const FEATURES: Section[] = [
   {
+    // Steve, 2026-10-23: Help gets its own tab in the directory. Placed first deliberately — it is
+    // the feature he expects people to talk about, and burying it under Going Live would be odd.
+    titleKey: "fsec_help",
+    features: [
+      { icon: "🤝", nameKey: "fname_help", blurbKey: "fblurb_help", to: "/help" },
+    ],
+  },
+  {
     titleKey: "fsec_going_live",
     features: [
       { icon: "🔴", nameKey: "fname_go_live", blurbKey: "fblurb_go_live", to: "/go-live" },

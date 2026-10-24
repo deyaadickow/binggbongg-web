@@ -19,7 +19,13 @@ import { tt, useT  } from "../lib/i18n";
  * server refuses gifting your own post and an overdrawn balance; both are also caught here
  * first so the member gets a plain message rather than a round trip.
  */
-export function PostGiftButton({ post: item, className = "btn small", onSent, onOpenChange }: { post: Post; className?: string; onSent?: (gift: Gift) => void; onOpenChange?: (open: boolean) => void }) {
+/**
+ * `sendOverride` lets a surface keep this exact gift UI — the gold tiles, the wallet check, the
+ * twelve-to-a-screen grid — while sending through its own endpoint. Help needs it: a Help gift
+ * accrues on the campaign instead of crediting the member straight away (the 30-day hold), so it
+ * cannot go through sendCoinsToPost even though a campaign does have a post behind it.
+ */
+export function PostGiftButton({ post: item, className = "btn small", onSent, onOpenChange, sendOverride }: { post: Post; className?: string; onSent?: (gift: Gift) => void; onOpenChange?: (open: boolean) => void; sendOverride?: (coins: number) => Promise<{ status: boolean; message?: string | null }> }) {
   const { t } = useT();
   const { user, isLoggedIn } = useSession();
   const navigate = useNavigate();
@@ -40,7 +46,7 @@ export function PostGiftButton({ post: item, className = "btn small", onSent, on
           onOpenChange?.(true);
         }}>
         {t("gift")}</button>
-      {open && <GiftSheet post={item} onClose={() => { setOpen(false); onOpenChange?.(false); }} onSent={onSent} />}
+      {open && <GiftSheet post={item} onClose={() => { setOpen(false); onOpenChange?.(false); }} onSent={onSent} sendOverride={sendOverride} />}
     </>
   );
 }
@@ -76,7 +82,7 @@ export function GiftFlash({ gift, onDone }: { gift: Gift; onDone: () => void }) 
   );
 }
 
-function GiftSheet({ post: item, onClose, onSent }: { post: Post; onClose: () => void; onSent?: (gift: Gift) => void }) {
+function GiftSheet({ post: item, onClose, onSent, sendOverride }: { post: Post; onClose: () => void; onSent?: (gift: Gift) => void; sendOverride?: (coins: number) => Promise<{ status: boolean; message?: string | null }> }) {
   const { t } = useT();
   const { user, refresh } = useSession();
   const [gifts, setGifts] = useState<Gift[]>([]);
@@ -116,7 +122,9 @@ function GiftSheet({ post: item, onClose, onSent }: { post: Post; onClose: () =>
     }
     setBusy(gift.id);
     try {
-      const res = await post("sendCoinsToPost", { my_user_id: user.id, coins: price, post_id: item.id });
+      const res = sendOverride
+        ? await sendOverride(price)
+        : await post("sendCoinsToPost", { my_user_id: user.id, coins: price, post_id: item.id });
       if (!res.status) throw new Error(res.message ?? tt("couldn_t_send_that_gift"));
       await refresh();
       // Close straight away so the gift shows over the video, as the phones do.

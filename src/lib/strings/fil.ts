@@ -1396,4 +1396,7 @@ export const fil = {
   // Steve, 23 Oct: this was the one key fil was missing, so the nav chip read
   // "Contests" in English next to "Para ti" and "Noticias Emocionantes".
   contests: "Mga Contest",
+  fsec_help: "Tulong",
+  fname_help: "Tulong",
+  fblurb_help: "Mga miyembrong dumaraan sa mahirap na sitwasyon, sa sarili nilang salita. Magpadala ng regalo at direkta itong mapupunta sa kanila.",
 };

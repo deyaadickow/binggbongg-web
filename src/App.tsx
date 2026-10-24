@@ -16,6 +16,7 @@ import {
 import { MemberAlbumPage } from "./pages/MemberAlbumPage";
 import { ContestUploadPage } from "./pages/ContestUploadPage";
 import { ContestsPage, ContestBoardPage } from "./pages/ContestsPage";
+import { HelpListPage, HelpCampaignPage, StartHelpPage } from "./pages/HelpPages";
 import { HomePage } from "./pages/HomePage";
 import { LanguagePage } from "./pages/LanguagePage";
 import { FeaturesPage } from "./pages/FeaturesPage";
@@ -124,6 +125,11 @@ export default function App() {
           <Route path="/enter-contest" element={<ContestUploadPage />} />
           {/* The board the site never had. Open to everyone, every country — entering is the
               only country-locked half, and that lives on /enter-contest. */}
+          {/* Help (Steve, 2026-10-23). /help/start is reached from Settings, as he specified;
+              the tab in the directory and the feed cards both land on /help. */}
+          <Route path="/help" element={<HelpListPage />} />
+          <Route path="/help/start" element={<StartHelpPage />} />
+          <Route path="/help/:id" element={<HelpCampaignPage />} />
           <Route path="/contests" element={<ContestsPage />} />
           <Route path="/contests/:id" element={<ContestBoardPage />} />
           <Route path="/settings" element={<SettingsHubPage />} />
