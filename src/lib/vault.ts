@@ -39,6 +39,32 @@ function b64decode(s: string): Uint8Array {
   return out;
 }
 
+/**
+ * The recovery code alphabet. No 0/O/1/I/L — this gets written on paper and read back by hand,
+ * and a code that cannot be transcribed reliably is not a recovery.
+ */
+const RECOVERY_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+const RECOVERY_GROUPS = 6;
+const RECOVERY_GROUP_LEN = 5;
+
+/** ~147 bits. Generated here, shown once, and never sent to the server. */
+export function newRecoveryCode(): string {
+  const n = RECOVERY_GROUPS * RECOVERY_GROUP_LEN;
+  const bytes = crypto.getRandomValues(new Uint8Array(n));
+  let out = "";
+  for (let i = 0; i < n; i++) {
+    // Modulo bias is negligible at 31 symbols over 256 and irrelevant at this entropy.
+    out += RECOVERY_ALPHABET[bytes[i] % RECOVERY_ALPHABET.length];
+    if ((i + 1) % RECOVERY_GROUP_LEN === 0 && i + 1 < n) out += "-";
+  }
+  return out;
+}
+
+/** Typed back in, people add spaces, lose dashes and use lower case. All of that is fine. */
+export function normaliseRecoveryCode(raw: string): string {
+  return raw.toUpperCase().replace(/[^A-Z0-9]/g, "");
+}
+
 /** PBKDF2-HMAC-SHA256 -> a 256-bit AES-GCM key. */
 export async function deriveWrappingKey(passcode: string, saltB64: string, iterations: number): Promise<CryptoKey> {
   const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(passcode), "PBKDF2", false, ["deriveKey"]);
@@ -80,6 +106,11 @@ export interface VaultEntry {
 
 export interface VaultStatus {
   is_set_up: boolean;
+  /** Whether a recovery code was ever set up. Null for a vault made before recovery existed. */
+  has_recovery?: boolean;
+  recovery_salt?: string | null;
+  recovery_wrapped_key?: string | null;
+  recovery_verifier?: string | null;
   kdf_salt: string | null;
   kdf_iterations: number;
   wrapped_key: string | null;
@@ -95,18 +126,45 @@ export async function fetchVaultStatus(userId: number): Promise<VaultStatus | nu
 }
 
 /** First-time setup: make a data key, wrap it under the passcode, hand over only the ciphertext. */
-export async function setupVault(userId: number, passcode: string) {
+export async function setupVault(userId: number, passcode: string, recoveryCode: string) {
   const salt = crypto.getRandomValues(new Uint8Array(16));
   const saltB64 = b64encode(salt);
   const wrappingKey = await deriveWrappingKey(passcode, saltB64, VAULT_KDF_ITERATIONS);
   const dataKey = crypto.getRandomValues(new Uint8Array(32));
+
+  // The SAME data key, wrapped a second time under the recovery code. That is what makes
+  // recovery possible without this server ever being able to read anything: forgetting the
+  // passcode costs you the first wrapping, not the key.
+  const recSalt = crypto.getRandomValues(new Uint8Array(16));
+  const recSaltB64 = b64encode(recSalt);
+  const recKey = await deriveWrappingKey(normaliseRecoveryCode(recoveryCode), recSaltB64, VAULT_KDF_ITERATIONS);
+
   return post("setupVault", {
     user_id: userId,
     kdf_salt: saltB64,
     kdf_iterations: VAULT_KDF_ITERATIONS,
     wrapped_key: await seal(wrappingKey, dataKey),
     verifier: await seal(wrappingKey, new TextEncoder().encode(VERIFIER_PLAINTEXT)),
+    recovery_salt: recSaltB64,
+    recovery_wrapped_key: await seal(recKey, dataKey),
+    recovery_verifier: await seal(recKey, new TextEncoder().encode(VERIFIER_PLAINTEXT)),
   });
+}
+
+/**
+ * Unlock with the RECOVERY CODE instead of the passcode. Returns the raw data key, because the
+ * only thing worth doing next is setting a new passcode around it.
+ */
+export async function unlockWithRecoveryCode(status: VaultStatus, code: string): Promise<Uint8Array | null> {
+  if (!status.recovery_salt || !status.recovery_verifier || !status.recovery_wrapped_key) return null;
+  try {
+    const key = await deriveWrappingKey(normaliseRecoveryCode(code), status.recovery_salt, status.kdf_iterations);
+    const check = new TextDecoder().decode(await open(key, status.recovery_verifier));
+    if (check !== VERIFIER_PLAINTEXT) return null;
+    return await open(key, status.recovery_wrapped_key);
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -114,6 +172,12 @@ export async function setupVault(userId: number, passcode: string) {
  * Returns null for a wrong passcode — the GCM tag is what decides, not a comparison we could
  * get wrong, and it is checked on THIS device, never by the server.
  */
+/** Kept so a passcode change can re-wrap without asking for the old passcode again. Module
+ *  scope, cleared on lock — never storage, never the server. */
+let lastRawDataKey: Uint8Array | null = null;
+export function rawDataKey(): Uint8Array | null { return lastRawDataKey; }
+export function forgetRawDataKey() { lastRawDataKey = null; }
+
 export async function unlockVault(status: VaultStatus, passcode: string): Promise<CryptoKey | null> {
   if (!status.is_set_up || !status.kdf_salt || !status.verifier || !status.wrapped_key) return null;
   try {
@@ -121,6 +185,7 @@ export async function unlockVault(status: VaultStatus, passcode: string): Promis
     const check = new TextDecoder().decode(await open(wrappingKey, status.verifier));
     if (check !== VERIFIER_PLAINTEXT) return null;
     const dataKey = await open(wrappingKey, status.wrapped_key);
+    lastRawDataKey = dataKey;
     return crypto.subtle.importKey("raw", dataKey as BufferSource, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
   } catch {
     return null;
@@ -161,16 +226,38 @@ export async function deleteVaultItem(userId: number, itemId: number) {
 }
 
 /** Only the wrapped key changes — the items stay encrypted under the same data key. */
-export async function changeVaultPasscode(userId: number, dataKeyRaw: Uint8Array, newPasscode: string) {
+export async function changeVaultPasscode(
+  userId: number,
+  dataKeyRaw: Uint8Array,
+  newPasscode: string,
+  newRecoveryCode?: string,
+) {
   const salt = crypto.getRandomValues(new Uint8Array(16));
   const saltB64 = b64encode(salt);
   const wrappingKey = await deriveWrappingKey(newPasscode, saltB64, VAULT_KDF_ITERATIONS);
+
+  // A new recovery code is OPTIONAL here. Omitting it leaves the existing recovery wrapping
+  // untouched and still valid, because the data key has not changed — the server deliberately
+  // does not rewrite it unless all three fields arrive together.
+  let recovery = {};
+  if (newRecoveryCode) {
+    const recSalt = crypto.getRandomValues(new Uint8Array(16));
+    const recSaltB64 = b64encode(recSalt);
+    const recKey = await deriveWrappingKey(normaliseRecoveryCode(newRecoveryCode), recSaltB64, VAULT_KDF_ITERATIONS);
+    recovery = {
+      recovery_salt: recSaltB64,
+      recovery_wrapped_key: await seal(recKey, dataKeyRaw),
+      recovery_verifier: await seal(recKey, new TextEncoder().encode(VERIFIER_PLAINTEXT)),
+    };
+  }
+
   return post("changeVaultPasscode", {
     user_id: userId,
     kdf_salt: saltB64,
     kdf_iterations: VAULT_KDF_ITERATIONS,
     wrapped_key: await seal(wrappingKey, dataKeyRaw),
     verifier: await seal(wrappingKey, new TextEncoder().encode(VERIFIER_PLAINTEXT)),
+    ...recovery,
   });
 }
 
