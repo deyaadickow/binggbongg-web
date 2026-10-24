@@ -263,6 +263,9 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 
 .notice { padding: 12px 14px; border-radius: 10px; border: 1px solid var(--gold-border); color: var(--text-soft); background: var(--panel); }
 .notice.error { border-color: var(--red); color: var(--red); }
+/* Help only (Steve, 2026-10-24: "center all the text in all the boxes"). Scoped rather than
+   applied to .notice itself, which dozens of other pages use left-aligned. */
+.help-page .notice { text-align: center; }
 .center { text-align: center; }
 .spacer { flex: 1; }
 .login-box { max-width: 420px; margin: 40px auto; }
