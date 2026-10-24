@@ -1397,5 +1397,5 @@ export const en = {
   fwhere_settings: "Settings",
   fsec_help: "Help",
   fname_help: "Help",
-  fblurb_help: "Members going through something hard, in their own words. Send a gift and it goes to them.",
+  fblurb_help: "Members going through hard times. Send a gift to help them out the same way you would send a gift when members are live streaming.",
 } as const;

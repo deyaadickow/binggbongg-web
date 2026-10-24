@@ -1398,5 +1398,5 @@ export const fil = {
   contests: "Mga Contest",
   fsec_help: "Tulong",
   fname_help: "Tulong",
-  fblurb_help: "Mga miyembrong dumaraan sa mahirap na sitwasyon, sa sarili nilang salita. Magpadala ng regalo at direkta itong mapupunta sa kanila.",
+  fblurb_help: "Mga miyembrong dumaraan sa mahirap na panahon. Magpadala ng regalo para matulungan sila, tulad ng pagpapadala mo ng regalo kapag may mga miyembrong nagla-live stream.",
 };
