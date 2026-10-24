@@ -7,6 +7,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { mediaUrl, type Post } from "../lib/api";
 import { useSession } from "../lib/session";
+import { useT } from "../lib/i18n";
 import { Loading, Notice } from "../components/Common";
 import { PageTitle } from "../components/PageTitle";
 import { PostGiftButton } from "../components/GiftSheet";
@@ -49,6 +50,7 @@ function CampaignCard({ c }: { c: HelpCampaign }) {
 
 /** The Help tab in the directory. */
 export function HelpListPage() {
+  const { t } = useT();
   const [rows, setRows] = useState<HelpCampaign[] | null>(null);
   const { user } = useSession();
   const [status, setStatus] = useState<HelpStatus | null>(null);
@@ -63,8 +65,7 @@ export function HelpListPage() {
       <PageTitle>Help</PageTitle>
       <div className="card pad" style={{ marginBottom: 12 }}>
         <div className="soft" style={{ fontSize: 14 }}>
-          Members going through something hard, in their own words. Send a gift the same way you
-          would in a battle — every gift goes to them.
+          {t("help_intro")}
         </div>
         {/* Only offered when the server says they may. blocked_reason is its wording, not ours. */}
         {status && !status.blocked_reason && (
