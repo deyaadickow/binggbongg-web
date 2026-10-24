@@ -12,7 +12,6 @@ import { PageTitle } from "../components/PageTitle";
 import { PostGiftButton } from "../components/GiftSheet";
 
 import { createUploadUrls, putToSignedUrl, videoDuration, videoThumbnail } from "../lib/upload";
-import { post } from "../lib/api";
 import {
   createHelpCampaign, fetchHelpCampaign, fetchHelpCampaigns,
   fetchHelpStatus, giftToHelpCampaign,
@@ -214,20 +213,16 @@ export function StartHelpPage() {
       const thumb = await videoThumbnail(file);
       await putToSignedUrl(thumbSlot, new File([thumb], "thumb.jpg", { type: "image/jpeg" }));
 
-      setStage("Publishing…");
-      const up = await post<{ post_id?: number }>("uploadPost", {
-        user_id: user.id,
-        video: videoSlot.key,
-        thumbnail: thumbSlot.key,
-        can_comment: 1, can_save: 0, allow_repost: 0,
-      });
-      // post_id comes back at the TOP level, never data.id — the contest entry chain lost a week
-      // to that once.
-      const postId = (up as unknown as { post_id?: number }).post_id ?? up.data?.post_id;
-      if (!up.status || !postId) throw new Error(up.message ?? "Couldn't publish that video.");
-
+      // One call, not two. createHelpCampaign takes the S3 keys and creates the post itself —
+      // it must NOT go through uploadPost, which requires a contest_cat_id this screen has no
+      // category to supply.
       setStage("Starting your campaign…");
-      const made = await createHelpCampaign(user.id, postId, description, goal ? Number(goal) : null);
+      const made = await createHelpCampaign(
+        user.id,
+        { videoKey: videoSlot.key, thumbKey: thumbSlot.key },
+        description,
+        goal ? Number(goal) : null,
+      );
       if (!made.status) throw new Error(made.message ?? "Couldn't start your campaign.");
       navigate("/help");
     } catch (e) {

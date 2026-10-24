@@ -5,7 +5,7 @@
 // Keys below are read off HelpController, not guessed. Guessing a response key fails silently as
 // an empty list, which looks exactly like "no data" — the Following tab said "No members yet."
 // against 30 real rows because it had copied `toUser` from the PHP when the JSON says `to_user`.
-import { post } from "./api";
+import { post, type Post } from "./api";
 
 // Every call here is wrapped. post() throws on a non-2xx, and Help can legitimately be unreachable:
 // the routes 404 until the backend is deployed, and the endpoints answer status:false whenever the
@@ -32,6 +32,12 @@ export interface HelpCampaign {
   raised_coins: number;
   is_open: boolean;
   contributors?: HelpContributor[];
+  /**
+   * The ORDINARY post behind this campaign, sent with the campaign so the feed can draw a real
+   * video card without a second call per campaign. null when the post was deleted or its owner is
+   * blocked — skip those rather than drawing a card with no video.
+   */
+  post?: Post | null;
 }
 
 export interface HelpContributor {
@@ -88,10 +94,24 @@ export async function fetchHelpContributors(id: number): Promise<HelpContributor
   }, []);
 }
 
-export async function createHelpCampaign(userId: number, postId: number, description: string, goal: number | null) {
+/**
+ * One call. The video is PUT straight to S3 first (same pre-signed-URL flow as a normal upload)
+ * and only the keys come here — createHelpCampaign creates the post itself.
+ *
+ * It deliberately does NOT go through uploadPost: that endpoint validates `contest_cat_id` as
+ * required and the Help screen has no category to ask for, so the two-call version this replaced
+ * could never have succeeded.
+ */
+export async function createHelpCampaign(
+  userId: number,
+  video: { videoKey: string; thumbKey: string },
+  description: string,
+  goal: number | null,
+) {
   return post("createHelpCampaign", {
     user_id: userId,
-    post_id: postId,
+    video_path: video.videoKey,
+    thumb_path: video.thumbKey,
     ...(description.trim() ? { description: description.trim() } : {}),
     ...(goal && goal > 0 ? { goal_amount: goal } : {}),
   });

@@ -23,6 +23,12 @@ export function HelpFeedCard({ campaign }: { campaign: HelpCampaign }) {
           </div>
         </div>
       </div>
+      {/* The video's own still, now that the campaign carries its post. Without it this read as
+          a text notice in a feed of videos, which is not what it is. */}
+      {campaign.post?.thumbnail && (
+        <img src={mediaUrl(campaign.post.thumbnail)} alt="" loading="lazy"
+             style={{ width: "100%", maxHeight: 320, objectFit: "cover", borderRadius: 10, marginTop: 10, display: "block" }} />
+      )}
       {campaign.description && (
         <div className="soft" style={{ fontSize: 13, marginTop: 8, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
           {campaign.description}
