@@ -27,7 +27,8 @@ import { Link } from "react-router-dom";
 import { useT, type StringKey } from "../lib/i18n";
 import { PageTitle } from "../components/PageTitle";
 import { useSession } from "../lib/session";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { fetchFeatureVideos } from "../lib/featureVideos";
 
 interface Feature {
   icon: string;
@@ -171,7 +172,7 @@ const FEATURES: Section[] = [
   },
 ];
 
-function Tile({ f }: { f: Feature }) {
+function Tile({ f, video, onWatch }: { f: Feature; video?: string; onWatch: () => void }) {
   const { t } = useT();
   // The battle badge, the streak, the Lifetime Battle Board and Playlists all live on your own
   // profile, whose address needs the signed-in id. Signed out, the tile leads to the sign-in
@@ -199,16 +200,69 @@ function Tile({ f }: { f: Feature }) {
             📱 {t(f.whereKey)}
           </span>
         )}
+        {/* Room for the Watch video pill, which sits ON the card rather than in it: the card is
+            inside the tile's link, and a button inside a link also follows the link. */}
+        {video && <span style={{ display: "block", height: 42 }} aria-hidden />}
       </span>
     </div>
   );
-  return to
+  const tile = to
     ? <Link to={to} style={{ textDecoration: "none", display: "block", height: "100%" }}>{inner}</Link>
     : inner;
+  if (!video) return tile;
+  return (
+    <div style={{ position: "relative", height: "100%" }}>
+      {tile}
+      <button
+        onClick={onWatch}
+        style={{
+          position: "absolute", left: 52, bottom: 14,
+          display: "inline-flex", alignItems: "center", gap: 7,
+          background: "rgba(0,0,0,0.9)", color: "var(--gold)", fontWeight: 700, fontSize: 13,
+          border: "2px solid var(--gold-border)", borderRadius: 999, padding: "6px 15px", cursor: "pointer",
+        }}
+      >▶ {t("watch_video")}</button>
+    </div>
+  );
+}
+
+/** Full-screen player for one tile's video: plays with sound, the browser's own controls, a gold
+ *  back button and the feature's name on top. Esc or the back button closes it. */
+function FeatureVideoPlayer({ url, title, onClose }: { url: string; title: string; onClose: () => void }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+  return (
+    // The bar sits ABOVE the video, not over it — over it, it covered the video's own logo.
+    <div role="dialog" aria-modal="true" aria-label={title} style={{
+      position: "fixed", inset: 0, zIndex: 2000, background: "#000",
+      display: "flex", flexDirection: "column",
+    }}>
+      <div style={{ padding: "10px 14px", display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+        <button onClick={onClose} aria-label="Back" style={{
+          width: 40, height: 40, borderRadius: "50%", background: "#000", color: "var(--gold)",
+          border: "2px solid var(--gold-border)", fontSize: 20, fontWeight: 700, cursor: "pointer", lineHeight: 1,
+        }}>‹</button>
+        <b style={{ color: "var(--gold)", fontSize: 17 }}>{title}</b>
+      </div>
+      <video src={url} controls autoPlay playsInline
+        style={{ flex: 1, minHeight: 0, width: "100%", objectFit: "contain", background: "#000" }} />
+    </div>
+  );
 }
 
 export function FeaturesPage() {
-  const { t } = useT();
+  const { t, lang } = useT();
+  // Feature Videos: tile key -> URL, in the member's language (English fallback on the server).
+  const [videos, setVideos] = useState<Record<string, string>>({});
+  const [playing, setPlaying] = useState<{ url: string; title: string } | null>(null);
+  useEffect(() => {
+    let live = true;
+    fetchFeatureVideos(lang).then((v) => { if (live) setVideos(v); });
+    return () => { live = false; };
+  }, [lang]);
   // Steve, 2026-10-19: "Please add search on top of this page." Fifty-seven tiles is a lot to
   // scroll past when you already know what you are looking for. Matches the NAME and the
   // DESCRIPTION, both translated, so "coins" finds tiles that only mention coins in their blurb.
@@ -263,10 +317,14 @@ export function FeaturesPage() {
             gridTemplateColumns: "1fr",
             gap: 10,
           }}>
-            {section.features.map((f) => <Tile key={f.nameKey} f={f} />)}
+            {section.features.map((f) => (
+              <Tile key={f.nameKey} f={f} video={videos[f.nameKey]}
+                onWatch={() => setPlaying({ url: videos[f.nameKey], title: t(f.nameKey) })} />
+            ))}
           </div>
         </div>
       ))}
+      {playing && <FeatureVideoPlayer url={playing.url} title={playing.title} onClose={() => setPlaying(null)} />}
     </div>
   );
 }
