@@ -81,6 +81,9 @@ export function sidebarSections(userId: number | null): SideSection[] {
       // No needsLogin — the Help list is public, and the page itself decides whether this
       // member may ASK, from the server's own blocked_reason.
       { to: "/help", label: "help_title", icon: "🤝" },
+      // Password Protected Page (Steve, 2026-10-24). Optional — it does nothing until a member
+      // sets a passcode, and the page itself explains that nobody can recover it.
+      { to: "/settings/vault", label: "vault_title", icon: "🔐", needsLogin: true },
     ] },
     { title: "general", links: [
       { to: "/settings/language", label: "change_language", icon: "🌐" },

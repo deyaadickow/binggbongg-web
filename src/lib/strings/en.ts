@@ -1399,6 +1399,7 @@ export const en = {
   fname_help: "Help",
   fblurb_help: "Members going through hard times. Send a gift to help them out the same way you would send a gift when members are live streaming.",
   help_title: "Help",
+  vault_title: "Password Protected Page",
   help_ask_for_help: "Ask for help",
   help_intro: "Members going through hard times. Send a gift to help them out the same way you would send a gift when members are live streaming.",
 } as const;

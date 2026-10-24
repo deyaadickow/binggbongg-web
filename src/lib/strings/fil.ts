@@ -1400,6 +1400,7 @@ export const fil = {
   fname_help: "Tulong",
   fblurb_help: "Mga miyembrong dumaraan sa mahirap na panahon. Magpadala ng regalo para matulungan sila, tulad ng pagpapadala mo ng regalo kapag may mga miyembrong nagla-live stream.",
   help_title: "Tulong",
+  vault_title: "Pahinang Protektado ng Password",
   help_ask_for_help: "Humingi ng tulong",
   help_intro: "Mga miyembrong dumaraan sa mahirap na panahon. Magpadala ng regalo para matulungan sila, tulad ng pagpapadala mo ng regalo kapag may mga miyembrong nagla-live stream.",
 };
