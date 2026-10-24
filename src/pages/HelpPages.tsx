@@ -89,6 +89,13 @@ export function HelpListPage() {
         )}
       </div>
 
+      {/* The server's own sentence, shown the way the phones show it — it is the only place a
+          member learns why they cannot ask (the country list, a fraud ban, the lockout). The web
+          had been dropping it silently on this page and only showing it on /help/start. */}
+      {status?.blocked_reason && !status.campaign && (
+        <div style={{ marginBottom: 12 }}><Notice>{status.blocked_reason}</Notice></div>
+      )}
+
       {rows === null ? <Loading /> : rows.length === 0 ? (
         <Notice>Nobody is asking for help right now.</Notice>
       ) : rows.map((c) => <CampaignCard key={c.id} c={c} />)}
