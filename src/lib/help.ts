@@ -106,3 +106,27 @@ export async function giftToHelpCampaign(userId: number, campaignId: number, coi
     is_anonymous: anonymous ? 1 : 0,
   });
 }
+
+/**
+ * Where Help cards go in the main feed.
+ *
+ * Steve, 2026-10-23: "we can show one of the help videos every 20 to 30 videos shown on main feed."
+ * A RANGE, re-rolled after each insertion, so the placement is not perfectly regular — and both
+ * ends come from the server (help_feed_every_min / help_feed_every_max) so tuning it never needs
+ * a deploy of this app, let alone the phones.
+ *
+ * Returns the indexes to insert at, not a merged array, so the caller keeps its own post list
+ * intact — the video page steps through that exact order and inserting into it would desync it.
+ */
+export function helpFeedSlots(postCount: number, campaignCount: number, everyMin: number, everyMax: number): number[] {
+  if (postCount <= 0 || campaignCount <= 0) return [];
+  const lo = Math.max(1, Math.min(everyMin, everyMax));
+  const hi = Math.max(lo, Math.max(everyMin, everyMax));
+  const slots: number[] = [];
+  let at = lo + Math.floor(Math.random() * (hi - lo + 1));
+  while (at < postCount && slots.length < campaignCount) {
+    slots.push(at);
+    at += lo + Math.floor(Math.random() * (hi - lo + 1));
+  }
+  return slots;
+}

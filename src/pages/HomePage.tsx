@@ -1,10 +1,12 @@
-import { useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import { post, type Post } from "../lib/api";
 import { useSession } from "../lib/session";
 import { PostCard } from "../components/PostCard";
 import { Loading, Notice, StoreBadges } from "../components/Common";
 import { setFeed } from "../lib/feed";
 import { FeedPhotoCard } from "../components/FeedPhotoCard";
+import { HelpFeedCard } from "../components/HelpFeedCard";
+import { fetchHelpCampaigns, helpFeedSlots, type HelpCampaign } from "../lib/help";
 import { tt, useT  } from "../lib/i18n";
 
 export function HomePage() {
@@ -13,6 +15,11 @@ export function HomePage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Help campaigns to sprinkle through the feed, and the interval the SERVER chose. Loaded once;
+  // a failure here must never affect the feed, so help.ts swallows it and returns an empty list.
+  const [help, setHelp] = useState<{ rows: HelpCampaign[]; everyMin: number; everyMax: number }>(
+    { rows: [], everyMin: 20, everyMax: 30 },
+  );
 
   const loadMore = useCallback(async () => {
     setLoading(true);
@@ -44,6 +51,12 @@ export function HomePage() {
     loadMore();
   }, [loadMore]);
 
+  useEffect(() => { fetchHelpCampaigns(0, 10).then(setHelp); }, []);
+
+  // Indexes only, never a merged array: the video page steps through `posts` in exactly this
+  // order, and splicing anything into it would desync which video "next" means.
+  const slots = helpFeedSlots(posts.length, help.rows.length, help.everyMin, help.everyMax);
+
   return (
     <div className="page">
       <div className="row" style={{ marginBottom: 14, flexWrap: "wrap" }}>
@@ -56,7 +69,15 @@ export function HomePage() {
           free storage allowance are eligible — that is the server's rule, not ours. */}
       <FeedPhotoCard />
       <div className="grid">
-        {posts.map((p) => <PostCard key={p.id} post={p} />)}
+        {posts.map((p, i) => {
+          const slot = slots.indexOf(i);
+          return (
+            <Fragment key={p.id}>
+              {slot !== -1 && help.rows[slot] && <HelpFeedCard campaign={help.rows[slot]} />}
+              <PostCard post={p} />
+            </Fragment>
+          );
+        })}
       </div>
       {loading ? <Loading /> : (
         <div className="center" style={{ marginTop: 20 }}>
