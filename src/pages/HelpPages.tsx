@@ -30,15 +30,26 @@ function CampaignCard({ c }: { c: HelpCampaign }) {
       <div className="row" style={{ gap: 10 }}>
         {c.profile_image && (
           <img src={mediaUrl(c.profile_image)} alt="" width={44} height={44}
-               style={{ borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />
+               style={{ borderRadius: "50%", objectFit: "cover", flexShrink: 0,
+                        border: "1.5px solid var(--gold-border)" }} />
         )}
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontWeight: 700 }}>{c.fullname || c.username || "—"}</div>
+          <div style={{ fontWeight: 800, color: "var(--gold)", overflow: "hidden",
+                        textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {c.fullname || c.username || "—"}
+          </div>
           <div className="muted" style={{ fontSize: 13 }}>
-            {c.days_left > 0 ? `${c.days_left} days left` : "Closing today"} · {coins(c.raised_coins)} coins
+            {c.days_left > 0 ? `${c.days_left} days left` : "Closing today"}
+            {" · "}
+            <b style={{ color: "var(--gold)", fontVariantNumeric: "tabular-nums" }}>{coins(c.raised_coins)}</b> coins
           </div>
         </div>
       </div>
+      {c.post?.thumbnail && (
+        <img src={mediaUrl(c.post.thumbnail)} alt="" loading="lazy"
+             style={{ width: "100%", maxHeight: 260, objectFit: "cover", borderRadius: 10,
+                      marginTop: 10, display: "block", border: "1px solid var(--gold-border)" }} />
+      )}
       {c.description && (
         <div className="soft" style={{ fontSize: 14, marginTop: 8, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
           {c.description}
@@ -69,7 +80,7 @@ export function HelpListPage() {
         </div>
         {/* Only offered when the server says they may. blocked_reason is its wording, not ours. */}
         {status && !status.blocked_reason && (
-          <Link to="/help/start" className="btn small" style={{ marginTop: 10 }}>Ask for help</Link>
+          <Link to="/help/start" className="btn gold small" style={{ marginTop: 10 }}>{t("help_ask_for_help")}</Link>
         )}
         {status?.blocked_reason && status.campaign && (
           <Link to={`/help/${status.campaign.id}`} className="btn small ghost" style={{ marginTop: 10 }}>
@@ -123,8 +134,9 @@ export function HelpCampaignPage() {
             ? (c.days_left > 0 ? `${c.days_left} days left` : "Closing today")
             : "This campaign has closed"}
         </div>
-        <div style={{ fontSize: 15, marginTop: 6 }}>
-          <b style={{ color: "var(--gold)" }}>{coins(c.raised_coins)}</b> coins received
+        <div style={{ fontSize: 22, marginTop: 6, fontWeight: 800, color: "var(--gold)",
+                      fontVariantNumeric: "tabular-nums" }}>
+          {coins(c.raised_coins)} <span style={{ fontSize: 14, fontWeight: 600 }}>coins received</span>
           {c.goal_amount ? <span className="muted"> · goal ${c.goal_amount.toLocaleString()}</span> : null}
         </div>
         {c.description && <div className="soft" style={{ fontSize: 14, marginTop: 10, whiteSpace: "pre-wrap" }}>{c.description}</div>}
@@ -134,7 +146,7 @@ export function HelpCampaignPage() {
           {c.is_open && isLoggedIn && !mine && (
             <PostGiftButton
               post={asPost}
-              className="btn small"
+              className="btn gold small"
               sendOverride={async (price) => {
                 const res = await giftToHelpCampaign(user!.id, c.id, price, anon);
                 if (res.status) { setNote("Your gift was sent."); load(); }
@@ -162,14 +174,14 @@ export function HelpCampaignPage() {
         ) : givers.map((g, i) => (
           <div key={`${g.user_id ?? "anon"}-${i}`} className="row" style={{ gap: 10, padding: "8px 0", borderTop: i ? "1px solid var(--line)" : undefined }}>
             {g.profile_image
-              ? <img src={mediaUrl(g.profile_image)} alt="" width={32} height={32} style={{ borderRadius: "50%", objectFit: "cover" }} />
+              ? <img src={mediaUrl(g.profile_image)} alt="" width={32} height={32} style={{ borderRadius: "50%", objectFit: "cover", border: "1px solid var(--gold-border)" }} />
               : <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#1a1a1a" }} />}
             <div style={{ flex: 1, minWidth: 0 }}>
               {g.user_id
                 ? <Link to={`/profile/${g.user_id}`} style={{ fontWeight: 600 }}>{g.fullname}</Link>
                 : <span style={{ fontWeight: 600 }} className="soft">{g.fullname}</span>}
             </div>
-            <div style={{ fontVariantNumeric: "tabular-nums" }}>{coins(g.total_coins)}</div>
+            <div style={{ fontVariantNumeric: "tabular-nums", fontWeight: 800, color: "var(--gold)" }}>{coins(g.total_coins)}</div>
           </div>
         ))}
       </div>
