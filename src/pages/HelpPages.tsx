@@ -27,22 +27,24 @@ function coins(n: number): string {
 function CampaignCard({ c }: { c: HelpCampaign }) {
   return (
     <Link to={`/help/${c.id}`} className="card pad" style={{ display: "block", marginBottom: 12, textDecoration: "none" }}>
-      <div className="row" style={{ gap: 10 }}>
+      {/* Steve, 2026-10-24: "center all the text in all the boxes on all platforms." The avatar
+          sits on top rather than beside the name, which is what lets the text actually centre
+          instead of hanging off a left column. */}
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, textAlign: "center" }}>
         {c.profile_image && (
-          <img src={mediaUrl(c.profile_image)} alt="" width={44} height={44}
+          <img src={mediaUrl(c.profile_image)} alt="" width={54} height={54}
                style={{ borderRadius: "50%", objectFit: "cover", flexShrink: 0,
                         border: "1.5px solid var(--gold-border)" }} />
         )}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontWeight: 800, color: "var(--gold)", overflow: "hidden",
-                        textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-            {c.fullname || c.username || "—"}
-          </div>
-          <div className="muted" style={{ fontSize: 13 }}>
-            {c.days_left > 0 ? `${c.days_left} days left` : "Closing today"}
-            {" · "}
-            <b style={{ color: "var(--gold)", fontVariantNumeric: "tabular-nums" }}>{coins(c.raised_coins)}</b> coins
-          </div>
+        <div style={{ fontWeight: 800, color: "var(--gold)", maxWidth: "100%", overflow: "hidden",
+                      textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          {c.fullname || c.username || "—"}
+        </div>
+        <div className="muted" style={{ fontSize: 13 }}>
+          {c.days_left > 0 ? `${c.days_left} days left` : "Closing today"}
+        </div>
+        <div style={{ fontWeight: 800, color: "var(--gold)", fontVariantNumeric: "tabular-nums", fontSize: 14 }}>
+          {coins(c.raised_coins)} coins received
         </div>
       </div>
       {c.post?.thumbnail && (
@@ -51,7 +53,7 @@ function CampaignCard({ c }: { c: HelpCampaign }) {
                       marginTop: 10, display: "block", border: "1px solid var(--gold-border)" }} />
       )}
       {c.description && (
-        <div className="soft" style={{ fontSize: 14, marginTop: 8, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+        <div className="soft" style={{ fontSize: 14, marginTop: 8, textAlign: "center", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
           {c.description}
         </div>
       )}
@@ -72,15 +74,17 @@ export function HelpListPage() {
   }, [user?.id]);
 
   return (
-    <div className="page" style={{ maxWidth: 720 }}>
+    <div className="page help-page" style={{ maxWidth: 720 }}>
       <PageTitle>Help</PageTitle>
       <div className="card pad" style={{ marginBottom: 12 }}>
-        <div className="soft" style={{ fontSize: 14 }}>
+        <div className="soft" style={{ fontSize: 14, textAlign: "center" }}>
           {t("help_intro")}
         </div>
         {/* Only offered when the server says they may. blocked_reason is its wording, not ours. */}
         {status && !status.blocked_reason && (
-          <Link to="/help/start" className="btn gold small" style={{ marginTop: 10 }}>{t("help_ask_for_help")}</Link>
+          <div style={{ textAlign: "center" }}>
+            <Link to="/help/start" className="btn gold small" style={{ marginTop: 10 }}>{t("help_ask_for_help")}</Link>
+          </div>
         )}
         {status?.blocked_reason && status.campaign && (
           <Link to={`/help/${status.campaign.id}`} className="btn small ghost" style={{ marginTop: 10 }}>
@@ -124,7 +128,7 @@ export function HelpCampaignPage() {
   useEffect(() => { load(); }, [load]);
 
   if (c === null) return <div className="page"><Loading /></div>;
-  if (c === "missing") return <div className="page"><Notice>That Help campaign couldn't be found.</Notice></div>;
+  if (c === "missing") return <div className="page help-page"><Notice>That Help campaign couldn't be found.</Notice></div>;
 
   const mine = user?.id === c.user_id;
   // GiftSheet only reads id and user_id off a post, and user_id is what makes it hide the button
@@ -132,23 +136,23 @@ export function HelpCampaignPage() {
   const asPost = { id: c.post_id ?? 0, user_id: c.user_id } as Post;
 
   return (
-    <div className="page" style={{ maxWidth: 720 }}>
+    <div className="page help-page" style={{ maxWidth: 720 }}>
       <PageTitle>{c.fullname || c.username || "Help"}</PageTitle>
 
       <div className="card pad" style={{ marginBottom: 12 }}>
-        <div className="muted" style={{ fontSize: 13 }}>
+        <div className="muted" style={{ fontSize: 13, textAlign: "center" }}>
           {c.status === "active"
             ? (c.days_left > 0 ? `${c.days_left} days left` : "Closing today")
             : "This campaign has closed"}
         </div>
         <div style={{ fontSize: 22, marginTop: 6, fontWeight: 800, color: "var(--gold)",
-                      fontVariantNumeric: "tabular-nums" }}>
+                      textAlign: "center", fontVariantNumeric: "tabular-nums" }}>
           {coins(c.raised_coins)} <span style={{ fontSize: 14, fontWeight: 600 }}>coins received</span>
           {c.goal_amount ? <span className="muted"> · goal ${c.goal_amount.toLocaleString()}</span> : null}
         </div>
-        {c.description && <div className="soft" style={{ fontSize: 14, marginTop: 10, whiteSpace: "pre-wrap" }}>{c.description}</div>}
+        {c.description && <div className="soft" style={{ fontSize: 14, marginTop: 10, textAlign: "center", whiteSpace: "pre-wrap" }}>{c.description}</div>}
 
-        <div className="row" style={{ gap: 8, marginTop: 12, flexWrap: "wrap" }}>
+        <div className="row" style={{ gap: 8, marginTop: 12, flexWrap: "wrap", justifyContent: "center" }}>
           {c.post_id != null && <Link className="btn small ghost" to={`/video/${c.post_id}`}>Watch the video</Link>}
           {c.is_open && isLoggedIn && !mine && (
             <PostGiftButton
@@ -175,7 +179,7 @@ export function HelpCampaignPage() {
       </div>
 
       <div className="card pad">
-        <div className="card-title" style={{ marginBottom: 8 }}>Who has helped</div>
+        <div className="card-title" style={{ marginBottom: 8, textAlign: "center" }}>Who has helped</div>
         {givers.length === 0 ? (
           <div className="muted" style={{ fontSize: 13 }}>No gifts yet.</div>
         ) : givers.map((g, i) => (
@@ -252,11 +256,11 @@ export function StartHelpPage() {
     }
   }
 
-  if (!user) return <div className="page"><Notice>Sign in first.</Notice></div>;
+  if (!user) return <div className="page help-page"><Notice>Sign in first.</Notice></div>;
   if (!status) return <div className="page"><Loading /></div>;
   // The server's sentence, verbatim. It knows whether the feature is on, whether this member is
   // blocked, whether their country is in, and when their 90 days are up.
-  if (status.blocked_reason) return <div className="page"><Notice>{status.blocked_reason}</Notice></div>;
+  if (status.blocked_reason) return <div className="page help-page"><Notice>{status.blocked_reason}</Notice></div>;
 
   return (
     <div className="page" style={{ maxWidth: 640 }}>
