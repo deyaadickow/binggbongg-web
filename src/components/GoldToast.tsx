@@ -101,3 +101,91 @@ export function showGoldAlert(message: string) {
     </div>,
   );
 }
+
+/**
+ * The same card, with two buttons — Steve, 2026-10-24: "Add our design on that popup on all
+ * platforms please."
+ *
+ * showGoldAlert covered the one-button notice, but anything that ASKED still fell through to
+ * the browser's own grey confirm()/prompt(), which is exactly the box that ask was about. The
+ * Password Page's "delete this entry" and "erase everything" were the last two.
+ *
+ * Resolves true only when the member presses the confirm button. `confirmWord` makes them type
+ * something first — used for erasing a vault, where there is no undo and no recovery.
+ */
+export function showGoldConfirm(opts: {
+  message: string;
+  confirmLabel: string;
+  cancelLabel: string;
+  /** When set, the confirm button stays disabled until this exact word is typed. */
+  confirmWord?: string;
+  danger?: boolean;
+}): Promise<boolean> {
+  return new Promise((resolve) => {
+    const host = document.createElement("div");
+    document.body.appendChild(host);
+    const root = createRoot(host);
+
+    const close = (result: boolean) => {
+      root.unmount();
+      host.remove();
+      resolve(result);
+    };
+
+    function Card() {
+      const [typed, setTyped] = useState("");
+      const armed = !opts.confirmWord || typed.trim().toUpperCase() === opts.confirmWord.toUpperCase();
+      return (
+        <div
+          style={{
+            position: "fixed", inset: 0, zIndex: 70,
+            background: "rgba(0,0,0,.45)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            padding: 24,
+          }}
+        >
+          <div
+            className="card pad"
+            style={{ maxWidth: 420, width: "100%", textAlign: "center", background: "#000", borderColor: "var(--gold-border)" }}
+          >
+            <p style={{ margin: "4px 0 14px", color: "#fff", fontSize: 16, whiteSpace: "pre-wrap" }}>{opts.message}</p>
+            {opts.confirmWord && (
+              <input
+                className="input"
+                value={typed}
+                autoFocus
+                placeholder={opts.confirmWord}
+                onChange={(e) => setTyped(e.target.value)}
+                style={{ marginBottom: 14, textAlign: "center" }}
+              />
+            )}
+            <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+              <button
+                className="btn"
+                onClick={() => close(false)}
+                style={{ minWidth: 130 }}
+              >
+                {opts.cancelLabel}
+              </button>
+              <button
+                className="btn"
+                disabled={!armed}
+                onClick={() => armed && close(true)}
+                style={{
+                  minWidth: 130,
+                  background: armed ? (opts.danger ? "#C9372C" : "var(--gold-border)") : "#2a2a2a",
+                  borderColor: armed ? (opts.danger ? "#C9372C" : "var(--gold-border)") : "#2a2a2a",
+                  color: armed ? "#000" : "#777",
+                }}
+              >
+                {opts.confirmLabel}
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    root.render(<Card />);
+  });
+}
