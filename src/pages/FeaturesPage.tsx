@@ -53,6 +53,9 @@ const FEATURES: Section[] = [
     titleKey: "fsec_help",
     features: [
       { icon: "🤝", nameKey: "fname_help", blurbKey: "fblurb_help", to: "/help" },
+      // Password Protected Page (Steve, 2026-10-24). Added with Help, but its tile here was
+      // missed — and every tile in this directory must OPEN something.
+      { icon: "🔐", nameKey: "fname_vault", blurbKey: "fblurb_vault", to: "/settings/vault", whereKey: "fwhere_settings" },
     ],
   },
   {
