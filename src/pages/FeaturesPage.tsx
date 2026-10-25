@@ -55,9 +55,6 @@ const FEATURES: Section[] = [
     features: [
       { icon: "🎤", nameKey: "fname_philippine_singing_contest", blurbKey: "fblurb_philippine_singing_contest", to: "/featured-contest" },
       { icon: "📣", nameKey: "fname_exciting_news", blurbKey: "fblurb_exciting_news", to: "/exciting-news" },
-      // Steve, 2026-10-25: Share Your Idea — Support with the idea reason picked; the page shows
-      // the $100 bonus rules above the form when it arrives this way.
-      { icon: "💡", nameKey: "fname_share_your_idea", blurbKey: "fblurb_share_your_idea", to: "/settings/support?reason=" + encodeURIComponent(IDEA_SUPPORT_REASON) },
     ],
   },
   {
@@ -193,6 +190,9 @@ const FEATURES: Section[] = [
       // Password Protected Page (Steve, 2026-10-24). Added with Help, but its tile here was
       // missed — and every tile in this directory must OPEN something.
       { icon: "🔐", nameKey: "fname_vault", blurbKey: "fblurb_vault", to: "/settings/vault", whereKey: "fwhere_settings" },
+      // Steve, 2026-10-25: "move it to the last of the BB features." Share Your Idea — Support with the idea reason picked; the page shows
+      // the $100 bonus rules above the form when it arrives this way.
+      { icon: "💡", nameKey: "fname_share_your_idea", blurbKey: "fblurb_share_your_idea", to: "/settings/support?reason=" + encodeURIComponent(IDEA_SUPPORT_REASON) },
     ],
   },
 ];
