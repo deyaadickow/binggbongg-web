@@ -643,3 +643,12 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .onestroke-node { fill: var(--gold); }
 .onestroke-node.live { fill: #fff; }
 .onestroke-actions { display: flex; gap: 10px; justify-content: center; margin-top: 4px; }
+
+/* Steve, 2026-10-25: LIVE tag above a live (or battling) creator's avatar on the video page —
+   the fill blinks red/black, the gold border never changes. */
+.live-avatar { position: relative; display: inline-flex; flex-direction: column; align-items: center; }
+.live-tag { position: relative; z-index: 1; margin-bottom: -7px; padding: 1px 9px; border-radius: 10px;
+  border: 1.5px solid var(--gold-border); color: #fff; font-weight: 800; font-size: 10px; letter-spacing: .04em;
+  background: #ff1744; animation: live-tag-blink 1.2s ease-in-out infinite; }
+@keyframes live-tag-blink { 0%, 100% { background: #ff1744; } 50% { background: #000; } }
+@media (prefers-reduced-motion: reduce) { .live-tag { animation: none; } }

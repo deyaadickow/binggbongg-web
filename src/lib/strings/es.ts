@@ -1379,6 +1379,7 @@ export const es = {
   to_do_list_saved: "Guardado",
   couldn_t_load_your_to_do_list: "No se pudo cargar tu lista de tareas.",
   this_video: "Este video",
+  live_badge: "EN VIVO",
   video_uploaded_from: "Subido desde %1$s",
   member_local_time: "Hora local de %1$s: %2$s",
   copy_this_video: "Copiar este video",

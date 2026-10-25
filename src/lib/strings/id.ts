@@ -1379,6 +1379,7 @@ export const id = {
   to_do_list_saved: "Tersimpan",
   couldn_t_load_your_to_do_list: "Tidak bisa memuat Daftar Tugas kamu.",
   this_video: "Video ini",
+  live_badge: "LIVE",
   video_uploaded_from: "Diunggah dari %1$s",
   member_local_time: "Waktu setempat %1$s: %2$s",
   copy_this_video: "Salin video ini",

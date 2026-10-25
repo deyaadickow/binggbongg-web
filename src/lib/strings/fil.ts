@@ -1379,6 +1379,7 @@ export const fil = {
   to_do_list_saved: "Na-save",
   couldn_t_load_your_to_do_list: "Hindi makuha ang iyong To Do List.",
   this_video: "Ang video na ito",
+  live_badge: "LIVE",
   video_uploaded_from: "Na-upload mula sa %1$s",
   member_local_time: "Oras ngayon ni %1$s: %2$s",
   copy_this_video: "Kopyahin ang video na ito",

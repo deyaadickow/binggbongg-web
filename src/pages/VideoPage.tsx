@@ -3,7 +3,7 @@ import { ReportDialog } from "../components/ReportDialog";
 import { CommentsPanel } from "../components/CommentsPanel";
 import { rememberCopiedLink, videoShareUrl } from "../lib/copiedLink";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { displayName, mediaUrl, post, type Gift, type Post } from "../lib/api";
+import { displayName, mediaUrl, post, type Gift, type LiveStream, type Post } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice } from "../components/Common";
 import { GiftFlash, PostGiftButton } from "../components/GiftSheet";
@@ -44,6 +44,18 @@ export function VideoPage() {
   // that is playing in case they want to copy it." The controls that sat on the video are rows
   // in this menu now.
   const [menuOpen, setMenuOpen] = useState(false);
+  // Who is live right now, for the LIVE tag on the creator's avatar. One fetch per page visit,
+  // refreshed every minute; a battle runs inside a live room, so battlers are in this list too.
+  const [liveHosts, setLiveHosts] = useState<LiveStream[]>([]);
+  useEffect(() => {
+    let alive = true;
+    const load = () => post<LiveStream[]>("fetchActiveLiveStreams", { user_id: 0, connections_only: false })
+      .then((r) => { if (alive && r.status) setLiveHosts(r.data ?? []); })
+      .catch(() => {});
+    load();
+    const timer = window.setInterval(load, 60000);
+    return () => { alive = false; window.clearInterval(timer); };
+  }, []);
   const [chromeHidden, setChromeHidden] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const holdTimer = useRef(0);
@@ -194,6 +206,7 @@ export function VideoPage() {
   // Steve, 2026-10-25: "please add what country that video was uploaded from. So country and
   // local time." Under the menu's title: the post's country, then the poster's clock, worked
   // out here from their IANA zone and written in the viewer's own format.
+  const authorLive = item ? liveHosts.find((s) => Number(s.host_user_id) === Number(item.user_id)) ?? null : null;
   const originLines: string[] = [];
   {
     const shown = item ?? (index >= 0 ? feed[index] : null);
@@ -406,7 +419,16 @@ export function VideoPage() {
         </div>
       </div>
       <div className="row" style={{ marginTop: 14, alignItems: "flex-start" }}>
-        <Link to={`/profile/${item.user_id}`}><Avatar user={item.user} /></Link>
+        {authorLive ? (
+          // Steve, 2026-10-25: a creator who is live or battling gets a LIVE tag above their
+          // avatar, red blinking to black inside a gold border, and the avatar opens the live.
+          <Link to={`/live/${encodeURIComponent(authorLive.room_name)}`} className="live-avatar">
+            <span className="live-tag">{t("live_badge")}</span>
+            <Avatar user={item.user} />
+          </Link>
+        ) : (
+          <Link to={`/profile/${item.user_id}`}><Avatar user={item.user} /></Link>
+        )}
         <div style={{ flex: 1 }}>
           <Link to={`/profile/${item.user_id}`} style={{ fontWeight: 800, color: "var(--text)" }}>{displayName(item.user)}</Link>
           <div className="soft">{item.description}</div>
