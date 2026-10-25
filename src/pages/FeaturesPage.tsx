@@ -28,7 +28,7 @@ import { useT, type StringKey } from "../lib/i18n";
 import { PageTitle } from "../components/PageTitle";
 import { useSession } from "../lib/session";
 import { useEffect, useState } from "react";
-import { fetchFeatureVideos } from "../lib/featureVideos";
+import { fetchFeatureVideos, featureVideoLabels } from "../lib/featureVideos";
 
 interface Feature {
   icon: string;
@@ -198,7 +198,7 @@ const FEATURES: Section[] = [
 const FEATURE_NUMBER: Record<string, number> = {};
 FEATURES.flatMap((sec) => sec.features).forEach((f, i) => { FEATURE_NUMBER[f.nameKey] = i + 1; });
 
-function Tile({ f, video, onWatch }: { f: Feature; video?: string; onWatch: () => void }) {
+function Tile({ f, video, onWatch, extras = [], onWatchExtra }: { f: Feature; video?: string; onWatch: () => void; extras?: { key: string; label: string }[]; onWatchExtra?: (key: string) => void }) {
   const { t } = useT();
   // The battle badge, the streak, the Lifetime Battle Board and Playlists all live on your own
   // profile, whose address needs the signed-in id. Signed out, the tile leads to the sign-in
@@ -229,6 +229,7 @@ function Tile({ f, video, onWatch }: { f: Feature; video?: string; onWatch: () =
         {/* Room for the Watch video pill, which sits ON the card rather than in it: the card is
             inside the tile's link, and a button inside a link also follows the link. */}
         {video && <span style={{ display: "block", height: 42 }} aria-hidden />}
+        {extras.length > 0 && <span style={{ display: "block", height: 42 }} aria-hidden />}
       </span>
       <span style={{
         flexShrink: 0, color: "var(--gold)", fontWeight: 700, fontSize: 15,
@@ -240,19 +241,25 @@ function Tile({ f, video, onWatch }: { f: Feature; video?: string; onWatch: () =
   const tile = to
     ? <Link to={to} style={{ textDecoration: "none", display: "block", height: "100%" }}>{inner}</Link>
     : inner;
-  if (!video) return tile;
+  if (!video && extras.length === 0) return tile;
+  const pill: React.CSSProperties = {
+    display: "inline-flex", alignItems: "center", gap: 7, whiteSpace: "nowrap",
+    background: "rgba(0,0,0,0.9)", color: "var(--gold)", fontWeight: 700, fontSize: 13,
+    border: "2px solid var(--gold-border)", borderRadius: 999, padding: "6px 15px", cursor: "pointer",
+  };
   return (
     <div style={{ position: "relative", height: "100%" }}>
       {tile}
-      <button
-        onClick={onWatch}
-        style={{
-          position: "absolute", left: 52, bottom: 14,
-          display: "inline-flex", alignItems: "center", gap: 7,
-          background: "rgba(0,0,0,0.9)", color: "var(--gold)", fontWeight: 700, fontSize: 13,
-          border: "2px solid var(--gold-border)", borderRadius: 999, padding: "6px 15px", cursor: "pointer",
-        }}
-      >▶ {t("watch_video")}</button>
+      <div style={{ position: "absolute", left: 52, right: 14, bottom: 14, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8 }}>
+        {video && <button onClick={onWatch} style={pill}>▶ {t("watch_video")}</button>}
+        {extras.length > 0 && (
+          <div style={{ display: "flex", gap: 8, overflowX: "auto", maxWidth: "100%", scrollbarWidth: "none" }}>
+            {extras.map((x) => (
+              <button key={x.key} onClick={() => onWatchExtra?.(x.key)} style={pill}>▶ {x.label}</button>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -350,7 +357,10 @@ export function FeaturesPage() {
           }}>
             {section.features.map((f) => (
               <Tile key={f.nameKey} f={f} video={videos[f.nameKey]}
-                onWatch={() => setPlaying({ url: videos[f.nameKey], title: t(f.nameKey) })} />
+                onWatch={() => setPlaying({ url: videos[f.nameKey], title: t(f.nameKey) })}
+                extras={Object.keys(videos).filter((k) => k.startsWith(f.nameKey + "__")).sort()
+                  .map((k) => ({ key: k, label: featureVideoLabels[k] ?? t("watch_video") }))}
+                onWatchExtra={(k) => setPlaying({ url: videos[k], title: featureVideoLabels[k] ?? t(f.nameKey) })} />
             ))}
           </div>
         </div>
