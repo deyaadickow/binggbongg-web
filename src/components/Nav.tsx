@@ -28,9 +28,9 @@ export function Nav() {
 
             Settings keeps its narrow-screen link: it is not a feed destination, it is how a
             member reaches their own account when the sidebar is off screen. */}
+        {/* Steve, 2026-10-25: Contests and Exciting News are directory tiles #1 and #2 now —
+            only For You and the directory stay up here, centred like the phones. */}
         <NavLink to="/" end>{t("for_you")}</NavLink>
-        <NavLink to="/contests">{t("contests")}</NavLink>
-        <NavLink to="/exciting-news">{t("exciting_news")}</NavLink>
         <NavLink to="/features">{t("everything_bingg_bongg_does")}</NavLink>
         <NavLink to="/settings" className="only-narrow">{t("settings")}</NavLink>
       </nav>

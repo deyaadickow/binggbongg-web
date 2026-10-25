@@ -20,6 +20,7 @@ import { HelpListPage, HelpCampaignPage, StartHelpPage } from "./pages/HelpPages
 import { HomePage } from "./pages/HomePage";
 import { LanguagePage } from "./pages/LanguagePage";
 import { FeaturesPage } from "./pages/FeaturesPage";
+import { FeaturedContestPage } from "./pages/FeaturedContestPage";
 import { ExcitingNewsPage } from "./pages/ExcitingNewsPage";
 import { BusinessPage, BusinessTabPage, CreateBusinessPage, MyBusinessesPage } from "./pages/BusinessPages";
 import { LoginPage } from "./pages/LoginPage";
@@ -132,6 +133,7 @@ export default function App() {
           <Route path="/help/start" element={<StartHelpPage />} />
           <Route path="/help/:id" element={<HelpCampaignPage />} />
           <Route path="/contests" element={<ContestsPage />} />
+          <Route path="/featured-contest" element={<FeaturedContestPage />} />
           <Route path="/contests/:id" element={<ContestBoardPage />} />
           <Route path="/settings" element={<SettingsHubPage />} />
           <Route path="/settings/account" element={<AccountSettingsPage />} />

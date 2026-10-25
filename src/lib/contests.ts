@@ -17,6 +17,8 @@ import { post } from "./api";
 export type ContestStatus = "active" | "upcoming" | "ended" | "disabled";
 
 export interface Contest {
+  /** The contest that owns the featured spot (directory tile #1 since 2026-10-25). */
+  is_featured?: boolean;
   id: number;
   name?: string | null;
   ranking_metric?: "votes" | "gifts" | "both" | null;
@@ -66,6 +68,16 @@ export interface Board {
 export async function fetchContests(userId?: number): Promise<Contest[]> {
   const res = await post<Contest[]>("fetchOfficialContestCalendar", userId ? { user_id: userId } : {});
   return res.status ? (res.data ?? []) : [];
+}
+
+/** The featured contest's id — the one the phones' tile #1 opens — or null if none is set. */
+export async function fetchFeaturedContestId(): Promise<number | null> {
+  try {
+    const all = await fetchContests();
+    return all.find((c) => c.is_featured)?.id ?? null;
+  } catch {
+    return null;
+  }
 }
 
 /** The two states worth showing. Excludes ended and disabled only. */

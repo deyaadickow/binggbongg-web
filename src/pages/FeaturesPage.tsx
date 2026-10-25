@@ -49,6 +49,14 @@ interface Section {
 
 const FEATURES: Section[] = [
   {
+    // Steve, 2026-10-25: these two were tabs at the top; they are #1 and #2 here now.
+    titleKey: "fsec_featured",
+    features: [
+      { icon: "🎤", nameKey: "fname_philippine_singing_contest", blurbKey: "fblurb_philippine_singing_contest", to: "/featured-contest" },
+      { icon: "📣", nameKey: "fname_exciting_news", blurbKey: "fblurb_exciting_news", to: "/exciting-news" },
+    ],
+  },
+  {
     // Steve, 2026-10-23: Help gets its own tab in the directory. Placed first deliberately — it is
     // the feature he expects people to talk about, and burying it under Going Live would be odd.
     titleKey: "fsec_help",
@@ -106,7 +114,6 @@ const FEATURES: Section[] = [
       { icon: "🎬", nameKey: "fname_videos", blurbKey: "fblurb_videos", to: "/upload" },
       { icon: "🖼️", nameKey: "fname_photos", blurbKey: "fblurb_photos", to: "/photos" },
       { icon: "✨", nameKey: "fname_photo_styles", blurbKey: "fblurb_photo_styles", to: "/cartoon" },
-      { icon: "📣", nameKey: "fname_exciting_news", blurbKey: "fblurb_exciting_news", to: "/exciting-news" },
       { icon: "📑", nameKey: "fname_playlists", blurbKey: "fblurb_playlists", myProfile: true, whereKey: "fwhere_your_profile" },
       { icon: "🔮", nameKey: "fname_lucky_numbers_and_horoscope", blurbKey: "fblurb_lucky_numbers_and_horoscope", to: "/lucky" },
     ],

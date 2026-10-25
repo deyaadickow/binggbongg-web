@@ -66,6 +66,11 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
    property for this selector in THIS block; splitting them is what broke it. */
 .nav .links { display: flex; gap: 6px; overflow-x: auto; order: 3; flex: 1 1 100%; scrollbar-width: none; }
 .nav .links::-webkit-scrollbar { display: none; }
+/* Steve, 2026-10-25: only For You and the directory are left up here — centred, like the phones. */
+/* Auto margins, not justify-content: centred when there is room, and a row too wide for a phone
+   still scrolls from its first tab instead of clipping it. */
+.nav .links > :first-child { margin-left: auto; }
+.nav .links > :last-child { margin-right: auto; }
 @media (min-width: 700px) { .nav .links { order: 0; flex: 1 1 auto; } }
 /* Same bullets as the sidebar: a gold-bordered pill each, the current page filled gold. */
 .nav .links a { padding: 7px 14px; border-radius: 999px; border: 1px solid var(--gold-border); background: #0d0d0d; color: var(--text-soft); font-weight: 600; white-space: nowrap; transition: background .15s, color .15s; }
