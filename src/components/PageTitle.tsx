@@ -11,7 +11,9 @@ import type { CSSProperties, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { useT } from "../lib/i18n";
 
-export function PageTitle({ children, style }: { children: ReactNode; style?: CSSProperties }) {
+/** `backTo` fixes where the arrow goes. The directory uses it (Steve, 2026-10-25: its back arrow
+ *  must always lead to For You, whatever page was open before it). */
+export function PageTitle({ children, style, backTo }: { children: ReactNode; style?: CSSProperties; backTo?: string }) {
   const navigate = useNavigate();
   const { t } = useT();
   return (
@@ -19,7 +21,7 @@ export function PageTitle({ children, style }: { children: ReactNode; style?: CS
       {/* navigate(-1) rather than a fixed destination: a page is reached from the directory,
           from the nav, or from a link inside another page, and "back" should mean whichever of
           those it was. */}
-      <button className="back-circle" onClick={() => navigate(-1)} aria-label={t("back")}>‹</button>
+      <button className="back-circle" onClick={() => (backTo ? navigate(backTo) : navigate(-1))} aria-label={t("back")}>‹</button>
       <h1 className="page-title" style={{ margin: 0, ...style }}>{children}</h1>
     </div>
   );

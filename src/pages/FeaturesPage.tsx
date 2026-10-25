@@ -57,17 +57,6 @@ const FEATURES: Section[] = [
     ],
   },
   {
-    // Steve, 2026-10-23: Help gets its own tab in the directory. Placed first deliberately — it is
-    // the feature he expects people to talk about, and burying it under Going Live would be odd.
-    titleKey: "fsec_help",
-    features: [
-      { icon: "🤝", nameKey: "fname_help", blurbKey: "fblurb_help", to: "/help" },
-      // Password Protected Page (Steve, 2026-10-24). Added with Help, but its tile here was
-      // missed — and every tile in this directory must OPEN something.
-      { icon: "🔐", nameKey: "fname_vault", blurbKey: "fblurb_vault", to: "/settings/vault", whereKey: "fwhere_settings" },
-    ],
-  },
-  {
     titleKey: "fsec_going_live",
     features: [
       { icon: "🔴", nameKey: "fname_go_live", blurbKey: "fblurb_go_live", to: "/go-live" },
@@ -192,6 +181,16 @@ const FEATURES: Section[] = [
       { icon: "📍", nameKey: "fname_by_location", blurbKey: "fblurb_by_location", to: "/browse/location" },
     ],
   },
+  {
+    // Steve, 2026-10-23: Help gets its own tab. 2026-10-25: moved to the bottom of the directory.
+    titleKey: "fsec_help",
+    features: [
+      { icon: "🤝", nameKey: "fname_help", blurbKey: "fblurb_help", to: "/help" },
+      // Password Protected Page (Steve, 2026-10-24). Added with Help, but its tile here was
+      // missed — and every tile in this directory must OPEN something.
+      { icon: "🔐", nameKey: "fname_vault", blurbKey: "fblurb_vault", to: "/settings/vault", whereKey: "fwhere_settings" },
+    ],
+  },
 ];
 
 // Steve, 2026-10-25: "add a number on top right corner of each feature starting from #1". The
@@ -232,8 +231,8 @@ function Tile({ f, video, onWatch }: { f: Feature; video?: string; onWatch: () =
         {video && <span style={{ display: "block", height: 42 }} aria-hidden />}
       </span>
       <span style={{
-        flexShrink: 0, color: "var(--gold)", fontWeight: 700, fontSize: 12,
-        border: "1px solid var(--gold-border)", borderRadius: 999, padding: "2px 8px",
+        flexShrink: 0, color: "var(--gold)", fontWeight: 700, fontSize: 15,
+        border: "1px solid var(--gold-border)", borderRadius: 999, padding: "3px 10px",
         background: "rgba(0,0,0,0.9)", fontVariantNumeric: "tabular-nums",
       }}>#{FEATURE_NUMBER[f.nameKey]}</span>
     </div>
@@ -315,7 +314,7 @@ export function FeaturesPage() {
     // One column, and narrow enough that a banner still reads as a line of text rather than
     // stretching a dozen words across a desktop monitor. Same shape as the phones.
     <div className="page" style={{ maxWidth: 760 }}>
-      <PageTitle>{t("everything_bingg_bongg_does")}</PageTitle>
+      <PageTitle backTo="/">{t("everything_bingg_bongg_does")}</PageTitle>
       {/* The plate comes from the stylesheet — see .cosmic-page .page > p.muted. */}
       <div style={{ position: "relative", marginBottom: 12 }}>
         <input
