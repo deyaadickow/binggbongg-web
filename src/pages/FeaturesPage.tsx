@@ -139,28 +139,43 @@ const FEATURES: Section[] = [
     titleKey: "fsec_everything_else",
     features: [
       { icon: "🏆", nameKey: "fname_talent_contests", blurbKey: "fblurb_talent_contests", to: "/enter-contest" },
+
       { icon: "🎂", nameKey: "fname_birthdays", blurbKey: "fblurb_birthdays", to: "/birthdays" },
-      { icon: "⭐", nameKey: "fname_vip_voter_badges", blurbKey: "fblurb_vip_voter_badges", to: "/browse/vip-badges" },
-      { icon: "💬", nameKey: "fname_direct_messages", blurbKey: "fblurb_direct_messages", to: "/messages" },
-      { icon: "🔔", nameKey: "fname_notifications_kept", blurbKey: "fblurb_notifications_kept", to: "/notifications" },
-      { icon: "🗣️", nameKey: "fname_n53_languages", blurbKey: "fblurb_n53_languages", to: "/settings/language" },
-      { icon: "📝", nameKey: "fname_to_do_list", blurbKey: "fblurb_to_do_list", to: "/settings/todo", whereKey: "fwhere_settings" },
-      { icon: "🆘", nameKey: "fname_support", blurbKey: "fblurb_support", to: "/settings/support" },
-      // Steve, 2026-10-20: "Please add everything to BB Features." These all existed and had
-      // no row — an audit of every web route against the directory turned them up.
-      { icon: "🎭", nameKey: "fname_virtual_look", blurbKey: "fblurb_virtual_look", to: "/settings/virtual-look" },
-      { icon: "🤖", nameKey: "fname_virtual_battles", blurbKey: "fblurb_virtual_battles", to: "/settings/virtual-battles" },
+
       { icon: "✅", nameKey: "fname_get_verified", blurbKey: "fblurb_get_verified", to: "/settings/verification" },
+
       { icon: "📱", nameKey: "fname_my_qr_code", blurbKey: "fblurb_my_qr_code", to: "/settings/qr" },
+
+      { icon: "🔎", nameKey: "fname_search", blurbKey: "fblurb_search", to: "/search" },
+
+      { icon: "🎭", nameKey: "fname_virtual_look", blurbKey: "fblurb_virtual_look", to: "/settings/virtual-look" },
+
+      { icon: "⭐", nameKey: "fname_vip_voter_badges", blurbKey: "fblurb_vip_voter_badges", to: "/browse/vip-badges" },
+
+      { icon: "💬", nameKey: "fname_direct_messages", blurbKey: "fblurb_direct_messages", to: "/messages" },
+
+      { icon: "🔔", nameKey: "fname_notifications_kept", blurbKey: "fblurb_notifications_kept", to: "/notifications" },
+
+      { icon: "🗣️", nameKey: "fname_n53_languages", blurbKey: "fblurb_n53_languages", to: "/settings/language" },
+
+      { icon: "📝", nameKey: "fname_to_do_list", blurbKey: "fblurb_to_do_list", to: "/settings/todo", whereKey: "fwhere_settings" },
+
+      { icon: "🆘", nameKey: "fname_support", blurbKey: "fblurb_support", to: "/settings/support" },
+
+      // Web-only tiles, kept last so the numbers above match the phones.
+      { icon: "🤖", nameKey: "fname_virtual_battles", blurbKey: "fblurb_virtual_battles", to: "/settings/virtual-battles" },
+
       { icon: "❓", nameKey: "fname_help_and_faq", blurbKey: "fblurb_help_and_faq", to: "/settings/faq" },
+
       { icon: "✉️", nameKey: "fname_contact_us", blurbKey: "fblurb_contact_us", to: "/settings/contact" },
+
       { icon: "ℹ️", nameKey: "fname_about_bingg_bongg", blurbKey: "fblurb_about_bingg_bongg", to: "/settings/about" },
+
     ],
   },
   {
     titleKey: "fsec_browse_the_feed",
     features: [
-      { icon: "🔎", nameKey: "fname_search", blurbKey: "fblurb_search", to: "/search" },
       { icon: "📺", nameKey: "fname_all_shows", blurbKey: "fblurb_all_shows", to: "/shows" },
       { icon: "📣", nameKey: "fname_advertisers", blurbKey: "fblurb_advertisers", to: "/browse/advertisers" },
       { icon: "🗂", nameKey: "fname_categories_browse", blurbKey: "fblurb_categories_browse", to: "/browse/categories" },
@@ -171,6 +186,11 @@ const FEATURES: Section[] = [
     ],
   },
 ];
+
+// Steve, 2026-10-25: "add a number on top right corner of each feature starting from #1". The
+// number is the tile's place in the WHOLE directory, so a search keeps #12 as #12.
+const FEATURE_NUMBER: Record<string, number> = {};
+FEATURES.flatMap((sec) => sec.features).forEach((f, i) => { FEATURE_NUMBER[f.nameKey] = i + 1; });
 
 function Tile({ f, video, onWatch }: { f: Feature; video?: string; onWatch: () => void }) {
   const { t } = useT();
@@ -185,7 +205,7 @@ function Tile({ f, video, onWatch }: { f: Feature; video?: string; onWatch: () =
       display: "flex", gap: 12, alignItems: "flex-start",
     }}>
       <span style={{ fontSize: 26, lineHeight: 1, flexShrink: 0 }} aria-hidden>{f.icon}</span>
-      <span style={{ minWidth: 0 }}>
+      <span style={{ minWidth: 0, flex: 1 }}>
         <b style={{ color: "var(--gold)", display: "block", fontSize: 15 }}>{t(f.nameKey)}</b>
         {/* Steve, 2026-10-19: "Make the white text readable... a little bolder." The dim grey
             was hardest to read on the phones, and the same line here was only a shade better
@@ -204,6 +224,11 @@ function Tile({ f, video, onWatch }: { f: Feature; video?: string; onWatch: () =
             inside the tile's link, and a button inside a link also follows the link. */}
         {video && <span style={{ display: "block", height: 42 }} aria-hidden />}
       </span>
+      <span style={{
+        flexShrink: 0, color: "var(--gold)", fontWeight: 700, fontSize: 12,
+        border: "1px solid var(--gold-border)", borderRadius: 999, padding: "2px 8px",
+        background: "rgba(0,0,0,0.9)", fontVariantNumeric: "tabular-nums",
+      }}>#{FEATURE_NUMBER[f.nameKey]}</span>
     </div>
   );
   const tile = to
