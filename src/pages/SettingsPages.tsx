@@ -13,6 +13,7 @@ import { VirtualGiftRecordOverlay, personName } from "../components/BattleEngine
 import { GoldSelect } from "../components/GoldSelect";
 import { tt, useT, type StringKey  } from "../lib/i18n";
 import { PageTitle } from "../components/PageTitle";
+import { IDEA_SUPPORT_REASON } from "../lib/ideas";
 
 const SITE = "https://www.binggbongg.com";
 
@@ -739,6 +740,13 @@ export function SupportPage() {
           <p style={{ marginTop: 0, marginBottom: 12, fontSize: 13, textAlign: "center", color: "var(--gold)", background: "#000", border: "1.5px solid #fff", borderRadius: 12, padding: 12 }}>
             {tn("support_intro", <Link to="/settings/support/archive" style={{ color: "var(--gold)", textDecoration: "underline" }}>{t("archive")}</Link>)}
           </p>
+          {/* Share Your Idea (Steve, 2026-10-25): the bonus rules, shown while the idea reason
+              is the one picked. */}
+          {reason === IDEA_SUPPORT_REASON && (
+            <div style={{ marginBottom: 12, fontSize: 14, color: "var(--gold)", background: "#000", border: "1.5px solid var(--gold-border)", borderRadius: 12, padding: 12, whiteSpace: "pre-line" }}>
+              {t("idea_rules")}
+            </div>
+          )}
           {/* Steve, 2026-10-17: "In between the boxes add another drop-down box that says
               'Reason For This Support'." */}
           {reasons.length > 0 && (

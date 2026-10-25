@@ -29,6 +29,7 @@ import { PageTitle } from "../components/PageTitle";
 import { useSession } from "../lib/session";
 import { useEffect, useState } from "react";
 import { fetchFeatureVideos, featureVideoLabels } from "../lib/featureVideos";
+import { IDEA_SUPPORT_REASON } from "../lib/ideas";
 
 interface Feature {
   icon: string;
@@ -54,6 +55,9 @@ const FEATURES: Section[] = [
     features: [
       { icon: "🎤", nameKey: "fname_philippine_singing_contest", blurbKey: "fblurb_philippine_singing_contest", to: "/featured-contest" },
       { icon: "📣", nameKey: "fname_exciting_news", blurbKey: "fblurb_exciting_news", to: "/exciting-news" },
+      // Steve, 2026-10-25: Share Your Idea — Support with the idea reason picked; the page shows
+      // the $100 bonus rules above the form when it arrives this way.
+      { icon: "💡", nameKey: "fname_share_your_idea", blurbKey: "fblurb_share_your_idea", to: "/settings/support?reason=" + encodeURIComponent(IDEA_SUPPORT_REASON) },
     ],
   },
   {
