@@ -143,6 +143,9 @@ export interface UserSummary {
    *  self-only hidden fields — and is what lib/dm.ts builds conversationId from. */
   identity?: string;
   is_verified?: number;
+  /** IANA zone for this member's local time on the feed's hold menu (Steve, 2026-10-25): the
+   *  zone their device reported, else their profile country's. */
+  local_timezone?: string;
   bio?: string;
   country?: string;
   total_followers?: number;
@@ -172,6 +175,8 @@ export interface Post {
   vote_count?: number;
   is_post_liked?: boolean | number;
   created_at?: string;
+  /** Where the video was uploaded from — a name, or on some older posts a 2-letter code. */
+  country?: string | null;
   user?: UserSummary;
   /** Steve, 2026-10-13: what the (C) button copies for this video. */
   share_url?: string;

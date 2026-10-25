@@ -1381,6 +1381,8 @@ export const en = {
   to_do_list_saved: "Saved",
   couldn_t_load_your_to_do_list: "Couldn't load your To Do List.",
   this_video: "This Video",
+  video_uploaded_from: "Uploaded from %1$s",
+  member_local_time: "%1$s's local time: %2$s",
   copy_this_video: "Copy this video",
   clear_the_screen: "Clear the screen",
   the_turning_record: "The turning record",

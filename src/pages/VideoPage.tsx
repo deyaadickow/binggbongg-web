@@ -191,6 +191,27 @@ export function VideoPage() {
   // Two seconds exactly, matched to the phones, and cancelled by a pointer that leaves or
   // lifts first. A hold is not a click, so the browser's own context menu on a long press is
   // suppressed for that gesture only.
+  // Steve, 2026-10-25: "please add what country that video was uploaded from. So country and
+  // local time." Under the menu's title: the post's country, then the poster's clock, worked
+  // out here from their IANA zone and written in the viewer's own format.
+  const originLines: string[] = [];
+  {
+    const shown = item ?? (index >= 0 ? feed[index] : null);
+    let country = (shown?.country ?? "").trim();
+    if (country.length === 2) {
+      try { country = new Intl.DisplayNames([navigator.language], { type: "region" }).of(country.toUpperCase()) ?? country; } catch { /* keep the code */ }
+    }
+    if (country && country.toLowerCase() !== "null") originLines.push(t("video_uploaded_from", country));
+    const zone = shown?.user?.local_timezone?.trim();
+    if (zone) {
+      try {
+        const time = new Intl.DateTimeFormat(navigator.language, { weekday: "short", hour: "numeric", minute: "2-digit", timeZone: zone }).format(new Date());
+        const uname = shown?.user?.username?.trim();
+        originLines.push(t("member_local_time", uname ? "@" + uname : (shown?.user?.fullname ?? ""), time));
+      } catch { /* unknown zone: leave the line out */ }
+    }
+  }
+
   function startHold() {
     cancelHold();
     holdFired.current = false;
@@ -198,7 +219,9 @@ export function VideoPage() {
       holdFired.current = true;
       videoRef.current?.pause();
       setMenuOpen(true);
-    }, 2000);
+      // Steve, 2026-10-25: the popup took 3-5 seconds and should "appear within 2 seconds".
+      // One second, the same as both phones now.
+    }, 1000);
   }
 
   function cancelHold() {
@@ -310,6 +333,11 @@ export function VideoPage() {
               <div style={{ fontWeight: 800, fontSize: 17, color: "var(--gold)", textAlign: "center", marginBottom: 12 }}>
                 {t("this_video")}
               </div>
+              {originLines.length > 0 && (
+                <div style={{ color: "var(--gold)", textAlign: "center", fontSize: 13, marginTop: -4, marginBottom: 12, lineHeight: 1.5 }}>
+                  {originLines.map((line) => <div key={line}>{line}</div>)}
+                </div>
+              )}
               {menuRows.map((r) => (
                 <button
                   key={r.label}

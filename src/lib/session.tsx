@@ -80,6 +80,16 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, token]);
 
+  // Steve, 2026-10-25: the feed's hold menu shows each member's local time, so this browser's
+  // time zone is reported once per sign-in (the server ignores a zone it already has).
+  useEffect(() => {
+    if (!user || !token) return;
+    let zone = "";
+    try { zone = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch { /* old browser */ }
+    if (zone) void post("updateMyTimezone", { my_user_id: user.id, timezone: zone }).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, token]);
+
   const value = useMemo<Session>(() => ({ user, token, isLoggedIn: !!(user && token), signIn, signOut, refresh }), [user, token, signIn, signOut, refresh]);
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
 }
