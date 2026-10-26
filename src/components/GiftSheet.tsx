@@ -62,13 +62,32 @@ export function GiftFlash({ gift, onDone }: { gift: Gift; onDone: () => void }) 
   // Eddie, 2026-09-19 / Steve, 2026-10-06: a TapTap gift bursts one icon per coin instead of
   // showing the single card — and now does so everywhere a gift is given, not just live rooms.
   const burst = isTapTapGift(gift);
+  // Steve, 2026-10-26: a gift with its own video plays it over the whole video (a tall clip
+  // covers it, a wide one fills the width) to its own end; 20s is only a safety cap.
+  const video = !burst && gift.video ? gift.video : null;
 
   useEffect(() => {
-    const t = setTimeout(onDone, burst ? tapTapBurstDuration(gift) : 2800);
+    const t = setTimeout(onDone, burst ? tapTapBurstDuration(gift) : video ? 20000 : 2800);
     return () => clearTimeout(t);
-  }, [gift, onDone, burst]);
+  }, [gift, onDone, burst, video]);
 
   if (burst) return <TapTapBurst gift={gift} />;
+
+  if (video) {
+    return (
+      <div className="gift-video" aria-live="polite">
+        <video src={mediaUrl(video)} autoPlay playsInline
+          onLoadedMetadata={(e) => {
+            const v = e.currentTarget;
+            v.classList.toggle("tall", v.videoHeight > v.videoWidth);
+            // Browsers refuse sound without a tap; the send WAS a tap, but fall back to silent.
+            v.play().catch(() => { v.muted = true; v.play().catch(() => {}); });
+          }}
+          onEnded={onDone} onError={onDone} />
+        <span className="gift-video-name">{t("you_have_sent")} {gift.name ?? ""}</span>
+      </div>
+    );
+  }
 
   return (
     <div className="gift-flash" aria-live="polite">
