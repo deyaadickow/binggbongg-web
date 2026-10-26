@@ -13,7 +13,9 @@ import { useT } from "../lib/i18n";
 
 /** `backTo` fixes where the arrow goes. The directory uses it (Steve, 2026-10-25: its back arrow
  *  must always lead to For You, whatever page was open before it). */
-export function PageTitle({ children, style, backTo }: { children: ReactNode; style?: CSSProperties; backTo?: string }) {
+/** [right]: an optional control on the far side of the bar, across from the back arrow (the
+ *  Features page puts its language bullseye there — Steve, 2026-10-26). */
+export function PageTitle({ children, style, backTo, right }: { children: ReactNode; style?: CSSProperties; backTo?: string; right?: ReactNode }) {
   const navigate = useNavigate();
   const { t } = useT();
   return (
@@ -23,6 +25,7 @@ export function PageTitle({ children, style, backTo }: { children: ReactNode; st
           those it was. */}
       <button className="back-circle" onClick={() => (backTo ? navigate(backTo) : navigate(-1))} aria-label={t("back")}>‹</button>
       <h1 className="page-title" style={{ margin: 0, ...style }}>{children}</h1>
+      {right && <div style={{ marginLeft: "auto" }}>{right}</div>}
     </div>
   );
 }

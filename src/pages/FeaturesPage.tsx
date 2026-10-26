@@ -325,7 +325,18 @@ export function FeaturesPage() {
     // One column, and narrow enough that a banner still reads as a line of text rather than
     // stretching a dozen words across a desktop monitor. Same shape as the phones.
     <div className="page" style={{ maxWidth: 760 }}>
-      <PageTitle backTo="/">{t("everything_bingg_bongg_does")}</PageTitle>
+      {/* Steve, 2026-10-26: "Add a bullseye on the other side of the back arrow/the right side
+          of the page, when i click it, it will show all languages for translations." */}
+      <PageTitle backTo="/" right={
+        <Link to="/settings/language" className="back-circle"
+          title={t("change_language")} aria-label={t("change_language")}>
+          <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden>
+            <circle cx="12" cy="12" r="9" fill="none" stroke="#fff" strokeWidth="1.8" />
+            <circle cx="12" cy="12" r="5.2" fill="none" stroke="#fff" strokeWidth="1.5" />
+            <circle cx="12" cy="12" r="2.6" fill="#F0C420" />
+          </svg>
+        </Link>
+      }>{t("everything_bingg_bongg_does")}</PageTitle>
       {/* The plate comes from the stylesheet — see .cosmic-page .page > p.muted. */}
       <div style={{ position: "relative", marginBottom: 12 }}>
         <input
