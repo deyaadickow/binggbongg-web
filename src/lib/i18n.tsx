@@ -23,20 +23,42 @@ import { es } from "./strings/es";
 import { fil } from "./strings/fil";
 import { id } from "./strings/id";
 import { tl } from "./strings/tl";
+import { MORE_LANGUAGES } from "./strings/more";
 
 export type StringKey = keyof typeof en;
-export type Lang = "en" | "es" | "fil" | "id" | "tl";
+type Dict = Partial<Record<StringKey, string>>;
 
-/** Only languages with a real dictionary are offered; the picker is built from this list. */
+/**
+ * Steve, 2026-10-26: "We only have these 5 languages on the web but all the languages on the
+ * phones." The five launch dictionaries ship in the page; the other 48 (machine-translated from
+ * the same English, with the phones' own translations reused wherever key and English match —
+ * see strings/more/) are fetched only when someone picks one, so the page every visitor loads
+ * does not grow by 48 dictionaries.
+ */
+const MORE: Record<string, { native: string; english: string; load: () => Promise<{ default: Dict }> }> =
+  MORE_LANGUAGES;
+
+export type Lang = string;
+
+/** The picker is built from this list: the five launch languages first, then the rest A-Z. */
 export const LANGUAGES: { code: Lang; native: string; english: string }[] = [
   { code: "en", native: "English", english: "English" },
   { code: "es", native: "Español", english: "Spanish" },
   { code: "fil", native: "Filipino", english: "Filipino" },
   { code: "tl", native: "Tagalog", english: "Tagalog" },
   { code: "id", native: "Bahasa Indonesia", english: "Indonesian" },
+  ...Object.entries(MORE)
+    .map(([code, m]) => ({ code, native: m.native, english: m.english }))
+    .sort((a, b) => a.english.localeCompare(b.english)),
 ];
 
-const DICTS: Record<Lang, Partial<Record<StringKey, string>>> = { en, es, fil, id, tl };
+const DICTS: Record<string, Dict> = { en, es, fil, id, tl };
+
+/** Fetch a non-bundled dictionary once; resolves when it is ready (or immediately if bundled). */
+function ensureDict(lang: Lang): Promise<void> {
+  if (DICTS[lang] || !MORE[lang]) return Promise.resolve();
+  return MORE[lang].load().then((m) => { DICTS[lang] = m.default; }).catch(() => { /* stays English */ });
+}
 const STORAGE_KEY = "bb.lang";
 
 /**
@@ -99,6 +121,9 @@ function initialLang(): Lang {
   const base = tag.split("-")[0];
   if (base === "tl") return "fil";       // Tagalog's older tag, still what some browsers send
   if (base === "in") return "id";        // Indonesian's deprecated code, likewise
+  if (base === "iw") return "he";        // Hebrew's deprecated code
+  if (base === "no" || base === "nn") return "nb";
+  if (base === "zh") return tag.includes("tw") || tag.includes("hk") || tag.includes("hant") ? "zh-TW" : "zh";
   const found = LANGUAGES.find((l) => l.code === base);
   return found ? found.code : "en";
 }
@@ -146,6 +171,14 @@ const I18nContext = createContext<I18n | null>(null);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>(initialLang);
+  // Bumped when a fetched dictionary arrives, so everything re-renders in it.
+  const [loaded, setLoaded] = useState(0);
+  useEffect(() => {
+    if (DICTS[lang]) return;
+    let live = true;
+    ensureDict(lang).then(() => { if (live) setLoaded((n) => n + 1); });
+    return () => { live = false; };
+  }, [lang]);
   // Set during render, not in the effect: a tt() call from an imperative toast fired in
   // the same tick as the change would otherwise still read the previous language.
   activeLang = lang;
@@ -159,12 +192,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const t = useCallback(
     (key: StringKey, ...args: (string | number)[]) => translate(lang, key, ...args),
-    [lang],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [lang, loaded],
   );
   const tn = useCallback(
     (key: StringKey, ...nodes: ReactNode[]) =>
       formatNodes(DICTS[lang]?.[key] ?? en[key] ?? "", nodes),
-    [lang],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [lang, loaded],
   );
   const value = useMemo(() => ({ lang, setLang: setLangState, t, tn }), [lang, t, tn]);
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
