@@ -211,6 +211,21 @@ const SCENES: Record<string, string> = {
 // These are per-GAME overrides, checked before the category — the phones already paint every game
 // from a per-key palette, so this is the web catching up for the games where it matters most.
 const KEY_SCENES: Record<string, string> = {
+  // The 100th game (2026-10-26): a festival night sky, gold glows where the bursts have been.
+  fireworks_finale:
+    "radial-gradient(circle at 25% 28%, rgba(255,201,74,0.35), transparent 22%)," +
+    "radial-gradient(circle at 74% 20%, rgba(255,110,170,0.30), transparent 20%)," +
+    "radial-gradient(circle at 60% 46%, rgba(120,200,255,0.25), transparent 18%)," +
+    "linear-gradient(#1E1450 0%, #0B0628 60%, #030110 100%)",
+  // Mango orchard: sunny sky over a green canopy.
+  mango_harvest:
+    "radial-gradient(ellipse 140% 40% at 50% 100%, #2E7A3A 0%, #2E7A3A 55%, transparent 56%)," +
+    "radial-gradient(circle at 80% 14%, rgba(255,236,150,0.65), transparent 16%)," +
+    "linear-gradient(#9EDCF2 0%, #CDEFF7 50%, #3A8A46 100%)",
+  // Lantern festival: dusk turning to night, a warm orange glow low on the horizon.
+  lantern_festival:
+    "radial-gradient(ellipse 120% 30% at 50% 100%, rgba(255,176,74,0.45), transparent 70%)," +
+    "linear-gradient(#4A1E5A 0%, #1E0A2E 55%, #0C0418 100%)",
   // Basketball hall: wooden floor, lit from the roof.
   hoops_tap:
     "radial-gradient(ellipse 130% 38% at 50% 100%, #A9762E 0%, #A9762E 56%, transparent 57%)," +
