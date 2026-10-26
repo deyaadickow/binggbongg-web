@@ -95,7 +95,9 @@ export function LiveViewerPage() {
     setGiftEffectQueue(rest);
     setGiftEffect(next);
     const burst = next.gift ? isTapTapGift(next.gift) : false;
-    const t = setTimeout(() => setGiftEffect(null), burst && next.gift ? tapTapBurstDuration(next.gift) : 3200);
+    // A video gift ends itself (onEnded below); 20s is only a safety cap.
+    const hasVideo = !burst && !!next.gift?.video;
+    const t = setTimeout(() => setGiftEffect(null), burst && next.gift ? tapTapBurstDuration(next.gift) : hasVideo ? 20000 : 3200);
     return () => clearTimeout(t);
   }, [giftEffect, giftEffectQueue]);
 
@@ -840,6 +842,22 @@ export function LiveViewerPage() {
             {/* The gift playing right now — an effect gift bursts, a plain one shows the card. */}
             {giftEffect && (giftEffect.gift && isTapTapGift(giftEffect.gift) ? (
               <TapTapBurst key={giftEffect.key} gift={giftEffect.gift} />
+            ) : giftEffect.gift?.video ? (
+              // Steve, 2026-10-26: "make it 9:16 so it will cover the phone". A gift with a video
+              // plays it over the whole live view — a tall clip covers it, a wide one fills the
+              // width — to its own end, with the sender line along the bottom.
+              <div key={giftEffect.key} className="gift-video" aria-live="polite">
+                <video src={mediaUrl(giftEffect.gift.video)} autoPlay playsInline
+                  onLoadedMetadata={(e) => {
+                    const v = e.currentTarget;
+                    v.classList.toggle("tall", v.videoHeight > v.videoWidth);
+                    // Browsers refuse sound without a tap on the page; play it silent rather than not at all.
+                    v.play().catch(() => { v.muted = true; v.play().catch(() => {}); });
+                  }}
+                  onEnded={() => setGiftEffect(null)}
+                  onError={() => setGiftEffect(null)} />
+                <span className="gift-video-name">{giftEffect.text}</span>
+              </div>
             ) : (
               <div key={giftEffect.key} className="gift-flash" aria-live="polite">
                 <div className="gift-flash-card">

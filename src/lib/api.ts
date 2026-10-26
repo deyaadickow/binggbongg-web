@@ -214,6 +214,8 @@ export interface Gift {
   id: number;
   name?: string;
   image?: string;
+  /** The gift's own animation (admin "View Video"). Plays full screen in a live room when sent. */
+  video?: string | null;
   /** tbl_gifts stores the price as `votes`; the battle ledgers call it coin_price. */
   votes?: number;
   coin_price?: number;
