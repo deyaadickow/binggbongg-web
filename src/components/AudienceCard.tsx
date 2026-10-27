@@ -107,7 +107,8 @@ export function AudienceCard({ round, myUserId, onRound, onToast }: {
               bottomRight={round.my_streak > 0 ? [[`🔥 ${round.my_streak}`, true]] : []}
               centre={round.status === "settled" && round.winner_key ? `🏆 ${shortName(round.winner_key)} won!` : !open ? "No winner" : null}
               pop={round.status === "settled"} />
-            {open && (
+            {/* "Cheer your team!" only until a team is loudest — then the chip says who. */}
+            {open && (round.predict_open || !(loudest && loudest.cheer > 0)) && (
               <div style={{ position: "absolute", left: round.predict_open ? 50 : 8, right: round.my_streak > 0 ? 52 : 8, bottom: 5, textAlign: "center", zIndex: 3 }}>
                 <span style={{ display: "inline-block", maxWidth: "100%", background: "rgba(0,0,0,.6)", borderRadius: 999, padding: "2px 10px", fontSize: 12, fontWeight: 900, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", boxSizing: "border-box" }}>
                   {round.predict_open ? "🔮 Who wins?" : "📣 Cheer your team!"}
