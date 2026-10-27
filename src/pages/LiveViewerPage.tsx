@@ -23,6 +23,8 @@ import { type AudienceRound } from "../lib/audience";
 import { fetchRoomGames } from "../lib/roomgames";
 import { AudienceCard } from "../components/AudienceCard";
 import { GuessCard, GuessStartDialog } from "../components/GuessGame";
+import { TriviaNightPanel, TriviaNightStartDialog } from "../components/TriviaNight";
+import { answerTriviaNight, endTriviaNight, pauseTriviaNight, startTriviaNight, type TriviaNight } from "../lib/trivianight";
 import { buyGuess, cancelGuess, changeGuess, lockGuess, resolveGuess, startGuessGame, type GuessGame, type GuessValue } from "../lib/guess";
 import { fetchActiveTapGame, gameTitle, type TapGameType } from "../lib/tapgame";
 import { TapGameOverlay } from "../components/TapGameOverlay";
@@ -246,6 +248,12 @@ export function LiveViewerPage() {
   const boardClosedId = useRef<number | null>(null);
   const boardAnnounced = useRef<number | null>(null);
   const boardBusy = useRef(false);
+  // Trivia Night (#20, Steve 2026-10-27) — arrives with the room's one combined poll.
+  const [triviaNight, setTriviaNight] = useState<TriviaNight | null>(null);
+  const [triviaNightStartOpen, setTriviaNightStartOpen] = useState(false);
+  const triviaNightClosedId = useRef<number | null>(null);
+  const triviaNightBusy = useRef(false);
+
   // Guessing Games (Steve, 2026-10-27) — arrives with the room's one combined poll.
   const [guess, setGuess] = useState<GuessGame | null>(null);
   const [guessStartOpen, setGuessStartOpen] = useState(false);
@@ -555,6 +563,24 @@ export function LiveViewerPage() {
     setGuessStartOpen(true);
   }
 
+  function applyTriviaNight(fresh: TriviaNight | null) {
+    setTriviaNight(fresh);
+  }
+  async function triviaNightAct(p: () => Promise<{ game: TriviaNight | null; message: string | null }>, ok?: string) {
+    if (triviaNightBusy.current) return;
+    triviaNightBusy.current = true;
+    try {
+      const { game, message } = await p();
+      if (message) setToast(message); else if (ok) setToast(ok);
+      if (game) applyTriviaNight(game);
+    } finally { triviaNightBusy.current = false; }
+  }
+  function openTriviaNight() {
+    if (triviaNight && triviaNight.status === "active") { triviaNightClosedId.current = null; setToast("Trivia Night is running — it's on screen."); return; }
+    if (role !== "host") { setToast("Trivia Night isn't running — the host starts it."); return; }
+    setTriviaNightStartOpen(true);
+  }
+
   function applyAudience(r: AudienceRound | null) {
     // A finished round stays up for a minute so everyone sees the result and the forfeit.
     if (r && r.status === "open") audienceSeenAt.current = Date.now();
@@ -565,8 +591,8 @@ export function LiveViewerPage() {
   // request") — it used to be five polls per viewer. The server says when to ask again: 1.5s
   // while a board game or Trivia runs, 3s for Bingo / Pyramid / an audience card, 10s when idle.
   // The apply functions sit in a ref so the loop always calls the latest render's closures.
-  const roomApply = useRef({ applyBingo, applyPyramid, applyBoard, applyTrivia, applyAudience, applyGuess });
-  roomApply.current = { applyBingo, applyPyramid, applyBoard, applyTrivia, applyAudience, applyGuess };
+  const roomApply = useRef({ applyBingo, applyPyramid, applyBoard, applyTrivia, applyAudience, applyGuess, applyTriviaNight });
+  roomApply.current = { applyBingo, applyPyramid, applyBoard, applyTrivia, applyAudience, applyGuess, applyTriviaNight };
   useEffect(() => {
     if (!roomName) return;
     let alive = true;
@@ -578,7 +604,7 @@ export function LiveViewerPage() {
         if (!alive) return;
         if (g) {
           const a = roomApply.current;
-          a.applyBingo(g.bingo); a.applyPyramid(g.pyramid); a.applyBoard(g.board); a.applyTrivia(g.trivia); a.applyAudience(g.audience); a.applyGuess(g.guess);
+          a.applyBingo(g.bingo); a.applyPyramid(g.pyramid); a.applyBoard(g.board); a.applyTrivia(g.trivia); a.applyAudience(g.audience); a.applyGuess(g.guess); a.applyTriviaNight(g.triviaNight);
           wait = g.nextPollMs;
         }
       } catch { wait = 5000; /* keep the last good state; try again shortly */ }
@@ -1525,6 +1551,34 @@ export function LiveViewerPage() {
           }}
         />
       )}
+      {triviaNight && triviaNightClosedId.current !== triviaNight.trivia_night_id && (
+        <TriviaNightPanel
+          game={triviaNight}
+          myUserId={myId}
+          onAnswer={(i) => {
+            if (myId === null) return;
+            const t = triviaNight;
+            void triviaNightAct(() => answerTriviaNight(myId, t, i), t.is_player ? undefined : `🧠 Answer in! (${t.coins_per_answer} coin${t.coins_per_answer === 1 ? "" : "s"})`);
+          }}
+          onPause={(p) => { if (myId !== null) void triviaNightAct(() => pauseTriviaNight(myId, triviaNight, p), p ? "⏸ Pausing after this question." : "▶ Back on!"); }}
+          onEnd={() => { if (myId !== null) void triviaNightAct(() => endTriviaNight(myId, triviaNight), "Trivia Night ended."); }}
+          onClose={() => { triviaNightClosedId.current = triviaNight.trivia_night_id; setTriviaNight({ ...triviaNight }); }}
+        />
+      )}
+      {triviaNightStartOpen && myId !== null && (
+        <TriviaNightStartDialog
+          people={broadcasters.map((b) => ({ userId: b.user_id, name: b.user_id === myId ? `${personName(b)} (you)` : personName(b) }))}
+          onClose={() => setTriviaNightStartOpen(false)}
+          onStart={async (s) => {
+            const { game, message } = await startTriviaNight(myId, roomName, s);
+            if (!game) { setToast(message ?? "Couldn't start Trivia Night."); return; }
+            setTriviaNightStartOpen(false);
+            triviaNightClosedId.current = null;
+            applyTriviaNight(game);
+            setToast("🧠 Trivia Night is on!");
+          }}
+        />
+      )}
       {guessStartOpen && myId !== null && (
         <GuessStartDialog
           people={broadcasters.map((b) => ({ userId: b.user_id, name: b.user_id === myId ? `${personName(b)} (you)` : personName(b) }))}
@@ -1570,6 +1624,7 @@ export function LiveViewerPage() {
           else if (k === "checkers" || k === "chess" || k === "fourinarow" || k === "reversi" || k === "mancala") openBoard(k);
           else if (k === "trivia") openTrivia();
           else if (k === "guess") openGuess();
+          else if (k === "trivianight") openTriviaNight();
           else if (k === "bingoBoard") setBingoBoardOpen(true);
           // The 31-day challenge and the three reference rows open their own overlay off the
           // same `picker` state — they start nothing, so they need no people-picker step.
