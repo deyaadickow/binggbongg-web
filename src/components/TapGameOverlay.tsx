@@ -3,6 +3,8 @@ import { mediaUrl } from "../lib/api";
 import { agreeToEntryFee, endTapGame, gameTitle, gameTitleWithRate, giftTapGameScore, isVideoUrl, sceneFor, speedProfile, startTapGame, type TapGameResult, type TapGameStart, type TapGameType } from "../lib/tapgame";
 import { useSession } from "../lib/session";
 import { useT } from "../lib/i18n";
+import { Confetti, MuteButton } from "./GameShow";
+import { haptic, isMuted, sfx } from "../lib/gameSounds";
 
 interface Target { id: number; x: number; y: number; bornAt: number; life: number }
 interface Balloon { id: number; lane: number; color: string }
@@ -60,6 +62,8 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
 
   const ctxRef = useRef<AudioContext | null>(null);
   const playTap = useCallback(() => {
+    // The Game Show mute button (shared by every room game) silences the taps too.
+    if (isMuted()) return;
     const a = audio.current;
     if (a) { a.currentTime = 0; a.play().catch(() => undefined); return; }
     // No admin sound: a short synthesized pop, same idea as the phones' built-in voices.
@@ -73,6 +77,18 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
       o.connect(g).connect(ctx.destination); o.start(); o.stop(ctx.currentTime + 0.15);
     } catch { /* audio not available */ }
   }, [isLanes]);
+
+  // Game Show (Steve, 2026-10-27): a fanfare and confetti when the round's result comes in.
+  const [burst, setBurst] = useState(0);
+  const prevPhase = useRef<Phase>(phase);
+  useEffect(() => {
+    const was = prevPhase.current;
+    prevPhase.current = phase;
+    if (phase === "done" && was !== "done" && result) {
+      if (Number(result.coins_earned) > 0) { sfx.fanfare(); haptic([40, 60, 40]); setBurst(Date.now()); }
+      else sfx.reveal();
+    }
+  }, [phase, result]);
 
   async function begin() {
     if (!user) return;
@@ -218,8 +234,10 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 50, background: "#000", display: "flex", flexDirection: "column" }}>
+      <Confetti burst={burst} />
       <div className="row" style={{ padding: "10px 14px", borderBottom: "1px solid var(--gold-border)", background: "var(--panel)" }}>
         <b style={{ color: "var(--gold)", flex: 1 }}>{gameTitleWithRate(game)}</b>
+        <MuteButton />
         {phase === "playing" && <span className="pill">{isRace ? `Station ${station}/${RACE_STATIONS} · ${clock(elapsed)}` : `${clock(secondsLeft)} left`}</span>}
         {phase === "playing" && <span className="pill" style={{ marginLeft: 8 }}>{isRace ? `${caught}/${RACE_FINISH}` : isLanes ? `Popped ${caught}` : `Caught ${caught}`}</span>}
         {phase !== "playing" && <button className="btn small ghost" onClick={onClose}>{t("close")}</button>}
