@@ -1,17 +1,27 @@
 // Pyramid battle panel (Steve, 2026-10-27) — top-left over the stream like his reference picture:
 // one column per player, 💰 🐶 🔥 ❤️ 🌹 from the top in gold circles, their coins, and a 🌹 button
 // (click = 1 Flower, shift-click = 10). Same shape as the phones.
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { LiveTile } from "../lib/live";
 import type { PyramidGame, PyramidPlayer } from "../lib/pyramid";
 
 const gold = "var(--gold, #F0C420)";
+
+/** A player's live camera at the top of their column (Steve, 2026-10-27: "add the video screen
+ *  for every player on all games") — a second video element on the room's own track. */
+function ColumnScreen({ tile }: { tile: LiveTile }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  useEffect(() => { const el = ref.current; if (!el) return; return tile.attach(el); }, [tile]);
+  return <video ref={ref} autoPlay playsInline muted style={{ width: 66, height: 88, objectFit: "cover", borderRadius: 8, background: "#000", border: `2px solid ${gold}`, marginBottom: 3, transform: tile.isLocal ? "scaleX(-1)" : undefined }} />;
+}
 
 function compact(n: number) {
   return n >= 1e6 ? (n / 1e6).toFixed(1) + "M" : n >= 1e3 ? (n / 1e3).toFixed(1) + "K" : String(n);
 }
 
-export function PyramidOverlay({ game, myUserId, onSend, onEnd, onClose }: {
+export function PyramidOverlay({ game, myUserId, onSend, onEnd, onClose, tileFor }: {
   game: PyramidGame; myUserId: number;
+  tileFor?: (userId: number) => LiveTile | undefined;
   onSend: (playerId: number, flowers: number) => void; onEnd: () => void; onClose: () => void;
 }) {
   const [left, setLeft] = useState(game.seconds_left);
@@ -34,8 +44,10 @@ export function PyramidOverlay({ game, myUserId, onSend, onEnd, onClose }: {
   );
   const column = (p: PyramidPlayer) => {
     const won = !active && game.winner_user_id === p.user_id;
+    const tile = tileFor?.(p.user_id);
     return (
       <div key={p.user_id} style={{ width: 74, display: "flex", flexDirection: "column", alignItems: "center" }}>
+        {tile && <ColumnScreen tile={tile} />}
         <div style={{ fontSize: 10.5, fontWeight: 700, color: won ? gold : "#fff", maxWidth: 74, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           {won ? "👑 " : ""}{p.name}
         </div>

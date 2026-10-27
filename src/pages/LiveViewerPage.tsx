@@ -1349,6 +1349,7 @@ export function LiveViewerPage() {
         <PyramidOverlay
           game={pyramidGame}
           myUserId={myId}
+          tileFor={(id) => orderedTiles.find((t) => (t.isLocal ? id === myId : t.userId === id))}
           onSend={async (playerId, flowers) => {
             if (playerId === myId) { setToast("That's you — the people watching send your Flowers."); return; }
             if (pyramidSending.current) return;
