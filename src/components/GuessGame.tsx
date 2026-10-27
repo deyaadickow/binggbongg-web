@@ -44,9 +44,11 @@ function ValueInput({ game, initial, label, onSubmit }: { game: GuessGame; initi
   );
 }
 
-export function GuessCard({ game, myUserId, onGuess, onLock, onResolve, onCancel }: {
+export function GuessCard({ game, myUserId, onGuess, onLock, onResolve, onCancel, onClose }: {
   game: GuessGame; myUserId: number | null;
   onGuess: (v: GuessValue) => void; onLock: () => void; onResolve: (v: GuessValue) => void; onCancel: () => void;
+  /** A finished game can be closed straight away (Steve, 2026-10-27) instead of waiting out its 90s. */
+  onClose: () => void;
 }) {
   const [collapsed, setCollapsed] = useState(false);
   const [board, setBoard] = useState<GuesserRow[] | null>(null);
@@ -74,6 +76,7 @@ export function GuessCard({ game, myUserId, onGuess, onLock, onResolve, onCancel
         <b style={{ color: gold, fontSize: 13, flex: 1 }}>{game.emoji} Guess #{game.game_no} · {game.coins_per_guess} coin{game.coins_per_guess === 1 ? "" : "s"}{game.my_streak > 0 ? ` · 🔥 ${game.my_streak}` : ""}</b>
         <button onClick={() => fetchGuessLeaderboard().then(setBoard)} style={{ background: "none", border: "none", color: gold, fontSize: 12, cursor: "pointer" }}>🏅 Top</button>
         <button onClick={() => setCollapsed((c) => !c)} aria-label={collapsed ? "Expand" : "Collapse"} style={{ background: "none", border: "none", color: gold, fontSize: 18, cursor: "pointer" }}>{collapsed ? "+" : "–"}</button>
+        {game.status === "resolved" && <button onClick={onClose} aria-label="Close" style={{ background: "none", border: "none", color: gold, fontSize: 16, cursor: "pointer" }}>✕</button>}
       </div>
       {!collapsed && (
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 6, fontSize: 12.5 }}>

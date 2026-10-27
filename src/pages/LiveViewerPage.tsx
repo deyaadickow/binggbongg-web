@@ -257,6 +257,8 @@ export function LiveViewerPage() {
   // Guessing Games (Steve, 2026-10-27) — arrives with the room's one combined poll.
   const [guess, setGuess] = useState<GuessGame | null>(null);
   const [guessStartOpen, setGuessStartOpen] = useState(false);
+  // The finished game this viewer closed with ✕, so the next poll doesn't bring it back.
+  const [guessClosedId, setGuessClosedId] = useState<number | null>(null);
   const guessAnnounced = useRef<number | null>(null);
   const guessBusy = useRef(false);
 
@@ -1534,7 +1536,7 @@ export function LiveViewerPage() {
         />
       )}
       {audience && <AudienceCard round={audience} myUserId={myId} onRound={setAudience} onToast={setToast} />}
-      {guess && (
+      {guess && guess.guess_game_id !== guessClosedId && (
         <GuessCard
           game={guess}
           myUserId={myId}
@@ -1543,6 +1545,7 @@ export function LiveViewerPage() {
             if (guess.my_guess) void guessAct(() => changeGuess(myId, guess, v), "Guess changed.");
             else void guessAct(() => buyGuess(myId, guess, v), `🔮 Guess in! (${guess.coins_per_guess} coin${guess.coins_per_guess === 1 ? "" : "s"})`);
           }}
+          onClose={() => setGuessClosedId(guess.guess_game_id)}
           onLock={() => { if (myId !== null) void guessAct(() => lockGuess(myId, guess), "🔒 Guessing is locked."); }}
           onResolve={(v: GuessValue) => { if (myId !== null) void guessAct(() => resolveGuess(myId, guess, v)); }}
           onCancel={() => {
