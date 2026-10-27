@@ -19,7 +19,7 @@ export function personName(p?: Person | null): string {
 
 /** `back` adds the gold back arrow beside the title (Steve, 2026-10-27, on Bingo's results:
  *  "Please add a back arrow to this page"); without it the popup closes by clicking outside. */
-export function Overlay({ title, children, onClose, width = 440, back = false }: { title: string; children: React.ReactNode; onClose: () => void; width?: number; back?: boolean }) {
+export function Overlay({ title, children, onClose, width = 440, back = false }: { title: React.ReactNode; children: React.ReactNode; onClose: () => void; width?: number; back?: boolean }) {
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", display: "grid", placeItems: "center", zIndex: 40, padding: 16 }} onClick={onClose}>
       <div className="card pad" style={{ width: `min(${width}px, 100%)`, maxHeight: "90vh", overflowY: "auto" }} onClick={(e) => e.stopPropagation()}>

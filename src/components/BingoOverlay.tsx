@@ -13,6 +13,7 @@
 // Steve, 2026-10-11: "Add a live video grid for the host and all the guest on top of the
 // bingo card if there is more than just the host." Here the strip is the room's own video
 // elements cloned by the caller — see the `strip` prop; this component only lays them out.
+import { bingoTitle } from "./BingoCardIcon";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   BINGO_CELL_H, BINGO_CELL_W, BINGO_COLUMNS, BINGO_COL_X, BINGO_ROW_Y, BINGO_ASPECT,
@@ -273,7 +274,7 @@ export function BingoStartDialog({ defaultPrice, candidates, onStart, onClose }:
   }
 
   return (
-    <Overlay title={t("start_bingo")} onClose={onClose} width={480}>
+    <Overlay title={bingoTitle(t("start_bingo"))} onClose={onClose} width={480}>
       {candidates.length > 0 && (
         <>
           <p className="soft" style={{ marginTop: 0 }}>{t("who_gets_a_card_pick_nobody_to_play_it_o")}</p>
@@ -348,7 +349,7 @@ export function BingoBoardOverlay({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <Overlay title={t("bingo_battle_board")} onClose={onClose} back width={520}>
+    <Overlay title={bingoTitle(t("bingo_battle_board"))} onClose={onClose} back width={520}>
       {board && (
         <div className="bingo-stats">
           <div><b>{board.total_games}</b><span>{t("games_2")}</span></div>
@@ -394,7 +395,7 @@ export function BingoWinnersOverlay({ bingoGameId, onClose }: { bingoGameId: num
   }, [bingoGameId]);
 
   return (
-    <Overlay title={`🎱 Bingo #${data?.game_no ?? ""}`} onClose={onClose} back width={460}>
+    <Overlay title={bingoTitle(`Bingo #${data?.game_no ?? ""}`)} onClose={onClose} back width={460}>
       {data && (
         <p className="soft" style={{ marginTop: 0 }}>
           {[bingoPlayedOn(data.played_at), t("bingo_players_n", data.players), t("bingo_squares_gifted_n", data.squares_gifted)].filter(Boolean).join(" · ")}

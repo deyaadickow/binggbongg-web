@@ -23,6 +23,7 @@
 // Translated into Spanish, Filipino and Indonesian (2026-10-18), from ONE source shared with
 // both phones: the same 109 key names exist in strings.xml, Localizable.strings and the web
 // dictionary, so a feature's wording is written once and lands on all three.
+import { BingoCardIcon } from "../components/BingoCardIcon";
 import { Link } from "react-router-dom";
 import { useT, type StringKey } from "../lib/i18n";
 import { PageTitle } from "../components/PageTitle";
@@ -92,7 +93,7 @@ const FEATURES: Section[] = [
     titleKey: "fsec_games",
     features: [
       { icon: "🎮", nameKey: "fname_n99_tap_games", blurbKey: "fblurb_n99_tap_games", to: "/live", whereKey: "fwhere_the_live_room" },
-      { icon: "🎱", nameKey: "fname_bingg_bongg_bingo", blurbKey: "fblurb_bingg_bongg_bingo", to: "/live", whereKey: "fwhere_the_live_room" },
+      { icon: "bingo_card", nameKey: "fname_bingg_bongg_bingo", blurbKey: "fblurb_bingg_bongg_bingo", to: "/live", whereKey: "fwhere_the_live_room" },
       { icon: "🔮", nameKey: "fname_guessing_games", blurbKey: "fblurb_guessing_games", to: "/live", whereKey: "fwhere_the_live_room" },
       { icon: "🧠", nameKey: "fname_trivia_night", blurbKey: "fblurb_trivia_night", to: "/live", whereKey: "fwhere_the_live_room" },
       { icon: "🏁", nameKey: "fname_race_games", blurbKey: "fblurb_race_games", to: "/live", whereKey: "fwhere_the_live_room" },
@@ -217,7 +218,7 @@ function Tile({ f, video, onWatch, extras = [], onWatchExtra }: { f: Feature; vi
       borderColor: "var(--gold-border)", height: "100%",
       display: "flex", gap: 12, alignItems: "flex-start",
     }}>
-      <span style={{ fontSize: 26, lineHeight: 1, flexShrink: 0 }} aria-hidden>{f.icon}</span>
+      <span style={{ fontSize: 26, lineHeight: 1, flexShrink: 0 }} aria-hidden>{f.icon === "bingo_card" ? <BingoCardIcon size={36} /> : f.icon}</span>
       <span style={{ minWidth: 0, flex: 1 }}>
         <b style={{ color: "var(--gold)", display: "block", fontSize: 15 }}>{t(f.nameKey)}</b>
         {/* Steve, 2026-10-19: "Make the white text readable... a little bolder." The dim grey
@@ -361,9 +362,12 @@ export function FeaturesPage() {
           >×</button>
         )}
       </div>
-      <p className="muted" style={{ marginTop: -4 }}>
-        {t("features_count_blurb", total)}
-      </p>
+      {/* "N features, and counting" describes the whole list — while searching it read "1 features". */}
+      {!q && (
+        <p className="muted" style={{ marginTop: -4 }}>
+          {t("features_count_blurb", total)}
+        </p>
+      )}
 
       {sections.map((section) => (
         <div key={section.titleKey} style={{ marginTop: 22 }}>
