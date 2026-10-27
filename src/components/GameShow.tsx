@@ -30,6 +30,47 @@ export function textOn(hex: string): string {
   return lum > 0.68 ? "#1A1A1A" : "#fff";
 }
 
+/** One colour per SIDE on the audience card and anything else that shows two teams (Steve,
+ *  2026-10-27): side 0 is blue, side 1 red — the 2v2 Team A / Team B colours — and a Solo Battle
+ *  with more entrants continues through yellow, green, purple, pink. Same table on the phones. */
+export const SIDE_COLORS = ["#2E9BFF", "#FF5A5F", "#F2C230", "#1E9E4A", "#8E4FD6", "#EC5C9F"];
+export const sideColor = (i: number) => SIDE_COLORS[Math.max(0, i) % SIDE_COLORS.length];
+/** Forfeit choices: neutral colours no side ever uses, so a forfeit never reads as a team. */
+export const FORFEIT_COLORS = ["#8E5BD9", "#16A3A3", "#BA7517"];
+
+/** Whole percentages that always add up to exactly 100 (largest remainder): 1/3 each shows
+ *  34 · 33 · 33, never 33 · 33 · 33. All zero stays all zero. */
+export function percentages(counts: number[]): number[] {
+  const total = counts.reduce((a, b) => a + Math.max(0, b), 0);
+  if (total <= 0) return counts.map(() => 0);
+  const raw = counts.map((c) => (100 * Math.max(0, c)) / total);
+  const out = raw.map(Math.floor);
+  let left = 100 - out.reduce((a, b) => a + b, 0);
+  const order = raw.map((r, i) => ({ i, rem: r - Math.floor(r) })).sort((a, b) => b.rem - a.rem || a.i - b.i);
+  for (const o of order) { if (left <= 0) break; out[o.i] += 1; left -= 1; }
+  return out;
+}
+
+/** A person's first name ("Maria Santos" -> "Maria"). */
+export const firstName = (name: string | null | undefined) => (name ?? "").trim().split(/\s+/)[0] ?? "";
+
+/** Short side names for tight spots: "Team A…"/"Team B…" stay "Team A"/"Team B", anything with
+ *  "Computer" is "Computer", anyone else their first name — unless two sides would then read
+ *  the same, when both keep their full label. */
+export function shortSideNames(labels: string[]): string[] {
+  const short = labels.map((l) => {
+    const t = (l ?? "").trim();
+    if (/^Team A/i.test(t)) return "Team A";
+    if (/^Team B/i.test(t)) return "Team B";
+    if (t.includes("Computer")) return "Computer";
+    return firstName(t) || t;
+  });
+  return short.map((s, i) => (short.some((o, j) => j !== i && o === s) ? labels[i] : s));
+}
+
+/** "🤖 Computer (Medium)" -> "Computer"; anyone else as given. */
+export const podiumName = (name: string) => (name.includes("Computer") ? "Computer" : name);
+
 /** A NASCAR-style stock car seen from the side, facing left, in its lane's colour with its number. */
 export function StockCar({ color, number, width = 56 }: { color: string; number: number; width?: number }) {
   const dark = shade(color, -38);
@@ -282,23 +323,51 @@ export function Confetti({ burst }: { burst: number }) {
   );
 }
 
-/** 1st in the middle, 2nd left, 3rd right. */
-export function Podium({ rows }: { rows: { name: string; value: string }[] }) {
+/** 1st in the middle, 2nd left, 3rd right. Names may wrap to two lines. `tie` = a shared first
+ *  place: nobody is crowned. */
+export function Podium({ rows, tie }: { rows: { name: string; value: string }[]; tie?: boolean }) {
   const order = [rows[1], rows[0], rows[2]];
   const heights = [34, 48, 24];
   const colors = ["#9AA0A6", "#F0C420", "#C77B3B"];
   const medals = ["🥈", "🥇", "🥉"];
+  const twoLines: React.CSSProperties = { display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", overflowWrap: "anywhere", lineHeight: 1.2 };
   return (
     <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "center", gap: 6, marginTop: 4 }}>
       {order.map((r, i) => r ? (
         <div key={i} style={{ width: 86, textAlign: "center" }}>
-          <div style={{ fontSize: i === 1 ? 20 : 16 }}>{i === 1 ? "👑" : medals[i]}</div>
-          <div style={{ fontSize: 11.5, fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.name}</div>
+          <div style={{ fontSize: i === 1 ? 20 : 16 }}>{i === 1 ? (tie ? "🤝" : "👑") : medals[i]}</div>
+          <div style={{ fontSize: 11.5, fontWeight: 700, ...twoLines }}>{podiumName(r.name)}</div>
           <div style={{ fontSize: 10.5, opacity: 0.85, marginBottom: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.value}</div>
           <div style={{ height: heights[i], background: colors[i], borderRadius: "6px 6px 0 0", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, color: "#111", fontSize: 15 }}>{i === 1 ? 1 : i === 0 ? 2 : 3}</div>
         </div>
       ) : <div key={i} style={{ width: 86 }} />)}
     </div>
+  );
+}
+
+/** The phones' scene overlays, drawn over a SceneBanner: a dark chip top-left (whose turn, who is
+ *  loudest), chips bottom-right (gold = the important one), and a centred banner that dims the
+ *  scene (the result, "Check!"). Above the scene's moving actors, so a rocket never crosses them. */
+export function SceneChips({ topLeft, topLeftOffset = 8, bottomRight = [], centre, shake, pop }: {
+  topLeft?: string | null; topLeftOffset?: number; bottomRight?: [string, boolean][]; centre?: string | null; shake?: boolean; pop?: boolean;
+}) {
+  useKeyframes();
+  const chip = (gold: boolean): React.CSSProperties => ({ background: gold ? "#F0C420" : "rgba(0,0,0,.63)", color: gold ? "#000" : "#fff", borderRadius: 999, padding: "2px 8px", fontSize: 11.5, fontWeight: 800, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "100%", boxSizing: "border-box", lineHeight: "15px" });
+  return (
+    <>
+      {topLeft && <span style={{ ...chip(false), position: "absolute", left: topLeftOffset, top: 6, maxWidth: `calc(100% - ${topLeftOffset + 8}px)`, zIndex: 3 }}>{topLeft}</span>}
+      {bottomRight.length > 0 && (
+        <div style={{ position: "absolute", right: 6, bottom: 5, left: 6, display: "flex", justifyContent: "flex-end", gap: 5, zIndex: 3, minWidth: 0 }}>
+          {bottomRight.map(([t, g], i) => <span key={i} style={{ ...chip(g), flex: "0 1 auto", minWidth: 0 }}>{t}</span>)}
+        </div>
+      )}
+      {centre && (
+        <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "rgba(0,0,0,.45)", padding: "0 10px", zIndex: 4 }}>
+          <span className="gs-anim" style={{ maxWidth: "100%", boxSizing: "border-box", textAlign: "center", overflowWrap: "anywhere", lineHeight: 1.2, fontSize: 16, fontWeight: 900, color: "#fff", textShadow: "0 2px 4px #000",
+                                             animation: shake ? "gs-shake .25s linear infinite" : pop ? "gs-pop .8s ease-in-out 3" : "none" }}>{centre}</span>
+        </div>
+      )}
+    </>
   );
 }
 
