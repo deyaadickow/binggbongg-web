@@ -1341,6 +1341,7 @@ export function LiveViewerPage() {
         <BoardGameOverlay
           game={boardGame}
           myUserId={myId}
+          tileFor={(id) => orderedTiles.find((t) => (t.isLocal ? id === myId : t.userId === id))}
           onMove={async (key) => {
             if (boardBusy.current) return;
             boardBusy.current = true;

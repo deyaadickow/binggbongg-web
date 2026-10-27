@@ -2,7 +2,8 @@
 // board in the middle. Click a piece, then where it goes — the squares it can reach light up, and
 // the server checks the move again. In an audience game viewers pick a move the same way, and that
 // click is their (paid) vote. Same shape as the phones.
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { LiveTile } from "../lib/live";
 import type { BoardGame, BoardKind, BoardMove, BoardPlayer, BoardStart, Sq } from "../lib/boardgame";
 
 const gold = "var(--gold, #F0C420)";
@@ -34,11 +35,29 @@ function why(reason: string | null) {
   }
 }
 
+/** A player's live camera, small, beside their name (Steve, 2026-10-27: "add two small screens
+ *  for the two players"). A second video element on the track the room's grid already shows. */
+function PlayerScreen({ tile, active }: { tile: LiveTile; active: boolean }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    return tile.attach(el);
+  }, [tile]);
+  return (
+    <video ref={ref} autoPlay playsInline muted
+           style={{ width: 58, height: 78, objectFit: "cover", borderRadius: 8, flex: "none", background: "#000",
+                    border: `2px solid ${active ? gold : "rgba(212,175,55,.6)"}`, transform: tile.isLocal ? "scaleX(-1)" : undefined }} />
+  );
+}
+
 const same = (a: Sq | undefined, r: number, c: number) => !!a && a[0] === r && a[1] === c;
 const onPath = (p: Sq[] | undefined, r: number, c: number) => !!p && p.some((q) => q[0] === r && q[1] === c);
 
-export function BoardGameOverlay({ game, myUserId, onMove, onBuy, onResign, onEnd, onClose }: {
+export function BoardGameOverlay({ game, myUserId, onMove, onBuy, onResign, onEnd, onClose, tileFor }: {
   game: BoardGame; myUserId: number;
+  /** The live tile of a member on stage, if any. */
+  tileFor?: (userId: number) => LiveTile | undefined;
   onMove: (key: string) => void;
   onBuy: (recipientId: number, powerup: "time" | "freeze" | "hint" | "vote", move?: string) => void;
   onResign: () => void; onEnd: () => void; onClose: () => void;
@@ -139,8 +158,11 @@ export function BoardGameOverlay({ game, myUserId, onMove, onBuy, onResign, onEn
     const pill = (label: string, onClick: () => void, title: string) => (
       <button title={title} onClick={onClick} style={{ fontSize: 11, fontWeight: 700, color: "#000", background: gold, border: "none", borderRadius: 999, padding: "4px 8px", cursor: "pointer", whiteSpace: "nowrap" }}>{label}</button>
     );
+    const tile = p.user_id !== null ? tileFor?.(p.user_id) : undefined;
     return (
-      <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 8px", borderRadius: 10, background: turn ? "rgba(240,196,32,.16)" : "rgba(255,255,255,.05)", border: `1px solid ${turn ? gold : "transparent"}`, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+      {tile && <PlayerScreen tile={tile} active={turn} />}
+      <div style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", gap: 8, padding: "6px 8px", borderRadius: 10, background: turn ? "rgba(240,196,32,.16)" : "rgba(255,255,255,.05)", border: `1px solid ${turn ? gold : "transparent"}`, flexWrap: "wrap" }}>
         <b style={{ fontSize: 13, color: won ? gold : "#fff", flex: 1, minWidth: 80, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           {won ? "👑 " : ""}{p.is_audience ? "👥 " : ""}{p.name}{isMe ? " (you)" : ""}
         </b>
@@ -154,6 +176,7 @@ export function BoardGameOverlay({ game, myUserId, onMove, onBuy, onResign, onEn
             {game.turn === p.side && !game.hint && pill(`💡 Hint · ${game.prices.hint}`, () => onBuy(p.user_id!, "hint"), "Shows them a good move")}
           </div>
         )}
+      </div>
       </div>
     );
   };
