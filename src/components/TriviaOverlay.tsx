@@ -4,10 +4,23 @@
 import { useEffect, useRef, useState } from "react";
 import type { LiveTile } from "../lib/live";
 import type { TriviaGame, TriviaMode, TriviaPlayer, TriviaStart } from "../lib/trivia";
+import { Confetti, CountdownRing, MuteButton, Podium, SceneBanner } from "./GameShow";
+import { SCENES, TRIVIA_SCENES } from "../lib/gameSceneData";
+import { haptic, sfx } from "../lib/gameSounds";
 
 const gold = "var(--gold, #F0C420)";
 const LETTERS = ["A", "B", "C", "D"];
 const GREEN = "#2fbf5b", RED = "#e5484d", BLUE = "#49a8ff";
+// Game Show (Steve, 2026-10-27: the games look like "plain text"): the same four tile colours as
+// Trivia Night, so A/B/C/D read the same in both quizzes.
+const TILE_COLORS = ["#D85A30", "#1D9E75", "#378ADD", "#BA7517"];
+
+/** The question's scene — by category when the game has one, else the classroom. The playroom
+ *  scene is skipped here: it has a die in it, and the battles keep clear of gambling pictures. */
+function triviaScene(category: string | null | undefined) {
+  const key = (category && TRIVIA_SCENES[category]) || "classroom";
+  return SCENES[key === "playroom" ? "classroom" : key] ?? SCENES.classroom;
+}
 
 function Screen({ tile }: { tile: LiveTile }) {
   const ref = useRef<HTMLVideoElement>(null);
@@ -25,32 +38,68 @@ export function TriviaOverlay({ game, myUserId, tileFor, onAnswer, onBuy, onEnd,
   const [collapsed, setCollapsed] = useState(false);
   const [polledAt, setPolledAt] = useState(() => Date.now());
   const [, setTick] = useState(0);
+  // Game Show: a drum roll before each answer is shown, a chime (and confetti) when you're right,
+  // a fanfare and the podium at the end. Fired on CHANGES only — the ref holds what the last poll
+  // said, so a poll that brings the same state back plays nothing.
+  const [drumroll, setDrumroll] = useState(false);
+  const [burst, setBurst] = useState(0);
+  const prev = useRef({ id: game.trivia_game_id, status: game.status, phase: game.phase, q: game.q_number, mine: game.my_answer });
+  const drumTimer = useRef<number | undefined>(undefined);
+  const lastTick = useRef(-1);
+  useEffect(() => () => window.clearTimeout(drumTimer.current), []);
   useEffect(() => { setPolledAt(Date.now()); }, [game]);
   useEffect(() => {
     if (game.status !== "active") return;
     const id = window.setInterval(() => setTick((t) => t + 1), 250);
     return () => window.clearInterval(id);
   }, [game.status, game.trivia_game_id]);
+  useEffect(() => {
+    const was = prev.current;
+    prev.current = { id: game.trivia_game_id, status: game.status, phase: game.phase, q: game.q_number, mine: game.my_answer };
+    if (was.id !== game.trivia_game_id) { window.clearTimeout(drumTimer.current); setDrumroll(false); return; }
+    if (was.mine === null && game.my_answer !== null && was.q === game.q_number) { sfx.lock(); haptic(25); }
+    if (was.status === "active" && game.status !== "active") {
+      window.clearTimeout(drumTimer.current); setDrumroll(false);
+      if (game.status !== "cancelled" && (game.result === "one" || game.result === "two")) { sfx.fanfare(); setBurst(Date.now()); }
+      else sfx.reveal();
+      return;
+    }
+    if (game.status === "active" && game.phase === "reveal" && was.phase === "question" && game.last_result) {
+      const r = game.last_result;
+      const mySide = game.players.find((p) => p.user_id === myUserId)?.side ?? null;
+      const myPick = mySide ? r.answers[mySide] : null;
+      setDrumroll(true); sfx.drumroll();
+      window.clearTimeout(drumTimer.current);
+      drumTimer.current = window.setTimeout(() => {
+        setDrumroll(false);
+        if (mySide && myPick === r.correct) { sfx.correct(); haptic([40, 60, 40]); setBurst(Date.now()); }
+        else if (mySide) { sfx.wrong(); haptic(80); }
+        else sfx.reveal();
+      }, 900);
+    }
+    // Only the fields that mark a change: last_result and players are new objects on every poll.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [game.trivia_game_id, game.status, game.phase, game.q_number, game.my_answer, game.result]);
   const since = Date.now() - polledAt;
 
   const active = game.status === "active";
   const asking = active && game.phase === "question";
   const me = game.players.find((p) => p.user_id === myUserId) ?? null;
   const iVote = asking && game.mode === "audience" && myUserId !== game.host_user_id;
-  const r = game.last_result;
+  // Held back during the drum roll, so the right answer lands with the reveal.
+  const r = drumroll ? null : game.last_result;
   const mySecondsLeft = me ? Math.max(0, Math.ceil((me.ms_left - since) / 1000)) : Math.max(0, Math.ceil((game.ms_left - since) / 1000));
   const canAnswer = asking && me !== null && game.my_answer === null && mySecondsLeft > 0;
+  const ringMs = Math.max(0, (me ? me.ms_left : game.ms_left) - since);
+  const ringSecs = Math.ceil(ringMs / 1000);
+  if (asking && ringSecs <= 5 && ringSecs > 0 && lastTick.current !== ringSecs) { lastTick.current = ringSecs; sfx.tick(); }
 
   const answerStyle = (i: number) => {
-    let bg = "rgba(255,255,255,.07)", border = "rgba(240,196,32,.5)", color = "#fff";
     const removed = asking && game.my_removed.includes(i);
-    if (asking && game.my_answer === i) { bg = "rgba(240,196,32,.25)"; border = gold; }
-    if (!asking && r) {
-      if (i === r.correct) { bg = "rgba(47,191,91,.3)"; border = GREEN; }
-      else if (r.answers.one === i || r.answers.two === i) { bg = "rgba(229,72,77,.25)"; border = RED; }
-    }
-    if (removed) { color = "rgba(255,255,255,.3)"; border = "rgba(255,255,255,.15)"; }
-    return { bg, border, color, removed };
+    const mine = asking && game.my_answer === i;
+    const right = !asking && !!r && i === r.correct;
+    const wrongPick = !asking && !!r && !right && (r.answers.one === i || r.answers.two === i);
+    return { removed, mine, right, wrongPick, dim: (!asking && !!r && !right) || removed };
   };
 
   const who = (i: number) => {
@@ -58,7 +107,7 @@ export function TriviaOverlay({ game, myUserId, tileFor, onAnswer, onBuy, onEnd,
     const marks: string[] = [];
     if (r.answers.one === i) marks.push(game.players[0].is_audience ? "👥" : (game.players[0].name.split(" ")[0]));
     if (r.answers.two === i) marks.push(game.players[1].is_audience ? "👥" : game.players[1].is_computer ? "🤖" : (game.players[1].name.split(" ")[0]));
-    return marks.length ? <span style={{ fontSize: 11, color: gold, marginLeft: 6 }}>← {marks.join(", ")}</span> : null;
+    return marks.length ? <span style={{ fontSize: 10.5, fontWeight: 800, background: "rgba(0,0,0,.35)", borderRadius: 999, padding: "1px 6px", maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{marks.join(", ")}</span> : null;
   };
 
   const playerRow = (p: TriviaPlayer) => {
@@ -94,17 +143,24 @@ export function TriviaOverlay({ game, myUserId, tileFor, onAnswer, onBuy, onEnd,
   const winner = game.players.find((p) => p.side === game.result);
   let status = "";
   if (!active) status = game.status === "cancelled" ? "Game ended — no winner." : game.result === "draw" ? "It's a draw!" : `🏆 ${winner?.name ?? ""} wins ${game.players[0].score} – ${game.players[1].score}!`;
+  else if (drumroll) status = "🥁 And the answer is…";
   else if (!asking && r) status = `The answer: ${r.right_answer ?? game.options[r.correct]}`;
   else if (canAnswer) status = "Pick your answer!";
   else if (me && game.my_answer !== null) status = "Answer locked in — waiting for the other side…";
   else if (iVote) status = `Vote for the audience's answer — ${game.prices.vote} coins a vote.`;
   else if (game.mode === "computer") status = "🤖 The computer is thinking…";
 
+  const podium = !active && game.status !== "cancelled"
+    ? [...game.players].sort((a, b) => b.score - a.score).map((p) => ({ name: p.name, value: `${p.score} pts` }))
+    : [];
+
   return (
     <div style={{ position: "fixed", top: 96, left: 12, zIndex: 90, background: "rgba(0,0,0,.85)", border: `2px solid ${gold}`, borderRadius: 14, padding: 10, color: "#fff", width: "min(372px, calc(100vw - 24px))", boxSizing: "border-box" }}>
+      <Confetti burst={burst} />
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-        <b style={{ color: gold, fontSize: 14, flex: 1 }}>🧠 Trivia #{game.game_no}{active ? ` · Question ${game.q_number}/${game.q_count}` : ""}</b>
-        {asking && <b style={{ fontVariantNumeric: "tabular-nums", color: Math.ceil((game.ms_left - since) / 1000) <= 5 ? RED : "#fff" }}>⏱ {Math.max(0, Math.ceil((game.ms_left - since) / 1000))}s</b>}
+        <b style={{ color: gold, fontSize: 14, flex: 1, minWidth: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>🧠 Trivia #{game.game_no}{active ? ` · Question ${game.q_number}/${game.q_count}` : ""}</b>
+        <MuteButton />
+        {asking && collapsed && <b style={{ fontVariantNumeric: "tabular-nums", color: Math.ceil((game.ms_left - since) / 1000) <= 5 ? RED : "#fff" }}>⏱ {Math.max(0, Math.ceil((game.ms_left - since) / 1000))}s</b>}
         {active && game.host_user_id === myUserId && (
           <button onClick={() => { if (window.confirm("End the Trivia game with no winner?")) onEnd(); }} style={{ fontSize: 11, fontWeight: 700, background: gold, color: "#000", border: "none", borderRadius: 999, padding: "2px 10px", cursor: "pointer" }}>End</button>
         )}
@@ -113,30 +169,55 @@ export function TriviaOverlay({ game, myUserId, tileFor, onAnswer, onBuy, onEnd,
       </div>
       {!collapsed && (
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <SceneBanner scene={triviaScene(game.category)} height={68}>
+            {asking && <div style={{ position: "absolute", left: 6, top: 6 }}><CountdownRing msLeft={ringMs} totalMs={Math.max(ringMs, game.question_seconds * 1000)} size={44} /></div>}
+            {active && game.q_number > 0 && (
+              <span style={{ position: "absolute", right: 8, bottom: 6, background: gold, color: "#000", borderRadius: 999, padding: "2px 9px", fontSize: 11.5, fontWeight: 900 }}>Q{game.q_number}/{game.q_count}</span>
+            )}
+            {drumroll && <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "rgba(0,0,0,.45)", fontSize: 17, fontWeight: 900, textShadow: "0 2px 4px #000" }}><span className="gs-anim" style={{ animation: "gs-shake .25s linear infinite" }}>🥁 And the answer is…</span></div>}
+            {!active && (
+              <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "rgba(0,0,0,.4)", padding: "0 10px", textAlign: "center" }}>
+                <span className="gs-anim" style={{ fontSize: 16, fontWeight: 900, textShadow: "0 2px 4px #000", maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", animation: winner ? "gs-pop .8s ease-in-out 3" : "none" }}>
+                  {game.status === "cancelled" ? "Game ended" : game.result === "draw" ? "🤝 It's a draw!" : `👑 ${winner?.name ?? ""} wins!`}
+                </span>
+              </div>
+            )}
+          </SceneBanner>
           <div style={{ display: "flex", gap: 6 }}>{playerRow(game.players[0])}{playerRow(game.players[1])}</div>
           {active && game.question && (
             <>
-              <div style={{ fontSize: 15, fontWeight: 700, lineHeight: 1.3, padding: "4px 2px" }}>{game.question}</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <div style={{ fontSize: 16, fontWeight: 900, lineHeight: 1.3, padding: "2px", textAlign: "center", textWrap: "balance" } as React.CSSProperties}>{game.question}</div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
                 {game.options.map((o, i) => {
                   const st = answerStyle(i);
                   const clickable = (canAnswer && !st.removed) || iVote;
                   const votes = game.vote_tallies?.[i];
                   return (
-                    <button key={i} disabled={!clickable}
+                    <button key={i} disabled={!clickable} className="gs-anim"
                             onClick={() => (iVote ? onBuy(game.host_user_id, "vote", i) : onAnswer(i))}
-                            style={{ display: "flex", alignItems: "center", gap: 8, textAlign: "left", padding: "9px 10px", borderRadius: 10, border: `2px solid ${st.border}`, background: st.bg, color: st.color,
-                                     cursor: clickable ? "pointer" : "default", textDecoration: st.removed ? "line-through" : undefined, fontSize: 14 }}>
-                      <b style={{ color: gold, width: 16 }}>{LETTERS[i]}</b><span style={{ flex: 1 }}>{o}</span>
-                      {votes !== undefined && votes > 0 && <b style={{ color: BLUE }}>🗳 {votes}</b>}
-                      {who(i)}
+                            style={{ position: "relative", minHeight: 54, minWidth: 0, padding: "7px 8px", borderRadius: 12, textAlign: "left", overflow: "hidden", color: "#fff",
+                                     background: st.removed ? "#3a3a3a" : TILE_COLORS[i % TILE_COLORS.length], border: `3px solid ${st.right || st.mine ? "#fff" : st.wrongPick ? RED : "transparent"}`,
+                                     cursor: clickable ? "pointer" : "default", opacity: st.dim ? 0.4 : 1, animation: st.right ? "gs-pop .5s ease-in-out 3" : "none", transition: "opacity .4s",
+                                     display: "flex", flexDirection: "column", gap: 3 }}>
+                      <span style={{ display: "flex", alignItems: "flex-start", gap: 6, minWidth: 0, width: "100%" }}>
+                        <b style={{ background: "rgba(0,0,0,.28)", borderRadius: 7, padding: "1px 6px", fontSize: 12.5, flex: "none" }}>{LETTERS[i]}</b>
+                        <span style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 800, lineHeight: 1.2, overflowWrap: "anywhere", textShadow: "0 1px 2px rgba(0,0,0,.35)", textDecoration: st.removed ? "line-through" : undefined }}>
+                          {st.right ? "✅ " : st.wrongPick ? "❌ " : ""}{o}
+                        </span>
+                      </span>
+                      <span style={{ display: "flex", alignItems: "center", gap: 4, flexWrap: "wrap", fontSize: 10.5, fontWeight: 800, minWidth: 0, width: "100%" }}>
+                        {st.mine && <span>⭐ your answer</span>}
+                        {votes !== undefined && votes > 0 && <span style={{ background: "rgba(0,0,0,.35)", borderRadius: 999, padding: "1px 6px", color: BLUE }}>🗳 {votes}</span>}
+                        {who(i)}
+                      </span>
                     </button>
                   );
                 })}
               </div>
             </>
           )}
-          <div style={{ fontSize: 12.5, fontWeight: 600, color: !active ? gold : "#fff" }}>{status}</div>
+          <div style={{ fontSize: 12.5, fontWeight: 600, color: !active ? gold : "#fff", textAlign: "center" }}>{status}</div>
+          {podium.length > 0 && <Podium rows={podium} />}
           {!asking && r && active && (
             <div style={{ fontSize: 12, opacity: 0.85 }}>{game.players[0].name.split(" ")[0]} +{r.points.one} · {game.players[1].name.split(" ")[0]} +{r.points.two}</div>
           )}
