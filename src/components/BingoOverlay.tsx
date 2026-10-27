@@ -186,13 +186,13 @@ export function BingoOverlay({ game, myUserId, isHost, strip, onBuy, onEndGame, 
         {strip.length > 1 && <div className="bingo-strip">{strip.map((node, i) => <div key={i}>{node}</div>)}</div>}
 
         <SceneBanner scene={SCENES.retro} height={84}>
-          <div style={{ position: "absolute", left: 8, right: 8, top: "50%", transform: "translateY(-50%)", textAlign: "center" }}>
+          <div style={{ position: "absolute", left: 8, right: 8, top: "50%", transform: "translateY(-50%)", textAlign: "center", zIndex: 3 }}>
             <span className="bingo-title" style={{ display: "inline-block", maxWidth: "100%", boxSizing: "border-box", background: "rgba(0,0,0,.6)", borderRadius: 999, padding: "4px 14px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textShadow: "0 1px 3px #000" }}>
               {active ? t("bingo_number", game.game_no) : t("bingo_number_finished", game.game_no)}
             </span>
           </div>
           {shout && (
-            <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "rgba(0,0,0,.45)", padding: "0 10px" }}>
+            <div style={{ position: "absolute", inset: 0, zIndex: 4, display: "grid", placeItems: "center", background: "rgba(0,0,0,.45)", padding: "0 10px" }}>
               <span className="gs-anim" style={{ maxWidth: "100%", boxSizing: "border-box", textAlign: "center", overflowWrap: "anywhere", lineHeight: 1.2, fontSize: 16, fontWeight: 900, color: "#000", background: "var(--gold, #F0C420)", borderRadius: 12, padding: "5px 12px", animation: "gs-pop .6s ease-in-out 4" }}>🎉 {shout}</span>
             </div>
           )}

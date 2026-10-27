@@ -13,7 +13,6 @@ const MODE_FILTERS = [
   { key: "catch", label: "Catch" },
   { key: "race", label: "Race" },
   { key: "falling_lanes", label: "Balloon Pop" },
-  { key: "puzzle", label: "Puzzle" },
 ] as const;
 
 type ModeFilter = (typeof MODE_FILTERS)[number]["key"];
@@ -51,7 +50,10 @@ export function HostGamesMenu({ userId, roomName, activeGame, onClose, onChanged
     return () => { alive = false; };
   }, []);
 
-  const shown = (games ?? []).filter((g) => {
+  // Colour Balls (game_mode "puzzle") is a phone puzzle — the web could only play it as a plain
+  // tap game, so the web menu leaves it out (Steve, 2026-10-27).
+  const playable = (games ?? []).filter((g) => g.game_mode !== "puzzle");
+  const shown = playable.filter((g) => {
     if (mode !== "all" && (g.game_mode ?? "") !== mode) return false;
     const q = query.trim().toLowerCase();
     if (!q) return true;
@@ -114,7 +116,7 @@ export function HostGamesMenu({ userId, roomName, activeGame, onClose, onChanged
                 {t("pick_a_game_for_your_room_viewers_pay_50")}</p>
               {/* There are ~77 games, so browsing the raw list is impractical. */}
               <input className="input" value={query} onChange={(e) => setQuery(e.target.value)}
-                placeholder={`Search ${games.length} games…`} style={{ width: "100%", marginBottom: 8 }} />
+                placeholder={`Search ${playable.length} games…`} style={{ width: "100%", marginBottom: 8 }} />
               <div className="row" style={{ flexWrap: "wrap", marginBottom: 10 }}>
                 {MODE_FILTERS.map((f) => (
                   <button key={f.key} className={f.key === mode ? "btn small" : "btn small ghost"}

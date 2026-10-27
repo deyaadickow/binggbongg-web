@@ -244,6 +244,8 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
       </div>
 
       <div ref={areaRef} style={{ flex: 1, position: "relative", overflow: "hidden", background: bg, touchAction: "manipulation", userSelect: "none" }}>
+        {/* The phones' race card: the racer riding a rainbow track through the 5 stations. */}
+        {isRace && phase === "playing" && <RaceTrack emoji={game.emoji || "🏁"} caught={caught} elapsed={clock(elapsed)} />}
         {bgIsVideo && bgUrl && (
           <video
             ref={(el) => {
@@ -318,9 +320,9 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
                   <h2 className="card-title" style={{ fontSize: 18, whiteSpace: "pre-line" }}>
                     {isRace
                       ? `Your ${game.catch_name || "racer"} reached Station ${RACE_STATIONS}\nin ${clock(elapsed)} — ${Number(result.coins_earned).toLocaleString()} coins!`
-                      : isLanes
-                      ? `You popped ${result.objects_caught} balloons,\nworth ${Number(result.coins_earned).toLocaleString()} coins!`
-                      : `You caught ${result.objects_caught} ${game.catch_name || "objects"},\nworth ${Number(result.coins_earned).toLocaleString()} coins!`}
+                      // Number then name, so no plural "s" is guessed: "Caught: 24 × Cricket Ball · worth 24 coins".
+                      : `${t(isLanes ? "tap_result_popped" : "tap_result_caught", Number(result.objects_caught).toLocaleString(), isLanes ? (game.catch_name || "Balloon") : (game.catch_name || game.display_name || game.name || "Catch"))} · ${
+                          Number(result.coins_earned) === 1 ? t("tap_result_worth_one_coin") : t("tap_result_worth_n_coins", Number(result.coins_earned).toLocaleString())}`}
                   </h2>
                   {/* The offer used to be hidden unless the server also returned host_name, so a
                       round where that came back empty ended with no way to gift at all and no
@@ -332,7 +334,7 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
                       {giftError && <p style={{ marginTop: 8, fontSize: 13, color: "var(--red)" }}>{giftError}</p>}
                       <div className="row" style={{ marginTop: 10 }}>
                         <button className="btn ghost" style={{ flex: 1 }} onClick={onClose} disabled={gifting}>{t("no")}</button>
-                        <button className="btn" style={{ flex: 1 }} onClick={gift} disabled={gifting}>{gifting ? "Gifting…" : "YES, GIFT"}</button>
+                        <button className="btn" style={{ flex: 1 }} onClick={gift} disabled={gifting}>{gifting ? t("gifting_ellipsis") : t("yes_gift")}</button>
                       </div>
                     </>
                   )}
@@ -359,6 +361,38 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+/** The race card over the play area — Android's RaceTrackView: a rainbow bar with a dot per
+ *  station (lit once reached), a 🏁 at the end, and the racer bobbing along it. */
+function RaceTrack({ emoji, caught, elapsed }: { emoji: string; caught: number; elapsed: string }) {
+  const progress = Math.min(1, caught / RACE_FINISH);
+  const reached = Math.min(RACE_STATIONS, Math.floor(caught / (RACE_FINISH / RACE_STATIONS)));
+  return (
+    <div style={{ position: "absolute", left: 10, right: 10, top: 10, zIndex: 2, background: "rgba(0,0,0,.7)", border: "2px solid var(--gold, #F0C420)", borderRadius: 14, padding: "8px 12px", pointerEvents: "none", color: "#fff" }}>
+      <div style={{ display: "flex", fontSize: 13, fontWeight: 700 }}>
+        <span style={{ flex: 1, minWidth: 0 }}>Tap the {emoji} — reach Station {RACE_STATIONS}!</span>
+        <span style={{ fontVariantNumeric: "tabular-nums" }}>{elapsed}</span>
+      </div>
+      <div style={{ position: "relative", height: 58 }}>
+        <div style={{ position: "absolute", left: 6, right: 26, top: "68%", height: 12, transform: "translateY(-50%)", borderRadius: 6, boxShadow: "0 0 0 2px rgba(255,255,255,.2)",
+                      background: "linear-gradient(90deg, #FF3B6B, #FF8C00, #FFD400, #22C55E, #22B8F5, #7C4DFF, #FF3B6B)" }}>
+          <div style={{ position: "absolute", top: 0, bottom: 0, right: 0, width: `${(1 - progress) * 100}%`, borderRadius: 6, background: "rgba(0,0,0,.4)", transition: "width .35s ease-out" }} />
+          {Array.from({ length: RACE_STATIONS }, (_, i) => (
+            <span key={i} style={{ position: "absolute", left: `${((i + 1) / RACE_STATIONS) * 100}%`, top: "50%", width: 7, height: 7, borderRadius: "50%", transform: "translate(-50%,-50%)",
+                                   background: i < reached ? "#fff" : "rgba(0,0,0,.53)", boxShadow: `0 0 0 1.5px ${i < reached ? "#F0C420" : "rgba(255,255,255,.67)"}` }}>
+              <b style={{ position: "absolute", top: 12, left: "50%", transform: "translateX(-50%)", fontSize: 9 }}>{i + 1}</b>
+            </span>
+          ))}
+          <span style={{ position: "absolute", left: `${progress * 100}%`, bottom: 8, transform: "translateX(-50%)", fontSize: 24, lineHeight: 1, transition: "left .35s ease-out" }}>
+            <span className="gs-anim" style={{ display: "inline-block", animation: "gs-bob 1.4s ease-in-out infinite" }}>{emoji}</span>
+          </span>
+          <span style={{ position: "absolute", left: "calc(100% + 13px)", top: "50%", transform: "translate(-50%,-60%)", fontSize: 16 }}>🏁</span>
+        </div>
+      </div>
+      <div style={{ color: "var(--gold, #F0C420)", fontWeight: 700, fontSize: 12 }}>Station {reached} of {RACE_STATIONS} • {caught} of {RACE_FINISH} coins</div>
     </div>
   );
 }

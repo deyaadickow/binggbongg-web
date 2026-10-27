@@ -204,12 +204,14 @@ export function OneStrokeOverlay({ onClose }: { onClose: () => void }) {
         {level ? (
           <>
             <SceneBanner scene={SCENES.space} height={72}>
-              <div style={{ position: "absolute", left: 8, right: 8, top: "50%", transform: "translateY(-50%)", textAlign: "center" }}>
+              {/* Above the scene's rocket and comets, which used to fly across the title. */}
+              <div style={{ position: "absolute", left: 8, right: 8, top: "50%", transform: "translateY(-50%)", textAlign: "center", zIndex: 3 }}>
                 <span className="onestroke-title gs-anim" style={{ display: "inline-block", maxWidth: "100%", boxSizing: "border-box", background: "rgba(0,0,0,.55)", borderRadius: 999, padding: "4px 14px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", animation: solved ? "gs-pop .6s ease-in-out 3" : "none" }}>
                   {solved ? "🌟 " : ""}{level.level_no}. {level.name}
                 </span>
               </div>
             </SceneBanner>
+            <div className="onestroke-hint" style={{ fontSize: 12.5 }}>{t("one_stroke_rule")}</div>
             <div className="onestroke-hint">{message || `${used.size} of ${level.edges.length} lines`}</div>
             <svg
               ref={svgRef}

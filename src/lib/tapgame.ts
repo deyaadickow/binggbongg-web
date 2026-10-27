@@ -105,7 +105,9 @@ export function gameTitle(g: TapGameType): string {
  *  coin_value to the host's actual pick for this activation. */
 export function gameTitleWithRate(g: TapGameType): string {
   const n = Number(g.coin_value ?? 0);
-  if (!(n > 0) || g.game_mode === "race" || g.game_mode === "puzzle") return gameTitle(g);
+  // A race pays one coin a tap, whatever the host picked — the phones' header says so.
+  if (g.game_mode === "race") return `${gameTitle(g)}, 1 Coin Per Tap`;
+  if (!(n > 0) || g.game_mode === "puzzle") return gameTitle(g);
   const unit = g.game_mode === "falling_lanes" ? "Pop" : "Catch";
   return `${gameTitle(g)}, ${n % 1 === 0 ? n : n.toFixed(2)} Coin${n === 1 ? "" : "s"} Per ${unit}`;
 }
@@ -211,6 +213,10 @@ const SCENES: Record<string, string> = {
 // These are per-GAME overrides, checked before the category — the phones already paint every game
 // from a per-key palette, so this is the web catching up for the games where it matters most.
 const KEY_SCENES: Record<string, string> = {
+  // Woodland and marsh, from the phones' palettes (TapGameSceneView.kt): a green field under trees
+  // for the rabbits, tall reeds over the marsh for the ducks.
+  rabbit_hunting: paletteScene("#8FCB7A", "#274A1E", "#1E3A17", "#2F5A23", "trees"),
+  duck_hunting: paletteScene("#7FB8AC", "#1B3A2E", "#2E3B22", "#4C6B34", "reeds"),
   // The 100th game (2026-10-26): a festival night sky, gold glows where the bursts have been.
   fireworks_finale:
     "radial-gradient(circle at 25% 28%, rgba(255,201,74,0.35), transparent 22%)," +
@@ -293,6 +299,69 @@ const KEY_SCENES: Record<string, string> = {
     "linear-gradient(#CFEAFF 0%, #8AA8C4 50%, #6A8AB8 100%)",
 };
 
+/** A phone palette (TapGameScenePalette on Android) as CSS: the sky gradient, a back and a front
+ *  foliage layer in the palette's own shape — tree canopy, reeds, dunes, rocks, clouds or waves. */
+type Foliage = "trees" | "reeds" | "dunes" | "rocks" | "clouds" | "leaves" | "none";
+function paletteScene(skyTop: string, skyBottom: string, back: string, front: string, foliage: Foliage): string {
+  const hills = (c: string, at: string, w: number, h: number) => `radial-gradient(ellipse ${w}% ${h}% at ${at}, ${c} 0%, ${c} 60%, transparent 61%)`;
+  const layers: string[] = [];
+  switch (foliage) {
+    case "trees":
+      // Round crowns along the horizon, the front row darker and lower.
+      for (const [x, y, r] of [[8, 80, 13], [27, 78, 15], [48, 81, 12], [68, 77, 15], [90, 80, 13]]) layers.push(`radial-gradient(circle at ${x}% ${y}%, ${back} 0 ${r}%, transparent ${r + 0.5}%)`);
+      for (const [x, y, r] of [[0, 96, 16], [20, 98, 14], [40, 95, 15], [62, 98, 14], [84, 95, 16], [100, 98, 13]]) layers.push(`radial-gradient(circle at ${x}% ${y}%, ${front} 0 ${r}%, transparent ${r + 0.5}%)`);
+      layers.push(`linear-gradient(transparent 0 86%, ${front} 86%)`);
+      break;
+    case "reeds":
+      // Thin upright reeds over a still marsh.
+      layers.push(`repeating-linear-gradient(90deg, ${front} 0 3px, transparent 3px 11px, ${back} 11px 13px, transparent 13px 22px) 0 100%/100% 30% no-repeat`);
+      layers.push(hills(back, "50% 100%", 150, 22));
+      break;
+    case "dunes": layers.push(hills(front, "25% 104%", 90, 28), hills(back, "78% 102%", 100, 32)); break;
+    case "rocks": layers.push(`linear-gradient(160deg, transparent 0 78%, ${front} 78%)`, `linear-gradient(200deg, transparent 0 74%, ${back} 74%)`); break;
+    case "clouds": layers.push(hills("rgba(255,255,255,0.85)", "22% 100%", 60, 16), hills("rgba(255,255,255,0.7)", "72% 102%", 70, 20), hills(front, "50% 104%", 140, 14)); break;
+    case "leaves": layers.push(hills(front, "20% 100%", 70, 22), hills(back, "75% 102%", 80, 26)); break;
+    case "none": break;
+  }
+  layers.push(`linear-gradient(${skyTop}, ${skyBottom})`);
+  return layers.join(",");
+}
+
+/** Every race its own scene — Android's race palettes exactly (TapGameSceneView.kt), so a horse
+ *  race and a rocket race no longer share one grey road. The 5-station track is drawn on top. */
+const RACE_PALETTES: Record<string, [string, string, string, string, Foliage]> = {
+  train_race: ["#3FB8FF", "#1FAF4B", "#0E7A3A", "#F2C94C", "trees"],
+  horse_race: ["#5AD0FF", "#3CB44B", "#1E8A3A", "#FF8C42", "reeds"],
+  dog_race: ["#7FE0FF", "#7AC943", "#2E9A3A", "#FFB300", "leaves"],
+  fox_race: ["#FF9A3C", "#7B2D8E", "#4A1A6A", "#FF5E3A", "trees"],
+  car_race: ["#4FC3FF", "#2A2A72", "#111144", "#FF3B6B", "clouds"],
+  motorcycle_race: ["#FF6A3D", "#3A0CA3", "#1A0560", "#F72585", "rocks"],
+  airplane_race: ["#7BD3FF", "#0077FF", "#0044AA", "#FFFFFF", "clouds"],
+  running_race: ["#FFD166", "#EF476F", "#8A1C3A", "#06D6A0", "reeds"],
+  rocket_race: ["#3A0CA3", "#0B0033", "#1B0A5A", "#7209B7", "rocks"],
+  speedboat_race: ["#4CC9F0", "#0353A4", "#023E7D", "#00B4D8", "leaves"],
+  bicycle_race: ["#8AE234", "#2A9D8F", "#1B6B62", "#E9C46A", "trees"],
+  camel_race: ["#FFB347", "#C2410C", "#7C2D12", "#FDE047", "dunes"],
+  rabbit_race: ["#B5F2A0", "#2DC653", "#157F3B", "#FF7AB6", "leaves"],
+  turtle_race: ["#5EEAD4", "#0F766E", "#134E4A", "#84CC16", "leaves"],
+  cheetah_race: ["#FFD60A", "#E85D04", "#9A3412", "#FFBA08", "reeds"],
+  dragon_race: ["#FF2E63", "#252A34", "#0F0F1A", "#08D9D6", "rocks"],
+  unicorn_race: ["#FFB3F6", "#7B2CBF", "#5A189A", "#48CAE4", "clouds"],
+  helicopter_race: ["#48CAE4", "#0096C7", "#023E8A", "#FF9F1C", "clouds"],
+  sailboat_race: ["#90E0EF", "#0077B6", "#03045E", "#00B4D8", "leaves"],
+  skateboard_race: ["#FF61A6", "#5F0F40", "#2B0A2E", "#FFD23F", "none"],
+  kangaroo_race: ["#FFC857", "#C44536", "#772E25", "#F4A261", "dunes"],
+  penguin_race: ["#A2D2FF", "#3A86FF", "#1E3F8A", "#FFFFFF", "rocks"],
+  dolphin_race: ["#00F5D4", "#0466C8", "#023E7D", "#00BBF9", "leaves"],
+  snail_race: ["#C7F9CC", "#38B000", "#006400", "#FF9E00", "leaves"],
+  elephant_race: ["#FFB703", "#FB8500", "#8B4513", "#8ECAE6", "trees"],
+  bus_race: ["#FFE45E", "#FF6392", "#7A1F4A", "#5AA9E6", "clouds"],
+  truck_race: ["#F77F00", "#003049", "#001A2E", "#D62828", "rocks"],
+  tractor_race: ["#FFD166", "#06A77D", "#005F4F", "#F9A03F", "dunes"],
+  dinosaur_race: ["#FF7B00", "#1B4332", "#081C15", "#80ED99", "trees"],
+  ufo_race: ["#7400B8", "#03071E", "#240046", "#4CC9F0", "rocks"],
+};
+
 /** Daylight sky over grass — Balloon Pop's own scene, and the safe default for anything new. */
 const SKY_SCENE =
   "radial-gradient(ellipse 70% 22% at 20% 100%, #2E7A3A 0%, #2E7A3A 60%, transparent 61%)," +
@@ -303,6 +372,8 @@ const SKY_SCENE =
 export function sceneFor(game: TapGameType): string {
   const byKey = game.key && KEY_SCENES[game.key];
   if (byKey) return byKey;
+  const race = game.key && RACE_PALETTES[game.key];
+  if (race) return paletteScene(...race);
   if (game.game_mode === "falling_lanes" || game.game_mode === "race") {
     return game.game_mode === "race" ? SCENES["Races"] : SKY_SCENE;
   }
