@@ -19,6 +19,8 @@ import { buyBoardPowerup, cancelBoardGame, fetchBoardGame, makeBoardMove, resign
 import { BOARD_TITLE, BoardGameOverlay, BoardGameStartDialog } from "../components/BoardGameOverlay";
 import { answerTrivia, buyTrivia, cancelTrivia, fetchTrivia, startTrivia, type TriviaGame } from "../lib/trivia";
 import { TriviaOverlay, TriviaStartDialog } from "../components/TriviaOverlay";
+import { fetchAudience, type AudienceRound } from "../lib/audience";
+import { AudienceCard } from "../components/AudienceCard";
 import { fetchActiveTapGame, gameTitle, type TapGameType } from "../lib/tapgame";
 import { TapGameOverlay } from "../components/TapGameOverlay";
 import { HostGamesMenu } from "../components/HostGamesMenu";
@@ -249,6 +251,9 @@ export function LiveViewerPage() {
   const triviaAnnounced = useRef<number | null>(null);
   const triviaBusy = useRef(false);
   const triviaRef = useRef<TriviaGame | null>(null);
+  // The audience layer on head-to-head battles (Steve, 2026-10-27) — predict, cheer, vote the forfeit.
+  const [audience, setAudience] = useState<AudienceRound | null>(null);
+  const audienceSeenAt = useRef(0);
   triviaRef.current = trivia;
   const [picker, setPicker] = useState<BattleKind | null>(null);
   // Steve, 2026-09-27: Hide & Seek — pick the shape first (free for all 2-4, or 2v2 teams).
@@ -553,6 +558,24 @@ export function LiveViewerPage() {
     return () => window.clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomName, triviaActive]);
+
+  useEffect(() => {
+    if (!roomName) return;
+    let alive = true;
+    const tick = async () => {
+      try {
+        const r = await fetchAudience(roomName, user?.id ?? null);
+        if (!alive) return;
+        // A finished round stays up for a minute so everyone sees the result and the forfeit.
+        if (r && r.status === "open") audienceSeenAt.current = Date.now();
+        setAudience(r && (r.status === "open" || Date.now() - audienceSeenAt.current < 60000) ? r : null);
+      } catch { /* keep the last good state */ }
+    };
+    void tick();
+    const id = window.setInterval(tick, 3000);
+    return () => { alive = false; window.clearInterval(id); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomName, user?.id]);
 
   function openTrivia() {
     if (trivia && trivia.status === "active") { triviaClosedId.current = null; setTriviaOpen(true); return; }
@@ -1473,6 +1496,7 @@ export function LiveViewerPage() {
           }}
         />
       )}
+      {audience && <AudienceCard round={audience} myUserId={myId} onRound={setAudience} onToast={setToast} />}
       {bingoBoardOpen && <BingoBoardOverlay onClose={() => setBingoBoardOpen(false)} />}
       {bingoFinishedId !== null && (
         <BingoWinnersOverlay bingoGameId={bingoFinishedId} onClose={() => setBingoFinishedId(null)} />
