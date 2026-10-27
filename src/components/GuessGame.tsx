@@ -219,7 +219,6 @@ export function GuessCard({ game, myUserId, onGuess, onLock, onResolve, onCancel
   );
 }
 
-const KIND_LABEL: Record<GuessKind, string> = { pick: "Pick one", number: "A number", score: "A score" };
 const LOCK_CHOICES = [{ m: 1, l: "1 min" }, { m: 3, l: "3 min" }, { m: 5, l: "5 min" }, { m: 10, l: "10 min" }, { m: 0, l: "When I lock it" }];
 
 /** Host: pick a ready-made game (or write one), the players, the price and the timer. */
@@ -243,15 +242,18 @@ export function GuessStartDialog({ people, onStart, onClose }: {
 
   function choose(t: GuessTemplate | "custom") {
     setTpl(t);
-    if (t === "custom") { setKind("pick"); setTitle(""); setUnit(""); setOptions(["", ""]); return; }
-    setKind(t.kind); setTitle(t.title); setUnit(t.unit ?? ""); setOptions(t.options ? [...t.options] : ["", ""]);
+    // Steve, 2026-10-27: "make it dummy proof ... A question, 3 or 4 answers, just add 3 or 4 boxes
+    // to click for the answer" — always four answer boxes; blank ones are left out.
+    const four = (o: string[] | null | undefined) => [...(o ?? []), "", "", "", ""].slice(0, 4);
+    if (t === "custom") { setKind("pick"); setTitle(""); setUnit(""); setOptions(four([])); return; }
+    setKind(t.kind); setTitle(t.title); setUnit(t.unit ?? ""); setOptions(four(t.options));
   }
   const togglePlayer = (id: number) => setPlayers((p) => (p.includes(id) ? p.filter((x) => x !== id) : p.length >= 4 ? p : [...p, id]));
   const cleanOptions = options.map((o) => o.trim()).filter(Boolean);
   const problem =
     !title.trim() ? "Write the question." :
     usesPlayers && players.length < 2 ? "Pick 2 to 4 players." :
-    kind === "pick" && !usesPlayers && cleanOptions.length < 2 ? "Give at least 2 choices." :
+    kind === "pick" && !usesPlayers && cleanOptions.length < 2 ? "Fill in at least 2 answer boxes." :
     kind === "score" && !(players.length === 2) && cleanOptions.length !== 2 ? "Name both sides." : null;
 
   const chip = (on: boolean, label: string, onClick: () => void) => (
@@ -275,15 +277,14 @@ export function GuessStartDialog({ people, onStart, onClose }: {
             )}
             {templates === null ? <p style={{ opacity: 0.7 }}>Loading…</p> : templates.filter((t) => cat === "All" || t.category === cat).map((t) => (
               <button key={t.key} onClick={() => choose(t)} style={{ display: "flex", width: "100%", gap: 10, alignItems: "center", padding: "9px 12px", marginBottom: 5, borderRadius: 10, border: "1px solid rgba(240,196,32,.35)", background: "rgba(255,255,255,.04)", color: "#fff", cursor: "pointer", textAlign: "left" }}>
-                <span style={{ fontSize: 20 }}>{t.emoji}</span><span style={{ flex: 1, fontSize: 13.5 }}>{t.title}</span><span style={{ fontSize: 10.5, color: gold, opacity: 0.8 }}>{KIND_LABEL[t.kind]}</span>
+                <span style={{ fontSize: 20 }}>{t.emoji}</span><span style={{ flex: 1, fontSize: 13.5 }}>{t.title}</span>
               </button>
             ))}
           </>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10, fontSize: 13 }}>
-            {tpl === "custom" && <div style={{ display: "flex", gap: 6 }}>{(["pick", "number", "score"] as GuessKind[]).map((k) => chip(kind === k, KIND_LABEL[k], () => { setKind(k); if (k === "score" && options.length !== 2) setOptions(["Me", "You"]); }))}</div>}
             <label style={{ display: "flex", flexDirection: "column", gap: 4 }}>The question
-              <input value={title} maxLength={120} onChange={(e) => setTitle(e.target.value)} placeholder={kind === "number" ? "How many sweets are in my jar?" : "Which car finishes first?"} style={field} />
+              <input value={title} maxLength={120} onChange={(e) => setTitle(e.target.value)} placeholder="Which car finishes first?" style={field} />
             </label>
             {kind === "number" && (
               <label style={{ display: "flex", flexDirection: "column", gap: 4 }}>Counted in (optional)
@@ -301,14 +302,12 @@ export function GuessStartDialog({ people, onStart, onClose }: {
             </div>
             {((kind === "pick" && !usesPlayers) || (kind === "score" && players.length !== 2)) && (
               <div>
-                <div style={{ marginBottom: 4 }}>{kind === "score" ? "The two sides" : "The choices"}</div>
+                <div style={{ marginBottom: 4 }}>{kind === "score" ? "The two sides" : "The answer boxes (fill 2 to 4)"}</div>
                 {options.map((o, i) => (
                   <div key={i} style={{ display: "flex", gap: 6, marginBottom: 4 }}>
-                    <input value={o} maxLength={30} onChange={(e) => setOptions((all) => all.map((x, j) => (j === i ? e.target.value : x)))} placeholder={`Choice ${i + 1}`} style={{ ...field, flex: 1 }} />
-                    {kind === "pick" && options.length > 2 && <button onClick={() => setOptions((all) => all.filter((_, j) => j !== i))} aria-label="Remove" style={btn(false)}>✕</button>}
+                    <input value={o} maxLength={30} onChange={(e) => setOptions((all) => all.map((x, j) => (j === i ? e.target.value : x)))} placeholder={`Answer ${i + 1}`} style={{ ...field, flex: 1 }} />
                   </div>
                 ))}
-                {kind === "pick" && options.length < 8 && <button onClick={() => setOptions((all) => [...all, ""])} style={btn(false)}>+ Add a choice</button>}
               </div>
             )}
             <label style={{ display: "flex", flexDirection: "column", gap: 4 }}>
