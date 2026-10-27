@@ -22,11 +22,16 @@ import {
 } from "../lib/bingo";
 import { Overlay } from "./BattleEngines";
 import { useT } from "../lib/i18n";
+import { Confetti, MuteButton, Podium, SceneBanner } from "./GameShow";
+import { SCENES } from "../lib/gameSceneData";
+import { haptic, sfx } from "../lib/gameSounds";
 
-export function BingoCardArt({ card, onBuy }: {
+export function BingoCardArt({ card, onBuy, popped }: {
   card: BingoCard | null;
   /** Absent makes the card read-only — a finished game, or a card nobody may buy into. */
   onBuy?: (cell: string) => void;
+  /** "col-row" keys of squares covered since the last poll — they pop in (Game Show). */
+  popped?: Set<string>;
 }) {
   const { t } = useT();
   const cells = useMemo(() => {
@@ -58,7 +63,7 @@ export function BingoCardArt({ card, onBuy }: {
       {cells.map((c) => (
         <div
           key={c.key}
-          className={`bingo-cell${c.gifter !== null ? " covered" : ""}`}
+          className={`bingo-cell${c.gifter !== null ? " covered" : ""}${c.gifter !== null && popped?.has(c.key) ? " popped" : ""}`}
           style={{
             left: c.left, top: c.top,
             width: `${BINGO_CELL_W * 100}%`, height: `${BINGO_CELL_H * 100}%`,
@@ -108,11 +113,59 @@ export function BingoOverlay({ game, myUserId, isHost, strip, onBuy, onEndGame, 
 
   const active = game.status === "active";
 
+  // Game Show (Steve, 2026-10-27: make the games "entertaining"): a square that gets covered pops
+  // in with a sound, a pattern win flashes BINGO! with confetti, and the end gets a fanfare and a
+  // podium. All of it fires on what CHANGED since the last poll — the ref holds the last one.
+  const [popped, setPopped] = useState<Set<string>>(() => new Set());
+  const [burst, setBurst] = useState(0);
+  const [shout, setShout] = useState<string | null>(null);
+  const timers = useRef<{ pop?: number; shout?: number }>({});
+  const coveredKeys = (g: BingoGame) => new Set(g.cards.flatMap((c) => c.covered.map((s) => `${c.bingo_card_id}:${s.col}-${s.row}`)));
+  const prev = useRef({ id: game.bingo_game_id, status: game.status, covered: coveredKeys(game), wins: game.wins.length });
+  useEffect(() => () => { window.clearTimeout(timers.current.pop); window.clearTimeout(timers.current.shout); }, []);
+  useEffect(() => {
+    const was = prev.current;
+    const covered = coveredKeys(game);
+    prev.current = { id: game.bingo_game_id, status: game.status, covered, wins: game.wins.length };
+    if (was.id !== game.bingo_game_id) { setPopped(new Set()); setShout(null); return; }
+    const fresh = [...covered].filter((k) => !was.covered.has(k));
+    if (fresh.length) {
+      setPopped(new Set(fresh));
+      window.clearTimeout(timers.current.pop);
+      timers.current.pop = window.setTimeout(() => setPopped(new Set()), 1400);
+    }
+    const ended = was.status === "active" && game.status !== "active";
+    if (game.wins.length > was.wins) {
+      const w = game.wins[game.wins.length - 1];
+      setShout(`BINGO! ${winLabel(w.pattern)} — ${w.name ?? "A member"}`);
+      window.clearTimeout(timers.current.shout);
+      timers.current.shout = window.setTimeout(() => setShout(null), 4000);
+      setBurst(Date.now());
+      if (!ended) { sfx.correct(); haptic([40, 60, 40]); }
+    } else if (fresh.length && !ended) { sfx.reveal(); haptic(20); }
+    if (ended && (game.winner_user_id !== null || game.wins.length > 0)) { sfx.fanfare(); setBurst(Date.now()); }
+  }, [game]);
+
+  // Who covered the most, the whole-card winner first — shown once the game is over.
+  const podium = active ? [] : [...game.cards]
+    .sort((a, b) => (Number(b.user_id === game.winner_user_id) - Number(a.user_id === game.winner_user_id)) || b.covered.length - a.covered.length)
+    .filter((c) => c.covered.length > 0)
+    .slice(0, 3)
+    .map((c) => ({ name: c.player_name, value: `${c.covered.length} square${c.covered.length === 1 ? "" : "s"}` }));
+  const shownPopped = useMemo(() => {
+    if (!shown) return undefined;
+    const prefix = `${shown.bingo_card_id}:`;
+    return new Set([...popped].filter((k) => k.startsWith(prefix)).map((k) => k.slice(prefix.length)));
+  }, [popped, shown]);
+
   return (
     <div className="bingo-overlay">
+      <Confetti burst={burst} />
       <div className="bingo-inner">
         <div className="bingo-top">
           <button className="btn ghost" onClick={onClose}>{t("close_2")}</button>
+          <span style={{ flex: 1 }} />
+          <MuteButton />
           {isHost && active && <button className="btn" onClick={onEndGame}>{t("end_game")}</button>}
         </div>
 
@@ -120,7 +173,18 @@ export function BingoOverlay({ game, myUserId, isHost, strip, onBuy, onEndGame, 
             shows — nothing worth a strip. */}
         {strip.length > 1 && <div className="bingo-strip">{strip.map((node, i) => <div key={i}>{node}</div>)}</div>}
 
-        <div className="bingo-title">{active ? t("bingo_number", game.game_no) : t("bingo_number_finished", game.game_no)}</div>
+        <SceneBanner scene={SCENES.retro} height={84}>
+          <div style={{ position: "absolute", left: 8, right: 8, top: "50%", transform: "translateY(-50%)", textAlign: "center" }}>
+            <span className="bingo-title" style={{ display: "inline-block", maxWidth: "100%", boxSizing: "border-box", background: "rgba(0,0,0,.6)", borderRadius: 999, padding: "4px 14px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textShadow: "0 1px 3px #000" }}>
+              {active ? t("bingo_number", game.game_no) : t("bingo_number_finished", game.game_no)}
+            </span>
+          </div>
+          {shout && (
+            <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "rgba(0,0,0,.45)", padding: "0 10px" }}>
+              <span className="gs-anim" style={{ maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: 19, fontWeight: 900, color: "#000", background: "var(--gold, #F0C420)", borderRadius: 12, padding: "5px 14px", animation: "gs-pop .6s ease-in-out 4" }}>🎉 {shout}</span>
+            </div>
+          )}
+        </SceneBanner>
 
         {/* Always on screen, because a double-click spends this without asking. */}
         <div className="bingo-price">
@@ -144,7 +208,10 @@ export function BingoOverlay({ game, myUserId, isHost, strip, onBuy, onEndGame, 
         <BingoCardArt
           card={shown}
           onBuy={active && shown ? (cell) => onBuy(shown, cell) : undefined}
+          popped={shownPopped}
         />
+
+        {podium.length > 0 && <div style={{ color: "#fff" }}><Podium rows={podium} /></div>}
 
         <div className="bingo-wins">
           {game.wins.length === 0

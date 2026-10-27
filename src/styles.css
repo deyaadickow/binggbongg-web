@@ -581,6 +581,15 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .bingo-cell.covered > span {
   font-size: clamp(7px, 1.5vw, 15px); text-align: center; overflow-wrap: anywhere; line-height: 1.05;
 }
+/* Game Show (2026-10-27): a square that was just covered pops in. The translate is repeated in
+   every frame because the cell is centred with a transform. */
+.bingo-cell.popped { animation: bingo-pop .7s cubic-bezier(.3,1.5,.5,1) both; box-shadow: 0 0 14px 4px rgba(255, 221, 85, .9); }
+@keyframes bingo-pop {
+  0% { transform: translate(-50%, -50%) scale(.3); opacity: 0; }
+  60% { transform: translate(-50%, -50%) scale(1.25); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) { .bingo-cell.popped { animation: none; } }
 
 .bingo-players { display: flex; flex-direction: column; gap: 6px; max-height: 190px; overflow-y: auto; }
 .bingo-rule { border: 0; border-top: 1px solid rgba(212, 175, 55, 0.4); margin: 14px 0; }
