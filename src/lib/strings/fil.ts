@@ -924,7 +924,7 @@ export const fil = {
   pick_an_age_group_to_see_its_videos: "Pumili ng age group para makita ang mga video nito.",
   pick_exactly_n_people: "Pumili ng eksaktong %1$s tao (%2$s/%1$s).",
   pick_exactly_one_person: "Pumili ng eksaktong %1$s tao (%2$s/%1$s).",
-  pick_one_at_random: "🎲 Pumili nang random",
+  pick_one_at_random: "🎮 Pumili nang random",
   pick_up_to_3_guests_in_your_room_members: "Pumili ng hanggang 3 — mga guest sa room mo, miyembrong hindi live, o maghanap ng kahit sinong miyembro. Ang mga hindi live ay ipapakita ang virtual look nila. 5 minuto, panalo ang may pinakamaraming coins.",
   pk_battle_contests: "Mga PK Battle Contest",
   play_games_while_you_battle: "Maglaro habang nag-battle",

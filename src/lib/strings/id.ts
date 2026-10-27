@@ -924,7 +924,7 @@ export const id = {
   pick_an_age_group_to_see_its_videos: "Pilih kelompok usia untuk melihat videonya.",
   pick_exactly_n_people: "Pilih tepat %1$s orang (%2$s/%1$s).",
   pick_exactly_one_person: "Pilih tepat %1$s orang (%2$s/%1$s).",
-  pick_one_at_random: "🎲 Pilih satu secara acak",
+  pick_one_at_random: "🎮 Pilih satu secara acak",
   pick_up_to_3_guests_in_your_room_members: "Pilih hingga 3 — tamu di room-mu, anggota yang tidak live, atau cari anggota mana pun. Yang tidak live menampilkan tampilan virtual mereka. 5 menit, koin terbanyak menang.",
   pk_battle_contests: "Kontes PK Battle",
   play_games_while_you_battle: "Main game sambil battle",

@@ -18,13 +18,29 @@ import {
   BINGO_CELL_H, BINGO_CELL_W, BINGO_COLUMNS, BINGO_COL_X, BINGO_ROW_Y, BINGO_ASPECT,
   BINGO_FALLBACK, BINGO_MIN, BINGO_PAYABLE_SQUARES, BINGO_QUICK_CHOICES, BINGO_STEP,
   bingoClamp, bingoFormat, bingoPlayedOn, fetchBingoBoard, fetchBingoGameWinners, winLabel,
-  type BingoBoard, type BingoCard, type BingoGame, type BingoWinners,
+  type BingoBoard, type BingoCard, type BingoGame, type BingoWin, type BingoWinners,
 } from "../lib/bingo";
 import { Overlay } from "./BattleEngines";
 import { useT } from "../lib/i18n";
 import { Confetti, MuteButton, Podium, SceneBanner } from "./GameShow";
 import { SCENES } from "../lib/gameSceneData";
 import { haptic, sfx } from "../lib/gameSounds";
+
+/** The Bingo podium rule, one everywhere (the room, the game's winners page, Android, iOS): the
+ *  whole-card winner first, then whoever took the most patterns. Under each name: "Whole card"
+ *  for the whole-card winner, otherwise "N patterns" ("1 pattern"). */
+function bingoPodium(wins: BingoWin[], winnerUserId: number | null, t: ReturnType<typeof useT>["t"]) {
+  const byUser = new Map<string, BingoWin[]>();
+  for (const w of wins) {
+    const k = String(w.user_id ?? w.name ?? "");
+    byUser.set(k, [...(byUser.get(k) ?? []), w]);
+  }
+  return [...byUser.values()]
+    .map((l) => ({ l, whole: l.some((w) => w.pattern === "whole_card") || (winnerUserId !== null && l[0].user_id === winnerUserId), n: l.length }))
+    .sort((a, b) => Number(b.whole) - Number(a.whole) || b.n - a.n)
+    .slice(0, 3)
+    .map(({ l, whole, n }) => ({ name: l[0].name ?? "A member", value: whole ? t("bingo_whole_card") : n === 1 ? t("bingo_one_pattern") : t("bingo_n_patterns", n) }));
+}
 
 export function BingoCardArt({ card, onBuy, popped }: {
   card: BingoCard | null;
@@ -146,12 +162,8 @@ export function BingoOverlay({ game, myUserId, isHost, strip, onBuy, onEndGame, 
     if (ended && (game.winner_user_id !== null || game.wins.length > 0)) { sfx.fanfare(); setBurst(Date.now()); }
   }, [game]);
 
-  // Who covered the most, the whole-card winner first — shown once the game is over.
-  const podium = active ? [] : [...game.cards]
-    .sort((a, b) => (Number(b.user_id === game.winner_user_id) - Number(a.user_id === game.winner_user_id)) || b.covered.length - a.covered.length)
-    .filter((c) => c.covered.length > 0)
-    .slice(0, 3)
-    .map((c) => ({ name: c.player_name, value: `${c.covered.length} square${c.covered.length === 1 ? "" : "s"}` }));
+  // The one podium rule on every platform: the whole-card winner first, then most patterns.
+  const podium = active ? [] : bingoPodium(game.wins, game.winner_user_id, t);
   const shownPopped = useMemo(() => {
     if (!shown) return undefined;
     const prefix = `${shown.bingo_card_id}:`;
@@ -189,8 +201,8 @@ export function BingoOverlay({ game, myUserId, isHost, strip, onBuy, onEndGame, 
         {/* Always on screen, because a double-click spends this without asking. */}
         <div className="bingo-price">
           {active
-            ? `Double-click a number to gift it — ${bingoFormat(game.coins_per_square)} coins a square`
-            : "This game has finished"}
+            ? t("bingo_price_line_click", bingoFormat(game.coins_per_square))
+            : t("bingo_game_has_finished")}
         </div>
 
         {game.cards.length > 1 && (
@@ -216,7 +228,7 @@ export function BingoOverlay({ game, myUserId, isHost, strip, onBuy, onEndGame, 
 
         <div className="bingo-wins">
           {game.wins.length === 0
-            ? "Vertical · Horizontal · Diagonal · 4 Corners · X · Whole Card — the game runs until somebody covers a whole card."
+            ? t("bingo_patterns_line")
             : game.wins.map((w) => `${winLabel(w.pattern)} — ${w.name ?? "A member"}`).join("   ")}
         </div>
       </div>
@@ -356,7 +368,7 @@ export function BingoBoardOverlay({ onClose }: { onClose: () => void }) {
             <b>{g.winner_name ?? (g.status === "active" ? "Playing now" : "No whole card")}</b>
             <span className="muted">{bingoPlayedOn(g.played_at)}</span>
           </span>
-          <span className="bingo-row-wins">{t(g.wins_count === 1 ? "n_win" : "n_wins", g.wins_count)}</span>
+          <span className="bingo-row-wins">{t("bingo_wins_n", g.wins_count)}</span>
           <span className="kind-go">›</span>
         </button>
       ))}
@@ -385,13 +397,13 @@ export function BingoWinnersOverlay({ bingoGameId, onClose }: { bingoGameId: num
     <Overlay title={`🎱 Bingo #${data?.game_no ?? ""}`} onClose={onClose} back width={460}>
       {data && (
         <p className="soft" style={{ marginTop: 0 }}>
-          {t(data.players === 1 ? "bingo_summary_one_player" : "bingo_summary_n_players",
-             bingoPlayedOn(data.played_at), data.players, data.squares_gifted)}
+          {[bingoPlayedOn(data.played_at), t("bingo_players_n", data.players), t("bingo_squares_gifted_n", data.squares_gifted)].filter(Boolean).join(" · ")}
         </p>
       )}
       {!data && failed && <p className="soft">{t("couldn_t_load_this_game_try_again")}</p>}
       {!data && !failed && <p className="soft">{t("imagePickerLoading")}</p>}
       {data && data.winners.length === 0 && <p className="soft">{t("nobody_completed_a_pattern_in_this_game")}</p>}
+      {data && data.winners.length > 0 && <div style={{ marginBottom: 10 }}><Podium rows={bingoPodium(data.winners, null, t)} /></div>}
       {data?.winners.map((w, i) => (
         <div key={i} className="bingo-winner-row">
           <span className="bingo-pattern">{winLabel(w.pattern)}</span>

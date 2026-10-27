@@ -924,7 +924,7 @@ export const es = {
   pick_an_age_group_to_see_its_videos: "Elige un grupo de edad para ver sus vídeos.",
   pick_exactly_n_people: "Elige exactamente %1$s personas (%2$s/%1$s).",
   pick_exactly_one_person: "Elige exactamente %1$s persona (%2$s/%1$s).",
-  pick_one_at_random: "🎲 Elegir una al azar",
+  pick_one_at_random: "🎮 Elegir una al azar",
   pick_up_to_3_guests_in_your_room_members: "Elige hasta 3: invitados de tu sala, miembros que no están en vivo, o busca a cualquier miembro. Quienes no están en vivo muestran su look virtual. 5 minutos, gana quien tenga más monedas.",
   pk_battle_contests: "Concursos de batalla PK",
   play_games_while_you_battle: "Juega mientras batallas",
