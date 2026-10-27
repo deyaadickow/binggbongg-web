@@ -2,7 +2,7 @@
 // dialog. One paid guess per viewer (the host's price, a gift to the host), free to change until
 // guessing locks; the host enters the answer and the closest guesses win — bragging rights only.
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Confetti, CountdownRing, MuteButton, Podium, SceneBanner, sceneForGuess, type Lane } from "./GameShow";
+import { Confetti, CountdownRing, MuteButton, Podium, SceneBanner, optionColor, sceneForGuess, textOn, type Lane } from "./GameShow";
 import { haptic, sfx } from "../lib/gameSounds";
 import {
   fetchGuessLeaderboard, fetchGuessTemplates, GUESS_PRICE_MAX, GUESS_PRICE_MIN,
@@ -10,7 +10,6 @@ import {
 } from "../lib/guess";
 
 const gold = "var(--gold, #F0C420)";
-const OPTION_COLORS = ["#D85A30", "#1D9E75", "#378ADD", "#BA7517", "#8E5BD9", "#D4537E", "#16A3A3", "#6B7280"];
 const field: React.CSSProperties = { padding: "7px 9px", borderRadius: 8, border: `1px solid ${gold}`, background: "#111", color: "#fff", fontSize: 14, minWidth: 0, boxSizing: "border-box" };
 const btn = (primary = true): React.CSSProperties => ({ padding: "8px 12px", borderRadius: 999, border: primary ? "none" : `1.5px solid ${gold}`, background: primary ? gold : "transparent", color: primary ? "#000" : gold, fontWeight: 700, fontSize: 13, cursor: "pointer" });
 
@@ -101,7 +100,7 @@ export function GuessCard({ game, myUserId, onGuess, onLock, onResolve, onCancel
   const racing = game.kind === "pick" && !!racer && game.options.length <= 4;
   const lanes: Lane[] | undefined = racing ? game.options.map((o, i) => {
     const won = resolved && game.answer?.choice === i;
-    return { label: o, emoji: racer!, progress: won ? 1 : 0.1 + 0.62 * ((tallies[i] ?? 0) / maxTally), winner: won, loser: resolved && !won };
+    return { label: o, emoji: racer!, color: optionColor(o, i), number: i + 1, progress: won ? 1 : 0.1 + 0.62 * ((tallies[i] ?? 0) / maxTally), winner: won, loser: resolved && !won };
   }) : undefined;
 
   return (
@@ -140,12 +139,12 @@ export function GuessCard({ game, myUserId, onGuess, onLock, onResolve, onCancel
                   <button key={i} disabled={!canTap}
                           onClick={() => { if (game.is_host) setAnswering(i); else onGuess({ choice: i }); }}
                           className="gs-anim"
-                          style={{ position: "relative", minHeight: 48, padding: "8px 9px", borderRadius: 11, overflow: "hidden", textAlign: "left", cursor: canTap ? "pointer" : "default", color: "#fff",
-                                   background: OPTION_COLORS[i % OPTION_COLORS.length], border: `3px solid ${right ? "#fff" : mine ? "#fff" : "transparent"}`,
+                          style={{ position: "relative", minHeight: 48, padding: "8px 9px", borderRadius: 11, overflow: "hidden", textAlign: "left", cursor: canTap ? "pointer" : "default", color: textOn(optionColor(o, i)),
+                                   background: optionColor(o, i), border: `3px solid ${right ? "#fff" : mine ? "#fff" : "transparent"}`,
                                    opacity: resolved && !right ? 0.4 : 1, animation: right ? "gs-pop .5s ease-in-out 3" : "none", transition: "opacity .4s" }}>
                     <span style={{ position: "absolute", left: 0, bottom: 0, height: 5, width: `${totalTally ? (100 * count) / totalTally : 0}%`, background: "rgba(255,255,255,.7)", transition: "width .5s" }} />
                     <span style={{ position: "relative", display: "flex", alignItems: "center", gap: 6 }}>
-                      <span style={{ flex: 1, fontSize: 13.5, fontWeight: 800, textShadow: "0 1px 2px rgba(0,0,0,.4)" }}>{right ? "✅ " : ""}{o}</span>
+                      <span style={{ flex: 1, fontSize: 13.5, fontWeight: 800, textShadow: textOn(optionColor(o, i)) === "#fff" ? "0 1px 2px rgba(0,0,0,.4)" : "none" }}>{right ? "✅ " : ""}{o}</span>
                       <b style={{ fontVariantNumeric: "tabular-nums", background: "rgba(0,0,0,.3)", borderRadius: 999, padding: "1px 7px", fontSize: 12 }}>{count}</b>
                     </span>
                     {mine && <span style={{ position: "relative", fontSize: 10.5, fontWeight: 800 }}>⭐ your pick</span>}

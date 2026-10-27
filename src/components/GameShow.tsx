@@ -13,6 +13,89 @@ export function sceneForGuess(templateKey: string | null, kind: string): { scene
   const [key, racer] = (templateKey && GUESS_SCENES[templateKey]) || [GUESS_KIND_SCENE[kind] ?? "stage", null];
   return { scene: SCENES[key] ?? SCENES.stage, racer };
 }
+/** The colour of an answer box: a box named after a colour IS that colour (Steve, 2026-10-27 — "Blue"
+ *  was a green box), otherwise the box's place in the game-show palette. Racers wear the same colour. */
+export const OPTION_COLORS = ["#D85A30", "#1D9E75", "#378ADD", "#BA7517", "#8E5BD9", "#D4537E", "#16A3A3", "#6B7280"];
+const NAMED_COLORS: Record<string, string> = {
+  red: "#E0312F", blue: "#2563EB", green: "#1E9E4A", yellow: "#F2C230", pink: "#EC5C9F", orange: "#F28C28",
+  purple: "#8E4FD6", white: "#F2F2F2", black: "#26272B", gold: "#D4A017", silver: "#AEB6BF", brown: "#8B5A2B",
+};
+export function optionColor(label: string, i: number): string {
+  return NAMED_COLORS[label.trim().toLowerCase()] ?? OPTION_COLORS[i % OPTION_COLORS.length];
+}
+/** Dark text on a light box (yellow, white, silver), white text otherwise. */
+export function textOn(hex: string): string {
+  const n = parseInt(hex.slice(1), 16);
+  const lum = (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
+  return lum > 0.68 ? "#1A1A1A" : "#fff";
+}
+
+/** A NASCAR-style stock car seen from the side, facing left, in its lane's colour with its number. */
+export function StockCar({ color, number, width = 56 }: { color: string; number: number; width?: number }) {
+  const dark = shade(color, -38);
+  return (
+    <svg width={width} height={width / 3} viewBox="0 0 120 40" style={{ display: "block", overflow: "visible" }}>
+      <ellipse cx="60" cy="38" rx="58" ry="2.6" fill="rgba(0,0,0,.4)" />
+      {/* Rear wing on its stand */}
+      <path d="M103 12 L120 11 L120 14.5 L104 15.5 Z" fill={dark} />
+      <path d="M114 14 L117 14 L116 19 L113 19 Z" fill="#111" />
+      {/* Low, long body with a fastback roof */}
+      <path d="M2 29 Q1 24 6 22 L42 18.5 Q50 10 58 9.5 L78 9.5 Q86 10 101 18 L116 19 Q119 20 119 25 L119 30 Q119 33 115 33 L5 33 Q2 33 2 29 Z" fill={color} stroke={dark} strokeWidth="1" />
+      {/* Paint scheme: a dark rear quarter and a white stripe */}
+      <path d="M88 19.5 L116 20 Q118 21 118 25 L118 31 L94 31 Z" fill={dark} opacity=".85" />
+      <path d="M4 26 L118 26 L118 27.8 L4 27.8 Z" fill="#fff" opacity=".85" />
+      {/* Glass, with the window net pillar */}
+      <path d="M46 18 Q53 11.5 59 11.5 L77 11.5 Q84 12 92 18 Z" fill="#17202B" />
+      <path d="M69 11.5 L71.5 11.5 L71.5 18 L69 18 Z" fill={color} />
+      {/* Headlight decal and splitter */}
+      <path d="M4 23.5 L11 23 L11 24.6 L4 25.2 Z" fill="#FFE9A8" />
+      <path d="M1 31.5 L18 31.5" stroke="#0B0B0B" strokeWidth="2.6" />
+      {/* Door number */}
+      <circle cx="64" cy="23.5" r="7.6" fill="#fff" stroke="#111" strokeWidth="1" />
+      <text x="64" y="27.6" textAnchor="middle" fontSize="11.5" fontWeight="900" fill="#111" fontFamily="Arial Black, Arial, sans-serif">{number}</text>
+      {/* Racing wheels */}
+      {[26, 96].map((cx) => (
+        <g key={cx}>
+          <circle cx={cx} cy="31.5" r="8.6" fill="#121212" />
+          <circle cx={cx} cy="31.5" r="4.6" fill="#C9CED6" />
+          <circle cx={cx} cy="31.5" r="1.6" fill="#444" />
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+/** A rubber duck, facing left. */
+function RubberDuck({ color, size = 26 }: { color: string; size?: number }) {
+  const dark = shade(color, -30);
+  return (
+    <svg width={size} height={size * 0.9} viewBox="0 0 40 36" style={{ display: "block", overflow: "visible" }}>
+      <path d="M6 22 Q6 33 20 33 Q36 33 37 21 Q38 16 33 18 Q30 19 28 17 Q24 15 18 17 Z" fill={color} stroke={dark} strokeWidth="1" />
+      <circle cx="13" cy="12" r="8.5" fill={color} stroke={dark} strokeWidth="1" />
+      <path d="M5.5 12 Q0 12.5 1 15 Q3 17 8 15 Z" fill="#F28C28" />
+      <circle cx="11" cy="9.5" r="1.8" fill="#111" /><circle cx="10.4" cy="8.9" r=".6" fill="#fff" />
+      <path d="M22 22 Q27 19 31 22 Q27 25 22 22 Z" fill={dark} opacity=".6" />
+    </svg>
+  );
+}
+
+/** A folded paper boat, facing left. */
+function PaperBoat({ color, size = 30 }: { color: string; size?: number }) {
+  const dark = shade(color, -30);
+  return (
+    <svg width={size} height={size * 0.8} viewBox="0 0 40 32" style={{ display: "block", overflow: "visible" }}>
+      <path d="M20 2 L28 20 L12 20 Z" fill={shade(color, 25)} stroke={dark} strokeWidth="1" />
+      <path d="M1 20 L39 20 L32 30 L8 30 Z" fill={color} stroke={dark} strokeWidth="1" />
+      <path d="M12 20 L20 26 L28 20" fill="none" stroke={dark} strokeWidth="1" />
+    </svg>
+  );
+}
+
+/** A glossy marble. */
+function Marble({ color, size = 20 }: { color: string; size?: number }) {
+  return <span style={{ display: "block", width: size, height: size, borderRadius: "50%", background: `radial-gradient(circle at 32% 30%, #fff 0 12%, ${color} 38%, ${shade(color, -40)} 100%)`, boxShadow: "0 2px 3px rgba(0,0,0,.45)" }} />;
+}
+
 export function sceneForTrivia(category: string | null | undefined): Scene {
   return SCENES[TRIVIA_SCENES[category ?? ""] ?? "lake"] ?? SCENES.lake;
 }
@@ -85,7 +168,7 @@ function Ground({ scene, racing }: { scene: Scene; racing?: boolean }) {
   }
 }
 
-export type Lane = { label: string; emoji: string; progress: number; winner?: boolean; loser?: boolean };
+export type Lane = { label: string; emoji: string; progress: number; winner?: boolean; loser?: boolean; color?: string; number?: number };
 
 /** The animated scene. `lanes` turns the ground into a race track (racers run right -> left). */
 export function SceneBanner({ scene, height = 104, lanes, children }: { scene: Scene; height?: number; lanes?: Lane[]; children?: React.ReactNode }) {
@@ -141,7 +224,15 @@ export function SceneBanner({ scene, height = 104, lanes, children }: { scene: S
             <div key={i} style={{ position: "relative", flex: 1, borderTop: i ? "1px dashed rgba(255,255,255,.45)" : "none" }}>
               <span style={{ position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)", fontSize: 10.5, fontWeight: 700, color: "#fff", textShadow: "0 1px 2px rgba(0,0,0,.7)", maxWidth: "24%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{l.label}</span>
               <span style={{ position: "absolute", top: "50%", left: `${(0.7 - 0.6 * Math.max(0, Math.min(1, l.progress))) * 100}%`, transform: "translate(-50%,-50%)", transition: "left 1.2s cubic-bezier(.3,1.2,.5,1)", fontSize: 21, opacity: l.loser ? 0.45 : 1 }}>
-                <span className="gs-anim" style={{ display: "inline-block", animation: l.loser ? "none" : "gs-gallop .45s ease-in-out infinite" }}>{l.emoji}</span>
+                <span className="gs-anim" style={{ display: "inline-block", animation: l.loser ? "none" : "gs-gallop .45s ease-in-out infinite" }}>
+                  {l.emoji === "🏎️" && l.color ? <StockCar color={l.color} number={l.number ?? i + 1} /> :
+                   l.emoji === "🔵" && l.color ? <Marble color={l.color} /> :
+                   l.emoji === "🦆" && l.color ? <RubberDuck color={l.color} /> :
+                   l.emoji === "⛵" && l.color ? <PaperBoat color={l.color} /> :
+                   <span style={{ position: "relative", display: "inline-block" }}>{l.emoji}
+                     {l.color && <b style={{ position: "absolute", right: -9, bottom: -2, minWidth: 14, height: 14, borderRadius: 7, background: l.color, color: textOn(l.color), border: "1.5px solid #fff", fontSize: 9, lineHeight: "11px", textAlign: "center", fontFamily: "Arial, sans-serif" }}>{l.number ?? i + 1}</b>}
+                   </span>}
+                </span>
                 {l.winner && <span style={{ position: "absolute", top: -14, left: 2, fontSize: 13 }}>👑</span>}
               </span>
             </div>
@@ -165,7 +256,7 @@ export function CountdownRing({ msLeft, totalMs, size = 44 }: { msLeft: number; 
       <circle cx={size / 2} cy={size / 2} r={r} stroke="rgba(255,255,255,.25)" strokeWidth={4} fill="none" />
       <circle cx={size / 2} cy={size / 2} r={r} stroke={late ? "#E5484D" : "#F0C420"} strokeWidth={4} fill="none" strokeLinecap="round"
               strokeDasharray={c} strokeDashoffset={c * (1 - frac)} transform={`rotate(-90 ${size / 2} ${size / 2})`} style={{ transition: "stroke-dashoffset .25s linear" }} />
-      <text x="50%" y="50%" dy=".35em" textAnchor="middle" fill="#fff" fontSize={secs > 99 ? 11 : 15} fontWeight={800}>{secs > 99 ? `${Math.ceil(secs / 60)}m` : secs}</text>
+      <text x="50%" y="50%" dy=".35em" textAnchor="middle" fill="#fff" fontSize={secs > 99 ? 11 : 15} fontWeight={800}>{secs > 99 ? `${Math.floor(secs / 60)}m` : secs}</text>
     </svg>
   );
 }
