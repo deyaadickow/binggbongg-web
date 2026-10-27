@@ -1,7 +1,7 @@
 // Trivia Battle panel (Steve, 2026-10-27). The black-and-gold panel the board battles use: the two
 // players with their scores (and small live screens), the question, four answers, and — for
 // viewers — lifelines to buy a player or, in an audience game, a paid vote on an answer.
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { LiveTile } from "../lib/live";
 import type { TriviaGame, TriviaMode, TriviaPlayer, TriviaStart } from "../lib/trivia";
 import { Confetti, CountdownRing, MuteButton, Podium, SceneBanner } from "./GameShow";
@@ -53,7 +53,8 @@ export function TriviaOverlay({ game, myUserId, tileFor, onAnswer, onBuy, onEnd,
     const id = window.setInterval(() => setTick((t) => t + 1), 250);
     return () => window.clearInterval(id);
   }, [game.status, game.trivia_game_id]);
-  useEffect(() => {
+  // A layout effect, so the drum roll is up before the browser paints the revealed answer.
+  useLayoutEffect(() => {
     const was = prev.current;
     prev.current = { id: game.trivia_game_id, status: game.status, phase: game.phase, q: game.q_number, mine: game.my_answer };
     if (was.id !== game.trivia_game_id) { window.clearTimeout(drumTimer.current); setDrumroll(false); return; }
