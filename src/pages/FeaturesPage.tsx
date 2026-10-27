@@ -94,6 +94,7 @@ const FEATURES: Section[] = [
       { icon: "🎮", nameKey: "fname_n99_tap_games", blurbKey: "fblurb_n99_tap_games", to: "/live", whereKey: "fwhere_the_live_room" },
       { icon: "🎱", nameKey: "fname_bingg_bongg_bingo", blurbKey: "fblurb_bingg_bongg_bingo", to: "/live", whereKey: "fwhere_the_live_room" },
       { icon: "🔮", nameKey: "fname_guessing_games", blurbKey: "fblurb_guessing_games", to: "/live", whereKey: "fwhere_the_live_room" },
+      { icon: "🧠", nameKey: "fname_trivia_night", blurbKey: "fblurb_trivia_night", to: "/live", whereKey: "fwhere_the_live_room" },
       { icon: "🏁", nameKey: "fname_race_games", blurbKey: "fblurb_race_games", to: "/live", whereKey: "fwhere_the_live_room" },
       { icon: "🧩", nameKey: "fname_one_stroke_and_block_escape", blurbKey: "fblurb_one_stroke_and_block_escape", to: "/live", whereKey: "fwhere_the_live_room" },
       { icon: "🏅", nameKey: "fname_game_leaderboards", blurbKey: "fblurb_game_leaderboards", to: "/live", whereKey: "fwhere_the_live_room" },
