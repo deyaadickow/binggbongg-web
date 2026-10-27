@@ -7,6 +7,8 @@ import { useEffect as useEffectVB, useRef as useRefVB, useState as useStateVB } 
 import { displayName, type UserSummary } from "../lib/api";
 import { clock, secondsUntil, type B555Data, type Battle2v2Data, type Invite2v2, type MarathonData, type SeriesData } from "../lib/battles";
 import { tt, useT, type StringKey } from "../lib/i18n";
+import { Confetti } from "./GameShow";
+import { haptic, sfx } from "../lib/gameSounds";
 
 export interface Person { user_id: number; fullname?: string | null; username?: string | null; profile_image?: string | null }
 export type NameOf = (id: number | null | undefined) => string;
@@ -408,6 +410,20 @@ export function resultTitle(winnerId: number | null | undefined, myUserId: numbe
   return winnerId === myUserId ? "🏆 You won!" : "You lost this one";
 }
 
+/** Game Show (Steve, 2026-10-27): a fanfare and confetti the moment a battle's result opens —
+ *  only when somebody won (a tie or a cancelled battle stays quiet). Mount it inside the result
+ *  popup; it fires once, when it mounts. */
+export function WinCelebration({ win }: { win: boolean }) {
+  const [burst, setBurst] = useStateVB(0);
+  useEffectVB(() => {
+    if (!win) return;
+    sfx.fanfare(); haptic([40, 60, 40]); setBurst(Date.now());
+    // Once per result popup, not on every re-render of the room behind it.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return <div aria-hidden style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 41 }}><Confetti burst={burst} /></div>;
+}
+
 export function ResultOverlay({ title, rows, onClose, onShare, sharing }: {
   title: string;
   rows: { label: string; value: string; win?: boolean }[];
@@ -417,12 +433,17 @@ export function ResultOverlay({ title, rows, onClose, onShare, sharing }: {
   sharing?: boolean;
 }) {
   const { t } = useT();
+  const anyWin = rows.some((r) => r.win);
   return (
     <Overlay title={title} onClose={onClose}>
+      {/* Keyed on the rows, so a NEW result arriving while one is open celebrates again. */}
+      <WinCelebration key={rows.map((r) => `${r.label}|${r.value}|${r.win ? 1 : 0}`).join("/")} win={anyWin} />
       {rows.map((r, i) => (
-        <div key={i} className="row" style={{ justifyContent: "space-between", fontSize: 16, padding: "4px 0" }}>
-          <span style={{ fontWeight: r.win ? 800 : 500, color: r.win ? "var(--gold)" : undefined }}>{r.win ? "🏆 " : ""}{r.label}</span>
-          <span style={{ color: "var(--gold)" }}>{r.value}</span>
+        <div key={i} className="row" style={{ justifyContent: "space-between", fontSize: 16, padding: "4px 0", gap: 8 }}>
+          <span className={r.win ? "gs-anim" : undefined} style={{ fontWeight: r.win ? 800 : 500, color: r.win ? "var(--gold)" : undefined, display: "inline-block", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", animation: r.win ? "gs-pop .8s ease-in-out 3" : undefined }}>
+            {r.win ? "👑 " : ""}{r.label}
+          </span>
+          <span style={{ color: "var(--gold)", flex: "none" }}>{r.win ? "🏆 " : ""}{r.value}</span>
         </div>
       ))}
       {onShare && (

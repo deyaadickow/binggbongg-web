@@ -7,7 +7,7 @@ import { chatChannel, ensureFirebaseSignIn, observeChat, sendChat, type ChatMess
 import { useLiveRoom, type LiveRole, type LiveTile } from "../lib/live";
 import { activeBoxingWindow, useBattle, type BattleData } from "../lib/battle";
 import { VIRTUAL, fetchVirtualGiftRecord, sendVirtualThankYou, startVirtualBattle, type VirtualBattleData, type VirtualGiftRecord, type VirtualParticipant, FIVE_FIVE_FIVE, MARATHON, SERIES, TWO_V_TWO, cancel555, createSeries, finalize2v2, finalizeSeriesRound, invite2v2, invite555, inviteMarathon, secondsUntil, useEngine, voteMarathonCancel, type B555Data, type Battle2v2Data, type MarathonData, type SeriesData } from "../lib/battles";
-import { B555Strip, BattleMenu, InviteCard, MarathonStrip, MultiPicker, Overlay, ResultOverlay, SeriesStrip, TwoVTwoPicker, TwoVTwoStrip, VirtualGiftRecordOverlay, VirtualPicker, VirtualStrip, describe2v2Invite, personName, resultTitle, type BattleKind } from "../components/BattleEngines";
+import { B555Strip, BattleMenu, InviteCard, MarathonStrip, MultiPicker, Overlay, ResultOverlay, SeriesStrip, TwoVTwoPicker, TwoVTwoStrip, VirtualGiftRecordOverlay, VirtualPicker, VirtualStrip, WinCelebration, describe2v2Invite, personName, resultTitle, type BattleKind } from "../components/BattleEngines";
 import { Challenge31Overlay, LifetimeBoardOverlay, PkContestsOverlay, PunishmentsOverlay } from "../components/BattleReference";
 import { BingoBoardOverlay, BingoOverlay, BingoStartDialog, BingoWinnersOverlay } from "../components/BingoOverlay";
 import { OneStrokeOverlay } from "../components/OneStrokeOverlay";
@@ -1788,8 +1788,9 @@ export function LiveViewerPage() {
       )}
       {battleResult && user && (
         <Overlay title={battleResult.winner_user_id === null ? "It's a tie" : battleResult.winner_user_id === user.id ? "🏆 You won!" : "You lost this one"} onClose={() => setBattleResult(null)}>
+          <WinCelebration key={battleResult.battle_id} win={battleResult.winner_user_id !== null} />
           <p className="soft" style={{ textAlign: "center", fontSize: 18 }}>
-            {displayName(nameOf(battleResult.player_one_user_id) as Partial<UserSummary>)} {battleResult.player_one_score} — {battleResult.player_two_score} {displayName(nameOf(battleResult.player_two_user_id) as Partial<UserSummary>)}
+            {battleResult.winner_user_id !== null && battleResult.winner_user_id === battleResult.player_one_user_id ? "👑 " : ""}{displayName(nameOf(battleResult.player_one_user_id) as Partial<UserSummary>)} {battleResult.player_one_score} — {battleResult.player_two_score} {displayName(nameOf(battleResult.player_two_user_id) as Partial<UserSummary>)}{battleResult.winner_user_id !== null && battleResult.winner_user_id === battleResult.player_two_user_id ? " 👑" : ""}
           </p>
           {/* Battle Recap (Steve, 2026-10-07). Shown to the LOSER exactly as to the winner —
               "the loser has as much reason to post it as the winner" is the whole mechanic. */}

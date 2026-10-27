@@ -1,12 +1,20 @@
 // Solo Battle in the live room: the strip everyone in the room sees while one is running, and
 // the standings sheet behind it. Mirrors what the phones show — a join window everyone can
 // enter during, then a live leaderboard scored by gift coins received.
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { mediaUrl } from "../lib/api";
 import { fetchSoloStandings, joinSoloBattle, type SoloBattle, type StandingRow } from "../lib/solobattle";
 import { clock, secondsUntil } from "../lib/battles";
 import { useT } from "../lib/i18n";
+import { Confetti, Podium } from "./GameShow";
+import { haptic, sfx } from "../lib/gameSounds";
+
+/** Past its end time — the clock the strip already counts down on. */
+function isFinished(battle: SoloBattle, now: number): boolean {
+  const left = secondsUntil(battle.ends_at, now);
+  return left !== null && left <= 0;
+}
 
 /** Whether the join window is still open — the phones gate the Join button on exactly this. */
 export function isJoinWindowOpen(battle: SoloBattle, now: number): boolean {
@@ -34,6 +42,16 @@ export function SoloBattleStrip({ battle, myUserId, onOpenStandings, onToast, on
   const joinLeft = secondsUntil(battle.starts_at, now);
   const endsIn = secondsUntil(battle.ends_at, now);
   const joined = battle.already_joined === true;
+  // Game Show (Steve, 2026-10-27): a fanfare and confetti the moment the battle's clock runs out
+  // while you're watching — on the CHANGE, so opening a room after it ended stays quiet.
+  const finished = isFinished(battle, now);
+  const [burst, setBurst] = useState(0);
+  const wasFinished = useRef({ id: battle.id, finished });
+  useEffect(() => {
+    const was = wasFinished.current;
+    wasFinished.current = { id: battle.id, finished };
+    if (was.id === battle.id && !was.finished && finished) { sfx.fanfare(); haptic([40, 60, 40]); setBurst(Date.now()); }
+  }, [battle.id, finished]);
 
   async function join() {
     if (!myUserId || busy) return;
@@ -50,7 +68,8 @@ export function SoloBattleStrip({ battle, myUserId, onOpenStandings, onToast, on
   }
 
   return (
-    <div className="card pad" style={{ marginTop: 12, borderColor: "var(--gold-border)" }}>
+    <div className="card pad" style={{ position: "relative", marginTop: 12, borderColor: "var(--gold-border)" }}>
+      <Confetti burst={burst} />
       <div className="row" style={{ alignItems: "center" }}>
         <div style={{ flex: 1 }}>
           <b style={{ color: "var(--gold)" }}>{t("solo_battle_with_unlimited_players")}</b>
@@ -59,7 +78,7 @@ export function SoloBattleStrip({ battle, myUserId, onOpenStandings, onToast, on
               ? `Anyone can join for the next ${clock(joinLeft)} — go live and the gifts you receive count.`
               : endsIn !== null && endsIn > 0
               ? `Running — ${clock(endsIn)} left. Most gift coins wins.`
-              : "Finished."}
+              : "🏁 Finished — 👑 the winner is top of the leaderboard."}
           </div>
         </div>
         <button className="btn small ghost" onClick={onOpenStandings}>{t("leaderboard")}</button>
@@ -81,6 +100,8 @@ export function SoloBattleStandingsSheet({ battle, myUserId, onClose }: {
 }) {
   const { t } = useT();
   const [rows, setRows] = useState<StandingRow[] | null>(null);
+  const finished = isFinished(battle, Date.now());
+  const nameOf = (r: StandingRow) => r.label || r.username || "Member";
 
   const load = useCallback(() => {
     fetchSoloStandings(battle.id, myUserId ?? undefined).then(setRows).catch(() => setRows([]));
@@ -105,7 +126,14 @@ export function SoloBattleStandingsSheet({ battle, myUserId, onClose }: {
         ) : rows.length === 0 ? (
           <p className="muted">{t("no_one_has_scored_yet")}</p>
         ) : (
-          rows.map((r, i) => (
+          <>
+          {/* Game Show: once it's over, the top three on a podium, the winner crowned. */}
+          {finished && Number(rows[0]?.score ?? 0) > 0 && (
+            <div style={{ marginBottom: 10 }}>
+              <Podium rows={rows.slice(0, 3).filter((r) => Number(r.score ?? 0) > 0).map((r) => ({ name: nameOf(r), value: Number(r.score ?? 0).toLocaleString() }))} />
+            </div>
+          )}
+          {rows.map((r, i) => (
             <div key={`${r.user_id ?? i}`} className="row" style={{ padding: "8px 0", borderBottom: "1px solid var(--line)", alignItems: "center" }}>
               <b style={{ color: "var(--gold)", width: 28 }}>#{i + 1}</b>
               {r.profile_image
@@ -114,13 +142,14 @@ export function SoloBattleStandingsSheet({ battle, myUserId, onClose }: {
               <div style={{ flex: 1, minWidth: 0 }}>
                 {/* The phones let you tap a name to go straight to that person's live. */}
                 {r.user_id
-                  ? <Link to={`/profile/${r.user_id}`} onClick={onClose} style={{ fontWeight: 700 }}>{r.label || r.username || "Member"}</Link>
-                  : <span style={{ fontWeight: 700 }}>{r.label || "Member"}</span>}
+                  ? <Link to={`/profile/${r.user_id}`} onClick={onClose} style={{ fontWeight: 700 }}>{finished && i === 0 ? "👑 " : ""}{r.label || r.username || "Member"}</Link>
+                  : <span style={{ fontWeight: 700 }}>{finished && i === 0 ? "👑 " : ""}{r.label || "Member"}</span>}
                 {r.location && <div className="muted" style={{ fontSize: 12 }}>{r.location}</div>}
               </div>
               <b>{Number(r.score ?? 0).toLocaleString()}</b>
             </div>
-          ))
+          ))}
+          </>
         )}
         <p className="muted" style={{ fontSize: 12, marginTop: 10, marginBottom: 0 }}>
           {t("scored_by_the_gift_coins_each_person_rec")}</p>
