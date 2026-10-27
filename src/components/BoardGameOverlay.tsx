@@ -5,6 +5,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { LiveTile } from "../lib/live";
 import type { AiLevel, BoardGame, BoardKind, BoardMove, BoardPlayer, BoardPowerup, BoardStart, Sq } from "../lib/boardgame";
+import { Confetti, MuteButton, Podium, SceneBanner } from "./GameShow";
+import { SCENES } from "../lib/gameSceneData";
+import { haptic, sfx } from "../lib/gameSounds";
 
 const gold = "var(--gold, #F0C420)";
 const LIGHT = "#E9D8A6", DARK = "#7A5230", CHECKERS_LIGHT = "#D9C29A", CHECKERS_DARK = "#2E4A2E";
@@ -14,6 +17,8 @@ const GLYPH: Record<string, string> = { k: "♚", q: "♛", r: "♜", b: "♝", 
 
 export const BOARD_TITLE: Record<BoardKind, string> = { checkers: "Checkers", chess: "Chess", fourinarow: "Four in a Row", reversi: "Reversi", mancala: "Mancala" };
 export const BOARD_ICON: Record<BoardKind, string> = { checkers: "⛀", chess: "♞", fourinarow: "🔴", reversi: "⚫", mancala: "🥥" };
+/** Game Show (Steve, 2026-10-27): the strip of scene over each board. */
+const BOARD_SCENE: Record<BoardKind, string> = { chess: "castle", checkers: "forest", fourinarow: "retro", reversi: "night", mancala: "jungle" };
 /** Placement games: no piece to pick up — one tap plays the move. */
 const PLACEMENT: BoardKind[] = ["fourinarow", "reversi", "mancala"];
 
@@ -81,6 +86,21 @@ export function BoardGameOverlay({ game, myUserId, onMove, onBuy, onResign, onEn
   }, [game.status, game.board_game_id]);
   void tick;
   const since = Date.now() - polledAt;
+  // Game Show: a click on every move, and a fanfare + confetti for the winner. Fired on CHANGES
+  // between polls only — the ref holds what the last poll said.
+  const [burst, setBurst] = useState(0);
+  const prev = useRef({ id: game.board_game_id, status: game.status, plies: game.plies });
+  useEffect(() => {
+    const was = prev.current;
+    prev.current = { id: game.board_game_id, status: game.status, plies: game.plies };
+    if (was.id !== game.board_game_id) return;
+    if (was.status === "active" && game.status !== "active") {
+      if (game.status !== "cancelled" && (game.result === "one" || game.result === "two")) { sfx.fanfare(); haptic([40, 60, 40]); setBurst(Date.now()); }
+      else if (game.result === "draw") sfx.reveal();
+      return;
+    }
+    if (game.plies > was.plies) { sfx.lock(); if (game.in_check) haptic(60); }
+  }, [game.board_game_id, game.status, game.plies, game.result, game.in_check]);
 
   const active = game.status === "active";
   const me = game.players.find((p) => p.user_id === myUserId) ?? null;
@@ -255,6 +275,8 @@ export function BoardGameOverlay({ game, myUserId, onMove, onBuy, onResign, onEn
   else if (game.mode === "computer" && game.turn === "two") status = "🤖 The computer is thinking…";
   else status = `${(game.turn === "one" ? game.players[0] : game.players[1]).name} to move${game.in_check ? " — check!" : ""}`;
 
+  const loser = game.players.find((p) => (game.result === "one" ? p.side === "two" : game.result === "two" ? p.side === "one" : false));
+  const finished = !active && game.status !== "cancelled";
   const lastEvent = game.events[game.events.length - 1];
   const eventText = (e: typeof lastEvent) => {
     if (!e) return "";
@@ -264,8 +286,10 @@ export function BoardGameOverlay({ game, myUserId, onMove, onBuy, onResign, onEn
 
   return (
     <div style={{ position: "fixed", top: 96, left: 12, zIndex: 90, background: "rgba(0,0,0,.82)", border: `2px solid ${gold}`, borderRadius: 14, padding: 10, color: "#fff", userSelect: "none", maxWidth: "calc(100vw - 24px)", boxSizing: "border-box" }}>
+      <Confetti burst={burst} />
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
         <b style={{ color: gold, fontSize: 14, flex: 1 }}>{BOARD_ICON[game.kind]} {BOARD_TITLE[game.kind]} #{game.game_no}{game.mode === "audience" ? " · vs the audience" : game.mode === "computer" ? " · vs the computer" : ""}</b>
+        <MuteButton />
         {active && me !== null && (
           <button onClick={() => { if (window.confirm("Resign this game?")) onResign(); }} style={{ fontSize: 11, fontWeight: 700, background: "transparent", color: gold, border: `1px solid ${gold}`, borderRadius: 999, padding: "2px 10px", cursor: "pointer" }}>Resign</button>
         )}
@@ -277,10 +301,23 @@ export function BoardGameOverlay({ game, myUserId, onMove, onBuy, onResign, onEn
       </div>
       {!collapsed && (
         <div style={{ display: "flex", flexDirection: "column", gap: 6, width: "min(352px, 86vw)" }}>
+          <SceneBanner scene={SCENES[BOARD_SCENE[game.kind]] ?? SCENES.castle} height={finished ? 58 : 42}>
+            {finished && (
+              <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "rgba(0,0,0,.35)", padding: "0 10px" }}>
+                <span className="gs-anim" style={{ maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: 17, fontWeight: 900, textShadow: "0 2px 4px #000", animation: winner ? "gs-pop .8s ease-in-out 3" : "none" }}>
+                  {winner ? `👑 ${winner.name} wins!` : "🤝 It's a draw!"}
+                </span>
+              </div>
+            )}
+          </SceneBanner>
           {playerRow(top)}
           {board}
           {playerRow(bottom)}
           <div style={{ fontSize: 12, fontWeight: 600, color: !active ? gold : "#fff" }}>{status}</div>
+          {finished && winner && loser && (() => {
+            const unit = game.kind === "mancala" ? "seeds" : "discs";
+            return <Podium rows={[{ name: winner.name, value: game.counts ? `${game.counts[winner.side]} ${unit}` : "🏆 Winner" }, { name: loser.name, value: game.counts ? `${game.counts[loser.side]} ${unit}` : "Good game!" }]} />;
+          })()}
           {game.vote && (
             <div style={{ fontSize: 12, background: "rgba(73,168,255,.12)", border: "1px solid #49a8ff", borderRadius: 10, padding: "6px 8px" }}>
               <b>🗳 {Math.ceil(Math.max(0, game.vote.ms_left - since) / 1000)}s left</b>
