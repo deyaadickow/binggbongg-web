@@ -16,6 +16,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { fetchOneStrokeLevels, type OneStrokeLevel } from "../lib/onestroke";
 import { tt, useT  } from "../lib/i18n";
+import { Confetti, MuteButton, SceneBanner } from "./GameShow";
+import { SCENES } from "../lib/gameSceneData";
+import { haptic, sfx } from "../lib/gameSounds";
 
 // The board's viewBox is inset beyond 0..1 so a thick stroke on an edge node is not clipped in
 // half. These two constants exist because that inset ALSO has to be undone when a pointer
@@ -39,6 +42,8 @@ export function OneStrokeOverlay({ onClose }: { onClose: () => void }) {
   const [finger, setFinger] = useState<{ x: number; y: number } | null>(null);
   const [iq, setIq] = useState(IQ_BASE);
   const [message, setMessage] = useState("");
+  // Game Show (Steve, 2026-10-27): a tick for every line drawn, a chime + confetti on a solve.
+  const [burst, setBurst] = useState(0);
   const svgRef = useRef<SVGSVGElement>(null);
   const drawing = useRef(false);
   // The trace itself lives in refs, and state is only a mirror of it for rendering.
@@ -163,7 +168,8 @@ export function OneStrokeOverlay({ onClose }: { onClose: () => void }) {
       setFinger(null);
       setIq((v) => v + IQ_PER_LEVEL);
       setMessage(tt("solved_in_one_stroke"));
-    }
+      sfx.correct(); haptic([40, 60, 40]); setBurst(Date.now());
+    } else sfx.tick();
   }
 
   function onUp() {
@@ -185,15 +191,25 @@ export function OneStrokeOverlay({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="onestroke-overlay">
+      <Confetti burst={burst} />
       <div className="onestroke-inner">
         <div className="onestroke-top">
           <button className="btn ghost" onClick={onClose}>{t("close_2")}</button>
-          <span className="onestroke-iq"><b>{t("iq")}</b> {iq}</span>
+          <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <MuteButton />
+            <span className="onestroke-iq"><b>{t("iq")}</b> {iq}</span>
+          </span>
         </div>
 
         {level ? (
           <>
-            <div className="onestroke-title">{level.level_no}. {level.name}</div>
+            <SceneBanner scene={SCENES.space} height={72}>
+              <div style={{ position: "absolute", left: 8, right: 8, top: "50%", transform: "translateY(-50%)", textAlign: "center" }}>
+                <span className="onestroke-title gs-anim" style={{ display: "inline-block", maxWidth: "100%", boxSizing: "border-box", background: "rgba(0,0,0,.55)", borderRadius: 999, padding: "4px 14px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", animation: solved ? "gs-pop .6s ease-in-out 3" : "none" }}>
+                  {solved ? "🌟 " : ""}{level.level_no}. {level.name}
+                </span>
+              </div>
+            </SceneBanner>
             <div className="onestroke-hint">{message || `${used.size} of ${level.edges.length} lines`}</div>
             <svg
               ref={svgRef}

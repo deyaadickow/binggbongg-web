@@ -14,6 +14,9 @@ import {
   type BEBlock, type BlockEscapeLevel,
 } from "../lib/blockescape";
 import { tt, useT  } from "../lib/i18n";
+import { Confetti, MuteButton, SceneBanner } from "./GameShow";
+import { SCENES } from "../lib/gameSceneData";
+import { haptic, sfx } from "../lib/gameSounds";
 
 export function BlockEscapeOverlay({ onClose }: { onClose: () => void }) {
   const { t } = useT();
@@ -24,6 +27,9 @@ export function BlockEscapeOverlay({ onClose }: { onClose: () => void }) {
   const [moves, setMoves] = useState(0);
   const [solved, setSolved] = useState(false);
   const [hint, setHint] = useState("Drag a block — it slides until something stops it.");
+  // Game Show (Steve, 2026-10-27): a click per slide, two notes when a block gets out, a chime +
+  // confetti when the board is clear.
+  const [burst, setBurst] = useState(0);
   // Board states before each move, so a bricked board is recoverable.
   const history = useRef<BEBlock[][]>([]);
   const drag = useRef<{ i: number; x: number; y: number } | null>(null);
@@ -68,6 +74,10 @@ export function BlockEscapeOverlay({ onClose }: { onClose: () => void }) {
       return;
     }
     if (travelled === EXITED) next[i].gone = true;
+    const cleared = remaining(next) === 0;
+    if (cleared) { sfx.correct(); haptic([40, 60, 40]); setBurst(Date.now()); }
+    else if (travelled === EXITED) { sfx.reveal(); haptic(25); }
+    else sfx.lock();
     history.current.push(before);
     setBlocks(next);
     setMoves((m) => m + 1);
@@ -115,12 +125,23 @@ export function BlockEscapeOverlay({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="overlay" onClick={onClose}>
-      <div className="card pad" style={{ maxWidth: 560, width: "100%" }} onClick={(e) => e.stopPropagation()}>
+      <div className="card pad" style={{ position: "relative", maxWidth: 560, width: "100%" }} onClick={(e) => e.stopPropagation()}>
+        <Confetti burst={burst} />
+        <div style={{ marginBottom: 10 }}>
+          <SceneBanner scene={SCENES.road} height={58}>
+            {solved && (
+              <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "rgba(0,0,0,.3)" }}>
+                <span className="gs-anim" style={{ fontSize: 17, fontWeight: 900, color: "#fff", textShadow: "0 2px 4px #000", animation: "gs-pop .6s ease-in-out 3" }}>🎉 Board cleared!</span>
+              </div>
+            )}
+          </SceneBanner>
+        </div>
         <div className="row" style={{ alignItems: "center", marginBottom: 6 }}>
           <h2 className="page-title" style={{ flex: 1, margin: 0, fontSize: 20 }}>
             {level ? `${level.level_no}. ${level.name}` : error ? "Couldn't load" : "Loading…"}
           </h2>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <MuteButton />
             <span style={{ background: "var(--gold)", color: "#000", fontWeight: 800, fontSize: 11, padding: "2px 9px", borderRadius: 999 }}>{t("moves")}</span>
             <b style={{ color: "var(--gold)", fontSize: 20 }}>{moves}</b>
           </div>
