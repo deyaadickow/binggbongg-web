@@ -13,6 +13,8 @@ import { BingoBoardOverlay, BingoOverlay, BingoStartDialog, BingoWinnersOverlay 
 import { OneStrokeOverlay } from "../components/OneStrokeOverlay";
 import { BlockEscapeOverlay } from "../components/BlockEscapeOverlay";
 import { BINGO_FALLBACK, bingoClamp, buyBingoSquare, cancelBingoBattle, fetchBingoGame, startBingoBattle, type BingoGame } from "../lib/bingo";
+import { cancelPyramidBattle, fetchPyramidGame, sendPyramidFlowers, startPyramidBattle, type PyramidGame } from "../lib/pyramid";
+import { PyramidOverlay, PyramidStartDialog } from "../components/PyramidOverlay";
 import { fetchActiveTapGame, gameTitle, type TapGameType } from "../lib/tapgame";
 import { TapGameOverlay } from "../components/TapGameOverlay";
 import { HostGamesMenu } from "../components/HostGamesMenu";
@@ -221,6 +223,13 @@ export function LiveViewerPage() {
   // the last square fell, the result passed you by entirely. Announced once per game.
   const [bingoFinishedId, setBingoFinishedId] = useState<number | null>(null);
   const bingoAnnouncedOver = useRef<number | null>(null);
+  // Pyramid battle (Steve, 2026-10-27) — same discovery rule as bingo: everyone polls.
+  const [pyramidGame, setPyramidGame] = useState<PyramidGame | null>(null);
+  const [pyramidOpen, setPyramidOpen] = useState(false);
+  const [pyramidStartOpen, setPyramidStartOpen] = useState(false);
+  const pyramidClosedId = useRef<number | null>(null);
+  const pyramidAnnounced = useRef<number | null>(null);
+  const pyramidSending = useRef(false);
   const [picker, setPicker] = useState<BattleKind | null>(null);
   // Steve, 2026-09-27: Hide & Seek — pick the shape first (free for all 2-4, or 2v2 teams).
   const [hideSeekMode, setHideSeekMode] = useState<"choose" | "2v2" | 1 | 2 | 3 | null>(null);
@@ -445,6 +454,38 @@ export function LiveViewerPage() {
     const id = window.setInterval(tick, 5000);
     return () => { alive = false; window.clearInterval(id); };
   }, [roomName]);
+
+  async function refreshPyramid() {
+    if (!roomName) return;
+    try {
+      const fresh = await fetchPyramidGame(roomName);
+      setPyramidGame(fresh);
+      if (!fresh) { setPyramidOpen(false); return; }
+      if (fresh.status === "active") {
+        if (pyramidClosedId.current !== fresh.pyramid_game_id) setPyramidOpen(true);
+      } else if (pyramidAnnounced.current !== fresh.pyramid_game_id) {
+        pyramidAnnounced.current = fresh.pyramid_game_id;
+        const w = fresh.players.find((p) => p.user_id === fresh.winner_user_id);
+        if (w && pyramidOpenRef.current) setToast(`🏆 ${w.name} wins Pyramid #${fresh.game_no}!`);
+      }
+    } catch { /* keep the last good state */ }
+  }
+  const pyramidOpenRef = useRef(false);
+  pyramidOpenRef.current = pyramidOpen;
+  const pyramidActive = pyramidGame?.status === "active";
+  useEffect(() => {
+    if (!roomName) return;
+    void refreshPyramid();
+    const id = window.setInterval(() => { void refreshPyramid(); }, pyramidActive ? 3000 : 8000);
+    return () => window.clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomName, pyramidActive]);
+
+  function openPyramid() {
+    if (pyramidGame && pyramidGame.status === "active") { pyramidClosedId.current = null; setPyramidOpen(true); return; }
+    if (role !== "host") { setToast("No Pyramid game is running — the host starts it."); return; }
+    setPyramidStartOpen(true);
+  }
 
   async function refreshBingo() {
     if (!roomName) return;
@@ -1219,6 +1260,41 @@ export function LiveViewerPage() {
           onClose={() => setBingoOpen(false)}
         />
       )}
+      {pyramidOpen && pyramidGame && myId !== null && (
+        <PyramidOverlay
+          game={pyramidGame}
+          myUserId={myId}
+          onSend={async (playerId, flowers) => {
+            if (playerId === myId) { setToast("That's you — the people watching send your Flowers."); return; }
+            if (pyramidSending.current) return;
+            pyramidSending.current = true;
+            const problem = await sendPyramidFlowers(myId, playerId, pyramidGame.pyramid_game_id, flowers, roomName);
+            pyramidSending.current = false;
+            setToast(problem ?? (flowers === 1 ? "🌹 Sent!" : `🌹 x${flowers} sent!`));
+            await refreshPyramid();
+          }}
+          onEnd={async () => {
+            const problem = await cancelPyramidBattle(myId, pyramidGame.pyramid_game_id);
+            if (problem) setToast(problem);
+            await refreshPyramid();
+          }}
+          onClose={() => { pyramidClosedId.current = pyramidGame.pyramid_game_id; setPyramidOpen(false); }}
+        />
+      )}
+      {pyramidStartOpen && myId !== null && (
+        <PyramidStartDialog
+          candidates={broadcasters.filter((b) => b.user_id !== myId).map((b) => ({ userId: b.user_id, name: personName(b) }))}
+          onClose={() => setPyramidStartOpen(false)}
+          onStart={async (others, price, minutes) => {
+            setPyramidStartOpen(false);
+            const { game, message } = await startPyramidBattle(myId, roomName, others, price, minutes);
+            if (!game) { setToast(message ?? "Couldn't start the Pyramid game."); return; }
+            pyramidClosedId.current = null;
+            setPyramidGame(game);
+            setPyramidOpen(true);
+          }}
+        />
+      )}
       {bingoBoardOpen && <BingoBoardOverlay onClose={() => setBingoBoardOpen(false)} />}
       {bingoFinishedId !== null && (
         <BingoWinnersOverlay bingoGameId={bingoFinishedId} onClose={() => setBingoFinishedId(null)} />
@@ -1247,6 +1323,7 @@ export function LiveViewerPage() {
           else if (k === "hideSeek") setHideSeekMode("choose");
           else if (k === "solo") startSolo();
           else if (k === "bingo") openBingo();
+          else if (k === "pyramid") openPyramid();
           else if (k === "bingoBoard") setBingoBoardOpen(true);
           // The 31-day challenge and the three reference rows open their own overlay off the
           // same `picker` state — they start nothing, so they need no people-picker step.

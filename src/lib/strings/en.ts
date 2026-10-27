@@ -1430,4 +1430,8 @@ export const en = {
   monster_status_failed: "Didn't come out — %1$s coins put back",
   post_to_my_feed: "Post to my feed",
   monster_delete_confirm: "Delete this Monster Video? If you posted it, the post stays on your feed.",
+  // Pyramid battle (Steve, 2026-10-27)
+  pyramid_battle: "Pyramid",
+  pyramid_battle_blurb: "Viewers send Flowers — fill the pyramid",
+  pyramid_battle_info: "Play on your own or with up to 3 others. Viewers send a player Flowers (the host sets 1 to 25 coins a Flower). 10 Flowers make a ❤️, 10 Hearts a 🔥, 10 Fires a 🐶, 10 Puppies a 💰 Money Bag. Whoever has the highest pyramid when time runs out wins — fill all 10 Money Bags and you win on the spot. Every Flower's coins go to that player, like a gift.",
 } as const;
