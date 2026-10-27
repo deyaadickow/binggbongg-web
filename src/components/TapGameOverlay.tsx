@@ -367,7 +367,7 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
 
 /** The race card over the play area — Android's RaceTrackView: a rainbow bar with a dot per
  *  station (lit once reached), a 🏁 at the end, and the racer bobbing along it. */
-function RaceTrack({ emoji, caught, elapsed }: { emoji: string; caught: number; elapsed: string }) {
+export function RaceTrack({ emoji, caught, elapsed }: { emoji: string; caught: number; elapsed: string }) {
   const progress = Math.min(1, caught / RACE_FINISH);
   const reached = Math.min(RACE_STATIONS, Math.floor(caught / (RACE_FINISH / RACE_STATIONS)));
   return (
