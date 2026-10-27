@@ -224,6 +224,9 @@ export function GuessStartDialog({ people, onStart, onClose }: {
             <p style={{ fontSize: 12, opacity: 0.8, margin: "0 0 10px" }}>Do something on camera and let the room guess what happens. Each viewer gets one guess at your price — the coins come to you. Right guesses win bragging rights, not coins.</p>
             <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 6, marginBottom: 6 }}>{cats.map((c) => chip(cat === c, c, () => setCat(c)))}</div>
             <button onClick={() => choose("custom")} style={{ display: "flex", width: "100%", gap: 10, alignItems: "center", padding: "10px 12px", marginBottom: 6, borderRadius: 10, border: `1.5px dashed ${gold}`, background: "transparent", color: gold, fontWeight: 700, cursor: "pointer", textAlign: "left" }}>✏️ Write your own</button>
+            {templates !== null && templates.length === 0 && (
+              <p style={{ fontSize: 13, opacity: 0.85 }}>Couldn't load the ready-made games. <button onClick={() => { setTemplates(null); fetchGuessTemplates().then(setTemplates); }} style={{ background: "none", border: "none", color: gold, fontWeight: 700, cursor: "pointer" }}>Retry</button></p>
+            )}
             {templates === null ? <p style={{ opacity: 0.7 }}>Loading…</p> : templates.filter((t) => cat === "All" || t.category === cat).map((t) => (
               <button key={t.key} onClick={() => choose(t)} style={{ display: "flex", width: "100%", gap: 10, alignItems: "center", padding: "9px 12px", marginBottom: 5, borderRadius: 10, border: "1px solid rgba(240,196,32,.35)", background: "rgba(255,255,255,.04)", color: "#fff", cursor: "pointer", textAlign: "left" }}>
                 <span style={{ fontSize: 20 }}>{t.emoji}</span><span style={{ flex: 1, fontSize: 13.5 }}>{t.title}</span><span style={{ fontSize: 10.5, color: gold, opacity: 0.8 }}>{KIND_LABEL[t.kind]}</span>
