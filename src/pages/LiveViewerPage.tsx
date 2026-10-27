@@ -1415,7 +1415,7 @@ export function LiveViewerPage() {
           else if (k === "solo") startSolo();
           else if (k === "bingo") openBingo();
           else if (k === "pyramid") openPyramid();
-          else if (k === "checkers" || k === "chess") openBoard(k);
+          else if (k === "checkers" || k === "chess" || k === "fourinarow" || k === "reversi" || k === "mancala") openBoard(k);
           else if (k === "bingoBoard") setBingoBoardOpen(true);
           // The 31-day challenge and the three reference rows open their own overlay off the
           // same `picker` state — they start nothing, so they need no people-picker step.

@@ -4,9 +4,10 @@
 // read off the game there.
 import { post } from "./api";
 
-export type BoardKind = "checkers" | "chess";
+export type BoardKind = "checkers" | "chess" | "fourinarow" | "reversi" | "mancala";
 export type Sq = [number, number];
-export type BoardMove = { key: string; from: Sq; to: Sq; path: Sq[]; label: string };
+/** `from` is null in placement games (Four in a Row, Reversi, Mancala): one tap plays it. */
+export type BoardMove = { key: string; from: Sq | null; to: Sq; path: Sq[]; label: string; column?: number };
 export type BoardPlayer = { side: "one" | "two"; user_id: number | null; is_audience: boolean; is_computer?: boolean; name: string; image?: string | null; ms_left: number | null; coins: number };
 export type BoardEvent = { type: string; by: string; for_user_id: number; move?: string | null };
 export type BoardGame = {
@@ -18,6 +19,7 @@ export type BoardGame = {
   frozen: { side: "one" | "two"; ms_left: number } | null;
   vote: { ms_left: number; tallies: { key: string; label: string; path: Sq[]; votes: number }[] } | null;
   history: string[]; events: BoardEvent[]; clock_minutes: number;
+  winning_line?: Sq[] | null; blocked_column?: number | null; counts?: { one: number; two: number } | null;
   prices: { time: number; freeze: number; hint: number; vote: number };
   players: BoardPlayer[];
 };
@@ -61,7 +63,8 @@ export async function cancelBoardGame(userId: number, gameId: number) {
 }
 
 /** A power-up for a player (coins go to them) or a vote (recipient = the host). */
-export async function buyBoardPowerup(myUserId: number, recipientId: number, gameId: number, powerup: "time" | "freeze" | "hint" | "vote", roomName: string, move?: string) {
+export type BoardPowerup = "time" | "freeze" | "hint" | "vote" | "block";
+export async function buyBoardPowerup(myUserId: number, recipientId: number, gameId: number, powerup: BoardPowerup, roomName: string, move?: string) {
   const res = await post<Record<string, unknown>>("sendCoinsToUser", {
     my_user_id: myUserId, user_id: recipientId, board_game_id: gameId, powerup, move: move ?? "", room_name: roomName,
   });
