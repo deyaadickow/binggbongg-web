@@ -19,7 +19,8 @@ import { buyBoardPowerup, cancelBoardGame, fetchBoardGame, makeBoardMove, resign
 import { BOARD_TITLE, BoardGameOverlay, BoardGameStartDialog } from "../components/BoardGameOverlay";
 import { answerTrivia, buyTrivia, cancelTrivia, fetchTrivia, startTrivia, type TriviaGame } from "../lib/trivia";
 import { TriviaOverlay, TriviaStartDialog } from "../components/TriviaOverlay";
-import { fetchAudience, type AudienceRound } from "../lib/audience";
+import { type AudienceRound } from "../lib/audience";
+import { fetchRoomGames } from "../lib/roomgames";
 import { AudienceCard } from "../components/AudienceCard";
 import { fetchActiveTapGame, gameTitle, type TapGameType } from "../lib/tapgame";
 import { TapGameOverlay } from "../components/TapGameOverlay";
@@ -451,130 +452,108 @@ export function LiveViewerPage() {
   const nameOf = useCallback((id: number | null) => broadcasters.find((b) => b.user_id === id), [broadcasters]);
   const broadcastersRef = useRef<Member[]>([]);
 
-  // Bingo's one read. Polled for every role, and the only way a game is discovered.
-  useEffect(() => {
-    if (!roomName) return;
-    let alive = true;
-    const tick = async () => {
-      try {
-        const fresh = await fetchBingoGame(roomName);
-        if (!alive) return;
-        setBingoGame(fresh);
-        // Auto-open once per game, so the card appears when the host starts one — and never
-        // again for that game, or closing it would be pointless.
-        if (fresh && fresh.status === "active" && bingoAutoOpened.current !== fresh.bingo_game_id) {
-          bingoAutoOpened.current = fresh.bingo_game_id;
-          setBingoOpen(true);
-        }
-        if (fresh && fresh.status !== "active" && bingoAnnouncedOver.current !== fresh.bingo_game_id) {
-          bingoAnnouncedOver.current = fresh.bingo_game_id;
-          setBingoFinishedId(fresh.bingo_game_id);
-        }
-      } catch {
-        // Fail open, same as every other poll in this room — keep the last good card rather
-        // than blanking it on one bad tick.
-      }
-    };
-    void tick();
-    const id = window.setInterval(tick, 5000);
-    return () => { alive = false; window.clearInterval(id); };
-  }, [roomName]);
+  // Bingo's state, from the room's one combined poll (see the RoomGames poll below).
+  function applyBingo(fresh: BingoGame | null) {
+    setBingoGame(fresh);
+    // Auto-open once per game, so the card appears when the host starts one — and never
+    // again for that game, or closing it would be pointless.
+    if (fresh && fresh.status === "active" && bingoAutoOpened.current !== fresh.bingo_game_id) {
+      bingoAutoOpened.current = fresh.bingo_game_id;
+      setBingoOpen(true);
+    }
+    if (fresh && fresh.status !== "active" && bingoAnnouncedOver.current !== fresh.bingo_game_id) {
+      bingoAnnouncedOver.current = fresh.bingo_game_id;
+      setBingoFinishedId(fresh.bingo_game_id);
+    }
+  }
 
   async function refreshPyramid() {
     if (!roomName) return;
-    try {
-      const fresh = await fetchPyramidGame(roomName);
-      setPyramidGame(fresh);
-      if (!fresh) { setPyramidOpen(false); return; }
-      if (fresh.status === "active") {
-        if (pyramidClosedId.current !== fresh.pyramid_game_id) setPyramidOpen(true);
-      } else if (pyramidAnnounced.current !== fresh.pyramid_game_id) {
-        pyramidAnnounced.current = fresh.pyramid_game_id;
-        const w = fresh.players.find((p) => p.user_id === fresh.winner_user_id);
-        if (w && pyramidOpenRef.current) setToast(`🏆 ${w.name} wins Pyramid #${fresh.game_no}!`);
-      }
-    } catch { /* keep the last good state */ }
+    try { applyPyramid(await fetchPyramidGame(roomName)); } catch { /* keep the last good state */ }
+  }
+  function applyPyramid(fresh: PyramidGame | null) {
+    setPyramidGame(fresh);
+    if (!fresh) { setPyramidOpen(false); return; }
+    if (fresh.status === "active") {
+      if (pyramidClosedId.current !== fresh.pyramid_game_id) setPyramidOpen(true);
+    } else if (pyramidAnnounced.current !== fresh.pyramid_game_id) {
+      pyramidAnnounced.current = fresh.pyramid_game_id;
+      const w = fresh.players.find((p) => p.user_id === fresh.winner_user_id);
+      if (w && pyramidOpenRef.current) setToast(`🏆 ${w.name} wins Pyramid #${fresh.game_no}!`);
+    }
   }
   const pyramidOpenRef = useRef(false);
   pyramidOpenRef.current = pyramidOpen;
-  const pyramidActive = pyramidGame?.status === "active";
-  useEffect(() => {
-    if (!roomName) return;
-    void refreshPyramid();
-    const id = window.setInterval(() => { void refreshPyramid(); }, pyramidActive ? 3000 : 8000);
-    return () => window.clearInterval(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomName, pyramidActive]);
 
   async function refreshBoard() {
     if (!roomName) return;
-    try {
-      const fresh = await fetchBoardGame(roomName);
-      setBoardGame(fresh);
-      if (!fresh) { setBoardOpen(false); return; }
-      if (fresh.status === "active") {
-        if (boardClosedId.current !== fresh.board_game_id) setBoardOpen(true);
-      } else if (boardAnnounced.current !== fresh.board_game_id) {
-        boardAnnounced.current = fresh.board_game_id;
-        const w = fresh.players.find((p) => p.side === fresh.result);
-        if (w && fresh.status === "completed" && boardOpenRef.current) setToast(`🏆 ${w.name} wins ${BOARD_TITLE[fresh.kind]} #${fresh.game_no}!`);
-      }
-    } catch { /* keep the last good board */ }
+    try { applyBoard(await fetchBoardGame(roomName)); } catch { /* keep the last good board */ }
+  }
+  function applyBoard(fresh: BoardGame | null) {
+    setBoardGame(fresh);
+    if (!fresh) { setBoardOpen(false); return; }
+    if (fresh.status === "active") {
+      if (boardClosedId.current !== fresh.board_game_id) setBoardOpen(true);
+    } else if (boardAnnounced.current !== fresh.board_game_id) {
+      boardAnnounced.current = fresh.board_game_id;
+      const w = fresh.players.find((p) => p.side === fresh.result);
+      if (w && fresh.status === "completed" && boardOpenRef.current) setToast(`🏆 ${w.name} wins ${BOARD_TITLE[fresh.kind]} #${fresh.game_no}!`);
+    }
   }
   const boardOpenRef = useRef(false);
   boardOpenRef.current = boardOpen;
-  const boardActive = boardGame?.status === "active";
-  useEffect(() => {
-    if (!roomName) return;
-    void refreshBoard();
-    // Moves need to show up fast for the person waiting on them.
-    const id = window.setInterval(() => { void refreshBoard(); }, boardActive ? 1500 : 8000);
-    return () => window.clearInterval(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomName, boardActive]);
 
   async function refreshTrivia() {
     if (!roomName) return;
     try {
       const me = user?.id ?? null;
       const iAmPlayer = !!me && !!triviaRef.current?.players.some((p) => p.user_id === me);
-      const fresh = await fetchTrivia(roomName, me, iAmPlayer);
-      setTrivia(fresh);
-      if (!fresh) { setTriviaOpen(false); return; }
-      if (fresh.status === "active") {
-        if (triviaClosedId.current !== fresh.trivia_game_id) setTriviaOpen(true);
-      } else if (triviaAnnounced.current !== fresh.trivia_game_id) {
-        triviaAnnounced.current = fresh.trivia_game_id;
-        const w = fresh.players.find((p) => p.side === fresh.result);
-        if (w && fresh.status === "completed") setToast(`🏆 ${w.name} wins Trivia #${fresh.game_no}!`);
-      }
+      applyTrivia(await fetchTrivia(roomName, me, iAmPlayer));
     } catch { /* keep the last good state */ }
   }
-  const triviaActive = trivia?.status === "active";
-  useEffect(() => {
-    if (!roomName) return;
-    void refreshTrivia();
-    const id = window.setInterval(() => { void refreshTrivia(); }, triviaActive ? 1500 : 8000);
-    return () => window.clearInterval(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomName, triviaActive]);
+  function applyTrivia(fresh: TriviaGame | null) {
+    setTrivia(fresh);
+    if (!fresh) { setTriviaOpen(false); return; }
+    if (fresh.status === "active") {
+      if (triviaClosedId.current !== fresh.trivia_game_id) setTriviaOpen(true);
+    } else if (triviaAnnounced.current !== fresh.trivia_game_id) {
+      triviaAnnounced.current = fresh.trivia_game_id;
+      const w = fresh.players.find((p) => p.side === fresh.result);
+      if (w && fresh.status === "completed") setToast(`🏆 ${w.name} wins Trivia #${fresh.game_no}!`);
+    }
+  }
 
+  function applyAudience(r: AudienceRound | null) {
+    // A finished round stays up for a minute so everyone sees the result and the forfeit.
+    if (r && r.status === "open") audienceSeenAt.current = Date.now();
+    setAudience(r && (r.status === "open" || Date.now() - audienceSeenAt.current < 60000) ? r : null);
+  }
+
+  // ONE poll for every game in the room (Steve, 2026-10-27: "combine the checks into one
+  // request") — it used to be five polls per viewer. The server says when to ask again: 1.5s
+  // while a board game or Trivia runs, 3s for Bingo / Pyramid / an audience card, 10s when idle.
+  // The apply functions sit in a ref so the loop always calls the latest render's closures.
+  const roomApply = useRef({ applyBingo, applyPyramid, applyBoard, applyTrivia, applyAudience });
+  roomApply.current = { applyBingo, applyPyramid, applyBoard, applyTrivia, applyAudience };
   useEffect(() => {
     if (!roomName) return;
     let alive = true;
+    let timer = 0;
     const tick = async () => {
+      let wait = 10000;
       try {
-        const r = await fetchAudience(roomName, user?.id ?? null);
+        const g = await fetchRoomGames(roomName, user?.id ?? null);
         if (!alive) return;
-        // A finished round stays up for a minute so everyone sees the result and the forfeit.
-        if (r && r.status === "open") audienceSeenAt.current = Date.now();
-        setAudience(r && (r.status === "open" || Date.now() - audienceSeenAt.current < 60000) ? r : null);
-      } catch { /* keep the last good state */ }
+        if (g) {
+          const a = roomApply.current;
+          a.applyBingo(g.bingo); a.applyPyramid(g.pyramid); a.applyBoard(g.board); a.applyTrivia(g.trivia); a.applyAudience(g.audience);
+          wait = g.nextPollMs;
+        }
+      } catch { wait = 5000; /* keep the last good state; try again shortly */ }
+      if (alive) timer = window.setTimeout(tick, wait);
     };
     void tick();
-    const id = window.setInterval(tick, 3000);
-    return () => { alive = false; window.clearInterval(id); };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => { alive = false; window.clearTimeout(timer); };
   }, [roomName, user?.id]);
 
   function openTrivia() {

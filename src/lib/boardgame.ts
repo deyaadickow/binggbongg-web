@@ -24,7 +24,7 @@ export type BoardGame = {
   players: BoardPlayer[];
 };
 
-function normalise(raw: unknown): BoardGame | null {
+export function normalise(raw: unknown): BoardGame | null {
   if (!raw || typeof raw !== "object") return null;
   const g = raw as BoardGame;
   if (!Array.isArray(g.board) || !Array.isArray(g.players)) return null;

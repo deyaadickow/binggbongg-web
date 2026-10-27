@@ -17,7 +17,7 @@ export type TriviaGame = {
   prices: { "5050": number; time: number; vote: number }; players: TriviaPlayer[];
 };
 
-const norm = (raw: unknown): TriviaGame | null => (raw && typeof raw === "object" && Array.isArray((raw as TriviaGame).players) ? raw as TriviaGame : null);
+export const norm = (raw: unknown): TriviaGame | null => (raw && typeof raw === "object" && Array.isArray((raw as TriviaGame).players) ? raw as TriviaGame : null);
 
 /** Players get their own secrets through the signed-in call; everyone else the public one. */
 export async function fetchTrivia(roomName: string, myUserId: number | null, iAmPlayer: boolean): Promise<TriviaGame | null> {

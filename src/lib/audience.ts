@@ -12,7 +12,7 @@ export type AudienceRound = {
 };
 export type PredictorRow = { rank: number; user_id: number; name: string; image?: string | null; predictions: number; correct: number; streak: number; best_streak: number };
 
-const norm = (raw: unknown): AudienceRound | null => (raw && typeof raw === "object" && Array.isArray((raw as AudienceRound).sides) ? raw as AudienceRound : null);
+export const norm = (raw: unknown): AudienceRound | null => (raw && typeof raw === "object" && Array.isArray((raw as AudienceRound).sides) ? raw as AudienceRound : null);
 
 export async function fetchAudience(roomName: string, myUserId: number | null) {
   const res = myUserId

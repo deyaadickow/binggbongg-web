@@ -11,7 +11,7 @@ export type PyramidGame = {
 
 const num = (v: unknown) => Number(v ?? 0) || 0;
 
-function normalise(raw: unknown): PyramidGame | null {
+export function normalise(raw: unknown): PyramidGame | null {
   if (!raw || typeof raw !== "object") return null;
   const g = raw as Record<string, unknown>;
   return {

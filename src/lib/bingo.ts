@@ -109,7 +109,7 @@ export function winLabel(pattern: string): string {
   }
 }
 
-function normaliseGame(raw: Record<string, unknown> | null | undefined): BingoGame | null {
+export function normaliseGame(raw: Record<string, unknown> | null | undefined): BingoGame | null {
   if (!raw) return null;
   const cards = Array.isArray(raw.cards) ? raw.cards : [];
   return {
