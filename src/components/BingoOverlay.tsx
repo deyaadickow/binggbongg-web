@@ -181,7 +181,7 @@ export function BingoOverlay({ game, myUserId, isHost, strip, onBuy, onEndGame, 
           </div>
           {shout && (
             <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "rgba(0,0,0,.45)", padding: "0 10px" }}>
-              <span className="gs-anim" style={{ maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: 19, fontWeight: 900, color: "#000", background: "var(--gold, #F0C420)", borderRadius: 12, padding: "5px 14px", animation: "gs-pop .6s ease-in-out 4" }}>🎉 {shout}</span>
+              <span className="gs-anim" style={{ maxWidth: "100%", boxSizing: "border-box", textAlign: "center", overflowWrap: "anywhere", lineHeight: 1.2, fontSize: 16, fontWeight: 900, color: "#000", background: "var(--gold, #F0C420)", borderRadius: 12, padding: "5px 12px", animation: "gs-pop .6s ease-in-out 4" }}>🎉 {shout}</span>
             </div>
           )}
         </SceneBanner>
@@ -205,13 +205,14 @@ export function BingoOverlay({ game, myUserId, isHost, strip, onBuy, onEndGame, 
           </div>
         )}
 
+        {/* Above the card, so the result is the first thing seen when the game ends. */}
+        {podium.length > 0 && <div style={{ color: "#fff" }}><Podium rows={podium} /></div>}
         <BingoCardArt
           card={shown}
           onBuy={active && shown ? (cell) => onBuy(shown, cell) : undefined}
           popped={shownPopped}
         />
 
-        {podium.length > 0 && <div style={{ color: "#fff" }}><Podium rows={podium} /></div>}
 
         <div className="bingo-wins">
           {game.wins.length === 0

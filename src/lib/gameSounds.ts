@@ -52,5 +52,11 @@ export const sfx = {
 
 /** A short buzz on phones that support it (web). */
 export function haptic(pattern: number | number[] = 30) {
-  try { navigator.vibrate?.(pattern); } catch { /* not supported */ }
+  // Only after the member has touched the page: before that Chrome refuses the call and logs it
+  // as a console error (seen in the web preview, 2026-10-27).
+  try {
+    const ua = (navigator as Navigator & { userActivation?: { hasBeenActive: boolean } }).userActivation;
+    if (ua && !ua.hasBeenActive) return;
+    navigator.vibrate?.(pattern);
+  } catch { /* not supported */ }
 }

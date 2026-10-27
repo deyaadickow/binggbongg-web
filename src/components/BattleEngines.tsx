@@ -440,10 +440,10 @@ export function ResultOverlay({ title, rows, onClose, onShare, sharing }: {
       <WinCelebration key={rows.map((r) => `${r.label}|${r.value}|${r.win ? 1 : 0}`).join("/")} win={anyWin} />
       {rows.map((r, i) => (
         <div key={i} className="row" style={{ justifyContent: "space-between", fontSize: 16, padding: "4px 0", gap: 8 }}>
-          <span className={r.win ? "gs-anim" : undefined} style={{ fontWeight: r.win ? 800 : 500, color: r.win ? "var(--gold)" : undefined, display: "inline-block", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", animation: r.win ? "gs-pop .8s ease-in-out 3" : undefined }}>
+          <span className={r.win ? "gs-anim" : undefined} style={{ flex: "1 1 0", fontWeight: r.win ? 800 : 500, color: r.win ? "var(--gold)" : undefined, display: "inline-block", minWidth: 0, overflowWrap: "anywhere", animation: r.win ? "gs-pop .8s ease-in-out 3" : undefined }}>
             {r.win ? "👑 " : ""}{r.label}
           </span>
-          <span style={{ color: "var(--gold)", flex: "none" }}>{r.win ? "🏆 " : ""}{r.value}</span>
+          <span style={{ color: "var(--gold)", maxWidth: "58%", textAlign: "right" }}>{r.win ? "🏆 " : ""}{r.value}</span>
         </div>
       ))}
       {onShare && (

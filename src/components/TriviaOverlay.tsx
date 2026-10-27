@@ -43,7 +43,10 @@ export function TriviaOverlay({ game, myUserId, tileFor, onAnswer, onBuy, onEnd,
   // said, so a poll that brings the same state back plays nothing.
   const [drumroll, setDrumroll] = useState(false);
   const [burst, setBurst] = useState(0);
-  const prev = useRef({ id: game.trivia_game_id, status: game.status, phase: game.phase, q: game.q_number, mine: game.my_answer });
+  const scoresOf = (g: TriviaGame) => Object.fromEntries(g.players.map((p) => [p.side, p.score])) as Record<string, number>;
+  const prev = useRef({ id: game.trivia_game_id, status: game.status, phase: game.phase, q: game.q_number, mine: game.my_answer, scores: scoresOf(game) });
+  // The scores from before the reveal, shown during the drum roll so they don't give it away.
+  const [heldScores, setHeldScores] = useState<Record<string, number> | null>(null);
   const drumTimer = useRef<number | undefined>(undefined);
   const lastTick = useRef(-1);
   useEffect(() => () => window.clearTimeout(drumTimer.current), []);
@@ -56,7 +59,7 @@ export function TriviaOverlay({ game, myUserId, tileFor, onAnswer, onBuy, onEnd,
   // A layout effect, so the drum roll is up before the browser paints the revealed answer.
   useLayoutEffect(() => {
     const was = prev.current;
-    prev.current = { id: game.trivia_game_id, status: game.status, phase: game.phase, q: game.q_number, mine: game.my_answer };
+    prev.current = { id: game.trivia_game_id, status: game.status, phase: game.phase, q: game.q_number, mine: game.my_answer, scores: scoresOf(game) };
     if (was.id !== game.trivia_game_id) { window.clearTimeout(drumTimer.current); setDrumroll(false); return; }
     if (was.mine === null && game.my_answer !== null && was.q === game.q_number) { sfx.lock(); haptic(25); }
     if (was.status === "active" && game.status !== "active") {
@@ -69,7 +72,7 @@ export function TriviaOverlay({ game, myUserId, tileFor, onAnswer, onBuy, onEnd,
       const r = game.last_result;
       const mySide = game.players.find((p) => p.user_id === myUserId)?.side ?? null;
       const myPick = mySide ? r.answers[mySide] : null;
-      setDrumroll(true); sfx.drumroll();
+      setDrumroll(true); setHeldScores(was.scores); sfx.drumroll();
       window.clearTimeout(drumTimer.current);
       drumTimer.current = window.setTimeout(() => {
         setDrumroll(false);
@@ -127,7 +130,7 @@ export function TriviaOverlay({ game, myUserId, tileFor, onAnswer, onBuy, onEnd,
             {won ? "👑 " : ""}{p.is_audience ? "👥 " : ""}{p.is_computer ? "🤖 " : ""}{p.name}{p.user_id === myUserId ? " (you)" : ""}
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12 }}>
-            <b style={{ color: gold, fontSize: 18 }}>{p.score}</b>
+            <b style={{ color: gold, fontSize: 18 }}>{drumroll && heldScores ? (heldScores[p.side] ?? p.score) : p.score}</b>
             {asking && <span style={{ opacity: 0.85 }}>{p.answered ? "✅ answered" : `⏱ ${left}s`}</span>}
           </div>
           {helpable && p.user_id !== null && (

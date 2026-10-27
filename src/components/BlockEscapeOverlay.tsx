@@ -131,7 +131,7 @@ export function BlockEscapeOverlay({ onClose }: { onClose: () => void }) {
           <SceneBanner scene={SCENES.road} height={58}>
             {solved && (
               <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "rgba(0,0,0,.3)" }}>
-                <span className="gs-anim" style={{ fontSize: 17, fontWeight: 900, color: "#fff", textShadow: "0 2px 4px #000", animation: "gs-pop .6s ease-in-out 3" }}>🎉 Board cleared!</span>
+                <span className="gs-anim" style={{ fontSize: 17, fontWeight: 900, color: "#fff", textShadow: "0 2px 4px #000", background: "rgba(0,0,0,.55)", borderRadius: 999, padding: "3px 14px", animation: "gs-pop .6s ease-in-out 3" }}>🎉 Board cleared!</span>
               </div>
             )}
           </SceneBanner>

@@ -92,7 +92,9 @@ export function SceneBanner({ scene, height = 104, lanes, children }: { scene: S
   useKeyframes();
   const night = scene.stars;
   return (
-    <div style={{ position: "relative", height, borderRadius: 12, overflow: "hidden", background: `linear-gradient(180deg, ${scene.sky[0]}, ${scene.sky[1]})` }}>
+    // flex "none": inside a scrolling flex column (Bingo, One Stroke) a long page otherwise squashes
+    // the banner to 0px, since overflow:hidden lets it shrink below its height.
+    <div style={{ position: "relative", height, flex: "none", borderRadius: 12, overflow: "hidden", background: `linear-gradient(180deg, ${scene.sky[0]}, ${scene.sky[1]})` }}>
       {night && Array.from({ length: 16 }, (_, i) => (
         <span key={i} className="gs-anim" style={{ position: "absolute", left: `${(i * 37) % 100}%`, top: `${(i * 23) % 55}%`, width: 3, height: 3, borderRadius: 2, background: "#fff", animation: `gs-twinkle ${1.6 + (i % 5) * 0.4}s ease-in-out ${i * 0.2}s infinite` }} />
       ))}

@@ -196,7 +196,7 @@ export function BoardGameOverlay({ game, myUserId, onMove, onBuy, onResign, onEn
   };
 
   const board = game.kind === "mancala" ? mancalaBoard() : (
-    <div style={{ display: "grid", gridTemplateColumns: `repeat(${nCols}, 1fr)`, width: "min(352px, 86vw)", aspectRatio: `${nCols} / ${nRows}`, border: `2px solid ${gold}`, borderRadius: 6, overflow: "hidden",
+    <div style={{ display: "grid", gridTemplateColumns: `repeat(${nCols}, 1fr)`, gridTemplateRows: `repeat(${nRows}, 1fr)`, width: "min(352px, 86vw)", aspectRatio: `${nCols} / ${nRows}`, border: `2px solid ${gold}`, borderRadius: 6, overflow: "hidden",
                   background: game.kind === "fourinarow" ? "#1f4fbf" : undefined, gap: game.kind === "reversi" ? 1 : 0 }}>
       {viewRows.map((r) => viewCols.map((c) => {
         const dark = (r + c) % 2 === 1;
