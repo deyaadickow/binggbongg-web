@@ -38,6 +38,11 @@ export function AudienceCard({ round, myUserId, onRound, onToast }: {
   const sideName = (k: string | null) => round.sides.find((s) => s.key === k)?.label ?? "";
   const totalPred = round.sides.reduce((a, s) => a + (s.predictions ?? 0), 0);
   const maxCheer = Math.max(1, ...round.sides.map((s) => s.cheer));
+  // Solo Battle can have many entrants: the six loudest teams (and always your own), then "+N more".
+  const MAX_ROWS = 6;
+  const ranked = [...round.sides].map((s, i) => ({ s, i })).sort((a, b) => b.s.cheer - a.s.cheer);
+  const shown = ranked.filter((x, n) => n < MAX_ROWS || x.s.key === round.my_team).sort((a, b) => a.i - b.i);
+  const hiddenCount = round.sides.length - shown.length;
   const pill = (label: string, onClick: () => void, color = gold) => (
     <button onClick={onClick} style={{ fontSize: 12, fontWeight: 700, color: "#000", background: color, border: "none", borderRadius: 999, padding: "5px 10px", cursor: "pointer", maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{label}</button>
   );
@@ -67,11 +72,11 @@ export function AudienceCard({ round, myUserId, onRound, onToast }: {
           )}
           {round.my_prediction && open && <div>🔮 You picked <b style={{ color: gold }}>{sideName(round.my_prediction)}</b></div>}
           {!round.predict_open && open && totalPred > 0 && (
-            <div style={{ opacity: 0.85 }}>🔮 {round.sides.map((s) => `${Math.round(100 * (s.predictions ?? 0) / totalPred)}% ${s.label.split(" ")[0]}`).join(" · ")}</div>
+            <div style={{ opacity: 0.85 }}>🔮 {[...round.sides].filter((s) => (s.predictions ?? 0) > 0).sort((a, b) => (b.predictions ?? 0) - (a.predictions ?? 0)).slice(0, 4).map((s) => `${Math.round(100 * (s.predictions ?? 0) / totalPred)}% ${s.label.split(" ")[0]}`).join(" · ")}</div>
           )}
           {/* Teams + cheer */}
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            {round.sides.map((s, i) => (
+            {shown.map(({ s, i }) => (
               <div key={s.key} style={{ display: "flex", alignItems: "center", gap: 6 }}>
                 <span style={{ width: 86, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontWeight: round.my_team === s.key ? 700 : 400 }}>{s.label}</span>
                 <div style={{ flex: 1, height: 10, borderRadius: 5, background: "rgba(255,255,255,.1)", overflow: "hidden" }}>
@@ -81,6 +86,7 @@ export function AudienceCard({ round, myUserId, onRound, onToast }: {
                 {open && viewer && !round.my_team && pill("Join", () => run(joinBattleTeam(myUserId!, round.round_id, s.key), `You're on ${s.label}'s team!`), TEAM_COLORS[i % 4])}
               </div>
             ))}
+            {hiddenCount > 0 && <div style={{ fontSize: 11, opacity: 0.7 }}>+{hiddenCount} more</div>}
             {open && viewer && round.my_team && (
               <button onClick={() => { pending.current += 1; onRound({ ...round, sides: round.sides.map((s) => (s.key === round.my_team ? { ...s, cheer: s.cheer + 1 } : s)) }); }}
                       style={{ marginTop: 2, padding: "8px 0", borderRadius: 999, border: "none", fontWeight: 800, fontSize: 14, cursor: "pointer", color: "#000",
