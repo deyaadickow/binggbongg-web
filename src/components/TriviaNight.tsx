@@ -2,7 +2,7 @@
 // start dialog. One question at a time; players on stage answer free, viewers pay the host's price
 // per answer (a gift to the host). Right answers win points and bragging rights, never coins.
 import { useEffect, useRef, useState } from "react";
-import { Confetti, CountdownRing, MuteButton, Podium, SceneBanner, sceneForTrivia } from "./GameShow";
+import { Confetti, CountdownRing, MuteButton, Podium, SceneBanner, percentages, sceneForTrivia } from "./GameShow";
 import { haptic, sfx } from "../lib/gameSounds";
 import { fetchTriviaCategories, fetchTriviaFans, type TriviaCategory, type TriviaFanRow, type TriviaNight, type TriviaNightStart } from "../lib/trivianight";
 
@@ -19,7 +19,8 @@ function AnswerTile({ game, i, text, showResult, onAnswer }: { game: TriviaNight
   const mine = game.my_answer === i;
   const right = r?.correct === i;
   const total = r ? r.counts.reduce((a, b) => a + b, 0) : 0;
-  const pct = r && total ? Math.round((100 * (r.counts[i] ?? 0)) / total) : null;
+  // Largest remainder, so the four shown percentages always add up to exactly 100.
+  const pct = r && total ? percentages(r.counts)[i] ?? 0 : null;
   const canTap = game.phase === "question" && game.my_answer === null && !game.is_host;
   return (
     <button disabled={!canTap} onClick={() => onAnswer(i)} className="gs-anim"
@@ -94,7 +95,7 @@ export function TriviaNightPanel({ game, myUserId, onAnswer, onPause, onEnd, onC
                   background: "rgba(0,0,0,.92)", border: `2px solid ${gold}`, borderRadius: 18, padding: 12, color: "#fff", maxHeight: "calc(100vh - 220px)", overflowY: "auto" }}>
       <Confetti burst={burst} />
       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-        <b style={{ color: gold, fontSize: 14, flex: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>🧠 Trivia Night · {coins(game.coins_per_answer)}</b>
+        <b style={{ color: gold, fontSize: 14, flex: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>🧠 Trivia Night · {coins(game.coins_per_answer)} per answer</b>
         <MuteButton />
         <button onClick={() => fetchTriviaFans().then(setFans)} style={{ background: "none", border: "none", color: gold, fontSize: 12, cursor: "pointer" }}>🏅 Top</button>
         <button onClick={() => setCollapsed((c) => !c)} aria-label={collapsed ? "Expand" : "Collapse"} style={{ background: "none", border: "none", color: gold, fontSize: 18, cursor: "pointer" }}>{collapsed ? "+" : "–"}</button>
