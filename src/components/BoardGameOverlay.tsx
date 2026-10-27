@@ -228,7 +228,7 @@ export function BoardGameOverlay({ game, myUserId, onMove, onBuy, onResign, onEn
                     background: "linear-gradient(#c58b4f, #9b6532)", border: `2px solid ${gold}`, borderRadius: 18 }}>
         {/* Each player's row of pits, tinted faintly with their side colour (one blue, two red). */}
         {[top, bottom].map((r, i) => (
-          <div key={`tint${r}`} style={{ gridRow: i + 1, gridColumn: "2 / span 6", borderRadius: 19, margin: -2, background: sideColor(r === 1 ? 0 : 1), opacity: 0.31 }} />
+          <div key={`tint${r}`} style={{ gridRow: i + 1, gridColumn: "2 / span 6", borderRadius: 19, margin: -2, background: `${sideColor(r === 1 ? 0 : 1)}50` }} />
         ))}
         <div style={{ gridRow: "1 / span 2", gridColumn: 1 }}>{pitView(leftStore[0], leftStore[1], true)}</div>
         {pitCols.map((c, i) => <div key={`t${c}`} style={{ gridRow: 1, gridColumn: i + 2 }}>{pitView(top, c, false)}</div>)}
@@ -387,7 +387,7 @@ export function BoardGameOverlay({ game, myUserId, onMove, onBuy, onResign, onEn
           {lastEvent && <div style={{ fontSize: 11, opacity: 0.85 }}>{eventText(lastEvent)}</div>}
           {game.history.length > 0 && (
             <div style={{ fontSize: 11, opacity: 0.7, maxHeight: 34, overflow: "hidden" }}>
-              {historyText.map((h, i) => <span key={i} style={{ marginRight: 8, whiteSpace: "nowrap" }}>{h}</span>)}
+              {historyText.map((h, i) => <span key={i} style={{ display: "inline-block", marginRight: 8, whiteSpace: "nowrap" }}>{h}</span>)}
             </div>
           )}
           {host && game.mode === "audience" && myUserId === game.host_user_id && active && (
