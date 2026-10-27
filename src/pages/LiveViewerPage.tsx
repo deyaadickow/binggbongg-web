@@ -15,6 +15,8 @@ import { BlockEscapeOverlay } from "../components/BlockEscapeOverlay";
 import { BINGO_FALLBACK, bingoClamp, buyBingoSquare, cancelBingoBattle, fetchBingoGame, startBingoBattle, type BingoGame } from "../lib/bingo";
 import { cancelPyramidBattle, fetchPyramidGame, sendPyramidFlowers, startPyramidBattle, type PyramidGame } from "../lib/pyramid";
 import { PyramidOverlay, PyramidStartDialog } from "../components/PyramidOverlay";
+import { buyBoardPowerup, cancelBoardGame, fetchBoardGame, makeBoardMove, resignBoardGame, startBoardGame, type BoardGame, type BoardKind } from "../lib/boardgame";
+import { BOARD_TITLE, BoardGameOverlay, BoardGameStartDialog } from "../components/BoardGameOverlay";
 import { fetchActiveTapGame, gameTitle, type TapGameType } from "../lib/tapgame";
 import { TapGameOverlay } from "../components/TapGameOverlay";
 import { HostGamesMenu } from "../components/HostGamesMenu";
@@ -230,6 +232,13 @@ export function LiveViewerPage() {
   const pyramidClosedId = useRef<number | null>(null);
   const pyramidAnnounced = useRef<number | null>(null);
   const pyramidSending = useRef(false);
+  // Checkers / Chess (Steve, 2026-10-27) — same discovery rule: everyone polls the room.
+  const [boardGame, setBoardGame] = useState<BoardGame | null>(null);
+  const [boardOpen, setBoardOpen] = useState(false);
+  const [boardStartKind, setBoardStartKind] = useState<BoardKind | null>(null);
+  const boardClosedId = useRef<number | null>(null);
+  const boardAnnounced = useRef<number | null>(null);
+  const boardBusy = useRef(false);
   const [picker, setPicker] = useState<BattleKind | null>(null);
   // Steve, 2026-09-27: Hide & Seek — pick the shape first (free for all 2-4, or 2v2 teams).
   const [hideSeekMode, setHideSeekMode] = useState<"choose" | "2v2" | 1 | 2 | 3 | null>(null);
@@ -480,6 +489,39 @@ export function LiveViewerPage() {
     return () => window.clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomName, pyramidActive]);
+
+  async function refreshBoard() {
+    if (!roomName) return;
+    try {
+      const fresh = await fetchBoardGame(roomName);
+      setBoardGame(fresh);
+      if (!fresh) { setBoardOpen(false); return; }
+      if (fresh.status === "active") {
+        if (boardClosedId.current !== fresh.board_game_id) setBoardOpen(true);
+      } else if (boardAnnounced.current !== fresh.board_game_id) {
+        boardAnnounced.current = fresh.board_game_id;
+        const w = fresh.players.find((p) => p.side === fresh.result);
+        if (w && fresh.status === "completed" && boardOpenRef.current) setToast(`🏆 ${w.name} wins ${BOARD_TITLE[fresh.kind]} #${fresh.game_no}!`);
+      }
+    } catch { /* keep the last good board */ }
+  }
+  const boardOpenRef = useRef(false);
+  boardOpenRef.current = boardOpen;
+  const boardActive = boardGame?.status === "active";
+  useEffect(() => {
+    if (!roomName) return;
+    void refreshBoard();
+    // Moves need to show up fast for the person waiting on them.
+    const id = window.setInterval(() => { void refreshBoard(); }, boardActive ? 1500 : 8000);
+    return () => window.clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomName, boardActive]);
+
+  function openBoard(kind: BoardKind) {
+    if (boardGame && boardGame.status === "active") { boardClosedId.current = null; setBoardOpen(true); return; }
+    if (role !== "host") { setToast(`No ${BOARD_TITLE[kind]} game is running — the host starts it.`); return; }
+    setBoardStartKind(kind);
+  }
 
   function openPyramid() {
     if (pyramidGame && pyramidGame.status === "active") { pyramidClosedId.current = null; setPyramidOpen(true); return; }
@@ -1295,6 +1337,54 @@ export function LiveViewerPage() {
           }}
         />
       )}
+      {boardOpen && boardGame && myId !== null && (
+        <BoardGameOverlay
+          game={boardGame}
+          myUserId={myId}
+          onMove={async (key) => {
+            if (boardBusy.current) return;
+            boardBusy.current = true;
+            const { game, message } = await makeBoardMove(myId, boardGame.board_game_id, key);
+            boardBusy.current = false;
+            if (message) setToast(message);
+            if (game) setBoardGame(game); else await refreshBoard();
+          }}
+          onBuy={async (recipientId, powerup, move) => {
+            if (boardBusy.current) return;
+            boardBusy.current = true;
+            const { game, message } = await buyBoardPowerup(myId, recipientId, boardGame.board_game_id, powerup, roomName, move);
+            boardBusy.current = false;
+            setToast(message ?? (powerup === "vote" ? "🗳 Vote counted!" : powerup === "time" ? "⏱ +30 seconds sent!" : powerup === "freeze" ? "❄ Frozen!" : "💡 Hint sent!"));
+            if (game) setBoardGame(game); else await refreshBoard();
+          }}
+          onResign={async () => {
+            const problem = await resignBoardGame(myId, boardGame.board_game_id);
+            if (problem) setToast(problem);
+            await refreshBoard();
+          }}
+          onEnd={async () => {
+            const problem = await cancelBoardGame(myId, boardGame.board_game_id);
+            if (problem) setToast(problem);
+            await refreshBoard();
+          }}
+          onClose={() => { boardClosedId.current = boardGame.board_game_id; setBoardOpen(false); }}
+        />
+      )}
+      {boardStartKind !== null && myId !== null && (
+        <BoardGameStartDialog
+          kind={boardStartKind}
+          candidates={broadcasters.filter((b) => b.user_id !== myId).map((b) => ({ userId: b.user_id, name: personName(b) }))}
+          onClose={() => setBoardStartKind(null)}
+          onStart={async (s) => {
+            setBoardStartKind(null);
+            const { game, message } = await startBoardGame(myId, roomName, s);
+            if (!game) { setToast(message ?? "Couldn't start the game."); return; }
+            boardClosedId.current = null;
+            setBoardGame(game);
+            setBoardOpen(true);
+          }}
+        />
+      )}
       {bingoBoardOpen && <BingoBoardOverlay onClose={() => setBingoBoardOpen(false)} />}
       {bingoFinishedId !== null && (
         <BingoWinnersOverlay bingoGameId={bingoFinishedId} onClose={() => setBingoFinishedId(null)} />
@@ -1324,6 +1414,7 @@ export function LiveViewerPage() {
           else if (k === "solo") startSolo();
           else if (k === "bingo") openBingo();
           else if (k === "pyramid") openPyramid();
+          else if (k === "checkers" || k === "chess") openBoard(k);
           else if (k === "bingoBoard") setBingoBoardOpen(true);
           // The 31-day challenge and the three reference rows open their own overlay off the
           // same `picker` state — they start nothing, so they need no people-picker step.

@@ -28,7 +28,7 @@ export function Overlay({ title, children, onClose, width = 440 }: { title: stri
 
 export type BattleKind =
   | "1v1" | "gameLimit" | "virtual" | "series" | "2v2" | "marathon" | "555" | "solo" | "hideSeek"
-  | "bingo" | "bingoBoard" | "pyramid"
+  | "bingo" | "bingoBoard" | "pyramid" | "checkers" | "chess"
   // Android numbers this one #5 and it belongs between Best Out Of and 5-5-5. It isn't a battle
   // you start against someone in the room — it's a personal 31-day streak you opt into — so it
   // needs no people on screen.
@@ -83,6 +83,12 @@ export const BATTLE_KINDS: {
   // pyramid when the host's timer ends wins. Solo is real, so minPeople is 1.
   { kind: "pyramid", number: "#12", title: "pyramid_battle", blurb: "pyramid_battle_blurb", minPeople: 1,
     info: "pyramid_battle_info" },
+  // Steve, 2026-10-27: Checkers + Chess — a duel on chess clocks with viewer power-ups, or the
+  // host against the audience's votes. Playing the audience needs nobody else, so minPeople is 1.
+  { kind: "checkers", number: "#13", title: "checkers_battle", blurb: "board_battle_blurb", minPeople: 1,
+    info: "checkers_battle_info" },
+  { kind: "chess", number: "#14", title: "chess_battle", blurb: "board_battle_blurb", minPeople: 1,
+    info: "chess_battle_info" },
   // Unnumbered from here down, exactly as on the phones: these aren't battles you can start, so
   // they carry no "#n" and never check how many people are on screen.
   { kind: "pkContests", title: "pk_battle_contests", blurb: "admin_run_scored_by_gift_coins", minPeople: 1, reference: true,

@@ -1433,5 +1433,10 @@ export const en = {
   // Pyramid battle (Steve, 2026-10-27)
   pyramid_battle: "Pyramid",
   pyramid_battle_blurb: "Viewers send Flowers — fill the pyramid",
+  checkers_battle: "Checkers",
+  chess_battle: "Chess",
+  board_battle_blurb: "Play someone on the clock, or play the audience",
+  checkers_battle_info: "Play another member on a chess clock (3, 5 or 10 minutes each) — run out of time and you lose. Viewers buy power-ups for a player at your prices: +30 seconds, Freeze (their opponent can't move for 10 seconds while the clock keeps running) and a Hint; the coins go to that player. Or play the audience: on their turn everyone watching has 20 seconds to vote for a move, and the most-voted move is played — every vote's coins come to you.",
+  chess_battle_info: "Full chess rules — castling, en passant, promotion, check and checkmate. Play another member on a chess clock (3, 5 or 10 minutes each), and viewers buy power-ups for a player at your prices: +30 seconds, Freeze (their opponent can't move for 10 seconds while the clock keeps running) and a Hint; the coins go to that player. Or play the audience: on their turn everyone watching has 20 seconds to vote for a move, and the most-voted move is played — every vote's coins come to you.",
   pyramid_battle_info: "Play on your own or with up to 3 others. Viewers send a player Flowers (the host sets 1 to 25 coins a Flower). 10 Flowers make a ❤️, 10 Hearts a 🔥, 10 Fires a 🐶, 10 Puppies a 💰 Money Bag. Whoever has the highest pyramid when time runs out wins — fill all 10 Money Bags and you win on the spot. Every Flower's coins go to that player, like a gift.",
 } as const;
