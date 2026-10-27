@@ -4,7 +4,7 @@
 // click is their (paid) vote. Same shape as the phones.
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { LiveTile } from "../lib/live";
-import type { BoardGame, BoardKind, BoardMove, BoardPlayer, BoardStart, Sq } from "../lib/boardgame";
+import type { AiLevel, BoardGame, BoardKind, BoardMove, BoardPlayer, BoardStart, Sq } from "../lib/boardgame";
 
 const gold = "var(--gold, #F0C420)";
 const LIGHT = "#E9D8A6", DARK = "#7A5230", CHECKERS_LIGHT = "#D9C29A", CHECKERS_DARK = "#2E4A2E";
@@ -154,7 +154,8 @@ export function BoardGameOverlay({ game, myUserId, onMove, onBuy, onResign, onEn
     const left = p.ms_left === null ? null : (turn ? p.ms_left - since : p.ms_left);
     const won = !active && game.result === p.side;
     const isMe = p.user_id === myUserId;
-    const helpable = active && game.mode === "duel" && !isMe && p.user_id !== null && me === null;
+    // Duel: either player. Computer: the host (the computer has no user). Audience: nobody.
+    const helpable = active && game.mode !== "audience" && !isMe && p.user_id !== null && me === null;
     const pill = (label: string, onClick: () => void, title: string) => (
       <button title={title} onClick={onClick} style={{ fontSize: 11, fontWeight: 700, color: "#000", background: gold, border: "none", borderRadius: 999, padding: "4px 8px", cursor: "pointer", whiteSpace: "nowrap" }}>{label}</button>
     );
@@ -164,7 +165,7 @@ export function BoardGameOverlay({ game, myUserId, onMove, onBuy, onResign, onEn
       {tile && <PlayerScreen tile={tile} active={turn} />}
       <div style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", gap: 8, padding: "6px 8px", borderRadius: 10, background: turn ? "rgba(240,196,32,.16)" : "rgba(255,255,255,.05)", border: `1px solid ${turn ? gold : "transparent"}`, flexWrap: "wrap" }}>
         <b style={{ fontSize: 13, color: won ? gold : "#fff", flex: 1, minWidth: 80, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-          {won ? "👑 " : ""}{p.is_audience ? "👥 " : ""}{p.name}{isMe ? " (you)" : ""}
+          {won ? "👑 " : ""}{p.is_audience ? "👥 " : ""}{p.is_computer ? "🤖 " : ""}{p.name}{isMe ? " (you)" : ""}
         </b>
         {frozen > 0 && <span style={{ fontSize: 12, color: "#7fd3ff", fontWeight: 700 }}>❄ {Math.ceil(frozen / 1000)}s</span>}
         <span style={{ fontSize: 11, color: gold }}>{p.coins} coins</span>
@@ -172,7 +173,7 @@ export function BoardGameOverlay({ game, myUserId, onMove, onBuy, onResign, onEn
         {helpable && p.user_id !== null && (
           <div style={{ display: "flex", gap: 4, width: "100%" }}>
             {pill(`+30s · ${game.prices.time}`, () => onBuy(p.user_id!, "time"), "30 more seconds on their clock")}
-            {game.turn !== p.side && pill(`❄ Freeze · ${game.prices.freeze}`, () => onBuy(p.user_id!, "freeze"), "Their opponent can't move for 10 seconds")}
+            {game.turn !== p.side && game.mode === "duel" && pill(`❄ Freeze · ${game.prices.freeze}`, () => onBuy(p.user_id!, "freeze"), "Their opponent can't move for 10 seconds")}
             {game.turn === p.side && !game.hint && pill(`💡 Hint · ${game.prices.hint}`, () => onBuy(p.user_id!, "hint"), "Shows them a good move")}
           </div>
         )}
@@ -190,6 +191,7 @@ export function BoardGameOverlay({ game, myUserId, onMove, onBuy, onResign, onEn
   else if (myTurn) status = picked ? "Now click where it goes." : "Your move — click a piece.";
   else if (iVote) status = `Vote for the audience's move — click a piece, then where it goes (${game.prices.vote} coins a vote).`;
   else if (game.mode === "audience" && game.turn === "two") status = "The audience is voting…";
+  else if (game.mode === "computer" && game.turn === "two") status = "🤖 The computer is thinking…";
   else status = `${(game.turn === "one" ? game.players[0] : game.players[1]).name} to move${game.in_check ? " — check!" : ""}`;
 
   const lastEvent = game.events[game.events.length - 1];
@@ -202,7 +204,7 @@ export function BoardGameOverlay({ game, myUserId, onMove, onBuy, onResign, onEn
   return (
     <div style={{ position: "fixed", top: 96, left: 12, zIndex: 90, background: "rgba(0,0,0,.82)", border: `2px solid ${gold}`, borderRadius: 14, padding: 10, color: "#fff", userSelect: "none", maxWidth: "calc(100vw - 24px)", boxSizing: "border-box" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-        <b style={{ color: gold, fontSize: 14, flex: 1 }}>{game.kind === "chess" ? "♞" : "⛀"} {BOARD_TITLE[game.kind]} #{game.game_no}{game.mode === "audience" ? " · vs the audience" : ""}</b>
+        <b style={{ color: gold, fontSize: 14, flex: 1 }}>{game.kind === "chess" ? "♞" : "⛀"} {BOARD_TITLE[game.kind]} #{game.game_no}{game.mode === "audience" ? " · vs the audience" : game.mode === "computer" ? " · vs the computer" : ""}</b>
         {active && me !== null && (
           <button onClick={() => { if (window.confirm("Resign this game?")) onResign(); }} style={{ fontSize: 11, fontWeight: 700, background: "transparent", color: gold, border: `1px solid ${gold}`, borderRadius: 999, padding: "2px 10px", cursor: "pointer" }}>Resign</button>
         )}
@@ -246,7 +248,8 @@ export function BoardGameStartDialog({ kind, candidates, onStart, onClose }: {
   kind: BoardKind; candidates: { userId: number; name: string }[];
   onStart: (s: BoardStart) => void; onClose: () => void;
 }) {
-  const [mode, setMode] = useState<"duel" | "audience">(candidates.length ? "duel" : "audience");
+  const [mode, setMode] = useState<"duel" | "audience" | "computer">(candidates.length ? "duel" : "computer");
+  const [level, setLevel] = useState<AiLevel>("medium");
   const [opponent, setOpponent] = useState<number | null>(candidates[0]?.userId ?? null);
   const [minutes, setMinutes] = useState(5);
   const [prices, setPrices] = useState({ time: 50, freeze: 100, hint: 25, vote: 5 });
@@ -265,9 +268,10 @@ export function BoardGameStartDialog({ kind, candidates, onStart, onClose }: {
     <div role="dialog" onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
       <div onClick={(e) => e.stopPropagation()} style={{ background: "#000", border: `2px solid ${gold}`, borderRadius: 16, padding: 18, maxWidth: 400, width: "100%", boxSizing: "border-box", color: "#fff", maxHeight: "90vh", overflowY: "auto" }}>
         <h3 style={{ color: gold, margin: "0 0 10px", textAlign: "center" }}>{kind === "chess" ? "♞" : "⛀"} {BOARD_TITLE[kind]}</h3>
-        <div style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 10 }}>
+        <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", marginBottom: 10 }}>
           {chip(mode === "duel", "Play someone", () => setMode("duel"))}
           {chip(mode === "audience", "Play the audience", () => setMode("audience"))}
+          {chip(mode === "computer", "Play the computer", () => setMode("computer"))}
         </div>
         {mode === "duel" ? (
           candidates.length === 0 ? <p style={{ fontSize: 13, opacity: 0.85 }}>Nobody is on screen with you yet — bring a guest up, or play the audience.</p> : (
@@ -280,6 +284,13 @@ export function BoardGameStartDialog({ kind, candidates, onStart, onClose }: {
               ))}
             </div>
           )
+        ) : mode === "computer" ? (
+          <div style={{ marginBottom: 8 }}>
+            <p style={{ fontSize: 13, opacity: 0.85, margin: "0 0 8px" }}>You move first. The computer answers a moment after each of your moves and has no clock — only you are timed. Viewers can buy you +30 seconds or a Hint.</p>
+            <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
+              {(["easy", "medium", "hard"] as AiLevel[]).map((l) => <span key={l}>{chip(level === l, l[0].toUpperCase() + l.slice(1), () => setLevel(l))}</span>)}
+            </div>
+          </div>
         ) : <p style={{ fontSize: 13, opacity: 0.85, margin: "0 0 8px" }}>You move first. On the audience's turn everyone watching has 20 seconds to vote, and the most-voted move is played. Every vote's coins come to you.</p>}
         <div style={{ fontSize: 13, fontWeight: 600, margin: "8px 0 6px" }}>{mode === "duel" ? "Each player's clock" : "Your clock"}</div>
         <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
@@ -293,9 +304,15 @@ export function BoardGameStartDialog({ kind, candidates, onStart, onClose }: {
             {price("hint", "💡 Hint")}
             <div style={{ fontSize: 11, opacity: 0.7 }}>Viewers buy these for a player — the coins go to that player.</div>
           </>
+        ) : mode === "computer" ? (
+          <>
+            {price("time", "+30 seconds")}
+            {price("hint", "💡 Hint")}
+            <div style={{ fontSize: 11, opacity: 0.7 }}>Viewers buy these for you — the coins come to you.</div>
+          </>
         ) : price("vote", "🗳 One vote")}
         <button disabled={mode === "duel" && opponent === null}
-                onClick={() => onStart({ kind, mode, opponent: mode === "duel" ? opponent ?? undefined : undefined, minutes, prices })}
+                onClick={() => onStart({ kind, mode, level: mode === "computer" ? level : undefined, opponent: mode === "duel" ? opponent ?? undefined : undefined, minutes, prices })}
                 style={{ marginTop: 16, width: "100%", padding: "12px 0", borderRadius: 999, border: "none", background: gold, color: "#000", fontWeight: 700, fontSize: 16, cursor: "pointer", opacity: mode === "duel" && opponent === null ? 0.5 : 1 }}>Start</button>
       </div>
     </div>

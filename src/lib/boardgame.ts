@@ -7,10 +7,10 @@ import { post } from "./api";
 export type BoardKind = "checkers" | "chess";
 export type Sq = [number, number];
 export type BoardMove = { key: string; from: Sq; to: Sq; path: Sq[]; label: string };
-export type BoardPlayer = { side: "one" | "two"; user_id: number | null; is_audience: boolean; name: string; image?: string | null; ms_left: number | null; coins: number };
+export type BoardPlayer = { side: "one" | "two"; user_id: number | null; is_audience: boolean; is_computer?: boolean; name: string; image?: string | null; ms_left: number | null; coins: number };
 export type BoardEvent = { type: string; by: string; for_user_id: number; move?: string | null };
 export type BoardGame = {
-  board_game_id: number; game_no: number; kind: BoardKind; mode: "duel" | "audience"; host_user_id: number;
+  board_game_id: number; game_no: number; kind: BoardKind; mode: "duel" | "audience" | "computer"; ai_level?: string | null; host_user_id: number;
   status: string; result: "one" | "two" | "draw" | null; reason: string | null; winner_user_id: number | null;
   turn: "one" | "two"; plies: number; in_check: boolean; board: string[][]; moves: BoardMove[];
   last_move: { key: string; path: Sq[]; side: string } | null;
@@ -34,11 +34,12 @@ export async function fetchBoardGame(roomName: string): Promise<BoardGame | null
   return res.status ? normalise(res.data) : null;
 }
 
-export type BoardStart = { kind: BoardKind; mode: "duel" | "audience"; opponent?: number; minutes: number; prices: BoardGame["prices"] };
+export type AiLevel = "easy" | "medium" | "hard";
+export type BoardStart = { kind: BoardKind; mode: "duel" | "audience" | "computer"; level?: AiLevel; opponent?: number; minutes: number; prices: BoardGame["prices"] };
 
 export async function startBoardGame(userId: number, roomName: string, s: BoardStart) {
   const res = await post<Record<string, unknown>>("startBoardGame", {
-    user_id: userId, room_name: roomName, kind: s.kind, mode: s.mode, opponent_user_id: s.opponent ?? "",
+    user_id: userId, room_name: roomName, kind: s.kind, mode: s.mode, ai_level: s.level ?? "", opponent_user_id: s.opponent ?? "",
     clock_minutes: s.minutes, price_time: s.prices.time, price_freeze: s.prices.freeze, price_hint: s.prices.hint, price_vote: s.prices.vote,
   });
   return { game: res.status ? normalise(res.data) : null, message: res.message };
