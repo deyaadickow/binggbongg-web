@@ -3,9 +3,14 @@
 // (click = 1 Flower, shift-click = 10). Same shape as the phones.
 import { useEffect, useRef, useState } from "react";
 import type { LiveTile } from "../lib/live";
-import type { PyramidGame, PyramidPlayer } from "../lib/pyramid";
+import type { PyramidGame, PyramidPlayer, PyramidTiers } from "../lib/pyramid";
+import { Confetti, CountdownRing, MuteButton, Podium, SceneBanner } from "./GameShow";
+import { SCENES } from "../lib/gameSceneData";
+import { haptic, sfx } from "../lib/gameSounds";
 
 const gold = "var(--gold, #F0C420)";
+/** Bottom to top — the order a gift climbs. */
+const TIERS: (keyof PyramidTiers)[] = ["flowers", "hearts", "fires", "puppies", "bags"];
 
 /** A player's live camera at the top of their column (Steve, 2026-10-27: "add the video screen
  *  for every player on all games") — a second video element on the room's own track. */
@@ -35,9 +40,49 @@ export function PyramidOverlay({ game, myUserId, onSend, onEnd, onClose, tileFor
   const active = game.status === "active";
   const winner = game.players.find((p) => p.user_id === game.winner_user_id);
 
-  const circle = (emoji: string, n: number) => (
-    <div style={{ width: 46, height: 46, borderRadius: "50%", border: `2px solid ${n > 0 ? gold : "rgba(212,175,55,.4)"}`, background: "rgba(0,0,0,.6)",
-                  display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", marginTop: 4, lineHeight: 1.05 }}>
+  // Game Show (Steve, 2026-10-27): every gift tier has its own sound — higher tiers louder — and
+  // the circle that went up pops; the end gets a fanfare, confetti and a podium. Fired on CHANGES
+  // between polls only: the ref holds what the last poll said.
+  const [popped, setPopped] = useState<Set<string>>(() => new Set());
+  const [burst, setBurst] = useState(0);
+  const popTimer = useRef<number | undefined>(undefined);
+  const tiersOf = (g: PyramidGame) => new Map(g.players.map((p) => [p.user_id, p.tiers]));
+  const prev = useRef({ id: game.pyramid_game_id, status: game.status, tiers: tiersOf(game) });
+  useEffect(() => () => window.clearTimeout(popTimer.current), []);
+  useEffect(() => {
+    const was = prev.current;
+    prev.current = { id: game.pyramid_game_id, status: game.status, tiers: tiersOf(game) };
+    if (was.id !== game.pyramid_game_id) { setPopped(new Set()); return; }
+    const up = new Set<string>();
+    let top = -1;
+    for (const p of game.players) {
+      const before = was.tiers.get(p.user_id);
+      TIERS.forEach((tier, level) => {
+        if (p.tiers[tier] > (before?.[tier] ?? 0)) { up.add(`${p.user_id}:${tier}`); top = Math.max(top, level); }
+      });
+    }
+    if (up.size) {
+      setPopped(up);
+      window.clearTimeout(popTimer.current);
+      popTimer.current = window.setTimeout(() => setPopped(new Set()), 1200);
+    }
+    if (was.status === "active" && game.status !== "active") {
+      if (game.winner_user_id !== null) { sfx.fanfare(); setBurst(Date.now()); }
+      return;
+    }
+    // 🌹 a click · ❤️ two notes · 🔥 🐶 the chime · 💰 the chime and a buzz.
+    if (top === 0) sfx.lock();
+    else if (top === 1) sfx.reveal();
+    else if (top >= 2) { sfx.correct(); if (top === 4) haptic([40, 60, 40]); }
+  }, [game]);
+  const podium = active ? [] : [...game.players].filter((p) => p.flowers_total > 0)
+    .sort((a, b) => (Number(b.user_id === game.winner_user_id) - Number(a.user_id === game.winner_user_id)) || b.flowers_total - a.flowers_total)
+    .slice(0, 3).map((p) => ({ name: p.name, value: `${compact(p.flowers_total)} 🌹` }));
+
+  const circle = (emoji: string, n: number, pop = false) => (
+    <div className="gs-anim" style={{ width: 46, height: 46, borderRadius: "50%", border: `2px solid ${n > 0 ? gold : "rgba(212,175,55,.4)"}`, background: pop ? "rgba(240,196,32,.35)" : "rgba(0,0,0,.6)",
+                  display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", marginTop: 4, lineHeight: 1.05,
+                  animation: pop ? "gs-pop .45s ease-in-out 2" : "none", boxShadow: pop ? "0 0 12px 3px rgba(240,196,32,.75)" : "none", transition: "background .4s, box-shadow .4s" }}>
       <span style={{ fontSize: 13 }}>{emoji}</span>
       <span style={{ fontSize: 12, fontWeight: 700, color: n > 0 ? gold : "#fff" }}>{n}</span>
     </div>
@@ -51,7 +96,7 @@ export function PyramidOverlay({ game, myUserId, onSend, onEnd, onClose, tileFor
         <div style={{ fontSize: 10.5, fontWeight: 700, color: won ? gold : "#fff", maxWidth: 74, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           {won ? "👑 " : ""}{p.name}
         </div>
-        {circle("💰", p.tiers.bags)}{circle("🐶", p.tiers.puppies)}{circle("🔥", p.tiers.fires)}{circle("❤️", p.tiers.hearts)}{circle("🌹", p.tiers.flowers)}
+        {circle("💰", p.tiers.bags, popped.has(`${p.user_id}:bags`))}{circle("🐶", p.tiers.puppies, popped.has(`${p.user_id}:puppies`))}{circle("🔥", p.tiers.fires, popped.has(`${p.user_id}:fires`))}{circle("❤️", p.tiers.hearts, popped.has(`${p.user_id}:hearts`))}{circle("🌹", p.tiers.flowers, popped.has(`${p.user_id}:flowers`))}
         <div style={{ fontSize: 10, color: gold, marginTop: 4 }}>{compact(p.coins)} coins</div>
         {active && (p.user_id === myUserId
           ? <div style={{ marginTop: 4, width: "100%", textAlign: "center", fontSize: 11, fontWeight: 700, color: gold, border: `1px solid ${gold}`, borderRadius: 999, padding: "4px 0" }}>You</div>
@@ -64,7 +109,8 @@ export function PyramidOverlay({ game, myUserId, onSend, onEnd, onClose, tileFor
   };
 
   return (
-    <div style={{ position: "fixed", top: 140, left: 12, zIndex: 90, background: "rgba(0,0,0,.72)", border: `2px solid ${gold}`, borderRadius: 14, padding: 8, color: "#fff", userSelect: "none" }}>
+    <div style={{ position: "fixed", top: 140, left: 12, zIndex: 90, background: "rgba(0,0,0,.72)", border: `2px solid ${gold}`, borderRadius: 14, padding: 8, color: "#fff", userSelect: "none", maxWidth: "calc(100vw - 24px)", boxSizing: "border-box" }}>
+      <Confetti burst={burst} />
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <b style={{ color: gold, fontSize: 13 }}>🔺 Pyramid #{game.game_no}</b>
         <b style={{ fontSize: 13, fontVariantNumeric: "tabular-nums" }}>{active ? `⏱ ${Math.floor(left / 60)}:${String(left % 60).padStart(2, "0")}` : "Finished"}</b>
@@ -72,16 +118,30 @@ export function PyramidOverlay({ game, myUserId, onSend, onEnd, onClose, tileFor
           <button onClick={() => { if (window.confirm("End the Pyramid game? Whoever has the highest pyramid right now wins.")) onEnd(); }}
                   style={{ fontSize: 11, fontWeight: 700, background: gold, color: "#000", border: "none", borderRadius: 999, padding: "2px 10px", cursor: "pointer" }}>End</button>
         )}
+        <MuteButton />
         <button onClick={() => setCollapsed((c) => !c)} style={{ background: "none", border: "none", color: gold, fontSize: 18, cursor: "pointer" }}>{collapsed ? "+" : "–"}</button>
         <button onClick={onClose} aria-label="Close" style={{ background: "none", border: "none", color: "#fff", fontSize: 15, cursor: "pointer" }}>✕</button>
       </div>
       {!collapsed && (
         <>
+          <div style={{ marginTop: 6 }}>
+            <SceneBanner scene={SCENES.garden} height={54}>
+              {active && <div style={{ position: "absolute", left: 5, top: 5 }}><CountdownRing msLeft={left * 1000} totalMs={Math.max(left, game.duration_minutes * 60) * 1000} size={44} /></div>}
+              {!active && (
+                <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "rgba(0,0,0,.3)", padding: "0 8px" }}>
+                  <span className="gs-anim" style={{ maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: 14, fontWeight: 900, textShadow: "0 2px 4px #000", animation: winner ? "gs-pop .8s ease-in-out 3" : "none" }}>
+                    {winner ? `👑 ${winner.name}` : "🏁 Finished"}
+                  </span>
+                </div>
+              )}
+            </SceneBanner>
+          </div>
           <div style={{ fontSize: 10.5, opacity: 0.9, maxWidth: Math.max(game.players.length * 78, 200), margin: "2px 0 4px" }}>
             {active ? `🌹 = ${game.coins_per_flower} coin${game.coins_per_flower === 1 ? "" : "s"} · click = 1, Shift-click = 10 · 10 of each = 1 of the next`
               : winner ? `🏆 ${winner.name} wins${game.reached_top ? " — the pyramid is full!" : "!"}` : "No Flowers this game."}
           </div>
           <div style={{ display: "flex", gap: 4 }}>{game.players.map(column)}</div>
+          {podium.length > 1 && <Podium rows={podium} />}
         </>
       )}
     </div>
