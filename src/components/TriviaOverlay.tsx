@@ -4,8 +4,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { LiveTile } from "../lib/live";
 import type { TriviaGame, TriviaMode, TriviaPlayer, TriviaStart } from "../lib/trivia";
-import { Confetti, CountdownRing, MuteButton, Podium, SceneBanner } from "./GameShow";
-import { SCENES, TRIVIA_SCENES } from "../lib/gameSceneData";
+import { Confetti, CountdownRing, MuteButton, Podium, SceneBanner, SceneChips, firstName, sceneForTrivia } from "./GameShow";
 import { haptic, sfx } from "../lib/gameSounds";
 
 const gold = "var(--gold, #F0C420)";
@@ -14,13 +13,6 @@ const GREEN = "#2fbf5b", RED = "#e5484d", BLUE = "#49a8ff";
 // Game Show (Steve, 2026-10-27: the games look like "plain text"): the same four tile colours as
 // Trivia Night, so A/B/C/D read the same in both quizzes.
 const TILE_COLORS = ["#D85A30", "#1D9E75", "#378ADD", "#BA7517"];
-
-/** The question's scene — by category when the game has one, else the classroom. The playroom
- *  scene is skipped here: it has a die in it, and the battles keep clear of gambling pictures. */
-function triviaScene(category: string | null | undefined) {
-  const key = (category && TRIVIA_SCENES[category]) || "classroom";
-  return SCENES[key === "playroom" ? "classroom" : key] ?? SCENES.classroom;
-}
 
 function Screen({ tile }: { tile: LiveTile }) {
   const ref = useRef<HTMLVideoElement>(null);
@@ -130,7 +122,7 @@ export function TriviaOverlay({ game, myUserId, tileFor, onAnswer, onBuy, onEnd,
             {won ? "👑 " : ""}{p.is_audience ? "👥 " : ""}{p.is_computer ? "🤖 " : ""}{p.name}{p.user_id === myUserId ? " (you)" : ""}
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12 }}>
-            <b style={{ color: gold, fontSize: 18 }}>{drumroll && heldScores ? (heldScores[p.side] ?? p.score) : p.score}</b>
+            <b style={{ color: gold, fontSize: 18 }}>{shownScore(p)}</b>
             {asking && <span style={{ opacity: 0.85 }}>{p.answered ? "✅ answered" : `⏱ ${left}s`}</span>}
           </div>
           {helpable && p.user_id !== null && (
@@ -145,8 +137,12 @@ export function TriviaOverlay({ game, myUserId, tileFor, onAnswer, onBuy, onEnd,
   };
 
   const winner = game.players.find((p) => p.side === game.result);
+  const loser = game.players.find((p) => p.side !== game.result);
+  const short = (p: TriviaPlayer) => (p.is_audience ? "👥" : p.is_computer ? "🤖" : firstName(p.name));
+  const shownScore = (p: TriviaPlayer) => (drumroll && heldScores ? (heldScores[p.side] ?? p.score) : p.score);
   let status = "";
-  if (!active) status = game.status === "cancelled" ? "Game ended — no winner." : game.result === "draw" ? "It's a draw!" : `🏆 ${winner?.name ?? ""} wins ${game.players[0].score} – ${game.players[1].score}!`;
+  // The winner's score first: "🏆 Maria wins 44 – 20!"
+  if (!active) status = game.status === "cancelled" ? "Game ended — no winner." : game.result === "draw" ? "It's a draw!" : `🏆 ${winner?.name ?? ""} wins ${winner?.score ?? 0} – ${loser?.score ?? 0}!`;
   else if (drumroll) status = "🥁 And the answer is…";
   else if (!asking && r) status = `The answer: ${r.right_answer ?? game.options[r.correct]}`;
   else if (canAnswer) status = "Pick your answer!";
@@ -162,7 +158,7 @@ export function TriviaOverlay({ game, myUserId, tileFor, onAnswer, onBuy, onEnd,
     <div style={{ position: "fixed", top: 96, left: 12, zIndex: 90, background: "rgba(0,0,0,.85)", border: `2px solid ${gold}`, borderRadius: 14, padding: 10, color: "#fff", width: "min(372px, calc(100vw - 24px))", boxSizing: "border-box" }}>
       <Confetti burst={burst} />
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-        <b style={{ color: gold, fontSize: 14, flex: 1, minWidth: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>🧠 Trivia #{game.game_no}{active ? ` · Question ${game.q_number}/${game.q_count}` : ""}</b>
+        <b style={{ color: gold, fontSize: 14, flex: 1, minWidth: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>🧠 Trivia #{game.game_no}</b>
         <MuteButton />
         {asking && collapsed && <b style={{ fontVariantNumeric: "tabular-nums", color: Math.ceil((game.ms_left - since) / 1000) <= 5 ? RED : "#fff" }}>⏱ {Math.max(0, Math.ceil((game.ms_left - since) / 1000))}s</b>}
         {active && game.host_user_id === myUserId && (
@@ -173,14 +169,16 @@ export function TriviaOverlay({ game, myUserId, tileFor, onAnswer, onBuy, onEnd,
       </div>
       {!collapsed && (
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          <SceneBanner scene={triviaScene(game.category)} height={68}>
-            {asking && <div style={{ position: "absolute", left: 6, top: 6 }}><CountdownRing msLeft={ringMs} totalMs={Math.max(ringMs, game.question_seconds * 1000)} size={44} /></div>}
-            {active && game.q_number > 0 && (
-              <span style={{ position: "absolute", right: 8, bottom: 6, background: gold, color: "#000", borderRadius: 999, padding: "2px 9px", fontSize: 11.5, fontWeight: 900 }}>Q{game.q_number}/{game.q_count}</span>
-            )}
-            {drumroll && <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "rgba(0,0,0,.45)", fontSize: 17, fontWeight: 900, textShadow: "0 2px 4px #000" }}><span className="gs-anim" style={{ animation: "gs-shake .25s linear infinite" }}>🥁 And the answer is…</span></div>}
+          <SceneBanner scene={sceneForTrivia(game.category)} height={68}>
+            {asking && <div style={{ position: "absolute", left: 6, top: 6, zIndex: 3 }}><CountdownRing msLeft={ringMs} totalMs={Math.max(ringMs, game.question_seconds * 1000)} size={44} /></div>}
+            {/* The score and the question number live here — the title stays "Trivia #N". */}
+            <SceneChips bottomRight={[
+              ...(game.players.length === 2 ? [[`${short(game.players[0])} ${shownScore(game.players[0])} – ${shownScore(game.players[1])} ${short(game.players[1])}`, false] as [string, boolean]] : []),
+              ...(active && game.q_number > 0 ? [[`Q ${game.q_number}/${game.q_count}`, true] as [string, boolean]] : []),
+            ]} />
+            {drumroll && <div style={{ position: "absolute", inset: 0, zIndex: 4, display: "grid", placeItems: "center", background: "rgba(0,0,0,.45)", fontSize: 17, fontWeight: 900, textShadow: "0 2px 4px #000" }}><span className="gs-anim" style={{ animation: "gs-shake .25s linear infinite" }}>🥁 And the answer is…</span></div>}
             {!active && (
-              <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "rgba(0,0,0,.4)", padding: "0 10px", textAlign: "center" }}>
+              <div style={{ position: "absolute", inset: 0, zIndex: 4, display: "grid", placeItems: "center", background: "rgba(0,0,0,.4)", padding: "0 10px", textAlign: "center" }}>
                 <span className="gs-anim" style={{ fontSize: 16, fontWeight: 900, textShadow: "0 2px 4px #000", maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", animation: winner ? "gs-pop .8s ease-in-out 3" : "none" }}>
                   {game.status === "cancelled" ? "Game ended" : game.result === "draw" ? "🤝 It's a draw!" : `👑 ${winner?.name ?? ""} wins!`}
                 </span>
@@ -229,7 +227,7 @@ export function TriviaOverlay({ game, myUserId, tileFor, onAnswer, onBuy, onEnd,
             <div style={{ fontSize: 11.5, maxHeight: 150, overflowY: "auto", opacity: 0.9 }}>
               {game.results.map((x) => (
                 <div key={x.q_index} style={{ padding: "3px 0", borderBottom: "1px solid rgba(255,255,255,.08)" }}>
-                  {x.q_index + 1}. {x.question} — <b style={{ color: GREEN }}>{x.right_answer}</b> <span style={{ color: gold }}>(+{x.points.one} / +{x.points.two})</span>
+                  {x.q_index + 1}. {x.question} — <b style={{ color: GREEN }}>{x.right_answer}</b> <span style={{ color: gold }}>{short(game.players[0])} +{x.points.one} · {short(game.players[1])} +{x.points.two}</span>
                 </div>
               ))}
             </div>
@@ -269,7 +267,7 @@ export function TriviaStartDialog({ candidates, onStart, onClose }: {
     <div role="dialog" onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
       <div onClick={(e) => e.stopPropagation()} style={{ background: "#000", border: `2px solid ${gold}`, borderRadius: 16, padding: 18, maxWidth: 400, width: "100%", boxSizing: "border-box", color: "#fff", maxHeight: "90vh", overflowY: "auto" }}>
         <h3 style={{ color: gold, margin: "0 0 4px", textAlign: "center" }}>🧠 Trivia</h3>
-        <p style={{ fontSize: 12, opacity: 0.8, textAlign: "center", margin: "0 0 10px" }}>10 questions, 15 seconds each. A right answer scores 10, plus up to 5 for speed.</p>
+        <p style={{ fontSize: 12, opacity: 0.8, textAlign: "center", margin: "0 0 10px" }}>10 questions, 15 seconds each. A right answer scores 10, plus up to 5 for speed{mode === "audience" ? " (players only)" : ""}.</p>
         <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", marginBottom: 10 }}>
           {chip(mode === "duel", "Play someone", () => setMode("duel"))}
           {chip(mode === "audience", "Play the audience", () => setMode("audience"))}
