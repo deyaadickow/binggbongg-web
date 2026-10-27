@@ -1,7 +1,9 @@
 // Trivia Night (#20, Steve 2026-10-27) — the quiz panel everyone in the room sees, and the host's
 // start dialog. One question at a time; players on stage answer free, viewers pay the host's price
 // per answer (a gift to the host). Right answers win points and bragging rights, never coins.
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Confetti, CountdownRing, MuteButton, Podium, SceneBanner, sceneForTrivia } from "./GameShow";
+import { haptic, sfx } from "../lib/gameSounds";
 import { fetchTriviaCategories, fetchTriviaFans, type TriviaCategory, type TriviaFanRow, type TriviaNight, type TriviaNightStart } from "../lib/trivianight";
 
 const gold = "var(--gold, #F0C420)";
@@ -10,23 +12,28 @@ const btn = (primary = true): React.CSSProperties => ({ padding: "7px 12px", bor
 const coins = (n: number) => `${n} coin${n === 1 ? "" : "s"}`;
 const END_TEXT: Record<string, string> = { host: "The host ended Trivia Night.", out_of_questions: "That's every question in these categories!", room_ended: "The live ended.", expired: "Trivia Night timed out." };
 
-function AnswerButton({ game, i, text, onAnswer }: { game: TriviaNight; i: number; text: string; onAnswer: (i: number) => void }) {
-  const open = game.phase === "question";
-  const r = game.result && game.result.q_number === game.q_number ? game.result : null;
+const TILE_COLORS = ["#D85A30", "#1D9E75", "#378ADD", "#BA7517"];
+
+function AnswerTile({ game, i, text, showResult, onAnswer }: { game: TriviaNight; i: number; text: string; showResult: boolean; onAnswer: (i: number) => void }) {
+  const r = showResult && game.result && game.result.q_number === game.q_number ? game.result : null;
   const mine = game.my_answer === i;
   const right = r?.correct === i;
   const total = r ? r.counts.reduce((a, b) => a + b, 0) : 0;
   const pct = r && total ? Math.round((100 * (r.counts[i] ?? 0)) / total) : null;
-  const canTap = open && game.my_answer === null && !game.is_host;
-  const border = r ? (right ? "#2fbf5b" : mine ? "#e5484d" : "rgba(240,196,32,.3)") : mine ? gold : "rgba(240,196,32,.45)";
+  const canTap = game.phase === "question" && game.my_answer === null && !game.is_host;
   return (
-    <button disabled={!canTap} onClick={() => onAnswer(i)}
-            style={{ position: "relative", display: "flex", alignItems: "center", gap: 8, padding: "9px 10px", borderRadius: 10, textAlign: "left", overflow: "hidden",
-                     color: "#fff", background: mine && !r ? "rgba(240,196,32,.18)" : "rgba(255,255,255,.06)", border: `2px solid ${border}`, cursor: canTap ? "pointer" : "default", minWidth: 0 }}>
-      {pct !== null && <span style={{ position: "absolute", inset: 0, width: `${pct}%`, background: right ? "rgba(47,191,91,.3)" : "rgba(255,255,255,.08)", transition: "width .5s" }} />}
-      <b style={{ position: "relative", color: gold, width: 16 }}>{LETTERS[i]}</b>
-      <span style={{ position: "relative", flex: 1, fontSize: 13.5, fontWeight: right || mine ? 700 : 500 }}>{right ? "✅ " : r && mine ? "❌ " : ""}{text}</span>
-      {pct !== null && <b style={{ position: "relative", fontSize: 12, fontVariantNumeric: "tabular-nums" }}>{pct}%</b>}
+    <button disabled={!canTap} onClick={() => onAnswer(i)} className="gs-anim"
+            style={{ position: "relative", minHeight: 58, padding: "8px 9px", borderRadius: 12, textAlign: "left", overflow: "hidden", color: "#fff",
+                     background: TILE_COLORS[i], border: `3px solid ${right ? "#fff" : mine ? "#fff" : "transparent"}`, cursor: canTap ? "pointer" : "default",
+                     opacity: r && !right ? 0.38 : 1, animation: right ? "gs-pop .5s ease-in-out 3" : "none", transition: "opacity .4s", minWidth: 0 }}>
+      {pct !== null && <span style={{ position: "absolute", left: 0, bottom: 0, height: 6, width: `${pct}%`, background: "rgba(255,255,255,.8)", transition: "width .8s" }} />}
+      <span style={{ position: "relative", display: "flex", alignItems: "flex-start", gap: 7 }}>
+        <b style={{ background: "rgba(0,0,0,.28)", borderRadius: 7, padding: "1px 6px", fontSize: 13 }}>{LETTERS[i]}</b>
+        <span style={{ flex: 1, fontSize: 13.5, fontWeight: 800, lineHeight: 1.2, textShadow: "0 1px 2px rgba(0,0,0,.35)" }}>{right ? "✅ " : r && mine ? "❌ " : ""}{text}</span>
+      </span>
+      <span style={{ position: "relative", display: "flex", justifyContent: "space-between", fontSize: 10.5, fontWeight: 800, marginTop: 3 }}>
+        <span>{mine ? "⭐ your answer" : ""}</span><span>{pct !== null ? `${pct}%` : ""}</span>
+      </span>
     </button>
   );
 }
@@ -39,65 +46,98 @@ export function TriviaNightPanel({ game, myUserId, onAnswer, onPause, onEnd, onC
   const [fans, setFans] = useState<TriviaFanRow[] | null>(null);
   const [polledAt, setPolledAt] = useState(() => Date.now());
   const [, setTick] = useState(0);
+  // Game Show (Steve, 2026-10-27): a drum roll before every answer, confetti and a chime when you're right.
+  const [drumroll, setDrumroll] = useState(false);
+  const [burst, setBurst] = useState(0);
+  const prevPhase = useRef(game.phase);
+  const prevQ = useRef(game.q_number);
+  const prevMine = useRef(game.my_answer);
+  const lastTick = useRef(-1);
   useEffect(() => { setPolledAt(Date.now()); }, [game]);
   useEffect(() => {
     if (game.phase !== "question") return;
     const id = window.setInterval(() => setTick((t) => t + 1), 250);
     return () => window.clearInterval(id);
   }, [game.phase, game.q_number]);
+  useEffect(() => {
+    if (prevMine.current === null && game.my_answer !== null && game.q_number === prevQ.current) { sfx.lock(); haptic(25); }
+    prevMine.current = game.my_answer;
+  }, [game.my_answer, game.q_number]);
+  useEffect(() => {
+    const was = prevPhase.current; const wasQ = prevQ.current;
+    prevPhase.current = game.phase; prevQ.current = game.q_number;
+    if (game.phase === "reveal" && was === "question" && wasQ === game.q_number) {
+      setDrumroll(true); sfx.drumroll();
+      const t = window.setTimeout(() => {
+        setDrumroll(false);
+        if (game.my_last_points !== null && game.my_last_points > 0) { sfx.correct(); haptic([40, 60, 40]); setBurst(Date.now()); }
+        else if (game.my_last_points === 0) { sfx.wrong(); haptic(80); }
+        else sfx.reveal();
+      }, 900);
+      return () => window.clearTimeout(t);
+    }
+    if (game.phase === "over" && was !== "over") { sfx.fanfare(); setBurst(Date.now()); }
+  }, [game.phase, game.q_number, game.my_last_points]);
+
   const over = game.status === "completed";
   const msLeft = game.ms_left === null ? 0 : Math.max(0, game.ms_left - (Date.now() - polledAt));
-  const frac = game.question_seconds ? msLeft / (game.question_seconds * 1000) : 0;
+  const secs = Math.ceil(msLeft / 1000);
+  if (game.phase === "question" && secs <= 5 && secs > 0 && lastTick.current !== secs) { lastTick.current = secs; sfx.tick(); }
   const viewer = !!myUserId && !game.is_host && !game.is_player;
+  const scene = sceneForTrivia(game.question?.category);
+  const showResult = game.phase !== "question" && !drumroll;
   const leader = game.players[0];
+  const podium = (game.players.length ? game.players : game.audience_top).filter((p) => p.points > 0).slice(0, 3).map((p) => ({ name: p.name, value: `${p.points} pts` }));
 
   return (
     <div style={{ position: "fixed", top: 120, left: "50%", transform: "translateX(-50%)", zIndex: 87, width: "min(430px, calc(100vw - 24px))", boxSizing: "border-box",
-                  background: "rgba(0,0,0,.9)", border: `2px solid ${gold}`, borderRadius: 16, padding: 12, color: "#fff", maxHeight: "calc(100vh - 220px)", overflowY: "auto" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <b style={{ color: gold, fontSize: 14, flex: 1 }}>🧠 Trivia Night{game.q_number ? ` · Q${game.q_number}` : ""} · {coins(game.coins_per_answer)}</b>
+                  background: "rgba(0,0,0,.92)", border: `2px solid ${gold}`, borderRadius: 18, padding: 12, color: "#fff", maxHeight: "calc(100vh - 220px)", overflowY: "auto" }}>
+      <Confetti burst={burst} />
+      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        <b style={{ color: gold, fontSize: 14, flex: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>🧠 Trivia Night · {coins(game.coins_per_answer)}</b>
+        <MuteButton />
         <button onClick={() => fetchTriviaFans().then(setFans)} style={{ background: "none", border: "none", color: gold, fontSize: 12, cursor: "pointer" }}>🏅 Top</button>
         <button onClick={() => setCollapsed((c) => !c)} aria-label={collapsed ? "Expand" : "Collapse"} style={{ background: "none", border: "none", color: gold, fontSize: 18, cursor: "pointer" }}>{collapsed ? "+" : "–"}</button>
         {over && <button onClick={onClose} aria-label="Close" style={{ background: "none", border: "none", color: gold, fontSize: 16, cursor: "pointer" }}>✕</button>}
       </div>
       {!collapsed && (
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 6 }}>
+          <SceneBanner scene={scene} height={96}>
+            {!over && game.phase === "question" && <div style={{ position: "absolute", left: 8, top: 8 }}><CountdownRing msLeft={msLeft} totalMs={game.question_seconds * 1000} size={48} /></div>}
+            <div style={{ position: "absolute", right: 8, bottom: 6, display: "flex", gap: 5, alignItems: "center" }}>
+              {game.question && !over && <span style={{ background: "rgba(0,0,0,.6)", borderRadius: 999, padding: "2px 9px", fontSize: 11.5, fontWeight: 800 }}>{game.question.category_label} · {game.question.difficulty}</span>}
+              {game.q_number > 0 && <span style={{ background: gold, color: "#000", borderRadius: 999, padding: "2px 9px", fontSize: 11.5, fontWeight: 900 }}>Q{game.q_number}</span>}
+            </div>
+            {drumroll && <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "rgba(0,0,0,.45)", fontSize: 19, fontWeight: 900, textShadow: "0 2px 4px #000" }}><span className="gs-anim" style={{ animation: "gs-shake .25s linear infinite" }}>🥁 And the answer is…</span></div>}
+            {game.phase === "waiting" && !over && <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "rgba(0,0,0,.45)", fontSize: 17, fontWeight: 900 }}>⏸ Paused</div>}
+            {over && <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "rgba(0,0,0,.35)", fontSize: 19, fontWeight: 900, textShadow: "0 2px 4px #000" }}>🏁 Trivia Night #{game.game_no} is over!</div>}
+          </SceneBanner>
+          {game.my_streak >= 3 && !over && (
+            <div className="gs-anim" style={{ textAlign: "center", fontWeight: 900, fontSize: 14, color: "#000", background: "#F0A020", borderRadius: 10, padding: "4px 8px", animation: "gs-pop .8s ease-in-out infinite" }}>🔥 ON FIRE — {game.my_streak} in a row!</div>
+          )}
           {game.question && !over && (
             <>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12 }}>
-                <span style={{ padding: "2px 8px", borderRadius: 999, border: `1px solid ${gold}`, color: gold }}>{game.question.category_label}</span>
-                <span style={{ opacity: 0.75, textTransform: "capitalize" }}>{game.question.difficulty}</span>
-                <span style={{ marginLeft: "auto", fontVariantNumeric: "tabular-nums", fontWeight: 700, color: game.phase === "question" && msLeft < 5000 ? "#ff8a8a" : "#fff" }}>
-                  {game.phase === "question" ? `⏱ ${Math.ceil(msLeft / 1000)}s` : game.phase === "waiting" ? "⏸ Paused" : "Answer!"}
-                </span>
+              <div style={{ fontSize: 17, fontWeight: 900, lineHeight: 1.3, textWrap: "balance", textAlign: "center" } as React.CSSProperties}>{game.question.text}</div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 7 }}>
+                {game.question.answers.map((a, i) => <AnswerTile key={i} game={game} i={i} text={a} showResult={showResult} onAnswer={onAnswer} />)}
               </div>
-              {game.phase === "question" && (
-                <div style={{ height: 5, borderRadius: 3, background: "rgba(255,255,255,.12)", overflow: "hidden" }}>
-                  <div style={{ width: `${frac * 100}%`, height: "100%", background: frac < 0.25 ? "#e5484d" : gold, transition: "width .25s linear" }} />
-                </div>
-              )}
-              <div style={{ fontSize: 16.5, fontWeight: 800, lineHeight: 1.3, textWrap: "balance" } as React.CSSProperties}>{game.question.text}</div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 6 }}>
-                {game.question.answers.map((a, i) => <AnswerButton key={i} game={game} i={i} text={a} onAnswer={onAnswer} />)}
-              </div>
-              <div style={{ fontSize: 12, opacity: 0.85 }}>
+              <div style={{ fontSize: 12, opacity: 0.85, textAlign: "center" }}>
                 {game.phase === "question"
                   ? (game.my_answer !== null ? `Locked in: ${LETTERS[game.my_answer]} · ${game.answered_count} answered` : viewer ? `Tap an answer — ${coins(game.coins_per_answer)}, one per question · ${game.answered_count} answered` : game.is_player ? `You're on stage — your answers are free · ${game.answered_count} answered` : `${game.answered_count} answered`)
-                  : game.result ? `${game.result.right_count} got it right${game.my_last_points !== null ? (game.my_last_points > 0 ? ` · +${game.my_last_points} for you!` : " · not this time") : ""}` : ""}
+                  : drumroll ? "…" : game.result ? `${game.result.right_count} got it right${game.my_last_points !== null ? (game.my_last_points > 0 ? ` · +${game.my_last_points} for you!` : " · not this time") : ""}` : ""}
               </div>
             </>
           )}
-          {game.phase === "waiting" && !over && <div style={{ opacity: 0.85 }}>⏸ The host paused after that answer.</div>}
           {over && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-              <b style={{ color: gold, fontSize: 15 }}>🏁 Trivia Night #{game.game_no} is over</b>
+            <div style={{ display: "flex", flexDirection: "column", gap: 4, textAlign: "center" }}>
               <span style={{ opacity: 0.85, fontSize: 12.5 }}>{END_TEXT[game.end_reason ?? ""] ?? ""} {game.q_number} question{game.q_number === 1 ? "" : "s"}.</span>
               {leader && leader.points > 0 && <span>🏆 <b>{leader.name}</b> wins with {leader.points} points!</span>}
+              {podium.length > 0 && <Podium rows={podium} />}
             </div>
           )}
 
-          {game.players.length > 0 && (
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+          {!over && game.players.length > 0 && (
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "center" }}>
               {game.players.map((p, i) => (
                 <span key={p.user_id} style={{ fontSize: 12, padding: "4px 9px", borderRadius: 999, background: i === 0 && p.points > 0 ? "rgba(240,196,32,.22)" : "rgba(255,255,255,.08)", border: `1px solid ${i === 0 && p.points > 0 ? gold : "transparent"}` }}>
                   {i === 0 && p.points > 0 ? "👑 " : ""}{p.name} <b style={{ color: gold }}>{p.points}</b>
@@ -105,11 +145,11 @@ export function TriviaNightPanel({ game, myUserId, onAnswer, onPause, onEnd, onC
               ))}
             </div>
           )}
-          {game.audience_top.length > 0 && (
-            <div style={{ fontSize: 12, opacity: 0.9 }}>👥 Audience: {game.audience_top.slice(0, 3).map((p, i) => `${["🥇", "🥈", "🥉"][i]} ${p.name} ${p.points}`).join("  ")}</div>
+          {!over && game.audience_top.length > 0 && (
+            <div style={{ fontSize: 12, opacity: 0.9, textAlign: "center" }}>👥 {game.audience_top.slice(0, 3).map((p, i) => `${["🥇", "🥈", "🥉"][i]} ${p.name} ${p.points}`).join("  ")}</div>
           )}
           {(game.my_points > 0 || game.my_streak > 1) && !game.is_host && (
-            <div style={{ fontSize: 12, color: gold }}>You: {game.my_points} points{game.my_rank ? ` · #${game.my_rank} in the audience` : ""}{game.my_streak > 1 ? ` · 🔥 ${game.my_streak} in a row` : ""}</div>
+            <div style={{ fontSize: 12, color: gold, textAlign: "center" }}>You: {game.my_points} points{game.my_rank ? ` · #${game.my_rank} in the audience` : ""}{game.my_streak > 1 ? ` · 🔥 ${game.my_streak} in a row` : ""}</div>
           )}
           {!myUserId && !over && <div style={{ fontSize: 12, opacity: 0.8 }}>Sign in to answer.</div>}
 

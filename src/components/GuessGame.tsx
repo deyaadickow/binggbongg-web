@@ -1,14 +1,16 @@
 // Guessing Games (Steve, 2026-10-27) — the card everyone in the room sees, and the host's start
 // dialog. One paid guess per viewer (the host's price, a gift to the host), free to change until
 // guessing locks; the host enters the answer and the closest guesses win — bragging rights only.
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Confetti, CountdownRing, MuteButton, Podium, SceneBanner, sceneForGuess, type Lane } from "./GameShow";
+import { haptic, sfx } from "../lib/gameSounds";
 import {
   fetchGuessLeaderboard, fetchGuessTemplates, GUESS_PRICE_MAX, GUESS_PRICE_MIN,
   type GuessGame, type GuessKind, type GuessStart, type GuessTemplate, type GuessValue, type GuesserRow,
 } from "../lib/guess";
 
 const gold = "var(--gold, #F0C420)";
-const OPTION_COLORS = ["#e5484d", "#49a8ff", "#2fbf5b", "#f0a020", "#b36bff", "#ff7ab8", "#22c3c3", "#c8c8c8"];
+const OPTION_COLORS = ["#D85A30", "#1D9E75", "#378ADD", "#BA7517", "#8E5BD9", "#D4537E", "#16A3A3", "#6B7280"];
 const field: React.CSSProperties = { padding: "7px 9px", borderRadius: 8, border: `1px solid ${gold}`, background: "#111", color: "#fff", fontSize: 14, minWidth: 0, boxSizing: "border-box" };
 const btn = (primary = true): React.CSSProperties => ({ padding: "8px 12px", borderRadius: 999, border: primary ? "none" : `1.5px solid ${gold}`, background: primary ? gold : "transparent", color: primary ? "#000" : gold, fontWeight: 700, fontSize: 13, cursor: "pointer" });
 
@@ -55,62 +57,105 @@ export function GuessCard({ game, myUserId, onGuess, onLock, onResolve, onCancel
   const [answering, setAnswering] = useState<number | null>(null);   // host: the pick they are about to confirm
   const [polledAt, setPolledAt] = useState(() => Date.now());
   const [, setTick] = useState(0);
+  // Game Show (Steve, 2026-10-27): a drum roll before the answer, then confetti for the winners.
+  const [drumroll, setDrumroll] = useState(false);
+  const [burst, setBurst] = useState(0);
+  const prevStatus = useRef(game.status);
+  const prevMine = useRef(game.my_guess);
+  const lastTick = useRef(-1);
   useEffect(() => { setPolledAt(Date.now()); }, [game]);
   useEffect(() => {
     if (game.status !== "open" || game.lock_ms_left === null) return;
     const id = window.setInterval(() => setTick((t) => t + 1), 1000);
     return () => window.clearInterval(id);
   }, [game.status, game.lock_ms_left, game.guess_game_id]);
+  useEffect(() => {
+    if (!prevMine.current && game.my_guess) { sfx.lock(); haptic(25); }
+    prevMine.current = game.my_guess;
+  }, [game.my_guess]);
+  useEffect(() => {
+    const was = prevStatus.current; prevStatus.current = game.status;
+    if (game.status === "resolved" && (was === "open" || was === "locked")) {
+      setDrumroll(true); sfx.drumroll();
+      const t = window.setTimeout(() => {
+        setDrumroll(false);
+        if (game.my_is_winner === true) { sfx.correct(); haptic([40, 60, 40]); } else if (game.my_is_winner === false) { sfx.wrong(); haptic(80); } else sfx.reveal();
+        if (game.winners_count > 0) setBurst(Date.now());
+      }, 1100);
+      return () => window.clearTimeout(t);
+    }
+  }, [game.status, game.my_is_winner, game.winners_count]);
 
   const open = game.status === "open";
   const live = open || game.status === "locked";
+  const resolved = game.status === "resolved" && !drumroll;
   const viewer = !!myUserId && !game.is_host && !game.is_player;
-  const secsLeft = game.lock_ms_left === null ? null : Math.max(0, Math.ceil((game.lock_ms_left - (Date.now() - polledAt)) / 1000));
-  const clock = secsLeft === null ? "" : `${Math.floor(secsLeft / 60)}:${String(secsLeft % 60).padStart(2, "0")}`;
-  const totalTally = (game.tallies ?? []).reduce((x, y) => x + y, 0);
+  const msLeft = game.lock_ms_left === null ? null : Math.max(0, game.lock_ms_left - (Date.now() - polledAt));
+  const secsLeft = msLeft === null ? null : Math.ceil(msLeft / 1000);
+  if (secsLeft !== null && open && secsLeft <= 5 && secsLeft > 0 && lastTick.current !== secsLeft) { lastTick.current = secsLeft; sfx.tick(); }
+  const tallies = game.tallies ?? [];
+  const maxTally = Math.max(1, ...tallies);
+  const totalTally = tallies.reduce((x, y) => x + y, 0);
   const guessLabel = game.my_guess ? "Change guess (free)" : `Guess · ${game.coins_per_guess} coin${game.coins_per_guess === 1 ? "" : "s"}`;
+  const { scene, racer } = sceneForGuess(game.template_key, game.kind);
+  const racing = game.kind === "pick" && !!racer && game.options.length <= 4;
+  const lanes: Lane[] | undefined = racing ? game.options.map((o, i) => {
+    const won = resolved && game.answer?.choice === i;
+    return { label: o, emoji: racer!, progress: won ? 1 : 0.1 + 0.62 * ((tallies[i] ?? 0) / maxTally), winner: won, loser: resolved && !won };
+  }) : undefined;
 
   return (
-    <div style={{ position: "fixed", left: 12, bottom: 96, zIndex: 86, width: "min(310px, calc(100vw - 24px))", boxSizing: "border-box", background: "rgba(0,0,0,.88)", border: `2px solid ${gold}`, borderRadius: 14, padding: 10, color: "#fff" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <b style={{ color: gold, fontSize: 13, flex: 1 }}>{game.emoji} Guess #{game.game_no} · {game.coins_per_guess} coin{game.coins_per_guess === 1 ? "" : "s"}{game.my_streak > 0 ? ` · 🔥 ${game.my_streak}` : ""}</b>
+    <div style={{ position: "fixed", left: 12, bottom: 96, zIndex: 86, width: "min(320px, calc(100vw - 24px))", boxSizing: "border-box", background: "rgba(0,0,0,.9)", border: `2px solid ${gold}`, borderRadius: 16, padding: 10, color: "#fff", maxHeight: "calc(100vh - 200px)", overflowY: "auto" }}>
+      <Confetti burst={burst} />
+      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        <b style={{ color: gold, fontSize: 13, flex: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{game.emoji} #{game.game_no} · {game.coins_per_guess} coin{game.coins_per_guess === 1 ? "" : "s"}{game.my_streak > 0 ? ` · 🔥 ${game.my_streak}` : ""}</b>
+        <MuteButton />
         <button onClick={() => fetchGuessLeaderboard().then(setBoard)} style={{ background: "none", border: "none", color: gold, fontSize: 12, cursor: "pointer" }}>🏅 Top</button>
         <button onClick={() => setCollapsed((c) => !c)} aria-label={collapsed ? "Expand" : "Collapse"} style={{ background: "none", border: "none", color: gold, fontSize: 18, cursor: "pointer" }}>{collapsed ? "+" : "–"}</button>
         {game.status === "resolved" && <button onClick={onClose} aria-label="Close" style={{ background: "none", border: "none", color: gold, fontSize: 16, cursor: "pointer" }}>✕</button>}
       </div>
       {!collapsed && (
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 6, fontSize: 12.5 }}>
-          <div style={{ fontSize: 15, fontWeight: 800, lineHeight: 1.25, textWrap: "balance" } as React.CSSProperties}>{game.title}</div>
+          <SceneBanner scene={scene} height={racing ? 128 : 100} lanes={lanes}>
+            {open && msLeft !== null && <div style={{ position: "absolute", left: 6, top: 6 }}><CountdownRing msLeft={msLeft} totalMs={Math.max(msLeft, 60000)} size={40} /></div>}
+            {game.status === "locked" && <div style={{ position: "absolute", left: 6, top: 6, background: "rgba(0,0,0,.6)", borderRadius: 999, padding: "3px 9px", fontSize: 12, fontWeight: 800 }}>🔒 Locked</div>}
+            {drumroll && <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "rgba(0,0,0,.45)", fontSize: 18, fontWeight: 900, textShadow: "0 2px 4px #000" }}><span className="gs-anim" style={{ animation: "gs-shake .25s linear infinite" }}>🥁 And the answer is…</span></div>}
+            {resolved && game.answer_label && !racing && <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%,-50%)", background: "rgba(0,0,0,.72)", border: `2px solid ${gold}`, borderRadius: 12, padding: "6px 12px", fontSize: 16, fontWeight: 900, whiteSpace: "nowrap", maxWidth: "88%", overflow: "hidden", textOverflow: "ellipsis" }}>✅ {game.answer_label}</div>}
+          </SceneBanner>
+          <div style={{ fontSize: 15.5, fontWeight: 800, lineHeight: 1.25, textWrap: "balance" } as React.CSSProperties}>{game.title}</div>
           {game.players.length > 0 && game.kind !== "pick" && <div style={{ opacity: 0.8 }}>🎮 {game.players.map((p) => p.name).join(" · ")}</div>}
           <div style={{ opacity: 0.85 }}>
-            {open ? (secsLeft !== null ? `⏱ ${clock} left to guess` : "Guessing is open") : game.status === "locked" ? "🔒 Guessing closed — watch what happens!" : `✅ Answer: ${game.answer_label}`}
+            {open ? (secsLeft !== null ? `Guessing closes in ${Math.floor(secsLeft / 60)}:${String(secsLeft % 60).padStart(2, "0")}` : "Guessing is open") : game.status === "locked" ? "Guessing closed — watch what happens!" : drumroll ? "…" : `Answer: ${game.answer_label}`}
             {` · ${game.guesses_count} guess${game.guesses_count === 1 ? "" : "es"}`}
           </div>
 
-          {/* Pick: the choices are the buttons (with live counts) */}
           {game.kind === "pick" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <div style={{ display: "grid", gridTemplateColumns: game.options.length <= 4 ? "1fr 1fr" : "1fr", gap: 6 }}>
               {game.options.map((o, i) => {
                 const mine = game.my_guess?.choice === i;
-                const right = game.status === "resolved" && game.answer?.choice === i;
-                const count = game.tallies?.[i] ?? 0;
-                const canTap = (open && viewer) || (game.is_host && live);
+                const right = resolved && game.answer?.choice === i;
+                const count = tallies[i] ?? 0;
+                const canTap = (open && viewer && !mine) || (game.is_host && live);
                 return (
                   <button key={i} disabled={!canTap}
-                          onClick={() => { if (game.is_host) setAnswering(i); else if (!mine) onGuess({ choice: i }); }}
-                          style={{ position: "relative", display: "flex", alignItems: "center", gap: 6, padding: "7px 9px", borderRadius: 9, overflow: "hidden", textAlign: "left", cursor: canTap ? "pointer" : "default",
-                                   color: "#fff", background: "rgba(255,255,255,.06)", border: `1.5px solid ${right ? "#2fbf5b" : mine ? gold : "rgba(240,196,32,.35)"}` }}>
-                    <span style={{ position: "absolute", inset: 0, width: `${totalTally ? (100 * count) / totalTally : 0}%`, background: OPTION_COLORS[i % OPTION_COLORS.length], opacity: 0.28, transition: "width .4s" }} />
-                    <span style={{ position: "relative", flex: 1, fontWeight: mine || right ? 800 : 500 }}>{right ? "✅ " : ""}{o}{mine ? "  ← you" : ""}</span>
-                    <b style={{ position: "relative", color: gold, fontVariantNumeric: "tabular-nums" }}>{count}</b>
+                          onClick={() => { if (game.is_host) setAnswering(i); else onGuess({ choice: i }); }}
+                          className="gs-anim"
+                          style={{ position: "relative", minHeight: 48, padding: "8px 9px", borderRadius: 11, overflow: "hidden", textAlign: "left", cursor: canTap ? "pointer" : "default", color: "#fff",
+                                   background: OPTION_COLORS[i % OPTION_COLORS.length], border: `3px solid ${right ? "#fff" : mine ? "#fff" : "transparent"}`,
+                                   opacity: resolved && !right ? 0.4 : 1, animation: right ? "gs-pop .5s ease-in-out 3" : "none", transition: "opacity .4s" }}>
+                    <span style={{ position: "absolute", left: 0, bottom: 0, height: 5, width: `${totalTally ? (100 * count) / totalTally : 0}%`, background: "rgba(255,255,255,.7)", transition: "width .5s" }} />
+                    <span style={{ position: "relative", display: "flex", alignItems: "center", gap: 6 }}>
+                      <span style={{ flex: 1, fontSize: 13.5, fontWeight: 800, textShadow: "0 1px 2px rgba(0,0,0,.4)" }}>{right ? "✅ " : ""}{o}</span>
+                      <b style={{ fontVariantNumeric: "tabular-nums", background: "rgba(0,0,0,.3)", borderRadius: 999, padding: "1px 7px", fontSize: 12 }}>{count}</b>
+                    </span>
+                    {mine && <span style={{ position: "relative", fontSize: 10.5, fontWeight: 800 }}>⭐ your pick</span>}
                   </button>
                 );
               })}
-              {open && viewer && <div style={{ fontSize: 11, opacity: 0.7 }}>{game.my_guess ? "Tap another choice to change it — free until guessing closes." : `Tap your pick — ${game.coins_per_guess} coin${game.coins_per_guess === 1 ? "" : "s"}, one guess each.`}</div>}
             </div>
           )}
+          {game.kind === "pick" && open && viewer && <div style={{ fontSize: 11, opacity: 0.7 }}>{game.my_guess ? "Tap another choice to change it — free until guessing closes." : `Tap your pick — ${game.coins_per_guess} coin${game.coins_per_guess === 1 ? "" : "s"}, one guess each.`}</div>}
 
-          {/* Number / score: the viewer's own entry */}
           {game.kind !== "pick" && open && viewer && (
             <ValueInput key={`g${game.guess_game_id}`} game={game} initial={game.my_guess} label={guessLabel} onSubmit={onGuess} />
           )}
@@ -118,7 +163,6 @@ export function GuessCard({ game, myUserId, onGuess, onLock, onResolve, onCancel
           {!myUserId && open && <div style={{ opacity: 0.8 }}>Sign in to guess.</div>}
           {game.is_player && live && <div style={{ opacity: 0.8 }}>You're playing — the room is guessing about you!</div>}
 
-          {/* Host controls */}
           {game.is_host && live && (
             <div style={{ display: "flex", flexDirection: "column", gap: 6, borderTop: "1px solid rgba(240,196,32,.3)", paddingTop: 8 }}>
               <div style={{ opacity: 0.85 }}>💰 {game.coins_total} coins from {game.guesses_count} guess{game.guesses_count === 1 ? "" : "es"}</div>
@@ -139,18 +183,17 @@ export function GuessCard({ game, myUserId, onGuess, onLock, onResolve, onCancel
             </div>
           )}
 
-          {/* Result */}
-          {game.status === "resolved" && (
+          {resolved && (
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-              {game.winners_count === 0 ? <b style={{ color: gold }}>Nobody got it this time!</b> : (
+              {game.winners_count === 0 ? <b style={{ color: gold, textAlign: "center" }}>Nobody got it this time!</b> : (
                 <>
-                  <b style={{ color: gold }}>🏆 {game.winners_count === 1 ? "Closest guess" : `${game.winners_count} got it`}{game.kind === "pick" ? "" : " (closest wins)"}</b>
-                  {game.winners.slice(0, 5).map((w) => <span key={w.user_id}>⭐ {w.name} — {w.guess_label}</span>)}
-                  {game.winners_count > 5 && <span style={{ opacity: 0.7 }}>+{game.winners_count - 5} more</span>}
+                  <b style={{ color: gold, textAlign: "center" }}>🏆 {game.winners_count === 1 ? "Closest guess" : `${game.winners_count} got it`}{game.kind === "pick" ? "" : " (closest wins)"}</b>
+                  <Podium rows={game.winners.slice(0, 3).map((w) => ({ name: w.name, value: w.guess_label }))} />
+                  {game.winners_count > 3 && <span style={{ opacity: 0.7, textAlign: "center" }}>+{game.winners_count - 3} more</span>}
                 </>
               )}
-              {game.my_is_winner === true && <span>✅ You got it! 🔥 Streak {game.my_streak}</span>}
-              {game.my_is_winner === false && <span>❌ Not this time — your guess: {game.my_guess_label}</span>}
+              {game.my_is_winner === true && <span style={{ textAlign: "center", fontWeight: 800 }}>✅ You got it! 🔥 Streak {game.my_streak}</span>}
+              {game.my_is_winner === false && <span style={{ textAlign: "center" }}>❌ Not this time — your guess: {game.my_guess_label}</span>}
             </div>
           )}
           <div style={{ fontSize: 10.5, opacity: 0.6 }}>For fun only — a right guess wins bragging rights, never coins.</div>

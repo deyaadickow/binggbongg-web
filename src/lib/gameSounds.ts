@@ -1,0 +1,56 @@
+// Game Show sounds (Steve, 2026-10-27: "make these games more exciting"). Synthesized with Web Audio
+// — no audio files, no licences — the same idea as the phones' TapGameSoundPlayer. One mute switch,
+// remembered in this browser, shared by Guessing Games and Trivia Night.
+const MUTE_KEY = "bb_game_show_muted";
+let ctx: AudioContext | null = null;
+
+export function isMuted(): boolean {
+  try { return localStorage.getItem(MUTE_KEY) === "1"; } catch { return false; }
+}
+export function setMuted(m: boolean) {
+  try { localStorage.setItem(MUTE_KEY, m ? "1" : "0"); } catch { /* private mode: stays as is */ }
+}
+
+function audio(): AudioContext | null {
+  if (isMuted()) return null;
+  try {
+    const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    ctx = ctx ?? new Ctx();
+    if (ctx.state === "suspended") void ctx.resume();
+    return ctx;
+  } catch { return null; }
+}
+
+/** One tone: a wave sliding f0 -> f1 over `ms`, starting `at` ms from now, with a quick fade. */
+function tone(f0: number, f1: number, ms: number, at = 0, type: OscillatorType = "sine", gain = 0.18) {
+  const a = audio(); if (!a) return;
+  const t = a.currentTime + at / 1000;
+  const o = a.createOscillator(); const g = a.createGain();
+  o.type = type; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(Math.max(1, f1), t + ms / 1000);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(gain, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + ms / 1000);
+  o.connect(g).connect(a.destination); o.start(t); o.stop(t + ms / 1000 + 0.02);
+}
+
+function noise(ms: number, at = 0, gain = 0.12) {
+  const a = audio(); if (!a) return;
+  const len = Math.floor(a.sampleRate * ms / 1000);
+  const buf = a.createBuffer(1, len, a.sampleRate); const d = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-6 * i / len);
+  const s = a.createBufferSource(); const g = a.createGain(); g.gain.value = gain;
+  s.buffer = buf; s.connect(g).connect(a.destination); s.start(a.currentTime + at / 1000);
+}
+
+export const sfx = {
+  tick: () => tone(1500, 1400, 40, 0, "square", 0.05),
+  lock: () => { tone(500, 900, 70, 0, "triangle", 0.15); tone(900, 900, 60, 70, "triangle", 0.12); },
+  drumroll: () => { for (let i = 0; i < 14; i++) noise(45, i * 55, 0.09 + i * 0.006); },
+  correct: () => [523, 659, 784, 1047].forEach((f, i) => tone(f, f, 160, i * 110, "triangle", 0.16)),
+  wrong: () => { tone(330, 300, 260, 0, "sawtooth", 0.07); tone(300, 220, 420, 250, "sawtooth", 0.07); },
+  reveal: () => { tone(392, 392, 140, 0, "triangle", 0.14); tone(523, 523, 220, 120, "triangle", 0.14); },
+  fanfare: () => [[523, 0], [659, 140], [784, 280], [1047, 420], [784, 620], [1047, 760]].forEach(([f, at]) => tone(f, f, 220, at, "triangle", 0.15)),
+};
+
+/** A short buzz on phones that support it (web). */
+export function haptic(pattern: number | number[] = 30) {
+  try { navigator.vibrate?.(pattern); } catch { /* not supported */ }
+}
