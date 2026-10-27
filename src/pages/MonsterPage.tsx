@@ -148,7 +148,7 @@ export function MonsterPage() {
               <button key={v.id} disabled={v.status !== "done"} onClick={() => setPlaying(v)}
                       style={{ background: "#000", border: "1px solid var(--gold-border)", borderRadius: 12, padding: 6, color: "#fff", font: "inherit", textAlign: "left", cursor: v.status === "done" ? "pointer" : "default" }}>
                 <div style={{ aspectRatio: "9 / 16", background: "#111", borderRadius: 8, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  {v.thumbnail_url ? <img src={v.thumbnail_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  {(v.thumbnail_url || styles.find((s) => s.name === v.style_name)?.thumb) ? <img src={(v.thumbnail_url || styles.find((s) => s.name === v.style_name)?.thumb) ?? ""} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", opacity: isWorking(v) ? 0.5 : 1 }} />
                     : <span className="muted" style={{ fontSize: 12, padding: 8, textAlign: "center" }}>{isWorking(v) ? t("monster_status_working") : ""}</span>}
                 </div>
                 <div style={{ fontSize: 13, fontWeight: 700, marginTop: 6 }}>{v.style_name}</div>
