@@ -95,7 +95,7 @@ export function TriviaNightPanel({ game, myUserId, onAnswer, onPause, onEnd, onC
                   background: "rgba(0,0,0,.92)", border: `2px solid ${gold}`, borderRadius: 18, padding: 12, color: "#fff", maxHeight: "calc(100vh - 220px)", overflowY: "auto" }}>
       <Confetti burst={burst} />
       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-        <b style={{ color: gold, fontSize: 14, flex: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>🧠 Trivia Night · {coins(game.coins_per_answer)} per answer</b>
+        <b style={{ color: gold, fontSize: 14, flex: 1, minWidth: 0, lineHeight: 1.25 }}>🧠 Trivia Night · {coins(game.coins_per_answer)} per answer</b>
         <MuteButton />
         <button onClick={() => fetchTriviaFans().then(setFans)} style={{ background: "none", border: "none", color: gold, fontSize: 12, cursor: "pointer" }}>🏅 Top</button>
         <button onClick={() => setCollapsed((c) => !c)} aria-label={collapsed ? "Expand" : "Collapse"} style={{ background: "none", border: "none", color: gold, fontSize: 18, cursor: "pointer" }}>{collapsed ? "+" : "–"}</button>
