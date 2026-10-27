@@ -48,7 +48,22 @@ export const sfx = {
   wrong: () => { tone(330, 300, 260, 0, "sawtooth", 0.07); tone(300, 220, 420, 250, "sawtooth", 0.07); },
   reveal: () => { tone(392, 392, 140, 0, "triangle", 0.14); tone(523, 523, 220, 120, "triangle", 0.14); },
   fanfare: () => [[523, 0], [659, 140], [784, 280], [1047, 420], [784, 620], [1047, 760]].forEach(([f, at]) => tone(f, f, 220, at, "triangle", 0.15)),
+  // Board games (Steve, 2026-10-27: "like a slap on the board"). A wooden clack is a click of noise,
+  // a short knock and a low thump; the same recipe on the phones.
+  clack: () => clack(0),
+  capture: () => { clack(0, 1.15); clack(110, 1.3); },
+  knock: () => { tone(220, 120, 90, 0, "sine", 0.3); noise(15, 0, 0.18); tone(220, 120, 90, 160, "sine", 0.3); noise(15, 160, 0.18); },
+  drop: () => { tone(1200, 500, 180, 0, "sine", 0.08); tone(1500, 1200, 30, 190, "triangle", 0.18); noise(10, 190, 0.12); },
+  rattle: () => [0, 40, 70, 115, 150, 200].forEach((at, i) => { noise(30, at, 0.1 + (i % 2) * 0.04); tone(2200 + i * 90, 2000, 12, at, "sine", 0.05); }),
+  /** Getting a King: a long ringing bell. */
+  ding: () => { tone(1046, 1046, 2200, 0, "sine", 0.22); tone(2092, 2092, 1600, 0, "sine", 0.09); tone(2887, 2887, 1000, 0, "sine", 0.05); tone(523, 523, 2400, 0, "sine", 0.08); },
 };
+
+function clack(at: number, loud = 1) {
+  noise(12, at, 0.22 * loud);
+  tone(1100, 850, 35, at, "sine", 0.14 * loud);
+  tone(160, 90, 70, at, "sine", 0.22 * loud);
+}
 
 /** A short buzz on phones that support it (web). */
 export function haptic(pattern: number | number[] = 30) {

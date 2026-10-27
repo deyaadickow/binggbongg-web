@@ -13,6 +13,22 @@ const gold = "var(--gold, #F0C420)";
 const LIGHT = "#E9D8A6", DARK = "#7A5230", CHECKERS_LIGHT = "#D9C29A", CHECKERS_DARK = "#2E4A2E";
 // One glyph set (the filled one) for both sides, coloured per side; ︎ keeps iOS/Android from
 // swapping ♟ for an emoji.
+/** What a move sounded like, from the board before and after it: a capture when a piece left the
+ *  board, and in Checkers which side just got a new King (capital letter = King; one = b, two = r). */
+function boardEvent(kind: string, before: string[][] | undefined, after: string[][]): { sound: "clack" | "capture" | "drop" | "rattle"; kingSide: "one" | "two" | null } {
+  if (kind === "fourinarow") return { sound: "drop", kingSide: null };
+  if (kind === "mancala") return { sound: "rattle", kingSide: null };
+  if (!before) return { sound: "clack", kingSide: null };
+  const count = (b: string[][], test: (p: string) => boolean) => b.flat().filter((p) => p !== "" && test(p)).length;
+  const captured = kind !== "reversi" && count(after, () => true) < count(before, () => true);
+  let kingSide: "one" | "two" | null = null;
+  if (kind === "checkers") {
+    if (count(after, (p) => p === "B") > count(before, (p) => p === "B")) kingSide = "one";
+    else if (count(after, (p) => p === "R") > count(before, (p) => p === "R")) kingSide = "two";
+  }
+  return { sound: captured ? "capture" : "clack", kingSide };
+}
+
 const GLYPH: Record<string, string> = { k: "♚", q: "♛", r: "♜", b: "♝", n: "♞", p: "♟" };
 
 export const BOARD_TITLE: Record<BoardKind, string> = { checkers: "Checkers", chess: "Chess", fourinarow: "Four in a Row", reversi: "Reversi", mancala: "Mancala" };
@@ -89,18 +105,27 @@ export function BoardGameOverlay({ game, myUserId, onMove, onBuy, onResign, onEn
   // Game Show: a click on every move, and a fanfare + confetti for the winner. Fired on CHANGES
   // between polls only — the ref holds what the last poll said.
   const [burst, setBurst] = useState(0);
-  const prev = useRef({ id: game.board_game_id, status: game.status, plies: game.plies });
+  const prev = useRef({ id: game.board_game_id, status: game.status, plies: game.plies, board: game.board });
   useEffect(() => {
     const was = prev.current;
-    prev.current = { id: game.board_game_id, status: game.status, plies: game.plies };
+    prev.current = { id: game.board_game_id, status: game.status, plies: game.plies, board: game.board };
     if (was.id !== game.board_game_id) return;
     if (was.status === "active" && game.status !== "active") {
       if (game.status !== "cancelled" && (game.result === "one" || game.result === "two")) { sfx.fanfare(); haptic([40, 60, 40]); setBurst(Date.now()); }
       else if (game.result === "draw") sfx.reveal();
       return;
     }
-    if (game.plies > was.plies) { sfx.lock(); if (game.in_check) haptic(60); }
-  }, [game.board_game_id, game.status, game.plies, game.result, game.in_check]);
+    if (game.plies > was.plies) {
+      const ev = boardEvent(game.kind, was.board, game.board);
+      if (game.in_check) { sfx.knock(); haptic(60); }
+      else sfx[ev.sound]();
+      // A new King: a "dinggg" for the room, and a 3-second buzz for the player who got it (Steve, 2026-10-27).
+      if (ev.kingSide) {
+        window.setTimeout(() => sfx.ding(), 150);
+        if (game.players.find((p) => p.side === ev.kingSide)?.user_id === myUserId) haptic(3000);
+      }
+    }
+  }, [game.board_game_id, game.status, game.plies, game.result, game.in_check, game.board, game.kind, game.players, myUserId]);
 
   const active = game.status === "active";
   const me = game.players.find((p) => p.user_id === myUserId) ?? null;
