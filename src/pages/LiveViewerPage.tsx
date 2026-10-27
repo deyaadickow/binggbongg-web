@@ -17,6 +17,8 @@ import { cancelPyramidBattle, fetchPyramidGame, sendPyramidFlowers, startPyramid
 import { PyramidOverlay, PyramidStartDialog } from "../components/PyramidOverlay";
 import { buyBoardPowerup, cancelBoardGame, fetchBoardGame, makeBoardMove, resignBoardGame, startBoardGame, type BoardGame, type BoardKind } from "../lib/boardgame";
 import { BOARD_TITLE, BoardGameOverlay, BoardGameStartDialog } from "../components/BoardGameOverlay";
+import { answerTrivia, buyTrivia, cancelTrivia, fetchTrivia, startTrivia, type TriviaGame } from "../lib/trivia";
+import { TriviaOverlay, TriviaStartDialog } from "../components/TriviaOverlay";
 import { fetchActiveTapGame, gameTitle, type TapGameType } from "../lib/tapgame";
 import { TapGameOverlay } from "../components/TapGameOverlay";
 import { HostGamesMenu } from "../components/HostGamesMenu";
@@ -239,6 +241,15 @@ export function LiveViewerPage() {
   const boardClosedId = useRef<number | null>(null);
   const boardAnnounced = useRef<number | null>(null);
   const boardBusy = useRef(false);
+  // Trivia (Steve, 2026-10-27) — same discovery rule: everyone polls the room.
+  const [trivia, setTrivia] = useState<TriviaGame | null>(null);
+  const [triviaOpen, setTriviaOpen] = useState(false);
+  const [triviaStartOpen, setTriviaStartOpen] = useState(false);
+  const triviaClosedId = useRef<number | null>(null);
+  const triviaAnnounced = useRef<number | null>(null);
+  const triviaBusy = useRef(false);
+  const triviaRef = useRef<TriviaGame | null>(null);
+  triviaRef.current = trivia;
   const [picker, setPicker] = useState<BattleKind | null>(null);
   // Steve, 2026-09-27: Hide & Seek — pick the shape first (free for all 2-4, or 2v2 teams).
   const [hideSeekMode, setHideSeekMode] = useState<"choose" | "2v2" | 1 | 2 | 3 | null>(null);
@@ -516,6 +527,38 @@ export function LiveViewerPage() {
     return () => window.clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomName, boardActive]);
+
+  async function refreshTrivia() {
+    if (!roomName) return;
+    try {
+      const me = user?.id ?? null;
+      const iAmPlayer = !!me && !!triviaRef.current?.players.some((p) => p.user_id === me);
+      const fresh = await fetchTrivia(roomName, me, iAmPlayer);
+      setTrivia(fresh);
+      if (!fresh) { setTriviaOpen(false); return; }
+      if (fresh.status === "active") {
+        if (triviaClosedId.current !== fresh.trivia_game_id) setTriviaOpen(true);
+      } else if (triviaAnnounced.current !== fresh.trivia_game_id) {
+        triviaAnnounced.current = fresh.trivia_game_id;
+        const w = fresh.players.find((p) => p.side === fresh.result);
+        if (w && fresh.status === "completed") setToast(`🏆 ${w.name} wins Trivia #${fresh.game_no}!`);
+      }
+    } catch { /* keep the last good state */ }
+  }
+  const triviaActive = trivia?.status === "active";
+  useEffect(() => {
+    if (!roomName) return;
+    void refreshTrivia();
+    const id = window.setInterval(() => { void refreshTrivia(); }, triviaActive ? 1500 : 8000);
+    return () => window.clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomName, triviaActive]);
+
+  function openTrivia() {
+    if (trivia && trivia.status === "active") { triviaClosedId.current = null; setTriviaOpen(true); return; }
+    if (role !== "host") { setToast("No Trivia game is running — the host starts it."); return; }
+    setTriviaStartOpen(true);
+  }
 
   function openBoard(kind: BoardKind) {
     if (boardGame && boardGame.status === "active") { boardClosedId.current = null; setBoardOpen(true); return; }
@@ -1386,6 +1429,49 @@ export function LiveViewerPage() {
           }}
         />
       )}
+      {triviaOpen && trivia && myId !== null && (
+        <TriviaOverlay
+          game={trivia}
+          myUserId={myId}
+          tileFor={(id) => orderedTiles.find((t) => (t.isLocal ? id === myId : t.userId === id))}
+          onAnswer={async (choice) => {
+            if (triviaBusy.current) return;
+            triviaBusy.current = true;
+            const { game, message } = await answerTrivia(myId, trivia.trivia_game_id, choice);
+            triviaBusy.current = false;
+            if (message) setToast(message);
+            if (game) setTrivia(game);
+          }}
+          onBuy={async (recipientId, powerup, choice) => {
+            if (triviaBusy.current) return;
+            triviaBusy.current = true;
+            const { game, message } = await buyTrivia(myId, recipientId, trivia.trivia_game_id, powerup, roomName, choice);
+            triviaBusy.current = false;
+            setToast(message ?? (powerup === "vote" ? "🗳 Vote counted!" : powerup === "5050" ? "50/50 sent!" : "⏱ +10 seconds sent!"));
+            if (game) setTrivia(game); else await refreshTrivia();
+          }}
+          onEnd={async () => {
+            const problem = await cancelTrivia(myId, trivia.trivia_game_id);
+            if (problem) setToast(problem);
+            await refreshTrivia();
+          }}
+          onClose={() => { triviaClosedId.current = trivia.trivia_game_id; setTriviaOpen(false); }}
+        />
+      )}
+      {triviaStartOpen && myId !== null && (
+        <TriviaStartDialog
+          candidates={broadcasters.filter((b) => b.user_id !== myId).map((b) => ({ userId: b.user_id, name: personName(b) }))}
+          onClose={() => setTriviaStartOpen(false)}
+          onStart={async (s) => {
+            setTriviaStartOpen(false);
+            const { game, message } = await startTrivia(myId, roomName, s);
+            if (!game) { setToast(message ?? "Couldn't start the game."); return; }
+            triviaClosedId.current = null;
+            setTrivia(game);
+            setTriviaOpen(true);
+          }}
+        />
+      )}
       {bingoBoardOpen && <BingoBoardOverlay onClose={() => setBingoBoardOpen(false)} />}
       {bingoFinishedId !== null && (
         <BingoWinnersOverlay bingoGameId={bingoFinishedId} onClose={() => setBingoFinishedId(null)} />
@@ -1416,6 +1502,7 @@ export function LiveViewerPage() {
           else if (k === "bingo") openBingo();
           else if (k === "pyramid") openPyramid();
           else if (k === "checkers" || k === "chess" || k === "fourinarow" || k === "reversi" || k === "mancala") openBoard(k);
+          else if (k === "trivia") openTrivia();
           else if (k === "bingoBoard") setBingoBoardOpen(true);
           // The 31-day challenge and the three reference rows open their own overlay off the
           // same `picker` state — they start nothing, so they need no people-picker step.
