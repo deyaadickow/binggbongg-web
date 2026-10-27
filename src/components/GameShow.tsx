@@ -110,7 +110,7 @@ const KEYFRAMES = `
 @keyframes gs-ripple{from{transform:translateX(0)}to{transform:translateX(-40px)}}
 @keyframes gs-gallop{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-3px) rotate(-4deg)}}
 @keyframes gs-pop{0%{transform:scale(1)}40%{transform:scale(1.07)}100%{transform:scale(1)}}
-@keyframes gs-fall{from{transform:translateY(-20px) rotate(0);opacity:1}to{transform:translateY(420px) rotate(540deg);opacity:0}}
+@keyframes gs-fall{from{top:-20px;transform:rotate(0);opacity:1}to{top:100%;transform:rotate(540deg);opacity:0}}
 @keyframes gs-shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
 @media (prefers-reduced-motion: reduce){.gs-anim{animation:none!important}}`;
 let injected = false;
@@ -276,7 +276,7 @@ export function Confetti({ burst }: { burst: number }) {
   return (
     <div aria-hidden style={{ position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none", zIndex: 5 }}>
       {pieces.map((p) => (
-        <span key={p.id} className="gs-anim" style={{ position: "absolute", top: 0, left: `${p.left}%`, width: 7, height: 11, borderRadius: 2, background: p.color, animation: `gs-fall ${p.dur}s ease-in ${p.delay}s forwards` }} />
+        <span key={p.id} className="gs-anim" style={{ position: "absolute", top: -20, left: `${p.left}%`, width: 7, height: 11, borderRadius: 2, background: p.color, animation: `gs-fall ${p.dur}s ease-in ${p.delay}s both` }} />
       ))}
     </div>
   );
