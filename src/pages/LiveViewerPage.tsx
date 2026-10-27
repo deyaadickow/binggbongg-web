@@ -7,7 +7,7 @@ import { chatChannel, ensureFirebaseSignIn, observeChat, sendChat, type ChatMess
 import { useLiveRoom, type LiveRole, type LiveTile } from "../lib/live";
 import { activeBoxingWindow, useBattle, type BattleData } from "../lib/battle";
 import { VIRTUAL, fetchVirtualGiftRecord, sendVirtualThankYou, startVirtualBattle, type VirtualBattleData, type VirtualGiftRecord, type VirtualParticipant, FIVE_FIVE_FIVE, MARATHON, SERIES, TWO_V_TWO, cancel555, createSeries, finalize2v2, finalizeSeriesRound, invite2v2, invite555, inviteMarathon, secondsUntil, useEngine, voteMarathonCancel, type B555Data, type Battle2v2Data, type MarathonData, type SeriesData } from "../lib/battles";
-import { B555Strip, BattleMenu, InviteCard, MarathonStrip, MultiPicker, Overlay, ResultOverlay, SeriesStrip, TwoVTwoPicker, TwoVTwoStrip, VirtualGiftRecordOverlay, VirtualPicker, VirtualStrip, WinCelebration, describe2v2Invite, personName, resultTitle, type BattleKind } from "../components/BattleEngines";
+import { B555Strip, BattleMenu, InviteCard, MarathonStrip, MultiPicker, Overlay, ResultOverlay, SeriesStrip, TwoVTwoPicker, TwoVTwoStrip, VirtualGiftRecordOverlay, VirtualPicker, VirtualStrip, WinCelebration, coinsLabel, describe2v2Invite, personName, resultTitle, type BattleKind } from "../components/BattleEngines";
 import { Challenge31Overlay, LifetimeBoardOverlay, PkContestsOverlay, PunishmentsOverlay } from "../components/BattleReference";
 import { BingoBoardOverlay, BingoOverlay, BingoStartDialog, BingoWinnersOverlay } from "../components/BingoOverlay";
 import { OneStrokeOverlay } from "../components/OneStrokeOverlay";
@@ -212,7 +212,7 @@ export function LiveViewerPage() {
   // The other four engines: Best Out Of, 2v2, No Time Limit, 5-5-5. One result overlay at a time.
   const [result, setResult] = useState<{
     title: string;
-    rows: { label: string; value: string; win?: boolean }[];
+    rows: { label: string; value: string; win?: boolean; score?: number }[];
     /** Set only for engines the server can build a recap for. */
     recap?: { id: number; engine: string };
   } | null>(null);
@@ -297,7 +297,7 @@ export function LiveViewerPage() {
         ? { id: d.series_id, engine: "best_out_of" }
         : undefined,
       title: resultTitle(d.winner_user_id, myId, acc.some((p) => p.user_id === myId), d.status === "cancelled"),
-      rows: acc.map((p) => ({ label: nameOfId(p.user_id) || personName(p), value: `${p.rounds_won ?? 0} round${p.rounds_won === 1 ? "" : "s"}`, win: p.user_id === d.winner_user_id })),
+      rows: acc.map((p) => ({ label: nameOfId(p.user_id) || personName(p), value: `${p.rounds_won ?? 0} round${p.rounds_won === 1 ? "" : "s"}`, score: p.rounds_won ?? 0, win: p.user_id === d.winner_user_id })),
     });
     refresh();
   }, [myId, nameOfId, refresh]);
@@ -311,8 +311,8 @@ export function LiveViewerPage() {
       recap: d.status === "completed" ? { id: d.battle_id, engine: "2v2" } : undefined,
       title: d.status === "cancelled" ? tt("battle_cancelled") : !d.winning_team ? tt("it_s_a_tie") : !iPlayed ? tt("battle_over") : iWon ? tt("your_team_won") : tt("your_team_lost_this_one"),
       rows: [
-        { label: team("A"), value: (d.team_a_score ?? 0).toLocaleString(), win: d.winning_team === "A" },
-        { label: team("B"), value: (d.team_b_score ?? 0).toLocaleString(), win: d.winning_team === "B" },
+        { label: team("A"), value: coinsLabel(d.team_a_score), score: d.team_a_score ?? 0, win: d.winning_team === "A" },
+        { label: team("B"), value: coinsLabel(d.team_b_score), score: d.team_b_score ?? 0, win: d.winning_team === "B" },
       ],
     });
     refresh();
@@ -321,7 +321,7 @@ export function LiveViewerPage() {
     const acc = d.participants.filter((p) => p.invite_status === "accepted");
     setResult({
       title: resultTitle(d.winner_user_id, myId, acc.some((p) => p.user_id === myId), d.status === "cancelled"),
-      rows: acc.map((p) => ({ label: nameOfId(p.user_id) || personName(p), value: (p.current_score ?? 0).toLocaleString(), win: p.user_id === d.winner_user_id })),
+      rows: acc.map((p) => ({ label: nameOfId(p.user_id) || personName(p), value: coinsLabel(p.current_score), score: p.current_score ?? 0, win: p.user_id === d.winner_user_id })),
     });
     refresh();
   }, [myId, nameOfId, refresh]);
@@ -329,7 +329,7 @@ export function LiveViewerPage() {
     const acc = d.participants.filter((p) => p.invite_status === "accepted");
     setResult({
       title: resultTitle(d.winner_user_id, myId, acc.some((p) => p.user_id === myId), d.status === "cancelled"),
-      rows: acc.map((p) => ({ label: nameOfId(p.user_id) || personName(p), value: `${p.games_completed ?? 0}/${d.games_to_win} games · ${(p.total_coins ?? 0).toLocaleString()} coins`, win: p.user_id === d.winner_user_id })),
+      rows: acc.map((p) => ({ label: nameOfId(p.user_id) || personName(p), value: `${p.games_completed ?? 0}/${d.games_to_win} games · ${coinsLabel(p.total_coins)}`, score: (p.games_completed ?? 0) * 1e9 + (p.total_coins ?? 0), win: p.user_id === d.winner_user_id })),
     });
     refresh();
   }, [myId, nameOfId, refresh]);
@@ -344,7 +344,7 @@ export function LiveViewerPage() {
     const mine = d.participants.find((p) => p.user_id === myId);
     setResult({
       title: resultTitle(d.winner_user_id, myId, !!mine, d.status === "cancelled"),
-      rows: [...d.participants].sort((a, b) => b.current_score - a.current_score).map((p) => ({ label: nameOfId(p.user_id) || personName(p), value: (p.current_score ?? 0).toLocaleString(), win: p.user_id === d.winner_user_id })),
+      rows: [...d.participants].sort((a, b) => b.current_score - a.current_score).map((p) => ({ label: nameOfId(p.user_id) || personName(p), value: coinsLabel(p.current_score), score: p.current_score ?? 0, win: p.user_id === d.winner_user_id })),
     });
     if (mine) setTimeout(() => openVirtualRecord(d.virtual_battle_id), 2500);
     refresh();

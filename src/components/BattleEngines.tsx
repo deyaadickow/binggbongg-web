@@ -424,15 +424,25 @@ export function WinCelebration({ win }: { win: boolean }) {
   return <div aria-hidden style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 41 }}><Confetti burst={burst} /></div>;
 }
 
-export function ResultOverlay({ title, rows, onClose, onShare, sharing }: {
+/** "1 coin" / "1,250 coins" — every result row says what its number counts. */
+export function coinsLabel(n: number | null | undefined): string {
+  const v = Number(n ?? 0) || 0;
+  return `${v.toLocaleString()} coin${v === 1 ? "" : "s"}`;
+}
+
+export function ResultOverlay({ title, rows: given, onClose, onShare, sharing }: {
   title: string;
-  rows: { label: string; value: string; win?: boolean }[];
+  /** `score` orders the rows, highest first; a shared top score crowns nobody. */
+  rows: { label: string; value: string; win?: boolean; score?: number }[];
   onClose: () => void;
   /** Battle Recap — omitted for the engines the server has no recap builder for. */
   onShare?: () => void;
   sharing?: boolean;
 }) {
   const { t } = useT();
+  const sorted = given.every((r) => r.score !== undefined) ? [...given].sort((a, b) => (b.score ?? 0) - (a.score ?? 0)) : given;
+  const tie = sorted.length > 1 && sorted[0].score !== undefined && sorted[0].score === sorted[1].score;
+  const rows = tie ? sorted.map((r) => ({ ...r, win: false })) : sorted;
   const anyWin = rows.some((r) => r.win);
   return (
     <Overlay title={title} onClose={onClose}>

@@ -22,6 +22,16 @@ export function isJoinWindowOpen(battle: SoloBattle, now: number): boolean {
   return left !== null && left > 0;
 }
 
+/** The winner of a finished Solo Battle from its standings: the top scorer, or a tie for first
+ *  (nobody is crowned), or nobody at all if no one scored. */
+function soloOutcome(rows: StandingRow[] | null): { winner: StandingRow | null; tie: boolean } {
+  const top = Number(rows?.[0]?.score ?? 0);
+  if (!rows || top <= 0) return { winner: null, tie: false };
+  if (rows.length > 1 && Number(rows[1].score ?? 0) === top) return { winner: null, tie: true };
+  return { winner: rows[0], tie: false };
+}
+const standingName = (r: StandingRow) => r.label || r.username || "Member";
+
 export function SoloBattleStrip({ battle, myUserId, onOpenStandings, onToast, onJoined }: {
   battle: SoloBattle;
   myUserId: number | null;
@@ -46,6 +56,15 @@ export function SoloBattleStrip({ battle, myUserId, onOpenStandings, onToast, on
   // while you're watching — on the CHANGE, so opening a room after it ended stays quiet.
   const finished = isFinished(battle, now);
   const [burst, setBurst] = useState(0);
+  // Once it's over, the strip names the winner — one standings read, not a poll.
+  const [finalRows, setFinalRows] = useState<StandingRow[] | null>(null);
+  useEffect(() => {
+    if (!finished) { setFinalRows(null); return; }
+    let alive = true;
+    fetchSoloStandings(battle.id, myUserId ?? undefined).then((r) => { if (alive) setFinalRows(r); }).catch(() => undefined);
+    return () => { alive = false; };
+  }, [finished, battle.id, myUserId]);
+  const outcome = soloOutcome(finalRows);
   const wasFinished = useRef({ id: battle.id, finished });
   useEffect(() => {
     const was = wasFinished.current;
@@ -78,6 +97,8 @@ export function SoloBattleStrip({ battle, myUserId, onOpenStandings, onToast, on
               ? `Anyone can join for the next ${clock(joinLeft)} — go live and the gifts you receive count.`
               : endsIn !== null && endsIn > 0
               ? `Running — ${clock(endsIn)} left. Most gift coins wins.`
+              : outcome.winner ? `🏁 Finished — 👑 ${standingName(outcome.winner)} wins!`
+              : outcome.tie ? "🏁 Finished — 🤝 Tie!"
               : "🏁 Finished — 👑 the winner is top of the leaderboard."}
           </div>
         </div>
@@ -101,7 +122,10 @@ export function SoloBattleStandingsSheet({ battle, myUserId, onClose }: {
   const { t } = useT();
   const [rows, setRows] = useState<StandingRow[] | null>(null);
   const finished = isFinished(battle, Date.now());
-  const nameOf = (r: StandingRow) => r.label || r.username || "Member";
+  const nameOf = standingName;
+
+  const { tie } = soloOutcome(rows);
+  const crowned = finished && !tie;
 
   const load = useCallback(() => {
     fetchSoloStandings(battle.id, myUserId ?? undefined).then(setRows).catch(() => setRows([]));
@@ -127,10 +151,12 @@ export function SoloBattleStandingsSheet({ battle, myUserId, onClose }: {
           <p className="muted">{t("no_one_has_scored_yet")}</p>
         ) : (
           <>
-          {/* Game Show: once it's over, the top three on a podium, the winner crowned. */}
+          {/* Game Show: once it's over, the top three on a podium, the winner crowned — unless
+              first place is shared, when nobody is ("Tie!"). */}
           {finished && Number(rows[0]?.score ?? 0) > 0 && (
             <div style={{ marginBottom: 10 }}>
-              <Podium rows={rows.slice(0, 3).filter((r) => Number(r.score ?? 0) > 0).map((r) => ({ name: nameOf(r), value: Number(r.score ?? 0).toLocaleString() }))} />
+              {tie && <div style={{ textAlign: "center", fontWeight: 900, color: "var(--gold)", marginBottom: 4 }}>🤝 Tie!</div>}
+              <Podium tie={tie} rows={rows.slice(0, 3).filter((r) => Number(r.score ?? 0) > 0).map((r) => ({ name: nameOf(r), value: Number(r.score ?? 0).toLocaleString() }))} />
             </div>
           )}
           {rows.map((r, i) => (
@@ -138,12 +164,12 @@ export function SoloBattleStandingsSheet({ battle, myUserId, onClose }: {
               <b style={{ color: "var(--gold)", width: 28 }}>#{i + 1}</b>
               {r.profile_image
                 ? <img src={mediaUrl(r.profile_image)} alt="" style={{ width: 30, height: 30, borderRadius: 15, objectFit: "cover" }} />
-                : <div style={{ width: 30, height: 30, borderRadius: 15, background: "var(--panel)" }} />}
+                : <div aria-hidden style={{ width: 30, height: 30, borderRadius: 15, background: "var(--panel)", border: "1px solid var(--gold-border)", color: "var(--gold)", fontWeight: 800, fontSize: 14, display: "grid", placeItems: "center", flex: "none" }}>{(nameOf(r).trim()[0] ?? "?").toUpperCase()}</div>}
               <div style={{ flex: 1, minWidth: 0 }}>
                 {/* The phones let you tap a name to go straight to that person's live. */}
                 {r.user_id
-                  ? <Link to={`/profile/${r.user_id}`} onClick={onClose} style={{ fontWeight: 700 }}>{finished && i === 0 ? "👑 " : ""}{r.label || r.username || "Member"}</Link>
-                  : <span style={{ fontWeight: 700 }}>{finished && i === 0 ? "👑 " : ""}{r.label || "Member"}</span>}
+                  ? <Link to={`/profile/${r.user_id}`} onClick={onClose} style={{ fontWeight: 700 }}>{crowned && i === 0 ? "👑 " : ""}{nameOf(r)}</Link>
+                  : <span style={{ fontWeight: 700 }}>{crowned && i === 0 ? "👑 " : ""}{nameOf(r)}</span>}
                 {r.location && <div className="muted" style={{ fontSize: 12 }}>{r.location}</div>}
               </div>
               <b>{Number(r.score ?? 0).toLocaleString()}</b>
