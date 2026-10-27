@@ -6,6 +6,7 @@ import { UploadVideoPage } from "./pages/UploadVideoPage";
 import { CreateVideoAdPage } from "./pages/CreateVideoAdPage";
 import { UploadPhotosPage } from "./pages/UploadPhotosPage";
 import { CartoonPage } from "./pages/CartoonPage";
+import { MonsterPage } from "./pages/MonsterPage";
 import { MyPhotosPage } from "./pages/MyPhotosPage";
 import { PhotosDirectoryPage } from "./pages/PhotosDirectoryPage";
 // The eight ways of browsing the feed the phones have always had (Steve, 2026-10-20).
@@ -124,6 +125,7 @@ export default function App() {
           <Route path="/upload-photos" element={<UploadPhotosPage />} />
           {/* Cartoon Me (Steve, 2026-10-12) */}
           <Route path="/cartoon" element={<CartoonPage />} />
+          <Route path="/monster" element={<MonsterPage />} />
           <Route path="/enter-contest" element={<ContestUploadPage />} />
           {/* The board the site never had. Open to everyone, every country — entering is the
               only country-locked half, and that lives on /enter-contest. */}

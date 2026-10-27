@@ -104,6 +104,7 @@ const FEATURES: Section[] = [
       { icon: "🎬", nameKey: "fname_videos", blurbKey: "fblurb_videos", to: "/upload" },
       { icon: "🖼️", nameKey: "fname_photos", blurbKey: "fblurb_photos", to: "/photos" },
       { icon: "✨", nameKey: "fname_photo_styles", blurbKey: "fblurb_photo_styles", to: "/cartoon" },
+      { icon: "🦖", nameKey: "fname_monster_videos", blurbKey: "fblurb_monster_videos", to: "/monster" },
       { icon: "📑", nameKey: "fname_playlists", blurbKey: "fblurb_playlists", myProfile: true, whereKey: "fwhere_your_profile" },
       { icon: "🔮", nameKey: "fname_lucky_numbers_and_horoscope", blurbKey: "fblurb_lucky_numbers_and_horoscope", to: "/lucky" },
     ],
