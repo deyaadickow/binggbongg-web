@@ -268,7 +268,7 @@ export function BingoBoardOverlay({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <Overlay title={t("bingo_battle_board")} onClose={onClose} width={520}>
+    <Overlay title={t("bingo_battle_board")} onClose={onClose} back width={520}>
       {board && (
         <div className="bingo-stats">
           <div><b>{board.total_games}</b><span>{t("games_2")}</span></div>
@@ -314,7 +314,7 @@ export function BingoWinnersOverlay({ bingoGameId, onClose }: { bingoGameId: num
   }, [bingoGameId]);
 
   return (
-    <Overlay title={`🎱 Bingo #${data?.game_no ?? ""}`} onClose={onClose} width={460}>
+    <Overlay title={`🎱 Bingo #${data?.game_no ?? ""}`} onClose={onClose} back width={460}>
       {data && (
         <p className="soft" style={{ marginTop: 0 }}>
           {t(data.players === 1 ? "bingo_summary_one_player" : "bingo_summary_n_players",

@@ -15,11 +15,20 @@ export function personName(p?: Person | null): string {
   return p ? displayName({ fullname: p.fullname ?? undefined, username: p.username ?? undefined } as Partial<UserSummary>) : "Someone";
 }
 
-export function Overlay({ title, children, onClose, width = 440 }: { title: string; children: React.ReactNode; onClose: () => void; width?: number }) {
+/** `back` adds the gold back arrow beside the title (Steve, 2026-10-27, on Bingo's results:
+ *  "Please add a back arrow to this page"); without it the popup closes by clicking outside. */
+export function Overlay({ title, children, onClose, width = 440, back = false }: { title: string; children: React.ReactNode; onClose: () => void; width?: number; back?: boolean }) {
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", display: "grid", placeItems: "center", zIndex: 40, padding: 16 }} onClick={onClose}>
       <div className="card pad" style={{ width: `min(${width}px, 100%)`, maxHeight: "90vh", overflowY: "auto" }} onClick={(e) => e.stopPropagation()}>
-        <h2 className="card-title" style={{ marginBottom: 10 }}>{title}</h2>
+        {back ? (
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+            <button onClick={onClose} aria-label="Back"
+                    style={{ width: 34, height: 34, flex: "none", borderRadius: "50%", border: "1.5px solid var(--gold, #F0C420)", background: "#000",
+                             color: "var(--gold, #F0C420)", fontSize: 20, lineHeight: 1, cursor: "pointer", display: "grid", placeItems: "center" }}>‹</button>
+            <h2 className="card-title" style={{ margin: 0 }}>{title}</h2>
+          </div>
+        ) : <h2 className="card-title" style={{ marginBottom: 10 }}>{title}</h2>}
         {children}
       </div>
     </div>
