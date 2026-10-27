@@ -406,6 +406,8 @@ export const fil = {
   fblurb_battle_badge: "Isang gintong bilog sa profile mo na bumibilang sa bawat battle na natapos mo.",
   fblurb_battle_rankings: "Mga board na daily, buwanan, taunan at all-time, kada bansa.",
   fblurb_bingg_bongg_bingo: "Binibili ng mga manonood ang mga kahon sa card mo, at napupuno ang card ng mga pangalan nila.",
+  fname_guessing_games: "Mga Larong Hulaan",
+  fblurb_guessing_games: "Gumawa ng kahit ano sa camera at huhulaan ng mga nanonood ang mangyayari — 1 hanggang 25 coins bawat hula.",
   fblurb_bingg_bongg_shop: "Magtinda ng sarili mong produkto, o magtinda ng sa iba para sa komisyon.",
   fblurb_business_pages: "Isang page para sa negosyo mo, nahahanap ayon sa bansa, estado at lungsod.",
   fblurb_by_age_group: "Ang feed na nakatuon sa isang age group.",

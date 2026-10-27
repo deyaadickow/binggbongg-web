@@ -406,6 +406,8 @@ export const id = {
   fblurb_battle_badge: "Lingkaran emas di profilmu yang menghitung setiap battle yang kamu selesaikan.",
   fblurb_battle_rankings: "Papan harian, bulanan, tahunan dan sepanjang masa, per negara.",
   fblurb_bingg_bongg_bingo: "Penonton membeli kotak di kartumu, dan kartunya terisi nama mereka.",
+  fname_guessing_games: "Permainan Tebak-tebakan",
+  fblurb_guessing_games: "Lakukan sesuatu di depan kamera dan penonton menebak apa yang terjadi — 1 sampai 25 koin per tebakan.",
   fblurb_bingg_bongg_shop: "Jual produkmu sendiri, atau jual produk orang lain untuk komisi.",
   fblurb_business_pages: "Halaman untuk bisnismu, ditemukan berdasarkan negara, provinsi dan kota.",
   fblurb_by_age_group: "Feed yang dipersempit ke satu kelompok usia.",

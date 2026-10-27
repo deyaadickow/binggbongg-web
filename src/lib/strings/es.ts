@@ -406,6 +406,8 @@ export const es = {
   fblurb_battle_badge: "Un círculo dorado en tu perfil que cuenta cada batalla que terminas.",
   fblurb_battle_rankings: "Tablas diarias, mensuales, anuales y de todos los tiempos, por país.",
   fblurb_bingg_bongg_bingo: "Los espectadores compran casillas de tu cartón, y el cartón se llena con sus nombres.",
+  fname_guessing_games: "Juegos de adivinanzas",
+  fblurb_guessing_games: "Haz algo ante la cámara y la sala adivina qué pasa: de 1 a 25 monedas por intento.",
   fblurb_bingg_bongg_shop: "Vende tus propios productos, o vende los de otros a comisión.",
   fblurb_business_pages: "Una página para tu negocio, encontrada por país, estado y ciudad.",
   fblurb_by_age_group: "El feed limitado a un grupo de edad.",

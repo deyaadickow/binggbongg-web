@@ -408,6 +408,8 @@ export const en = {
   fblurb_battle_badge: "A gold circle on your profile that counts every battle you finish.",
   fblurb_battle_rankings: "Daily, monthly, yearly and all-time boards, by country.",
   fblurb_bingg_bongg_bingo: "Viewers buy squares on your card, and the card fills with their names.",
+  fname_guessing_games: "Guessing Games",
+  fblurb_guessing_games: "Do something on camera and the room guesses what happens — 1 to 25 coins a guess.",
   fblurb_bingg_bongg_shop: "Sell your own products, or sell other people's for a commission.",
   fblurb_business_pages: "A page for your business, found by country, state and city.",
   fblurb_by_age_group: "The feed narrowed to an age group.",
