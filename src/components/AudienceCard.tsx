@@ -2,9 +2,15 @@
 // and cheer, vote the loser's forfeit — all free. Players see it read-only. Same shape as the phones.
 import { useEffect, useRef, useState } from "react";
 import { cheerBattle, fetchPredictionLeaderboard, joinBattleTeam, predictBattle, votePunishment, type AudienceRound, type PredictorRow } from "../lib/audience";
+import { Confetti, CountdownRing, MuteButton, SceneBanner } from "./GameShow";
+import { SCENES } from "../lib/gameSceneData";
+import { haptic, sfx } from "../lib/gameSounds";
 
 const gold = "var(--gold, #F0C420)";
 const TEAM_COLORS = ["#e5484d", "#49a8ff", "#2fbf5b", "#f0a020"];
+// Game Show (Steve, 2026-10-27): the choices are big coloured boxes, like the quiz tiles.
+const BOX_COLORS = ["#D85A30", "#1D9E75", "#378ADD", "#BA7517", "#8E5BD9", "#D4537E", "#16A3A3", "#6B7280"];
+const boxText: React.CSSProperties = { fontSize: 13, fontWeight: 800, textShadow: "0 1px 2px rgba(0,0,0,.4)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0 };
 
 export function AudienceCard({ round, myUserId, onRound, onToast }: {
   round: AudienceRound; myUserId: number | null;
@@ -15,6 +21,25 @@ export function AudienceCard({ round, myUserId, onRound, onToast }: {
   const [polledAt, setPolledAt] = useState(() => Date.now());
   const [, setTick] = useState(0);
   const pending = useRef(0);
+  // Game Show: a click when your pick locks in, a chime + confetti when your prediction comes
+  // true. Fired on CHANGES between polls only (the ref is what the last poll said).
+  const [burst, setBurst] = useState(0);
+  const prev = useRef({ id: round.round_id, status: round.status, pred: round.my_prediction, vote: round.my_punishment_vote });
+  // The longest predict window seen this round, so the ring drains from full.
+  const predictTotal = useRef({ id: round.round_id, ms: round.predict_ms_left });
+  if (predictTotal.current.id !== round.round_id) predictTotal.current = { id: round.round_id, ms: round.predict_ms_left };
+  else if (round.predict_ms_left > predictTotal.current.ms) predictTotal.current.ms = round.predict_ms_left;
+  useEffect(() => {
+    const was = prev.current;
+    prev.current = { id: round.round_id, status: round.status, pred: round.my_prediction, vote: round.my_punishment_vote };
+    if (was.id !== round.round_id) return;
+    if (!was.pred && round.my_prediction) { sfx.lock(); haptic(25); }
+    if (was.vote !== round.my_punishment_vote && round.my_punishment_vote !== null) sfx.lock();
+    if (was.status === "open" && round.status === "settled" && round.my_prediction) {
+      if (round.my_prediction_correct) { sfx.correct(); haptic([40, 60, 40]); setBurst(Date.now()); }
+      else { sfx.wrong(); haptic(80); }
+    }
+  }, [round.round_id, round.status, round.my_prediction, round.my_punishment_vote, round.my_prediction_correct]);
   useEffect(() => { setPolledAt(Date.now()); }, [round]);
   useEffect(() => {
     if (!round.predict_open) return;
@@ -34,7 +59,8 @@ export function AudienceCard({ round, myUserId, onRound, onToast }: {
 
   const open = round.status === "open";
   const viewer = !!myUserId && !round.is_player;
-  const secs = Math.max(0, Math.ceil((round.predict_ms_left - (Date.now() - polledAt)) / 1000));
+  const predictMs = Math.max(0, round.predict_ms_left - (Date.now() - polledAt));
+  const secs = Math.ceil(predictMs / 1000);
   const sideName = (k: string | null) => round.sides.find((s) => s.key === k)?.label ?? "";
   const totalPred = round.sides.reduce((a, s) => a + (s.predictions ?? 0), 0);
   const maxCheer = Math.max(1, ...round.sides.map((s) => s.cheer));
@@ -56,18 +82,39 @@ export function AudienceCard({ round, myUserId, onRound, onToast }: {
 
   return (
     <div style={{ position: "fixed", right: 12, bottom: 96, zIndex: 85, width: "min(300px, calc(100vw - 24px))", boxSizing: "border-box", background: "rgba(0,0,0,.85)", border: `2px solid ${gold}`, borderRadius: 14, padding: 10, color: "#fff" }}>
+      <Confetti burst={burst} />
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <b style={{ color: gold, fontSize: 13, flex: 1 }}>👥 Audience{round.my_streak > 0 ? ` · 🔥 ${round.my_streak}` : ""}</b>
+        <MuteButton />
         <button onClick={() => fetchPredictionLeaderboard().then(setBoard)} style={{ background: "none", border: "none", color: gold, fontSize: 12, cursor: "pointer" }}>🏅 Top</button>
         <button onClick={() => setCollapsed((c) => !c)} style={{ background: "none", border: "none", color: gold, fontSize: 18, cursor: "pointer" }}>{collapsed ? "+" : "–"}</button>
       </div>
       {!collapsed && (
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 6, fontSize: 12.5 }}>
+          <SceneBanner scene={SCENES.stadium} height={58}>
+            {open && round.predict_open && <div style={{ position: "absolute", left: 5, top: 5 }}><CountdownRing msLeft={predictMs} totalMs={Math.max(predictMs, predictTotal.current.ms)} size={40} /></div>}
+            <div style={{ position: "absolute", left: open && round.predict_open ? 50 : 8, right: 8, bottom: 5, textAlign: "center" }}>
+              <span style={{ display: "inline-block", maxWidth: "100%", background: "rgba(0,0,0,.6)", borderRadius: 999, padding: "2px 10px", fontSize: 12, fontWeight: 900, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", boxSizing: "border-box" }}>
+                {!open ? (round.status === "settled" ? `🏆 ${sideName(round.winner_key)} won!` : "No winner this time")
+                  : round.predict_open ? "🔮 Who wins?" : "📣 Cheer your team!"}
+              </span>
+            </div>
+          </SceneBanner>
+          {round.my_streak >= 2 && (
+            <div className="gs-anim" style={{ textAlign: "center", fontWeight: 900, fontSize: 13, color: "#000", background: "#F0A020", borderRadius: 10, padding: "3px 8px", animation: "gs-pop .8s ease-in-out infinite" }}>🔥 {round.my_streak} right calls in a row!</div>
+          )}
           {/* Predict */}
           {open && round.predict_open && viewer && !round.my_prediction && (
             <div>
               <div style={{ fontWeight: 700, marginBottom: 4 }}>🔮 Who wins? <span style={{ opacity: 0.7, fontWeight: 400 }}>({secs}s · free)</span></div>
-              <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>{round.sides.map((s) => <span key={s.key}>{pill(s.label, () => run(predictBattle(myUserId!, round.round_id, s.key), "🔮 Prediction locked in!"))}</span>)}</div>
+              <div style={{ display: "grid", gridTemplateColumns: round.sides.length === 1 ? "1fr" : "1fr 1fr", gap: 6 }}>
+                {round.sides.map((s, i) => (
+                  <button key={s.key} onClick={() => run(predictBattle(myUserId!, round.round_id, s.key), "🔮 Prediction locked in!")}
+                          style={{ minHeight: 44, minWidth: 0, padding: "6px 8px", borderRadius: 11, border: "3px solid transparent", background: BOX_COLORS[i % BOX_COLORS.length], color: "#fff", cursor: "pointer", textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <span style={boxText}>{s.label}</span>
+                  </button>
+                ))}
+              </div>
             </div>
           )}
           {round.my_prediction && open && <div>🔮 You picked <b style={{ color: gold }}>{sideName(round.my_prediction)}</b></div>}
@@ -99,13 +146,17 @@ export function AudienceCard({ round, myUserId, onRound, onToast }: {
           {round.punishments.length > 0 && open && (
             <div>
               <div style={{ fontWeight: 700, marginBottom: 4 }}>😜 Loser's forfeit — {viewer ? "vote!" : "the room is voting"}</div>
-              {round.punishments.map((p, i) => (
-                <button key={i} disabled={!viewer} onClick={() => run(votePunishment(myUserId!, round.round_id, i))}
-                        style={{ display: "flex", width: "100%", gap: 6, alignItems: "center", textAlign: "left", marginBottom: 4, padding: "6px 8px", borderRadius: 8, fontSize: 12, cursor: viewer ? "pointer" : "default",
-                                 color: "#fff", background: round.my_punishment_vote === i ? "rgba(240,196,32,.25)" : "rgba(255,255,255,.06)", border: `1px solid ${round.my_punishment_vote === i ? gold : "rgba(240,196,32,.35)"}` }}>
-                  <span style={{ flex: 1 }}>{p.text}</span><b style={{ color: gold }}>{p.votes}</b>
-                </button>
-              ))}
+              {round.punishments.map((p, i) => {
+                const mine = round.my_punishment_vote === i;
+                return (
+                  <button key={i} disabled={!viewer} onClick={() => run(votePunishment(myUserId!, round.round_id, i))}
+                          style={{ display: "flex", width: "100%", gap: 6, alignItems: "center", textAlign: "left", marginBottom: 5, padding: "7px 9px", borderRadius: 11, cursor: viewer ? "pointer" : "default", boxSizing: "border-box",
+                                   color: "#fff", background: BOX_COLORS[(i + 4) % BOX_COLORS.length], border: `3px solid ${mine ? "#fff" : "transparent"}` }}>
+                    <span style={{ flex: 1, minWidth: 0, fontSize: 12.5, fontWeight: 800, textShadow: "0 1px 2px rgba(0,0,0,.4)", overflowWrap: "anywhere" }}>{mine ? "⭐ " : ""}{p.text}</span>
+                    <b style={{ fontVariantNumeric: "tabular-nums", background: "rgba(0,0,0,.3)", borderRadius: 999, padding: "1px 7px", fontSize: 12 }}>{p.votes}</b>
+                  </button>
+                );
+              })}
             </div>
           )}
           {/* Result */}
