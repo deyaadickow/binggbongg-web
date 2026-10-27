@@ -4,7 +4,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { LiveTile } from "../lib/live";
 import type { PyramidGame, PyramidPlayer, PyramidTiers } from "../lib/pyramid";
-import { Confetti, CountdownRing, MuteButton, Podium, SceneBanner } from "./GameShow";
+import { Confetti, CountdownRing, MuteButton, Podium, SceneBanner, SceneChips, firstName } from "./GameShow";
 import { SCENES } from "../lib/gameSceneData";
 import { haptic, sfx } from "../lib/gameSounds";
 
@@ -18,6 +18,16 @@ function ColumnScreen({ tile }: { tile: LiveTile }) {
   const ref = useRef<HTMLVideoElement>(null);
   useEffect(() => { const el = ref.current; if (!el) return; return tile.attach(el); }, [tile]);
   return <video ref={ref} autoPlay playsInline muted style={{ width: 66, height: 88, objectFit: "cover", borderRadius: 8, background: "#000", border: `2px solid ${gold}`, marginBottom: 3, transform: tile.isLocal ? "scaleX(-1)" : undefined }} />;
+}
+
+/** Highest pyramid first: Money Bags, then Puppies, Fires, Hearts, Flowers — the phones' order. */
+const byHeight = (a: PyramidPlayer, b: PyramidPlayer) =>
+  b.tiers.bags - a.tiers.bags || b.tiers.puppies - a.tiers.puppies || b.tiers.fires - a.tiers.fires || b.tiers.hearts - a.tiers.hearts || b.tiers.flowers - a.tiers.flowers;
+
+/** The phones' podium value: a player's top two filled tiers, e.g. "🔥1 ❤️3". */
+function topTiers(t: PyramidTiers) {
+  return ([["💰", t.bags], ["🐶", t.puppies], ["🔥", t.fires], ["❤️", t.hearts], ["🌹", t.flowers]] as [string, number][])
+    .filter(([, n]) => n > 0).slice(0, 2).map(([e, n]) => `${e}${n}`).join(" ") || "—";
 }
 
 function compact(n: number) {
@@ -40,9 +50,9 @@ export function PyramidOverlay({ game, myUserId, onSend, onEnd, onClose, tileFor
   const active = game.status === "active";
   const winner = game.players.find((p) => p.user_id === game.winner_user_id);
 
-  // Game Show (Steve, 2026-10-27): every gift tier has its own sound — higher tiers louder — and
-  // the circle that went up pops; the end gets a fanfare, confetti and a podium. Fired on CHANGES
-  // between polls only: the ref holds what the last poll said.
+  // Game Show (Steve, 2026-10-27): every gift tier has its own sound — the phones' mapping, higher
+  // tiers bigger — and the circle that went up pops; a Money Bag and the end get a fanfare and
+  // confetti, and the end a podium. Fired on CHANGES between polls only: the ref holds the last poll.
   const [popped, setPopped] = useState<Set<string>>(() => new Set());
   const [burst, setBurst] = useState(0);
   const popTimer = useRef<number | undefined>(undefined);
@@ -67,17 +77,22 @@ export function PyramidOverlay({ game, myUserId, onSend, onEnd, onClose, tileFor
       popTimer.current = window.setTimeout(() => setPopped(new Set()), 1200);
     }
     if (was.status === "active" && game.status !== "active") {
-      if (game.winner_user_id !== null) { sfx.fanfare(); setBurst(Date.now()); }
+      sfx.fanfare(); haptic([40, 60, 40]); setBurst(Date.now());
       return;
     }
-    // 🌹 a click · ❤️ two notes · 🔥 🐶 the chime · 💰 the chime and a buzz.
-    if (top === 0) sfx.lock();
-    else if (top === 1) sfx.reveal();
-    else if (top >= 2) { sfx.correct(); if (top === 4) haptic([40, 60, 40]); }
+    // The phones' mapping: 🌹 a tick · ❤️ a click · 🔥 two notes · 🐶 the chime · 💰 a fanfare + confetti.
+    if (top === 0) sfx.tick();
+    else if (top === 1) sfx.lock();
+    else if (top === 2) sfx.reveal();
+    else if (top === 3) sfx.correct();
+    else if (top === 4) { sfx.fanfare(); setBurst(Date.now()); }
   }, [game]);
-  const podium = active ? [] : [...game.players].filter((p) => p.flowers_total > 0)
-    .sort((a, b) => (Number(b.user_id === game.winner_user_id) - Number(a.user_id === game.winner_user_id)) || b.flowers_total - a.flowers_total)
-    .slice(0, 3).map((p) => ({ name: p.name, value: `${compact(p.flowers_total)} 🌹` }));
+  const ranked = [...game.players].sort(byHeight);
+  // Whenever there's a winner, even playing alone: the winner, then the rest by pyramid height.
+  const podium = !active && winner
+    ? [winner, ...ranked.filter((p) => p.user_id !== winner.user_id)].slice(0, 3).map((p) => ({ name: p.name, value: topTiers(p.tiers) }))
+    : [];
+  const leader = ranked[0] && TIERS.some((t) => ranked[0].tiers[t] > 0) ? ranked[0] : null;
 
   const circle = (emoji: string, n: number, pop = false) => (
     <div className="gs-anim" style={{ width: 46, height: 46, borderRadius: "50%", border: `2px solid ${n > 0 ? gold : "rgba(212,175,55,.4)"}`, background: pop ? "rgba(240,196,32,.35)" : "rgba(0,0,0,.6)",
@@ -126,14 +141,9 @@ export function PyramidOverlay({ game, myUserId, onSend, onEnd, onClose, tileFor
         <>
           <div style={{ marginTop: 6 }}>
             <SceneBanner scene={SCENES.garden} height={54}>
-              {active && <div style={{ position: "absolute", left: 5, top: 5 }}><CountdownRing msLeft={left * 1000} totalMs={Math.max(left, game.duration_minutes * 60) * 1000} size={44} /></div>}
-              {!active && (
-                <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "rgba(0,0,0,.3)", padding: "0 8px" }}>
-                  <span className="gs-anim" style={{ maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: 14, fontWeight: 900, textShadow: "0 2px 4px #000", animation: winner ? "gs-pop .8s ease-in-out 3" : "none" }}>
-                    {winner ? `👑 ${winner.name}` : "🏁 Finished"}
-                  </span>
-                </div>
-              )}
+              {active && <div style={{ position: "absolute", left: 5, top: 5, zIndex: 3 }}><CountdownRing msLeft={left * 1000} totalMs={Math.max(left, game.duration_minutes * 60) * 1000} size={44} /></div>}
+              <SceneChips bottomRight={active && leader ? [[`👑 ${firstName(leader.name)}`, true]] : []}
+                          centre={active ? null : winner ? `🏆 ${firstName(winner.name)} wins!` : "🏁 Game over"} pop={!!winner} />
             </SceneBanner>
           </div>
           <div style={{ fontSize: 10.5, opacity: 0.9, maxWidth: Math.max(game.players.length * 78, 200), margin: "2px 0 4px" }}>
@@ -141,7 +151,7 @@ export function PyramidOverlay({ game, myUserId, onSend, onEnd, onClose, tileFor
               : winner ? `🏆 ${winner.name} wins${game.reached_top ? " — the pyramid is full!" : "!"}` : "No Flowers this game."}
           </div>
           <div style={{ display: "flex", gap: 4 }}>{game.players.map(column)}</div>
-          {podium.length > 1 && <Podium rows={podium} />}
+          {podium.length > 0 && <Podium rows={podium} />}
         </>
       )}
     </div>
