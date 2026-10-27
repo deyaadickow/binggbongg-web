@@ -32,6 +32,7 @@ export const cheerBattle = (userId: number, roundId: number, taps: number) => ac
 export const votePunishment = (userId: number, roundId: number, choice: number) => act("votePunishment", { user_id: userId, round_id: roundId, choice });
 
 export async function fetchPredictionLeaderboard(): Promise<PredictorRow[]> {
-  const res = await post<PredictorRow[]>("fetchPredictionLeaderboard", {});
+  // Never an empty body: the host's WAF answers an empty-body POST with a 403.
+  const res = await post<PredictorRow[]>("fetchPredictionLeaderboard", { limit: 50 });
   return res.status && Array.isArray(res.data) ? res.data : [];
 }
