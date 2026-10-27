@@ -37,7 +37,7 @@ export function Overlay({ title, children, onClose, width = 440, back = false }:
 
 export type BattleKind =
   | "1v1" | "gameLimit" | "virtual" | "series" | "2v2" | "marathon" | "555" | "solo" | "hideSeek"
-  | "bingo" | "bingoBoard" | "pyramid" | "checkers" | "chess" | "fourinarow" | "reversi" | "mancala" | "trivia"
+  | "bingo" | "bingoBoard" | "pyramid" | "checkers" | "chess" | "fourinarow" | "reversi" | "mancala" | "trivia" | "guess"
   // Android numbers this one #5 and it belongs between Best Out Of and 5-5-5. It isn't a battle
   // you start against someone in the room — it's a personal 31-day streak you opt into — so it
   // needs no people on screen.
@@ -107,6 +107,10 @@ export const BATTLE_KINDS: {
     info: "mancala_battle_info" },
   { kind: "trivia", number: "#18", title: "trivia_battle", blurb: "trivia_battle_blurb", minPeople: 1,
     info: "trivia_battle_info" },
+  // Steve, 2026-10-27: the room guesses what happens on the host's camera — one paid guess each,
+  // the coins to the host, and a right guess wins recognition only (never coins).
+  { kind: "guess", number: "#19", title: "guess_games", blurb: "guess_games_blurb", minPeople: 1,
+    info: "guess_games_info" },
   // Unnumbered from here down, exactly as on the phones: these aren't battles you can start, so
   // they carry no "#n" and never check how many people are on screen.
   { kind: "pkContests", title: "pk_battle_contests", blurb: "admin_run_scored_by_gift_coins", minPeople: 1, reference: true,

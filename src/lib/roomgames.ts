@@ -9,10 +9,11 @@ import { normalise as normPyramid, type PyramidGame } from "./pyramid";
 import { normalise as normBoard, type BoardGame } from "./boardgame";
 import { norm as normTrivia, type TriviaGame } from "./trivia";
 import { norm as normAudience, type AudienceRound } from "./audience";
+import { norm as normGuess, type GuessGame } from "./guess";
 
 export type RoomGames = {
   bingo: BingoGame | null; pyramid: PyramidGame | null; board: BoardGame | null;
-  trivia: TriviaGame | null; audience: AudienceRound | null; nextPollMs: number;
+  trivia: TriviaGame | null; audience: AudienceRound | null; guess: GuessGame | null; nextPollMs: number;
 };
 
 export async function fetchRoomGames(roomName: string, myUserId: number | null): Promise<RoomGames | null> {
@@ -27,6 +28,7 @@ export async function fetchRoomGames(roomName: string, myUserId: number | null):
     board: normBoard(d.board),
     trivia: normTrivia(d.trivia),
     audience: normAudience(d.audience),
+    guess: normGuess(d.guess),
     nextPollMs: Math.max(1000, Number(d.next_poll_ms) || 10000),
   };
 }
