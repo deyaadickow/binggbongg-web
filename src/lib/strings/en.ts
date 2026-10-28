@@ -1517,7 +1517,7 @@ export const en = {
   guess_games_info: "Pick one of 75 ready-made games (gumballs in a jar, which toy car wins, how long to get to work…) or write your own, and choose 1 to 4 players if you like. Everyone watching gets ONE guess at your price, 1 to 25 coins — the coins come to you — and can change it for free until guessing closes. Then do it on camera and enter what really happened: the closest guesses win. For fun only: a right guess wins bragging rights, a streak and a place on Top Guessers, never coins.",
   trivia_battle: "Trivia",
   trivia_battle_blurb: "10 questions — beat someone, the computer or the room",
-  trivia_battle_info: "10 questions, 15 seconds each. A right answer scores 10 points, plus up to 5 for answering fast — the most points wins. Play another member, play the computer (Easy, Medium or Hard), or play the audience: everyone watching votes for an answer and the most-voted answer is theirs. Viewers buy a player lifelines at your prices — 50/50 (two wrong answers disappear, for that player only) and +10 seconds; the coins go to that player, and every vote's coins go to the host.",
+  trivia_battle_info: "10 questions, 20 seconds each. A right answer scores 10 points, plus up to 5 for answering fast — the most points wins. Play another member, play the computer (Easy, Medium or Hard), or play the audience: everyone watching votes for an answer and the most-voted answer is theirs. Viewers buy a player lifelines at your prices — 50/50 (two wrong answers disappear, for that player only) and +10 seconds; the coins go to that player, and every vote's coins go to the host.",
   four_in_a_row_battle: "Four in a Row",
   reversi_battle: "Reversi",
   mancala_battle: "Mancala",

@@ -6,6 +6,7 @@ import type { LiveTile } from "../lib/live";
 import type { TriviaGame, TriviaMode, TriviaPlayer, TriviaStart } from "../lib/trivia";
 import { Confetti, CountdownRing, MuteButton, Podium, SceneBanner, SceneChips, firstName, sceneForTrivia } from "./GameShow";
 import { haptic, sfx } from "../lib/gameSounds";
+import { tt } from "../lib/i18n";
 
 const gold = "var(--gold, #F0C420)";
 const LETTERS = ["A", "B", "C", "D"];
@@ -144,7 +145,11 @@ export function TriviaOverlay({ game, myUserId, tileFor, onAnswer, onBuy, onEnd,
   // The winner's score first: "🏆 Maria wins 44 – 20!"
   if (!active) status = game.status === "cancelled" ? "Game ended — no winner." : game.result === "draw" ? "It's a draw!" : `🏆 ${winner?.name ?? ""} wins ${winner?.score ?? 0} – ${loser?.score ?? 0}!`;
   else if (drumroll) status = "🥁 And the answer is…";
-  else if (!asking && r) status = `The answer: ${r.right_answer ?? game.options[r.correct]}`;
+  else if (!asking && r) {
+    // The reveal holds 10s now; ms_left during it is the time to the next question.
+    const next = Math.max(1, Math.ceil((game.ms_left - since) / 1000));
+    status = `The answer: ${r.right_answer ?? game.options[r.correct]}${game.q_number < game.q_count ? ` · ${tt("quiz_next_question_in", next)}` : ""}`;
+  }
   else if (canAnswer) status = "Pick your answer!";
   else if (me && game.my_answer !== null) status = "Answer locked in — waiting for the other side…";
   else if (iVote) status = `Vote for the audience's answer — ${game.prices.vote} coins a vote.`;
