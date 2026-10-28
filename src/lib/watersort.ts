@@ -110,18 +110,18 @@ export type WaterLevel = { n: number; colours: number; bottles: Bottle[]; attemp
 
 /** Level n, identical on every platform:
  *  1. rand = mulberry32(n * 7919 + 13); C = coloursForLevel(n).
- *  2. list = [0,0,0,0, 1,1,1,1, ... C-1 x4] — filled ONCE.
+ *  2. list = [0,0,0,0, 1,1,1,1, ... C-1 x4] — REFILLED fresh for every deal (same as Android and iOS).
  *  3. Fisher-Yates the list IN PLACE: for i = len-1 down to 1, j = floor(rand() * (i+1)), swap.
  *  4. Deal: bottle k = list[4k..4k+3], index 0 = bottom; then 2 empty bottles.
- *  5. If any dealt bottle is already complete, or solvable() says no, go back to 3 — shuffling
- *     the SAME (already shuffled) list again, the PRNG carrying on where it was. */
+ *  5. If any dealt bottle is already complete, or solvable() says no, go back to 2 — a fresh list,
+ *     the PRNG carrying on where it was (level 274 is the first that needs a second deal). */
 export function generateLevel(n: number): WaterLevel {
   const level = Math.max(1, Math.floor(n));
   const rand = mulberry32(level * 7919 + 13);
   const colours = coloursForLevel(level);
-  const list: number[] = [];
-  for (let c = 0; c < colours; c++) for (let k = 0; k < CAPACITY; k++) list.push(c);
   for (let attempt = 1; ; attempt++) {
+    const list: number[] = [];
+    for (let c = 0; c < colours; c++) for (let k = 0; k < CAPACITY; k++) list.push(c);
     for (let i = list.length - 1; i >= 1; i--) {
       const j = Math.floor(rand() * (i + 1));
       const t = list[i]; list[i] = list[j]; list[j] = t;
