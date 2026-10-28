@@ -21,6 +21,7 @@ import { HelpListPage, HelpCampaignPage, StartHelpPage } from "./pages/HelpPages
 import { HomePage } from "./pages/HomePage";
 import { LanguagePage } from "./pages/LanguagePage";
 import { FeaturesPage } from "./pages/FeaturesPage";
+import { ReferralProgramPage } from "./pages/ReferralProgramPage";
 import { FeaturedContestPage } from "./pages/FeaturedContestPage";
 import { ExcitingNewsPage } from "./pages/ExcitingNewsPage";
 import { BusinessPage, BusinessTabPage, CreateBusinessPage, MyBusinessesPage } from "./pages/BusinessPages";
@@ -171,6 +172,7 @@ export default function App() {
           <Route path="/settings/language" element={<LanguagePage />} />
           {/* The feature directory (Steve, 2026-10-18) — one tile per feature, grouped. */}
           <Route path="/features" element={<FeaturesPage />} />
+          <Route path="/referral-program" element={<ReferralProgramPage />} />
           {/* The member's own notepad (Steve, 2026-10-19). */}
           <Route path="/settings/todo" element={<ToDoListPage />} />
           <Route path="/settings/vault" element={<VaultPage />} />

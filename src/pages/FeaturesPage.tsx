@@ -126,6 +126,7 @@ const FEATURES: Section[] = [
       { icon: "💳", nameKey: "fname_purchase_coins", blurbKey: "fblurb_purchase_coins", to: "/wallet" },
       { icon: "💸", nameKey: "fname_getting_paid_out", blurbKey: "fblurb_getting_paid_out", to: "/wallet/redeem" },
       { icon: "📅", nameKey: "fname_monthly_statement", blurbKey: "fblurb_monthly_statement", to: "/wallet/statements" },
+      { icon: "💸", nameKey: "fname_referral_program", blurbKey: "fblurb_referral_program", to: "/referral-program" },
       { icon: "🤝", nameKey: "fname_share_earn_10", blurbKey: "fblurb_share_earn_10", to: "/settings/referrals" },
       { icon: "💝", nameKey: "fname_who_supported_me", blurbKey: "fblurb_who_supported_me", to: "/support" },
       { icon: "🏪", nameKey: "fname_bingg_bongg_shop", blurbKey: "fblurb_bingg_bongg_shop", to: "/shop" },
