@@ -23,8 +23,8 @@ import { type AudienceRound } from "../lib/audience";
 import { fetchRoomGames } from "../lib/roomgames";
 import { AudienceCard } from "../components/AudienceCard";
 import { GuessCard, GuessStartDialog } from "../components/GuessGame";
-import { TriviaNightPanel, TriviaNightStartDialog } from "../components/TriviaNight";
-import { answerTriviaNight, endTriviaNight, pauseTriviaNight, startTriviaNight, type TriviaNight } from "../lib/trivianight";
+import { QuizGamesPicker, TriviaNightPanel } from "../components/TriviaNight";
+import { answerTriviaNight, endTriviaNight, startTriviaNight, type TriviaNight } from "../lib/trivianight";
 import { buyGuess, cancelGuess, changeGuess, lockGuess, resolveGuess, startGuessGame, type GuessGame, type GuessValue } from "../lib/guess";
 import { fetchActiveTapGame, gameTitle, type TapGameType } from "../lib/tapgame";
 import { TapGameOverlay } from "../components/TapGameOverlay";
@@ -578,8 +578,8 @@ export function LiveViewerPage() {
     } finally { triviaNightBusy.current = false; }
   }
   function openTriviaNight() {
-    if (triviaNight && triviaNight.status === "active") { triviaNightClosedId.current = null; setToast("Trivia Night is running — it's on screen."); return; }
-    if (role !== "host") { setToast("Trivia Night isn't running — the host starts it."); return; }
+    if (triviaNight && triviaNight.status === "active") { triviaNightClosedId.current = null; setToast(tt("quiz_is_running")); return; }
+    if (role !== "host") { setToast(tt("quiz_host_starts_it")); return; }
     setTriviaNightStartOpen(true);
   }
 
@@ -1558,27 +1558,35 @@ export function LiveViewerPage() {
         <TriviaNightPanel
           game={triviaNight}
           myUserId={myId}
-          onAnswer={(i) => {
-            if (myId === null) return;
-            const t = triviaNight;
-            void triviaNightAct(() => answerTriviaNight(myId, t, i), t.is_player ? undefined : `🧠 Answer in! (${t.coins_per_answer} coin${t.coins_per_answer === 1 ? "" : "s"})`);
+          onAnswer={async (i) => {
+            // Right or wrong comes back with the payment: the panel shows the celebration or the
+            // "Sorry, this answer is wrong" from it. A refusal (that box again, after a right answer) is a toast.
+            if (myId === null || triviaNightBusy.current) return null;
+            triviaNightBusy.current = true;
+            try {
+              const r = await answerTriviaNight(myId, triviaNight, i);
+              if (r.message) setToast(r.message);
+              if (r.game) applyTriviaNight(r.game);
+              return r;
+            } catch {
+              setToast(tt("quiz_answer_failed"));
+              return null;
+            } finally { triviaNightBusy.current = false; }
           }}
-          onPause={(p) => { if (myId !== null) void triviaNightAct(() => pauseTriviaNight(myId, triviaNight, p), p ? "⏸ Pausing after this question." : "▶ Back on!"); }}
-          onEnd={() => { if (myId !== null) void triviaNightAct(() => endTriviaNight(myId, triviaNight), "Trivia Night ended."); }}
+          onEnd={() => { if (myId !== null) void triviaNightAct(() => endTriviaNight(myId, triviaNight), tt("quiz_ended_toast")); }}
           onClose={() => { triviaNightClosedId.current = triviaNight.trivia_night_id; setTriviaNight({ ...triviaNight }); }}
         />
       )}
       {triviaNightStartOpen && myId !== null && (
-        <TriviaNightStartDialog
-          people={broadcasters.map((b) => ({ userId: b.user_id, name: b.user_id === myId ? `${personName(b)} (you)` : personName(b) }))}
+        <QuizGamesPicker
           onClose={() => setTriviaNightStartOpen(false)}
-          onStart={async (s) => {
-            const { game, message } = await startTriviaNight(myId, roomName, s);
-            if (!game) { setToast(message ?? "Couldn't start Trivia Night."); return; }
+          onStart={async (category) => {
+            const { game, message } = await startTriviaNight(myId, roomName, category);
+            if (!game) { setToast(message ?? tt("quiz_couldnt_start")); return; }
             setTriviaNightStartOpen(false);
             triviaNightClosedId.current = null;
             applyTriviaNight(game);
-            setToast("🧠 Trivia Night is on!");
+            setToast(tt("quiz_is_on"));
           }}
         />
       )}
