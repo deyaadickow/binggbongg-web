@@ -156,6 +156,9 @@ export function WordSearchPanel({ game, myUserId, onFind, onEnd, onClose, onNoti
   const [banner, setBanner] = useState<{ id: number; text: string } | null>(null);
   const [boardOpen, setBoardOpen] = useState(false);
   const busy = useRef(false);
+  // Steve, 2026-10-28: the host may play too (free), or just watch. Remembered on this device.
+  const [hostPlays, setHostPlaysState] = useState(() => { try { return localStorage.getItem("ws_host_plays") !== "0"; } catch { return true; } });
+  const setHostPlays = (v: boolean) => { setHostPlaysState(v); try { localStorage.setItem("ws_host_plays", v ? "1" : "0"); } catch { /* private mode */ } };
   const seen = useRef<Map<string, boolean> | null>(null);
   const prevPhase = useRef(game.phase);
   const lastTick = useRef(-1);
@@ -205,7 +208,7 @@ export function WordSearchPanel({ game, myUserId, onFind, onEnd, onClose, onNoti
   const nextSecs = Math.max(1, Math.ceil(((game.next_ms_left ?? 0) - since) / 1000));
   const secs = Math.ceil(msLeft / 1000);
   if (playing && secs <= 10 && secs > 0 && lastTick.current !== secs) { lastTick.current = secs; sfx.tick(); }
-  const canSwipe = playing && !!myUserId && !game.is_host && msLeft > 0;
+  const canSwipe = playing && !!myUserId && (!game.is_host || hostPlays) && msLeft > 0;
   const price = game.coins_per_letter;
 
   async function swiped(s: Sel) {
@@ -229,7 +232,7 @@ export function WordSearchPanel({ game, myUserId, onFind, onEnd, onClose, onNoti
         const fresh = r.game ?? game;
         const last = fresh.words.every((w) => w.found);
         const extra = last ? t("ws_last_one") : r.found.letters >= 8 ? t("ws_huge_word") : null;
-        setCelebrate({ id: Date.now(), line: t("ws_plus_letters", r.found.word, r.found.letters), extra });
+        setCelebrate({ id: Date.now(), line: game.is_host ? t("ws_host_found", r.found.word) : t("ws_plus_letters", r.found.word, r.found.letters), extra });
       }
     } finally { busy.current = false; setPending(null); }
   }
@@ -241,7 +244,7 @@ export function WordSearchPanel({ game, myUserId, onFind, onEnd, onClose, onNoti
 
   let status = "";
   if (playing) {
-    if (game.is_host) status = t("ws_host_watch");
+    if (game.is_host) status = hostPlays ? t("ws_host_play_line") : t("ws_host_watch");
     else if (!myUserId) status = t("quiz_sign_in_to_play");
     else status = t("ws_swipe_line", t(price === 1 ? "n_coin" : "n_coins", price));
   }
@@ -276,6 +279,15 @@ export function WordSearchPanel({ game, myUserId, onFind, onEnd, onClose, onNoti
                         style={{ flex: "none", padding: "9px 18px", borderRadius: 999, border: "none", background: gold, color: "#000", fontWeight: 900, fontSize: 15, cursor: "pointer" }}>{t("quiz_end_game")}</button>
               )}
             </div>
+          )}
+          {game.is_host && !over && (
+            <label style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, cursor: "pointer", fontWeight: 800, fontSize: 15 }}>
+              <span>{t("ws_playing_too")}</span>
+              <button type="button" role="switch" aria-checked={hostPlays} onClick={() => setHostPlays(!hostPlays)}
+                      style={{ width: 50, height: 28, borderRadius: 999, border: `2px solid ${GOLD}`, padding: 2, cursor: "pointer", background: hostPlays ? GOLD : "transparent", display: "flex", justifyContent: hostPlays ? "flex-end" : "flex-start", transition: "background .2s" }}>
+                <span style={{ width: 20, height: 20, borderRadius: "50%", background: hostPlays ? "#000" : GOLD }} />
+              </button>
+            </label>
           )}
           {status && <div style={{ fontSize: 14, fontWeight: 700, textAlign: "center", opacity: 0.95 }}>{status}</div>}
           {!game.is_host && game.my_points > 0 && !over && (
@@ -327,7 +339,7 @@ export function WordSearchPanel({ game, myUserId, onFind, onEnd, onClose, onNoti
                     <span style={{ flex: 1, minWidth: 0, fontWeight: 900, fontSize: 13.5, letterSpacing: 0.4, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
                       textDecoration: w.found ? "line-through" : "none", color: col ?? "#fff" }}>{w.word}</span>
                     <span style={{ flex: "none", fontSize: 11, fontWeight: 700, opacity: 0.85, whiteSpace: "nowrap", color: col ?? "#fff" }}>
-                      {w.found ? `✓ ${firstName(w.found_by?.name) || ""}` : `${lettersOf(w.word).length}×${price}=${lettersOf(w.word).length * price}`}
+                      {w.found ? `✓ ${w.found_by?.user_id === game.host_user_id ? "👑 " : ""}${firstName(w.found_by?.name) || ""}` : `${lettersOf(w.word).length}×${price}=${lettersOf(w.word).length * price}`}
                     </span>
                   </div>
                 );

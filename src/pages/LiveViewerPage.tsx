@@ -27,7 +27,7 @@ import { GuessCard, GuessStartDialog } from "../components/GuessGame";
 import { QuizGamesPicker, TriviaNightPanel } from "../components/TriviaNight";
 import { answerTriviaNight, endTriviaNight, startTriviaNight, type TriviaNight } from "../lib/trivianight";
 import { WordSearchPanel, WordSearchPicker } from "../components/WordSearch";
-import { endWordSearch, findWord, startWordSearch, type WordSearch } from "../lib/wordsearch";
+import { endWordSearch, findWord, hostFindWord, startWordSearch, type WordSearch } from "../lib/wordsearch";
 import { buyGuess, cancelGuess, changeGuess, lockGuess, resolveGuess, startGuessGame, type GuessGame, type GuessValue } from "../lib/guess";
 import { fetchActiveTapGame, gameTitle, type TapGameType } from "../lib/tapgame";
 import { TapGameOverlay } from "../components/TapGameOverlay";
@@ -1623,7 +1623,8 @@ export function LiveViewerPage() {
             if (myId === null || wordSearchBusy.current) return null;
             wordSearchBusy.current = true;
             try {
-              const r = await findWord(myId, wordSearch, from, to);
+              // The host plays free (hostFindWord); everyone else pays the host per letter.
+              const r = wordSearch.is_host ? await hostFindWord(myId, wordSearch, from, to) : await findWord(myId, wordSearch, from, to);
               if (r.message) setToast(r.message);
               if (r.game) applyWordSearch(r.game);
               return r;

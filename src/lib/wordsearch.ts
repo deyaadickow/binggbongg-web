@@ -31,8 +31,8 @@ export type WordSearch = {
 };
 export type WSFinder = { rank: number; user_id: number; name: string; image: string | null; words: number; letters: number; longest: number };
 
-/** The eight finder colours — the same hexes on Android and iOS. */
-export const WS_COLORS = ["#FF4D6D", "#4DABFF", "#3DDC84", "#FFB020", "#B76BFF", "#00D1C1", "#FF7A3D", "#FF5FD2"];
+/** The eight finder colours — the same hexes on Android and iOS — and [8], the host's own (a dark gold). */
+export const WS_COLORS = ["#FF4D6D", "#4DABFF", "#3DDC84", "#FFB020", "#B76BFF", "#00D1C1", "#FF7A3D", "#FF5FD2", "#B8860B"];
 export const WS_PRICES = [1, 5, 10, 25];
 export const WS_DEFAULT_PRICE = 5;
 export const WS_PUZZLE_MS = 300_000;
@@ -91,6 +91,15 @@ export async function findWord(myUserId: number, game: WordSearch, from: WSCell,
   });
   const f = res.found as WSFindResult["found"] | undefined;
   return { game: res.status ? norm(res.word_search) : null, found: res.status && f ? f : null, message: res.status ? null : (res.message ?? "That didn't go through.") };
+}
+
+/** The host finds a word — free; no points, never on the boards (Steve, 2026-10-28). */
+export async function hostFindWord(myUserId: number, game: WordSearch, from: WSCell, to: WSCell): Promise<WSFindResult> {
+  const res = await post<Record<string, unknown>>("hostFindWord", {
+    user_id: myUserId, word_search_id: game.word_search_id, from_r: from[0], from_c: from[1], to_r: to[0], to_c: to[1],
+  });
+  const f = res.found as WSFindResult["found"] | undefined;
+  return { game: res.status ? norm(res.data) : null, found: res.status && f ? f : null, message: res.status ? null : (res.message ?? "That didn't go through.") };
 }
 
 export async function endWordSearch(userId: number, game: WordSearch) {
