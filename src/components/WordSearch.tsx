@@ -419,7 +419,7 @@ export function WordSearchPicker({ onStart, onClose }: { onStart: (theme: string
     return (
       <button key={key ?? "mix"} type="button" onClick={() => setPicked(key)}
               style={{ minHeight: 78, padding: "8px 6px", borderRadius: 16, cursor: "pointer", color: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4,
-                       background: on ? "rgba(240,196,32,.18)" : "rgba(255,255,255,.07)", border: `2px solid ${on ? GOLD : "rgba(255,255,255,.14)"}`,
+                       background: on ? "rgba(240,196,32,.18)" : "rgba(255,255,255,.07)", border: `2px solid ${on ? GOLD : "rgba(212,175,55,.78)"}`,
                        boxShadow: on ? `0 0 0 3px ${GOLD}, 0 0 16px rgba(240,196,32,.45)` : "none", touchAction: "manipulation", minWidth: 0 }}>
         <span style={{ fontSize: 30, lineHeight: 1 }}>{emoji}</span>
         <span style={{ fontSize: 13.5, fontWeight: 800, lineHeight: 1.2, textAlign: "center", overflowWrap: "anywhere", color: on ? GOLD : "#fff" }}>{label}</span>
@@ -451,7 +451,7 @@ export function WordSearchPicker({ onStart, onClose }: { onStart: (theme: string
           {WS_PRICES.map((p) => (
             <button key={p} type="button" onClick={() => setPrice(p)}
                     style={{ minWidth: 56, padding: "8px 12px", borderRadius: 999, cursor: "pointer", fontWeight: 900, fontSize: 16,
-                             background: price === p ? GOLD : "transparent", color: price === p ? "#000" : "#fff", border: `2px solid ${price === p ? GOLD : "rgba(255,255,255,.3)"}` }}>{p}</button>
+                             background: price === p ? GOLD : "transparent", color: price === p ? "#000" : "#fff", border: `2px solid ${price === p ? GOLD : "rgba(212,175,55,.78)"}` }}>{p}</button>
           ))}
         </div>
         <div style={{ textAlign: "center", fontSize: 12.5, opacity: 0.8, marginTop: 6 }}>{t("ws_price_example", 4 * price)}</div>

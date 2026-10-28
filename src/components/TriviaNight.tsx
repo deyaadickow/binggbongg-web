@@ -227,7 +227,7 @@ export function QuizGamesPicker({ onStart, onClose }: { onStart: (category: stri
     return (
       <button key={key ?? "mix"} type="button" onClick={() => setPicked(key)}
               style={{ minHeight: 84, padding: "10px 8px", borderRadius: 16, cursor: "pointer", color: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4,
-                       background: on ? "rgba(240,196,32,.18)" : "rgba(255,255,255,.07)", border: `2px solid ${on ? "#F0C420" : "rgba(255,255,255,.14)"}`,
+                       background: on ? "rgba(240,196,32,.18)" : "rgba(255,255,255,.07)", border: `2px solid ${on ? "#F0C420" : "rgba(212,175,55,.78)"}`,
                        boxShadow: on ? "0 0 0 3px #F0C420, 0 0 16px rgba(240,196,32,.45)" : "none", touchAction: "manipulation", minWidth: 0 }}>
         <span style={{ fontSize: 32, lineHeight: 1 }}>{emoji}</span>
         <span style={{ fontSize: 14, fontWeight: 800, lineHeight: 1.2, textAlign: "center", overflowWrap: "anywhere", color: on ? "#F0C420" : "#fff" }}>{label}</span>
