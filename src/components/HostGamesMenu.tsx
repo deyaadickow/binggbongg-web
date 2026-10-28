@@ -13,7 +13,11 @@ const MODE_FILTERS = [
   { key: "catch", label: "Catch" },
   { key: "race", label: "Race" },
   { key: "falling_lanes", label: "Balloon Pop" },
+  { key: "puzzles", label: "Puzzles" },
 ] as const;
+
+/** The "Puzzles" tab: the web-playable puzzle engines (not Color Balls — see below). */
+const PUZZLE_MODES = ["one_stroke", "block_escape", "water_sort"];
 
 type ModeFilter = (typeof MODE_FILTERS)[number]["key"];
 
@@ -51,10 +55,12 @@ export function HostGamesMenu({ userId, roomName, activeGame, onClose, onChanged
   }, []);
 
   // Colour Balls (game_mode "puzzle") is a phone puzzle — the web could only play it as a plain
-  // tap game, so the web menu leaves it out (Steve, 2026-10-27).
+  // tap game, so the web menu leaves it out (Steve, 2026-10-27). Water Sort is its OWN mode
+  // ("water_sort") with its own web overlay, so it stays in: only exactly "puzzle" is dropped.
   const playable = (games ?? []).filter((g) => g.game_mode !== "puzzle");
   const shown = playable.filter((g) => {
-    if (mode !== "all" && (g.game_mode ?? "") !== mode) return false;
+    if (mode === "puzzles") { if (!PUZZLE_MODES.includes(g.game_mode ?? "")) return false; }
+    else if (mode !== "all" && (g.game_mode ?? "") !== mode) return false;
     const q = query.trim().toLowerCase();
     if (!q) return true;
     return `${g.display_name ?? ""} ${g.name ?? ""} ${g.catch_name ?? ""}`.toLowerCase().includes(q);

@@ -57,7 +57,35 @@ export const sfx = {
   rattle: () => [0, 40, 70, 115, 150, 200].forEach((at, i) => { noise(30, at, 0.1 + (i % 2) * 0.04); tone(2200 + i * 90, 2000, 12, at, "sine", 0.05); }),
   /** Getting a King: a long ringing bell. */
   ding: () => { tone(1046, 1046, 2200, 0, "sine", 0.22); tone(2092, 2092, 1600, 0, "sine", 0.09); tone(2887, 2887, 1000, 0, "sine", 0.05); tone(523, 523, 2400, 0, "sine", 0.08); },
+  // Water Sort (Steve, 2026-10-27). A pour is a splash of band-passed noise under three rising
+  // "bloops" — the glug of water finding its level; the phones' TapGameSoundPlayer WATER voice.
+  pour: () => {
+    swish(420, 120, 1400, 520);
+    [0, 120, 250].forEach((at, i) => tone(180 + i * 70, 420 + i * 90, 90, at + 40, "sine", 0.16));
+  },
+  /** A bottle filled with one colour: a bright little sparkle run. */
+  sparkle: () => [1568, 2093, 2637, 3136].forEach((f, i) => tone(f, f * 1.01, 260, i * 70, "sine", 0.09)),
+  /** That pour isn't allowed: a short, soft buzz — softer than a wrong answer. */
+  nope: () => { tone(150, 130, 120, 0, "square", 0.045); tone(140, 110, 140, 130, "square", 0.04); },
 };
+
+/** Noise through a band-pass filter whose centre slides f0 -> f1: water, wind, a whoosh. */
+function swish(ms: number, at: number, f0: number, f1: number, gain = 0.2) {
+  const a = audio(); if (!a) return;
+  const t = a.currentTime + at / 1000;
+  const len = Math.floor(a.sampleRate * ms / 1000);
+  const buf = a.createBuffer(1, len, a.sampleRate); const d = buf.getChannelData(0);
+  // A soft attack and a long tail, with a slow wobble so it gurgles rather than hisses.
+  for (let i = 0; i < len; i++) {
+    const x = i / len;
+    d[i] = (Math.random() * 2 - 1) * Math.min(1, x * 12) * (1 - x) * (0.65 + 0.35 * Math.sin(x * 38));
+  }
+  const s = a.createBufferSource(); s.buffer = buf;
+  const f = a.createBiquadFilter(); f.type = "bandpass"; f.Q.value = 6;
+  f.frequency.setValueAtTime(f0, t); f.frequency.exponentialRampToValueAtTime(f1, t + ms / 1000);
+  const g = a.createGain(); g.gain.value = gain;
+  s.connect(f).connect(g).connect(a.destination); s.start(t);
+}
 
 function clack(at: number, loud = 1) {
   noise(12, at, 0.22 * loud);

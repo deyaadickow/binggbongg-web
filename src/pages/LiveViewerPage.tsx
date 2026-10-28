@@ -12,6 +12,7 @@ import { Challenge31Overlay, LifetimeBoardOverlay, PkContestsOverlay, Punishment
 import { BingoBoardOverlay, BingoOverlay, BingoStartDialog, BingoWinnersOverlay } from "../components/BingoOverlay";
 import { OneStrokeOverlay } from "../components/OneStrokeOverlay";
 import { BlockEscapeOverlay } from "../components/BlockEscapeOverlay";
+import { WaterSortOverlay } from "../components/WaterSortOverlay";
 import { BINGO_FALLBACK, bingoClamp, buyBingoSquare, cancelBingoBattle, fetchBingoGame, startBingoBattle, type BingoGame } from "../lib/bingo";
 import { cancelPyramidBattle, fetchPyramidGame, sendPyramidFlowers, startPyramidBattle, type PyramidGame } from "../lib/pyramid";
 import { PyramidOverlay, PyramidStartDialog } from "../components/PyramidOverlay";
@@ -1274,7 +1275,9 @@ export function LiveViewerPage() {
             <div className="card row" style={{ marginTop: 12, padding: "10px 12px" }}>
               <div style={{ flex: 1 }}>
                 <b style={{ color: "var(--gold)" }}>🎮 {gameTitle(activeGame)}</b>
-                <div className="muted" style={{ fontSize: 12 }}>{role === "host" ? "Running in your room — viewers can play now." : "The host started a game. 50 coins to join, and your score becomes a gift to the host."}</div>
+                <div className="muted" style={{ fontSize: 12 }}>{role === "host" ? "Running in your room — viewers can play now."
+                  : activeGame.game_mode === "water_sort" ? "The host started Water Sort. 50 coins to join, then 1 coin a pour — all gifted to the host."
+                  : "The host started a game. 50 coins to join, and your score becomes a gift to the host."}</div>
               </div>
               <button className="btn small" onClick={() => setGameOpen(true)}>{t("play_now")}</button>
             </div>
@@ -1364,6 +1367,10 @@ export function LiveViewerPage() {
           // Steve, 2026-10-12: the sixth engine — drag a block, it slides until something stops
           // it, match it to its own gate to get it out. Its own overlay for the same reason.
           ? <BlockEscapeOverlay onClose={() => setGameOpen(false)} />
+          : activeGame.game_mode === "water_sort"
+          // Steve, 2026-10-27: Water Sort — pour coloured water between glass bottles. Its own
+          // overlay, paid the Color Balls way (50 to start, 1 coin a pour, charged at the end).
+          ? <WaterSortOverlay roomName={roomName} hostName={nameOfId(hostUserId)} isHost={myId !== null && myId === hostUserId} onClose={() => setGameOpen(false)} />
           : <TapGameOverlay game={activeGame} roomName={roomName} onClose={() => setGameOpen(false)} onToast={setToast} />
       )}
       {bingoOpen && bingoGame && myId !== null && (

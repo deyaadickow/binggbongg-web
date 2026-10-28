@@ -13,7 +13,7 @@ export interface TapGameType {
   catch_name?: string;
   emoji?: string;
   name?: string;
-  game_mode?: "catch" | "falling_lanes" | "puzzle" | "race" | "one_stroke" | "block_escape" | string;
+  game_mode?: "catch" | "falling_lanes" | "puzzle" | "race" | "one_stroke" | "block_escape" | "water_sort" | string;
   /** "Water / Fishing", "Races", … — drives the painted scene when there is no uploaded art. */
   category?: string | null;
   coin_value?: number;
@@ -73,6 +73,54 @@ export async function endTapGame(sessionId: number, objectsCaught: number, elaps
   return res.data;
 }
 
+// ---- Move-priced puzzles (Water Sort) -------------------------------------------------------
+// Steve, 2026-10-27. Same endpoints and economy as Color Balls on the phones: 50 coins to start
+// (first-timers agree on the Attention popup), then 1 coin a move, charged ONCE at the end. Same
+// WAF rule as above: the round is sent as tap_game_round_id, never a "session_id" param name.
+
+export interface ColourBallStart {
+  session_id: number;
+  needs_attention_popup: boolean;
+  entry_fee_coins: number;
+  move_cost_coins: number;
+}
+
+export interface ColourBallResult {
+  moves: number;
+  coins_charged: number;
+  host_name?: string | null;
+}
+
+/** CREATE mode: a new round. A returning player is charged the entry fee right here; a
+ *  first-timer comes back with needs_attention_popup and is charged by the confirm below. */
+export async function startColourBallSession(userId: number, roomName: string, gameKey = "water_sort"): Promise<ColourBallStart> {
+  const res = await post<ColourBallStart>("startColourBallSession", { user_id: userId, room_name: roomName, game_key: gameKey });
+  if (!res.status || !res.data) throw new Error(res.message ?? tt("couldn_t_start_the_game"));
+  // Through Number(): a raw row can send a number as a string (the decimal-as-string trap).
+  const d = res.data;
+  return {
+    session_id: Number(d.session_id),
+    needs_attention_popup: !!d.needs_attention_popup,
+    entry_fee_coins: Number(d.entry_fee_coins ?? 50),
+    move_cost_coins: Number(d.move_cost_coins ?? 1),
+  };
+}
+
+/** CONFIRM mode — the first-timer's AGREE on the Attention popup. Sending tap_game_round_id is
+ *  what selects it. */
+export async function confirmColourBallEntryFee(userId: number, roundId: number): Promise<void> {
+  const res = await post("startColourBallSession", { user_id: userId, tap_game_round_id: roundId });
+  if (!res.status) throw new Error(res.message ?? tt("couldn_t_charge_the_entry_fee"));
+}
+
+/** Once, when the player finishes (solved or not): the server charges moves x move cost, capped at
+ *  the wallet, and a retry returns the same frozen result rather than charging twice. */
+export async function endColourBallSession(roundId: number, moves: number): Promise<ColourBallResult> {
+  const res = await post<ColourBallResult>("endColourBallSession", { tap_game_round_id: roundId, moves: Math.max(0, Math.floor(moves)) });
+  if (!res.status || !res.data) throw new Error(res.message ?? tt("couldn_t_finish_the_game"));
+  return { moves: Number(res.data.moves), coins_charged: Number(res.data.coins_charged), host_name: res.data.host_name ?? null };
+}
+
 export async function giftTapGameScore(userId: number, sessionId: number): Promise<string> {
   const res = await post("giftTapGameScore", { user_id: userId, tap_game_round_id: sessionId });
   if (!res.status) throw new Error(res.message ?? tt("couldn_t_gift_those_coins"));
@@ -107,6 +155,8 @@ export function gameTitleWithRate(g: TapGameType): string {
   const n = Number(g.coin_value ?? 0);
   // A race pays one coin a tap, whatever the host picked — the phones' header says so.
   if (g.game_mode === "race") return `${gameTitle(g)}, 1 Coin Per Tap`;
+  // Water Sort charges per pour, not per catch — its coin_value is 0 by design.
+  if (g.game_mode === "water_sort") return `${gameTitle(g)}, 1 Coin Per Pour`;
   if (!(n > 0) || g.game_mode === "puzzle") return gameTitle(g);
   const unit = g.game_mode === "falling_lanes" ? "Pop" : "Catch";
   return `${gameTitle(g)}, ${n % 1 === 0 ? n : n.toFixed(2)} Coin${n === 1 ? "" : "s"} Per ${unit}`;
@@ -121,7 +171,7 @@ export const GAME_COIN_VALUES = [1, 2, 3, 4, 5] as const;
 
 /** Game modes with no length to pick: a puzzle has no clock, a race ends at the finish line. */
 export function needsDuration(g: TapGameType): boolean {
-  return !["puzzle", "race", "one_stroke", "block_escape"].includes(g.game_mode ?? "");
+  return !["puzzle", "race", "one_stroke", "block_escape", "water_sort"].includes(g.game_mode ?? "");
 }
 
 /** Only catch/pop games score per object, so only they take a host-chosen coin value. */
