@@ -26,6 +26,8 @@ import { AudienceCard } from "../components/AudienceCard";
 import { GuessCard, GuessStartDialog } from "../components/GuessGame";
 import { QuizGamesPicker, TriviaNightPanel } from "../components/TriviaNight";
 import { answerTriviaNight, endTriviaNight, startTriviaNight, type TriviaNight } from "../lib/trivianight";
+import { WordSearchPanel, WordSearchPicker } from "../components/WordSearch";
+import { endWordSearch, findWord, startWordSearch, type WordSearch } from "../lib/wordsearch";
 import { buyGuess, cancelGuess, changeGuess, lockGuess, resolveGuess, startGuessGame, type GuessGame, type GuessValue } from "../lib/guess";
 import { fetchActiveTapGame, gameTitle, type TapGameType } from "../lib/tapgame";
 import { TapGameOverlay } from "../components/TapGameOverlay";
@@ -254,6 +256,10 @@ export function LiveViewerPage() {
   const [triviaNightStartOpen, setTriviaNightStartOpen] = useState(false);
   const triviaNightClosedId = useRef<number | null>(null);
   const triviaNightBusy = useRef(false);
+  const [wordSearch, setWordSearch] = useState<WordSearch | null>(null);
+  const [wordSearchStartOpen, setWordSearchStartOpen] = useState(false);
+  const wordSearchClosedId = useRef<number | null>(null);
+  const wordSearchBusy = useRef(false);
 
   // Guessing Games (Steve, 2026-10-27) — arrives with the room's one combined poll.
   const [guess, setGuess] = useState<GuessGame | null>(null);
@@ -584,6 +590,15 @@ export function LiveViewerPage() {
     setTriviaNightStartOpen(true);
   }
 
+  function applyWordSearch(fresh: WordSearch | null) {
+    setWordSearch(fresh);
+  }
+  function openWordSearch() {
+    if (wordSearch && wordSearch.status === "active") { wordSearchClosedId.current = null; setToast(tt("ws_is_running")); return; }
+    if (role !== "host") { setToast(tt("ws_host_starts_it")); return; }
+    setWordSearchStartOpen(true);
+  }
+
   function applyAudience(r: AudienceRound | null) {
     // A finished round stays up for a minute so everyone sees the result and the forfeit.
     if (r && r.status === "open") audienceSeenAt.current = Date.now();
@@ -594,8 +609,8 @@ export function LiveViewerPage() {
   // request") — it used to be five polls per viewer. The server says when to ask again: 1.5s
   // while a board game or Trivia runs, 3s for Bingo / Pyramid / an audience card, 10s when idle.
   // The apply functions sit in a ref so the loop always calls the latest render's closures.
-  const roomApply = useRef({ applyBingo, applyPyramid, applyBoard, applyTrivia, applyAudience, applyGuess, applyTriviaNight });
-  roomApply.current = { applyBingo, applyPyramid, applyBoard, applyTrivia, applyAudience, applyGuess, applyTriviaNight };
+  const roomApply = useRef({ applyBingo, applyPyramid, applyBoard, applyTrivia, applyAudience, applyGuess, applyTriviaNight, applyWordSearch });
+  roomApply.current = { applyBingo, applyPyramid, applyBoard, applyTrivia, applyAudience, applyGuess, applyTriviaNight, applyWordSearch };
   useEffect(() => {
     if (!roomName) return;
     let alive = true;
@@ -607,7 +622,7 @@ export function LiveViewerPage() {
         if (!alive) return;
         if (g) {
           const a = roomApply.current;
-          a.applyBingo(g.bingo); a.applyPyramid(g.pyramid); a.applyBoard(g.board); a.applyTrivia(g.trivia); a.applyAudience(g.audience); a.applyGuess(g.guess); a.applyTriviaNight(g.triviaNight);
+          a.applyBingo(g.bingo); a.applyPyramid(g.pyramid); a.applyBoard(g.board); a.applyTrivia(g.trivia); a.applyAudience(g.audience); a.applyGuess(g.guess); a.applyTriviaNight(g.triviaNight); a.applyWordSearch(g.wordSearch);
           wait = g.nextPollMs;
         }
       } catch { wait = 5000; /* keep the last good state; try again shortly */ }
@@ -1597,6 +1612,48 @@ export function LiveViewerPage() {
           }}
         />
       )}
+      {wordSearch && wordSearchClosedId.current !== wordSearch.word_search_id && (
+        <WordSearchPanel
+          game={wordSearch}
+          myUserId={myId}
+          onNotice={setToast}
+          onFind={async (from, to) => {
+            // The server prices the find and claims the word; a refusal (taken a moment ago, not
+            // enough coins) is a toast.
+            if (myId === null || wordSearchBusy.current) return null;
+            wordSearchBusy.current = true;
+            try {
+              const r = await findWord(myId, wordSearch, from, to);
+              if (r.message) setToast(r.message);
+              if (r.game) applyWordSearch(r.game);
+              return r;
+            } catch {
+              setToast(tt("ws_find_failed"));
+              return null;
+            } finally { wordSearchBusy.current = false; }
+          }}
+          onEnd={async () => {
+            if (myId === null) return;
+            const { game, message } = await endWordSearch(myId, wordSearch);
+            setToast(message ?? tt("ws_ended_toast"));
+            if (game) applyWordSearch(game);
+          }}
+          onClose={() => { wordSearchClosedId.current = wordSearch.word_search_id; setWordSearch({ ...wordSearch }); }}
+        />
+      )}
+      {wordSearchStartOpen && myId !== null && (
+        <WordSearchPicker
+          onClose={() => setWordSearchStartOpen(false)}
+          onStart={async (theme, price) => {
+            const { game, message } = await startWordSearch(myId, roomName, theme, price);
+            if (game) applyWordSearch(game);
+            if (!game || message) { setToast(message ?? tt("ws_couldnt_start")); if (!game) return; }
+            setWordSearchStartOpen(false);
+            wordSearchClosedId.current = null;
+            if (!message) setToast(tt("ws_is_on"));
+          }}
+        />
+      )}
       {guessStartOpen && myId !== null && (
         <GuessStartDialog
           people={broadcasters.map((b) => ({ userId: b.user_id, name: b.user_id === myId ? `${personName(b)} (you)` : personName(b) }))}
@@ -1643,6 +1700,7 @@ export function LiveViewerPage() {
           else if (k === "trivia") openTrivia();
           else if (k === "guess") openGuess();
           else if (k === "trivianight") openTriviaNight();
+          else if (k === "wordsearch") openWordSearch();
           else if (k === "bingoBoard") setBingoBoardOpen(true);
           // The 31-day challenge and the three reference rows open their own overlay off the
           // same `picker` state — they start nothing, so they need no people-picker step.

@@ -17,7 +17,9 @@ export type CelebrationEffect = (typeof CELEBRATION_EFFECTS)[number];
 const CHEERS: StringKey[] = ["quiz_cheer_1", "quiz_cheer_2", "quiz_cheer_3", "quiz_cheer_4", "quiz_cheer_5", "quiz_cheer_6", "quiz_cheer_7", "quiz_cheer_8", "quiz_cheer_9", "quiz_cheer_10"];
 
 /** One show: `id` changes for every right answer (Date.now() is fine). */
-export type CelebrationShow = { id: number; streak?: number; points?: number | null; effect?: number; message?: number };
+export type CelebrationShow = { id: number; streak?: number; points?: number | null; effect?: number; message?: number;
+  /** A line of its own under the cheer, e.g. Word Search's "CRIB +4 points"; `extra` a pill under that ("🔥 HUGE WORD!"). */
+  line?: string | null; extra?: string | null };
 
 const CELEBRATE_MS = 2800;
 const WRONG_MS = 2200;
@@ -184,6 +186,13 @@ export function Celebration({ show, durationMs = CELEBRATE_MS, silent }: { show:
           animation: live.reduced ? "cel-msgfade .4s ease both" : "cel-msg .6s cubic-bezier(.2,.9,.3,1.3) .05s both" }}>{t(CHEERS[live.message])}</div>
         {show.points != null && show.points > 0 && (
           <div style={{ fontSize: 24, fontWeight: 900, color: "#fff", textShadow: "0 2px 6px #000", animation: "cel-msgfade .4s ease .35s both" }}>{t("quiz_plus_points", show.points)}</div>
+        )}
+        {show.line && (
+          <div style={{ fontSize: 26, fontWeight: 900, color: "#fff", letterSpacing: 0.5, textShadow: "0 2px 6px #000, 0 0 14px rgba(0,0,0,.8)", animation: "cel-msgfade .4s ease .3s both" }}>{show.line}</div>
+        )}
+        {show.extra && (
+          <div style={{ fontSize: 19, fontWeight: 900, color: "#000", background: "#F0A020", borderRadius: 999, padding: "5px 14px", boxShadow: "0 3px 10px rgba(0,0,0,.6)",
+            animation: live.reduced ? "cel-msgfade .4s ease .3s both" : "cel-msg .5s cubic-bezier(.2,.9,.3,1.3) .4s both" }}>{show.extra}</div>
         )}
         {streak >= 3 && (
           <div style={{ fontSize: 19, fontWeight: 900, color: "#000", background: "#F0A020", borderRadius: 999, padding: "5px 14px", boxShadow: "0 3px 10px rgba(0,0,0,.6)",

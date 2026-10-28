@@ -11,10 +11,12 @@ import { norm as normTrivia, type TriviaGame } from "./trivia";
 import { norm as normAudience, type AudienceRound } from "./audience";
 import { norm as normGuess, type GuessGame } from "./guess";
 import { norm as normTriviaNight, type TriviaNight } from "./trivianight";
+import { norm as normWordSearch, type WordSearch } from "./wordsearch";
 
 export type RoomGames = {
   bingo: BingoGame | null; pyramid: PyramidGame | null; board: BoardGame | null;
-  trivia: TriviaGame | null; audience: AudienceRound | null; guess: GuessGame | null; triviaNight: TriviaNight | null; nextPollMs: number;
+  trivia: TriviaGame | null; audience: AudienceRound | null; guess: GuessGame | null; triviaNight: TriviaNight | null;
+  wordSearch: WordSearch | null; nextPollMs: number;
 };
 
 export async function fetchRoomGames(roomName: string, myUserId: number | null): Promise<RoomGames | null> {
@@ -31,6 +33,7 @@ export async function fetchRoomGames(roomName: string, myUserId: number | null):
     audience: normAudience(d.audience),
     guess: normGuess(d.guess),
     triviaNight: normTriviaNight(d.trivia_night),
+    wordSearch: normWordSearch(d.word_search),
     nextPollMs: Math.max(1000, Number(d.next_poll_ms) || 10000),
   };
 }

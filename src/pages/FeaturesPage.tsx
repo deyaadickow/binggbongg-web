@@ -100,6 +100,7 @@ const FEATURES: Section[] = [
       // Guessing Games is hidden (Steve, 2026-10-27) — its tile comes back with it:
       // { icon: "🔮", nameKey: "fname_guessing_games", blurbKey: "fblurb_guessing_games", to: "/live", whereKey: "fwhere_the_live_room" },
       { icon: "🧠", nameKey: "fname_trivia_night", labelKey: "fname_quiz_games", blurbKey: "fblurb_quiz_games", to: "/live", whereKey: "fwhere_the_live_room" },
+      { icon: "🔤", nameKey: "fname_word_search", blurbKey: "fblurb_word_search", to: "/live", whereKey: "fwhere_the_live_room" },
       { icon: "🏁", nameKey: "fname_race_games", blurbKey: "fblurb_race_games", to: "/live", whereKey: "fwhere_the_live_room" },
       { icon: "🧩", nameKey: "fname_one_stroke_and_block_escape", blurbKey: "fblurb_one_stroke_and_block_escape", to: "/live", whereKey: "fwhere_the_live_room" },
       { icon: "🏅", nameKey: "fname_game_leaderboards", blurbKey: "fblurb_game_leaderboards", to: "/live", whereKey: "fwhere_the_live_room" },

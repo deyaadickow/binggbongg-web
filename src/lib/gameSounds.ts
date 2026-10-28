@@ -65,6 +65,8 @@ export const sfx = {
   },
   /** A bottle filled with one colour: a bright little sparkle run. */
   sparkle: () => [1568, 2093, 2637, 3136].forEach((f, i) => tone(f, f * 1.01, 260, i * 70, "sine", 0.09)),
+  /** Word Search: the swipe grew by a letter — a very soft blip. */
+  letter: () => tone(880, 990, 35, 0, "sine", 0.05),
   /** That pour isn't allowed: a short, soft buzz — softer than a wrong answer. */
   nope: () => { tone(150, 130, 120, 0, "square", 0.045); tone(140, 110, 140, 130, "square", 0.04); },
 };
