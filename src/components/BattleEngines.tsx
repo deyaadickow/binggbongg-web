@@ -60,6 +60,8 @@ export const BATTLE_KINDS: {
   number?: string; info: StringKey; built?: boolean;
   /** Opens a screen or an explanation instead of starting a battle: never people-gated. */
   reference?: boolean;
+  /** Kept (code and all) but left out of the menu — Steve may bring it back. */
+  hidden?: boolean;
 }[] = [
   { kind: "1v1", number: "#1", title: "bingg_bongg_battle", blurb: "n1v1_5_minutes_most_coins_wins", minPeople: 2,
     info: "challenge_another_live_streamer_to_a_rea" },
@@ -110,13 +112,15 @@ export const BATTLE_KINDS: {
   { kind: "trivia", number: "#18", title: "trivia_battle", blurb: "trivia_battle_blurb", minPeople: 1,
     info: "trivia_battle_info" },
   // Steve, 2026-10-27: the room guesses what happens on the host's camera — one paid guess each,
-  // the coins to the host, and a right guess wins recognition only (never coins).
+  // the coins to the host, and a right guess wins recognition only (never coins). HIDDEN the same
+  // day (Steve: "These games are to hard to understand") — everything still works, it's just not offered.
   { kind: "guess", number: "#19", title: "guess_games", blurb: "guess_games_blurb", minPeople: 1,
-    info: "guess_games_info" },
-  // Steve, 2026-10-27: unlimited room trivia by category — the players on stage answer free, the
-  // audience pays per answer (to the host), and right answers win points, never coins.
-  { kind: "trivianight", number: "#20", title: "trivia_night", blurb: "trivia_night_blurb", minPeople: 1,
-    info: "trivia_night_info" },
+    info: "guess_games_info", hidden: true },
+  // Quiz Games (was Trivia Night; Steve, 2026-10-27: "Pic a game and click start"): one screen of
+  // game tiles and START. The audience pays 5 coins an answer (to the host); right answers win
+  // points, never coins. #19 now Guessing Games is hidden, so the shown numbers run #1..#19.
+  { kind: "trivianight", number: "#19", title: "quiz_games", blurb: "quiz_games_blurb", minPeople: 1,
+    info: "quiz_games_info" },
   // Unnumbered from here down, exactly as on the phones: these aren't battles you can start, so
   // they carry no "#n" and never check how many people are on screen.
   { kind: "pkContests", title: "pk_battle_contests", blurb: "admin_run_scored_by_gift_coins", minPeople: 1, reference: true,
@@ -150,7 +154,7 @@ export function BattleMenu({ peopleOnScreen, onPick, onClose, onNotice }: { peop
   return (
     <Overlay title={t("start_a_battle")} onClose={onClose} width={560}>
       {peopleOnScreen < 2 && <p className="muted" style={{ fontSize: 13, marginTop: 0 }}>{t("you_re_the_only_one_on_screen_accept_a_v")}</p>}
-      {BATTLE_KINDS.map((k) => {
+      {BATTLE_KINDS.filter((k) => !k.hidden).map((k) => {
         // A reference row opens a screen or an explanation, so who's on screen is irrelevant to
         // it — gating those on headcount would hide the Lifetime Board from anyone alone.
         const ok = k.reference === true || peopleOnScreen >= k.minPeople;

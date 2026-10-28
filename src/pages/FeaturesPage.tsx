@@ -35,6 +35,9 @@ import { IDEA_SUPPORT_REASON } from "../lib/ideas";
 interface Feature {
   icon: string;
   nameKey: StringKey;
+  /** The name shown, when it differs from the tile's key (the key also finds its feature video, the
+   *  same key on all three platforms, so a renamed tile keeps its key). */
+  labelKey?: StringKey;
   blurbKey: StringKey;
   /** Where it lives on the web. Omitted means it is a phone-app feature. */
   to?: string;
@@ -94,8 +97,9 @@ const FEATURES: Section[] = [
     features: [
       { icon: "🎮", nameKey: "fname_n99_tap_games", blurbKey: "fblurb_n99_tap_games", to: "/live", whereKey: "fwhere_the_live_room" },
       { icon: "bingo_card", nameKey: "fname_bingg_bongg_bingo", blurbKey: "fblurb_bingg_bongg_bingo", to: "/live", whereKey: "fwhere_the_live_room" },
-      { icon: "🔮", nameKey: "fname_guessing_games", blurbKey: "fblurb_guessing_games", to: "/live", whereKey: "fwhere_the_live_room" },
-      { icon: "🧠", nameKey: "fname_trivia_night", blurbKey: "fblurb_trivia_night", to: "/live", whereKey: "fwhere_the_live_room" },
+      // Guessing Games is hidden (Steve, 2026-10-27) — its tile comes back with it:
+      // { icon: "🔮", nameKey: "fname_guessing_games", blurbKey: "fblurb_guessing_games", to: "/live", whereKey: "fwhere_the_live_room" },
+      { icon: "🧠", nameKey: "fname_trivia_night", labelKey: "fname_quiz_games", blurbKey: "fblurb_quiz_games", to: "/live", whereKey: "fwhere_the_live_room" },
       { icon: "🏁", nameKey: "fname_race_games", blurbKey: "fblurb_race_games", to: "/live", whereKey: "fwhere_the_live_room" },
       { icon: "🧩", nameKey: "fname_one_stroke_and_block_escape", blurbKey: "fblurb_one_stroke_and_block_escape", to: "/live", whereKey: "fwhere_the_live_room" },
       { icon: "🏅", nameKey: "fname_game_leaderboards", blurbKey: "fblurb_game_leaderboards", to: "/live", whereKey: "fwhere_the_live_room" },
@@ -220,7 +224,7 @@ function Tile({ f, video, onWatch, extras = [], onWatchExtra }: { f: Feature; vi
     }}>
       <span style={{ fontSize: 26, lineHeight: 1, flexShrink: 0 }} aria-hidden>{f.icon === "bingo_card" ? <BingoCardIcon size={36} /> : f.icon}</span>
       <span style={{ minWidth: 0, flex: 1 }}>
-        <b style={{ color: "var(--gold)", display: "block", fontSize: 15 }}>{t(f.nameKey)}</b>
+        <b style={{ color: "var(--gold)", display: "block", fontSize: 15 }}>{t(f.labelKey ?? f.nameKey)}</b>
         {/* Steve, 2026-10-19: "Make the white text readable... a little bolder." The dim grey
             was hardest to read on the phones, and the same line here was only a shade better
             over the artwork. Explicit rather than .muted, which is used site-wide. */}
@@ -318,7 +322,7 @@ export function FeaturesPage() {
     ? FEATURES.map((s) => ({
         ...s,
         features: s.features.filter(
-          (f) => t(f.nameKey).toLowerCase().includes(q) || t(f.blurbKey).toLowerCase().includes(q),
+          (f) => t(f.labelKey ?? f.nameKey).toLowerCase().includes(q) || t(f.blurbKey).toLowerCase().includes(q),
         ),
       })).filter((s) => s.features.length > 0)
     : FEATURES;
@@ -379,10 +383,10 @@ export function FeaturesPage() {
           }}>
             {section.features.map((f) => (
               <Tile key={f.nameKey} f={f} video={videos[f.nameKey]}
-                onWatch={() => setPlaying({ url: videos[f.nameKey], title: t(f.nameKey) })}
+                onWatch={() => setPlaying({ url: videos[f.nameKey], title: t(f.labelKey ?? f.nameKey) })}
                 extras={Object.keys(videos).filter((k) => k.startsWith(f.nameKey + "__")).sort()
                   .map((k) => ({ key: k, label: featureVideoLabels[k] ?? t("watch_video") }))}
-                onWatchExtra={(k) => setPlaying({ url: videos[k], title: featureVideoLabels[k] ?? t(f.nameKey) })} />
+                onWatchExtra={(k) => setPlaying({ url: videos[k], title: featureVideoLabels[k] ?? t(f.labelKey ?? f.nameKey) })} />
             ))}
           </div>
         </div>

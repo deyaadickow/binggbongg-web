@@ -518,7 +518,7 @@ export const fil = {
   fname_lucky_numbers_and_horoscope: "Lucky numbers at horoscope",
   fname_monthly_statement: "Buwanang statement",
   fname_my_qr_code: "Aking QR Code",
-  fname_n11_battle_modes: "20 battle mode",
+  fname_n11_battle_modes: "19 battle mode",
   fname_n53_languages: "53 wika",
   fname_n99_tap_games: "99 na tap game",
   fname_notifications_kept: "Nakatagong mga notification",

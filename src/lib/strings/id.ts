@@ -518,7 +518,7 @@ export const id = {
   fname_lucky_numbers_and_horoscope: "Angka keberuntungan dan horoskop",
   fname_monthly_statement: "Laporan bulanan",
   fname_my_qr_code: "Kode QR-ku",
-  fname_n11_battle_modes: "20 mode battle",
+  fname_n11_battle_modes: "19 mode battle",
   fname_n53_languages: "53 bahasa",
   fname_n99_tap_games: "99 game ketuk",
   fname_notifications_kept: "Notifikasi tersimpan",

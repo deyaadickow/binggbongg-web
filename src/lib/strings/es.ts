@@ -518,7 +518,7 @@ export const es = {
   fname_lucky_numbers_and_horoscope: "Números de la suerte y horóscopo",
   fname_monthly_statement: "Estado de cuenta mensual",
   fname_my_qr_code: "Mi código QR",
-  fname_n11_battle_modes: "20 modos de batalla",
+  fname_n11_battle_modes: "19 modos de batalla",
   fname_n53_languages: "53 idiomas",
   fname_n99_tap_games: "99 juegos de toque",
   fname_notifications_kept: "Notificaciones guardadas",
