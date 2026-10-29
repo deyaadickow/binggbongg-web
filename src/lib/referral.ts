@@ -9,10 +9,17 @@ export type ReferralCountry = {
   country_code: string; name: string; flag: string; language: string; description: string;
   flyer_phone: string | null; flyer_letter: string | null; phone_code_box: CodeBox | null; letter_code_box: CodeBox | null;
 };
-export type ReferredMember = { user_id: number; name: string; username: string | null; image: string | null; bonus_paid: number; joined: string | null };
+export type ReferredMember = { user_id: number; name: string; username: string | null; image: string | null; bonus_paid: number; joined: string | null;
+  /** Steve, 2026-10-29: $100 for a member brought in while VIP, else the normal cap. */
+  bonus_cap?: number };
+/** VIP Referral Members (Steve, 2026-10-29): anyone who applies is approved by the server about two
+ *  hours later (always within 24), and then earns the same 5% up to vip_cap per new member. */
+export type VipStatus = "none" | "pending" | "approved" | "revoked";
+export type VipInfo = { status: VipStatus; is_vip: boolean; platforms: string | null; applied_at: string | null; approved_at: string | null };
 export type ReferralProgram = {
   enabled: boolean; percent: number; cap: number; code_days: number; big_flyer_url: string; countries: ReferralCountry[];
-  me: null | { code: string; country: string; referred_count: number; bonus_earned: number; bonus_possible: number;
+  vip_enabled?: boolean; vip_cap?: number;
+  me: null | { vip?: VipInfo; code: string; country: string; referred_count: number; bonus_earned: number; bonus_possible: number;
     referred: ReferredMember[]; referred_by: null | { user_id: number; name: string; username: string | null }; can_enter_code: boolean };
 };
 
@@ -26,6 +33,22 @@ export async function fetchReferralProgram(userId: number | null): Promise<Refer
 export async function enterReferralCode(userId: number, code: string) {
   const res = await post<ReferralProgram>("enterReferralCode", { user_id: userId, code });
   return { ok: !!res.status, message: res.message ?? null, program: res.status ? res.data ?? null : null };
+}
+
+/** Apply to be a VIP Referral Member. The server binds user_id to the caller; `agree` is the
+ *  no-spam / no-income-promises / say-#ad checkbox, which the page will not send unticked. */
+export async function applyVipReferrer(userId: number, platforms: string[]) {
+  try {
+    const res = await post<ReferralProgram>("applyVipReferrer", { user_id: userId, agree: 1, platforms: platforms.join(", ") });
+    return { ok: !!res.status, message: res.message ?? null, program: res.status ? res.data ?? null : null };
+  } catch {
+    return { ok: false, message: null, program: null };
+  }
+}
+
+/** is_vip_referrer arrives as 0/1, "0"/"1" or a boolean depending on the payload — read them all. */
+export function isVipReferrer(v: unknown): boolean {
+  return v === true || v === 1 || v === "1" || v === "true";
 }
 
 /** The flyer with `code` written into its code box, as a PNG blob — or null if it can't be drawn. */

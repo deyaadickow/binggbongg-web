@@ -135,6 +135,9 @@ export interface UserSummary {
    *  one flame for every 30 days kept. Server-computed; see Users::extendStreak. */
   battle_streak?: number;
   battle_flames?: number;
+  /** Steve, 2026-10-29: a VIP Referral Member wears the gold "👑 VIP Referrer" pill on their
+   *  profile. 0/1, "0"/"1" or a boolean — read it with isVipReferrer() (lib/referral.ts). */
+  is_vip_referrer?: number | string | boolean;
   fullname?: string;
   username?: string;
   profile_image?: string;

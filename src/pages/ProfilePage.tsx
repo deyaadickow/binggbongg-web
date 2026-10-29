@@ -2,6 +2,8 @@ import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { rememberCopiedLink, videoShareUrl } from "../lib/copiedLink";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { displayName, mediaUrl, post, type Post, type UserSummary } from "../lib/api";
+import { VipBadge, VipBadgePopup } from "../components/VipBadge";
+import { isVipReferrer } from "../lib/referral";
 import { BattleBadge, BattleInfoPopup, BattleStreak, battleBadgeExplainer, battleStreakExplainer } from "../components/BattleBadge";
 import { useSession } from "../lib/session";
 import { ReportDialog } from "../components/ReportDialog";
@@ -302,6 +304,7 @@ export function ProfilePage() {
   // Steve, 2026-10-05: "Make all popup into our design black and gold" — the badge and streak
   // explainers open the app's own popup instead of the browser's white alert box.
   const [battleInfo, setBattleInfo] = useState<{ title: string; body: string } | null>(null);
+  const [vipInfo, setVipInfo] = useState(false);
   const [tabVideos, setTabVideos] = useState<ProfilePost[]>([]);
   const [tabUsers, setTabUsers] = useState<UserSummary[]>([]);
   // Photos are neither posts nor members, so they get their own bucket rather than being
@@ -562,6 +565,8 @@ export function ProfilePage() {
                   body: battleStreakExplainer(displayName(profile), profile.battle_streak ?? 0, profile.battle_flames ?? 0),
                 })}
               />
+              {/* Steve, 2026-10-29: a VIP Referral Member's gold pill; tapping it says what it is. */}
+              {isVipReferrer(profile.is_vip_referrer) && <VipBadge onClick={() => setVipInfo(true)} />}
               {profile.is_verified === 2 && (
                 <span title={t("verified")} style={{ color: "#4af", fontSize: 16 }}>✓</span>
               )}
@@ -807,6 +812,9 @@ export function ProfilePage() {
           onClose={() => setShowCreatePlaylist(false)}
           onCreated={(pl) => setPlaylists((prev) => [pl, ...prev])}
         />
+      )}
+      {vipInfo && (
+        <VipBadgePopup viewerIsVip={isVipReferrer(isMe ? profile.is_vip_referrer : me?.is_vip_referrer)} onClose={() => setVipInfo(false)} />
       )}
       {battleInfo && (
         <BattleInfoPopup title={battleInfo.title} body={battleInfo.body} onClose={() => setBattleInfo(null)} />

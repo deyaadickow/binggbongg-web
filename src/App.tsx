@@ -23,6 +23,7 @@ import { LanguagePage } from "./pages/LanguagePage";
 import { FeaturesPage } from "./pages/FeaturesPage";
 import { FeatureVideosPage } from "./pages/FeatureVideosPage";
 import { ReferralProgramPage } from "./pages/ReferralProgramPage";
+import { VipReferralPage } from "./pages/VipReferralPage";
 import { FeaturedContestPage } from "./pages/FeaturedContestPage";
 import { ExcitingNewsPage } from "./pages/ExcitingNewsPage";
 import { BusinessPage, BusinessTabPage, CreateBusinessPage, MyBusinessesPage } from "./pages/BusinessPages";
@@ -176,6 +177,7 @@ export default function App() {
           {/* Every feature's 60-second video under its own heading (Steve, 2026-10-29). */}
           <Route path="/feature-videos" element={<FeatureVideosPage />} />
           <Route path="/referral-program" element={<ReferralProgramPage />} />
+          <Route path="/vip-referral" element={<VipReferralPage />} />
           {/* The member's own notepad (Steve, 2026-10-19). */}
           <Route path="/settings/todo" element={<ToDoListPage />} />
           <Route path="/settings/vault" element={<VaultPage />} />

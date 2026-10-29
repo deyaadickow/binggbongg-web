@@ -3,6 +3,7 @@
 // adding a code (first 30 days), and the flyers with the member's code drawn in, to download and post.
 // The big printable flyer is web-only (Steve: "Do the same thing with the big flyer but only on the web").
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { PageTitle } from "../components/PageTitle";
 import { Loading } from "../components/Common";
 import { useSession } from "../lib/session";
@@ -174,6 +175,11 @@ export function ReferralProgramPage() {
         })}
       </div>
 
+      {/* Steve, 2026-10-29: VIP Referral Members earn up to $100 per new member instead of $25. */}
+      <Link to="/vip-referral" style={{ ...card, background: "linear-gradient(135deg,#2a2006,#0b0b0d)", textDecoration: "none", fontSize: 16, fontWeight: 800, lineHeight: 1.45, color: GOLD, display: "block" }}>
+        {me?.vip?.is_vip ? t("vip_card_open_kit") : t("vip_card_become")} ›
+      </Link>
+
       {!prog.enabled && <div style={{ ...card, borderColor: "#888" }}>{t("rp_paused")}</div>}
       {country && <div style={{ ...card, whiteSpace: "pre-line", fontSize: 16, lineHeight: 1.5 }}>{country.description}</div>}
 
@@ -193,7 +199,7 @@ export function ReferralProgramPage() {
                 {me!.referred.map((r) => (
                   <div key={r.user_id} style={{ display: "flex", justifyContent: "space-between", gap: 10, fontSize: 14, padding: "4px 0", borderBottom: "1px solid rgba(240,196,32,.2)" }}>
                     <span>{r.name}{r.username ? <span style={{ opacity: .6 }}> @{r.username}</span> : null}</span>
-                    <span style={{ color: GOLD, fontWeight: 800, whiteSpace: "nowrap" }}>{t("rp_of_cap", money(r.bonus_paid), money(prog.cap))}</span>
+                    <span style={{ color: GOLD, fontWeight: 800, whiteSpace: "nowrap" }}>{t("rp_of_cap", money(r.bonus_paid), money(r.bonus_cap ?? prog.cap))}</span>
                   </div>
                 ))}
               </div>
