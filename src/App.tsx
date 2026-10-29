@@ -21,6 +21,7 @@ import { HelpListPage, HelpCampaignPage, StartHelpPage } from "./pages/HelpPages
 import { HomePage } from "./pages/HomePage";
 import { LanguagePage } from "./pages/LanguagePage";
 import { FeaturesPage } from "./pages/FeaturesPage";
+import { FeatureVideosPage } from "./pages/FeatureVideosPage";
 import { ReferralProgramPage } from "./pages/ReferralProgramPage";
 import { FeaturedContestPage } from "./pages/FeaturedContestPage";
 import { ExcitingNewsPage } from "./pages/ExcitingNewsPage";
@@ -172,6 +173,8 @@ export default function App() {
           <Route path="/settings/language" element={<LanguagePage />} />
           {/* The feature directory (Steve, 2026-10-18) — one tile per feature, grouped. */}
           <Route path="/features" element={<FeaturesPage />} />
+          {/* Every feature's 60-second video under its own heading (Steve, 2026-10-29). */}
+          <Route path="/feature-videos" element={<FeatureVideosPage />} />
           <Route path="/referral-program" element={<ReferralProgramPage />} />
           {/* The member's own notepad (Steve, 2026-10-19). */}
           <Route path="/settings/todo" element={<ToDoListPage />} />

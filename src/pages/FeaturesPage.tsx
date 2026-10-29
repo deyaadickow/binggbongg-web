@@ -31,6 +31,7 @@ import { useSession } from "../lib/session";
 import { useEffect, useState } from "react";
 import { fetchFeatureVideos, featureVideoLabels } from "../lib/featureVideos";
 import { IDEA_SUPPORT_REASON } from "../lib/ideas";
+import { FeatureVideoPlayer } from "../components/FeatureVideoPlayer";
 
 interface Feature {
   icon: string;
@@ -54,11 +55,15 @@ interface Section {
 
 const FEATURES: Section[] = [
   {
-    // Steve, 2026-10-25: these two were tabs at the top; they are #1 and #2 here now.
+    // Steve, 2026-10-25: these two were tabs at the top; they are #1 and #2 here now. The
+    // Features Videos page is #3 (2026-10-29).
     titleKey: "fsec_featured",
     features: [
       { icon: "🎤", nameKey: "fname_philippine_singing_contest", blurbKey: "fblurb_philippine_singing_contest", to: "/featured-contest" },
       { icon: "📣", nameKey: "fname_exciting_news", blurbKey: "fblurb_exciting_news", to: "/exciting-news" },
+      // Steve, 2026-10-29: "make another page that's called 'Bingg Bongg Features Videos' and add
+      // all the videos on that page with a header on each feature" — every feature's 60-second video.
+      { icon: "🎞️", nameKey: "fname_feature_videos_page", blurbKey: "fblurb_feature_videos_page", to: "/feature-videos" },
     ],
   },
   {
@@ -274,33 +279,6 @@ function Tile({ f, video, onWatch, extras = [], onWatchExtra }: { f: Feature; vi
           </div>
         )}
       </div>
-    </div>
-  );
-}
-
-/** Full-screen player for one tile's video: plays with sound, the browser's own controls, a gold
- *  back button and the feature's name on top. Esc or the back button closes it. */
-function FeatureVideoPlayer({ url, title, onClose }: { url: string; title: string; onClose: () => void }) {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
-  return (
-    // The bar sits ABOVE the video, not over it — over it, it covered the video's own logo.
-    <div role="dialog" aria-modal="true" aria-label={title} style={{
-      position: "fixed", inset: 0, zIndex: 2000, background: "#000",
-      display: "flex", flexDirection: "column",
-    }}>
-      <div style={{ padding: "10px 14px", display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
-        <button onClick={onClose} aria-label="Back" style={{
-          width: 40, height: 40, borderRadius: "50%", background: "#000", color: "var(--gold)",
-          border: "2px solid var(--gold-border)", fontSize: 20, fontWeight: 700, cursor: "pointer", lineHeight: 1,
-        }}>‹</button>
-        <b style={{ color: "var(--gold)", fontSize: 17 }}>{title}</b>
-      </div>
-      <video src={url} controls autoPlay playsInline
-        style={{ flex: 1, minHeight: 0, width: "100%", objectFit: "contain", background: "#000" }} />
     </div>
   );
 }
