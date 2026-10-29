@@ -1578,6 +1578,7 @@ export const en = {
   rp_code_on_flyer: "Code on my flyer",
   rp_sign_in_for_flyer: "Sign in to put your referral code on your flyer.",
   rp_flyer_alt: "Bingg Bongg referral flyer",
+  rp_tap_to_zoom: "🔍 Tap the flyer to zoom in",
   rp_save_to_phone: "⬇️ Save to my phone",
   rp_downloaded: "Downloaded!",
   rp_download: "⬇️ Download",

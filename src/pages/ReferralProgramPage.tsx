@@ -2,7 +2,7 @@
 // the member's referral code (their username), the people they referred and what they have earned,
 // adding a code (first 30 days), and the flyers with the member's code drawn in, to download and post.
 // The big printable flyer is web-only (Steve: "Do the same thing with the big flyer but only on the web").
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { PageTitle } from "../components/PageTitle";
 import { Loading } from "../components/Common";
 import { useSession } from "../lib/session";
@@ -14,10 +14,73 @@ const card: React.CSSProperties = { background: "#0b0b0d", border: `2px solid ${
 const goldBtn: React.CSSProperties = { padding: "10px 18px", borderRadius: 999, border: "none", background: GOLD, color: "#000", fontWeight: 900, fontSize: 15, cursor: "pointer" };
 const ghostBtn: React.CSSProperties = { padding: "10px 18px", borderRadius: 999, border: `2px solid ${GOLD}`, background: "transparent", color: GOLD, fontWeight: 900, fontSize: 15, cursor: "pointer" };
 
+/** The flyer full screen on black: pinch (or ctrl/trackpad-pinch, or + and −) to zoom, drag or
+ *  scroll to move, double-tap to zoom in or back out; ✕ or Esc closes. Opens at the screen's width. */
+function FlyerZoom({ src, onClose }: { src: string; onClose: () => void }) {
+  const { t } = useT();
+  const box = useRef<HTMLDivElement>(null);
+  const [zoom, setZoom] = useState(1);
+  const zoomRef = useRef(1);
+  const pinch = useRef<{ d: number; z: number } | null>(null);
+  // Zoom to `z`, keeping the point under (cx, cy) — screen coordinates — where it is.
+  const zoomTo = (z: number, cx?: number, cy?: number) => {
+    const el = box.current; if (!el) return;
+    const nz = Math.min(5, Math.max(1, z));
+    const r = el.getBoundingClientRect();
+    const x = (cx ?? r.left + r.width / 2) - r.left, y = (cy ?? r.top + r.height / 2) - r.top;
+    const k = nz / zoomRef.current;
+    const left = (el.scrollLeft + x) * k - x, top = (el.scrollTop + y) * k - y;
+    zoomRef.current = nz; setZoom(nz);
+    requestAnimationFrame(() => { el.scrollLeft = left; el.scrollTop = top; });
+  };
+  useEffect(() => {
+    const el = box.current; if (!el) return;
+    const dist = (e: TouchEvent) => Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+    const start = (e: TouchEvent) => { if (e.touches.length === 2) pinch.current = { d: dist(e), z: zoomRef.current }; };
+    const move = (e: TouchEvent) => {
+      if (e.touches.length !== 2 || !pinch.current) return;
+      e.preventDefault();
+      zoomTo(pinch.current.z * dist(e) / pinch.current.d,
+        (e.touches[0].clientX + e.touches[1].clientX) / 2, (e.touches[0].clientY + e.touches[1].clientY) / 2);
+    };
+    const end = (e: TouchEvent) => { if (e.touches.length < 2) pinch.current = null; };
+    const wheel = (e: WheelEvent) => { if (!e.ctrlKey) return; e.preventDefault(); zoomTo(zoomRef.current * Math.exp(-e.deltaY / 100), e.clientX, e.clientY); };
+    const key = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    el.addEventListener("touchstart", start, { passive: true });
+    el.addEventListener("touchmove", move, { passive: false });
+    el.addEventListener("touchend", end);
+    el.addEventListener("wheel", wheel, { passive: false });
+    window.addEventListener("keydown", key);
+    const body = document.body.style.overflow; document.body.style.overflow = "hidden";
+    return () => {
+      el.removeEventListener("touchstart", start); el.removeEventListener("touchmove", move);
+      el.removeEventListener("touchend", end); el.removeEventListener("wheel", wheel);
+      window.removeEventListener("keydown", key); document.body.style.overflow = body;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const round: React.CSSProperties = { width: 48, height: 48, borderRadius: "50%", background: "rgba(0,0,0,.9)", border: "2px solid #D4AF37", color: "#F0C420", fontSize: 22, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0 };
+  return (
+    <div role="dialog" aria-modal="true" style={{ position: "fixed", inset: 0, background: "#000", zIndex: 1000 }}>
+      <div ref={box} style={{ position: "absolute", inset: 0, overflow: "auto", touchAction: "pan-x pan-y" }}
+        onDoubleClick={(e) => zoomTo(zoomRef.current < 1.5 ? 2.5 : 1, e.clientX, e.clientY)}>
+        <img src={src} alt={t("rp_flyer_alt")} draggable={false}
+          style={{ display: "block", width: `min(${zoom * 100}%, ${zoom * 900}px)`, maxWidth: "none", margin: "0 auto", userSelect: "none" }} />
+      </div>
+      <div style={{ position: "absolute", top: 12, right: 16, display: "flex", gap: 10 }}>
+        <button style={round} aria-label="−" onClick={() => zoomTo(zoomRef.current / 1.5)}>−</button>
+        <button style={round} aria-label="+" onClick={() => zoomTo(zoomRef.current * 1.5)}>+</button>
+        <button style={round} aria-label={t("close")} onClick={onClose}>✕</button>
+      </div>
+    </div>
+  );
+}
+
 function Flyer({ url, box, code, fileName, big, onNotice }: { url: string; box: CodeBox | null; code: string | null; fileName: string; big?: boolean; onNotice: (m: string) => void }) {
   const { t } = useT();
   const [blob, setBlob] = useState<Blob | null>(null);
   const [src, setSrc] = useState<string | null>(null);
+  const [zoomed, setZoomed] = useState(false);
   useEffect(() => {
     let alive = true; let made: string | null = null;
     setBlob(null); setSrc(null);
@@ -50,7 +113,9 @@ function Flyer({ url, box, code, fileName, big, onNotice }: { url: string; box: 
   };
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 10, alignItems: "center" }}>
-      {src ? <img src={src} alt={t("rp_flyer_alt")} style={{ width: "100%", maxWidth: big ? 760 : 420, borderRadius: 8, display: "block" }} /> : <Loading />}
+      {src ? <img src={src} alt={t("rp_flyer_alt")} onClick={() => setZoomed(true)} style={{ width: "100%", maxWidth: big ? 760 : 420, borderRadius: 8, display: "block", cursor: "zoom-in" }} /> : <Loading />}
+      {src && <button onClick={() => setZoomed(true)} style={{ background: "none", border: "none", color: "#F0C420", fontSize: 14, fontWeight: 600, cursor: "pointer", padding: 4 }}>{t("rp_tap_to_zoom")}</button>}
+      {zoomed && src && <FlyerZoom src={src} onClose={() => setZoomed(false)} />}
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center" }}>
         <button style={goldBtn} disabled={!blob} onClick={download}>{big ? t("rp_download") : t("rp_save_to_phone")}</button>
         {big ? <button style={ghostBtn} disabled={!src} onClick={print}>{t("rp_print")}</button> : <button style={ghostBtn} disabled={!blob} onClick={() => void share()}>{t("rp_share")}</button>}
