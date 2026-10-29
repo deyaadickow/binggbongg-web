@@ -1417,6 +1417,8 @@ export const en = {
   share_live_text: "%1$s is live on Bingg Bongg — come watch!",
   live_link_copied: "Link to this live copied.",
   thanks_for_the_report: "Thanks — we'll look at your report.",
+  who_to_report: "Who do you want to report?",
+  nobody_else_to_report: "No one else is in the room to report.",
   watching_now_count: "Watching now (%1$s)",
   nobody_else_watching: "No one else is watching right now.",
   copy_this_video: "Copy this video",

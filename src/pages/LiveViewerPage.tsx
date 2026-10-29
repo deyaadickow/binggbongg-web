@@ -70,6 +70,9 @@ export function LiveViewerPage() {
   const [roomMenuOpen, setRoomMenuOpen] = useState(false);
   const [watchersOpen, setWatchersOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
+  // Steve, 2026-10-29: on your OWN live there is no streamer to report — pick from the room.
+  const [reportPick, setReportPick] = useState<{ user_id: number; fullname?: string; username?: string; profile_image?: string }[] | null>(null);
+  const [reportChosen, setReportChosen] = useState<{ user_id: number; fullname?: string; username?: string } | null>(null);
   const [menuNow, setMenuNow] = useState(Date.now());
   const roomHoldTimer = useRef<number>(0);
   const roomHoldFired = useRef(false);
@@ -1073,12 +1076,21 @@ export function LiveViewerPage() {
     roomMenuRows.push({ label: "❤️ " + t("favourite_streamer"), trailing: t(isFavourite ? "switch_on" : "switch_off"), onPick: () => { void toggleFavourite(); } });
   }
   roomMenuRows.push({ label: "📤 " + t("share_the_live"), onPick: () => { setRoomMenuOpen(false); void shareLive(); } });
-  // Always offered (Steve, 2026-10-29): the streamer, else another player — never yourself.
-  // Nobody else on screen (a host alone): Report opens Support in a new tab.
-  const reportTarget = members ? [{ user_id: members.host_user_id, fullname: members.host_fullname, username: members.host_username }, ...members.guests].find((m) => m.user_id && m.user_id !== myId) ?? null : null;
+  // Always offered (Steve, 2026-10-29): watching someone, it reports the streamer; on your own
+  // live it lists everyone else in the room (players, then watchers) to pick from.
   roomMenuRows.push({ label: t("report"), onPick: () => {
     setRoomMenuOpen(false);
-    if (reportTarget) setReportOpen(true); else window.open("/settings/support", "_blank", "noopener");
+    if (members && members.host_user_id && members.host_user_id !== myId) {
+      setReportChosen({ user_id: members.host_user_id, fullname: members.host_fullname, username: members.host_username });
+      setReportOpen(true);
+      return;
+    }
+    const seen = new Set<number>();
+    const rows = [...(members?.guests ?? []), ...watcherList].filter((m) => {
+      if (!m.user_id || m.user_id === myId || seen.has(m.user_id)) return false;
+      seen.add(m.user_id); return true;
+    });
+    if (rows.length === 0) setToast(t("nobody_else_to_report")); else setReportPick(rows);
   } });
   // A new tab, so a host asking for help doesn't end their own live by leaving the page.
   roomMenuRows.push({ label: t("support"), onPick: () => { setRoomMenuOpen(false); window.open("/settings/support", "_blank", "noopener"); } });
@@ -1342,9 +1354,26 @@ export function LiveViewerPage() {
               </div>
             </div>
           )}
-          {reportOpen && reportTarget && (
-            <ReportDialog reportedUserId={reportTarget.user_id}
-              reportedName={displayName({ fullname: reportTarget.fullname, username: reportTarget.username } as Partial<UserSummary>)}
+          {reportPick && (
+            <div className="modal-backdrop" onClick={() => setReportPick(null)}>
+              <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
+                <h3 style={{ color: "var(--gold)", marginTop: 0, textAlign: "center" }}>{t("who_to_report")}</h3>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: "50vh", overflowY: "auto" }}>
+                  {reportPick.map((m) => (
+                    <button key={m.user_id} className="row" style={{ padding: "8px 10px", border: "1px solid var(--gold-border)", borderRadius: 10, background: "#111", color: "inherit", cursor: "pointer" }}
+                      onClick={() => { setReportPick(null); setReportChosen(m); setReportOpen(true); }}>
+                      <Avatar user={{ fullname: m.fullname, username: m.username, profile_image: m.profile_image ? mediaUrl(m.profile_image) : undefined } as Partial<UserSummary>} />
+                      <span style={{ flex: 1, textAlign: "left", fontWeight: 600 }}>{displayName({ fullname: m.fullname, username: m.username } as Partial<UserSummary>)}</span>
+                    </button>
+                  ))}
+                </div>
+                <button className="btn" style={{ marginTop: 12 }} onClick={() => setReportPick(null)}>{t("close")}</button>
+              </div>
+            </div>
+          )}
+          {reportOpen && reportChosen && (
+            <ReportDialog reportedUserId={reportChosen.user_id}
+              reportedName={displayName({ fullname: reportChosen.fullname, username: reportChosen.username } as Partial<UserSummary>)}
               onClose={() => setReportOpen(false)} onDone={() => { setReportOpen(false); setToast(t("thanks_for_the_report")); }} />
           )}
 
