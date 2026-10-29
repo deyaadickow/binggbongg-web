@@ -35,13 +35,15 @@ import { HostGamesMenu } from "../components/HostGamesMenu";
 import { SoloBattleStandingsSheet, SoloBattleStrip } from "../components/SoloBattle";
 import { fetchActiveSoloBattle, startSoloBattle, type SoloBattle } from "../lib/solobattle";
 import { Avatar, Notice } from "../components/Common";
+import { ReportDialog } from "../components/ReportDialog";
 import { InviteOverlay, WhosPlayingOverlay } from "../components/RoomPeople";
 import { PickerSheet } from "../components/PickerSheet";
 import { TRANSLATION_LANGUAGES, defaultTargetLanguage, languageName, translateChatMessage, type TranslationResult } from "../lib/translate";
 import { tt, useT  } from "../lib/i18n";
 
-interface Member { user_id: number; fullname?: string; username?: string; profile_image?: string; country?: string }
-interface RoomMembers { host_user_id: number; host_fullname?: string; host_username?: string; host_profile_image?: string; host_country?: string; guests: Member[] }
+interface Member { user_id: number; fullname?: string; username?: string; profile_image?: string; country?: string; local_timezone?: string }
+interface RoomMembers { host_user_id: number; host_fullname?: string; host_username?: string; host_profile_image?: string; host_country?: string; host_local_timezone?: string; live_seconds?: number; guests: Member[] }
+interface Watcher { user_id: number; fullname?: string; username?: string; profile_image?: string }
 interface JoinRequest { request_id: number; user_id: number; fullname?: string; username?: string; profile_image?: string }
 
 const HEARTBEAT_MS = 20000;
@@ -62,6 +64,17 @@ export function LiveViewerPage() {
   const [members, setMembers] = useState<RoomMembers | null>(null);
   const [roomClosed, setRoomClosed] = useState(false);
   const [watchers, setWatchers] = useState<number | null>(null);
+  const [watcherList, setWatcherList] = useState<Watcher[]>([]);
+  // Steve, 2026-10-29: the live room's hold menu (country, local time, how long live, favourite,
+  // share, report, support) and the watchers popup that now carries the Leader Board.
+  const [roomMenuOpen, setRoomMenuOpen] = useState(false);
+  const [watchersOpen, setWatchersOpen] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [menuNow, setMenuNow] = useState(Date.now());
+  const roomHoldTimer = useRef<number>(0);
+  const roomHoldFired = useRef(false);
+  // live_seconds as the server measured it, and when it arrived — the clock counts on from that.
+  const liveClockRef = useRef<{ secs: number; at: number } | null>(null);
   const [joinRequests, setJoinRequests] = useState<JoinRequest[]>([]);
   const [joinState, setJoinState] = useState<"none" | "requested" | "approved">("none");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -671,6 +684,7 @@ export function LiveViewerPage() {
       if (!alive || !res) return;
       if (!res.status || !res.data) { setRoomClosed(true); return; }
       setMembers(res.data);
+      if (typeof res.data.live_seconds === "number") liveClockRef.current = { secs: res.data.live_seconds, at: Date.now() };
       // Viewer who asked to join (or was invited): the moment I'm in guests, publish.
       if (user && role === "viewer" && res.data.guests.some((g) => g.user_id === user.id)) {
         setJoinState("approved");
@@ -688,7 +702,7 @@ export function LiveViewerPage() {
     let alive = true;
     async function tick() {
       const w = await post<unknown[]>("fetchLiveRoomWatchers", { room_name: roomName }).catch(() => null);
-      if (alive && w?.status) setWatchers((w.data ?? []).length);
+      if (alive && w?.status) { setWatchers((w.data ?? []).length); setWatcherList((w.data ?? []) as Watcher[]); }
       if (role === "host" && user) {
         const r = await post<JoinRequest[]>("fetchJoinRequests", { user_id: user.id, room_name: roomName }).catch(() => null);
         if (alive && r?.status) setJoinRequests(r.data ?? []);
@@ -864,9 +878,6 @@ export function LiveViewerPage() {
   const orderedTiles = [...live.tiles].sort((a, b) => (a.userId === hostUserId ? -1 : b.userId === hostUserId ? 1 : 0));
   const statusLabel = roomClosed || live.status === "ended" ? "ENDED" : live.status === "live" ? "● LIVE" : live.status === "error" ? "ERROR" : "CONNECTING";
 
-  if (!isLoggedIn) {
-    return <div className="page"><Notice>{tn("sign_in_to_watch_this_live", <Link to="/login">{t("sign_in")}</Link>)}</Notice></div>;
-  }
 
   // ---- Taps on the live (Steve, 2026-10-14) ------------------------------------------------
   //
@@ -991,6 +1002,81 @@ export function LiveViewerPage() {
   // Nothing should still be pending when the page goes away.
   useEffect(() => () => { if (tapFlushTimer.current !== null) window.clearTimeout(tapFlushTimer.current); }, []);
 
+  // The hold menu's "Live for" line ticks while the menu is open.
+  useEffect(() => {
+    if (!roomMenuOpen) return;
+    setMenuNow(Date.now());
+    const id = window.setInterval(() => setMenuNow(Date.now()), 1000);
+    return () => window.clearInterval(id);
+  }, [roomMenuOpen]);
+
+  // Moved down here from above the hooks (2026-10-29): an early return BEFORE hooks changes
+  // their order when the session changes, the crash VideoPage.tsx already fixed.
+  if (!isLoggedIn) {
+    return <div className="page"><Notice>{tn("sign_in_to_watch_this_live", <Link to="/login">{t("sign_in")}</Link>)}</Notice></div>;
+  }
+
+  // ---- Hold the live for a second (Steve, 2026-10-29) --------------------------------------
+  // "Remove the Country from the live and add it here, Country, Local time, report, support,
+  // share the live, The heart simble for favorite streamer, Timer for how long he's been live
+  // streaming". Same card as the feed's hold menu, about the streamer whose room this is.
+  function startRoomHold(e: React.PointerEvent) {
+    if ((e.target as HTMLElement).closest("button, a, input, textarea, select")) return;
+    cancelRoomHold();
+    roomHoldFired.current = false;
+    roomHoldTimer.current = window.setTimeout(() => { roomHoldFired.current = true; setRoomMenuOpen(true); }, 1000);
+  }
+  function cancelRoomHold() {
+    if (roomHoldTimer.current) { window.clearTimeout(roomHoldTimer.current); roomHoldTimer.current = 0; }
+  }
+  const countryName = (c?: string | null) => {
+    let v = (c ?? "").trim();
+    if (!v || v.toLowerCase() === "null") return "";
+    if (v.length === 2) { try { v = new Intl.DisplayNames([navigator.language], { type: "region" }).of(v.toUpperCase()) ?? v; } catch { /* keep */ } }
+    return v;
+  };
+  const clockIn = (zone?: string | null) => {
+    if (!zone?.trim()) return "";
+    try { return new Intl.DateTimeFormat(navigator.language, { weekday: "short", hour: "numeric", minute: "2-digit", timeZone: zone.trim() }).format(new Date(menuNow)); } catch { return ""; }
+  };
+  const roomLines: string[] = [];
+  if (members) {
+    const hostName = members.host_username ? "@" + members.host_username : (members.host_fullname ?? "");
+    const hc = countryName(members.host_country);
+    if (hc) roomLines.push("🌍 " + t("live_from_country", hostName, hc));
+    const ht = clockIn(members.host_local_timezone);
+    if (ht) roomLines.push("🕒 " + t("member_local_time", hostName, ht));
+    if (liveClockRef.current) {
+      const secs = liveClockRef.current.secs + Math.max(0, Math.floor((menuNow - liveClockRef.current.at) / 1000));
+      const h = Math.floor(secs / 3600), m = Math.floor((secs % 3600) / 60), sec = secs % 60;
+      const two = (n: number) => String(n).padStart(2, "0");
+      roomLines.push("⏱️ " + t("live_for_duration", h > 0 ? `${h}:${two(m)}:${two(sec)}` : `${m}:${two(sec)}`));
+    }
+    for (const g of members.guests) {
+      const gn = g.username ? "@" + g.username : (g.fullname ?? "");
+      const parts = [countryName(g.country), clockIn(g.local_timezone)].filter(Boolean);
+      if (parts.length) roomLines.push(gn + ": " + parts.join(" · "));
+    }
+  }
+  const liveUrl = `https://binggbongg.com/live/${encodeURIComponent(roomName)}`;
+  async function shareLive() {
+    const name = members ? displayName({ fullname: members.host_fullname, username: members.host_username } as Partial<UserSummary>) : "";
+    const text = t("share_live_text", name);
+    try {
+      if (navigator.share) { await navigator.share({ text, url: liveUrl }); return; }
+      await navigator.clipboard.writeText(`${text} ${liveUrl}`);
+      setToast(t("live_link_copied"));
+    } catch { /* cancelled */ }
+  }
+  const roomMenuRows: { label: string; trailing?: string; onPick: () => void }[] = [];
+  if (!isPublisher && hostUserId > 0) {
+    roomMenuRows.push({ label: "❤️ " + t("favourite_streamer"), trailing: t(isFavourite ? "switch_on" : "switch_off"), onPick: () => { void toggleFavourite(); } });
+  }
+  roomMenuRows.push({ label: "📤 " + t("share_the_live"), onPick: () => { setRoomMenuOpen(false); void shareLive(); } });
+  if (myId !== hostUserId) roomMenuRows.push({ label: t("report"), onPick: () => { setRoomMenuOpen(false); setReportOpen(true); } });
+  // A new tab, so a host asking for help doesn't end their own live by leaving the page.
+  roomMenuRows.push({ label: t("support"), onPick: () => { setRoomMenuOpen(false); window.open("/settings/support", "_blank", "noopener"); } });
+
   return (
     <div className="page">
       <div className="row" style={{ marginBottom: 12 }}>
@@ -998,7 +1084,10 @@ export function LiveViewerPage() {
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontWeight: 800 }}>{hostCard ? displayName(hostCard) : "Live"}{role === "host" ? " (you)" : ""}</div>
           <div className="muted" style={{ fontSize: 13 }}>
-            {watchers !== null ? `👁 ${watchers} watching` : ""}{broadcasters.length > 1 ? ` · ${broadcasters.length} on screen` : ""}
+            {watchers !== null && (
+              <button type="button" className="live-watchers-btn" title={t("leader_board_top_givers_this_live")}
+                onClick={() => { setWatchersOpen(true); openLeaderBoard(); }}>👁 {watchers} watching</button>
+            )}{broadcasters.length > 1 ? ` · ${broadcasters.length} on screen` : ""}
           </div>
         </div>
         <span className={`pill ${statusLabel === "● LIVE" ? "live" : ""}`}>{statusLabel}</span>
@@ -1027,7 +1116,10 @@ export function LiveViewerPage() {
               cancel555(myId, b555.data.battle_555_id).then(() => setToast("5-5-5 cancelled.")).catch((e) => setToast((e as Error).message));
             }} />
           )}
-          <div className={`video-grid count-${Math.min(4, Math.max(1, orderedTiles.length))}`} onDoubleClick={dropHeart}>
+          <div className={`video-grid count-${Math.min(4, Math.max(1, orderedTiles.length))}`} onDoubleClick={dropHeart}
+            onPointerDown={startRoomHold} onPointerUp={cancelRoomHold} onPointerLeave={cancelRoomHold} onPointerCancel={cancelRoomHold}
+            onContextMenu={(e) => { if (roomHoldFired.current) e.preventDefault(); }}
+            onClickCapture={(e) => { if (roomHoldFired.current) { e.stopPropagation(); roomHoldFired.current = false; } }}>
             {/* Hearts and the room total. pointer-events:none in CSS — one stolen click here
                 would break everything the tiles underneath do. */}
             <div className="live-hearts">
@@ -1076,9 +1168,6 @@ export function LiveViewerPage() {
                 ❤️ {tapCount.toLocaleString()}
               </button>
             )}
-            <button type="button" className="live-lb" title={t("leader_board_top_givers_this_live")}
-              onClick={(e) => { e.stopPropagation(); openLeaderBoard(); }}>
-              {t("lb")}</button>
             {orderedTiles.length === 0 && (
               <div className="tile" style={{ display: "grid", placeItems: "center" }}>
                 <span className="muted">{live.status === "live" ? "Waiting for video…" : "Connecting…"}</span>
@@ -1150,8 +1239,8 @@ export function LiveViewerPage() {
             </div>
           )}
 
-          {lbMembers !== null && (
-            <div className="modal-backdrop" onClick={() => setLbMembers(null)}>
+          {watchersOpen && lbMembers !== null && (
+            <div className="modal-backdrop" onClick={() => { setLbMembers(null); setWatchersOpen(false); }}>
               <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
                 <h3 style={{ color: "var(--gold)", marginTop: 0, textAlign: "center" }}>{t("leader_board")}</h3>
                 <p style={{ color: "var(--gold)", textAlign: "center", fontWeight: 600, fontSize: 13, margin: "0 0 12px" }}>
@@ -1200,9 +1289,57 @@ export function LiveViewerPage() {
                     )}
                   </>
                 )}
-                <button className="btn" style={{ marginTop: 12 }} onClick={() => setLbMembers(null)}>{t("close")}</button>
+                {/* Steve, 2026-10-29: the (LB) board now opens from the watchers icon, so the
+                    people watching are listed under it. */}
+                <h4 style={{ color: "var(--gold)", margin: "16px 0 8px", textAlign: "center" }}>👁 {t("watching_now_count", String(watcherList.length))}</h4>
+                {watcherList.length === 0 ? (
+                  <p className="muted" style={{ textAlign: "center" }}>{t("nobody_else_watching")}</p>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: "30vh", overflowY: "auto" }}>
+                    {watcherList.map((w) => (
+                      <div key={w.user_id} className="row" style={{ padding: "8px 10px", border: "1px solid var(--gold-border)", borderRadius: 10, background: "#111" }}>
+                        <Avatar user={{ fullname: w.fullname, username: w.username, profile_image: w.profile_image ? mediaUrl(w.profile_image) : undefined } as Partial<UserSummary>} />
+                        <div style={{ flex: 1, minWidth: 0, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {displayName({ fullname: w.fullname, username: w.username } as Partial<UserSummary>)}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <button className="btn" style={{ marginTop: 12 }} onClick={() => { setLbMembers(null); setWatchersOpen(false); }}>{t("close")}</button>
               </div>
             </div>
+          )}
+
+          {roomMenuOpen && (
+            <div onClick={() => setRoomMenuOpen(false)}
+              style={{ position: "fixed", inset: 0, zIndex: 60, background: "rgba(0,0,0,.75)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+              <div onClick={(e) => e.stopPropagation()}
+                style={{ width: "100%", maxWidth: 360, background: "#000", border: "1.5px solid var(--gold-border)", borderRadius: 16, padding: 16 }}>
+                <div style={{ textAlign: "center", marginBottom: 12 }}>
+                  <img src="/logo_horizontal.png" alt="Bingg Bongg" style={{ height: 62, maxWidth: "100%" }} />
+                </div>
+                <div style={{ fontWeight: 800, fontSize: 17, color: "var(--gold)", textAlign: "center", marginBottom: 12 }}>{t("this_live")}</div>
+                {roomLines.length > 0 && (
+                  <div style={{ color: "var(--gold)", textAlign: "center", fontSize: 13, marginTop: -4, marginBottom: 12, lineHeight: 1.6 }}>
+                    {roomLines.map((line) => <div key={line}>{line}</div>)}
+                  </div>
+                )}
+                {roomMenuRows.map((r) => (
+                  <button key={r.label} onClick={r.onPick}
+                    style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", cursor: "pointer", padding: "13px 14px", marginBottom: 8, borderRadius: 10, background: "#101010", color: "var(--gold)", border: "1.5px solid var(--gold-border)", fontSize: 15 }}>
+                    <span style={{ flex: 1, textAlign: "center" }}>{r.label}</span>
+                    <span style={{ fontWeight: 800 }}>{r.trailing ?? "\u203A"}</span>
+                  </button>
+                ))}
+                <button className="btn ghost" style={{ width: "100%", marginTop: 4 }} onClick={() => setRoomMenuOpen(false)}>{t("close")}</button>
+              </div>
+            </div>
+          )}
+          {reportOpen && members && (
+            <ReportDialog reportedUserId={members.host_user_id}
+              reportedName={displayName({ fullname: members.host_fullname, username: members.host_username } as Partial<UserSummary>)}
+              onClose={() => setReportOpen(false)} onDone={() => { setReportOpen(false); setToast(t("thanks_for_the_report")); }} />
           )}
 
           {favExplainer && (

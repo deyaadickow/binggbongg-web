@@ -200,6 +200,9 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .live-tap-count { position: absolute; left: 10px; bottom: 10px; z-index: 5; pointer-events: auto; cursor: pointer; font: inherit; display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: rgba(0,0,0,.8); border: 1px solid var(--gold); color: var(--gold); font-weight: 800; font-size: 13px; }
 /* Steve, 2026-10-14: the (LB) Leader Board badge — bottom-right of the video, every role. */
 .live-lb { position: absolute; right: 10px; bottom: 10px; z-index: 5; pointer-events: auto; cursor: pointer; font: inherit; width: 34px; height: 34px; border-radius: 50%; background: rgba(0,0,0,.8); border: 1px solid var(--gold); color: var(--gold); font-weight: 800; font-size: 12px; display: grid; place-items: center; }
+/* Steve, 2026-10-29: the watchers count opens the Leader Board + who is watching (the LB button is gone). */
+.live-watchers-btn { background: none; border: 1px solid var(--gold-border); border-radius: 999px; padding: 2px 10px; color: var(--gold); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.live-watchers-btn:hover { border-color: var(--gold); }
 .lb-members { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 8px; }
 .lb-member { font: inherit; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 4px; border-radius: 10px; background: #111; border: 1px solid var(--gold-border); color: #fff; min-width: 0; }
 .lb-member.selected { border-color: var(--gold); border-width: 2px; background: rgba(212,175,55,.18); }
