@@ -67,14 +67,8 @@ export function ReferralProgramPage() {
   const [codeIn, setCodeIn] = useState("");
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
-  // Steve, 2026-10-28: members can put their code on the flyer themselves — pre-filled with their
-  // username, editable (and typeable when signed out); the flyers redraw a moment after typing stops.
-  const [typed, setTyped] = useState<string | null>(null);
-  const [flyerCode, setFlyerCode] = useState<string>("");
   useEffect(() => { if (!toast) return; const id = setTimeout(() => setToast(null), 2600); return () => clearTimeout(id); }, [toast]);
   useEffect(() => { fetchReferralProgram(user?.id ?? null).then((p) => setProg(p)).catch(() => setProg(null)); }, [user?.id]);
-  const fieldValue = typed ?? prog?.me?.code ?? "";
-  useEffect(() => { const id = setTimeout(() => setFlyerCode(fieldValue.trim().slice(0, 30)), 300); return () => clearTimeout(id); }, [fieldValue]);
 
   const country: ReferralCountry | null = useMemo(() => {
     if (!prog || prog.countries.length === 0) return null;
@@ -156,22 +150,24 @@ export function ReferralProgramPage() {
 
       {(country?.flyer_phone || country?.flyer_letter) && (
         <div style={card}>
-          <div style={{ fontWeight: 800, marginBottom: 8 }}>{t("rp_code_on_flyer")}</div>
-          <input value={fieldValue} maxLength={30} onChange={(e) => setTyped(e.target.value)} placeholder={t("rp_code_placeholder")}
-                 style={{ width: "100%", boxSizing: "border-box", padding: "10px 14px", borderRadius: 999, border: `2px solid ${GOLD}`, background: "#000", color: "#fff", fontSize: 16, fontWeight: 800 }} />
+          {/* Steve, 2026-10-28: "no need to be able to edit" — the flyer always carries the member's own
+              code (their username); signed out, the slot stays empty until they sign in. */}
+          {code ? (
+            <div style={{ fontSize: 16 }}>{t("rp_code_on_flyer")}: <b style={{ color: GOLD, fontSize: 20 }}>{code}</b></div>
+          ) : <div style={{ fontSize: 16 }}>{t("rp_sign_in_for_flyer")}</div>}
         </div>
       )}
       {country?.flyer_phone && (
         <div style={card}>
           <div style={{ fontWeight: 900, color: GOLD, fontSize: 18, marginBottom: 10 }}>{t("rp_phone_flyer")}</div>
-          <Flyer url={country.flyer_phone} box={country.phone_code_box} code={flyerCode || null} fileName={`Bingg Bongg referral flyer${flyerCode ? ` - ${flyerCode}` : ""}.png`} onNotice={setToast} />
+          <Flyer url={country.flyer_phone} box={country.phone_code_box} code={code} fileName={`Bingg Bongg referral flyer${code ? ` - ${code}` : ""}.png`} onNotice={setToast} />
         </div>
       )}
       {country?.flyer_letter && (
         <div style={card}>
           <div style={{ fontWeight: 900, color: GOLD, fontSize: 18, marginBottom: 4 }}>🖨️ {t("rp_big_flyer")}</div>
           <div style={{ fontSize: 14, color: "#EDE6D2", marginBottom: 10 }}>{t("rp_big_flyer_note")}</div>
-          <Flyer big url={country.flyer_letter} box={country.letter_code_box} code={flyerCode || null} fileName={`Bingg Bongg big flyer${flyerCode ? ` - ${flyerCode}` : ""}.png`} onNotice={setToast} />
+          <Flyer big url={country.flyer_letter} box={country.letter_code_box} code={code} fileName={`Bingg Bongg big flyer${code ? ` - ${code}` : ""}.png`} onNotice={setToast} />
         </div>
       )}
       {toast && <div style={{ position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", background: "#000", border: `1.5px solid ${GOLD}`, color: "#fff", padding: "10px 18px", borderRadius: 999, zIndex: 2000, fontWeight: 800 }}>{toast}</div>}
