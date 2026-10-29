@@ -1073,7 +1073,13 @@ export function LiveViewerPage() {
     roomMenuRows.push({ label: "❤️ " + t("favourite_streamer"), trailing: t(isFavourite ? "switch_on" : "switch_off"), onPick: () => { void toggleFavourite(); } });
   }
   roomMenuRows.push({ label: "📤 " + t("share_the_live"), onPick: () => { setRoomMenuOpen(false); void shareLive(); } });
-  if (myId !== hostUserId) roomMenuRows.push({ label: t("report"), onPick: () => { setRoomMenuOpen(false); setReportOpen(true); } });
+  // Always offered (Steve, 2026-10-29): the streamer, else another player — never yourself.
+  // Nobody else on screen (a host alone): Report opens Support in a new tab.
+  const reportTarget = members ? [{ user_id: members.host_user_id, fullname: members.host_fullname, username: members.host_username }, ...members.guests].find((m) => m.user_id && m.user_id !== myId) ?? null : null;
+  roomMenuRows.push({ label: t("report"), onPick: () => {
+    setRoomMenuOpen(false);
+    if (reportTarget) setReportOpen(true); else window.open("/settings/support", "_blank", "noopener");
+  } });
   // A new tab, so a host asking for help doesn't end their own live by leaving the page.
   roomMenuRows.push({ label: t("support"), onPick: () => { setRoomMenuOpen(false); window.open("/settings/support", "_blank", "noopener"); } });
 
@@ -1336,9 +1342,9 @@ export function LiveViewerPage() {
               </div>
             </div>
           )}
-          {reportOpen && members && (
-            <ReportDialog reportedUserId={members.host_user_id}
-              reportedName={displayName({ fullname: members.host_fullname, username: members.host_username } as Partial<UserSummary>)}
+          {reportOpen && reportTarget && (
+            <ReportDialog reportedUserId={reportTarget.user_id}
+              reportedName={displayName({ fullname: reportTarget.fullname, username: reportTarget.username } as Partial<UserSummary>)}
               onClose={() => setReportOpen(false)} onDone={() => { setReportOpen(false); setToast(t("thanks_for_the_report")); }} />
           )}
 
