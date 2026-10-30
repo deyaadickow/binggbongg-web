@@ -272,6 +272,9 @@ function Tile({ f, video, onWatch, extras = [], onWatchExtra }: { f: Feature; vi
           inside the tile's link, and a button inside a link also follows the link. */}
       {video && <span style={{ display: "block", height: 38 }} aria-hidden />}
       {extras.length > 0 && <span style={{ display: "block", height: 42 }} aria-hidden />}
+      {/* Steve, 2026-10-30: "center everything from top to bottom/vertically on each box". The
+          corners take room at the top, so the same room is left at the bottom. */}
+      <span style={{ display: "block", height: 22 }} aria-hidden />
     </div>
   );
   const tile = to
@@ -286,7 +289,7 @@ function Tile({ f, video, onWatch, extras = [], onWatchExtra }: { f: Feature; vi
   return (
     <div style={{ position: "relative", height: "100%" }}>
       {tile}
-      <div style={{ position: "absolute", left: 14, right: 14, bottom: 14, display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+      <div style={{ position: "absolute", left: 14, right: 14, bottom: 44, display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
         {video && <button onClick={onWatch} style={pill}>▶ {t("watch_video")}</button>}
         {extras.length > 0 && (
           <div style={{ display: "flex", gap: 8, overflowX: "auto", maxWidth: "100%", scrollbarWidth: "none" }}>
