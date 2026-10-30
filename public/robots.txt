@@ -1,0 +1,26 @@
+# binggbongg.com (2026-10-30). Everything public may be indexed; members' private screens may not.
+User-agent: *
+Allow: /
+Disallow: /login
+Disallow: /wallet
+Disallow: /messages
+Disallow: /notifications
+Disallow: /upload
+Disallow: /upload-photos
+Disallow: /my-show
+Disallow: /my-gigs
+Disallow: /enter-contest
+Disallow: /settings/account
+Disallow: /settings/delete-account
+Disallow: /settings/vault
+Disallow: /settings/todo
+Disallow: /settings/support
+Disallow: /settings/blocked
+Disallow: /settings/moderators
+Disallow: /shop/orders
+Disallow: /shop/earnings
+Disallow: /shop/seller
+Disallow: /shop/agent
+Disallow: /support
+
+Sitemap: https://www.binggbongg.com/sitemap.xml

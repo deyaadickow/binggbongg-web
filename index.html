@@ -10,7 +10,76 @@
     <link rel="apple-touch-icon" href="/logo_round.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@500;700;800&display=swap" rel="stylesheet" />
-    <title>Bingg Bongg</title>
+    <!-- SEO (Steve, 2026-10-30: "Can you create seo for Bingg Bongg?"). These are the HOME page's;
+         src/lib/seo.ts updates title, description and canonical for each public page as you move
+         around. The page body below is filled in at build time by seo.config.ts. -->
+    <title>Bingg Bongg – Live Streaming, Battles, Games &amp; Singing Contests</title>
+    <meta name="description" content="Free live streaming app: go live, battle in 20 modes, play 100+ games, join singing contests with cash prizes, send gifts and get paid. Android &amp; iPhone." />
+    <link rel="canonical" href="https://www.binggbongg.com/" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Bingg Bongg" />
+    <meta property="og:url" content="https://www.binggbongg.com/" />
+    <meta property="og:title" content="Bingg Bongg – Live Streaming, Battles, Games &amp; Singing Contests" />
+    <meta property="og:description" content="Go live, battle in 20 modes, play 100+ games, join singing contests with cash prizes, send gifts and get paid. Free on Google Play and the App Store." />
+    <meta property="og:image" content="https://www.binggbongg.com/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Bingg Bongg – go live, battle, play and get paid" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Bingg Bongg – Live Streaming, Battles, Games &amp; Singing Contests" />
+    <meta name="twitter:description" content="Go live, battle in 20 modes, play 100+ games, join singing contests with cash prizes, send gifts and get paid." />
+    <meta name="twitter:image" content="https://www.binggbongg.com/og-image.jpg" />
+    <meta name="apple-itunes-app" content="app-id=1616509409" />
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://www.binggbongg.com/#org",
+          "name": "Bingg Bongg Inc.",
+          "url": "https://www.binggbongg.com/",
+          "logo": "https://www.binggbongg.com/logo_round.png",
+          "sameAs": [
+            "https://www.tiktok.com/@binggbongg2026",
+            "https://play.google.com/store/apps/details?id=com.apps.binggbongg",
+            "https://apps.apple.com/app/bingg-bongg/id1616509409"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://www.binggbongg.com/#site",
+          "url": "https://www.binggbongg.com/",
+          "name": "Bingg Bongg",
+          "publisher": { "@id": "https://www.binggbongg.com/#org" }
+        },
+        {
+          "@type": "MobileApplication",
+          "name": "Bingg Bongg",
+          "operatingSystem": "Android, iOS",
+          "applicationCategory": "SocialNetworkingApplication",
+          "description": "Free live streaming app: go live from your phone or computer, battle in 20 battle modes, play quiz games, bingo and 100+ tap games, enter singing contests with real cash prizes, send gifts and get paid. In 53 languages.",
+          "url": "https://www.binggbongg.com/",
+          "image": "https://www.binggbongg.com/og-image.jpg",
+          "downloadUrl": [
+            "https://play.google.com/store/apps/details?id=com.apps.binggbongg",
+            "https://apps.apple.com/app/bingg-bongg/id1616509409"
+          ],
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+          "publisher": { "@id": "https://www.binggbongg.com/#org" }
+        }
+      ]
+    }
+    </script>
+    <style>
+      /* The build-time page for search engines (seo.config.ts), in the site's own colours so the
+         instant before the app starts doesn't flash white. React replaces it. */
+      .seo-static { background: #000; color: #eee; font-family: Urbanist, system-ui, sans-serif; padding: 16px; max-width: 900px; margin: 0 auto; line-height: 1.5; }
+      .seo-static h1, .seo-static h2 { color: #F0C420; }
+      .seo-static a { color: #F0C420; }
+      body { background: #000; }
+    </style>
   </head>
   <body>
     <div id="root"></div>

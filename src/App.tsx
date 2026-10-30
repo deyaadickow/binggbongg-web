@@ -1,4 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { RouteMeta } from "./lib/seo";
 import { SessionProvider } from "./lib/session";
 import { LanguageProvider } from "./lib/i18n";
 import { Nav } from "./components/Nav";
@@ -60,6 +61,7 @@ export default function App() {
     <SessionProvider>
       <LanguageProvider>
       <BrowserRouter>
+        <RouteMeta />
         <Nav />
         <div className="shell">
         <Sidebar />
