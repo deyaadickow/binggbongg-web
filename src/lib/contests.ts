@@ -113,3 +113,22 @@ export async function voteForEntry(userId: number, videoId: number): Promise<Vot
     videoVoteCount: res.data?.video_vote_count,
   };
 }
+
+// Steve, 2026-10-30: "Yes build the share to get votes button". The link a contestant shares
+// opens the contest board on the website, scrolled to their entry and lit up in gold, where a
+// friend can vote (signing in first if they have to). Same link on Android and iOS.
+export function contestEntryShareUrl(contestId: number, videoId: number): string {
+  return `https://www.binggbongg.com/contests/${contestId}?entry=${videoId}`;
+}
+
+/** The phone's own share sheet where there is one, otherwise the link goes to the clipboard. */
+export async function shareContestEntry(text: string, url: string): Promise<"shared" | "copied" | "failed"> {
+  try {
+    if (navigator.share) { await navigator.share({ text, url }); return "shared"; }
+  } catch (e) {
+    if ((e as Error)?.name === "AbortError") return "shared"; // they closed the sheet themselves
+  }
+  try { await navigator.clipboard.writeText(`${text} ${url}`); return "copied"; } catch { /* fall through */ }
+  window.prompt("Copy this link", `${text} ${url}`);
+  return "copied";
+}

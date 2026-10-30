@@ -8,10 +8,11 @@
 // which is how the server has always behaved: voteOfficialContestVideo has no country check
 // and the calendar has never been filtered.
 import { useCallback, useEffect, useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { mediaUrl } from "../lib/api";
 import { useSession } from "../lib/session";
-import { fetchContests, fetchBoard, voteForEntry, isLive, type Contest, type Board, type BoardRow } from "../lib/contests";
+import { fetchContests, fetchBoard, voteForEntry, isLive, contestEntryShareUrl, shareContestEntry, type Contest, type Board, type BoardRow } from "../lib/contests";
+import { useT } from "../lib/i18n";
 import { Loading, Notice } from "../components/Common";
 import { PageTitle } from "../components/PageTitle";
 
@@ -59,10 +60,14 @@ export function ContestsPage() {
   );
 }
 
-function EntryRow({ row, canVote, onVoted }: {
+function EntryRow({ row, canVote, onVoted, contest, votingOpen, highlighted }: {
   row: BoardRow; canVote: boolean; onVoted: (videoId: number, count: number) => void;
+  contest: Contest; votingOpen: boolean; highlighted: boolean;
 }) {
   const { user } = useSession();
+  const { t } = useT();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState("");
 
@@ -80,8 +85,17 @@ function EntryRow({ row, canVote, onVoted }: {
 
   const isMine = user?.id === row.user_id;
 
+  // Steve, 2026-10-30: "Yes build the share to get votes button". Your own entry gets the
+  // share button where the Vote button would be (the server refuses a vote for yourself).
+  async function share() {
+    const text = contest.name ? t("share_vote_text", contest.name) : t("share_vote_text_no_name");
+    const how = await shareContestEntry(text, contestEntryShareUrl(contest.id, row.video_id));
+    if (how === "copied") setNote(t("link_copied_paste_it_anywhere"));
+  }
+
   return (
-    <div className="card pad" style={{ marginBottom: 10 }}>
+    <div id={`entry-${row.video_id}`} className="card pad"
+         style={{ marginBottom: 10, ...(highlighted ? { borderColor: "var(--gold)", boxShadow: "0 0 0 2px var(--gold), 0 0 18px rgba(240,196,32,0.45)" } : {}) }}>
       <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
         <div style={{ fontWeight: 700, fontSize: 18, minWidth: 28 }}>#{row.rank}</div>
         {row.thumb_path && (
@@ -112,6 +126,16 @@ function EntryRow({ row, canVote, onVoted }: {
             {busy ? "Voting…" : "Vote"}
           </button>
         )}
+        {/* A friend who opened a shared link without being signed in: Vote takes them to sign
+            in (or sign up) and brings them straight back to this entry. */}
+        {votingOpen && !user && (
+          <button className="btn small" onClick={() => navigate("/login", { state: { from: location.pathname + location.search } })}>
+            {t("vote_sign_in")}
+          </button>
+        )}
+        {isMine && (
+          <button className="btn small" onClick={share} style={{ background: "var(--gold-border)", color: "#000", borderColor: "var(--gold-border)" }}>{t("share_to_get_votes")}</button>
+        )}
         {row.post_id != null && (
           <Link className="btn small" to={`/video/${row.post_id}`}>Watch &amp; Gift</Link>
         )}
@@ -129,6 +153,10 @@ export function ContestBoardPage() {
   const contestId = Number(id);
   const navigate = useNavigate();
   const { user, isLoggedIn } = useSession();
+  const location = useLocation();
+  const [params] = useSearchParams();
+  const entryParam = Number(params.get("entry"));
+  const highlightId = Number.isFinite(entryParam) && entryParam > 0 ? entryParam : null;
   const [board, setBoard] = useState<Board | null | "missing">(null);
   const [tab, setTab] = useState<"votes" | "gifts">("votes");
 
@@ -137,6 +165,12 @@ export function ContestBoardPage() {
     fetchBoard(contestId).then((b) => setBoard(b ?? "missing"));
   }, [contestId]);
   useEffect(() => { load(); }, [load]);
+  // A shared link (?entry=<contest video id>) scrolls to that entry once the board has drawn.
+  useEffect(() => {
+    if (!highlightId || board === null || board === "missing") return;
+    const el = document.getElementById(`entry-${highlightId}`);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [board, highlightId]);
 
   if (board === null) return <div className="page"><Loading /></div>;
   if (board === "missing") return <div className="page"><Notice>That contest couldn't be found.</Notice></div>;
@@ -199,14 +233,19 @@ export function ContestBoardPage() {
         </div>
       )}
 
-      {!isLoggedIn && <Notice>Sign in to vote and send gifts.</Notice>}
+      {!isLoggedIn && (
+        <Notice>
+          <Link to="/login" state={{ from: location.pathname + location.search }}>Sign in</Link> to vote and send gifts.
+        </Notice>
+      )}
 
       {rows.length === 0 ? (
         <Notice>No entries yet.</Notice>
       ) : (
         rows.map((r) => (
           <EntryRow key={`${tab}-${r.video_id}`} row={r}
-                    canVote={votingOpen && isLoggedIn && !!user} onVoted={onVoted} />
+                    canVote={votingOpen && isLoggedIn && !!user} onVoted={onVoted}
+                    contest={c} votingOpen={votingOpen} highlighted={r.video_id === highlightId} />
         ))
       )}
 

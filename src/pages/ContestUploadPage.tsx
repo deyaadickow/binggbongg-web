@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { currentAuthHeaders } from "../lib/api";
 import { useSession } from "../lib/session";
 import { fetchOpenContests, uploadContestVideo, type OpenContest } from "../lib/contestupload";
+import { contestEntryShareUrl, shareContestEntry } from "../lib/contests";
 import { videoDuration } from "../lib/upload";
 import { Loading, Notice } from "../components/Common";
 import { useT } from "../lib/i18n";
@@ -25,6 +26,8 @@ function ContestCard({ contest, userId, onDone }: { contest: OpenContest; userId
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState("");
   const [sent, setSent] = useState(false);
+  const [entryId, setEntryId] = useState<number | null>(null);
+  const [shareNote, setShareNote] = useState("");
 
   const remaining = contest.my_uploads_remaining;
   const full = remaining !== null && remaining !== undefined && remaining <= 0;
@@ -44,7 +47,8 @@ function ContestCard({ contest, userId, onDone }: { contest: OpenContest; userId
       if (maxSecs && secs && secs > maxSecs) {
         throw new Error(`That video is ${Math.round(secs)}s — ${contest.name} allows up to ${maxSecs}s.`);
       }
-      await uploadContestVideo(userId, contest.id, file, secs, currentAuthHeaders(), setProgress);
+      const { videoId } = await uploadContestVideo(userId, contest.id, file, secs, currentAuthHeaders(), setProgress);
+      setEntryId(videoId);
       setSent(true);
       onDone();
     } catch (e) {
@@ -80,7 +84,15 @@ function ContestCard({ contest, userId, onDone }: { contest: OpenContest; userId
       )}
 
       {error && <p style={{ color: "#f55", fontSize: 13 }}>{error}</p>}
-      {sent && <p className="soft" style={{ fontSize: 13 }}>{t("entered_good_luck")}</p>}
+      {sent && <p className="soft" style={{ fontSize: 13 }}>{entryId ? t("share_after_entry") : t("entered_good_luck")}</p>}
+      {/* Steve, 2026-10-30: "Yes build the share to get votes button". */}
+      {sent && entryId && (
+        <button className="btn block" style={{ marginTop: 6 }} onClick={async () => {
+          const how = await shareContestEntry(t("share_vote_text", contest.name ?? ""), contestEntryShareUrl(contest.id, entryId));
+          if (how === "copied") setShareNote(t("link_copied_paste_it_anywhere"));
+        }}>{t("share_to_get_votes")}</button>
+      )}
+      {shareNote && <p className="soft" style={{ fontSize: 13 }}>{shareNote}</p>}
 
       {busy && (
         <div style={{ height: 8, background: "var(--panel)", borderRadius: 999, overflow: "hidden", margin: "10px 0" }}>

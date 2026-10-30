@@ -57,7 +57,7 @@ export function uploadContestVideo(
   durationSeconds: number | null,
   headers: Record<string, string>,
   onProgress?: (fraction: number) => void,
-): Promise<void> {
+): Promise<{ videoId: number | null }> {
   return new Promise((resolve, reject) => {
     const form = new FormData();
     form.append("user_id", String(userId));
@@ -72,9 +72,10 @@ export function uploadContestVideo(
       if (e.lengthComputable && onProgress) onProgress(e.loaded / e.total);
     };
     xhr.onload = () => {
-      let body: { status?: boolean; message?: string } = {};
+      let body: { status?: boolean; message?: string; data?: { id?: number } } = {};
       try { body = JSON.parse(xhr.responseText); } catch { /* falls through to the status check */ }
-      if (xhr.status >= 200 && xhr.status < 300 && body.status) resolve();
+      // The new entry's contest-video id, for the "Share to get votes" link (2026-10-30).
+      if (xhr.status >= 200 && xhr.status < 300 && body.status) resolve({ videoId: Number(body.data?.id) || null });
       else reject(new Error(uploadErrorMessage(xhr.status, body.message)));
     };
     xhr.onerror = () => reject(new Error(uploadErrorMessage(0)));
