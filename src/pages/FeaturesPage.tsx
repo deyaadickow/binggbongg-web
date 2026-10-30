@@ -356,7 +356,11 @@ export function FeaturesPage() {
 
       {sections.map((section) => (
         <div key={section.titleKey} style={{ marginTop: 22 }}>
-          <h2 style={{ color: "var(--gold)", fontSize: 17, margin: "0 0 10px" }}>{t(section.titleKey)}</h2>
+          {/* Steve, 2026-10-29: "make the headline standout, somehow make it different" — solid gold bar,
+              bold black capitals, so a section heading never reads like a feature name. */}
+          <h2 style={{ color: "#000", background: "linear-gradient(90deg, #F0C420, #D4AF37)", borderRadius: 10,
+                       padding: "10px 16px", fontSize: 16, fontWeight: 800, letterSpacing: "0.08em",
+                       textTransform: "uppercase", margin: "0 0 10px" }}>{t(section.titleKey)}</h2>
           <div style={{
             display: "grid",
             gridTemplateColumns: "1fr",
