@@ -232,7 +232,11 @@ function Tile({ f, video, onWatch, extras = [], onWatchExtra }: { f: Feature; vi
     }}>
       <span style={{ fontSize: 26, lineHeight: 1, flexShrink: 0 }} aria-hidden>{f.icon === "bingo_card" ? <BingoCardIcon size={36} /> : f.icon}</span>
       <span style={{ minWidth: 0, flex: 1 }}>
-        <b style={{ color: "var(--gold)", display: "block", fontSize: 15 }}>{t(f.labelKey ?? f.nameKey)}</b>
+        {/* Steve, 2026-10-29 (circling each feature's name): "make the headline standout, somehow make it
+            different" — bigger, brighter gold with a soft glow, in its own gold-outlined box. */}
+        <b style={{ color: "#FFD84D", display: "inline-block", fontSize: 18, padding: "3px 10px 4px",
+                    background: "#2A2205", border: "2px solid #F0C420", borderRadius: 8,
+                    textShadow: "0 0 8px rgba(240,196,32,0.6)", marginBottom: 2 }}>{t(f.labelKey ?? f.nameKey)}</b>
         {/* Steve, 2026-10-19: "Make the white text readable... a little bolder." The dim grey
             was hardest to read on the phones, and the same line here was only a shade better
             over the artwork. Explicit rather than .muted, which is used site-wide. */}
