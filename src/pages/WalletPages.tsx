@@ -194,7 +194,7 @@ function EarningsRow({ earn, year, onYear }: { earn: Earnings | null; year: numb
 interface WiseProfile { has_profile?: boolean; profile?: { country?: string; currency?: string; provider?: string; account_holder_name?: string; account_number?: string; address_line?: string; address_city?: string; address_postcode?: string } }
 interface WiseCountry { code?: string; country?: string; name?: string; currency?: string; providers?: ({ key?: string; id?: string; value?: string; name?: string; label?: string } | string)[] }
 export function RedeemPage() {
-  const { t } = useT();
+  const { t, lang } = useT();
   const { user, isLoggedIn, refresh } = useSession();
   // Owned here so the Spending circle and the move card can never disagree about the figure.
   const [cashAccount, setCashAccount] = useState<number | null>(null);
@@ -245,7 +245,8 @@ export function RedeemPage() {
     if (gateway !== "Wise" && !account.trim()) { setToast(`Enter your ${pretty(gateway)} account (email or mobile).`); return; }
     setBusy(true);
     try {
-      const r = await post("submitRedeem", { user_id: user!.id, gateway, account: gateway === "Wise" ? "wise" : account.trim(), cash_amount: cash });
+      // language: the server answers in it (Steve, 2026-10-30).
+      const r = await post("submitRedeem", { user_id: user!.id, gateway, account: gateway === "Wise" ? "wise" : account.trim(), cash_amount: cash, language: lang });
       if (!r.status) throw new Error(r.message ?? tt("couldn_t_submit_the_request"));
       // The server says what actually happened: "Paid! Your payout was sent automatically." for
       // $20-$100, or that a larger one goes to the team. Fall back to the generic line.
