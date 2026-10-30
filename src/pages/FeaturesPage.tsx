@@ -218,6 +218,11 @@ const FEATURES: Section[] = [
 const FEATURE_NUMBER: Record<string, number> = {};
 FEATURES.flatMap((sec) => sec.features).forEach((f, i) => { FEATURE_NUMBER[f.nameKey] = i + 1; });
 
+/** The red star either side of every feature's name (Steve, 2026-10-30). */
+const RED_STAR: React.CSSProperties = {
+  color: "#E53935", fontSize: 20, lineHeight: 1, flexShrink: 0, textShadow: "0 0 8px rgba(229,57,53,0.75)",
+};
+
 function Tile({ f, video, onWatch, extras = [], onWatchExtra }: { f: Feature; video?: string; onWatch: () => void; extras?: { key: string; label: string }[]; onWatchExtra?: (key: string) => void }) {
   const { t } = useT();
   // The battle badge, the streak, the Lifetime Battle Board and Playlists all live on your own
@@ -227,39 +232,43 @@ function Tile({ f, video, onWatch, extras = [], onWatchExtra }: { f: Feature; vi
   const to = f.myProfile ? (user ? `/profile/${user.id}` : "/login") : f.to;
   const inner = (
     <div className="card pad" style={{
-      borderColor: "var(--gold-border)", height: "100%",
-      display: "flex", gap: 12, alignItems: "flex-start",
+      borderColor: "var(--gold-border)", height: "100%", position: "relative",
+      display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: 8,
     }}>
-      <span style={{ fontSize: 26, lineHeight: 1, flexShrink: 0 }} aria-hidden>{f.icon === "bingo_card" ? <BingoCardIcon size={36} /> : f.icon}</span>
-      <span style={{ minWidth: 0, flex: 1 }}>
+      {/* Steve, 2026-10-30: "center everything on each box ... and add a red star icon on each side
+          of the headline". The icon sits centred on top, the #number pinned top-right. */}
+      <span style={{
+        position: "absolute", top: 14, right: 14, color: "var(--gold)", fontWeight: 700, fontSize: 15,
+        border: "1px solid var(--gold-border)", borderRadius: 999, padding: "3px 10px",
+        background: "rgba(0,0,0,0.9)", fontVariantNumeric: "tabular-nums",
+      }}>#{FEATURE_NUMBER[f.nameKey]}</span>
+      <span style={{ fontSize: 28, lineHeight: 1 }} aria-hidden>{f.icon === "bingo_card" ? <BingoCardIcon size={38} /> : f.icon}</span>
+      <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, maxWidth: "100%" }}>
+        <span style={RED_STAR} aria-hidden>★</span>
         {/* Steve, 2026-10-29 (circling each feature's name): "make the headline standout, somehow make it
             different" — bigger, brighter gold with a soft glow, in its own gold-outlined box. */}
         <b style={{ color: "#FFD84D", display: "inline-block", fontSize: 18, padding: "3px 10px 4px",
                     background: "#2A2205", border: "2px solid #F0C420", borderRadius: 8,
-                    textShadow: "0 0 8px rgba(240,196,32,0.6)", marginBottom: 2 }}>{t(f.labelKey ?? f.nameKey)}</b>
-        {/* Steve, 2026-10-19: "Make the white text readable... a little bolder." The dim grey
-            was hardest to read on the phones, and the same line here was only a shade better
-            over the artwork. Explicit rather than .muted, which is used site-wide. */}
-        <span style={{ fontSize: 13, display: "block", marginTop: 3, color: "rgba(255,255,255,0.85)", fontWeight: 500 }}>{t(f.blurbKey)}</span>
-        {/* Steve, 2026-10-19: "add all the links that you can to as many boxes that you can."
-            Now that nearly every tile opens something, this line answers "where IS this?"
-            rather than apologising for going nowhere — Bingg Bongg Bingo says "the live room"
-            AND takes you to Live Now to find one. */}
-        {f.whereKey && (
-          <span style={{ fontSize: 12, color: "var(--gold)", opacity: 0.75, display: "block", marginTop: 6 }}>
-            📱 {t(f.whereKey)}
-          </span>
-        )}
-        {/* Room for the Watch video pill, which sits ON the card rather than in it: the card is
-            inside the tile's link, and a button inside a link also follows the link. */}
-        {video && <span style={{ display: "block", height: 42 }} aria-hidden />}
-        {extras.length > 0 && <span style={{ display: "block", height: 42 }} aria-hidden />}
+                    textShadow: "0 0 8px rgba(240,196,32,0.6)", minWidth: 0 }}>{t(f.labelKey ?? f.nameKey)}</b>
+        <span style={RED_STAR} aria-hidden>★</span>
       </span>
-      <span style={{
-        flexShrink: 0, color: "var(--gold)", fontWeight: 700, fontSize: 15,
-        border: "1px solid var(--gold-border)", borderRadius: 999, padding: "3px 10px",
-        background: "rgba(0,0,0,0.9)", fontVariantNumeric: "tabular-nums",
-      }}>#{FEATURE_NUMBER[f.nameKey]}</span>
+      {/* Steve, 2026-10-19: "Make the white text readable... a little bolder." The dim grey
+          was hardest to read on the phones, and the same line here was only a shade better
+          over the artwork. Explicit rather than .muted, which is used site-wide. */}
+      <span style={{ fontSize: 13, display: "block", color: "rgba(255,255,255,0.85)", fontWeight: 500 }}>{t(f.blurbKey)}</span>
+      {/* Steve, 2026-10-19: "add all the links that you can to as many boxes that you can."
+          Now that nearly every tile opens something, this line answers "where IS this?"
+          rather than apologising for going nowhere — Bingg Bongg Bingo says "the live room"
+          AND takes you to Live Now to find one. */}
+      {f.whereKey && (
+        <span style={{ fontSize: 12, color: "var(--gold)", opacity: 0.75, display: "block" }}>
+          📱 {t(f.whereKey)}
+        </span>
+      )}
+      {/* Room for the Watch video pill, which sits ON the card rather than in it: the card is
+          inside the tile's link, and a button inside a link also follows the link. */}
+      {video && <span style={{ display: "block", height: 38 }} aria-hidden />}
+      {extras.length > 0 && <span style={{ display: "block", height: 42 }} aria-hidden />}
     </div>
   );
   const tile = to
@@ -274,7 +283,7 @@ function Tile({ f, video, onWatch, extras = [], onWatchExtra }: { f: Feature; vi
   return (
     <div style={{ position: "relative", height: "100%" }}>
       {tile}
-      <div style={{ position: "absolute", left: 52, right: 14, bottom: 14, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8 }}>
+      <div style={{ position: "absolute", left: 14, right: 14, bottom: 14, display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
         {video && <button onClick={onWatch} style={pill}>▶ {t("watch_video")}</button>}
         {extras.length > 0 && (
           <div style={{ display: "flex", gap: 8, overflowX: "auto", maxWidth: "100%", scrollbarWidth: "none" }}>
