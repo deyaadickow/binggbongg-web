@@ -247,7 +247,9 @@ export function RedeemPage() {
     try {
       const r = await post("submitRedeem", { user_id: user!.id, gateway, account: gateway === "Wise" ? "wise" : account.trim(), cash_amount: cash });
       if (!r.status) throw new Error(r.message ?? tt("couldn_t_submit_the_request"));
-      setToast(tt("withdrawal_requested_you_ll_see_it_in_pa")); setAmount(""); refresh();
+      // The server says what actually happened: "Paid! Your payout was sent automatically." for
+      // $20-$100, or that a larger one goes to the team. Fall back to the generic line.
+      setToast(r.message || tt("withdrawal_requested_you_ll_see_it_in_pa")); setAmount(""); refresh();
     } catch (e) { setToast((e as Error).message); } finally { setBusy(false); }
   }
   return (
@@ -328,6 +330,8 @@ export function RedeemPage() {
           </div>
         )}
         <button className="btn block" disabled={busy || (gateway === "Wise" && !wise?.has_profile)} onClick={redeem}>{busy ? "Sending…" : "Redeem"}</button>
+        {/* Steve, 2026-10-30: automatic payouts, $20-$100, up to 3 a day; larger ones by the team. */}
+        <p className="muted" style={{ fontSize: 12, margin: "10px 0 0", textAlign: "center" }}>{t("auto_payout_note")}</p>
       </div>
       {el}
     </Page>
