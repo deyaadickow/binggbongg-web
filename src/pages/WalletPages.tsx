@@ -171,7 +171,7 @@ function EarningsRow({ earn, year, onYear }: { earn: Earnings | null; year: numb
   const thisYear = new Date().getFullYear();
   return (
     <div className="row" style={{ flexWrap: "wrap", gap: 18 }}>
-      {[["Today", earn?.todayEarnings], ["This week", earn?.thisWeekEarnings], ["This month", earn?.thisMonthEarnings]].map(([k, v]) => (
+      {[[t("today"), earn?.todayEarnings], [t("earn_this_week"), earn?.thisWeekEarnings], [t("earn_this_month"), earn?.thisMonthEarnings]].map(([k, v]) => (
         <div key={k as string}><div className="muted" style={{ fontSize: 12 }}>{k as string}</div><div style={{ fontWeight: 800, color: "var(--gold)", fontSize: 18 }}>{earn ? money(v) : "…"}</div></div>
       ))}
       <div>
@@ -179,9 +179,11 @@ function EarningsRow({ earn, year, onYear }: { earn: Earnings | null; year: numb
             list opened as the operating system's grey menu with a red highlight. */}
         <GoldSelect
           ariaLabel={t("year")}
-          style={{ minWidth: 92 }}
+          style={{ minWidth: 132 }}
           value={String(year)}
-          options={[0, 1, 2, 3].map((i) => ({ value: String(thisYear - i), label: String(thisYear - i) }))}
+          // Steve, 2026-10-30: "What are the $0.00 under the date?" — the selector now says what the
+          // number under it is: the whole year's total.
+          options={[0, 1, 2, 3].map((i) => ({ value: String(thisYear - i), label: t("all_of_year", thisYear - i) }))}
           onChange={(v) => onYear(Number(v))}
         />
         <div style={{ fontWeight: 800, color: "var(--gold)", fontSize: 18 }}>{earn ? money(earn.yearEarnings) : "…"}</div>
