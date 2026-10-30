@@ -236,13 +236,16 @@ function Tile({ f, video, onWatch, extras = [], onWatchExtra }: { f: Feature; vi
       display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: 8,
     }}>
       {/* Steve, 2026-10-30: "center everything on each box ... and add a red star icon on each side
-          of the headline". The icon sits centred on top, the #number pinned top-right. */}
+          of the headline". The icon sits top-left, the #number top-right. */}
       <span style={{
         position: "absolute", top: 14, right: 14, color: "var(--gold)", fontWeight: 700, fontSize: 15,
         border: "1px solid var(--gold-border)", borderRadius: 999, padding: "3px 10px",
         background: "rgba(0,0,0,0.9)", fontVariantNumeric: "tabular-nums",
       }}>#{FEATURE_NUMBER[f.nameKey]}</span>
-      <span style={{ fontSize: 28, lineHeight: 1 }} aria-hidden>{f.icon === "bingo_card" ? <BingoCardIcon size={38} /> : f.icon}</span>
+      {/* Top-left corner, opposite the #number (Steve, 2026-10-30). The empty line keeps the name
+          below the corners. */}
+      <span style={{ position: "absolute", top: 14, left: 16, fontSize: 24, lineHeight: 1 }} aria-hidden>{f.icon === "bingo_card" ? <BingoCardIcon size={32} /> : f.icon}</span>
+      <span style={{ display: "block", height: 22 }} aria-hidden />
       <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, maxWidth: "100%" }}>
         <span style={RED_STAR} aria-hidden>★</span>
         {/* Steve, 2026-10-29 (circling each feature's name): "make the headline standout, somehow make it
