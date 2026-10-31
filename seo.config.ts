@@ -80,6 +80,36 @@ export function seoStaticContent(): Plugin {
     transformIndexHtml(html) {
       return html.replace('<div id="root"></div>', `<div id="root">${staticPage(root)}</div>`);
     },
+    // The ads' landing page gets its OWN dist/ph/index.html (Steve, 2026-10-31). Meta's ad review
+    // and Facebook's link preview read the raw HTML, never the running app, and the home page's
+    // description talks about cash prizes — the wording that already got one ad rejected as a
+    // "social casino". Apache serves a real folder before the SPA fallback, so /ph gets this.
+    writeBundle(options) {
+      const out = options.dir ?? path.join(root, "dist");
+      const home = path.join(out, "index.html");
+      if (!fs.existsSync(home)) return;
+      const title = "Philippine Singing Contest – Bingg Bongg";
+      const desc = "Free to enter all November. Upload your song on Bingg Bongg and members vote for the best voices. Free on Google Play and the App Store.";
+      const url = `${SITE}/ph`;
+      let html = fs.readFileSync(home, "utf8");
+      html = html
+        .replace(/<title>[^<]*<\/title>/, `<title>${esc(title)}</title>`)
+        .replace(/(<meta name="description" content=")[^"]*(")/, `$1${esc(desc)}$2`)
+        .replace(/(<link rel="canonical" href=")[^"]*(")/, `$1${url}$2`)
+        .replace(/(<meta property="og:url" content=")[^"]*(")/, `$1${url}$2`)
+        .replace(/(<meta property="og:title" content=")[^"]*(")/, `$1${esc(title)}$2`)
+        .replace(/(<meta property="og:description" content=")[^"]*(")/, `$1${esc(desc)}$2`)
+        .replace(/(<meta name="twitter:title" content=")[^"]*(")/, `$1${esc(title)}$2`)
+        .replace(/(<meta name="twitter:description" content=")[^"]*(")/, `$1${esc(desc)}$2`)
+        .replace(/(<meta property="og:image:alt" content=")[^"]*(")/, `$1${esc(title)}$2`)
+        // The site-wide structured data describes the whole app (cash prizes, getting paid); the
+        // landing page doesn't need it, and Meta reads it.
+        .replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>\s*/, "")
+        // Only the landing page's own words in the body, not the whole site's feature list.
+        .replace(/<div id="root">[\s\S]*?<\/div>\s*(<script|<\/body>)/, `<div id="root"><main><h1>${esc(title)}</h1><p>${esc(desc)}</p><p><a href="${PLAY}">Get it on Google Play</a> · <a href="${APPSTORE}">Download on the App Store</a></p></main></div>\n$1`);
+      fs.mkdirSync(path.join(out, "ph"), { recursive: true });
+      fs.writeFileSync(path.join(out, "ph", "index.html"), html);
+    },
   };
 }
 

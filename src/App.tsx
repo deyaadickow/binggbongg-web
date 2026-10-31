@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { RouteMeta } from "./lib/seo";
 import { SessionProvider } from "./lib/session";
 import { LanguageProvider } from "./lib/i18n";
@@ -41,6 +41,10 @@ import { BirthdayPage } from "./pages/BirthdayPage";
 import { SupporterBreakdownPage, SupportersPage } from "./pages/SupportersPage";
 import { MyAnalyticsPage } from "./pages/MyAnalyticsPage";
 import { AdAnalyticsPage } from "./pages/AdAnalyticsPage";
+import { LandingPage } from "./pages/LandingPage";
+import { useEffect, type ReactNode } from "react";
+import { post } from "./lib/api";
+import { pixelPageView } from "./lib/pixel";
 import { SearchPage } from "./pages/SearchPage";
 import { LiveNowPage } from "./pages/LiveNowPage";
 import { MyShowPage, ShowsPage } from "./pages/ShowsPages";
@@ -59,12 +63,43 @@ import { SellerPage } from "./pages/SellerPage";
 import { AgentPage } from "./pages/AgentPage";
 import { VaultPage } from "./pages/VaultPage";
 
+/** The ads' landing page (/ph) stands alone — no menu, no sidebar, nothing but the contest and the
+ *  download button (Steve, 2026-10-31). Everything else gets the normal site. */
+function LandingSwitch({ children }: { children: ReactNode }) {
+  const { pathname } = useLocation();
+  return pathname.replace(/\/+$/, "") === "/ph" ? <LandingPage /> : <>{children}</>;
+}
+
+/** Someone arriving on the website from one of our ads (Facebook adds fbclid; our own links add
+ *  src) is counted once per visit as "Ad → our website" on the admin dashboard (AdLinkController).
+ *  Also tells the Meta Pixel about every page as the visitor moves around. */
+function AdArrival() {
+  const { pathname } = useLocation();
+  useEffect(() => { pixelPageView(); }, [pathname]);
+  useEffect(() => {
+    let q: URLSearchParams;
+    try { q = new URLSearchParams(window.location.search); } catch { return; }
+    if (window.location.pathname.replace(/\/+$/, "") === "/ph") return; // the landing page counts itself
+    const fbclid = q.get("fbclid");
+    const src = q.get("src") || q.get("utm_campaign") || "";
+    if (!fbclid && !src && !q.get("utm_source")) return;
+    try {
+      if (sessionStorage.getItem("bb.adArrival") === "1") return;
+      sessionStorage.setItem("bb.adArrival", "1");
+    } catch { /* private mode: count it anyway */ }
+    post("recordAdLinkEvent", { event: "website", src, ...(fbclid ? { fbclid } : {}) }).catch(() => undefined);
+  }, []);
+  return null;
+}
+
 export default function App() {
   return (
     <SessionProvider>
       <LanguageProvider>
       <BrowserRouter>
         <RouteMeta />
+        <AdArrival />
+        <LandingSwitch>
         <Nav />
         <div className="shell">
         <Sidebar />
@@ -203,6 +238,7 @@ export default function App() {
         </Routes>
         </main>
         </div>
+        </LandingSwitch>
       </BrowserRouter>
       </LanguageProvider>
     </SessionProvider>
