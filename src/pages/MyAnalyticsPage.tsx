@@ -79,8 +79,9 @@ const CARD_LABELS: Record<string, StringKey> = {
 
 const VS: Record<string, StringKey> = { day: "ma_vs_yesterday", month: "ma_vs_last_month", year: "ma_vs_last_year" };
 
-/** prev null -> nothing; both 0 -> "—"; prev 0 -> "new"; else "▲ 12% vs last month" / "▼ 8% ...". */
-function Comparison({ value, prev, prevLabel }: { value: number; prev: number | null; prevLabel: string }) {
+/** prev null -> nothing; both 0 -> "—"; prev 0 -> "new"; else "▲ 12% vs last month" / "▼ 8% ...".
+ *  lowerIsBetter (Ads Analytics' cost cards): a rise is shown red and a fall green. */
+export function Comparison({ value, prev, prevLabel, lowerIsBetter = false }: { value: number; prev: number | null; prevLabel: string; lowerIsBetter?: boolean }) {
   const { t } = useT();
   if (prev === null) return null;
   const style = { fontSize: 12, fontWeight: 700 } as const;
@@ -90,8 +91,9 @@ function Comparison({ value, prev, prevLabel }: { value: number; prev: number | 
   const vs = VS[prevLabel] ?? "ma_vs_last_month";
   if (pct === 0) return <div className="muted" style={style}>{t(vs, "0%")}</div>;
   const up = pct > 0;
+  const good = lowerIsBetter ? !up : up;
   return (
-    <div style={{ ...style, color: up ? "#34d399" : "#f87171" }}>
+    <div style={{ ...style, color: good ? "#34d399" : "#f87171" }}>
       {t(vs, `${up ? "▲" : "▼"} ${Math.abs(pct).toLocaleString()}%`)}
     </div>
   );
@@ -104,7 +106,7 @@ const CHARTS: { key: ChartKey; label: StringKey }[] = [
   { key: "earned", label: "ma_chart_earned" },
 ];
 
-function BarChart({ buckets, values, isMoney }: { buckets: string[]; values: number[]; isMoney: boolean }) {
+export function BarChart({ buckets, values, isMoney }: { buckets: string[]; values: number[]; isMoney: boolean }) {
   const [active, setActive] = useState<number | null>(null);
   useEffect(() => setActive(null), [buckets, values]);
   const max = Math.max(0, ...values);
@@ -142,7 +144,7 @@ function BarChart({ buckets, values, isMoney }: { buckets: string[]; values: num
 }
 
 /** "2026-10-04" -> "October 4, 2026" in the page's language, read as a local date. */
-function longDate(ymd: string | undefined, lang: string): string {
+export function longDate(ymd: string | undefined, lang: string): string {
   const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(ymd ?? "");
   if (!m) return ymd ?? "";
   const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));

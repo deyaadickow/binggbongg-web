@@ -6,8 +6,12 @@ import { Loading, Notice, StoreBadges } from "../components/Common";
 import { setFeed } from "../lib/feed";
 import { FeedPhotoCard } from "../components/FeedPhotoCard";
 import { HelpFeedCard } from "../components/HelpFeedCard";
+import { PaidAdCard, type FeedVideoAd } from "../components/PaidAdCard";
 import { fetchHelpCampaigns, helpFeedSlots, type HelpCampaign } from "../lib/help";
 import { tt, useT  } from "../lib/i18n";
+
+/** A paid ad after every this many videos — the same as Android and iOS. */
+const PAID_AD_EVERY = 5;
 
 export function HomePage() {
   const { t } = useT();
@@ -53,6 +57,18 @@ export function HomePage() {
 
   useEffect(() => { fetchHelpCampaigns(0, 10).then(setHelp); }, []);
 
+  // Paid video ads for where this member is (Steve, 2026-10-31). Signed-in only: the endpoint
+  // needs the member, as it does on the phones. A failure just means no ads, never no feed.
+  const [ads, setAds] = useState<FeedVideoAd[]>([]);
+  useEffect(() => {
+    if (!user?.id) { setAds([]); return; }
+    let live = true;
+    post<FeedVideoAd[]>("fetchFeedVideoAds", { my_user_id: user.id })
+      .then((r) => { if (live) setAds((r.data ?? []).filter((a) => a.video_path)); })
+      .catch(() => undefined);
+    return () => { live = false; };
+  }, [user?.id]);
+
   // Indexes only, never a merged array: the video page steps through `posts` in exactly this
   // order, and splicing anything into it would desync which video "next" means.
   const slots = helpFeedSlots(posts.length, help.rows.length, help.everyMin, help.everyMax);
@@ -73,6 +89,10 @@ export function HomePage() {
           const slot = slots.indexOf(i);
           return (
             <Fragment key={p.id}>
+              {/* One paid ad after every 5 videos, taking turns — the phones' cadence. */}
+              {user && ads.length > 0 && i > 0 && i % PAID_AD_EVERY === 0 && (
+                <PaidAdCard ad={ads[(i / PAID_AD_EVERY - 1) % ads.length]} userId={user.id} />
+              )}
               {slot !== -1 && help.rows[slot] && <HelpFeedCard campaign={help.rows[slot]} />}
               <PostCard post={p} />
             </Fragment>

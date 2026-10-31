@@ -496,7 +496,11 @@ export function AdvertisePage() {
                 {a.stats.summary_text}
               </div>
             )}
-            <span className="pill">{a.status ?? "—"}</span>
+            <div style={{ display: "grid", gap: 6, justifyItems: "end" }}>
+              <span className="pill">{a.status ?? "—"}</span>
+              {/* Steve, 2026-10-31: the full Ads Analytics page for this ad. */}
+              <Link className="btn small" to={`/settings/advertise/${a.id}/analytics`}>{t("aa_open")}</Link>
+            </div>
           </div>
         ))}
       </div>

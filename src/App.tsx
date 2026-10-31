@@ -40,6 +40,7 @@ import { DailyFortunePage } from "./pages/DailyFortunePage";
 import { BirthdayPage } from "./pages/BirthdayPage";
 import { SupporterBreakdownPage, SupportersPage } from "./pages/SupportersPage";
 import { MyAnalyticsPage } from "./pages/MyAnalyticsPage";
+import { AdAnalyticsPage } from "./pages/AdAnalyticsPage";
 import { SearchPage } from "./pages/SearchPage";
 import { LiveNowPage } from "./pages/LiveNowPage";
 import { MyShowPage, ShowsPage } from "./pages/ShowsPages";
@@ -162,6 +163,7 @@ export default function App() {
           <Route path="/settings/printable-ads" element={<PrintableAdsPage />} />
           <Route path="/settings/advertise" element={<AdvertisePage />} />
           <Route path="/settings/advertise/new" element={<CreateVideoAdPage />} />
+          <Route path="/settings/advertise/:id/analytics" element={<AdAnalyticsPage />} />
           <Route path="/settings/business" element={<MyBusinessesPage />} />
           <Route path="/settings/business/new" element={<CreateBusinessPage />} />
           <Route path="/settings/business/edit/:id" element={<CreateBusinessPage />} />
