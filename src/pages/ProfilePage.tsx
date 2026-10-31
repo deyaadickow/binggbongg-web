@@ -303,7 +303,7 @@ export function ProfilePage() {
   const [tab, setTab] = useState<TabKey>("videos");
   // Steve, 2026-10-05: "Make all popup into our design black and gold" — the badge and streak
   // explainers open the app's own popup instead of the browser's white alert box.
-  const [battleInfo, setBattleInfo] = useState<{ title: string; body: string } | null>(null);
+  const [battleInfo, setBattleInfo] = useState<{ title: string; body: string; flames?: number } | null>(null);
   const [vipInfo, setVipInfo] = useState(false);
   const [tabVideos, setTabVideos] = useState<ProfilePost[]>([]);
   const [tabUsers, setTabUsers] = useState<UserSummary[]>([]);
@@ -563,6 +563,7 @@ export function ProfilePage() {
                 onClick={() => setBattleInfo({
                   title: "Battle Streak",
                   body: battleStreakExplainer(displayName(profile), profile.battle_streak ?? 0, profile.battle_flames ?? 0),
+                  flames: profile.battle_flames ?? 0,
                 })}
               />
               {/* Steve, 2026-10-29: a VIP Referral Member's gold pill; tapping it says what it is. */}
@@ -817,7 +818,7 @@ export function ProfilePage() {
         <VipBadgePopup viewerIsVip={isVipReferrer(isMe ? profile.is_vip_referrer : me?.is_vip_referrer)} onClose={() => setVipInfo(false)} />
       )}
       {battleInfo && (
-        <BattleInfoPopup title={battleInfo.title} body={battleInfo.body} onClose={() => setBattleInfo(null)} />
+        <BattleInfoPopup title={battleInfo.title} body={battleInfo.body} flames={battleInfo.flames} onClose={() => setBattleInfo(null)} />
       )}
       {showReport && profile && (
         <ReportDialog

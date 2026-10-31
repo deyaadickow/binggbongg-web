@@ -144,11 +144,36 @@ export function battleStreakExplainer(name: string, streak: number, flames: numb
  * Steve, 2026-10-05: "Make all popup into our design black and gold." The browser's own alert box
  * is white with a blue button; this is the app's popup, used for both circles' explainers.
  */
+/**
+ * Steve, 2026-10-31: "Put images of a flame on this popup". One big flame per flame banked, lit;
+ * under three, the missing ones are faded so "0 flames" still shows what there is to earn. Past
+ * ten it becomes one flame and a count, so the row never wraps.
+ */
+function FlameRow({ flames }: { flames: number }) {
+  if (flames > 10) {
+    return (
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 4, marginBottom: 10 }}>
+        <span style={{ fontSize: 40, lineHeight: 1 }}>🔥</span>
+        <span style={{ fontSize: 26, fontWeight: 800 }}>×{flames}</span>
+      </div>
+    );
+  }
+  const shown = Math.max(3, flames);
+  return (
+    <div style={{ display: "flex", justifyContent: "center", gap: 4, marginBottom: 10 }} aria-hidden>
+      {Array.from({ length: shown }, (_, i) => (
+        <span key={i} style={{ fontSize: shown > 5 ? 30 : 40, lineHeight: 1, opacity: i < flames ? 1 : 0.25 }}>🔥</span>
+      ))}
+    </div>
+  );
+}
+
 export function BattleInfoPopup({
   title,
   body,
+  flames,
   onClose,
-}: { title: string; body: string; onClose: () => void }) {
+}: { title: string; body: string; flames?: number; onClose: () => void }) {
   const { t } = useT();
   return (
     <div
@@ -180,6 +205,7 @@ export function BattleInfoPopup({
         {/* Steve, 2026-10-06: "make the text even to both lines so it will look cleaner" — no
             more paragraphs ending in a lonely two words. Each paragraph is balanced on its own;
             balancing one block would even out the total and leave a paragraph just as lopsided. */}
+        {flames !== undefined && <FlameRow flames={flames} />}
         <div style={{ fontWeight: 800, fontSize: 19, marginBottom: 12, textWrap: "balance" }}>{title}</div>
         <div style={{ fontSize: 14, lineHeight: 1.5 }}>
           {body.split("\n\n").map((paragraph, i) => (

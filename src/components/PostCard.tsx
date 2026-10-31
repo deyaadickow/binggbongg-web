@@ -9,7 +9,7 @@ export function PostCard({ post }: { post: Post }) {
   const [sent, setSent] = useState<Gift | null>(null);
   // Steve, 2026-10-05: "Make all popup into our design black and gold" — the explainers for the
   // two circles open the app's own popup, not the browser's white alert box.
-  const [info, setInfo] = useState<{ title: string; body: string } | null>(null);
+  const [info, setInfo] = useState<{ title: string; body: string; flames?: number } | null>(null);
   const clearSent = useCallback(() => setSent(null), []);
   return (
     <div className="card post-card">
@@ -54,6 +54,7 @@ export function PostCard({ post }: { post: Post }) {
                   setInfo({
                     title: "Battle Streak",
                     body: battleStreakExplainer(displayName(post.user), post.user?.battle_streak ?? 0, post.user?.battle_flames ?? 0),
+                    flames: post.user?.battle_flames ?? 0,
                   });
                 }}
               />
@@ -64,7 +65,7 @@ export function PostCard({ post }: { post: Post }) {
         {/* Steve, 2026-10-01: "add gift boxes on all video on for you page on the web." */}
         <PostGiftButton post={post} onSent={setSent} />
       </div>
-      {info && <BattleInfoPopup title={info.title} body={info.body} onClose={() => setInfo(null)} />}
+      {info && <BattleInfoPopup title={info.title} body={info.body} flames={info.flames} onClose={() => setInfo(null)} />}
     </div>
   );
 }
