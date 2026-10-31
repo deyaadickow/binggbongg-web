@@ -4,7 +4,7 @@
 // asked for separately.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { readCopiedLink } from "../lib/copiedLink";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { post } from "../lib/api";
 import { useSession } from "../lib/session";
 import { createUploadUrls, putToSignedUrl, videoDuration, videoThumbnail } from "../lib/upload";
@@ -23,7 +23,12 @@ export function UploadVideoPage() {
   const { t } = useT();
   const { user, isLoggedIn } = useSession();
   const navigate = useNavigate();
+  const location = useLocation();
   const fileRef = useRef<HTMLInputElement>(null);
+  // A Green Screen recording arrives with its own length and thumbnail: a recorded MP4 often
+  // has no duration in its header and can't be seeked for a frame, so those come from the
+  // recorder instead (see GreenScreenPage).
+  const recordedThumbRef = useRef<Blob | null>(null);
 
   const [file, setFile] = useState<File | null>(null);
   const [duration, setDuration] = useState<number | null>(null);
@@ -57,6 +62,14 @@ export function UploadVideoPage() {
       .catch(() => undefined);
   }, []);
 
+  useEffect(() => {
+    const gs = (location.state as { greenScreen?: { file: File; duration: number; thumb: Blob | null } } | null)?.greenScreen;
+    if (!gs?.file) return;
+    setFile(gs.file);
+    setDuration(gs.duration);
+    recordedThumbRef.current = gs.thumb && gs.thumb.size ? gs.thumb : null;
+  }, [location.state]);
+
   // Prefill the member's own country so most people never touch these two.
   useEffect(() => {
     if (user?.country && !country) setCountry(user.country);
@@ -70,6 +83,7 @@ export function UploadVideoPage() {
   const pick = useCallback(async (f: File) => {
     setError("");
     setDuration(null);
+    recordedThumbRef.current = null;
     if (f.size > MAX_MB * 1024 * 1024) {
       setError(`That file is ${(f.size / 1024 / 1024).toFixed(0)}MB — the limit is ${MAX_MB}MB.`);
       return;
@@ -90,7 +104,7 @@ export function UploadVideoPage() {
     setError("");
     try {
       setStage("Making a thumbnail…");
-      const thumb = await videoThumbnail(file);
+      const thumb = recordedThumbRef.current ?? await videoThumbnail(file);
 
       setStage("Preparing the upload…");
       const safe = file.name.replace(/[^A-Za-z0-9._-]/g, "_");
@@ -163,7 +177,10 @@ export function UploadVideoPage() {
         {!file ? (
           <>
             <p className="soft" style={{ marginTop: 0 }}>{t("choose_a_video_up_to_mb", MAX_MB)}</p>
-            <button className="btn" onClick={() => fileRef.current?.click()}>{t("choose_video")}</button>
+            <div className="row" style={{ gap: 10, flexWrap: "wrap" }}>
+              <button className="btn" onClick={() => fileRef.current?.click()}>{t("choose_video")}</button>
+              <button className="btn" onClick={() => navigate("/green-screen")}>🟩 {t("gs_record_with")}</button>
+            </div>
           </>
         ) : (
           <div className="row" style={{ alignItems: "center" }}>

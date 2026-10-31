@@ -115,6 +115,8 @@ const FEATURES: Section[] = [
     titleKey: "fsec_videos_photos_and_news",
     features: [
       { icon: "🎬", nameKey: "fname_videos", blurbKey: "fblurb_videos", to: "/upload" },
+      // Steve, 2026-10-30: "Build the green screen for feed videos on all platforms".
+      { icon: "🟩", nameKey: "fname_green_screen", blurbKey: "fblurb_green_screen", to: "/green-screen" },
       { icon: "🖼️", nameKey: "fname_photos", blurbKey: "fblurb_photos", to: "/photos" },
       { icon: "✨", nameKey: "fname_photo_styles", blurbKey: "fblurb_photo_styles", to: "/cartoon" },
       { icon: "🦖", nameKey: "fname_monster_videos", blurbKey: "fblurb_monster_videos", to: "/monster" },

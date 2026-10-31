@@ -4,6 +4,7 @@ import { SessionProvider } from "./lib/session";
 import { LanguageProvider } from "./lib/i18n";
 import { Nav } from "./components/Nav";
 import { UploadVideoPage } from "./pages/UploadVideoPage";
+import { GreenScreenPage } from "./pages/GreenScreenPage";
 import { CreateVideoAdPage } from "./pages/CreateVideoAdPage";
 import { UploadPhotosPage } from "./pages/UploadPhotosPage";
 import { CartoonPage } from "./pages/CartoonPage";
@@ -111,6 +112,7 @@ export default function App() {
           <Route path="/go-live" element={<GoLivePage />} />
           <Route path="/go-live/computer" element={<StreamFromPcPage />} />
           <Route path="/upload" element={<UploadVideoPage />} />
+          <Route path="/green-screen" element={<GreenScreenPage />} />
           <Route path="/photos" element={<MyPhotosPage />} />
           <Route path="/photos-directory" element={<PhotosDirectoryPage />} />
 
