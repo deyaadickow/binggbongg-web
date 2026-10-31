@@ -137,6 +137,8 @@ const FEATURES: Section[] = [
       { icon: "👑", nameKey: "fname_vip_referral", blurbKey: "fblurb_vip_referral", to: "/vip-referral" },
       { icon: "🤝", nameKey: "fname_share_earn_10", blurbKey: "fblurb_share_earn_10", to: "/settings/referrals" },
       { icon: "💝", nameKey: "fname_who_supported_me", blurbKey: "fblurb_who_supported_me", to: "/support" },
+      // Steve, 2026-10-31: "Can we add analytics for all members?" -> "In the app, for each member".
+      { icon: "📈", nameKey: "fname_my_analytics", blurbKey: "fblurb_my_analytics", to: "/my-analytics" },
       { icon: "🏪", nameKey: "fname_bingg_bongg_shop", blurbKey: "fblurb_bingg_bongg_shop", to: "/shop" },
       { icon: "🎥", nameKey: "fname_video_ad_gig", blurbKey: "fblurb_video_ad_gig", to: "/gigs" },
       { icon: "🎤", nameKey: "fname_your_own_live_show", blurbKey: "fblurb_your_own_live_show", to: "/my-show" },

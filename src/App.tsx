@@ -39,6 +39,7 @@ import { ChatPage } from "./pages/ChatPage";
 import { DailyFortunePage } from "./pages/DailyFortunePage";
 import { BirthdayPage } from "./pages/BirthdayPage";
 import { SupporterBreakdownPage, SupportersPage } from "./pages/SupportersPage";
+import { MyAnalyticsPage } from "./pages/MyAnalyticsPage";
 import { SearchPage } from "./pages/SearchPage";
 import { LiveNowPage } from "./pages/LiveNowPage";
 import { MyShowPage, ShowsPage } from "./pages/ShowsPages";
@@ -89,6 +90,8 @@ export default function App() {
           <Route path="/birthdays" element={<BirthdayPage />} />
           <Route path="/support" element={<SupportersPage />} />
           <Route path="/support/:id" element={<SupporterBreakdownPage />} />
+          {/* My Analytics (Steve, 2026-10-31: "Can we add analytics for all members?"). */}
+          <Route path="/my-analytics" element={<MyAnalyticsPage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/live" element={<LiveNowPage />} />
           {/* Your own live Bingg Bongg show (Steve, 2026-10-17). */}
