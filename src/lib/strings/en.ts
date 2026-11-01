@@ -1785,4 +1785,5 @@ export const en = {
   lp_final_sub: "Free on Google Play and the App Store.",
   lp_keep_scrolling: "Keep scrolling — videos from Bingg Bongg members",
   lp_tap_sound: "Tap for sound",
+  lp_watch_again: "Watch again",
 } as const;

@@ -101,7 +101,7 @@ export function LandingPage() {
     <div className="lp">
       <div className="lp-inner">
         {/* The tour opens the page; it carries its own big logo, so the page's is only shown without it. */}
-        {TOUR_VIDEO ? <TourVideo label={t("lp_tap_sound")} /> : <img className="lp-logo" src="/logo_horizontal.png" alt="Bingg Bongg" />}
+        {TOUR_VIDEO ? <TourVideo label={t("lp_tap_sound")} again={t("lp_watch_again")} /> : <img className="lp-logo" src="/logo_horizontal.png" alt="Bingg Bongg" />}
         <h1 className="lp-title">{t("lp_hero_title")}</h1>
         <p className="lp-sub">{t("lp_hero_sub")}</p>
         {ctas}
@@ -159,28 +159,52 @@ export function LandingPage() {
 
 /**
  * The feature tour, playing the moment the page opens (Steve: "Let the video play right away").
- * Browsers only let a video start by itself with the sound OFF, so it starts muted with a big
- * "Tap for sound" button that restarts it from the top with the voice. The captions are burned in,
- * so it reads even before anyone taps.
+ * Browsers only let a video start by itself with the sound OFF, so it starts muted, looping, with a
+ * big "Tap for sound" button that restarts it from the top with the voice. With the sound on it
+ * plays ONCE and stops on "Watch again" — looping with the voice, it kept talking while people had
+ * scrolled on to the rest of the page (Steve: "The video keeps repeating but i can't see it"). It
+ * also pauses whenever it is scrolled out of view and carries on when it comes back.
  */
-function TourVideo({ label }: { label: string }) {
+function TourVideo({ label, again }: { label: string; again: string }) {
+  const box = useRef<HTMLDivElement>(null);
   const ref = useRef<HTMLVideoElement>(null);
   const [muted, setMuted] = useState(true);
+  const [ended, setEnded] = useState(false);
+  const endedRef = useRef(false);
   useEffect(() => { ref.current?.play().catch(() => undefined); }, []);
-  const unmute = () => {
+  useEffect(() => {
+    const el = box.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(([e]) => {
+      const v = ref.current;
+      if (!v) return;
+      if (e.isIntersecting) { if (!endedRef.current) v.play().catch(() => undefined); }
+      else v.pause();
+    }, { threshold: 0.35 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  const playWithSound = () => {
     const v = ref.current;
     if (!v) return;
     v.muted = false;
+    v.loop = false;
     v.currentTime = 0;
+    endedRef.current = false;
+    setEnded(false);
     v.play().catch(() => undefined);
     setMuted(false);
   };
   return (
-    <div className="lp-video">
-      <video ref={ref} src={TOUR_VIDEO} poster={TOUR_POSTER || undefined} autoPlay muted={muted} playsInline loop
-        controls={!muted} preload="auto" />
+    <div ref={box} className="lp-video">
+      <video ref={ref} src={TOUR_VIDEO} poster={TOUR_POSTER || undefined} autoPlay muted={muted} playsInline loop={muted}
+        controls={!muted && !ended} preload="auto"
+        onEnded={() => { if (!muted) { endedRef.current = true; setEnded(true); } }} />
       {muted && (
-        <button type="button" className="lp-sound" onClick={unmute}>🔊 {label}</button>
+        <button type="button" className="lp-sound" onClick={playWithSound}>🔊 {label}</button>
+      )}
+      {!muted && ended && (
+        <button type="button" className="lp-sound" onClick={playWithSound}>▶ {again}</button>
       )}
     </div>
   );

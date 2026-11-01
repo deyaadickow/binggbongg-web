@@ -1585,4 +1585,5 @@ export const id = {
   lp_final_sub: "Gratis di Google Play dan App Store.",
   lp_keep_scrolling: "Terus gulir — video dari anggota Bingg Bongg",
   lp_tap_sound: "Ketuk untuk suara",
+  lp_watch_again: "Tonton lagi",
 };

@@ -1590,4 +1590,5 @@ export const fil = {
   lp_final_sub: "Libre sa Google Play at sa App Store.",
   lp_keep_scrolling: "Mag-scroll pa — mga video mula sa mga miyembro ng Bingg Bongg",
   lp_tap_sound: "I-tap para may tunog",
+  lp_watch_again: "Panoorin ulit",
 };

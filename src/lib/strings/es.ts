@@ -1571,4 +1571,5 @@ export const es = {
   lp_final_sub: "Gratis en Google Play y en el App Store.",
   lp_keep_scrolling: "Sigue bajando — videos de los miembros de Bingg Bongg",
   lp_tap_sound: "Toca para activar el sonido",
+  lp_watch_again: "Ver de nuevo",
 };
