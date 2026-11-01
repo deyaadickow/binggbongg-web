@@ -17,9 +17,25 @@ import { pixelEvent } from "../lib/pixel";
 import { HomePage } from "./HomePage";
 
 const GO = "https://admin.binggbongg.com/go/";
-/** The 2-3 minute feature tour (Steve, 2026-10-31), on S3 like the other feature videos. */
-const TOUR_VIDEO = "https://binggbongg.s3.amazonaws.com/uploads/landing/feature-tour-v1.mp4";
-const TOUR_POSTER = "https://binggbongg.s3.amazonaws.com/uploads/landing/feature-tour-v1.jpg";
+/** The 2-3 minute feature tour (Steve, 2026-10-31), on S3 like the other feature videos. Tagalog
+ *  for visitors in the Philippines (Steve: "make this video in Tagalog language when people from the
+ *  philippines clicks"), English for everyone else; a switch under it changes it either way. */
+type TourLang = "tl" | "en";
+const TOURS: Record<TourLang, { video: string; poster: string; label: string }> = {
+  tl: { video: "https://binggbongg.s3.amazonaws.com/uploads/landing/feature-tour-tl-v1.mp4",
+        poster: "https://binggbongg.s3.amazonaws.com/uploads/landing/feature-tour-tl-v1.jpg", label: "Tagalog" },
+  en: { video: "https://binggbongg.s3.amazonaws.com/uploads/landing/feature-tour-v1.mp4",
+        poster: "https://binggbongg.s3.amazonaws.com/uploads/landing/feature-tour-v1.jpg", label: "English" },
+};
+
+/** In the Philippines? The phone's own clock (Asia/Manila), its language (Filipino/Tagalog), or one
+ *  of our Philippines ads (src fb-ph-...). No network lookup, so the video can start at once. */
+function inPhilippines(src: string): boolean {
+  try { if (Intl.DateTimeFormat().resolvedOptions().timeZone === "Asia/Manila") return true; } catch { /* old browser */ }
+  const langs = (navigator.languages?.length ? navigator.languages : [navigator.language || ""]).map((l) => l.toLowerCase());
+  if (langs.some((l) => l.startsWith("fil") || l.startsWith("tl"))) return true;
+  return src.startsWith("fb-ph");
+}
 
 function adSource(): string {
   try {
@@ -41,6 +57,9 @@ export function LandingPage() {
   const { t } = useT();
   const src = useMemo(adSource, []);
   const device = useMemo(deviceOf, []);
+  const [tourLang, setTourLang] = useState<TourLang>(() => (inPhilippines(src) ? "tl" : "en"));
+  // Switching language is a tap, so the new one may start with its voice straight away.
+  const [tourSound, setTourSound] = useState(false);
   const playUrl = `${GO}play?from=landing&src=${encodeURIComponent(src)}`;
   const iosUrl = `${GO}appstore?from=landing&src=${encodeURIComponent(src)}`;
 
@@ -101,7 +120,13 @@ export function LandingPage() {
     <div className="lp">
       <div className="lp-inner">
         {/* The tour opens the page; it carries its own big logo, so the page's is only shown without it. */}
-        {TOUR_VIDEO ? <TourVideo label={t("lp_tap_sound")} again={t("lp_watch_again")} /> : <img className="lp-logo" src="/logo_horizontal.png" alt="Bingg Bongg" />}
+        <TourVideo key={tourLang} tour={TOURS[tourLang]} label={t("lp_tap_sound")} again={t("lp_watch_again")} startWithSound={tourSound} />
+        <div className="lp-langs" role="group" aria-label="Video language">
+          {(["tl", "en"] as TourLang[]).map((l) => (
+            <button key={l} type="button" className={l === tourLang ? "on" : ""} aria-pressed={l === tourLang}
+              onClick={() => { if (l !== tourLang) { setTourSound(true); setTourLang(l); } }}>{TOURS[l].label}</button>
+          ))}
+        </div>
         <h1 className="lp-title">{t("lp_hero_title")}</h1>
         <p className="lp-sub">{t("lp_hero_sub")}</p>
         {ctas}
@@ -165,13 +190,22 @@ export function LandingPage() {
  * scrolled on to the rest of the page (Steve: "The video keeps repeating but i can't see it"). It
  * also pauses whenever it is scrolled out of view and carries on when it comes back.
  */
-function TourVideo({ label, again }: { label: string; again: string }) {
+function TourVideo({ tour, label, again, startWithSound }: { tour: { video: string; poster: string }; label: string; again: string; startWithSound: boolean }) {
   const box = useRef<HTMLDivElement>(null);
   const ref = useRef<HTMLVideoElement>(null);
-  const [muted, setMuted] = useState(true);
+  const [muted, setMuted] = useState(!startWithSound);
   const [ended, setEnded] = useState(false);
   const endedRef = useRef(false);
-  useEffect(() => { ref.current?.play().catch(() => undefined); }, []);
+  useEffect(() => {
+    const v = ref.current;
+    if (!v) return;
+    v.play().catch(() => {
+      // A browser that still refuses sound: fall back to the muted start with the button.
+      v.muted = true;
+      setMuted(true);
+      v.play().catch(() => undefined);
+    });
+  }, []);
   useEffect(() => {
     const el = box.current;
     if (!el || typeof IntersectionObserver === "undefined") return;
@@ -197,7 +231,7 @@ function TourVideo({ label, again }: { label: string; again: string }) {
   };
   return (
     <div ref={box} className="lp-video">
-      <video ref={ref} src={TOUR_VIDEO} poster={TOUR_POSTER || undefined} autoPlay muted={muted} playsInline loop={muted}
+      <video ref={ref} src={tour.video} poster={tour.poster} autoPlay muted={muted} playsInline loop={muted}
         controls={!muted && !ended} preload="auto"
         onEnded={() => { if (!muted) { endedRef.current = true; setEnded(true); } }} />
       {muted && (
