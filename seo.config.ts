@@ -29,7 +29,7 @@ function englishStrings(root: string): Record<string, string> {
 }
 
 interface Tile { name: string; blurb: string; to?: string }
-interface Section { title: string; tiles: Tile[] }
+interface Section { key: string; title: string; tiles: Tile[] }
 
 /** Sections and tiles from FeaturesPage.tsx, in the directory's own order; commented-out tiles skipped. */
 function featureSections(root: string, en: Record<string, string>): Section[] {
@@ -49,25 +49,37 @@ function featureSections(root: string, en: Record<string, string>): Section[] {
       const name = en[label ?? m[1]] ?? en[m[1]];
       if (name) tiles.push({ name, blurb: blurb ? en[blurb] ?? "" : "", to });
     }
-    if (tiles.length) sections.push({ title: en[titleKey] ?? titleKey, tiles });
+    if (tiles.length) sections.push({ key: titleKey, title: en[titleKey] ?? titleKey, tiles });
   }
   return sections;
 }
 
+// Meta's ad review reads this page (it is where the ads land) and rejected three ads on
+// 2026-10-31 as a "social casino": coins, cash prizes, payouts, paying to play and bingo side by
+// side read to it like a casino app. Those features stay in the app and on /features; the crawled
+// copy leaves out the Money section and any tile whose words are about coins or money.
+const LEFT_OUT_SECTIONS = new Set(["fsec_money"]);
+const CASINO_WORDS = /\b(coins?|cash|paid|pays?|paying|payouts?|earn\w*|money|prizes?|bingo|lucky|buy|bought|commission|\$)|\$\d/i;
+
 function staticPage(root: string): string {
   const en = englishStrings(root);
-  const sections = featureSections(root, en);
-  const count = sections.reduce((n, s) => n + s.tiles.length, 0);
+  const all = featureSections(root, en);
+  const count = all.reduce((n, s) => n + s.tiles.length, 0);
+  const sections = all
+    .filter((s) => !LEFT_OUT_SECTIONS.has(s.key))
+    .map((s) => ({ ...s, tiles: s.tiles.filter((t) => !CASINO_WORDS.test(`${t.name} ${t.blurb}`)) }))
+    .filter((s) => s.tiles.length);
   const list = sections.map((s) =>
     `<h2>${esc(s.title)}</h2><ul>` +
     s.tiles.map((t) => `<li>${t.to ? `<a href="${esc(t.to)}">` : ""}<strong>${esc(t.name)}</strong>${t.to ? "</a>" : ""}${t.blurb ? ` — ${esc(t.blurb)}` : ""}</li>`).join("") +
     "</ul>").join("");
   return `<div class="seo-static">
-<h1>Bingg Bongg — live streaming, battles, games and singing contests</h1>
-<p>Bingg Bongg is a free live streaming app. Go live from your phone or your computer, battle other streamers in 20 battle modes, play quiz games, word search, bingo and over a hundred tap games, enter singing contests with real cash prizes, send gifts, make friends and get paid for what you post. Payouts from $20 to $100 are sent automatically. Bingg Bongg is available in 53 languages.</p>
+<h1>Bingg Bongg — live streaming, battles and singing contests</h1>
+<p>Bingg Bongg is a free live streaming app. Go live from your phone or your computer, battle your friends in 20 battle modes, sing in contests where members vote for the best voices, make videos with Green Screen and face filters, and make friends all over the world — every message translated, in 53 languages.</p>
+<p>This November: the <a href="/ph">Philippine Singing Contest</a> — free to enter, and members vote for the best voices.</p>
 <p><a href="${PLAY}">Get Bingg Bongg on Google Play</a> · <a href="${APPSTORE}">Download Bingg Bongg on the App Store</a> · <a href="/features">See all ${count} features</a> · <a href="/feature-videos">Watch the feature videos</a></p>
 ${list}
-<p><a href="/contests">Contests</a> · <a href="/live">Live now</a> · <a href="/exciting-news">Exciting News</a> · <a href="/referral-program">Referral Program</a> · <a href="/help">Help</a> · <a href="/settings/about">About us</a> · <a href="/settings/faq">FAQ</a> · <a href="/settings/contact">Contact us</a> · <a href="/settings/terms">Terms of Use</a> · <a href="/settings/privacy">Privacy Policy</a></p>
+<p><a href="/contests">Contests</a> · <a href="/live">Live now</a> · <a href="/exciting-news">Exciting News</a> · <a href="/help">Help</a> · <a href="/settings/about">About us</a> · <a href="/settings/faq">FAQ</a> · <a href="/settings/contact">Contact us</a> · <a href="/settings/terms">Terms of Use</a> · <a href="/settings/privacy">Privacy Policy</a></p>
 <p>© Bingg Bongg Inc.</p>
 </div>`;
 }
@@ -82,7 +94,7 @@ export function seoStaticContent(): Plugin {
     },
     // The ads' landing page gets its OWN dist/ph/index.html (Steve, 2026-10-31). Meta's ad review
     // and Facebook's link preview read the raw HTML, never the running app, and the home page's
-    // description talks about cash prizes — the wording that already got one ad rejected as a
+    // description used to talk about cash prizes — the wording that got ads rejected as a
     // "social casino". Apache serves a real folder before the SPA fallback, so /ph gets this.
     writeBundle(options) {
       const out = options.dir ?? path.join(root, "dist");

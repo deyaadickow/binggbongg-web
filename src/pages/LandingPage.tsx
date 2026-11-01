@@ -106,7 +106,7 @@ export function LandingPage() {
   const pillars: { img: string; title: StringKey; text: StringKey; icon: string }[] = [
     { img: "/lp/live.jpg", title: "lp_p_live_t", text: "lp_p_live_d", icon: "🔴" },
     { img: "/lp/battle.jpg", title: "lp_p_battle_t", text: "lp_p_battle_d", icon: "⚔️" },
-    { img: "/lp/earn.jpg", title: "lp_p_earn_t", text: "lp_p_earn_d", icon: "💰" },
+    { img: "/lp/earn.jpg", title: "lp_p_earn_t", text: "lp_p_earn_d", icon: "🎁" },
     { img: "/lp/friends.jpg", title: "lp_p_world_t", text: "lp_p_world_d", icon: "🌍" },
   ];
   const more: { icon: string; text: StringKey }[] = [
