@@ -196,7 +196,7 @@ export function stageText(t: (k: StringKey) => string, day: Pick<CbDay, "stage" 
 export function roundsText(t: (k: StringKey) => string, day: Pick<CbDay, "rounds" | "round_minutes">): string {
   if (day.round_minutes === 5 && day.rounds === 3) return t("cb_rounds_3");
   if (day.round_minutes === 5 && day.rounds === 5) return t("cb_rounds_5");
-  return cbText(t("cb_rounds_custom"), { n: day.rounds, total: day.round_minutes });
+  return cbText(t("cb_rounds_n"), { n: day.rounds, total: day.round_minutes });
 }
 
 /** The grid for a stage: Mon–Fri 24 tiles 4 across, Saturday 12 4 across, Sunday 6 2 across. */
@@ -212,6 +212,10 @@ export function reasonText(t: (k: StringKey) => string, reason: string | null | 
   const r = (reason ?? "").toLowerCase();
   if (!r) return "";
   if (r.includes("sign")) return t("cb_signin");
+  if (r === "full") return t("cb_full");
+  if (r === "ended") return t("cb_ended_today");
+  if (r === "off") return t("cb_off");
+  if (r === "not_set_up") return t("cb_not_set_up");
   if (r === "not_country" || r.includes("country")) return cbText(t("cb_not_country"), { country });
   if (r === "only_12" || r.includes("12") || r.includes("saturday")) return t("cb_only_12");
   if (r === "only_6" || r.includes("sunday") || r === "6") return t("cb_only_6");

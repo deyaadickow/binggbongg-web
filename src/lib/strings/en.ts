@@ -1931,5 +1931,8 @@ export const en = {
   cb_test: "Test battle — only testers can see this",
   cb_bullseye: "Country Battle",
   cb_played: "Played",
-  cb_rounds_custom: "{n} rounds × {total} min",
+  cb_rounds_n: "{n} rounds × {total} min",
+  cb_off: "Country Battle is not on right now.",
+  cb_ended: "Today's battle is over",
+  cb_not_set_up: "Country Battle isn't ready yet. Please try again later.",
 } as const;
