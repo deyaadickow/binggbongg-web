@@ -1586,4 +1586,12 @@ export const id = {
   lp_keep_scrolling: "Terus gulir — video dari anggota Bingg Bongg",
   lp_tap_sound: "Ketuk untuk suara",
   lp_watch_again: "Tonton lagi",
+  ga_bar_title: "Bingg Bongg gratis",
+  ga_on_google_play: "Dapatkan aplikasinya di Google Play",
+  ga_on_app_store: "Dapatkan aplikasinya di App Store",
+  ga_install: "Pasang",
+  ga_login_title: "Pasang aplikasi gratis untuk bergabung",
+  ga_login_text: "Browser Facebook tidak bisa membuka login Google. Pasang Bingg Bongg saja — gratis dan cuma semenit.",
+  ga_open_chrome: "Atau buka halaman ini di Chrome",
+  ga_ios_hint: "Atau ketuk ⋯ di atas lalu pilih Buka di browser.",
 };

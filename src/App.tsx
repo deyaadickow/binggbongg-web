@@ -62,6 +62,8 @@ import { AccountSettingsPage, AdvertisePage, BlockedProfilesPage, ComingSoonPage
 import { SellerPage } from "./pages/SellerPage";
 import { AgentPage } from "./pages/AgentPage";
 import { VaultPage } from "./pages/VaultPage";
+import { GetAppBar } from "./components/GetAppBar";
+import { rememberAdSource } from "./lib/getApp";
 
 /** The ads' landing page (/ph) stands alone — no menu, no sidebar, nothing but the contest and the
  *  download button (Steve, 2026-10-31). Everything else gets the normal site. */
@@ -79,9 +81,11 @@ function AdArrival() {
   useEffect(() => {
     let q: URLSearchParams;
     try { q = new URLSearchParams(window.location.search); } catch { return; }
-    if (window.location.pathname.replace(/\/+$/, "") === "/ph") return; // the landing page counts itself
     const fbclid = q.get("fbclid");
     const src = q.get("src") || q.get("utm_campaign") || "";
+    // Kept for the visit's store links (GetAppBar, the sign-in page), so an install is credited to its ad.
+    rememberAdSource((src || (fbclid ? "facebook" : "")).toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 60));
+    if (window.location.pathname.replace(/\/+$/, "") === "/ph") return; // the landing page counts itself
     if (!fbclid && !src && !q.get("utm_source")) return;
     try {
       if (sessionStorage.getItem("bb.adArrival") === "1") return;
@@ -239,6 +243,7 @@ export default function App() {
         </main>
         </div>
         </LandingSwitch>
+        <GetAppBar />
       </BrowserRouter>
       </LanguageProvider>
     </SessionProvider>

@@ -1786,4 +1786,12 @@ export const en = {
   lp_keep_scrolling: "Keep scrolling — videos from Bingg Bongg members",
   lp_tap_sound: "Tap for sound",
   lp_watch_again: "Watch again",
+  ga_bar_title: "Bingg Bongg is free",
+  ga_on_google_play: "Get the app on Google Play",
+  ga_on_app_store: "Get the app on the App Store",
+  ga_install: "Install",
+  ga_login_title: "Get the free app to join",
+  ga_login_text: "Facebook's browser can't open Google sign-in. Install Bingg Bongg instead — it's free and takes a minute.",
+  ga_open_chrome: "Or open this page in Chrome",
+  ga_ios_hint: "Or tap ⋯ at the top and choose Open in browser.",
 } as const;

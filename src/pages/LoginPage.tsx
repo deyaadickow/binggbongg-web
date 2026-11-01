@@ -4,6 +4,7 @@ import { post, setAuthHeaders, type UserSummary } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Notice, StoreBadges } from "../components/Common";
 import { tt, useT  } from "../lib/i18n";
+import { chromeUrl, inAppBrowser, phoneOs, storeUrl } from "../lib/getApp";
 
 // Google Identity Services. The web client id must be added to the backend's
 // GOOGLE_SIGNIN_CLIENT_IDS (registration verifies the ID token) — see README.
@@ -44,6 +45,10 @@ export function LoginPage() {
   const devMode = new URLSearchParams(location.search).get("dev") === "1";
   const [devUserId, setDevUserId] = useState("");
   const [devToken, setDevToken] = useState("");
+  // Inside Facebook's or Instagram's browser Google refuses to sign anyone in, so the page
+  // offers the app instead of a button that can only fail (Steve, 2026-11-01).
+  const stuckInApp = inAppBrowser() && !devMode;
+  const os = phoneOs();
 
   useEffect(() => {
     if (isLoggedIn) navigate(from, { replace: true });
@@ -84,7 +89,7 @@ export function LoginPage() {
   }
 
   useEffect(() => {
-    if (!GOOGLE_CLIENT_ID) return;
+    if (!GOOGLE_CLIENT_ID || stuckInApp) return;
     const script = document.createElement("script");
     script.src = "https://accounts.google.com/gsi/client";
     script.async = true;
@@ -124,6 +129,18 @@ export function LoginPage() {
 
   return (
     <div className="page">
+      {stuckInApp ? (
+        <div className="card pad login-box">
+          <h1 className="card-title" style={{ fontSize: 22 }}>{t("ga_login_title")}</h1>
+          <p className="soft" style={{ marginTop: 6 }}>{t("ga_login_text")}</p>
+          <div className="get-app-login">
+            {os !== "ios" && <a className="lp-cta" href={storeUrl("login", "android")}><span className="lp-cta-icon">▶</span>{t("lp_cta_play")}</a>}
+            {os !== "android" && <a className="lp-cta" href={storeUrl("login", "ios")}><span className="lp-cta-icon"></span>{t("lp_cta_ios")}</a>}
+            {os === "android" && <a className="soft-link" href={chromeUrl()}>{t("ga_open_chrome")}</a>}
+            {os === "ios" && <p className="muted" style={{ margin: 0 }}>{t("ga_ios_hint")}</p>}
+          </div>
+        </div>
+      ) : (
       <div className="card pad login-box">
         <h1 className="card-title" style={{ fontSize: 22 }}>{t("sign_in_to_bingg_bongg")}</h1>
         <p className="soft" style={{ marginTop: 6 }}>{t("use_the_same_google_account_you_use_in_t")}</p>
@@ -142,7 +159,8 @@ export function LoginPage() {
           </div>
         )}
       </div>
-      <div style={{ marginTop: 24 }}><StoreBadges /></div>
+      )}
+      {!stuckInApp && <div style={{ marginTop: 24 }}><StoreBadges /></div>}
     </div>
   );
 }

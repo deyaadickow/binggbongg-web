@@ -1572,4 +1572,12 @@ export const es = {
   lp_keep_scrolling: "Sigue bajando — videos de los miembros de Bingg Bongg",
   lp_tap_sound: "Toca para activar el sonido",
   lp_watch_again: "Ver de nuevo",
+  ga_bar_title: "Bingg Bongg es gratis",
+  ga_on_google_play: "Descarga la app en Google Play",
+  ga_on_app_store: "Descarga la app en el App Store",
+  ga_install: "Instalar",
+  ga_login_title: "Descarga la app gratis para unirte",
+  ga_login_text: "El navegador de Facebook no puede abrir el inicio de sesión de Google. Instala Bingg Bongg — es gratis y toma un minuto.",
+  ga_open_chrome: "O abre esta página en Chrome",
+  ga_ios_hint: "O toca ⋯ arriba y elige Abrir en el navegador.",
 };

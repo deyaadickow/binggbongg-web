@@ -1591,4 +1591,12 @@ export const fil = {
   lp_keep_scrolling: "Mag-scroll pa — mga video mula sa mga miyembro ng Bingg Bongg",
   lp_tap_sound: "I-tap para may tunog",
   lp_watch_again: "Panoorin ulit",
+  ga_bar_title: "Libre ang Bingg Bongg",
+  ga_on_google_play: "Kunin ang app sa Google Play",
+  ga_on_app_store: "Kunin ang app sa App Store",
+  ga_install: "I-install",
+  ga_login_title: "Kunin ang libreng app para sumali",
+  ga_login_text: "Hindi mabuksan ng browser ng Facebook ang Google sign-in. I-install na lang ang Bingg Bongg — libre ito at isang minuto lang.",
+  ga_open_chrome: "O buksan ang page na ito sa Chrome",
+  ga_ios_hint: "O pindutin ang ⋯ sa itaas at piliin ang Open in browser.",
 };
