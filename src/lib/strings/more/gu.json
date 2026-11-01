@@ -1557,5 +1557,6 @@
  "cb_rounds_n": "{n} રાઉન્ડ × {total} મિનિટ",
  "cb_off": "Country Battle અત્યારે ચાલુ નથી.",
  "cb_not_set_up": "Country Battle હજુ તૈયાર નથી. કૃપા કરીને પછીથી ફરી પ્રયાસ કરો.",
- "cb_ended": "આજની battle પૂરી થઈ ગઈ છે"
+ "cb_ended": "આજની battle પૂરી થઈ ગઈ છે",
+ "cb_coming_soon": "ટૂંક સમયમાં આવી રહ્યું છે — અમે પ્રથમ battle ની તારીખ અહીં જાહેર કરીશું."
 }

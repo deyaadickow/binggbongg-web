@@ -1555,5 +1555,6 @@
  "cb_rounds_n": "{n} rundor × {total} min",
  "cb_off": "Country Battle är inte igång just nu.",
  "cb_not_set_up": "Country Battle är inte redo än. Försök igen senare.",
- "cb_ended": "Dagens battle är över"
+ "cb_ended": "Dagens battle är över",
+ "cb_coming_soon": "Kommer snart — vi meddelar datumet för första matchen här."
 }

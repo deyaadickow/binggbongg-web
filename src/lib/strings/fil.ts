@@ -1739,4 +1739,6 @@ export const fil = {
   cb_off: "Walang Country Battle ngayon.",
   cb_not_set_up: "Hindi pa handa ang Country Battle. Subukan ulit mamaya.",
   cb_ended: "Tapos na ang laban ngayong araw",
+  // Country Battle coming soon (Steve, 2026-11-01)
+  cb_coming_soon: "Malapit na — ia-announce namin dito ang petsa ng unang battle.",
 };

@@ -1556,5 +1556,6 @@
  "cb_rounds_n": "{n} kol × {total} min",
  "cb_off": "Bitva zemí právě neprobíhá.",
  "cb_not_set_up": "Bitva zemí ještě není připravena. Zkuste to prosím později.",
- "cb_ended": "Dnešní bitva skončila"
+ "cb_ended": "Dnešní bitva skončila",
+ "cb_coming_soon": "Již brzy — datum první bitvy oznámíme zde."
 }

@@ -1555,5 +1555,6 @@
  "cb_rounds_n": "{n} rondtes × {total} min",
  "cb_off": "Country Battle is nie nou aan die gang nie.",
  "cb_not_set_up": "Country Battle is nog nie gereed nie. Probeer asseblief later weer.",
- "cb_ended": "Vandag se stryd is verby"
+ "cb_ended": "Vandag se stryd is verby",
+ "cb_coming_soon": "Binnekort — ons sal die eerste battle-datum hier aankondig."
 }

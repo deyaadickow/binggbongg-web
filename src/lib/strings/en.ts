@@ -1935,4 +1935,5 @@ export const en = {
   cb_off: "Country Battle is not on right now.",
   cb_ended: "Today's battle is over",
   cb_not_set_up: "Country Battle isn't ready yet. Please try again later.",
+  cb_coming_soon: "Coming soon — we'll announce the first battle date here.",
 } as const;

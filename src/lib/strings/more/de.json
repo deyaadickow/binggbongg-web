@@ -1557,5 +1557,6 @@
  "cb_rounds_n": "{n} Runden × {total} Min.",
  "cb_off": "Country Battle läuft gerade nicht.",
  "cb_not_set_up": "Country Battle ist noch nicht bereit. Bitte versuche es später erneut.",
- "cb_ended": "Das heutige Battle ist vorbei"
+ "cb_ended": "Das heutige Battle ist vorbei",
+ "cb_coming_soon": "Demnächst – das Datum für das erste Battle geben wir hier bekannt."
 }

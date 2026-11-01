@@ -14,6 +14,8 @@ import { PageTitle } from "../components/PageTitle";
 import { Loading, Notice } from "../components/Common";
 import { CbPersonRow, CountryBattleParticipants, CountryBattleParticipantsModal, PlacePill, BullseyeIcon } from "../components/CountryBattleBits";
 import { useSession } from "../lib/session";
+import { fetchFeatureVideos } from "../lib/featureVideos";
+import { FeatureVideoPlayer } from "../components/FeatureVideoPlayer";
 import { useT, type StringKey } from "../lib/i18n";
 import {
   cbText, clock, dayTimeline, fetchCountryBattleBoard, fetchCountryBattleStatus, flag, reasonText, roundsText,
@@ -94,21 +96,14 @@ export function CountryBattlePage() {
     lastPhase.current = key;
   }, [day?.id, pl.phase, load]);
 
-  if (error && !status) return <div className="page cb-page"><PageTitle>{t("cb_title")}</PageTitle><Notice error>{error}</Notice></div>;
+  // The directory tile shows to everyone while the switch is off (Steve, 2026-11-01: "we will
+  // announce it with one of the feature with a video"), so OFF — or no answer at all — is the
+  // explainer, not an error.
+  if (error && !status) return <CountryBattleExplainer note={t("cb_coming_soon")} />;
   if (!status) return <div className="page cb-page"><PageTitle>{t("cb_title")}</PageTitle><Loading /></div>;
 
   if (!status.enabled || !battle) {
-    return (
-      <div className="page cb-page" style={{ maxWidth: 760 }}>
-        <PageTitle>{t("cb_title")}</PageTitle>
-        <div className="card pad" style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: 10 }}>
-          <span style={{ fontSize: 40 }} aria-hidden>🌏</span>
-          <b style={{ color: "var(--gold)" }}>{t("cb_none")}</b>
-          {status.enabled && <span style={{ color: "rgba(255,255,255,.85)", fontSize: 14 }}>{t("cb_explain")}</span>}
-          {status.enabled && <Link to="/country-battle/board" className="btn">{t("cb_board")}</Link>}
-        </div>
-      </div>
-    );
+    return <CountryBattleExplainer note={status.enabled ? t("cb_none") : t("cb_coming_soon")} />;
   }
 
   const me = battle.me ?? null;
@@ -246,6 +241,61 @@ export function CountryBattlePage() {
         <CountryBattleParticipantsModal battleId={battle.id} profileUserId={uid || undefined}
           title={`${country}${battle.month_label ? ` · ${battle.month_label}` : ""}`} onClose={() => setShowPeople(false)} />
       )}
+    </div>
+  );
+}
+
+/** What Country Battle is, for when there is no battle to show: the announcement page. No Join or
+ *  Watch — there is nothing to join. */
+function CountryBattleExplainer({ note }: { note: string }) {
+  const { t, lang } = useT();
+  const [video, setVideo] = useState<string | null>(null);
+  const [playing, setPlaying] = useState(false);
+  useEffect(() => {
+    let live = true;
+    fetchFeatureVideos(lang).then((v) => { if (live) setVideo(v.country_battle ?? null); });
+    return () => { live = false; };
+  }, [lang]);
+  // 8 PM in the member's own clock format — each country's battle runs at 8 PM there.
+  const eightPm = new Date(2000, 0, 1, 20, 0).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+  const week: [string, string][] = [
+    [`${t("cb_d1")} – ${t("cb_d5")}`, t("cb_rounds_3")],
+    [t("cb_stage_saturday"), t("cb_rounds_3")],
+    [t("cb_stage_sunday"), t("cb_rounds_5")],
+  ];
+  return (
+    <div className="page cb-page" style={{ maxWidth: 760 }}>
+      <PageTitle>{t("cb_title")}</PageTitle>
+      <div className="card pad" style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
+        <span style={{ fontSize: 40 }} aria-hidden>🌏</span>
+        <b style={{ color: "#FFD84D", fontSize: 20 }}>{t("cb_tagline")}</b>
+        {video && (
+          <button className="btn" style={{ alignSelf: "center" }} onClick={() => setPlaying(true)}>▶ {t("watch_video")}</button>
+        )}
+      </div>
+
+      <div className="notice" style={{ textAlign: "center", marginBottom: 12, color: "var(--gold)", fontWeight: 700, borderColor: "var(--gold)" }}>
+        {note}
+      </div>
+
+      <div className="card pad" style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
+        <span style={{ color: "rgba(255,255,255,.88)", fontSize: 14 }}>{t("cb_explain")}</span>
+        <b style={{ color: "var(--gold)", fontSize: 14 }}>{t("cb_how_score")}</b>
+      </div>
+
+      <div className="card pad" style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
+        <b style={{ color: "var(--gold)" }}>{t("cb_this_week")}</b>
+        {week.map(([when, rounds]) => (
+          <div key={when} className="row" style={{ gap: 10, alignItems: "baseline" }}>
+            <b style={{ color: "#fff", fontSize: 14, minWidth: 0 }}>{when}</b>
+            <span style={{ marginLeft: "auto", color: "var(--gold)", fontSize: 14, fontWeight: 700, whiteSpace: "nowrap" }}>{rounds}</span>
+          </div>
+        ))}
+        <span style={{ color: "var(--text-soft)", fontSize: 13 }}>🕗 {cbText(t("cb_starts_at"), { time: eightPm })}</span>
+      </div>
+
+      <Link to="/country-battle/board" className="btn" style={{ display: "flex", justifyContent: "center" }}>🥇 {t("cb_board")}</Link>
+      {playing && video && <FeatureVideoPlayer url={video} title={t("cb_title")} onClose={() => setPlaying(false)} />}
     </div>
   );
 }

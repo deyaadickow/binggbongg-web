@@ -33,7 +33,6 @@ import { fetchFeatureVideos, featureVideoLabels } from "../lib/featureVideos";
 import { IDEA_SUPPORT_REASON } from "../lib/ideas";
 import { FeatureVideoPlayer } from "../components/FeatureVideoPlayer";
 import { useContestOn } from "../lib/contests";
-import { useCountryBattleVisible } from "../lib/countryBattle";
 
 interface Feature {
   icon: string;
@@ -52,9 +51,9 @@ interface Feature {
    *  "remove all singing contest from the app for now, we will start the contest in the
    *  future"). Switching one on in the admin panel brings the tile back, no deploy. */
   contestOnly?: true;
-  /** Country Battle (Steve, 2026-11-01): "Add on/off switch because we will not start this battle
-   *  until we have a few thousand members." Shown only when the admin switch is on, or to a tester. */
-  countryBattleOnly?: true;
+  /** The key its feature video is stored under, when it is not nameKey (Country Battle's tile is
+   *  named by cb_title, its video key is "country_battle" on all three platforms). */
+  videoKey?: string;
 }
 
 interface Section {
@@ -95,7 +94,10 @@ const FEATURES: Section[] = [
     features: [
       { icon: "⚔️", nameKey: "fname_n11_battle_modes", blurbKey: "fblurb_n11_battle_modes", to: "/battles", whereKey: "fwhere_the_live_room" },
       { icon: "🏆", nameKey: "fname_pk_battle_contests", blurbKey: "fblurb_pk_battle_contests", to: "/pk-contests", whereKey: "fwhere_the_live_room" },
-      { icon: "🌏", nameKey: "cb_title", blurbKey: "cb_tagline", to: "/country-battle", countryBattleOnly: true },
+      // Steve, 2026-11-01: "we will not start this battle until we have a few thousand members. but we
+      // will announce it with one of the feature with a video" — so the tile shows to EVERYONE even
+      // while the switch is off; the page explains it and says it is coming soon.
+      { icon: "🌏", nameKey: "cb_title", blurbKey: "cb_tagline", to: "/country-battle", videoKey: "country_battle" },
       { icon: "💣", nameKey: "fname_power_ups", blurbKey: "fblurb_power_ups", to: "/feature/power-ups", whereKey: "fwhere_the_live_room" },
       { icon: "🔍", nameKey: "fname_find_a_battle", blurbKey: "fblurb_find_a_battle", to: "/settings/find-a-battle" },
       { icon: "📊", nameKey: "fname_battle_rankings", blurbKey: "fblurb_battle_rankings", to: "/feature/battle-rankings", whereKey: "fwhere_the_live_room" },
@@ -332,10 +334,9 @@ export function FeaturesPage() {
     return () => { live = false; };
   }, [lang]);
   const hasContest = useContestOn();
-  const hasCountryBattle = useCountryBattleVisible();
   const shown = FEATURES.map((s) => ({
     ...s,
-    features: s.features.filter((f) => (hasContest || !f.contestOnly) && (hasCountryBattle || !f.countryBattleOnly)),
+    features: s.features.filter((f) => hasContest || !f.contestOnly),
   }));
   const numbers = featureNumbers(shown);
   // Steve, 2026-10-19: "Please add search on top of this page." Fifty-seven tiles is a lot to
@@ -410,13 +411,16 @@ export function FeaturesPage() {
             gridTemplateColumns: "1fr",
             gap: 10,
           }}>
-            {section.features.map((f) => (
-              <Tile key={f.nameKey} f={f} number={numbers[f.nameKey]} video={videos[f.nameKey]}
-                onWatch={() => setPlaying({ url: videos[f.nameKey], title: t(f.labelKey ?? f.nameKey) })}
-                extras={Object.keys(videos).filter((k) => k.startsWith(f.nameKey + "__")).sort()
+            {section.features.map((f) => {
+              const vk = f.videoKey ?? f.nameKey;
+              return (
+              <Tile key={f.nameKey} f={f} number={numbers[f.nameKey]} video={videos[vk]}
+                onWatch={() => setPlaying({ url: videos[vk], title: t(f.labelKey ?? f.nameKey) })}
+                extras={Object.keys(videos).filter((k) => k.startsWith(vk + "__")).sort()
                   .map((k) => ({ key: k, label: featureVideoLabels[k] ?? t("watch_video") }))}
                 onWatchExtra={(k) => setPlaying({ url: videos[k], title: featureVideoLabels[k] ?? t(f.labelKey ?? f.nameKey) })} />
-            ))}
+              );
+            })}
           </div>
         </div>
       ))}

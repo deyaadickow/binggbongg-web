@@ -1720,4 +1720,6 @@ export const es = {
   cb_off: "La Batalla de países no está activa en este momento.",
   cb_not_set_up: "La Batalla de países aún no está lista. Inténtalo de nuevo más tarde.",
   cb_ended: "La batalla de hoy ha terminado",
+  // Country Battle coming soon (Steve, 2026-11-01)
+  cb_coming_soon: "Próximamente — anunciaremos la fecha de la primera batalla aquí.",
 };

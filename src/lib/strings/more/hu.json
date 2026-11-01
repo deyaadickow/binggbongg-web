@@ -1550,5 +1550,6 @@
  "cb_rounds_n": "{n} kör × {total} perc",
  "cb_off": "Az Országcsata épp nem zajlik.",
  "cb_not_set_up": "Az Országcsata még nem áll készen. Kérjük, próbáld újra később.",
- "cb_ended": "A mai csata véget ért"
+ "cb_ended": "A mai csata véget ért",
+ "cb_coming_soon": "Hamarosan — az első csata időpontját itt jelentjük be."
 }

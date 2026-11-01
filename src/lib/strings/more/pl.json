@@ -1557,5 +1557,6 @@
  "cb_rounds_n": "{n} rund × {total} min",
  "cb_off": "Country Battle nie jest teraz aktywna.",
  "cb_not_set_up": "Country Battle nie jest jeszcze gotowa. Spróbuj ponownie później.",
- "cb_ended": "Dzisiejsza bitwa dobiegła końca"
+ "cb_ended": "Dzisiejsza bitwa dobiegła końca",
+ "cb_coming_soon": "Już wkrótce — tutaj ogłosimy datę pierwszej bitwy."
 }

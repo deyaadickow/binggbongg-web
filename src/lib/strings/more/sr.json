@@ -1557,5 +1557,6 @@
  "cb_rounds_n": "{n} rundi × {total} min",
  "cb_off": "Bitka država trenutno nije u toku.",
  "cb_not_set_up": "Bitka država još nije spremna. Pokušaj ponovo kasnije.",
- "cb_ended": "Današnja bitka je završena"
+ "cb_ended": "Današnja bitka je završena",
+ "cb_coming_soon": "Uskoro — ovde ćemo objaviti datum prve bitke."
 }

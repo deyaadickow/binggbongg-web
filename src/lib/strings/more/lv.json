@@ -1553,5 +1553,6 @@
  "cb_rounds_n": "{n} raundi × {total} min",
  "cb_off": "Valstu cīņa šobrīd nenotiek.",
  "cb_not_set_up": "Valstu cīņa vēl nav gatava. Lūdzu, mēģini vēlāk.",
- "cb_ended": "Šodienas cīņa ir beigusies"
+ "cb_ended": "Šodienas cīņa ir beigusies",
+ "cb_coming_soon": "Drīzumā — šeit paziņosim pirmās cīņas datumu."
 }

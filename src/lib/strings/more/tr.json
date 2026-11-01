@@ -1557,5 +1557,6 @@
  "cb_rounds_n": "{n} tur × {total} dk",
  "cb_off": "Country Battle şu anda aktif değil.",
  "cb_not_set_up": "Country Battle henüz hazır değil. Lütfen daha sonra tekrar dene.",
- "cb_ended": "Bugünkü karşılaşma bitti"
+ "cb_ended": "Bugünkü karşılaşma bitti",
+ "cb_coming_soon": "Çok yakında — ilk kapışma tarihini burada duyuracağız."
 }

@@ -1557,5 +1557,6 @@
  "cb_rounds_n": "{n} txanda × {total} min",
  "cb_off": "Country Battle ez dago martxan oraintxe bertan.",
  "cb_not_set_up": "Country Battle ez dago prest oraindik. Saiatu berriro geroago.",
- "cb_ended": "Gaurko borroka amaitu da"
+ "cb_ended": "Gaurko borroka amaitu da",
+ "cb_coming_soon": "Laster — hemen iragarriko dugu lehen borrokaren data."
 }

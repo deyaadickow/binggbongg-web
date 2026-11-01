@@ -1548,5 +1548,6 @@
  "cb_rounds_n": "{n} erää × {total} min",
  "cb_off": "Country Battle ei ole käynnissä juuri nyt.",
  "cb_not_set_up": "Country Battle ei ole vielä valmis. Yritä myöhemmin uudelleen.",
- "cb_ended": "Tämän päivän taistelu on päättynyt"
+ "cb_ended": "Tämän päivän taistelu on päättynyt",
+ "cb_coming_soon": "Tulossa pian — ilmoitamme ensimmäisen taistelun ajankohdan täällä."
 }

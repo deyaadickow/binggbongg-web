@@ -1554,5 +1554,6 @@
  "cb_rounds_n": "{n} lotur × {total} mín",
  "cb_off": "Landabaráttan er ekki í gangi núna.",
  "cb_not_set_up": "Landabaráttan er ekki tilbúin enn. Reyndu aftur síðar.",
- "cb_ended": "Baráttu dagsins er lokið"
+ "cb_ended": "Baráttu dagsins er lokið",
+ "cb_coming_soon": "Væntanlegt — við tilkynnum dagsetningu fyrsta bardagans hér."
 }

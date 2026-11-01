@@ -1553,5 +1553,6 @@
  "cb_rounds_n": "{n} roldas × {total} min",
  "cb_off": "Country Battle non está activa agora mesmo.",
  "cb_not_set_up": "Country Battle aínda non está lista. Inténtao de novo máis tarde.",
- "cb_ended": "A batalla de hoxe rematou"
+ "cb_ended": "A batalla de hoxe rematou",
+ "cb_coming_soon": "Moi pronto — anunciaremos aquí a data da primeira batalla."
 }

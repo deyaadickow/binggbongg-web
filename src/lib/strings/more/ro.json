@@ -1552,5 +1552,6 @@
  "cb_rounds_n": "{n} runde × {total} min",
  "cb_off": "Bătălia țărilor nu este activă acum.",
  "cb_not_set_up": "Bătălia țărilor nu este gata încă. Încearcă din nou mai târziu.",
- "cb_ended": "Bătălia de astăzi s-a încheiat"
+ "cb_ended": "Bătălia de astăzi s-a încheiat",
+ "cb_coming_soon": "În curând — vom anunța aici data primei bătălii."
 }

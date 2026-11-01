@@ -1556,5 +1556,6 @@
  "cb_rounds_n": "{n} rondes × {total} min",
  "cb_off": "Country Battle no està activa ara mateix.",
  "cb_not_set_up": "Country Battle encara no està a punt. Torna-ho a provar més tard.",
- "cb_ended": "La batalla d'avui s'ha acabat"
+ "cb_ended": "La batalla d'avui s'ha acabat",
+ "cb_coming_soon": "Molt aviat — anunciarem la data de la primera batalla aquí."
 }

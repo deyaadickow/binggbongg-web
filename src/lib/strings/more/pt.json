@@ -1557,5 +1557,6 @@
  "cb_rounds_n": "{n} rodadas × {total} min",
  "cb_off": "A Batalha de Países não está acontecendo agora.",
  "cb_not_set_up": "A Batalha de Países ainda não está pronta. Tente novamente mais tarde.",
- "cb_ended": "A batalha de hoje terminou"
+ "cb_ended": "A batalha de hoje terminou",
+ "cb_coming_soon": "Em breve — anunciaremos a data da primeira batalha aqui."
 }

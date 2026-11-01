@@ -1734,4 +1734,6 @@ export const id = {
   cb_off: "Country Battle sedang tidak aktif saat ini.",
   cb_not_set_up: "Country Battle belum siap. Coba lagi nanti.",
   cb_ended: "Pertarungan hari ini sudah selesai",
+  // Country Battle coming soon (Steve, 2026-11-01)
+  cb_coming_soon: "Segera hadir — kami akan umumkan tanggal battle pertama di sini.",
 };
