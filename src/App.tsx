@@ -63,6 +63,10 @@ import { SellerPage } from "./pages/SellerPage";
 import { AgentPage } from "./pages/AgentPage";
 import { VaultPage } from "./pages/VaultPage";
 import { GetAppBar } from "./components/GetAppBar";
+import { FallbackBack } from "./components/FallbackBack";
+import { BattlesPage } from "./pages/BattlesPage";
+import { LiveFeaturePage } from "./pages/LiveFeaturePage";
+import { PkContestsPage } from "./pages/PkContestsPage";
 import { rememberAdSource } from "./lib/getApp";
 
 /** The ads' landing page (/ph) stands alone — no menu, no sidebar, nothing but the contest and the
@@ -111,6 +115,7 @@ export default function App() {
             here rather than to thirty page files: .cosmic-page's backdrop is position:fixed, so
             one element covers every route and nothing can be missed or drift later. */}
         <main className="content cosmic-page">
+        <FallbackBack />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/exciting-news" element={<ExcitingNewsPage />} />
@@ -134,6 +139,10 @@ export default function App() {
           <Route path="/my-analytics" element={<MyAnalyticsPage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/live" element={<LiveNowPage />} />
+          {/* Steve, 2026-11-01: the directory's live-room tiles open their own pages, not an empty Live Now. */}
+          <Route path="/battles" element={<BattlesPage />} />
+          <Route path="/pk-contests" element={<PkContestsPage />} />
+          <Route path="/feature/:slug" element={<LiveFeaturePage />} />
           {/* Your own live Bingg Bongg show (Steve, 2026-10-17). */}
           <Route path="/shows" element={<ShowsPage />} />
           <Route path="/my-show" element={<MyShowPage />} />

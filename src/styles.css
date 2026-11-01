@@ -758,3 +758,6 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .get-app-login { display: grid; gap: 10px; margin-top: 16px; text-align: center; }
 .get-app-login .lp-cta { margin-top: 0; }
 .get-app-login a.soft-link { color: var(--gold); font-weight: 700; text-decoration: underline; }
+
+/* The back arrow for pages that have none of their own (components/FallbackBack.tsx). */
+.fallback-back-row { margin: 0 0 10px; }
