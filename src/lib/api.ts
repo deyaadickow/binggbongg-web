@@ -163,6 +163,12 @@ export interface UserSummary {
    *  phones read off their own row (CategoryFragment.initFav). Only ever set on your own user. */
   fav_cats?: string;
   auth_token?: string;
+  /** Country Battle (Steve, 2026-11-01): the current or most recent battle this member took part
+   *  in (drives the ◎ on their profile), their champion badges newest first, and — on the
+   *  signed-in member's own row only — whether they may see test battles. */
+  country_battle_id?: number | null;
+  country_battle_badges?: { place: number; country?: string; month_label?: string; battle_id?: number }[] | null;
+  country_battle_tester?: boolean | number;
 }
 
 export interface Post {

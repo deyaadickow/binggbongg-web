@@ -33,6 +33,7 @@ import { fetchFeatureVideos, featureVideoLabels } from "../lib/featureVideos";
 import { IDEA_SUPPORT_REASON } from "../lib/ideas";
 import { FeatureVideoPlayer } from "../components/FeatureVideoPlayer";
 import { useContestOn } from "../lib/contests";
+import { useCountryBattleVisible } from "../lib/countryBattle";
 
 interface Feature {
   icon: string;
@@ -51,6 +52,9 @@ interface Feature {
    *  "remove all singing contest from the app for now, we will start the contest in the
    *  future"). Switching one on in the admin panel brings the tile back, no deploy. */
   contestOnly?: true;
+  /** Country Battle (Steve, 2026-11-01): "Add on/off switch because we will not start this battle
+   *  until we have a few thousand members." Shown only when the admin switch is on, or to a tester. */
+  countryBattleOnly?: true;
 }
 
 interface Section {
@@ -91,6 +95,7 @@ const FEATURES: Section[] = [
     features: [
       { icon: "⚔️", nameKey: "fname_n11_battle_modes", blurbKey: "fblurb_n11_battle_modes", to: "/battles", whereKey: "fwhere_the_live_room" },
       { icon: "🏆", nameKey: "fname_pk_battle_contests", blurbKey: "fblurb_pk_battle_contests", to: "/pk-contests", whereKey: "fwhere_the_live_room" },
+      { icon: "🌏", nameKey: "cb_title", blurbKey: "cb_tagline", to: "/country-battle", countryBattleOnly: true },
       { icon: "💣", nameKey: "fname_power_ups", blurbKey: "fblurb_power_ups", to: "/feature/power-ups", whereKey: "fwhere_the_live_room" },
       { icon: "🔍", nameKey: "fname_find_a_battle", blurbKey: "fblurb_find_a_battle", to: "/settings/find-a-battle" },
       { icon: "📊", nameKey: "fname_battle_rankings", blurbKey: "fblurb_battle_rankings", to: "/feature/battle-rankings", whereKey: "fwhere_the_live_room" },
@@ -327,9 +332,11 @@ export function FeaturesPage() {
     return () => { live = false; };
   }, [lang]);
   const hasContest = useContestOn();
-  const shown = hasContest
-    ? FEATURES
-    : FEATURES.map((s) => ({ ...s, features: s.features.filter((f) => !f.contestOnly) }));
+  const hasCountryBattle = useCountryBattleVisible();
+  const shown = FEATURES.map((s) => ({
+    ...s,
+    features: s.features.filter((f) => (hasContest || !f.contestOnly) && (hasCountryBattle || !f.countryBattleOnly)),
+  }));
   const numbers = featureNumbers(shown);
   // Steve, 2026-10-19: "Please add search on top of this page." Fifty-seven tiles is a lot to
   // scroll past when you already know what you are looking for. Matches the NAME and the

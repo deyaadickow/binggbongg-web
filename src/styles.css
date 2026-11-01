@@ -761,3 +761,79 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 
 /* The back arrow for pages that have none of their own (components/FallbackBack.tsx). */
 .fallback-back-row { margin: 0 0 10px; }
+
+/* ── Country Battle (Steve, 2026-11-01) ────────────────────────────────────
+   "top left tile will be the person for his account and the rest of the tile will be members
+   popping up at random and keep changing". Mon–Fri up to 24 tiles 4 across, Saturday 12 4 across,
+   Sunday 6 2 across. The grid is sized in JS (CountryBattleLivePage) so every row fits on the
+   screen at once, on a phone and on a desktop. */
+.cb-page { max-width: 980px; }
+.cb-head { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; margin-bottom: 8px; background: rgba(0,0,0,.88); border: 1.5px solid var(--gold-border); border-radius: var(--radius); }
+.cb-head-row { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.cb-head-title { color: var(--gold); font-weight: 800; font-size: 18px; line-height: 1.1; }
+.cb-head-stage { color: #fff; font-size: 13px; font-weight: 600; }
+.cb-head-clock { margin-left: auto; text-align: right; flex: 0 0 auto; }
+.cb-head-clock b { display: block; color: var(--gold); font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.cb-head-clock span { display: block; color: #fff; font-size: 12px; font-weight: 600; }
+.cb-head-sub { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--text-soft); }
+.cb-head-sub .cb-score { color: var(--gold); font-weight: 800; }
+.cb-test { display: block; text-align: center; padding: 6px 10px; margin-bottom: 8px; border-radius: 10px; background: #2a0d0d; border: 1px dashed #ff8a65; color: #ffcc80; font-size: 12px; font-weight: 700; }
+.cb-stage { position: relative; margin: 0 auto; }
+.cb-grid { display: grid; gap: 3px; width: 100%; }
+.cb-tile { position: relative; aspect-ratio: 3 / 4; border-radius: 6px; overflow: hidden; background: #111; border: 1px solid rgba(212,175,55,.35); cursor: pointer; animation: cb-pop .45s ease-out; padding: 0; container-type: inline-size; font: inherit; color: inherit; text-align: left; }
+.cb-tile.own { border: 2px solid var(--gold); box-shadow: 0 0 10px rgba(240,196,32,.55); cursor: default; }
+.cb-tile.listening { border-color: #4CD964; box-shadow: 0 0 0 1px #4CD964; }
+.cb-tile video, .cb-tile .cb-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.cb-tile .cb-ph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+.cb-tile .cb-ph i { font-style: normal; width: 46%; aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; background: var(--gold); color: #101010; font-weight: 800; font-size: 15cqw; }
+.cb-name { position: absolute; left: 0; right: 0; bottom: 0; padding: 2px 4px; background: rgba(0,0,0,.72); color: #fff; font-size: 9px; line-height: 1.3; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; }
+.cb-tile.own .cb-name { color: var(--gold); font-weight: 800; }
+.cb-gift { position: absolute; top: 3px; right: 3px; z-index: 2; width: 22px; height: 22px; padding: 0; border-radius: 50%; background: #000; border: 1.5px solid var(--gold); display: grid; place-items: center; font-size: 11px; line-height: 1; cursor: pointer; }
+.cb-gift:hover { border-color: var(--gold-bright); }
+.cb-ear { position: absolute; top: 3px; left: 3px; z-index: 2; font-size: 11px; line-height: 1; padding: 3px 4px; border-radius: 999px; background: rgba(0,0,0,.75); border: 1px solid #4CD964; }
+.cb-grid.cols-2 .cb-name { font-size: 12px; padding: 3px 6px; }
+.cb-grid.cols-2 .cb-gift { width: 32px; height: 32px; font-size: 16px; top: 6px; right: 6px; }
+.cb-grid.cols-2 .cb-ear { font-size: 14px; top: 6px; left: 6px; }
+@media (min-width: 700px) {
+  .cb-grid { gap: 5px; }
+  .cb-name { font-size: 11px; }
+  .cb-gift { width: 26px; height: 26px; font-size: 13px; }
+}
+.cb-hint { text-align: center; margin: 6px auto 0; font-size: 12px; color: var(--text-soft); }
+.cb-empty { display: flex; align-items: center; justify-content: center; text-align: center; min-height: 160px; padding: 20px; color: var(--text-soft); }
+@keyframes cb-pop { from { transform: scale(.9); filter: brightness(1.8); } to { transform: scale(1); filter: none; } }
+@media (prefers-reduced-motion: reduce) { .cb-tile { animation: none; } }
+/* The week, one row a day; today filled gold-dark and ringed. */
+.cb-week { display: flex; flex-direction: column; gap: 6px; }
+.cb-day { display: grid; grid-template-columns: 46px 1fr auto; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line); background: #0b0b0b; }
+.cb-day.today { border: 2px solid var(--gold); background: #2A2205; }
+.cb-day.done { opacity: .7; }
+.cb-day .cb-dname { color: var(--gold); font-weight: 800; }
+.cb-day .cb-dstage { font-weight: 700; font-size: 14px; }
+.cb-day .cb-drounds { font-size: 12px; color: var(--text-soft); }
+.cb-people { display: flex; flex-direction: column; gap: 6px; }
+.cb-person { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 10px; background: #0b0b0b; border: 1px solid var(--line); color: inherit; }
+.cb-person b { color: var(--gold); }
+.cb-person .cb-num { margin-left: auto; color: var(--gold); font-weight: 800; font-variant-numeric: tabular-nums; }
+.cb-place { display: inline-flex; align-items: center; justify-content: center; min-width: 30px; height: 24px; padding: 0 8px; border-radius: 999px; font-weight: 800; font-size: 12px; color: #000; background: #8A8478; }
+.cb-place.p1 { background: linear-gradient(135deg, #FFE27A, #D4AF37); }
+.cb-place.p2 { background: linear-gradient(135deg, #F2F2F2, #A8A8A8); }
+.cb-place.p3 { background: linear-gradient(135deg, #F0B27A, #A0522D); }
+/* Champion pills on a profile. */
+.cb-badge { display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 10px; border-radius: 999px; font-weight: 800; font-size: 11.5px; white-space: nowrap; color: #241500; border: 1.5px solid rgba(0,0,0,.25); }
+.cb-badge.p1 { background: linear-gradient(135deg, #FFE27A, #D4AF37); }
+.cb-badge.p2 { background: linear-gradient(135deg, #FAFAFA, #B5B5B5); }
+.cb-badge.p3 { background: linear-gradient(135deg, #F3BE8C, #B0663A); }
+.cb-bullseye { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; padding: 0; border-radius: 50%; border: 2px solid var(--gold); background: #000; cursor: pointer; flex: 0 0 auto; }
+/* The participants list: name, then Mon..Sun. */
+.cb-prow { display: flex; flex-direction: column; gap: 6px; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line); background: #0b0b0b; }
+.cb-prow.me { border: 2px solid var(--gold); }
+.cb-prow-top { display: flex; align-items: center; gap: 10px; min-width: 0; color: inherit; }
+.cb-prow-top b { color: var(--gold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cb-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.cb-days span { display: flex; flex-direction: column; align-items: center; padding: 3px 0; border-radius: 6px; background: #151515; font-size: 10px; color: var(--text-dim); min-width: 0; }
+.cb-days span em { font-style: normal; color: #fff; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; min-height: 16px; }
+.cb-days span.on { background: #2A2205; color: var(--gold); }
+.cb-days span.on em { color: var(--gold); }
+.cb-totals { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 12px; color: var(--text-soft); }
+.cb-totals b { color: var(--gold); }

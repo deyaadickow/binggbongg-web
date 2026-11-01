@@ -12,6 +12,7 @@ import { fetchUserPhotos, type Photo } from "../lib/photos";
 import { MemberBusinessesPanel, MyBusinessesPanel } from "./BusinessPages";
 import { ScheduleSection } from "../components/ScheduleSection";
 import { showGoldAlert } from "../components/GoldToast";
+import { CountryBattleBadges, CountryBattleBullseye, CountryBattleParticipantsModal } from "../components/CountryBattleBits";
 import { tt, useT  } from "../lib/i18n";
 
 interface ProfileUser extends UserSummary {
@@ -305,6 +306,8 @@ export function ProfilePage() {
   // explainers open the app's own popup instead of the browser's white alert box.
   const [battleInfo, setBattleInfo] = useState<{ title: string; body: string; flames?: number } | null>(null);
   const [vipInfo, setVipInfo] = useState(false);
+  // Country Battle (Steve, 2026-11-01): the ◎ on a participant's page opens the battle's list.
+  const [showCountryBattle, setShowCountryBattle] = useState(false);
   const [tabVideos, setTabVideos] = useState<ProfilePost[]>([]);
   const [tabUsers, setTabUsers] = useState<UserSummary[]>([]);
   // Photos are neither posts nor members, so they get their own bucket rather than being
@@ -568,6 +571,8 @@ export function ProfilePage() {
               />
               {/* Steve, 2026-10-29: a VIP Referral Member's gold pill; tapping it says what it is. */}
               {isVipReferrer(profile.is_vip_referrer) && <VipBadge onClick={() => setVipInfo(true)} />}
+              {/* Steve, 2026-11-01: "Every member that is in this battle will have a bullseye on his page". */}
+              {!!profile.country_battle_id && <CountryBattleBullseye onClick={() => setShowCountryBattle(true)} />}
               {profile.is_verified === 2 && (
                 <span title={t("verified")} style={{ color: "#4af", fontSize: 16 }}>✓</span>
               )}
@@ -581,6 +586,8 @@ export function ProfilePage() {
             <div className="gold-plate" style={{ fontSize: 12, marginTop: 4 }}>
               @{profile.username}{profile.country ? ` · ${profile.country}` : ""}
             </div>
+            {/* Country Battle champion pills — 1st gold, 2nd silver, 3rd bronze, newest first. */}
+            <CountryBattleBadges badges={profile.country_battle_badges} />
             {profile.bio && (
               <p className="gold-plate" style={{ marginTop: 6, fontSize: 13, lineHeight: 1.4 }}>{profile.bio}</p>
             )}
@@ -813,6 +820,9 @@ export function ProfilePage() {
           onClose={() => setShowCreatePlaylist(false)}
           onCreated={(pl) => setPlaylists((prev) => [pl, ...prev])}
         />
+      )}
+      {showCountryBattle && !!profile.country_battle_id && (
+        <CountryBattleParticipantsModal battleId={profile.country_battle_id} profileUserId={profile.id} onClose={() => setShowCountryBattle(false)} />
       )}
       {vipInfo && (
         <VipBadgePopup viewerIsVip={isVipReferrer(isMe ? profile.is_vip_referrer : me?.is_vip_referrer)} onClose={() => setVipInfo(false)} />

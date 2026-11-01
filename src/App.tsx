@@ -67,6 +67,8 @@ import { FallbackBack } from "./components/FallbackBack";
 import { BattlesPage } from "./pages/BattlesPage";
 import { LiveFeaturePage } from "./pages/LiveFeaturePage";
 import { PkContestsPage } from "./pages/PkContestsPage";
+import { CountryBattleBoardPage, CountryBattlePage, CountryBattleResultsPage } from "./pages/CountryBattlePages";
+import { CountryBattleLivePage } from "./pages/CountryBattleLivePage";
 import { rememberAdSource } from "./lib/getApp";
 
 /** The ads' landing page (/ph) stands alone — no menu, no sidebar, nothing but the contest and the
@@ -142,6 +144,11 @@ export default function App() {
           {/* Steve, 2026-11-01: the directory's live-room tiles open their own pages, not an empty Live Now. */}
           <Route path="/battles" element={<BattlesPage />} />
           <Route path="/pk-contests" element={<PkContestsPage />} />
+          {/* Country Battle (Steve, 2026-11-01) — the home, the battle screen, the lifetime board. */}
+          <Route path="/country-battle" element={<CountryBattlePage />} />
+          <Route path="/country-battle/live/:dayId" element={<CountryBattleLivePage />} />
+          <Route path="/country-battle/board" element={<CountryBattleBoardPage />} />
+          <Route path="/country-battle/board/:id" element={<CountryBattleResultsPage />} />
           <Route path="/feature/:slug" element={<LiveFeaturePage />} />
           {/* Your own live Bingg Bongg show (Steve, 2026-10-17). */}
           <Route path="/shows" element={<ShowsPage />} />

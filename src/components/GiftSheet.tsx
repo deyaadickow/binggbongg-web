@@ -101,7 +101,9 @@ export function GiftFlash({ gift, onDone }: { gift: Gift; onDone: () => void }) 
   );
 }
 
-function GiftSheet({ post: item, onClose, onSent, sendOverride }: { post: Post; onClose: () => void; onSent?: (gift: Gift) => void; sendOverride?: (coins: number) => Promise<{ status: boolean; message?: string | null }> }) {
+/** Exported for the Country Battle grid (2026-11-01), which gifts a MEMBER, not a post: it passes
+ *  no post and sends through `sendOverride`, which also gets the gift (sendCoinsToUser needs its id). */
+export function GiftSheet({ post: item, onClose, onSent, sendOverride }: { post?: Post; onClose: () => void; onSent?: (gift: Gift) => void; sendOverride?: (coins: number, gift: Gift) => Promise<{ status: boolean; message?: string | null }> }) {
   const { t } = useT();
   const { user, refresh } = useSession();
   const [gifts, setGifts] = useState<Gift[]>([]);
@@ -142,8 +144,10 @@ function GiftSheet({ post: item, onClose, onSent, sendOverride }: { post: Post; 
     setBusy(gift.id);
     try {
       const res = sendOverride
-        ? await sendOverride(price)
-        : await post("sendCoinsToPost", { my_user_id: user.id, coins: price, post_id: item.id });
+        ? await sendOverride(price, gift)
+        : item
+          ? await post("sendCoinsToPost", { my_user_id: user.id, coins: price, post_id: item.id })
+          : { status: false, message: tt("couldn_t_send_that_gift") };
       if (!res.status) throw new Error(res.message ?? tt("couldn_t_send_that_gift"));
       await refresh();
       // Close straight away so the gift shows over the video, as the phones do.
