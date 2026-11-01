@@ -8,7 +8,7 @@ import { BingoCardIcon } from "../components/BingoCardIcon";
 import { Avatar } from "../components/Common";
 import { LiveRoomsList } from "../components/LiveRoomsList";
 import { post } from "../lib/api";
-import { useT } from "../lib/i18n";
+import { useT, type StringKey } from "../lib/i18n";
 import { BATTLE_MODES } from "../lib/battleModes";
 
 interface LiveBattle {
@@ -79,7 +79,7 @@ export function BattlesPage() {
             </span>
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
               <b style={{ color: "var(--gold)", fontSize: 16 }}>#{i + 1} {m.name}</b>
-              <span style={{ fontSize: 14, color: "rgba(255,255,255,0.85)" }}>{m.text}</span>
+              <span style={{ fontSize: 14, color: "rgba(255,255,255,0.85)" }}>{t(`bm_${i + 1}` as StringKey)}</span>
             </div>
           </div>
         ))}

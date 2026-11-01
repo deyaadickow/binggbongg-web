@@ -35,7 +35,7 @@ function ContestCard({ c, userId }: { c: PkContest; userId: number }) {
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <b style={{ color: "var(--gold)", fontSize: 17, flex: 1 }}>{c.name || t("fname_pk_battle_contests")}</b>
         <span className="pill" style={{ borderColor: running ? "#4CAF50" : "var(--gold-border)", color: running ? "#4CAF50" : "var(--gold)" }}>
-          {contestStatusLabel(c.status)}
+          {c.status === "active" ? t("pkc_status_active") : c.status === "upcoming" ? t("pkc_status_upcoming") : contestStatusLabel(c.status)}
         </span>
       </div>
       <span className="muted">{dates(c)}</span>
