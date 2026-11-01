@@ -8,6 +8,7 @@
 // the Following tab once showed "No members yet." against 30 real rows because the page had
 // copied `toUser` from the PHP when the JSON says `to_user`. Guessed response keys fail
 // silently as an empty list, which looks exactly like "no data".
+import { useEffect, useState } from "react";
 import { post } from "./api";
 
 /** computedStatus() on the model. There is no "running" — a filter on that string matches
@@ -78,6 +79,24 @@ export async function fetchFeaturedContestId(): Promise<number | null> {
   } catch {
     return null;
   }
+}
+
+/** Is any contest switched on? Steve, 2026-11-01: "Please remove all singing contest from the
+ *  app for now, we will start the contest in the future." Every way into contests (the directory
+ *  tiles, the sidebar's "Enter a contest") is hidden while none is on, and comes back by itself
+ *  when the admin switches one on. One request per page load, shared by every caller. */
+let contestOnRequest: Promise<boolean> | null = null;
+export function useContestOn(): boolean {
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    let live = true;
+    contestOnRequest ??= fetchContests()
+      .then((all) => all.some((c) => (c.status ?? "").toLowerCase() !== "disabled"))
+      .catch(() => false);
+    contestOnRequest.then((v) => { if (live) setOn(v); });
+    return () => { live = false; };
+  }, []);
+  return on;
 }
 
 /** The two states worth showing. Excludes ended and disabled only. */

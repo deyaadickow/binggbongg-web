@@ -32,6 +32,7 @@ import { useEffect, useState } from "react";
 import { fetchFeatureVideos, featureVideoLabels } from "../lib/featureVideos";
 import { IDEA_SUPPORT_REASON } from "../lib/ideas";
 import { FeatureVideoPlayer } from "../components/FeatureVideoPlayer";
+import { useContestOn } from "../lib/contests";
 
 interface Feature {
   icon: string;
@@ -46,6 +47,10 @@ interface Feature {
   whereKey?: StringKey;
   /** Your OWN profile, whose id is only known once somebody is signed in. */
   myProfile?: true;
+  /** Shown only while the admin has a contest switched on (Steve, 2026-11-01:
+   *  "remove all singing contest from the app for now, we will start the contest in the
+   *  future"). Switching one on in the admin panel brings the tile back, no deploy. */
+  contestOnly?: true;
 }
 
 interface Section {
@@ -59,7 +64,7 @@ const FEATURES: Section[] = [
     // Features Videos page is #3 (2026-10-29).
     titleKey: "fsec_featured",
     features: [
-      { icon: "🎤", nameKey: "fname_philippine_singing_contest", blurbKey: "fblurb_philippine_singing_contest", to: "/featured-contest" },
+      { icon: "🎤", nameKey: "fname_philippine_singing_contest", blurbKey: "fblurb_philippine_singing_contest", to: "/featured-contest", contestOnly: true },
       { icon: "📣", nameKey: "fname_exciting_news", blurbKey: "fblurb_exciting_news", to: "/exciting-news" },
       // Steve, 2026-10-29: "make another page that's called 'Bingg Bongg Features Videos' and add
       // all the videos on that page with a header on each feature" — every feature's 60-second video.
@@ -155,7 +160,7 @@ const FEATURES: Section[] = [
   {
     titleKey: "fsec_everything_else",
     features: [
-      { icon: "🏆", nameKey: "fname_talent_contests", blurbKey: "fblurb_talent_contests", to: "/enter-contest" },
+      { icon: "🏆", nameKey: "fname_talent_contests", blurbKey: "fblurb_talent_contests", to: "/enter-contest", contestOnly: true },
 
       { icon: "🎂", nameKey: "fname_birthdays", blurbKey: "fblurb_birthdays", to: "/birthdays" },
 
@@ -218,16 +223,20 @@ const FEATURES: Section[] = [
 ];
 
 // Steve, 2026-10-25: "add a number on top right corner of each feature starting from #1". The
-// number is the tile's place in the WHOLE directory, so a search keeps #12 as #12.
-const FEATURE_NUMBER: Record<string, number> = {};
-FEATURES.flatMap((sec) => sec.features).forEach((f, i) => { FEATURE_NUMBER[f.nameKey] = i + 1; });
+// number is the tile's place in the WHOLE directory, so a search keeps #12 as #12. Counted over
+// the tiles actually shown, so a hidden contest tile does not leave the list starting at #2.
+function featureNumbers(sections: Section[]): Record<string, number> {
+  const numbers: Record<string, number> = {};
+  sections.flatMap((sec) => sec.features).forEach((f, i) => { numbers[f.nameKey] = i + 1; });
+  return numbers;
+}
 
 /** The red star either side of every feature's name (Steve, 2026-10-30). */
 const RED_STAR: React.CSSProperties = {
   color: "#E53935", fontSize: 20, lineHeight: 1, flexShrink: 0, textShadow: "0 0 8px rgba(229,57,53,0.75)",
 };
 
-function Tile({ f, video, onWatch, extras = [], onWatchExtra }: { f: Feature; video?: string; onWatch: () => void; extras?: { key: string; label: string }[]; onWatchExtra?: (key: string) => void }) {
+function Tile({ f, number, video, onWatch, extras = [], onWatchExtra }: { f: Feature; number: number; video?: string; onWatch: () => void; extras?: { key: string; label: string }[]; onWatchExtra?: (key: string) => void }) {
   const { t } = useT();
   // The battle badge, the streak, the Lifetime Battle Board and Playlists all live on your own
   // profile, whose address needs the signed-in id. Signed out, the tile leads to the sign-in
@@ -245,7 +254,7 @@ function Tile({ f, video, onWatch, extras = [], onWatchExtra }: { f: Feature; vi
         position: "absolute", top: 14, right: 14, color: "var(--gold)", fontWeight: 700, fontSize: 15,
         border: "1px solid var(--gold-border)", borderRadius: 999, padding: "3px 10px",
         background: "rgba(0,0,0,0.9)", fontVariantNumeric: "tabular-nums",
-      }}>#{FEATURE_NUMBER[f.nameKey]}</span>
+      }}>#{number}</span>
       {/* Top-left corner, opposite the #number (Steve, 2026-10-30). The empty line keeps the name
           below the corners. */}
       <span style={{ position: "absolute", top: 14, left: 16, fontSize: 24, lineHeight: 1 }} aria-hidden>{f.icon === "bingo_card" ? <BingoCardIcon size={32} /> : f.icon}</span>
@@ -317,19 +326,24 @@ export function FeaturesPage() {
     fetchFeatureVideos(lang).then((v) => { if (live) setVideos(v); });
     return () => { live = false; };
   }, [lang]);
+  const hasContest = useContestOn();
+  const shown = hasContest
+    ? FEATURES
+    : FEATURES.map((s) => ({ ...s, features: s.features.filter((f) => !f.contestOnly) }));
+  const numbers = featureNumbers(shown);
   // Steve, 2026-10-19: "Please add search on top of this page." Fifty-seven tiles is a lot to
   // scroll past when you already know what you are looking for. Matches the NAME and the
   // DESCRIPTION, both translated, so "coins" finds tiles that only mention coins in their blurb.
   const [query, setQuery] = useState("");
   const q = query.trim().toLowerCase();
   const sections = q
-    ? FEATURES.map((s) => ({
+    ? shown.map((s) => ({
         ...s,
         features: s.features.filter(
           (f) => t(f.labelKey ?? f.nameKey).toLowerCase().includes(q) || t(f.blurbKey).toLowerCase().includes(q),
         ),
       })).filter((s) => s.features.length > 0)
-    : FEATURES;
+    : shown;
   const total = sections.reduce((n, s) => n + s.features.length, 0);
 
   return (
@@ -390,7 +404,7 @@ export function FeaturesPage() {
             gap: 10,
           }}>
             {section.features.map((f) => (
-              <Tile key={f.nameKey} f={f} video={videos[f.nameKey]}
+              <Tile key={f.nameKey} f={f} number={numbers[f.nameKey]} video={videos[f.nameKey]}
                 onWatch={() => setPlaying({ url: videos[f.nameKey], title: t(f.labelKey ?? f.nameKey) })}
                 extras={Object.keys(videos).filter((k) => k.startsWith(f.nameKey + "__")).sort()
                   .map((k) => ({ key: k, label: featureVideoLabels[k] ?? t("watch_video") }))}

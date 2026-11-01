@@ -5,6 +5,7 @@ import { NavLink } from "react-router-dom";
 import { useSession } from "../lib/session";
 import { APP_STORE_URL, PLAY_STORE_URL } from "./Common";
 import { useT, type StringKey } from "../lib/i18n";
+import { useContestOn } from "../lib/contests";
 
 // `label` is a translation KEY, not text. sidebarSections() is a plain function with no hook,
 // so the data carries the key and the view translates it; typing it as StringKey means a
@@ -12,7 +13,8 @@ import { useT, type StringKey } from "../lib/i18n";
 export interface SideLink { to: string; label: StringKey; icon: string; external?: boolean; needsLogin?: boolean; action?: "signout" }
 export interface SideSection { title?: StringKey; links: SideLink[] }
 
-export function sidebarSections(userId: number | null): SideSection[] {
+/** `contestOn`: whether any contest is switched on (see useContestOn) — "Enter a contest" only shows then. */
+export function sidebarSections(userId: number | null, contestOn = false): SideSection[] {
   return [
     { links: [
       { to: "/", label: "for_you", icon: "🏠" },
@@ -41,7 +43,7 @@ export function sidebarSections(userId: number | null): SideSection[] {
       // style files its result into the member's own photo folders.
       { to: "/cartoon", label: "photo_styles", icon: "✨", needsLogin: true },
       { to: "/upload-photos", label: "upload_photos", icon: "⬆️", needsLogin: true },
-      { to: "/enter-contest", label: "enter_a_contest", icon: "🏆", needsLogin: true },
+      ...(contestOn ? [{ to: "/enter-contest", label: "enter_a_contest", icon: "🏆", needsLogin: true } as SideLink] : []),
       { to: "/go-live", label: "go_live", icon: "📡", needsLogin: true },
       { to: "/my-show", label: "my_show", icon: "🎙", needsLogin: true },
       { to: "/my-gigs", label: "gig_my_gigs", icon: "🎬", needsLogin: true },
@@ -110,9 +112,10 @@ export function sidebarSections(userId: number | null): SideSection[] {
 export function Sidebar() {
   const { t } = useT();
   const { user, isLoggedIn, signOut } = useSession();
+  const contestOn = useContestOn();
   return (
     <aside className="sidebar">
-      {sidebarSections(user?.id ?? null).map((sec, i) => {
+      {sidebarSections(user?.id ?? null, contestOn).map((sec, i) => {
         const links = sec.links.filter((l) => !l.needsLogin || isLoggedIn);
         // Signed out, every ACCOUNT link is filtered away and the heading was left stranded
         // over nothing — drop a section once it has no links left to show.

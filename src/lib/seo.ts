@@ -6,16 +6,16 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
 const SITE = "https://www.binggbongg.com";
-const HOME_TITLE = "Bingg Bongg – Live Streaming, Battles & Singing Contests";
-const HOME_DESC = "Free live streaming app: go live, battle your friends in 20 modes, sing in contests where members vote, and chat with people worldwide in 60 languages. Android & iPhone.";
+const HOME_TITLE = "Bingg Bongg – Live Streaming, Battles & Videos";
+const HOME_DESC = "Free live streaming app: go live, battle your friends in 20 modes, upload videos, and chat with people worldwide in 60 languages. Android & iPhone.";
 
 const PAGES: Record<string, [string, string]> = {
   // The ads' landing page (Steve, 2026-10-31). No money wording: Meta reviews this page too.
-  "/ph": ["Philippine Singing Contest – Bingg Bongg", "Free to enter all November. Upload your song on Bingg Bongg and members vote for the best voices. Free on Google Play and the App Store."],
-  "/features": ["Bingg Bongg Features – Every Way to Go Live, Battle and Sing", "Every Bingg Bongg feature in one place: going live, 20 battle modes, singing contests, Green Screen, face filters, translation and more."],
-  "/feature-videos": ["Bingg Bongg Feature Videos – See Every Feature in 60 Seconds", "Watch a 60-second video of every Bingg Bongg feature: live streaming, battles, contests, Green Screen and more."],
-  "/contests": ["Singing Contests – Bingg Bongg", "Enter Bingg Bongg singing and talent contests for free. Members vote for the best voices."],
-  "/exciting-news": ["Exciting News – What's New on Bingg Bongg", "Everything new on Bingg Bongg: contests, countries, features and launches."],
+  "/ph": ["Bingg Bongg – The New Social Media App", "Go live, upload videos, battle other members in 20 modes and make friends all over the world. Free on Google Play and the App Store."],
+  "/features": ["Bingg Bongg Features – Every Way to Go Live, Battle and Make Friends", "Every Bingg Bongg feature in one place: going live, 20 battle modes, videos, Green Screen, face filters, translation and more."],
+  "/feature-videos": ["Bingg Bongg Feature Videos – See Every Feature in 60 Seconds", "Watch a 60-second video of every Bingg Bongg feature: live streaming, battles, videos, Green Screen and more."],
+  "/contests": ["Contests – Bingg Bongg", "Bingg Bongg talent contests, where members vote for their favourites."],
+  "/exciting-news": ["Exciting News – What's New on Bingg Bongg", "Everything new on Bingg Bongg: countries, features and launches."],
   "/live": ["Live Now – Watch Live Streams on Bingg Bongg", "Watch live streams and battles from all over the world on Bingg Bongg, in 53 languages."],
   "/referral-program": ["Referral Program – Earn 5% for Every Member You Bring | Bingg Bongg", "Share your Bingg Bongg referral code and earn 5% of what every new member earns."],
   "/vip-referral": ["VIP Referral Member – Earn Up to $100 per Member | Bingg Bongg", "Apply to be a Bingg Bongg VIP Referral Member and earn 5% of what every new member earns, up to $100 each."],

@@ -47,6 +47,9 @@ function featureSections(root: string, en: Record<string, string>): Section[] {
       const blurb = /blurbKey:\s*"([a-z0-9_]+)"/.exec(obj)?.[1];
       const to = /to:\s*"([^"]+)"/.exec(obj)?.[1];
       const name = en[label ?? m[1]] ?? en[m[1]];
+      // A contest tile only shows while a contest is switched on (Steve, 2026-11-01: "remove all
+      // singing contest from the app for now"), so the crawled copy never lists it.
+      if (/contestOnly:\s*true/.test(obj)) continue;
       if (name) tiles.push({ name, blurb: blurb ? en[blurb] ?? "" : "", to });
     }
     if (tiles.length) sections.push({ key: titleKey, title: en[titleKey] ?? titleKey, tiles });
@@ -74,12 +77,11 @@ function staticPage(root: string): string {
     s.tiles.map((t) => `<li>${t.to ? `<a href="${esc(t.to)}">` : ""}<strong>${esc(t.name)}</strong>${t.to ? "</a>" : ""}${t.blurb ? ` — ${esc(t.blurb)}` : ""}</li>`).join("") +
     "</ul>").join("");
   return `<div class="seo-static">
-<h1>Bingg Bongg — live streaming, battles and singing contests</h1>
-<p>Bingg Bongg is a free live streaming app. Go live from your phone or your computer, battle your friends in 20 battle modes, sing in contests where members vote for the best voices, make videos with Green Screen and face filters, and make friends all over the world — every message translated, in 53 languages.</p>
-<p>This November: the <a href="/ph">Philippine Singing Contest</a> — free to enter, and members vote for the best voices.</p>
+<h1>Bingg Bongg — the new social media app: live streaming, battles and videos</h1>
+<p>Bingg Bongg is a free live streaming app. Go live from your phone or your computer, battle your friends in 20 battle modes, upload videos, make videos with Green Screen and face filters, and make friends all over the world — every message translated, in 53 languages.</p>
 <p><a href="${PLAY}">Get Bingg Bongg on Google Play</a> · <a href="${APPSTORE}">Download Bingg Bongg on the App Store</a> · <a href="/features">See all ${count} features</a> · <a href="/feature-videos">Watch the feature videos</a></p>
 ${list}
-<p><a href="/contests">Contests</a> · <a href="/live">Live now</a> · <a href="/exciting-news">Exciting News</a> · <a href="/help">Help</a> · <a href="/settings/about">About us</a> · <a href="/settings/faq">FAQ</a> · <a href="/settings/contact">Contact us</a> · <a href="/settings/terms">Terms of Use</a> · <a href="/settings/privacy">Privacy Policy</a></p>
+<p><a href="/live">Live now</a> · <a href="/exciting-news">Exciting News</a> · <a href="/help">Help</a> · <a href="/settings/about">About us</a> · <a href="/settings/faq">FAQ</a> · <a href="/settings/contact">Contact us</a> · <a href="/settings/terms">Terms of Use</a> · <a href="/settings/privacy">Privacy Policy</a></p>
 <p>© Bingg Bongg Inc.</p>
 </div>`;
 }
@@ -100,8 +102,8 @@ export function seoStaticContent(): Plugin {
       const out = options.dir ?? path.join(root, "dist");
       const home = path.join(out, "index.html");
       if (!fs.existsSync(home)) return;
-      const title = "Philippine Singing Contest – Bingg Bongg";
-      const desc = "Free to enter all November. Upload your song on Bingg Bongg and members vote for the best voices. Free on Google Play and the App Store.";
+      const title = "Bingg Bongg – The New Social Media App";
+      const desc = "Go live, upload videos, battle other members in 20 modes and make friends all over the world. Free on Google Play and the App Store.";
       const url = `${SITE}/ph`;
       let html = fs.readFileSync(home, "utf8");
       html = html

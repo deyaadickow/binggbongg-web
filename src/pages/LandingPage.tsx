@@ -1,6 +1,10 @@
 // The ads' landing page, /ph (Steve, 2026-10-31: 1,503 Facebook ad clicks landed on the generic
 // For You feed and not one became a member — "Do 1 and 2 and 3"). One job: tell someone who just
-// tapped the Singing Contest ad what it is, and get the app onto their phone.
+// tapped an ad what Bingg Bongg is, and get the app onto their phone.
+//
+// Steve, 2026-11-01: "Please remove all singing contest from the app for now, we will start the
+// contest in the future." The contest box and its "upload up to 3 songs" steps are gone; the page
+// sells the app itself, like the new ads do.
 //
 // Shown on its own, without the site's menu and sidebar. The big button is the store for THIS
 // phone (Android -> Google Play, iPhone -> App Store; a computer gets both). Store taps go through
@@ -21,11 +25,13 @@ const GO = "https://admin.binggbongg.com/go/";
  *  for visitors in the Philippines (Steve: "make this video in Tagalog language when people from the
  *  philippines clicks"), English for everyone else; a switch under it changes it either way. */
 type TourLang = "tl" | "en";
+// Steve, 2026-11-01: the tour opened on the Singing Contest, so it is now the "new social media
+// app" video from the Facebook ads (Zephyr's voice, no contest).
 const TOURS: Record<TourLang, { video: string; poster: string; label: string }> = {
-  tl: { video: "https://binggbongg.s3.amazonaws.com/uploads/landing/feature-tour-tl-v1.mp4",
-        poster: "https://binggbongg.s3.amazonaws.com/uploads/landing/feature-tour-tl-v1.jpg", label: "Tagalog" },
-  en: { video: "https://binggbongg.s3.amazonaws.com/uploads/landing/feature-tour-v1.mp4",
-        poster: "https://binggbongg.s3.amazonaws.com/uploads/landing/feature-tour-v1.jpg", label: "English" },
+  tl: { video: "https://binggbongg.s3.amazonaws.com/uploads/landing/social-app-tl-v1.mp4",
+        poster: "https://binggbongg.s3.amazonaws.com/uploads/landing/social-app-tl-v1.jpg", label: "Tagalog" },
+  en: { video: "https://binggbongg.s3.amazonaws.com/uploads/landing/social-app-en-v1.mp4",
+        poster: "https://binggbongg.s3.amazonaws.com/uploads/landing/social-app-en-v1.jpg", label: "English" },
 };
 
 /** In the Philippines? The phone's own clock (Asia/Manila), its language (Filipino/Tagalog), or one
@@ -64,13 +70,13 @@ export function LandingPage() {
   const iosUrl = `${GO}appstore?from=landing&src=${encodeURIComponent(src)}`;
 
   useEffect(() => {
-    document.title = "Philippine Singing Contest – Bingg Bongg";
+    document.title = "Bingg Bongg – The New Social Media App";
     // One view per visit, however often the page re-renders or is refreshed in this tab.
     const key = `bb.landing.${src}`;
     let seen = false;
     try { seen = sessionStorage.getItem(key) === "1"; sessionStorage.setItem(key, "1"); } catch { /* private mode */ }
     if (!seen) post("recordAdLinkEvent", { event: "landing", src }).catch(() => undefined);
-    pixelEvent("ViewContent", { content_name: "Philippine Singing Contest" });
+    pixelEvent("ViewContent", { content_name: "Bingg Bongg" });
   }, [src]);
 
   const lead = (store: string) => pixelEvent("Lead", { content_name: store });
@@ -131,15 +137,6 @@ export function LandingPage() {
         <p className="lp-sub">{t("lp_hero_sub")}</p>
         {ctas}
 
-        {/* The contest the ads are about. */}
-        <section className="lp-contest">
-          <img src="/lp/contest.jpg" alt="" loading="eager" />
-          <div className="lp-contest-text">
-            <div className="lp-badge">{t("lp_contest_tag")}</div>
-            <h2>🎤 {t("lp_title")}</h2>
-            <p>{t("lp_contest_text")}</p>
-          </div>
-        </section>
         <ol className="lp-steps">
           <li><b>1</b><span>{t("lp_step1")}</span></li>
           <li><b>2</b><span>{t("lp_step2")}</span></li>
