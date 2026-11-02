@@ -221,18 +221,24 @@ export function SceneBanner({ scene, height = 104, lanes, children }: { scene: S
   // loaded, replaces the drawn sky, sun/moon, stars, ground, decor and actors. Until then — or
   // with no manifest, no key, or a failed image — the drawing below is exactly as before.
   const photo = useSceneArt(scene.key);
+  // A photo that arrives after the banner is on screen fades in OVER the drawing, which is only
+  // dropped once the fade has finished; a photo already loaded when the banner mounts just shows.
+  const [initialPhoto] = useState(photo);
+  const [fadedIn, setFadedIn] = useState<string | null>(null);
+  const fading = !!photo && photo !== initialPhoto && fadedIn !== photo;
   return (
     // flex "none": inside a scrolling flex column (Bingo, One Stroke) a long page otherwise squashes
     // the banner to 0px, since overflow:hidden lets it shrink below its height.
     <div style={{ position: "relative", height, flex: "none", borderRadius: 12, overflow: "hidden", background: `linear-gradient(180deg, ${scene.sky[0]}, ${scene.sky[1]})` }}>
-      {photo ? (
-        <>
-          <div className="gs-anim" style={{ position: "absolute", inset: 0, background: `url("${photo}") center/cover no-repeat`, animation: "gs-fade .45s ease-out" }} />
+      {(!photo || fading) && <SceneDrawing scene={scene} night={night} racing={!!lanes} />}
+      {photo && (
+        <div style={{ position: "absolute", inset: 0, background: `url("${photo}") center/cover no-repeat`, animation: fading ? "gs-fade .45s ease-out" : "none" }}
+             onAnimationEnd={() => setFadedIn(photo)}>
           {/* A light overall darken plus a soft fade to ~45% black over the bottom half, so the
               centre text, chips and race lanes drawn over the photo stay readable. */}
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,.12) 0%, rgba(0,0,0,.12) 50%, rgba(0,0,0,.45) 100%)" }} />
-        </>
-      ) : <SceneDrawing scene={scene} night={night} racing={!!lanes} />}
+        </div>
+      )}
       {lanes && (
         <div style={{ position: "absolute", left: 0, right: 0, top: "41%", bottom: 2, display: "flex", flexDirection: "column" }}>
           <span style={{ position: "absolute", left: 10, top: -22, fontSize: 18 }}>🏁</span>
