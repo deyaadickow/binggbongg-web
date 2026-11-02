@@ -13,7 +13,7 @@ export interface TapGameType {
   catch_name?: string;
   emoji?: string;
   name?: string;
-  game_mode?: "catch" | "falling_lanes" | "puzzle" | "race" | "one_stroke" | "block_escape" | "water_sort" | string;
+  game_mode?: "catch" | "falling_lanes" | "hit_me" | "puzzle" | "race" | "one_stroke" | "block_escape" | "water_sort" | string;
   /** "Water / Fishing", "Races", … — drives the painted scene when there is no uploaded art. */
   category?: string | null;
   coin_value?: number;
@@ -31,6 +31,9 @@ export interface TapGameStart {
   entry_fee_coins: number;
   duration_seconds: number;
   speed?: "slow" | "fast" | "insane" | string | null;
+  /** Hit Me (2026-11-02): the room host's picture for the balloons — full URL, null when they have none. */
+  host_profile_image?: string | null;
+  host_name?: string | null;
 }
 
 export interface TapGameResult {
@@ -158,7 +161,7 @@ export function gameTitleWithRate(g: TapGameType): string {
   // Water Sort charges per pour, not per catch — its coin_value is 0 by design.
   if (g.game_mode === "water_sort") return `${gameTitle(g)}, 1 Coin Per Pour`;
   if (!(n > 0) || g.game_mode === "puzzle") return gameTitle(g);
-  const unit = g.game_mode === "falling_lanes" ? "Pop" : "Catch";
+  const unit = g.game_mode === "falling_lanes" ? "Pop" : g.game_mode === "hit_me" ? "Hit" : "Catch";
   return `${gameTitle(g)}, ${n % 1 === 0 ? n : n.toFixed(2)} Coin${n === 1 ? "" : "s"} Per ${unit}`;
 }
 
@@ -176,7 +179,7 @@ export function needsDuration(g: TapGameType): boolean {
 
 /** Only catch/pop games score per object, so only they take a host-chosen coin value. */
 export function needsCoinValue(g: TapGameType): boolean {
-  return ["catch", "falling_lanes"].includes(g.game_mode ?? "");
+  return ["catch", "falling_lanes", "hit_me"].includes(g.game_mode ?? "");
 }
 
 export async function fetchTapGameTypes(): Promise<TapGameType[]> {
@@ -263,6 +266,16 @@ const SCENES: Record<string, string> = {
 // These are per-GAME overrides, checked before the category — the phones already paint every game
 // from a per-key palette, so this is the web catching up for the games where it matters most.
 const KEY_SCENES: Record<string, string> = {
+  // Hit Me (2026-11-02): a bright party sky with soft clouds, so every balloon colour (and the host's face on it)
+  // stands out; a fairground-green strip at the bottom where the balloons are let go.
+  hit_me:
+    "radial-gradient(ellipse 16% 5% at 18% 16%, rgba(255,255,255,.95) 0 55%, transparent 60%)," +
+    "radial-gradient(ellipse 11% 4% at 27% 14%, rgba(255,255,255,.9) 0 55%, transparent 60%)," +
+    "radial-gradient(ellipse 18% 5% at 76% 30%, rgba(255,255,255,.85) 0 55%, transparent 60%)," +
+    "radial-gradient(ellipse 12% 4% at 66% 28%, rgba(255,255,255,.8) 0 55%, transparent 60%)," +
+    "radial-gradient(ellipse 14% 4% at 40% 52%, rgba(255,255,255,.55) 0 55%, transparent 60%)," +
+    "radial-gradient(ellipse 80% 9% at 50% 103%, #3FAE4F 0 60%, transparent 61%)," +
+    "linear-gradient(#3AA8F5 0%, #79CBFA 55%, #CDEFFF 100%)",
   // Woodland and marsh, from the phones' palettes (TapGameSceneView.kt): a green field under trees
   // for the rabbits, tall reeds over the marsh for the ducks.
   rabbit_hunting: paletteScene("#8FCB7A", "#274A1E", "#1E3A17", "#2F5A23", "trees"),
@@ -424,7 +437,7 @@ export function sceneFor(game: TapGameType): string {
   if (byKey) return byKey;
   const race = game.key && RACE_PALETTES[game.key];
   if (race) return paletteScene(...race);
-  if (game.game_mode === "falling_lanes" || game.game_mode === "race") {
+  if (game.game_mode === "falling_lanes" || game.game_mode === "race" || game.game_mode === "hit_me") {
     return game.game_mode === "race" ? SCENES["Races"] : SKY_SCENE;
   }
   return (game.category && SCENES[game.category]) || SKY_SCENE;

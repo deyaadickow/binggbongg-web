@@ -852,3 +852,22 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .cb-days span.on em { color: var(--gold); }
 .cb-totals { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 12px; color: var(--text-soft); }
 .cb-totals b { color: var(--gold); }
+
+/* Hit Me (2026-11-02): balloons with the host's picture rise from the bottom; a hit bursts the balloon and squashes
+   the face. The sway is on an inner wrapper so the rise and the sway never fight over one transform. */
+@keyframes hm-rise { from { transform: translateY(0); } to { transform: translateY(calc(-100vh - 100%)); } }
+@keyframes hm-sway { from { transform: translateX(calc(-1 * var(--hm-sway))) rotate(calc(-1 * var(--hm-tilt))); } to { transform: translateX(var(--hm-sway)) rotate(var(--hm-tilt)); } }
+@keyframes hm-shard { from { transform: translate(0, 0) rotate(0deg); opacity: 1; } to { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); opacity: 0; } }
+@keyframes hm-ring { from { transform: scale(.4); opacity: 1; } to { transform: scale(1.5); opacity: 0; } }
+@keyframes hm-ouch {
+  0% { transform: scale(1, 1); }
+  12% { transform: scale(1.45, .58); }
+  26% { transform: scale(.8, 1.22); }
+  40% { transform: scale(1.12, .9) rotate(-8deg); }
+  55% { transform: scale(.96, 1.04) rotate(7deg); }
+  70% { transform: scale(1) rotate(-3deg); opacity: 1; }
+  100% { transform: scale(.85) translateY(34px) rotate(0deg); opacity: 0; }
+}
+@keyframes hm-star { from { transform: rotate(var(--a)) translateX(var(--r)) rotate(calc(-1 * var(--a))); opacity: 1; } to { transform: rotate(calc(var(--a) + 320deg)) translateX(var(--r)) rotate(calc(-1 * var(--a) - 320deg)); opacity: 0; } }
+@keyframes hm-word { 0% { transform: translate(-50%, 10px) scale(.3); opacity: 0; } 15% { transform: translate(-50%, 0) scale(1.25); opacity: 1; } 30% { transform: translate(-50%, 0) scale(1); } 75% { opacity: 1; } 100% { transform: translate(-50%, -40px) scale(1); opacity: 0; } }
+@keyframes hm-plus { 0% { transform: translateY(0) scale(.5); opacity: 0; } 20% { transform: translateY(-6px) scale(1.2); opacity: 1; } 100% { transform: translateY(-50px) scale(1); opacity: 0; } }

@@ -1936,4 +1936,17 @@ export const en = {
   cb_ended: "Today's battle is over",
   cb_not_set_up: "Country Battle isn't ready yet. Please try again later.",
   cb_coming_soon: "Coming soon — we'll announce the first battle date here.",
+  // Hit Me (Steve, 2026-11-02)
+  hm_intro: "Balloons with the host's picture float up from the bottom — tap them to hit the host! Each hit is worth %1$s.",
+  hm_hits: "Hits: %1$s",
+  hm_result: "Hits on %1$s: %2$s",
+  hm_hit_label: "Hit the balloon",
+  hm_ouch: "OUCH!",
+  hm_add_pic_title: "Add your picture",
+  hm_add_pic_body: "Please add your picture to your avatar — it goes on every balloon in Hit Me!",
+  hm_add_pic_button: "Add Your Picture",
+  hm_not_now: "Not now",
+  hm_uploading: "Uploading your picture…",
+  hm_pic_saved: "Your picture is on the balloons!",
+  hm_pic_failed: "Couldn't add that picture — please try another one.",
 } as const;

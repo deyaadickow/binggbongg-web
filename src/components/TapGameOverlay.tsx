@@ -5,6 +5,7 @@ import { useSession } from "../lib/session";
 import { useT } from "../lib/i18n";
 import { Confetti, MuteButton } from "./GameShow";
 import { haptic, isMuted, sfx } from "../lib/gameSounds";
+import { AddPicturePopup, HitMeField, hasProfilePicture } from "./HitMe";
 
 interface Target { id: number; x: number; y: number; bornAt: number; life: number }
 interface Balloon { id: number; lane: number; color: string }
@@ -28,11 +29,20 @@ const MAX_ON_SCREEN = 10;
  * Race mode: 100 taps through 5 stations, timed. Balloon Pop and Colour Balls fall back to the
  * catch mechanic (their exact phone layouts are a later pass).
  */
-export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: TapGameType; roomName: string; onClose: () => void; onToast: (m: string) => void }) {
+export function TapGameOverlay({ game, roomName, onClose, onToast, hostAvatar, isHost }: {
+  game: TapGameType; roomName: string; onClose: () => void; onToast: (m: string) => void;
+  /** Hit Me: the room host's picture as this page already knows it (the server's own answer wins). */
+  hostAvatar?: string | null;
+  isHost?: boolean;
+}) {
   const { t } = useT();
   const { user, refresh } = useSession();
   const isRace = game.game_mode === "race";
   const isLanes = game.game_mode === "falling_lanes";
+  // Hit Me (Steve, 2026-11-02): balloons with the host's picture rise from the bottom; a tap is a hit.
+  const isHitMe = game.game_mode === "hit_me";
+  const [askPicture, setAskPicture] = useState(false);
+  const [newPicture, setNewPicture] = useState<string | null>(null);
   // Through Number(), because the API typed this as a number but sent a quoted decimal ("1.00")
   // until the backend cast landed 2026-10-03 — which read as "worth 1.00 coins" and never
   // matched the singular test. Old data and old caches can still hand us the string.
@@ -90,8 +100,13 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
     }
   }, [phase, result]);
 
-  async function begin() {
+  async function begin(skipPictureCheck = false) {
     if (!user) return;
+    // Steve, 2026-11-02: a host with no picture is asked to add one before playing Hit Me — it goes on every balloon.
+    if (isHitMe && isHost && !skipPictureCheck && !newPicture && !hasProfilePicture(user.profile_image)) {
+      setAskPicture(true);
+      return;
+    }
     setPhase("starting");
     setError(null);
     try {
@@ -158,7 +173,8 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
       setSecondsLeft(left);
       if (left === 0) finish();
     }, 250);
-    const spawner = isLanes
+    // Hit Me spawns its own balloons (HitMeField); only the clock runs here.
+    const spawner = isHitMe ? undefined : isLanes
       ? setInterval(() => {
           const now = Date.now();
           const lane = Math.floor(Math.random() * LANES);
@@ -178,8 +194,8 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
             return [...alive, { id: nextId.current++, x: Math.random() * w, y: Math.random() * h, bornAt: now, life: lifeMs + Math.random() * lifeJitterMs }];
           });
         }, spawnMs);
-    return () => { clearInterval(clock); clearInterval(spawner); };
-  }, [phase, start, finish, isLanes]);
+    return () => { clearInterval(clock); if (spawner) clearInterval(spawner); };
+  }, [phase, start, finish, isLanes, isHitMe]);
 
   function pop(id: number) {
     if (phase !== "playing") return;
@@ -187,6 +203,12 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
     caughtRef.current += 1;
     setCaught(caughtRef.current);
     playTap();
+  }
+
+  function hitBalloon() {
+    if (phase !== "playing") return;
+    caughtRef.current += 1;
+    setCaught(caughtRef.current);
   }
 
   function missed(id: number) {
@@ -231,15 +253,27 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
   const bgIsVideo = isVideoUrl(bgUrl);
   const bg = bgUrl && !bgIsVideo ? `url(${bgUrl}) center/cover` : sceneFor(game);
   const character = game.character_image_url ? mediaUrl(game.character_image_url) : null;
+  const hitMeAvatar = newPicture ? mediaUrl(newPicture)
+    : start?.host_profile_image ? mediaUrl(start.host_profile_image)
+    : hostAvatar && hasProfilePicture(hostAvatar) ? mediaUrl(hostAvatar) : null;
+  const hitMeHost = start?.host_name || t("the_host");
+  const coinsWord = coinsPer === 1 ? t("n_coin", 1) : t("n_coins", coinsPer);
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 50, background: "#000", display: "flex", flexDirection: "column" }}>
       <Confetti burst={burst} />
+      {askPicture && user && (
+        <AddPicturePopup userId={user.id} onDone={(path) => {
+          setAskPicture(false);
+          if (path) { setNewPicture(path); refresh(); onToast(t("hm_pic_saved")); }
+          void begin(true);
+        }} />
+      )}
       <div className="row" style={{ padding: "10px 14px", borderBottom: "1px solid var(--gold-border)", background: "var(--panel)" }}>
         <b style={{ color: "var(--gold)", flex: 1 }}>{gameTitleWithRate(game)}</b>
         <MuteButton />
         {phase === "playing" && <span className="pill">{isRace ? `Station ${station}/${RACE_STATIONS} · ${clock(elapsed)}` : `${clock(secondsLeft)} left`}</span>}
-        {phase === "playing" && <span className="pill" style={{ marginLeft: 8 }}>{isRace ? `${caught}/${RACE_FINISH}` : isLanes ? `Popped ${caught}` : `Caught ${caught}`}</span>}
+        {phase === "playing" && <span className="pill" style={{ marginLeft: 8 }}>{isRace ? `${caught}/${RACE_FINISH}` : isHitMe ? t("hm_hits", caught) : isLanes ? `Popped ${caught}` : `Caught ${caught}`}</span>}
         {phase !== "playing" && <button className="btn small ghost" onClick={onClose}>{t("close")}</button>}
       </div>
 
@@ -260,12 +294,13 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
             style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", pointerEvents: "none" }}
           />
         )}
+        {isHitMe && <HitMeField avatarUrl={hitMeAvatar} playing={phase === "playing"} onHit={hitBalloon} />}
         {phase === "playing" && isLanes && balloons.map((b) => <BalloonSprite key={b.id} b={b} onPop={() => pop(b.id)} onMiss={() => missed(b.id)} />)}
         {/* With admin art, the sprite itself is the target. Without it — which is every game but
             one — the phones draw the game's OWN emoji as text (a fish for Fishing, a crab for Crab
             Beach). The web used to draw a gold disc with a dartboard on it for all of them, which
             is why the fishing game showed circles and no fish. */}
-        {phase === "playing" && !isLanes && targets.map((t) => (
+        {phase === "playing" && !isLanes && !isHitMe && targets.map((t) => (
           <button key={t.id} onPointerDown={() => hit(t.id)} aria-label={`Tap the ${game.catch_name || "target"}`}
             style={{
               position: "absolute", left: t.x, top: t.y, width: 72, height: 72, padding: 0, cursor: "pointer",
@@ -292,12 +327,13 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
                 <>
                   <h2 className="card-title" style={{ fontSize: 22 }}>{gameTitle(game)}</h2>
                   <p className="soft" style={{ marginTop: 8 }}>
-                    {isLanes ? `Balloons fall down 8 lanes — tap them to pop them before they reach the bottom. Every pop is worth ${coinsPer} coin${coinsPer === 1 ? "" : "s"}.`
+                    {isHitMe ? t("hm_intro", coinsWord)
+                      : isLanes ? `Balloons fall down 8 lanes — tap them to pop them before they reach the bottom. Every pop is worth ${coinsPer} coin${coinsPer === 1 ? "" : "s"}.`
                       : isRace ? `Tap as fast as you can: 5 stations, 20 taps each. Reach station 5 for 100 coins — your time goes on the leaderboard.`
                       : `Tap every ${game.catch_name || "character"} before it disappears. Each catch is worth ${coinsPer} coin${coinsPer === 1 ? "" : "s"}.`}
                   </p>
                   <p className="muted" style={{ fontSize: 12, marginTop: 6 }}>{t("playing_gifts_the_host_50_coins_to_start")}</p>
-                  <button className="btn block" style={{ marginTop: 14 }} onClick={begin}>{t("play_now")}</button>
+                  <button className="btn block" style={{ marginTop: 14 }} onClick={() => begin()}>{t("play_now")}</button>
                 </>
               )}
               {phase === "starting" && <p className="muted">{t("starting")}</p>}
@@ -318,7 +354,10 @@ export function TapGameOverlay({ game, roomName, onClose, onToast }: { game: Tap
                       host, never coins you receive, so it is not presented as a standalone
                       total and declining is "NO" rather than "keep them". */}
                   <h2 className="card-title" style={{ fontSize: 18, whiteSpace: "pre-line" }}>
-                    {isRace
+                    {isHitMe
+                      ? `🥊 ${t("hm_result", hitMeHost, Number(result.objects_caught).toLocaleString())} · ${
+                          Number(result.coins_earned) === 1 ? t("tap_result_worth_one_coin") : t("tap_result_worth_n_coins", Number(result.coins_earned).toLocaleString())}`
+                      : isRace
                       ? `Your ${game.catch_name || "racer"} reached Station ${RACE_STATIONS}\nin ${clock(elapsed)} — ${Number(result.coins_earned).toLocaleString()} coins!`
                       // Number then name, so no plural "s" is guessed: "Caught: 24 × Cricket Ball · worth 24 coins".
                       : `${t(isLanes ? "tap_result_popped" : "tap_result_caught", Number(result.objects_caught).toLocaleString(), isLanes ? (game.catch_name || "Balloon") : (game.catch_name || game.display_name || game.name || "Catch"))} · ${

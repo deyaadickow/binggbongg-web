@@ -1741,4 +1741,17 @@ export const fil = {
   cb_ended: "Tapos na ang laban ngayong araw",
   // Country Battle coming soon (Steve, 2026-11-01)
   cb_coming_soon: "Malapit na — ia-announce namin dito ang petsa ng unang battle.",
+  // Hit Me (Steve, 2026-11-02)
+  hm_intro: "Lumulutang pataas ang mga lobo na may litrato ng host — i-tap sila para tamaan ang host! Bawat tama ay may halagang %1$s.",
+  hm_hits: "Tama: %1$s",
+  hm_result: "Tama kay %1$s: %2$s",
+  hm_hit_label: "Tamaan ang lobo",
+  hm_ouch: "ARAY!",
+  hm_add_pic_title: "Idagdag ang iyong litrato",
+  hm_add_pic_body: "Pakidagdag ang iyong litrato sa iyong avatar — ilalagay ito sa bawat lobo sa Hit Me!",
+  hm_add_pic_button: "Idagdag ang Litrato Mo",
+  hm_not_now: "Mamaya na",
+  hm_uploading: "Ina-upload ang iyong litrato…",
+  hm_pic_saved: "Nasa mga lobo na ang litrato mo!",
+  hm_pic_failed: "Hindi naidagdag ang litratong iyan — subukan ang iba.",
 };
