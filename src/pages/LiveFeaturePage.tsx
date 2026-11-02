@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
 import { PageTitle } from "../components/PageTitle";
 import { BingoCardIcon } from "../components/BingoCardIcon";
+import { FeatureIcon } from "../components/ArtIcon";
 import { LiveRoomsList } from "../components/LiveRoomsList";
 import { FeatureVideoPlayer } from "../components/FeatureVideoPlayer";
 import { fetchFeatureVideos } from "../lib/featureVideos";
@@ -14,7 +15,7 @@ import { useT, type StringKey } from "../lib/i18n";
 /** URL slug -> the tile's name key (also its feature-video key), its icon and its two texts. */
 export const LIVE_FEATURES: Record<string, { nameKey: StringKey; labelKey?: StringKey; icon: string; what: StringKey; how: StringKey }> = {
   "power-ups": { nameKey: "fname_power_ups", icon: "💣", what: "fx_power_ups_what", how: "fx_power_ups_how" },
-  "friendly-punishments": { nameKey: "fname_friendly_punishments", icon: "🎲", what: "fx_friendly_punishments_what", how: "fx_friendly_punishments_how" },
+  "friendly-punishments": { nameKey: "fname_friendly_punishments", icon: "🎭", what: "fx_friendly_punishments_what", how: "fx_friendly_punishments_how" },
   "battle-rankings": { nameKey: "fname_battle_rankings", icon: "📊", what: "fx_battle_rankings_what", how: "fx_battle_rankings_how" },
   "tap-games": { nameKey: "fname_n99_tap_games", icon: "🎮", what: "fx_n99_tap_games_what", how: "fx_n99_tap_games_how" },
   "bingo": { nameKey: "fname_bingg_bongg_bingo", icon: "bingo_card", what: "fx_bingg_bongg_bingo_what", how: "fx_bingg_bongg_bingo_how" },
@@ -48,7 +49,7 @@ export function LiveFeaturePage() {
     <div className="page" style={{ maxWidth: 760 }}>
       <PageTitle>{title}</PageTitle>
       <div className="card pad" style={{ borderColor: "var(--gold-border)", display: "flex", flexDirection: "column", gap: 12, marginBottom: 18 }}>
-        <span style={{ fontSize: 34, lineHeight: 1 }} aria-hidden>{f.icon === "bingo_card" ? <BingoCardIcon size={40} /> : f.icon}</span>
+        <span style={{ fontSize: 34, lineHeight: 1 }} aria-hidden><FeatureIcon artKey={f.nameKey.replace(/^fname_/, "")} size={40}>{f.icon === "bingo_card" ? <BingoCardIcon size={40} /> : f.icon}</FeatureIcon></span>
         <div>
           <b style={{ color: "var(--gold)" }}>{t("fx_what")}</b>
           <p style={{ margin: "6px 0 0", color: "rgba(255,255,255,0.9)" }}>{t(f.what)}</p>

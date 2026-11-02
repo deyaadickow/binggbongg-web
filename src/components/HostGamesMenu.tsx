@@ -7,6 +7,20 @@ import {
   needsCoinValue, needsDuration, setActiveTapGame, type TapGameType,
 } from "../lib/tapgame";
 import { useT } from "../lib/i18n";
+import { mediaUrl } from "../lib/api";
+import { GameThumb } from "./ArtIcon";
+
+/** A game's name with its picture in front: the game's own still (character_image_url) as a small
+ *  circle once it loads, else its emoji — the same "<emoji> <name>" it read before. */
+function GameName({ g, bold = true, gold = false }: { g: TapGameType; bold?: boolean; gold?: boolean }) {
+  const name = g.display_name || g.name || "Tap game";
+  return (
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: bold ? 700 : undefined, color: gold ? "var(--gold)" : undefined, minWidth: 0 }}>
+      <GameThumb url={g.character_image_url ? mediaUrl(g.character_image_url) : null} emoji={g.emoji} size={28} />
+      <span style={{ minWidth: 0 }}>{name}</span>
+    </span>
+  );
+}
 
 const MODE_FILTERS = [
   { key: "all", label: "All" },
@@ -107,7 +121,7 @@ export function HostGamesMenu({ userId, roomName, activeGame, onClose, onChanged
         {activeGame && !picked && (
           <div className="card pad" style={{ marginBottom: 12 }}>
             <div className="muted" style={{ fontSize: 12 }}>{t("running_now")}</div>
-            <b style={{ color: "var(--gold)" }}>{gameTitle(activeGame)}</b>
+            <div><GameName g={activeGame} gold /></div>
             <button className="btn ghost block" style={{ marginTop: 10 }} disabled={busy} onClick={turnOff}>
               {t("turn_this_game_off")}</button>
           </div>
@@ -139,7 +153,7 @@ export function HostGamesMenu({ userId, roomName, activeGame, onClose, onChanged
                     borderRadius: 10, border: "1px solid var(--gold-border)", background: "transparent",
                     color: "var(--text)", cursor: "pointer", font: "inherit",
                   }}>
-                  <span style={{ fontWeight: 700 }}>{gameTitle(g)}</span>
+                  <GameName g={g} />
                   {g.description && (
                     <span className="muted" style={{
                       display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
@@ -155,7 +169,7 @@ export function HostGamesMenu({ userId, roomName, activeGame, onClose, onChanged
         {picked && (
           <>
             <div className="row" style={{ marginBottom: 12 }}>
-              <b style={{ flex: 1, color: "var(--gold)" }}>{gameTitle(picked)}</b>
+              <span style={{ flex: 1, minWidth: 0 }}><GameName g={picked} gold /></span>
               <button className="btn small ghost" onClick={() => setPicked(null)}>{t("back")}</button>
             </div>
 

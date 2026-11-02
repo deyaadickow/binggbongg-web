@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { PageTitle } from "../components/PageTitle";
 import { BingoCardIcon } from "../components/BingoCardIcon";
+import { BattleIcon } from "../components/ArtIcon";
 import { Avatar } from "../components/Common";
 import { LiveRoomsList } from "../components/LiveRoomsList";
 import { post } from "../lib/api";
@@ -75,7 +76,7 @@ export function BattlesPage() {
         {BATTLE_MODES.map((m, i) => (
           <div key={m.name} className="card pad" style={{ borderColor: "var(--gold-border)", display: "flex", gap: 12 }}>
             <span style={{ fontSize: 26, lineHeight: 1, width: 34, textAlign: "center", flexShrink: 0 }} aria-hidden>
-              {m.icon === "bingo_card" ? <BingoCardIcon size={30} /> : m.icon}
+              <BattleIcon artKey={m.art} size={32}>{m.icon === "bingo_card" ? <BingoCardIcon size={30} /> : m.icon}</BattleIcon>
             </span>
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
               <b style={{ color: "var(--gold)", fontSize: 16 }}>#{i + 1} {m.name}</b>

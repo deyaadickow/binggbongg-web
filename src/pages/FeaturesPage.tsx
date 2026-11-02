@@ -24,6 +24,7 @@
 // both phones: the same 109 key names exist in strings.xml, Localizable.strings and the web
 // dictionary, so a feature's wording is written once and lands on all three.
 import { BingoCardIcon } from "../components/BingoCardIcon";
+import { FeatureIcon } from "../components/ArtIcon";
 import { Link } from "react-router-dom";
 import { useT, type StringKey } from "../lib/i18n";
 import { PageTitle } from "../components/PageTitle";
@@ -106,7 +107,7 @@ const FEATURES: Section[] = [
       { icon: "🔥", nameKey: "fname_streak_and_flames", blurbKey: "fblurb_streak_and_flames", myProfile: true, whereKey: "fwhere_your_profile" },
       { icon: "🌍", nameKey: "fname_country_vs_country", blurbKey: "fblurb_country_vs_country", to: "/cvc" },
       { icon: "🗓", nameKey: "fname_lives_and_battles_schedule", blurbKey: "fblurb_lives_and_battles_schedule", to: "/upcoming" },
-      { icon: "🎲", nameKey: "fname_friendly_punishments", blurbKey: "fblurb_friendly_punishments", to: "/feature/friendly-punishments", whereKey: "fwhere_the_live_room" },
+      { icon: "🎭", nameKey: "fname_friendly_punishments", blurbKey: "fblurb_friendly_punishments", to: "/feature/friendly-punishments", whereKey: "fwhere_the_live_room" },
     ],
   },
   {
@@ -242,6 +243,10 @@ function featureNumbers(sections: Section[]): Record<string, number> {
   return numbers;
 }
 
+/** A tile's key in the game-art manifest's feature_icons: its name key without "fname_", or its
+ *  video key where the name key is not an fname_ key (Country Battle -> "country_battle"). */
+const featureArtKey = (f: Feature) => f.videoKey ?? f.nameKey.replace(/^fname_/, "");
+
 /** The red star either side of every feature's name (Steve, 2026-10-30). */
 const RED_STAR: React.CSSProperties = {
   color: "#E53935", fontSize: 20, lineHeight: 1, flexShrink: 0, textShadow: "0 0 8px rgba(229,57,53,0.75)",
@@ -268,7 +273,9 @@ function Tile({ f, number, video, onWatch, extras = [], onWatchExtra }: { f: Fea
       }}>#{number}</span>
       {/* Top-left corner, opposite the #number (Steve, 2026-10-30). The empty line keeps the name
           below the corners. */}
-      <span style={{ position: "absolute", top: 14, left: 16, fontSize: 24, lineHeight: 1 }} aria-hidden>{f.icon === "bingo_card" ? <BingoCardIcon size={32} /> : f.icon}</span>
+      <span style={{ position: "absolute", top: 14, left: 16, fontSize: 24, lineHeight: 1 }} aria-hidden>
+        <FeatureIcon artKey={featureArtKey(f)} size={32}>{f.icon === "bingo_card" ? <BingoCardIcon size={32} /> : f.icon}</FeatureIcon>
+      </span>
       <span style={{ display: "block", height: 22 }} aria-hidden />
       <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, maxWidth: "100%" }}>
         <span style={RED_STAR} aria-hidden>★</span>

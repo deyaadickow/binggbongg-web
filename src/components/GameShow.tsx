@@ -6,6 +6,7 @@
 import { useEffect, useState } from "react";
 import { SCENES, GUESS_SCENES, GUESS_KIND_SCENE, TRIVIA_SCENES, type Scene } from "../lib/gameSceneData";
 import { isMuted, setMuted } from "../lib/gameSounds";
+import { useSceneArt } from "../lib/gameArt";
 
 const gold = "var(--gold, #F0C420)";
 
@@ -143,6 +144,7 @@ export function sceneForTrivia(category: string | null | undefined): Scene {
 
 const KEYFRAMES = `
 @keyframes gs-drift{from{left:104%}to{left:-16%}}
+@keyframes gs-fade{from{opacity:0}to{opacity:1}}
 @keyframes gs-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 @keyframes gs-hop{0%,100%{transform:translateY(0)}40%{transform:translateY(-10px)}}
 @keyframes gs-jump{0%{transform:translate(0,0) rotate(0);opacity:0}10%{opacity:1}50%{transform:translate(-30px,-34px) rotate(-30deg)}90%{opacity:1}100%{transform:translate(-60px,0) rotate(-70deg);opacity:0}}
@@ -215,48 +217,22 @@ export type Lane = { label: string; emoji: string; progress: number; winner?: bo
 export function SceneBanner({ scene, height = 104, lanes, children }: { scene: Scene; height?: number; lanes?: Lane[]; children?: React.ReactNode }) {
   useKeyframes();
   const night = scene.stars;
+  // Real images (Steve, 2026-11-02): the scene's photo from the game-art manifest, once it has
+  // loaded, replaces the drawn sky, sun/moon, stars, ground, decor and actors. Until then — or
+  // with no manifest, no key, or a failed image — the drawing below is exactly as before.
+  const photo = useSceneArt(scene.key);
   return (
     // flex "none": inside a scrolling flex column (Bingo, One Stroke) a long page otherwise squashes
     // the banner to 0px, since overflow:hidden lets it shrink below its height.
     <div style={{ position: "relative", height, flex: "none", borderRadius: 12, overflow: "hidden", background: `linear-gradient(180deg, ${scene.sky[0]}, ${scene.sky[1]})` }}>
-      {night && Array.from({ length: 16 }, (_, i) => (
-        <span key={i} className="gs-anim" style={{ position: "absolute", left: `${(i * 37) % 100}%`, top: `${(i * 23) % 55}%`, width: 3, height: 3, borderRadius: 2, background: "#fff", animation: `gs-twinkle ${1.6 + (i % 5) * 0.4}s ease-in-out ${i * 0.2}s infinite` }} />
-      ))}
-      {scene.body === "sun" && <span className="gs-anim" style={{ position: "absolute", right: "6%", top: 6, fontSize: 28, animation: "gs-spin 18s linear infinite" }}>☀️</span>}
-      {scene.body === "moon" && <span style={{ position: "absolute", right: "7%", top: 6, fontSize: 24 }}>🌙</span>}
-      {/* Fluffy clouds drifting across a daytime sky. */}
-      {scene.body === "sun" && [0, 1].map((i) => (
-        <span key={`c${i}`} className="gs-anim" style={{ position: "absolute", top: `${10 + i * 14}%`, width: 54 - i * 12, height: 16 - i * 3, borderRadius: 20, background: "rgba(255,255,255,.9)",
-          boxShadow: `${14 - i * 4}px -7px 0 2px rgba(255,255,255,.9), ${-12 + i * 3}px -4px 0 0 rgba(255,255,255,.9)`, animation: `gs-drift ${38 + i * 17}s linear ${-i * 19}s infinite` }} />
-      ))}
-      {/* Rolling hills behind outdoor ground. */}
-      {OUTDOOR.has(scene.ground) && (
+      {photo ? (
         <>
-          <div style={{ position: "absolute", left: "-12%", width: "62%", top: "50%", height: "60%", borderRadius: "50%", background: shade(scene.ground === "lake" || scene.ground === "pool" ? "#5FB548" : scene.groundColor, -18), opacity: 0.85 }} />
-          <div style={{ position: "absolute", right: "-14%", width: "66%", top: "54%", height: "60%", borderRadius: "50%", background: shade(scene.ground === "lake" || scene.ground === "pool" ? "#5FB548" : scene.groundColor, -8), opacity: 0.85 }} />
+          <div className="gs-anim" style={{ position: "absolute", inset: 0, background: `url("${photo}") center/cover no-repeat`, animation: "gs-fade .45s ease-out" }} />
+          {/* A light overall darken plus a soft fade to ~45% black over the bottom half, so the
+              centre text, chips and race lanes drawn over the photo stay readable. */}
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,.12) 0%, rgba(0,0,0,.12) 50%, rgba(0,0,0,.45) 100%)" }} />
         </>
-      )}
-      <Ground scene={scene} racing={!!lanes} />
-      {/* Grass tufts in the foreground of grassy scenes. */}
-      {(scene.ground === "grass" || scene.ground === "field") && !lanes && [8, 27, 46, 63, 79, 93].map((x, i) => (
-        <span key={`g${i}`} style={{ position: "absolute", left: `${x}%`, bottom: 2 + (i % 2) * 6, fontSize: 11, opacity: 0.9 }}>🌱</span>
-      ))}
-      {!lanes && scene.decor.map(([e, x, y, size], i) => (
-        <span key={`d${i}`} style={{ position: "absolute", left: `${x * 100}%`, top: `${y * 100}%`, fontSize: size, transform: "translate(-50%,-50%)", lineHeight: 1 }}>{e}</span>
-      ))}
-      {!lanes && scene.actors.map(([e, kind, y, size, secs], i) => {
-        const style: React.CSSProperties = { position: "absolute", top: `${y * 100}%`, fontSize: size, lineHeight: 1, transform: "translateY(-50%)" };
-        if (kind === "drift" || kind === "swim" || kind === "fly") {
-          return (
-            <span key={`a${i}`} className="gs-anim" style={{ ...style, left: "100%", animation: `gs-drift ${secs}s linear ${-i * 3}s infinite` }}>
-              <span className="gs-anim" style={{ display: "inline-block", animation: `${kind === "drift" ? "gs-gallop" : "gs-bob"} ${kind === "fly" ? 1.2 : 0.9}s ease-in-out infinite` }}>{e}</span>
-            </span>
-          );
-        }
-        if (kind === "jump") return <span key={`a${i}`} className="gs-anim" style={{ ...style, left: "60%", animation: `gs-jump ${secs}s ease-in-out infinite` }}>{e}</span>;
-        if (kind === "bounce") return <span key={`a${i}`} className="gs-anim" style={{ ...style, left: `${30 + i * 18}%`, animation: `gs-hop ${0.8 + secs * 0.2}s ease-in-out infinite` }}>{e}</span>;
-        return <span key={`a${i}`} className="gs-anim" style={{ ...style, left: `${20 + i * 22}%`, animation: `gs-twinkle ${secs}s ease-in-out infinite` }}>{e}</span>;
-      })}
+      ) : <SceneDrawing scene={scene} night={night} racing={!!lanes} />}
       {lanes && (
         <div style={{ position: "absolute", left: 0, right: 0, top: "41%", bottom: 2, display: "flex", flexDirection: "column" }}>
           <span style={{ position: "absolute", left: 10, top: -22, fontSize: 18 }}>🏁</span>
@@ -282,6 +258,52 @@ export function SceneBanner({ scene, height = 104, lanes, children }: { scene: S
       )}
       {children}
     </div>
+  );
+}
+
+/** Today's drawn scene: sky dots, sun/moon, clouds, hills, ground, decor and the moving actors. */
+function SceneDrawing({ scene, night, racing }: { scene: Scene; night: boolean; racing: boolean }) {
+  return (
+    <>
+      {night && Array.from({ length: 16 }, (_, i) => (
+        <span key={i} className="gs-anim" style={{ position: "absolute", left: `${(i * 37) % 100}%`, top: `${(i * 23) % 55}%`, width: 3, height: 3, borderRadius: 2, background: "#fff", animation: `gs-twinkle ${1.6 + (i % 5) * 0.4}s ease-in-out ${i * 0.2}s infinite` }} />
+      ))}
+      {scene.body === "sun" && <span className="gs-anim" style={{ position: "absolute", right: "6%", top: 6, fontSize: 28, animation: "gs-spin 18s linear infinite" }}>☀️</span>}
+      {scene.body === "moon" && <span style={{ position: "absolute", right: "7%", top: 6, fontSize: 24 }}>🌙</span>}
+      {/* Fluffy clouds drifting across a daytime sky. */}
+      {scene.body === "sun" && [0, 1].map((i) => (
+        <span key={`c${i}`} className="gs-anim" style={{ position: "absolute", top: `${10 + i * 14}%`, width: 54 - i * 12, height: 16 - i * 3, borderRadius: 20, background: "rgba(255,255,255,.9)",
+          boxShadow: `${14 - i * 4}px -7px 0 2px rgba(255,255,255,.9), ${-12 + i * 3}px -4px 0 0 rgba(255,255,255,.9)`, animation: `gs-drift ${38 + i * 17}s linear ${-i * 19}s infinite` }} />
+      ))}
+      {/* Rolling hills behind outdoor ground. */}
+      {OUTDOOR.has(scene.ground) && (
+        <>
+          <div style={{ position: "absolute", left: "-12%", width: "62%", top: "50%", height: "60%", borderRadius: "50%", background: shade(scene.ground === "lake" || scene.ground === "pool" ? "#5FB548" : scene.groundColor, -18), opacity: 0.85 }} />
+          <div style={{ position: "absolute", right: "-14%", width: "66%", top: "54%", height: "60%", borderRadius: "50%", background: shade(scene.ground === "lake" || scene.ground === "pool" ? "#5FB548" : scene.groundColor, -8), opacity: 0.85 }} />
+        </>
+      )}
+      <Ground scene={scene} racing={racing} />
+      {/* Grass tufts in the foreground of grassy scenes. */}
+      {(scene.ground === "grass" || scene.ground === "field") && !racing && [8, 27, 46, 63, 79, 93].map((x, i) => (
+        <span key={`g${i}`} style={{ position: "absolute", left: `${x}%`, bottom: 2 + (i % 2) * 6, fontSize: 11, opacity: 0.9 }}>🌱</span>
+      ))}
+      {!racing && scene.decor.map(([e, x, y, size], i) => (
+        <span key={`d${i}`} style={{ position: "absolute", left: `${x * 100}%`, top: `${y * 100}%`, fontSize: size, transform: "translate(-50%,-50%)", lineHeight: 1 }}>{e}</span>
+      ))}
+      {!racing && scene.actors.map(([e, kind, y, size, secs], i) => {
+        const style: React.CSSProperties = { position: "absolute", top: `${y * 100}%`, fontSize: size, lineHeight: 1, transform: "translateY(-50%)" };
+        if (kind === "drift" || kind === "swim" || kind === "fly") {
+          return (
+            <span key={`a${i}`} className="gs-anim" style={{ ...style, left: "100%", animation: `gs-drift ${secs}s linear ${-i * 3}s infinite` }}>
+              <span className="gs-anim" style={{ display: "inline-block", animation: `${kind === "drift" ? "gs-gallop" : "gs-bob"} ${kind === "fly" ? 1.2 : 0.9}s ease-in-out infinite` }}>{e}</span>
+            </span>
+          );
+        }
+        if (kind === "jump") return <span key={`a${i}`} className="gs-anim" style={{ ...style, left: "60%", animation: `gs-jump ${secs}s ease-in-out infinite` }}>{e}</span>;
+        if (kind === "bounce") return <span key={`a${i}`} className="gs-anim" style={{ ...style, left: `${30 + i * 18}%`, animation: `gs-hop ${0.8 + secs * 0.2}s ease-in-out infinite` }}>{e}</span>;
+        return <span key={`a${i}`} className="gs-anim" style={{ ...style, left: `${20 + i * 22}%`, animation: `gs-twinkle ${secs}s ease-in-out infinite` }}>{e}</span>;
+      })}
+    </>
   );
 }
 
