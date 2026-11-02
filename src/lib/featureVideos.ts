@@ -6,11 +6,21 @@ import { post, mediaUrl } from "./api";
 
 /** The player's language switch (Steve, 2026-11-02: "we should do this with all three languages.
  *  English, Tagalog and Indonesia. on our Bingg Bongg Features. and will show each country with their
- *  language by default."), in the order it shows them. Names are not translated. */
-export type VideoLang = "en" | "fil" | "id";
+ *  language by default.", then "Please add the Spanish language as well." and "Also Arabic."), in the
+ *  order it shows them. Names are not translated. */
+export type VideoLang = "en" | "fil" | "id" | "es" | "ar";
 export const VIDEO_LANGS: { code: VideoLang; label: string }[] = [
   { code: "en", label: "English" }, { code: "fil", label: "Tagalog" }, { code: "id", label: "Indonesia" },
+  { code: "es", label: "Español" }, { code: "ar", label: "العربية" },
 ];
+
+const SPANISH_COUNTRIES = ["mexico", "spain", "colombia", "argentina", "peru", "venezuela", "chile", "ecuador",
+  "guatemala", "cuba", "bolivia", "dominican republic", "honduras", "paraguay", "el salvador", "nicaragua",
+  "costa rica", "panama", "uruguay", "puerto rico", "equatorial guinea"];
+/** "Arabic language will cover many countries" (Steve) — one Modern Standard Arabic video for all of them. */
+const ARABIC_COUNTRIES = ["saudi arabia", "united arab emirates", "egypt", "iraq", "jordan", "kuwait", "qatar",
+  "bahrain", "oman", "yemen", "syria", "lebanon", "palestine", "libya", "tunisia", "algeria", "morocco", "sudan",
+  "mauritania"];
 /** language -> full URL, for one video. */
 export type VideoSources = Partial<Record<VideoLang, string>>;
 
@@ -33,20 +43,26 @@ export function videoSources(raw?: Record<string, string> | null): VideoSources 
 const PICK_KEY = "bb.featureVideoLang";
 
 /** The language the switch opens on: the one the member last picked, else their country's
- *  (Philippines -> Tagalog, Indonesia -> Indonesian, from the profile and then the device's time
- *  zone), else English. */
+ *  (Philippines -> Tagalog, Indonesia -> Indonesian, Spanish- and Arabic-speaking countries -> Spanish
+ *  and Arabic; from the profile, then the device's time zone and language), else English. */
 export function defaultVideoLang(country?: string | null): VideoLang {
   try {
     const picked = localStorage.getItem(PICK_KEY);
-    if (picked === "en" || picked === "fil" || picked === "id") return picked;
+    if (VIDEO_LANGS.some((l) => l.code === picked)) return picked as VideoLang;
   } catch { /* private mode */ }
   const c = (country ?? "").trim().toLowerCase();
   if (c === "philippines" || c === "ph") return "fil";
   if (c === "indonesia" || c === "id") return "id";
+  if (SPANISH_COUNTRIES.includes(c)) return "es";
+  if (ARABIC_COUNTRIES.includes(c)) return "ar";
   let tz = "";
   try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch { /* old browser */ }
   if (tz === "Asia/Manila") return "fil";
   if (["Asia/Jakarta", "Asia/Pontianak", "Asia/Makassar", "Asia/Jayapura"].includes(tz)) return "id";
+  // The browser's language, for Spanish and Arabic (time zones span too many countries to tell).
+  const langs = (navigator.languages?.length ? navigator.languages : [navigator.language || ""]).map((l) => l.toLowerCase());
+  if (langs[0]?.startsWith("es")) return "es";
+  if (langs[0]?.startsWith("ar")) return "ar";
   return "en";
 }
 
