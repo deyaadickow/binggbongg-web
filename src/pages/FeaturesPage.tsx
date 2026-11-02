@@ -29,7 +29,7 @@ import { useT, type StringKey } from "../lib/i18n";
 import { PageTitle } from "../components/PageTitle";
 import { useSession } from "../lib/session";
 import { useEffect, useState } from "react";
-import { fetchFeatureVideos, featureVideoLabels } from "../lib/featureVideos";
+import { fetchFeatureVideos, featureVideoLabels, featureVideoSources, type VideoSources } from "../lib/featureVideos";
 import { IDEA_SUPPORT_REASON } from "../lib/ideas";
 import { FeatureVideoPlayer } from "../components/FeatureVideoPlayer";
 import { useContestOn } from "../lib/contests";
@@ -327,7 +327,8 @@ export function FeaturesPage() {
   const { t, lang } = useT();
   // Feature Videos: tile key -> URL, in the member's language (English fallback on the server).
   const [videos, setVideos] = useState<Record<string, string>>({});
-  const [playing, setPlaying] = useState<{ url: string; title: string } | null>(null);
+  const [playing, setPlaying] = useState<{ url: string; title: string; sources?: VideoSources } | null>(null);
+  const { user } = useSession();
   useEffect(() => {
     let live = true;
     fetchFeatureVideos(lang).then((v) => { if (live) setVideos(v); });
@@ -415,16 +416,17 @@ export function FeaturesPage() {
               const vk = f.videoKey ?? f.nameKey;
               return (
               <Tile key={f.nameKey} f={f} number={numbers[f.nameKey]} video={videos[vk]}
-                onWatch={() => setPlaying({ url: videos[vk], title: t(f.labelKey ?? f.nameKey) })}
+                onWatch={() => setPlaying({ url: videos[vk], title: t(f.labelKey ?? f.nameKey), sources: featureVideoSources[vk] })}
                 extras={Object.keys(videos).filter((k) => k.startsWith(vk + "__")).sort()
                   .map((k) => ({ key: k, label: featureVideoLabels[k] ?? t("watch_video") }))}
-                onWatchExtra={(k) => setPlaying({ url: videos[k], title: featureVideoLabels[k] ?? t(f.labelKey ?? f.nameKey) })} />
+                onWatchExtra={(k) => setPlaying({ url: videos[k], title: featureVideoLabels[k] ?? t(f.labelKey ?? f.nameKey), sources: featureVideoSources[k] })} />
               );
             })}
           </div>
         </div>
       ))}
-      {playing && <FeatureVideoPlayer url={playing.url} title={playing.title} onClose={() => setPlaying(null)} />}
+      {playing && <FeatureVideoPlayer url={playing.url} title={playing.title} sources={playing.sources}
+        country={user?.country} onClose={() => setPlaying(null)} />}
     </div>
   );
 }

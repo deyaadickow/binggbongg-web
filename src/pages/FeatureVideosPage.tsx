@@ -12,15 +12,19 @@ import { useT } from "../lib/i18n";
 import { PageTitle } from "../components/PageTitle";
 import { Loading, Notice } from "../components/Common";
 import { FeatureVideoPlayer } from "../components/FeatureVideoPlayer";
+import { videoSources, type VideoSources } from "../lib/featureVideos";
+import { useSession } from "../lib/session";
 
-interface FeaturePageVideoRow { id: number; sort: number; title: string; video: string; thumbnail?: string | null }
-interface FeaturePageVideo { id: number; title: string; url: string; poster: string }
+interface FeaturePageVideoRow { id: number; sort: number; title: string; video: string; thumbnail?: string | null; videos?: Record<string, string> }
+/** sources: the same video in English, Tagalog and Indonesian, for the player's switch. */
+interface FeaturePageVideo { id: number; title: string; url: string; poster: string; sources: VideoSources }
 
 export function FeatureVideosPage() {
   const { t } = useT();
   const [videos, setVideos] = useState<FeaturePageVideo[] | null>(null);
   const [failed, setFailed] = useState(false);
   const [playing, setPlaying] = useState<FeaturePageVideo | null>(null);
+  const { user } = useSession();
 
   // Keyed on nothing that re-creates (not the session user): the list is the same for everyone.
   const load = useCallback(async () => {
@@ -31,7 +35,7 @@ export function FeatureVideosPage() {
       const res = await post<FeaturePageVideoRow[]>("fetchFeaturePageVideos", { platform: "web" });
       if (!res.status) throw new Error(res.message || "failed");
       const rows = [...(res.data ?? [])].filter((r) => r.video).sort((a, b) => a.sort - b.sort);
-      setVideos(rows.map((r) => ({ id: r.id, title: r.title, url: mediaUrl(r.video), poster: mediaUrl(r.thumbnail) })));
+      setVideos(rows.map((r) => ({ id: r.id, title: r.title, url: mediaUrl(r.video), poster: mediaUrl(r.thumbnail), sources: videoSources(r.videos) })));
     } catch {
       setFailed(true);
     }
@@ -93,7 +97,8 @@ export function FeatureVideosPage() {
           ))}
         </div>
       )}
-      {playing && <FeatureVideoPlayer url={playing.url} title={playing.title} onClose={closePlayer} />}
+      {playing && <FeatureVideoPlayer url={playing.url} title={playing.title} sources={playing.sources}
+        country={user?.country} onClose={closePlayer} />}
     </div>
   );
 }
