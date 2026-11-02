@@ -8,7 +8,7 @@
 // The rules are NOT in here — they live in lib/blockescape.ts, free of React, so they can be
 // checked against the solver that proved every board clearable. If the two ever drift, a board
 // verified as solvable silently stops being so.
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   EXITED, blockColour, fetchBlockEscapeLevels, remaining, slide,
   type BEBlock, type BlockEscapeLevel,
@@ -33,6 +33,10 @@ export function BlockEscapeOverlay({ onClose }: { onClose: () => void }) {
   // Board states before each move, so a bricked board is recoverable.
   const history = useRef<BEBlock[][]>([]);
   const drag = useRef<{ i: number; x: number; y: number } | null>(null);
+  // The width the board may use. A 7-column board at full size is 366px — wider than the card on
+  // a 390px phone — so cells shrink to fit rather than the board spilling off the side.
+  const boardBox = useRef<HTMLDivElement>(null);
+  const [boardWidth, setBoardWidth] = useState(0);
 
   const level = levels?.[index];
 
@@ -62,6 +66,17 @@ export function BlockEscapeOverlay({ onClose }: { onClose: () => void }) {
   }, [levels]);
 
   useEffect(() => { if (levels && levels.length > 0) show(0); }, [levels, show]);
+
+  // Measured once before the first paint, then kept current. The observer alone is not enough:
+  // it only reports on a rendered frame, so a board opened in a background tab never drew.
+  useLayoutEffect(() => {
+    const el = boardBox.current;
+    if (!el) return;
+    setBoardWidth(el.clientWidth);
+    const ro = new ResizeObserver(() => setBoardWidth(el.clientWidth));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [level]);
 
   function move(i: number, dx: number, dy: number) {
     if (!level || solved) return;
@@ -120,11 +135,13 @@ export function BlockEscapeOverlay({ onClose }: { onClose: () => void }) {
     else move(d.i, 0, dy > 0 ? 1 : -1);
   }
 
-  const cell = 46;
   const gutter = 22;
+  const cell = level && boardWidth > 0
+    ? Math.max(24, Math.min(46, Math.floor((boardWidth - gutter * 2) / level.cols)))
+    : 46;
 
   return (
-    <div className="overlay" onClick={onClose}>
+    <div className="blockescape-overlay" onClick={onClose}>
       <div className="card pad" style={{ position: "relative", maxWidth: 560, width: "100%" }} onClick={(e) => e.stopPropagation()}>
         <Confetti burst={burst} />
         <div style={{ marginBottom: 10 }}>
@@ -150,8 +167,10 @@ export function BlockEscapeOverlay({ onClose }: { onClose: () => void }) {
         <div className="muted" style={{ fontSize: 13, marginBottom: 10 }}>{error || hint}</div>
 
         {level && (
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <div style={{ position: "relative", width: level.cols * cell + gutter * 2, height: level.rows * cell + gutter * 2 }}>
+          <div ref={boardBox} style={{ display: "flex", justifyContent: "center" }}>
+            {/* Drawn only once measured: drawn at the default size first, every block would
+                visibly slide into place as the cells shrank to fit. */}
+            {boardWidth > 0 && <div style={{ position: "relative", width: level.cols * cell + gutter * 2, height: level.rows * cell + gutter * 2 }}>
               {/* Gates sit OUTSIDE the grid so one is never mistaken for a cell to move into. */}
               {level.gates.map((g, k) => {
                 const thick = gutter * 0.6;
@@ -190,7 +209,7 @@ export function BlockEscapeOverlay({ onClose }: { onClose: () => void }) {
                   }}
                 />
               ))}
-            </div>
+            </div>}
           </div>
         )}
 
