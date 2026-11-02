@@ -60,7 +60,7 @@ export function LiveFeaturePage() {
       </div>
       <h2 style={{ color: "var(--gold)", fontSize: 18, margin: "0 0 10px" }}>{t("fx_live_now")}</h2>
       <LiveRoomsList />
-      {playing && video && <FeatureVideoPlayer url={video} title={title} onClose={() => setPlaying(false)} />}
+      {playing && video && <FeatureVideoPlayer items={[{ url: video, title }]} onClose={() => setPlaying(false)} />}
     </div>
   );
 }

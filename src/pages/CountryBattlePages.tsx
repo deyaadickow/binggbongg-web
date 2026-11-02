@@ -295,7 +295,7 @@ function CountryBattleExplainer({ note }: { note: string }) {
       </div>
 
       <Link to="/country-battle/board" className="btn" style={{ display: "flex", justifyContent: "center" }}>🥇 {t("cb_board")}</Link>
-      {playing && video && <FeatureVideoPlayer url={video} title={t("cb_title")} onClose={() => setPlaying(false)} />}
+      {playing && video && <FeatureVideoPlayer items={[{ url: video, title: t("cb_title") }]} onClose={() => setPlaying(false)} />}
     </div>
   );
 }

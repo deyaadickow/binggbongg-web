@@ -23,7 +23,8 @@ export function FeatureVideosPage() {
   const { t } = useT();
   const [videos, setVideos] = useState<FeaturePageVideo[] | null>(null);
   const [failed, setFailed] = useState(false);
-  const [playing, setPlaying] = useState<FeaturePageVideo | null>(null);
+  // Index of the video being watched; the player scrolls on from there.
+  const [playing, setPlaying] = useState<number | null>(null);
   const { user } = useSession();
 
   // Keyed on nothing that re-creates (not the session user): the list is the same for everyone.
@@ -65,7 +66,7 @@ export function FeatureVideosPage() {
           display: "grid", gap: 16, marginTop: 14,
           gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
         }}>
-          {videos.map((v) => (
+          {videos.map((v, vi) => (
             // The heading takes the spare height, so every card in a row lines up at the bottom
             // however many lines its title wraps to.
             <div key={v.id} style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
@@ -77,7 +78,7 @@ export function FeatureVideosPage() {
                 {/* A dark plate, so the gold reads over the bright parts of the cosmic backdrop. */}
                 <span style={{ background: "rgba(0,0,0,0.78)", borderRadius: 8, padding: "3px 8px" }}>{v.title}</span>
               </h2>
-              <button onClick={() => setPlaying(v)} aria-label={`${t("watch_video")}: ${v.title}`} style={{
+              <button onClick={() => setPlaying(vi)} aria-label={`${t("watch_video")}: ${v.title}`} style={{
                 position: "relative", display: "block", width: "100%", aspectRatio: "9 / 16", padding: 0,
                 borderRadius: 14, border: "2px solid var(--gold-border)", overflow: "hidden",
                 background: "#000", cursor: "pointer",
@@ -97,8 +98,9 @@ export function FeatureVideosPage() {
           ))}
         </div>
       )}
-      {playing && <FeatureVideoPlayer url={playing.url} title={playing.title} sources={playing.sources}
-        country={user?.country} onClose={closePlayer} />}
+      {playing !== null && videos && (
+        <FeatureVideoPlayer items={videos} start={playing} country={user?.country} onClose={closePlayer} />
+      )}
     </div>
   );
 }

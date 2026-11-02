@@ -29,9 +29,9 @@ import { useT, type StringKey } from "../lib/i18n";
 import { PageTitle } from "../components/PageTitle";
 import { useSession } from "../lib/session";
 import { useEffect, useState } from "react";
-import { fetchFeatureVideos, featureVideoLabels, featureVideoSources, type VideoSources } from "../lib/featureVideos";
+import { fetchFeatureVideos, featureVideoLabels, featureVideoSources } from "../lib/featureVideos";
 import { IDEA_SUPPORT_REASON } from "../lib/ideas";
-import { FeatureVideoPlayer } from "../components/FeatureVideoPlayer";
+import { FeatureVideoPlayer, type PlayerItem } from "../components/FeatureVideoPlayer";
 import { useContestOn } from "../lib/contests";
 
 interface Feature {
@@ -327,7 +327,8 @@ export function FeaturesPage() {
   const { t, lang } = useT();
   // Feature Videos: tile key -> URL, in the member's language (English fallback on the server).
   const [videos, setVideos] = useState<Record<string, string>>({});
-  const [playing, setPlaying] = useState<{ url: string; title: string; sources?: VideoSources } | null>(null);
+  // What the player is showing: a feed of videos and where in it to start.
+  const [playing, setPlaying] = useState<{ items: PlayerItem[]; start: number } | null>(null);
   const { user } = useSession();
   useEffect(() => {
     let live = true;
@@ -340,6 +341,17 @@ export function FeaturesPage() {
     features: s.features.filter((f) => hasContest || !f.contestOnly),
   }));
   const numbers = featureNumbers(shown);
+  // Every tile's own video, in the directory's order, so the player can scroll from one feature's
+  // video to the next (Steve: "scroll up and down for the next and previous feature videos").
+  const feed = shown.flatMap((sec) => sec.features).filter((f) => videos[f.videoKey ?? f.nameKey])
+    .map((f) => {
+      const vk = f.videoKey ?? f.nameKey;
+      return { key: vk, item: { url: videos[vk], title: t(f.labelKey ?? f.nameKey), sources: featureVideoSources[vk] } };
+    });
+  const watch = (vk: string) => {
+    const start = feed.findIndex((x) => x.key === vk);
+    if (start >= 0) setPlaying({ items: feed.map((x) => x.item), start });
+  };
   // Steve, 2026-10-19: "Please add search on top of this page." Fifty-seven tiles is a lot to
   // scroll past when you already know what you are looking for. Matches the NAME and the
   // DESCRIPTION, both translated, so "coins" finds tiles that only mention coins in their blurb.
@@ -416,16 +428,17 @@ export function FeaturesPage() {
               const vk = f.videoKey ?? f.nameKey;
               return (
               <Tile key={f.nameKey} f={f} number={numbers[f.nameKey]} video={videos[vk]}
-                onWatch={() => setPlaying({ url: videos[vk], title: t(f.labelKey ?? f.nameKey), sources: featureVideoSources[vk] })}
+                onWatch={() => watch(vk)}
                 extras={Object.keys(videos).filter((k) => k.startsWith(vk + "__")).sort()
                   .map((k) => ({ key: k, label: featureVideoLabels[k] ?? t("watch_video") }))}
-                onWatchExtra={(k) => setPlaying({ url: videos[k], title: featureVideoLabels[k] ?? t(f.labelKey ?? f.nameKey), sources: featureVideoSources[k] })} />
+                // An extra video (the ads on #1) plays on its own.
+                onWatchExtra={(k) => setPlaying({ items: [{ url: videos[k], title: featureVideoLabels[k] ?? t(f.labelKey ?? f.nameKey), sources: featureVideoSources[k] }], start: 0 })} />
               );
             })}
           </div>
         </div>
       ))}
-      {playing && <FeatureVideoPlayer url={playing.url} title={playing.title} sources={playing.sources}
+      {playing && <FeatureVideoPlayer items={playing.items} start={playing.start}
         country={user?.country} onClose={() => setPlaying(null)} />}
     </div>
   );
