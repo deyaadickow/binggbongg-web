@@ -17,13 +17,14 @@ import { useSession } from "../lib/session";
 import { useT } from "../lib/i18n";
 import { Notice } from "../components/Common";
 import { PageTitle } from "../components/PageTitle";
+import { SEGMENTER_MODEL_URL, SEGMENTER_WASM_BASE } from "../lib/segmenter";
 
 const W = 720;
 const H = 1280;
 const MAX_SECONDS = 180;
-/** Pinned to the npm package version so the wasm and the JS glue always match. */
-const WASM_BASE = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35/wasm";
-const MODEL_URL = "/models/selfie_segmenter.tflite";
+/** Shared with Text Behind Photo: the wasm pinned to the npm package version, the model self-hosted. */
+const WASM_BASE = SEGMENTER_WASM_BASE;
+const MODEL_URL = SEGMENTER_MODEL_URL;
 const USABLE = /\.(png|jpe?g|gif|webp|mp4|webm)$/i;
 const VIDEO_EXT = /\.(mp4|webm)$/i;
 const HIDDEN_MEDIA = { position: "absolute", left: 0, top: 0, width: 2, height: 2, opacity: 0.01, pointerEvents: "none" } as const;

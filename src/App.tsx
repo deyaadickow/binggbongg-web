@@ -8,6 +8,7 @@ import { GreenScreenPage } from "./pages/GreenScreenPage";
 import { CreateVideoAdPage } from "./pages/CreateVideoAdPage";
 import { UploadPhotosPage } from "./pages/UploadPhotosPage";
 import { CartoonPage } from "./pages/CartoonPage";
+import { TextBehindPhotoPage } from "./pages/TextBehindPhotoPage";
 import { MonsterPage } from "./pages/MonsterPage";
 import { MyPhotosPage } from "./pages/MyPhotosPage";
 import { PhotosDirectoryPage } from "./pages/PhotosDirectoryPage";
@@ -191,6 +192,7 @@ export default function App() {
           <Route path="/upload-photos" element={<UploadPhotosPage />} />
           {/* Cartoon Me (Steve, 2026-10-12) */}
           <Route path="/cartoon" element={<CartoonPage />} />
+          <Route path="/text-behind-photo" element={<TextBehindPhotoPage />} />
           <Route path="/monster" element={<MonsterPage />} />
           <Route path="/enter-contest" element={<ContestUploadPage />} />
           {/* The board the site never had. Open to everyone, every country — entering is the

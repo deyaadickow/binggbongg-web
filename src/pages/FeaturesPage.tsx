@@ -118,6 +118,8 @@ const FEATURES: Section[] = [
       // { icon: "🔮", nameKey: "fname_guessing_games", blurbKey: "fblurb_guessing_games", to: "/live", whereKey: "fwhere_the_live_room" },
       { icon: "🧠", nameKey: "fname_trivia_night", labelKey: "fname_quiz_games", blurbKey: "fblurb_quiz_games", to: "/feature/quiz-games", whereKey: "fwhere_the_live_room" },
       { icon: "🔤", nameKey: "fname_word_search", blurbKey: "fblurb_word_search", to: "/feature/word-search", whereKey: "fwhere_the_live_room" },
+      // Steve, 2026-11-02: "Yes, build both on all three platforms" — a word hides behind the host.
+      { icon: "🫣", nameKey: "fname_whats_behind_me", blurbKey: "fblurb_whats_behind_me", to: "/feature/whats-behind-me", whereKey: "fwhere_the_live_room" },
       { icon: "🏁", nameKey: "fname_race_games", blurbKey: "fblurb_race_games", to: "/feature/race-games", whereKey: "fwhere_the_live_room" },
       { icon: "🧩", nameKey: "fname_one_stroke_and_block_escape", blurbKey: "fblurb_one_stroke_and_block_escape", to: "/feature/puzzles", whereKey: "fwhere_the_live_room" },
       { icon: "🏅", nameKey: "fname_game_leaderboards", blurbKey: "fblurb_game_leaderboards", to: "/feature/game-leaderboards", whereKey: "fwhere_the_live_room" },
@@ -131,6 +133,8 @@ const FEATURES: Section[] = [
       { icon: "🟩", nameKey: "fname_green_screen", blurbKey: "fblurb_green_screen", to: "/green-screen" },
       { icon: "🖼️", nameKey: "fname_photos", blurbKey: "fblurb_photos", to: "/photos" },
       { icon: "✨", nameKey: "fname_photo_styles", blurbKey: "fblurb_photo_styles", to: "/cartoon" },
+      // Steve, 2026-11-02: big words behind the person in a photo, drawn on the device.
+      { icon: "🖼️", nameKey: "fname_text_behind_photo", blurbKey: "fblurb_text_behind_photo", to: "/text-behind-photo" },
       { icon: "🦖", nameKey: "fname_monster_videos", blurbKey: "fblurb_monster_videos", to: "/monster" },
       { icon: "📑", nameKey: "fname_playlists", blurbKey: "fblurb_playlists", myProfile: true, whereKey: "fwhere_your_profile" },
       { icon: "🔮", nameKey: "fname_lucky_numbers_and_horoscope", blurbKey: "fblurb_lucky_numbers_and_horoscope", to: "/lucky" },

@@ -39,7 +39,7 @@ export function Overlay({ title, children, onClose, width = 440, back = false }:
 
 export type BattleKind =
   | "1v1" | "gameLimit" | "virtual" | "series" | "2v2" | "marathon" | "555" | "solo" | "hideSeek"
-  | "bingo" | "bingoBoard" | "pyramid" | "checkers" | "chess" | "fourinarow" | "reversi" | "mancala" | "trivia" | "guess" | "trivianight" | "wordsearch"
+  | "bingo" | "bingoBoard" | "pyramid" | "checkers" | "chess" | "fourinarow" | "reversi" | "mancala" | "trivia" | "guess" | "trivianight" | "wordsearch" | "behind"
   // Android numbers this one #5 and it belongs between Best Out Of and 5-5-5. It isn't a battle
   // you start against someone in the room — it's a personal 31-day streak you opt into — so it
   // needs no people on screen.
@@ -62,6 +62,8 @@ export const BATTLE_KINDS: {
   reference?: boolean;
   /** Kept (code and all) but left out of the menu — Steve may bring it back. */
   hidden?: boolean;
+  /** Started from the phone app only: the row explains that instead of starting anything on the web. */
+  phonesOnly?: boolean;
 }[] = [
   { kind: "1v1", number: "#1", title: "bingg_bongg_battle", blurb: "n1v1_5_minutes_most_coins_wins", minPeople: 2,
     info: "challenge_another_live_streamer_to_a_rea" },
@@ -125,6 +127,13 @@ export const BATTLE_KINDS: {
   // letters x the host's price (to the host), a swipe that isn't a word is free. Points, never coins.
   { kind: "wordsearch", number: "#20", title: "ws_word_search", blurb: "ws_blurb", minPeople: 1,
     info: "ws_info" },
+  // What's Behind Me? (Steve, 2026-11-02): the host's phone draws the round's word BEHIND the host
+  // (the camera's background is replaced, the word scrolls slowly) and the room taps which word it
+  // is, 5 coins a tap to the host. A web host's camera has no background-replacement pipeline, so
+  // the word could not be drawn — the row is here (the phones' #21) but starts nothing on the web:
+  // it says to start it from the phone app. Web VIEWERS play it like any quiz game.
+  { kind: "behind", number: "#21", title: "wbm_title", blurb: "wbm_blurb", minPeople: 1,
+    info: "wbm_info", phonesOnly: true },
   // Unnumbered from here down, exactly as on the phones: these aren't battles you can start, so
   // they carry no "#n" and never check how many people are on screen.
   { kind: "pkContests", title: "pk_battle_contests", blurb: "admin_run_scored_by_gift_coins", minPeople: 1, reference: true,
@@ -179,7 +188,12 @@ export function BattleMenu({ peopleOnScreen, onPick, onClose, onNotice }: { peop
               }}>
               <span className="kind-title">{k.number ? `${k.number} ` : ""}{t(k.title)}</span>
               <span className="kind-blurb muted">{t(k.blurb)}</span>
-              {ok && k.built !== false ? <span className="kind-go">›</span> : (
+              {k.phonesOnly ? (
+                <span className="kind-need">
+                  <span className="need-long">{t("wbm_phone_app_pill")}</span>
+                  <span className="need-short">📱</span>
+                </span>
+              ) : ok && k.built !== false ? <span className="kind-go">›</span> : (
                 // Two spellings of the same pill: CSS shows the long one normally and the short
                 // one on a phone. Truncating the TITLE to keep "Needs 2 people" whole gets the
                 // priority backwards — the title is what identifies the row, and the reason is
