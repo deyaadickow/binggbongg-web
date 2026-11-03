@@ -1575,7 +1575,8 @@ export function LiveViewerPage() {
           // Steve, 2026-10-27: Water Sort — pour coloured water between glass bottles. Its own
           // overlay, paid the Color Balls way (50 to start, 1 coin a pour, charged at the end).
           ? <WaterSortOverlay roomName={roomName} hostName={nameOfId(hostUserId)} isHost={myId !== null && myId === hostUserId} onClose={() => setGameOpen(false)} />
-          : <TapGameOverlay game={activeGame} roomName={roomName} onClose={() => setGameOpen(false)} onToast={setToast} />
+          : <TapGameOverlay game={activeGame} roomName={roomName} onClose={() => setGameOpen(false)} onToast={setToast}
+              hostAvatar={members?.host_profile_image ?? null} isHost={myId !== null && myId === hostUserId} />
       )}
       {bingoOpen && bingoGame && myId !== null && (
         <BingoOverlay

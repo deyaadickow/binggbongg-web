@@ -7,6 +7,8 @@ import {
   needsCoinValue, needsDuration, setActiveTapGame, type TapGameType,
 } from "../lib/tapgame";
 import { useT } from "../lib/i18n";
+import { useSession } from "../lib/session";
+import { AddPicturePopup, hasProfilePicture } from "./HitMe";
 
 const MODE_FILTERS = [
   { key: "all", label: "All" },
@@ -35,6 +37,9 @@ export function HostGamesMenu({ userId, roomName, activeGame, onClose, onChanged
   onToast: (m: string) => void;
 }) {
   const { t } = useT();
+  const { user, refresh } = useSession();
+  // Hit Me puts the host's picture on every balloon (Steve, 2026-11-02): a host without one is asked to add it.
+  const [askPicture, setAskPicture] = useState<TapGameType | null>(null);
   const [games, setGames] = useState<TapGameType[] | null>(null);
   const [picked, setPicked] = useState<TapGameType | null>(null);
   const [coinValue, setCoinValue] = useState(1);
@@ -98,6 +103,12 @@ export function HostGamesMenu({ userId, roomName, activeGame, onClose, onChanged
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 60, background: "rgba(0,0,0,0.65)", display: "grid", placeItems: "center", padding: 16 }}>
+      {askPicture && (
+        <AddPicturePopup userId={userId} onDone={(path) => {
+          setAskPicture(null);
+          if (path) { refresh(); onToast(t("hm_pic_saved")); }
+        }} />
+      )}
       <div className="card pad" style={{ width: "min(460px, 100%)", maxHeight: "86vh", overflowY: "auto" }}>
         <div className="row" style={{ marginBottom: 10 }}>
           <b style={{ color: "var(--gold)", flex: 1, fontSize: 18 }}>{t("games")}</b>
@@ -133,7 +144,10 @@ export function HostGamesMenu({ userId, roomName, activeGame, onClose, onChanged
               {/* Not .btn here: that is a pill, and a game with a long description (Color Balls)
                   spills straight out of the rounded shape. A squared-off row holds both lines. */}
               {shown.map((g) => (
-                <button key={g.id} onClick={() => { setPicked(g); setCoinValue(Math.round(Number(g.coin_value)) || 1); setDuration(120); }}
+                <button key={g.id} onClick={() => {
+                  if (g.game_mode === "hit_me" && !hasProfilePicture(user?.profile_image)) setAskPicture(g);
+                  setPicked(g); setCoinValue(Math.round(Number(g.coin_value)) || 1); setDuration(120);
+                }}
                   style={{
                     display: "block", width: "100%", textAlign: "left", marginBottom: 8, padding: "10px 12px",
                     borderRadius: 10, border: "1px solid var(--gold-border)", background: "transparent",

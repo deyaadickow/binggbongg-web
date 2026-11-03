@@ -1794,4 +1794,17 @@ export const es = {
   wbm_cat_things: "Cosas",
   wbm_cat_jobs: "Oficios",
   wbm_cat_nature: "Naturaleza",
+  // Hit Me (Steve, 2026-11-02)
+  hm_intro: "Globos con la foto del anfitrión suben desde abajo — ¡tócalos para golpear al anfitrión! Cada golpe vale %1$s.",
+  hm_hits: "Golpes: %1$s",
+  hm_result: "Golpes a %1$s: %2$s",
+  hm_hit_label: "Golpea el globo",
+  hm_ouch: "¡AY!",
+  hm_add_pic_title: "Agrega tu foto",
+  hm_add_pic_body: "Por favor agrega tu foto a tu avatar — ¡va en cada globo de Hit Me!",
+  hm_add_pic_button: "Agregar tu foto",
+  hm_not_now: "Ahora no",
+  hm_uploading: "Subiendo tu foto…",
+  hm_pic_saved: "¡Tu foto ya está en los globos!",
+  hm_pic_failed: "No se pudo agregar esa foto — intenta con otra.",
 };

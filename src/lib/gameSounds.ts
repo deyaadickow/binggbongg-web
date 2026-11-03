@@ -42,6 +42,9 @@ function noise(ms: number, at = 0, gain = 0.12) {
 
 export const sfx = {
   tick: () => tone(1500, 1400, 40, 0, "square", 0.05),
+  /** Hit Me (2026-11-02): the balloon bursts (a bright noise crack) and the host's face says "oof" (a quick
+   *  falling boing) right behind it. */
+  hitPop: () => { noise(55, 0, 0.32); tone(1800, 600, 40, 0, "triangle", 0.12); tone(420, 170, 170, 45, "sine", 0.22); },
   lock: () => { tone(500, 900, 70, 0, "triangle", 0.15); tone(900, 900, 60, 70, "triangle", 0.12); },
   drumroll: () => { for (let i = 0; i < 14; i++) noise(45, i * 55, 0.09 + i * 0.006); },
   correct: () => [523, 659, 784, 1047].forEach((f, i) => tone(f, f, 160, i * 110, "triangle", 0.16)),

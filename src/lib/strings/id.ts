@@ -1808,4 +1808,17 @@ export const id = {
   wbm_cat_things: "Benda",
   wbm_cat_jobs: "Pekerjaan",
   wbm_cat_nature: "Alam",
+  // Hit Me (Steve, 2026-11-02)
+  hm_intro: "Balon dengan foto host melayang naik dari bawah — ketuk untuk memukul host! Setiap pukulan bernilai %1$s.",
+  hm_hits: "Pukulan: %1$s",
+  hm_result: "Pukulan ke %1$s: %2$s",
+  hm_hit_label: "Pukul balonnya",
+  hm_ouch: "ADUH!",
+  hm_add_pic_title: "Tambahkan fotomu",
+  hm_add_pic_body: "Silakan tambahkan fotomu ke avatar — fotomu akan ada di setiap balon di Hit Me!",
+  hm_add_pic_button: "Tambahkan Fotomu",
+  hm_not_now: "Nanti saja",
+  hm_uploading: "Mengunggah fotomu…",
+  hm_pic_saved: "Fotomu sudah ada di balon!",
+  hm_pic_failed: "Foto itu tidak bisa ditambahkan — coba foto lain.",
 };
