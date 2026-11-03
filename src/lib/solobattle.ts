@@ -25,6 +25,10 @@ export interface SoloBattle {
   room_name?: string | null;
   /** The host asked about: the battler a follower's screen pins top-left. */
   home_user_id?: number | null;
+  /** Country Battle v2 (2026-11-03, only with country=1): "country_battle" = the host is a live
+   *  battler in a Country Battle — follow them into its screen. `id` is 0 then (not a contest). */
+  kind?: string | null;
+  country_battle_day_id?: number | null;
 }
 
 export interface StandingRow {
@@ -51,8 +55,8 @@ export async function joinSoloBattle(contestId: number, userId: number): Promise
 /** The host's own running Solo Battle, if any. Returns null when there isn't one. */
 export async function fetchActiveSoloBattle(hostUserId: number, viewerUserId?: number): Promise<SoloBattle | null> {
   // chat=1: also find a Chat Battle the host JOINED (not only one they started), so a battler's
-  // own audience follows them in.
-  const params: Record<string, unknown> = { host_user_id: hostUserId, user_id: viewerUserId ?? 0, chat: 1 };
+  // own audience follows them in. country=1: the same for a Country Battle.
+  const params: Record<string, unknown> = { host_user_id: hostUserId, user_id: viewerUserId ?? 0, chat: 1, country: 1 };
   if (viewerUserId) params.viewer_user_id = viewerUserId;
   const res = await post<SoloBattle>("fetchActiveSoloBattleForHost", params).catch(() => null);
   return res?.status ? (res.data ?? null) : null;

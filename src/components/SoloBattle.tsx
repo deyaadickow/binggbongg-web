@@ -114,7 +114,7 @@ export function SoloBattleStrip({ battle, myUserId, onOpenStandings, onToast, on
   );
 }
 
-export function SoloBattleStandingsSheet({ battle, myUserId, onClose, rows: givenRows, onPick, finished: givenFinished, footer }: {
+export function SoloBattleStandingsSheet({ battle, myUserId, onClose, rows: givenRows, onPick, finished: givenFinished, footer, title, noTie }: {
   battle: SoloBattle;
   myUserId: number | null;
   onClose: () => void;
@@ -124,6 +124,10 @@ export function SoloBattleStandingsSheet({ battle, myUserId, onClose, rows: give
   onPick?: (row: StandingRow) => void;
   finished?: boolean;
   footer?: string;
+  /** Country Battle names its own sheet (default: the Chat Battle name). */
+  title?: string;
+  /** Country Battle breaks equal scores by who reached them first — never "Tie!". */
+  noTie?: boolean;
 }) {
   const { t } = useT();
   const [fetched, setRows] = useState<StandingRow[] | null>(null);
@@ -131,7 +135,7 @@ export function SoloBattleStandingsSheet({ battle, myUserId, onClose, rows: give
   const finished = givenFinished ?? isFinished(battle, Date.now());
   const nameOf = standingName;
 
-  const { tie } = soloOutcome(rows);
+  const tie = !noTie && soloOutcome(rows).tie;
   const crowned = finished && !tie;
 
   const load = useCallback(() => {
@@ -151,7 +155,7 @@ export function SoloBattleStandingsSheet({ battle, myUserId, onClose, rows: give
     <div style={{ position: "fixed", inset: 0, zIndex: 60, background: "rgba(0,0,0,0.65)", display: "grid", placeItems: "center", padding: 16 }}>
       <div className="card pad" style={{ width: "min(460px, 100%)", maxHeight: "86vh", overflowY: "auto" }}>
         <div className="row" style={{ marginBottom: 10 }}>
-          <b style={{ color: "var(--gold)", flex: 1, fontSize: 18 }}>{t("solo_battle_with_unlimited_players")}</b>
+          <b style={{ color: "var(--gold)", flex: 1, fontSize: 18 }}>{title ?? t("solo_battle_with_unlimited_players")}</b>
           <button className="btn small ghost" onClick={onClose}>{t("close")}</button>
         </div>
         {rows === null ? (

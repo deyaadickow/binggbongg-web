@@ -37,7 +37,8 @@ import { TapGameOverlay } from "../components/TapGameOverlay";
 import { HostGamesMenu } from "../components/HostGamesMenu";
 import { SoloBattleStandingsSheet, SoloBattleStrip } from "../components/SoloBattle";
 import { fetchActiveSoloBattle, type SoloBattle } from "../lib/solobattle";
-import { chatBattlePath, chatReasonText, checkUserLiveRoom, startChatBattle } from "../lib/chatBattle";
+import { battleScreenPath, chatBattlePath, chatReasonText, checkUserLiveRoom, startChatBattle } from "../lib/chatBattle";
+import { countryBattlePath } from "../lib/countryBattle";
 import { Avatar, Notice } from "../components/Common";
 import { WatchersList } from "../components/WatchersList";
 import { ReportDialog } from "../components/ReportDialog";
@@ -459,7 +460,11 @@ export function LiveViewerPage() {
       if (b?.shared && running && role !== "host" && !followedRef.current) {
         followedRef.current = true;
         live.disconnect();
-        navigate(chatBattlePath(Number(b.chat_battle_contest_id ?? b.id), { home: b.home_user_id ?? hostUserId }), { replace: true });
+        // Country Battle (country=1): branch on country_battle_day_id — its `id` is 0, not a contest.
+        const homeId = b.home_user_id ?? hostUserId;
+        navigate(b.kind === "country_battle" || b.country_battle_day_id
+          ? countryBattlePath(Number(b.country_battle_day_id), { home: homeId })
+          : chatBattlePath(Number(b.chat_battle_contest_id ?? b.id), { home: homeId }), { replace: true });
         return;
       }
       setSoloBattle(b?.shared ? null : b);
@@ -476,9 +481,10 @@ export function LiveViewerPage() {
     if (!(roomClosed || live.status === "ended") || role === "host" || !hostUserId || endedLookup.current || followedRef.current) return;
     endedLookup.current = true;
     checkUserLiveRoom(hostUserId).then((r) => {
-      if (r?.chat_battle_contest_id && !followedRef.current) {
+      const to = r ? battleScreenPath(r, hostUserId) : null;
+      if (to && !followedRef.current) {
         followedRef.current = true;
-        navigate(chatBattlePath(r.chat_battle_contest_id, { home: hostUserId }), { replace: true });
+        navigate(to, { replace: true });
       }
     });
   }, [roomClosed, live.status, role, hostUserId, navigate]);
@@ -491,7 +497,8 @@ export function LiveViewerPage() {
     setSoloStandingsOpen(false);
     const r = await checkUserLiveRoom(id);
     if (r?.is_live && r.room_name) {
-      if (r.chat_battle_contest_id) navigate(chatBattlePath(r.chat_battle_contest_id, { home: id }));
+      const to = battleScreenPath(r, id);
+      if (to) navigate(to);
       else if (r.room_name !== roomName) navigate(`/live/${encodeURIComponent(r.room_name)}`);
     } else navigate(`/profile/${id}`);
   }, [navigate, roomName]);

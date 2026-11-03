@@ -15,6 +15,7 @@ import { GoldSelect } from "../components/GoldSelect";
 import { tt, useT, type StringKey  } from "../lib/i18n";
 import { PageTitle } from "../components/PageTitle";
 import { IDEA_SUPPORT_REASON } from "../lib/ideas";
+import { CountryBattleReminderToggle } from "../components/CountryBattleBits";
 
 const SITE = "https://www.binggbongg.com";
 
@@ -129,6 +130,9 @@ export function AccountSettingsPage() {
                 <input type="checkbox" className="switch" disabled={busy} checked={on(me[tog.key])} onChange={(e) => save({ [tog.key]: e.target.checked ? 1 : 0 })} />
               </label>
             ))}
+            {/* Country Battle v2 (Steve, 2026-11-03): "a push at 7:55 PM daily that members can turn
+                off". The push is phone-only, but the setting is the member's, so it is here too. */}
+            <CountryBattleReminderToggle row initial={me.country_battle_reminders == null ? null : on(me.country_battle_reminders)} />
           </div>
           <div className="card pad">
             <div className="row" style={{ marginBottom: 12 }}><Avatar user={me} size="lg" /><div><div style={{ fontWeight: 800 }}>{displayName(me)}</div><div className="muted">@{me.username}</div></div></div>

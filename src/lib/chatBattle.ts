@@ -9,7 +9,7 @@
 //
 // Never send an empty POST body (the LiteSpeed WAF 403s it) — every call carries user_id.
 import { post } from "./api";
-import { noteServerNow } from "./countryBattle";
+import { countryBattlePath, noteServerNow } from "./countryBattle";
 import type { StringKey } from "./i18n";
 
 export interface ChbPerson {
@@ -30,7 +30,8 @@ export interface ChbBattler extends ChbPerson {
   chat_room_name: string | null;
 }
 
-export type ChbPhase = "joining" | "battle" | "ended";
+/** "upcoming" is Country Battle's only (the room is not open yet); a Chat Battle never sends it. */
+export type ChbPhase = "upcoming" | "joining" | "battle" | "ended";
 
 export interface ChbMe {
   user_id: number;
@@ -81,6 +82,12 @@ export interface ChbState {
   tie: boolean;
   finished: boolean;
   me: ChbMe;
+  /** Country Battle: a test day (testers only) — show the small banner. */
+  is_test?: boolean;
+  /** Country Battle: once finished, the podium (ties already broken by who reached it first). */
+  top3?: (ChbPerson & { place: number; score: number })[];
+  /** Country Battle: the lobby opens (room opens, joining opens). */
+  opens_at?: string | null;
 }
 
 /** What start/join answer: the contest summary plus, for a Chat Battle, where to go. */
@@ -152,13 +159,27 @@ export interface ChbLiveRoom {
   broadcaster_image?: string | null;
   /** Non-null = that room is a Chat Battle's shared room: open the Chat Battle screen instead. */
   chat_battle_contest_id: number | null;
+  /** Non-null = that room is a Country Battle's shared room: open the Country Battle screen. */
+  country_battle_day_id: number | null;
 }
 
 /** Where is this member live right now? */
 export async function checkUserLiveRoom(userId: number): Promise<ChbLiveRoom | null> {
   const res = await post<ChbLiveRoom>("checkUserLiveRoom", { user_id: userId }).catch(() => null);
   if (!res?.status || !res.data) return null;
-  return { ...res.data, chat_battle_contest_id: res.data.chat_battle_contest_id ? Number(res.data.chat_battle_contest_id) : null };
+  return {
+    ...res.data,
+    chat_battle_contest_id: res.data.chat_battle_contest_id ? Number(res.data.chat_battle_contest_id) : null,
+    country_battle_day_id: res.data.country_battle_day_id ? Number(res.data.country_battle_day_id) : null,
+  };
+}
+
+/** The battle screen a live member is on (Chat Battle or Country Battle), with them as the home
+ *  tile — or null when they are in an ordinary live room. */
+export function battleScreenPath(r: ChbLiveRoom, home: number | null): string | null {
+  if (r.chat_battle_contest_id) return chatBattlePath(r.chat_battle_contest_id, { home });
+  if (r.country_battle_day_id) return countryBattlePath(r.country_battle_day_id, { home });
+  return null;
 }
 
 /** Round 2: the "cb_gift" data message, exactly as the server hands it to the sender. */
@@ -177,7 +198,9 @@ export interface ChbGiftMsg {
 
 /** Round 2: what a confirmed tile gift answers (`chat_battle_gift`, absent before the deploy). */
 export interface ChbGiftInfo {
-  contest_id: number;
+  /** Chat Battle's id; a Country Battle gift carries day_id instead. */
+  contest_id?: number;
+  day_id?: number;
   gift_id: number;
   gift_name?: string | null;
   icon_url?: string | null;

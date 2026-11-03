@@ -12,6 +12,7 @@ import { post } from "../lib/api";
 import { useT, type StringKey } from "../lib/i18n";
 import { BATTLE_MODES } from "../lib/battleModes";
 import { chatBattlePath } from "../lib/chatBattle";
+import { countryBattlePath } from "../lib/countryBattle";
 
 interface LiveBattle {
   room_name: string;
@@ -23,6 +24,8 @@ interface LiveBattle {
   players: { user_id: number; name: string; username?: string | null; profile_image?: string | null }[];
   /** A Chat Battle's shared room: open the Chat Battle screen, not the live room. */
   chat_battle_contest_id?: number | null;
+  /** The Country Battle's shared room: open the Country Battle screen as a viewer. */
+  country_battle_day_id?: number | null;
 }
 
 function LiveBattles() {
@@ -50,7 +53,7 @@ function LiveBattles() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
       {battles.map((b, i) => (
-        <Link key={b.room_name + b.battle + i} to={b.chat_battle_contest_id ? chatBattlePath(b.chat_battle_contest_id) : `/live/${encodeURIComponent(b.room_name)}`} className="card pad"
+        <Link key={b.room_name + b.battle + i} to={b.chat_battle_contest_id ? chatBattlePath(b.chat_battle_contest_id) : b.country_battle_day_id ? countryBattlePath(b.country_battle_day_id) : `/live/${encodeURIComponent(b.room_name)}`} className="card pad"
           style={{ borderColor: "var(--gold-border)", color: "inherit", display: "flex", flexDirection: "column", gap: 8 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <span className="pill" style={{ borderColor: "#E53935", color: "#ff6b6b" }}>● LIVE</span>

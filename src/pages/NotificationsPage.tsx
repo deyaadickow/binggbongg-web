@@ -17,6 +17,7 @@ import { Avatar, Loading, Notice } from "../components/Common";
 import { useT } from "../lib/i18n";
 import { PageTitle } from "../components/PageTitle";
 import { chatBattlePath } from "../lib/chatBattle";
+import { countryBattlePath } from "../lib/countryBattle";
 
 interface NotificationRow {
   id: number;
@@ -30,12 +31,18 @@ interface NotificationRow {
    *  `data` as the server sends it) opens the battle as a viewer with the host pinned. */
   chat_battle_contest_id?: number | string | null;
   notification_type?: string | null;
-  data?: { type?: string; contest_id?: string | number; chat_battle_contest_id?: string | number; host_user_id?: string | number } | null;
+  data?: { type?: string; contest_id?: string | number; chat_battle_contest_id?: string | number; host_user_id?: string | number; day_id?: string | number; country_battle_day_id?: string | number } | null;
 }
 
 /** Where a Chat Battle alert row leads, or null for every other row. */
 function chatBattleLink(row: NotificationRow): string | null {
   const d = row.data && typeof row.data === "object" ? row.data : null;
+  // Country Battle v2: the 7:55 PM reminder (a phone push; a row here, if the server ever lists
+  // one, opens the battle as a viewer — "Join live" shows there while a join would work).
+  if (row.notification_type === "country_battle_reminder" || d?.type === "country_battle_reminder") {
+    const day = Number(d?.country_battle_day_id ?? d?.day_id ?? 0);
+    return day ? countryBattlePath(day) : "/country-battle";
+  }
   const isAlert = row.notification_type === "chat_battle_alert" || d?.type === "chat_battle_alert" || row.chat_battle_contest_id != null;
   const id = Number(row.chat_battle_contest_id ?? d?.chat_battle_contest_id ?? d?.contest_id ?? 0);
   if (!isAlert || !id) return null;

@@ -167,12 +167,15 @@ export interface UserSummary {
    *  phones read off their own row (CategoryFragment.initFav). Only ever set on your own user. */
   fav_cats?: string;
   auth_token?: string;
-  /** Country Battle (Steve, 2026-11-01): the current or most recent battle this member took part
-   *  in (drives the ◎ on their profile), their champion badges newest first, and — on the
-   *  signed-in member's own row only — whether they may see test battles. */
+  /** Country Battle v2 (Steve, 2026-11-03): the member's DAILY 1st/2nd/3rd badges newest first
+   *  (max 10) and their lifetime counts; on the signed-in member's own row only, whether they may
+   *  see test battles and whether the 7:55 PM reminder is on. `country_battle_id` is always null
+   *  now (the v1 bullseye is gone). */
   country_battle_id?: number | null;
-  country_battle_badges?: { place: number; country?: string; month_label?: string; battle_id?: number }[] | null;
+  country_battle_badges?: { place: number; country?: string; date?: string; date_label?: string; day_id?: number; month_label?: string; battle_id?: number }[] | null;
+  country_battle_badge_counts?: { first: number; second: number; third: number } | null;
   country_battle_tester?: boolean | number;
+  country_battle_reminders?: boolean | number;
 }
 
 export interface Post {

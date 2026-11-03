@@ -68,7 +68,7 @@ import { FallbackBack } from "./components/FallbackBack";
 import { BattlesPage } from "./pages/BattlesPage";
 import { LiveFeaturePage } from "./pages/LiveFeaturePage";
 import { PkContestsPage } from "./pages/PkContestsPage";
-import { CountryBattleBoardPage, CountryBattlePage, CountryBattleResultsPage } from "./pages/CountryBattlePages";
+import { CountryBattleBoardPage, CountryBattleDayPage, CountryBattlePage } from "./pages/CountryBattlePages";
 import { CountryBattleLivePage } from "./pages/CountryBattleLivePage";
 import { ChatBattleLivePage } from "./pages/ChatBattleLivePage";
 import { rememberAdSource } from "./lib/getApp";
@@ -149,11 +149,12 @@ export default function App() {
           {/* Steve, 2026-11-01: the directory's live-room tiles open their own pages, not an empty Live Now. */}
           <Route path="/battles" element={<BattlesPage />} />
           <Route path="/pk-contests" element={<PkContestsPage />} />
-          {/* Country Battle (Steve, 2026-11-01) — the home, the battle screen, the lifetime board. */}
+          {/* Country Battle v2 (Steve, 2026-11-03) — the page, the daily battle screen, the lifetime
+              Bragging Rights board (every day) and one day's top 100. */}
           <Route path="/country-battle" element={<CountryBattlePage />} />
           <Route path="/country-battle/live/:dayId" element={<CountryBattleLivePage />} />
           <Route path="/country-battle/board" element={<CountryBattleBoardPage />} />
-          <Route path="/country-battle/board/:id" element={<CountryBattleResultsPage />} />
+          <Route path="/country-battle/board/:id" element={<CountryBattleDayPage />} />
           {/* Chat Battle (#9, Steve 2026-11-03) — the shared 24-tile battle screen. */}
           <Route path="/chat-battle/:contestId" element={<ChatBattleLivePage />} />
           <Route path="/feature/:slug" element={<LiveFeaturePage />} />

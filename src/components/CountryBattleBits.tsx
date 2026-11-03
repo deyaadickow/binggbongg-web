@@ -1,59 +1,44 @@
-// Country Battle pieces shared by the profile, the Country Battle home and the board.
-//
-// Steve, 2026-11-01: "Every member that is in this battle will have a bullseye on his page, when
-// clicked it will give a daily score of every member participating in this battle, host on top
-// after the host will be member in alphabetical order no one will knows the score leader ...
-// until the end of the battle friday". Chosen: the list shows a ✓ for each day played; a member
-// sees only THEIR OWN numbers; everyone's are revealed Friday night with the 12 for Saturday.
-// The server enforces that (daily is null unless it is your row or revealed) — this only draws.
+// Country Battle pieces shared by the profile, the Country Battle page and the Bragging Rights
+// board. v2 (Steve, 2026-11-03): one battle a day, so the badges are DAILY 1st/2nd/3rd ("keep daily
+// 1st/2nd/3rd badges") — the v1 bullseye and its hidden-score list are gone.
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Avatar, Loading, Notice } from "./Common";
+import { Avatar } from "./Common";
+import { showGoldAlert } from "./GoldToast";
 import { useT, type StringKey } from "../lib/i18n";
 import { useSession } from "../lib/session";
 import {
-  cbText, fetchCountryBattleParticipants,
-  type CbBadge, type CbParticipantRow, type CbPerson,
+  badgeCountsText, cbText, fetchCountryBattleReminder, setCountryBattleReminder,
+  type CbBadge, type CbBadgeCounts, type CbReminder,
 } from "../lib/countryBattle";
+import type { ChbPerson } from "../lib/chatBattle";
 
-export function BullseyeIcon({ size = 20 }: { size?: number }) {
-  return (
-    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
-      <circle cx="12" cy="12" r="9" fill="none" stroke="#F0C420" strokeWidth="1.8" />
-      <circle cx="12" cy="12" r="5.2" fill="none" stroke="#F0C420" strokeWidth="1.5" />
-      <circle cx="12" cy="12" r="2.6" fill="#F0C420" />
-    </svg>
-  );
-}
+const MEDAL = ["", "🥇", "🥈", "🥉"];
 
-/** The ◎ beside the name on the profile of anyone who took part in their country's current or
- *  most recent battle. */
-export function CountryBattleBullseye({ onClick }: { onClick: () => void }) {
+/** "🥇 Country Battle · Nov 2, 2026" pills, newest first, the newest few, each opening that day's
+ *  top 100; then the lifetime counts "🥇×2 🥉×5" when there are more than the pills show. */
+export function CountryBattleBadges({ badges, counts, max = 3 }: { badges?: CbBadge[] | null; counts?: CbBadgeCounts | null; max?: number }) {
   const { t } = useT();
+  const list = (Array.isArray(badges) ? badges : []).filter((b) => b.place >= 1 && b.place <= 3);
+  const total = counts ? Number(counts.first || 0) + Number(counts.second || 0) + Number(counts.third || 0) : list.length;
+  if (list.length === 0 && total === 0) return null;
+  const countText = total > Math.min(max, list.length) ? badgeCountsText(counts) : "";
   return (
-    <button type="button" className="cb-bullseye" onClick={onClick} title={t("cb_bullseye")} aria-label={t("cb_bullseye")}>
-      <BullseyeIcon />
-    </button>
-  );
-}
-
-/** 🥇/🥈/🥉 pills, newest first, the newest few. */
-export function CountryBattleBadges({ badges, max = 3 }: { badges?: CbBadge[] | null; max?: number }) {
-  const { t } = useT();
-  if (!Array.isArray(badges) || badges.length === 0) return null;
-  return (
-    <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 6 }}>
-      {badges.filter((b) => b.place >= 1 && b.place <= 3).slice(0, max).map((b, i) => {
-        const label = b.place === 1
-          ? `${t("cb_badge_1")}${b.month_label ? ` · ${b.month_label}` : ""}`
-          : t(b.place === 2 ? "cb_badge_2" : "cb_badge_3");
-        return (
-          <span key={`${b.battle_id ?? i}-${b.place}`} className={`cb-badge p${b.place}`}
-            title={[b.country, b.month_label].filter(Boolean).join(" · ")}>
-            <span aria-hidden>{b.place === 1 ? "🥇" : b.place === 2 ? "🥈" : "🥉"}</span>{label}
-          </span>
+    <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", marginTop: 6 }}>
+      {list.slice(0, max).map((b, i) => {
+        const when = b.date_label || b.month_label || "";
+        const pill = (
+          <>
+            <span aria-hidden>{MEDAL[b.place]}</span>
+            {t("cb_title")}{when ? ` · ${when}` : ""}
+          </>
         );
+        const title = [t(`cb_place_${b.place}` as StringKey), b.country, when].filter(Boolean).join(" · ");
+        return b.day_id
+          ? <Link key={`${b.day_id}-${b.place}`} to={`/country-battle/board/${b.day_id}`} className={`cb-badge p${b.place}`} title={title}>{pill}</Link>
+          : <span key={`${b.battle_id ?? i}-${b.place}`} className={`cb-badge p${b.place}`} title={title}>{pill}</span>;
       })}
+      {countText && <span className="cb-badge-counts" title={t("cb2_badges")}>{countText}</span>}
     </div>
   );
 }
@@ -64,14 +49,14 @@ export function PlacePill({ place }: { place: number }) {
   return <span className={`cb-place p${place}`}>{label}</span>;
 }
 
-/** One member in a ranked list — the 12, the 6, the champions. */
-export function CbPersonRow({ p, place, num }: { p: CbPerson; place?: number | null; num?: number | null }) {
+/** One member in a ranked list — yesterday's top 3, a day's top 100. */
+export function CbPersonRow({ p, place, num, me, medal }: { p: ChbPerson; place?: number | null; num?: number | null; me?: boolean; medal?: number | null }) {
   return (
-    <Link to={`/profile/${p.user_id}`} className="cb-person">
+    <Link to={`/profile/${p.user_id}`} className={`cb-person${me ? " me" : ""}`}>
       {place ? <PlacePill place={place} /> : null}
       <Avatar user={{ id: p.user_id, fullname: p.name ?? undefined, username: p.username ?? undefined, profile_image: p.profile_image ?? undefined }} />
       <div style={{ minWidth: 0 }}>
-        <b style={{ display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name || p.username}</b>
+        <b style={{ display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{medal ? `${MEDAL[medal]} ` : ""}{p.name || p.username}</b>
         {p.username && <span className="muted" style={{ fontSize: 12 }}>@{p.username}</span>}
       </div>
       {num != null && <span className="cb-num">{num.toLocaleString()}</span>}
@@ -79,88 +64,53 @@ export function CbPersonRow({ p, place, num }: { p: CbPerson; place?: number | n
   );
 }
 
-const DAY_KEYS: StringKey[] = ["cb_d1", "cb_d2", "cb_d3", "cb_d4", "cb_d5", "cb_d6", "cb_d7"];
-
-/** The participants of one battle: the profile owner first, then A–Z (the server's order). */
-export function CountryBattleParticipants({ battleId, profileUserId }: { battleId: number; profileUserId?: number }) {
+/** The "Country Battle reminders" switch (§8): the 7:55 PM push is phone-only, but members can set
+ *  it here. Hidden until the server answers (signed out, or not deployed yet). `row` = the Settings
+ *  list's row style; otherwise a card for the Country Battle page. */
+export function CountryBattleReminderToggle({ row, initial }: { row?: boolean; initial?: boolean | null }) {
   const { t } = useT();
   const { user } = useSession();
-  const [data, setData] = useState<{ revealed: boolean; rows: CbParticipantRow[] } | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const uid = user?.id ?? 0;
+  const [rem, setRem] = useState<CbReminder | null>(null);
+  const [busy, setBusy] = useState(false);
   useEffect(() => {
+    if (!uid) return;
     let live = true;
-    setData(null);
-    fetchCountryBattleParticipants(user?.id ?? 0, battleId, profileUserId)
-      .then((d) => { if (live) setData(d); })
-      .catch((e) => { if (live) setError((e as Error).message); });
+    fetchCountryBattleReminder(uid).then((r) => { if (live) setRem(r); });
     return () => { live = false; };
-  }, [battleId, profileUserId, user?.id]);
-
-  if (error) return <Notice error>{error}</Notice>;
-  if (!data) return <Loading />;
+  }, [uid]);
+  const enabled = rem ? rem.enabled : initial;
+  if (!uid || enabled == null) return null;
+  async function toggle(on: boolean) {
+    setBusy(true);
+    const r = await setCountryBattleReminder(uid, on);
+    setBusy(false);
+    if (r.ok && r.reminder) {
+      setRem(r.reminder);
+      showGoldAlert(r.message || t(r.reminder.enabled ? "cb2_reminders_on_done" : "cb2_reminders_off_done"));
+    } else showGoldAlert(r.message || t("couldn_t_save"));
+  }
+  const hint = rem && !rem.available
+    ? t("cb2_reminders_none")
+    : rem?.remind_at_local && rem.country
+      ? cbText(t("cb2_reminders_hint_at"), { time: hhmm(rem.remind_at_local), country: rem.country })
+      : t("cb2_reminders_hint");
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-      <div className="muted" style={{ textAlign: "center", fontSize: 13 }}>
-        {cbText(t("cb_participants_count"), { n: data.rows.length })}
+    <label className={row ? "row" : "card pad row"} style={row
+      ? { padding: "12px 14px", borderBottom: "1px solid var(--line)", cursor: "pointer" }
+      : { cursor: "pointer", marginBottom: 12 }}>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontWeight: 700 }}>🔔 {t("cb2_reminders")}</div>
+        <div className="muted" style={{ fontSize: 12 }}>{hint}</div>
       </div>
-      {!data.revealed && <div className="notice" style={{ textAlign: "center", fontSize: 13 }}>{t("cb_secret")}</div>}
-      {data.rows.map((r) => {
-        const mine = r.user_id === user?.id;
-        const played = new Set(r.days_played ?? []);
-        const daily = Array.isArray(r.daily) ? r.daily : null;
-        return (
-          <div key={r.user_id} className={`cb-prow${mine ? " me" : ""}`}>
-            <Link to={`/profile/${r.user_id}`} className="cb-prow-top">
-              {r.place ? <PlacePill place={r.place} /> : null}
-              <Avatar user={{ id: r.user_id, fullname: r.name ?? undefined, username: r.username ?? undefined, profile_image: r.profile_image ?? undefined }} />
-              <div style={{ minWidth: 0, display: "flex", flexDirection: "column" }}>
-                <b>{r.name || r.username}</b>
-                {r.username && <span className="muted" style={{ fontSize: 12 }}>@{r.username}</span>}
-              </div>
-            </Link>
-            <div className="cb-days">
-              {DAY_KEYS.map((k, i) => {
-                const on = played.has(i + 1);
-                const n = daily?.[i];
-                return (
-                  <span key={k} className={on ? "on" : ""} title={on ? t("cb_played") : undefined}>
-                    {t(k)}
-                    <em>{n != null ? n.toLocaleString() : on ? "✓" : ""}</em>
-                  </span>
-                );
-              })}
-            </div>
-            {(r.week_total != null || r.saturday_score != null || r.sunday_score != null) && (
-              <div className="cb-totals">
-                {r.week_total != null && <span>{t("cb_week_total")}: <b>{r.week_total.toLocaleString()}</b></span>}
-                {r.saturday_score != null && <span>{t("cb_sat")}: <b>{r.saturday_score.toLocaleString()}</b></span>}
-                {r.sunday_score != null && <span>{t("cb_sun")}: <b>{r.sunday_score.toLocaleString()}</b></span>}
-              </div>
-            )}
-          </div>
-        );
-      })}
-    </div>
+      <input type="checkbox" className="switch" disabled={busy} checked={!!enabled} onChange={(e) => toggle(e.target.checked)} aria-label={t("cb2_reminders")} />
+    </label>
   );
 }
 
-export function CountryBattleParticipantsModal({ battleId, profileUserId, title, onClose }: { battleId: number; profileUserId?: number; title?: string; onClose: () => void }) {
-  const { t } = useT();
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
-  return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal-sheet" onClick={(e) => e.stopPropagation()} role="dialog" aria-label={t("cb_participants")}>
-        <div className="row" style={{ marginBottom: 12 }}>
-          <BullseyeIcon size={24} />
-          <h3 style={{ margin: 0, flex: 1, textAlign: "left" }}>{title ?? t("cb_title")} · {t("cb_participants")}</h3>
-          <button className="btn small ghost" onClick={onClose}>{t("close")}</button>
-        </div>
-        <CountryBattleParticipants battleId={battleId} profileUserId={profileUserId} />
-      </div>
-    </div>
-  );
+/** "19:55" (the battle country's local clock) -> "7:55 PM" in the viewer's own clock format. */
+function hhmm(v: string): string {
+  const m = v.match(/^(\d{1,2}):(\d{2})/);
+  if (!m) return v;
+  return new Date(2000, 0, 1, Number(m[1]), Number(m[2])).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
 }

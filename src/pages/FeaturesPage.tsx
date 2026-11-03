@@ -98,7 +98,10 @@ const FEATURES: Section[] = [
       // Steve, 2026-11-01: "we will not start this battle until we have a few thousand members. but we
       // will announce it with one of the feature with a video" — so the tile shows to EVERYONE even
       // while the switch is off; the page explains it and says it is coming soon.
-      { icon: "🌏", nameKey: "cb_title", blurbKey: "cb_tagline", to: "/country-battle", videoKey: "country_battle" },
+      { icon: "🌏", nameKey: "cb_title", blurbKey: "cb2_tagline", to: "/country-battle", videoKey: "country_battle" },
+      // Country Battle v2 (Steve, 2026-11-03): "We will have a lifetime Bragging rights battle board,
+      // for every day, and we will show the top 100 with the most score daily."
+      { icon: "🏅", nameKey: "cb2_board", blurbKey: "cb2_board_blurb", to: "/country-battle/board" },
       { icon: "💣", nameKey: "fname_power_ups", blurbKey: "fblurb_power_ups", to: "/feature/power-ups", whereKey: "fwhere_the_live_room" },
       { icon: "🔍", nameKey: "fname_find_a_battle", blurbKey: "fblurb_find_a_battle", to: "/settings/find-a-battle" },
       { icon: "📊", nameKey: "fname_battle_rankings", blurbKey: "fblurb_battle_rankings", to: "/feature/battle-rankings", whereKey: "fwhere_the_live_room" },

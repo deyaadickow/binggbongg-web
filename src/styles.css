@@ -861,14 +861,6 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .cb-empty { display: flex; align-items: center; justify-content: center; text-align: center; min-height: 160px; padding: 20px; color: var(--text-soft); }
 @keyframes cb-pop { from { transform: scale(.9); filter: brightness(1.8); } to { transform: scale(1); filter: none; } }
 @media (prefers-reduced-motion: reduce) { .cb-tile { animation: none; } }
-/* The week, one row a day; today filled gold-dark and ringed. */
-.cb-week { display: flex; flex-direction: column; gap: 6px; }
-.cb-day { display: grid; grid-template-columns: 46px 1fr auto; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line); background: #0b0b0b; }
-.cb-day.today { border: 2px solid var(--gold); background: #2A2205; }
-.cb-day.done { opacity: .7; }
-.cb-day .cb-dname { color: var(--gold); font-weight: 800; }
-.cb-day .cb-dstage { font-weight: 700; font-size: 14px; }
-.cb-day .cb-drounds { font-size: 12px; color: var(--text-soft); }
 .cb-people { display: flex; flex-direction: column; gap: 6px; }
 .cb-person { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 10px; background: #0b0b0b; border: 1px solid var(--line); color: inherit; }
 .cb-person b { color: var(--gold); }
@@ -877,24 +869,17 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .cb-place.p1 { background: linear-gradient(135deg, #FFE27A, #D4AF37); }
 .cb-place.p2 { background: linear-gradient(135deg, #F2F2F2, #A8A8A8); }
 .cb-place.p3 { background: linear-gradient(135deg, #F0B27A, #A0522D); }
-/* Champion pills on a profile. */
+/* Country Battle v2: the daily badge pills on a profile (each opens that day's top 100), the
+   lifetime counts, my own row on a day's board, and "Country Battle is full" under the header. */
+a.cb-badge, a.cb-badge:hover { color: #241500; text-decoration: none; }
+.cb-badge-counts { display: inline-flex; align-items: center; height: 24px; padding: 0 9px; border-radius: 999px; border: 1px solid var(--gold-border); color: var(--gold); font-weight: 800; font-size: 12px; white-space: nowrap; background: #000; }
+.cb-person.me { border: 2px solid var(--gold); background: #2A2205; }
+.cb-join-note { text-align: center; margin: 0 0 8px; padding: 6px 10px; border-radius: 10px; border: 1px solid var(--gold-border); background: #0b0b0b; color: var(--gold); font-size: 12.5px; font-weight: 700; }
 .cb-badge { display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 10px; border-radius: 999px; font-weight: 800; font-size: 11.5px; white-space: nowrap; color: #241500; border: 1.5px solid rgba(0,0,0,.25); }
 .cb-badge.p1 { background: linear-gradient(135deg, #FFE27A, #D4AF37); }
 .cb-badge.p2 { background: linear-gradient(135deg, #FAFAFA, #B5B5B5); }
 .cb-badge.p3 { background: linear-gradient(135deg, #F3BE8C, #B0663A); }
 .cb-bullseye { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; padding: 0; border-radius: 50%; border: 2px solid var(--gold); background: #000; cursor: pointer; flex: 0 0 auto; }
-/* The participants list: name, then Mon..Sun. */
-.cb-prow { display: flex; flex-direction: column; gap: 6px; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line); background: #0b0b0b; }
-.cb-prow.me { border: 2px solid var(--gold); }
-.cb-prow-top { display: flex; align-items: center; gap: 10px; min-width: 0; color: inherit; }
-.cb-prow-top b { color: var(--gold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.cb-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
-.cb-days span { display: flex; flex-direction: column; align-items: center; padding: 3px 0; border-radius: 6px; background: #151515; font-size: 10px; color: var(--text-dim); min-width: 0; }
-.cb-days span em { font-style: normal; color: #fff; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; min-height: 16px; }
-.cb-days span.on { background: #2A2205; color: var(--gold); }
-.cb-days span.on em { color: var(--gold); }
-.cb-totals { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 12px; color: var(--text-soft); }
-.cb-totals b { color: var(--gold); }
 
 /* Hit Me (2026-11-02): balloons with the host's picture rise from the bottom; a hit bursts the balloon and squashes
    the face. The sway is on an inner wrapper so the rise and the sway never fight over one transform. */
