@@ -6,6 +6,7 @@ import { useT } from "../lib/i18n";
 import { Confetti, MuteButton } from "./GameShow";
 import { haptic, isMuted, sfx } from "../lib/gameSounds";
 import { AddPicturePopup, HitMeField, hasProfilePicture } from "./HitMe";
+import { useLoadedImage } from "../lib/gameArt";
 
 interface Target { id: number; x: number; y: number; bornAt: number; life: number }
 interface Balloon { id: number; lane: number; color: string }
@@ -279,7 +280,7 @@ export function TapGameOverlay({ game, roomName, onClose, onToast, hostAvatar, i
 
       <div ref={areaRef} style={{ flex: 1, position: "relative", overflow: "hidden", background: bg, touchAction: "manipulation", userSelect: "none" }}>
         {/* The phones' race card: the racer riding a rainbow track through the 5 stations. */}
-        {isRace && phase === "playing" && <RaceTrack emoji={game.emoji || "🏁"} caught={caught} elapsed={clock(elapsed)} />}
+        {isRace && phase === "playing" && <RaceTrack emoji={game.emoji || "🏁"} image={character && !isVideoUrl(character) ? character : null} caught={caught} elapsed={clock(elapsed)} />}
         {bgIsVideo && bgUrl && (
           <video
             ref={(el) => {
@@ -406,7 +407,10 @@ export function TapGameOverlay({ game, roomName, onClose, onToast, hostAvatar, i
 
 /** The race card over the play area — Android's RaceTrackView: a rainbow bar with a dot per
  *  station (lit once reached), a 🏁 at the end, and the racer bobbing along it. */
-export function RaceTrack({ emoji, caught, elapsed }: { emoji: string; caught: number; elapsed: string }) {
+export function RaceTrack({ emoji, image, caught, elapsed }: { emoji: string; image?: string | null; caught: number; elapsed: string }) {
+  // The game's own picture (character_image_url, a still) rides the track when it has one — the
+  // way catch mode already uses it — and the emoji until it loads or if it fails.
+  const racer = useLoadedImage(image);
   const progress = Math.min(1, caught / RACE_FINISH);
   const reached = Math.min(RACE_STATIONS, Math.floor(caught / (RACE_FINISH / RACE_STATIONS)));
   return (
@@ -426,7 +430,9 @@ export function RaceTrack({ emoji, caught, elapsed }: { emoji: string; caught: n
             </span>
           ))}
           <span style={{ position: "absolute", left: `${progress * 100}%`, bottom: 8, transform: "translateX(-50%)", fontSize: 24, lineHeight: 1, transition: "left .35s ease-out" }}>
-            <span className="gs-anim" style={{ display: "inline-block", animation: "gs-bob 1.4s ease-in-out infinite" }}>{emoji}</span>
+            <span className="gs-anim" style={{ display: "inline-block", animation: "gs-bob 1.4s ease-in-out infinite" }}>
+              {racer ? <img src={racer} alt="" draggable={false} style={{ display: "block", width: 34, height: 34, objectFit: "contain", filter: "drop-shadow(0 2px 3px rgba(0,0,0,.6))" }} /> : emoji}
+            </span>
           </span>
           <span style={{ position: "absolute", left: "calc(100% + 13px)", top: "50%", transform: "translate(-50%,-60%)", fontSize: 16 }}>🏁</span>
         </div>
