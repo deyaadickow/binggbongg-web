@@ -3,10 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { useSession } from "../lib/session";
 import { ScheduleSection } from "../components/ScheduleSection";
 import {
-  fetchUpcomingSchedules, formatScheduleTime, mediaUrl,
+  canRemind, fetchUpcomingSchedules, formatScheduleTime, mediaUrl,
   type ScheduleItem, type ScheduleKind,
 } from "../lib/api";
 import { tt, useT  } from "../lib/i18n";
+import { RemindButton, RemindedCount, applyReminder } from "../components/ScheduleReminder";
 
 /**
  * Everything coming up across the app — Steve's "for all the members to see and maybe they will
@@ -37,7 +38,10 @@ export function UpcomingPage() {
         setLoading(false);
       }
     })();
-  }, [me, filter]);
+    // Keyed on the id, not the session object: refresh() replaces `me` after every gift and
+    // would reload the list (and throw away a reminder just toggled) for nothing.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [me?.id, filter]);
 
   if (!me) return <div className="notice">{t("sign_in_to_see_what_s_coming_up")}</div>;
 
@@ -72,26 +76,41 @@ export function UpcomingPage() {
       ) : items.length === 0 ? (
         <div className="lb-bar">{t("nothing_scheduled_yet_be_the_first_add_o")}</div>
       ) : (
-        items.map((item) => (
-          <Link key={item.id} to={`/profile/${item.user_id}`} className="card schedule-row upcoming-row">
-            {item.user?.profile_image ? (
-              <img className="upcoming-avatar" src={mediaUrl(item.user.profile_image)} alt="" loading="lazy" />
-            ) : (
-              <span className="upcoming-avatar upcoming-avatar-blank" aria-hidden />
-            )}
-            <div>
-              <b>{item.user?.fullname ?? "A member"}</b>
-              <div className="muted">
-                {item.kind === "battle"
-                  ? `${item.battle_type ?? "Battle"}${item.opponent?.fullname ? ` vs ${item.opponent.fullname}` : ""}`
-                  : "Going live"}
-              </div>
-              {item.note && <div className="muted">{item.note}</div>}
+        items.map((item) => {
+          const mine = Number(item.user_id) === me.id || Number(item.opponent_user_id) === me.id;
+          const showRemind = canRemind(item, me.id);
+          return (
+            <div key={item.id} className="card upcoming-row upcoming-card">
+              <Link to={`/profile/${item.user_id}`} className="schedule-row upcoming-link">
+                {item.user?.profile_image ? (
+                  <img className="upcoming-avatar" src={mediaUrl(item.user.profile_image)} alt="" loading="lazy" />
+                ) : (
+                  <span className="upcoming-avatar upcoming-avatar-blank" aria-hidden />
+                )}
+                <div>
+                  <b>{item.user?.fullname ?? "A member"}</b>
+                  <div className="muted">
+                    {item.kind === "battle"
+                      ? `${item.battle_type ?? "Battle"}${item.opponent?.fullname ? ` vs ${item.opponent.fullname}` : ""}`
+                      : "Going live"}
+                  </div>
+                  {item.note && <div className="muted">{item.note}</div>}
+                </div>
+                <span className="spacer" />
+                <div className="upcoming-when">{formatScheduleTime(item.starts_at)}</div>
+              </Link>
+              {/* "Remind me" (Steve, 2026-11-03) — its own line under the row, so it never
+                  squeezes the name and time on a 360-wide phone, and is not inside the link. */}
+              {showRemind ? (
+                <div className="upcoming-remind">
+                  <RemindButton item={item} myId={me.id} onChange={(u) => setItems((rows) => applyReminder(rows, u))} />
+                </div>
+              ) : mine ? (
+                <div className="upcoming-remind"><RemindedCount item={item} /></div>
+              ) : null}
             </div>
-            <span className="spacer" />
-            <div className="upcoming-when">{formatScheduleTime(item.starts_at)}</div>
-          </Link>
-        ))
+          );
+        })
       )}
     </div>
   );

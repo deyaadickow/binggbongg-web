@@ -2055,4 +2055,16 @@ export const en = {
   cb2_reminders_none: "Your country has no Country Battle yet — this applies as soon as one is added.",
   cb2_reminders_on_done: "Country Battle reminders are on.",
   cb2_reminders_off_done: "Country Battle reminders are off.",
+  // "Remind me" on scheduled lives and battles (Steve, 2026-11-03).
+  sr_remind_me: "🔔 Remind me",
+  sr_reminder_set: "🔔 Reminder set",
+  sr_first_on: "We'll remind you 5 minutes before it starts",
+  sr_failed: "Could not change that reminder. Please try again.",
+  sr_my_reminders: "My Reminders",
+  sr_empty: "No reminders yet. Tap 🔔 Remind me on any scheduled live or battle.",
+  sr_could_not_load: "Could not load your reminders.",
+  sr_live_now: "LIVE NOW",
+  sr_kind_live: "Live",
+  sr_kind_battle: "Battle",
+  sr_n_reminded: "🔔 %1$s reminded",
 } as const;

@@ -1855,4 +1855,16 @@ export const id = {
   cb2_reminders_none: "Negaramu belum punya Country Battle — ini berlaku begitu ada yang ditambahkan.",
   cb2_reminders_on_done: "Pengingat Country Battle aktif.",
   cb2_reminders_off_done: "Pengingat Country Battle nonaktif.",
+  // "Remind me" on scheduled lives and battles (Steve, 2026-11-03).
+  sr_remind_me: "🔔 Ingatkan saya",
+  sr_reminder_set: "🔔 Pengingat aktif",
+  sr_first_on: "Kami akan mengingatkanmu 5 menit sebelum dimulai",
+  sr_failed: "Tidak dapat mengubah pengingat itu. Silakan coba lagi.",
+  sr_my_reminders: "Pengingat Saya",
+  sr_empty: "Belum ada pengingat. Ketuk 🔔 Ingatkan saya pada live atau battle yang dijadwalkan.",
+  sr_could_not_load: "Tidak dapat memuat pengingatmu.",
+  sr_live_now: "LIVE SEKARANG",
+  sr_kind_live: "Live",
+  sr_kind_battle: "Battle",
+  sr_n_reminded: "🔔 %1$s diingatkan",
 };

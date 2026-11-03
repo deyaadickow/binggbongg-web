@@ -59,6 +59,7 @@ import { Sidebar } from "./components/Sidebar";
 import { AdReferralEarningsPage, AllVideosEarningsPage, PayoutHistoryPage, RedeemPage, RepostEarningsPage, RewardingActionsPage, StatementsPage } from "./pages/WalletPages";
 import { PrintableAdsPage } from "./pages/PrintableAdsPage";
 import { ShopPage, ShopProductPage } from "./pages/ShopPage";
+import { MyRemindersPage } from "./pages/MyRemindersPage";
 import { AccountSettingsPage, AdvertisePage, BlockedProfilesPage, ComingSoonPage, ContestRequestsPage, DeleteAccountPage, FindABattlePage, ModeratorsPage, QrCodePage, ReferralsPage, SettingsHubPage, ShareProfilePage, SimulcastPage, SupportArchivePage, SupportPage, VirtualLookPage, MyVirtualBattlesPage, TermsOfUsePage, PrivacyPolicyPage, ContactUsPage, AboutUsPage, FaqPage, AppFeaturesPage, ToDoListPage } from "./pages/SettingsPages";
 import { SellerPage } from "./pages/SellerPage";
 import { AgentPage } from "./pages/AgentPage";
@@ -224,6 +225,7 @@ export default function App() {
           <Route path="/settings/simulcast" element={<SimulcastPage />} />
           <Route path="/settings/virtual-look" element={<VirtualLookPage />} />
           <Route path="/settings/virtual-battles" element={<MyVirtualBattlesPage />} />
+          <Route path="/settings/reminders" element={<MyRemindersPage />} />
           <Route path="/settings/printable-ads" element={<PrintableAdsPage />} />
           <Route path="/settings/advertise" element={<AdvertisePage />} />
           <Route path="/settings/advertise/new" element={<CreateVideoAdPage />} />

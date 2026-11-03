@@ -1841,4 +1841,16 @@ export const es = {
   cb2_reminders_none: "Tu país aún no tiene Batalla de Países; se aplicará en cuanto se agregue una.",
   cb2_reminders_on_done: "Los recordatorios de Batalla de Países están activados.",
   cb2_reminders_off_done: "Los recordatorios de Batalla de Países están desactivados.",
+  // "Remind me" on scheduled lives and battles (Steve, 2026-11-03).
+  sr_remind_me: "🔔 Recordarme",
+  sr_reminder_set: "🔔 Recordatorio activado",
+  sr_first_on: "Te avisaremos 5 minutos antes de que empiece",
+  sr_failed: "No se pudo cambiar ese recordatorio. Inténtalo de nuevo.",
+  sr_my_reminders: "Mis recordatorios",
+  sr_empty: "Aún no tienes recordatorios. Toca 🔔 Recordarme en cualquier en vivo o batalla programada.",
+  sr_could_not_load: "No se pudieron cargar tus recordatorios.",
+  sr_live_now: "EN VIVO",
+  sr_kind_live: "En vivo",
+  sr_kind_battle: "Batalla",
+  sr_n_reminded: "🔔 %1$s con recordatorio",
 };

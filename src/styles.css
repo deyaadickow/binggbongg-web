@@ -406,6 +406,33 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .upcoming-avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 1px solid var(--gold-border); }
 .upcoming-avatar-blank { display: inline-block; background: #111; }
 .upcoming-when { font-size: 13px; color: var(--gold); white-space: nowrap; text-align: right; }
+/* "Remind me" (Steve, 2026-11-03). Off = outlined gold, on = filled gold, both on an opaque
+   black so the cosmic backdrop never shows through the word. */
+.remind-wrap { display: inline-flex; align-items: center; gap: 8px; flex: none; flex-wrap: wrap; justify-content: center; }
+.remind-btn { min-height: 34px; padding: 0 14px; border-radius: 999px; border: 1.5px solid var(--gold-border); background: #000; color: var(--gold); font-size: 13px; font-weight: 800; cursor: pointer; white-space: nowrap; }
+.remind-btn:hover { border-color: var(--gold-bright); color: var(--gold-bright); }
+.remind-btn.on { background: var(--gold-border); color: #000; }
+.remind-btn.on:hover { background: var(--gold-bright); color: #000; }
+.remind-btn:disabled { opacity: .7; cursor: default; }
+.remind-count { padding: 4px 10px; border-radius: 999px; border: 1px solid var(--gold-border); background: rgba(0,0,0,.9); color: var(--gold); font-size: 12px; font-weight: 700; white-space: nowrap; }
+.schedule-row .remind-wrap { flex-shrink: 0; }
+/* A phone: the button gets its own line under the entry instead of squeezing its text. */
+@media (max-width: 480px) {
+  .schedule-row:has(> .remind-wrap) { flex-wrap: wrap; }
+  .schedule-row > .remind-wrap { width: 100%; justify-content: flex-end; }
+}
+.upcoming-card { display: flex; flex-direction: column; }
+.upcoming-link { text-decoration: none; color: inherit; padding: 0; border-top: 0; }
+.upcoming-remind { display: flex; justify-content: center; padding-top: 8px; margin-top: 8px; border-top: 1px solid rgba(212,175,55,.25); }
+.upcoming-remind:empty { display: none; }
+.reminder-row { padding: 12px; margin-bottom: 8px; border-radius: 14px; background: rgba(0,0,0,.9); }
+.reminder-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; min-width: 0; }
+.reminder-text { flex: 1; min-width: 0; }
+.reminder-text b { color: var(--gold); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.reminder-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 2px; }
+.reminder-kind { color: var(--text-soft); font-size: 13px; }
+.reminder-when { text-align: left; margin-top: 2px; }
+.live-now-pill { padding: 2px 8px; border-radius: 999px; background: #E53935; color: #fff; font-size: 11px; font-weight: 800; letter-spacing: .04em; }
 
 /* Steve, 2026-10-06: "make all these pages into our design with a back arrow circle and our
    cosmic background and black and gold on all the tabs." The image is the SAME bg_vip_cosmic the

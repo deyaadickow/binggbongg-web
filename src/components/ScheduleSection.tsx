@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  BATTLE_TYPES, addSchedule, deleteSchedule, fetchMyBattleRequests, fetchUserSchedule,
+  BATTLE_TYPES, addSchedule, canRemind, deleteSchedule, fetchMyBattleRequests, fetchUserSchedule,
   formatScheduleTime, localInputToUtc, respondToBattleRequest, sendBattleRequest,
   type BattleRequestItem, type ScheduleItem, type ScheduleKind,
 } from "../lib/api";
 import { tt, useT  } from "../lib/i18n";
+import { RemindButton, RemindedCount, applyReminder } from "./ScheduleReminder";
 
 /**
  * "My Live/Battle Schedule" — Steve, 2026-10-06.
@@ -207,6 +208,10 @@ export function ScheduleSection({ profileId, myId }: { profileId: number; myId?:
               {item.note && <div className="muted">{item.note}</div>}
             </div>
             <span className="spacer" />
+            {isMine && <RemindedCount item={item} />}
+            {!isMine && canRemind(item, myId) && (
+              <RemindButton item={item} myId={myId} onChange={(u) => setItems((rows) => applyReminder(rows, u))} />
+            )}
             {isMine && (
               <button className="btn small ghost" disabled={busy} onClick={() => void remove(item)}>{t("remove")}</button>
             )}

@@ -1860,4 +1860,16 @@ export const fil = {
   cb2_reminders_none: "Wala pang Country Battle ang bansa mo — gagana ito kapag may naidagdag na.",
   cb2_reminders_on_done: "Naka-on ang mga paalala ng Country Battle.",
   cb2_reminders_off_done: "Naka-off ang mga paalala ng Country Battle.",
+  // "Remind me" on scheduled lives and battles (Steve, 2026-11-03).
+  sr_remind_me: "🔔 Paalalahanan ako",
+  sr_reminder_set: "🔔 May paalala na",
+  sr_first_on: "Paaalalahanan ka namin 5 minuto bago ito magsimula",
+  sr_failed: "Hindi mabago ang paalalang iyan. Pakisubukan ulit.",
+  sr_my_reminders: "Mga Paalala Ko",
+  sr_empty: "Wala ka pang paalala. I-tap ang 🔔 Paalalahanan ako sa kahit anong naka-schedule na live o battle.",
+  sr_could_not_load: "Hindi ma-load ang mga paalala mo.",
+  sr_live_now: "LIVE NGAYON",
+  sr_kind_live: "Live",
+  sr_kind_battle: "Battle",
+  sr_n_reminded: "🔔 %1$s ang may paalala",
 };

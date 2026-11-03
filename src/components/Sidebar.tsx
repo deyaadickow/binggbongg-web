@@ -58,6 +58,9 @@ export function sidebarSections(userId: number | null, contestOn = false): SideS
     ] },
     { title: "account", links: [
       { to: userId ? `/profile/${userId}` : "/login", label: "my_profile", icon: "👤", needsLogin: true },
+      // "Remind me" (Steve, 2026-11-03: "add it to his account"). Right under My Profile, because
+      // that is where the web keeps My Live/Battle Schedule.
+      { to: "/settings/reminders", label: "sr_my_reminders", icon: "⏰", needsLogin: true },
       // Steve, 2026-09-26: "Where is support on the web?" — the 💝 Support button lives on the
       // member's own profile page; this puts Who Supported Me one click away from anywhere too.
       { to: "/support", label: "who_supported_me", icon: "💝", needsLogin: true },

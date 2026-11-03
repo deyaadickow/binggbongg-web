@@ -114,6 +114,7 @@ const ROUTES: ScreenRoute[] = [
   // name of their own for it.
   { path: "/settings", screen: "settings" },
   { path: "/settings/account", screen: "edit_profile" },
+  { path: "/settings/reminders", screen: "my_reminders" },
   { path: "/settings/support", screen: "support" },
   { path: "/settings/support/archive", screen: "support" },
   { path: "/settings/shop", screen: "shop" },

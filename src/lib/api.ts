@@ -295,8 +295,29 @@ export interface ScheduleItem {
   /** UTC. */
   starts_at: string;
   opponent_user_id?: number | null;
+  /** An accepted battle request is ONE battle written as TWO rows, one per member, sharing this. */
+  battle_request_id?: number | null;
   user?: UserSummary | null;
   opponent?: UserSummary | null;
+  /** "Remind me" (Steve, 2026-11-03): the signed-in caller has a reminder on this entry. Read it
+   *  with isReminded() — a raw row can send it as 0/1 or "1". Absent before the backend deploy. */
+  i_reminded?: boolean | number | string;
+  /** How many members have a reminder on it. Same on both halves of an accepted battle. */
+  reminder_count?: number | string;
+}
+
+/** One row of fetchMyScheduleReminders: the full entry plus its owner flattened as `host`. */
+export interface ReminderItem extends ScheduleItem {
+  host?: {
+    id: number;
+    username?: string | null;
+    fullname?: string | null;
+    profile_image?: string | null;
+    profile_image_url?: string | null;
+    is_live?: boolean | number | string;
+    room_name?: string | null;
+  } | null;
+  reminder_notified?: boolean | number | string;
 }
 
 export interface BattleRequestItem {
@@ -408,6 +429,38 @@ export async function addSchedule(input: {
 
 export async function deleteSchedule(myId: number, scheduleId: number) {
   return post("deleteSchedule", { my_user_id: myId, user_id: myId, schedule_id: scheduleId });
+}
+
+/* "Remind me" on scheduled lives and battles (Steve, 2026-11-03: "a one click button reminder for
+ * the person who clicked the reminder button and add it to his account. Then he needs to be
+ * reminded a few minutes before the battle"). The caller is always the signed-in member (from
+ * the headers); my_user_id is sent anyway so the POST body is never empty (the WAF 403s those). */
+
+/** true / 1 / "1" — a raw Eloquent row can send a boolean any of those ways. */
+export function apiTrue(v: unknown): boolean {
+  return v === true || v === 1 || v === "1" || v === "true";
+}
+export const isReminded = (item: ScheduleItem) => apiTrue(item.i_reminded);
+export const reminderCount = (item: ScheduleItem) => Number(item.reminder_count ?? 0) || 0;
+
+/** The button shows only on someone else's entry that has not started yet. */
+export function canRemind(item: ScheduleItem, myId?: number | null): boolean {
+  if (myId != null && (Number(item.user_id) === myId || Number(item.opponent_user_id) === myId)) return false;
+  const t = new Date(item.starts_at).getTime();
+  return Number.isFinite(t) && t > Date.now();
+}
+
+export interface ReminderResult { schedule_id: number; reminded: boolean; reminder_count: number }
+
+export async function setScheduleReminder(myId: number, scheduleId: number, on: boolean) {
+  return post<ReminderResult>("setScheduleReminder", {
+    my_user_id: myId, schedule_id: scheduleId, on: on ? 1 : 0,
+  });
+}
+
+export async function fetchMyScheduleReminders(myId: number) {
+  const res = await post<ReminderItem[]>("fetchMyScheduleReminders", { my_user_id: myId });
+  return res.data ?? [];
 }
 
 export async function sendBattleRequest(input: {
