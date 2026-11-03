@@ -1826,4 +1826,6 @@ export const fil = {
   hm_uploading: "Ina-upload ang iyong litrato…",
   hm_pic_saved: "Nasa mga lobo na ang litrato mo!",
   hm_pic_failed: "Hindi naidagdag ang litratong iyan — subukan ang iba.",
+  watch_time_watching: "Nanonood",
+  watch_time_longest_first: "Unahin ang pinakamatagal nanonood",
 };

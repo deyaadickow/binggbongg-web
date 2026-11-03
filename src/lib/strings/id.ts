@@ -1821,4 +1821,6 @@ export const id = {
   hm_uploading: "Mengunggah fotomu…",
   hm_pic_saved: "Fotomu sudah ada di balon!",
   hm_pic_failed: "Foto itu tidak bisa ditambahkan — coba foto lain.",
+  watch_time_watching: "Menonton",
+  watch_time_longest_first: "Paling lama menonton di atas",
 };

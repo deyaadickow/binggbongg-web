@@ -38,6 +38,7 @@ import { HostGamesMenu } from "../components/HostGamesMenu";
 import { SoloBattleStandingsSheet, SoloBattleStrip } from "../components/SoloBattle";
 import { fetchActiveSoloBattle, startSoloBattle, type SoloBattle } from "../lib/solobattle";
 import { Avatar, Notice } from "../components/Common";
+import { WatchersList } from "../components/WatchersList";
 import { ReportDialog } from "../components/ReportDialog";
 import { InviteOverlay, WhosPlayingOverlay } from "../components/RoomPeople";
 import { PickerSheet } from "../components/PickerSheet";
@@ -68,6 +69,7 @@ export function LiveViewerPage() {
   const [roomClosed, setRoomClosed] = useState(false);
   const [watchers, setWatchers] = useState<number | null>(null);
   const [watcherList, setWatcherList] = useState<Watcher[]>([]);
+  const watcherFirstSeen = useRef(new Map<number, number>());
   // Steve, 2026-10-29: the live room's hold menu (country, local time, how long live, favourite,
   // share, report, support) and the watchers popup that now carries the Leader Board.
   const [roomMenuOpen, setRoomMenuOpen] = useState(false);
@@ -730,7 +732,15 @@ export function LiveViewerPage() {
     let alive = true;
     async function tick() {
       const w = await post<unknown[]>("fetchLiveRoomWatchers", { room_name: roomName }).catch(() => null);
-      if (alive && w?.status) { setWatchers((w.data ?? []).length); setWatcherList((w.data ?? []) as Watcher[]); }
+      if (alive && w?.status) {
+        const list = (w.data ?? []) as Watcher[];
+        // The watch-time fallback: when this client first saw each member in the list, for a
+        // member LiveKit can't place by identity. Someone who left and came back starts again.
+        const seen = watcherFirstSeen.current, ids = new Set(list.map((x) => x.user_id)), at = Date.now();
+        for (const id of [...seen.keys()]) if (!ids.has(id)) seen.delete(id);
+        for (const id of ids) if (!seen.has(id)) seen.set(id, at);
+        setWatchers(list.length); setWatcherList(list);
+      }
       if (role === "host" && user) {
         const r = await post<JoinRequest[]>("fetchJoinRequests", { user_id: user.id, room_name: roomName }).catch(() => null);
         if (alive && r?.status) setJoinRequests(r.data ?? []);
@@ -1338,16 +1348,8 @@ export function LiveViewerPage() {
                 {watcherList.length === 0 ? (
                   <p className="muted" style={{ textAlign: "center" }}>{t("nobody_else_watching")}</p>
                 ) : (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: "30vh", overflowY: "auto" }}>
-                    {watcherList.map((w) => (
-                      <div key={w.user_id} className="row" style={{ padding: "8px 10px", border: "1px solid var(--gold-border)", borderRadius: 10, background: "#111" }}>
-                        <Avatar user={{ fullname: w.fullname, username: w.username, profile_image: w.profile_image ? mediaUrl(w.profile_image) : undefined } as Partial<UserSummary>} />
-                        <div style={{ flex: 1, minWidth: 0, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                          {displayName({ fullname: w.fullname, username: w.username } as Partial<UserSummary>)}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  <WatchersList watchers={watcherList} joinTimes={live.joinTimes} firstSeen={watcherFirstSeen.current}
+                    onStage={new Set([hostUserId, ...live.tiles.map((x) => x.userId)].filter((id): id is number => typeof id === "number"))} />
                 )}
                 <button className="btn" style={{ marginTop: 12 }} onClick={() => { setLbMembers(null); setWatchersOpen(false); }}>{t("close")}</button>
               </div>

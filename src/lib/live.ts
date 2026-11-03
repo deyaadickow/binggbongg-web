@@ -195,5 +195,27 @@ export function useLiveRoom(roomName: string, role: LiveRole, enabled: boolean) 
       .catch(() => { /* best-effort, same as the phones */ });
   }, []);
 
-  return { status, error, publishError, tiles, cameraOn, micOn, grantedRole, toggleCamera, toggleMic, flipCamera, disconnect, sendHeart, incomingHeart };
+  /// Steve, 2026-11-03: the watch-time timer in the watchers list. When each member joined THIS
+  /// room, as user id -> epoch ms, read from LiveKit's own `participant.joinedAt` (set by the SFU,
+  /// so every client agrees on it). A getter rather than state: the open list reads it once per
+  /// tick, and a closed list costs nothing. A member on two devices keeps the earlier join.
+  /// Participants whose identity carries no user id (or no joinedAt) are simply left out — the
+  /// list falls back to when this client first saw them.
+  const joinTimes = useCallback((): Map<number, number> => {
+    const out = new Map<number, number>();
+    const room = roomRef.current;
+    if (!room) return out;
+    const add = (p: Participant) => {
+      const uid = userIdOf(p);
+      const at = p.joinedAt?.getTime();
+      if (uid === null || !at || !Number.isFinite(at)) return;
+      const prev = out.get(uid);
+      if (prev === undefined || at < prev) out.set(uid, at);
+    };
+    add(room.localParticipant);
+    room.remoteParticipants.forEach(add);
+    return out;
+  }, []);
+
+  return { status, error, publishError, tiles, cameraOn, micOn, grantedRole, toggleCamera, toggleMic, flipCamera, disconnect, sendHeart, incomingHeart, joinTimes };
 }

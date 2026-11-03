@@ -1433,6 +1433,8 @@ export const en = {
   nobody_else_to_report: "No one else is in the room to report.",
   watching_now_count: "Watching now (%1$s)",
   nobody_else_watching: "No one else is watching right now.",
+  watch_time_watching: "Watching",
+  watch_time_longest_first: "Longest watching first",
   copy_this_video: "Copy this video",
   clear_the_screen: "Clear the screen",
   the_turning_record: "The turning record",

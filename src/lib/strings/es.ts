@@ -1807,4 +1807,6 @@ export const es = {
   hm_uploading: "Subiendo tu foto…",
   hm_pic_saved: "¡Tu foto ya está en los globos!",
   hm_pic_failed: "No se pudo agregar esa foto — intenta con otra.",
+  watch_time_watching: "Viendo",
+  watch_time_longest_first: "Más tiempo viendo primero",
 };
