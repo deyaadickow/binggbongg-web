@@ -36,7 +36,8 @@ import { fetchActiveTapGame, gameTitle, type TapGameType } from "../lib/tapgame"
 import { TapGameOverlay } from "../components/TapGameOverlay";
 import { HostGamesMenu } from "../components/HostGamesMenu";
 import { SoloBattleStandingsSheet, SoloBattleStrip } from "../components/SoloBattle";
-import { fetchActiveSoloBattle, startSoloBattle, type SoloBattle } from "../lib/solobattle";
+import { fetchActiveSoloBattle, type SoloBattle } from "../lib/solobattle";
+import { chatBattlePath, chatReasonText, checkUserLiveRoom, startChatBattle } from "../lib/chatBattle";
 import { Avatar, Notice } from "../components/Common";
 import { WatchersList } from "../components/WatchersList";
 import { ReportDialog } from "../components/ReportDialog";
@@ -415,26 +416,82 @@ export function LiveViewerPage() {
   }, [two, twoSecs, iAmIn2v2]);
 
   // Tap games: the host activates one from the phone (or later, here); everyone gets a Play button.
+  // Chat Battle (#9, Steve 2026-11-03): the host's start asks for the shared room (shared_room=1).
+  // A shared answer means "Moving everyone into the Chat Battle…" for ~5 s — one viewer poll, so
+  // the audience's browsers see it and follow — then this room is left for the battle screen.
+  // shared:false (the switch is off) is the old own-room flow, unchanged.
+  const [movingToChat, setMovingToChat] = useState(false);
   async function startSolo() {
     if (role !== "host" || !user) { setToast(tt("only_the_host_can_start_a_solo_battle_wi")); return; }
     try {
-      const b = await startSoloBattle(user.id);
-      setSoloBattle(b);
+      const r = await startChatBattle(user.id);
+      if (!r.ok) { setToast(chatReasonText(t, r.reason, r.message || tt("couldn_t_start_a_solo_battle_with_unlimi"))); return; }
+      if (r.data.shared && (r.data.chat_battle_contest_id ?? r.data.id)) {
+        const contestId = Number(r.data.chat_battle_contest_id ?? r.data.id);
+        setMovingToChat(true);
+        setTimeout(() => {
+          live.disconnect();
+          navigate(chatBattlePath(contestId, { battler: true }), { replace: true });
+        }, 5000);
+        return;
+      }
+      setSoloBattle(r.data);
       setToast(tt("solo_battle_with_unlimited_players_start"));
     } catch (e) {
       setToast((e as Error).message);
     }
   }
 
-  // A Solo Battle belongs to the room's host, so everyone here polls the same one.
+  // A Solo Battle belongs to the room's host, so everyone here polls the same one — every 4 s,
+  // like the phones, because a Chat Battle answer (shared) moves the whole audience: everyone but
+  // the host follows into the battle screen with the host pinned top-left.
+  const followedRef = useRef(false);
   useEffect(() => {
     if (!hostUserId || roomClosed) return;
     let alive = true;
-    const tick = () => fetchActiveSoloBattle(hostUserId, user?.id).then((b) => { if (alive) setSoloBattle(b); }).catch(() => undefined);
+    const tick = () => fetchActiveSoloBattle(hostUserId, user?.id).then((b) => {
+      if (!alive) return;
+      // Never back into a battle that is already over (the trip home from its podium lands here).
+      const running = !b?.ends_at || Date.parse(b.ends_at) > Date.now();
+      if (b?.shared && running && role !== "host" && !followedRef.current) {
+        followedRef.current = true;
+        live.disconnect();
+        navigate(chatBattlePath(Number(b.chat_battle_contest_id ?? b.id), { home: b.home_user_id ?? hostUserId }), { replace: true });
+        return;
+      }
+      setSoloBattle(b?.shared ? null : b);
+    }).catch(() => undefined);
     tick();
-    const t = setInterval(tick, 8000);
+    const t = setInterval(tick, 4000);
     return () => { alive = false; clearInterval(t); };
-  }, [hostUserId, user?.id, roomClosed]);
+  }, [hostUserId, user?.id, roomClosed, role]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Missed the poll and the room just ended? The host may have moved into a Chat Battle: look
+  // them up once and follow (checkUserLiveRoom names the battle room).
+  const endedLookup = useRef(false);
+  useEffect(() => {
+    if (!(roomClosed || live.status === "ended") || role === "host" || !hostUserId || endedLookup.current || followedRef.current) return;
+    endedLookup.current = true;
+    checkUserLiveRoom(hostUserId).then((r) => {
+      if (r?.chat_battle_contest_id && !followedRef.current) {
+        followedRef.current = true;
+        navigate(chatBattlePath(r.chat_battle_contest_id, { home: hostUserId }), { replace: true });
+      }
+    });
+  }, [roomClosed, live.status, role, hostUserId, navigate]);
+
+  // The old-flow leaderboard: tap a name to go straight to their live (the phones' behaviour),
+  // else their profile.
+  const openStandingLive = useCallback(async (row: { user_id?: number | null }) => {
+    const id = Number(row.user_id ?? 0);
+    if (!id) return;
+    setSoloStandingsOpen(false);
+    const r = await checkUserLiveRoom(id);
+    if (r?.is_live && r.room_name) {
+      if (r.chat_battle_contest_id) navigate(chatBattlePath(r.chat_battle_contest_id, { home: id }));
+      else if (r.room_name !== roomName) navigate(`/live/${encodeURIComponent(r.room_name)}`);
+    } else navigate(`/profile/${id}`);
+  }, [navigate, roomName]);
 
   const [activeGame, setActiveGame] = useState<TapGameType | null>(null);
   const [gameOpen, setGameOpen] = useState(false);
@@ -1543,8 +1600,9 @@ export function LiveViewerPage() {
           </form>
         </div>
       </div>
+      {movingToChat && <div className="chb-moving" role="status">💬 {t("chb_moving")}</div>}
       {soloStandingsOpen && soloBattle && (
-        <SoloBattleStandingsSheet battle={soloBattle} myUserId={user?.id ?? null} onClose={() => setSoloStandingsOpen(false)} />
+        <SoloBattleStandingsSheet battle={soloBattle} myUserId={user?.id ?? null} onClose={() => setSoloStandingsOpen(false)} onPick={openStandingLive} />
       )}
       {whosPlayingOpen && <WhosPlayingOverlay roomName={roomName} onClose={() => setWhosPlayingOpen(false)} />}
       {mtOpen && (

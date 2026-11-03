@@ -70,6 +70,7 @@ import { LiveFeaturePage } from "./pages/LiveFeaturePage";
 import { PkContestsPage } from "./pages/PkContestsPage";
 import { CountryBattleBoardPage, CountryBattlePage, CountryBattleResultsPage } from "./pages/CountryBattlePages";
 import { CountryBattleLivePage } from "./pages/CountryBattleLivePage";
+import { ChatBattleLivePage } from "./pages/ChatBattleLivePage";
 import { rememberAdSource } from "./lib/getApp";
 import { PageTracking } from "./components/PageTracking";
 
@@ -153,6 +154,8 @@ export default function App() {
           <Route path="/country-battle/live/:dayId" element={<CountryBattleLivePage />} />
           <Route path="/country-battle/board" element={<CountryBattleBoardPage />} />
           <Route path="/country-battle/board/:id" element={<CountryBattleResultsPage />} />
+          {/* Chat Battle (#9, Steve 2026-11-03) — the shared 24-tile battle screen. */}
+          <Route path="/chat-battle/:contestId" element={<ChatBattleLivePage />} />
           <Route path="/feature/:slug" element={<LiveFeaturePage />} />
           {/* Your own live Bingg Bongg show (Steve, 2026-10-17). */}
           <Route path="/shows" element={<ShowsPage />} />

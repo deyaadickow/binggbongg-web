@@ -3,8 +3,10 @@
 // people or more, and pulling fifty camera feeds into one browser would melt a phone. It
 // subscribes to:
 //   - the VIDEO of the members whose tiles are on screen right now, and
-//   - the AUDIO of the one tile the viewer tapped to listen to (Steve's spec: "other tiles are
-//     silent until the viewer taps a tile").
+//   - the AUDIO of the tiles this screen hears: the one a viewer tapped ("other tiles are silent
+//     until the viewer taps a tile"), or — on a battler's screen — the members they starred
+//     (Steve, 2026-11-03: "They can also chat with each other, means their speaker will be on").
+// It also carries the star signal ("cb_star": you starred me) as a LiveKit data message.
 // A participant publishes their own camera and mic, exactly like a guest in a normal room; the
 // token server already accepts role=guest for members joinCountryBattle approved.
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -21,6 +23,12 @@ function userIdOf(p: Participant): number | null {
   return m ? Number(m[1]) : null;
 }
 
+/** A battler's identity exactly (`user_{id}`) — a viewer's `user_{id}_v…` never matches. */
+export function battlerIdOf(identity: string | undefined | null): number | null {
+  const m = (identity ?? "").match(/^user_(\d+)$/);
+  return m ? Number(m[1]) : null;
+}
+
 export interface CbPublisher { userId: number; name: string }
 
 export function useCountryBattleRoom(opts: {
@@ -29,10 +37,12 @@ export function useCountryBattleRoom(opts: {
   enabled: boolean;
   /** Members whose tiles are on screen — their video is subscribed, nobody else's. */
   visible: number[];
-  /** The one member being listened to, or null for silence. */
-  listen: number | null;
+  /** The member(s) heard on this screen — one tapped tile, or a battler's starred members. */
+  listen: number | null | number[];
   /** The camera or mic could not be opened (permission denied, no device). */
   onPublishFailed?: (err: Error) => void;
+  /** A data message arrived (the star signal). `from` is the sender's battler id, or null. */
+  onData?: (topic: string, payload: unknown, from: number | null) => void;
 }) {
   const { roomName, role, enabled, visible, listen } = opts;
   const roomRef = useRef<Room | null>(null);
@@ -42,11 +52,14 @@ export function useCountryBattleRoom(opts: {
   const [version, setVersion] = useState(0);
   const [publishers, setPublishers] = useState<CbPublisher[]>([]);
   const visibleRef = useRef<Set<number>>(new Set());
-  const listenRef = useRef<number | null>(null);
+  const listenRef = useRef<Set<number>>(new Set());
   const onFailRef = useRef(opts.onPublishFailed);
   onFailRef.current = opts.onPublishFailed;
+  const onDataRef = useRef(opts.onData);
+  onDataRef.current = opts.onData;
   visibleRef.current = new Set(visible);
-  listenRef.current = listen;
+  listenRef.current = new Set(Array.isArray(listen) ? listen : listen != null ? [listen] : []);
+  const listenKey = Array.isArray(listen) ? [...listen].sort((a, b) => a - b).join(",") : String(listen);
 
   /** Make every remote subscription match what is on screen. Idempotent; cheap to call often. */
   const applyPolicy = useCallback(() => {
@@ -59,7 +72,7 @@ export function useCountryBattleRoom(opts: {
       const mic = p.getTrackPublication(Track.Source.Microphone) as RemoteTrackPublication | undefined;
       if (uid != null && cam) pubs.push({ userId: uid, name: p.name || "" });
       const wantVideo = uid != null && visibleRef.current.has(uid);
-      const wantAudio = uid != null && listenRef.current === uid;
+      const wantAudio = uid != null && listenRef.current.has(uid);
       if (cam && cam.isDesired !== wantVideo) cam.setSubscribed(wantVideo);
       if (mic && mic.isDesired !== wantAudio) mic.setSubscribed(wantAudio);
     });
@@ -70,7 +83,7 @@ export function useCountryBattleRoom(opts: {
     });
   }, []);
 
-  useEffect(() => { applyPolicy(); }, [visible.join(","), listen, applyPolicy]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { applyPolicy(); }, [visible.join(","), listenKey, applyPolicy]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!enabled || !roomName) return;
@@ -106,6 +119,12 @@ export function useCountryBattleRoom(opts: {
       .on(RoomEvent.TrackUnmuted, bump)
       .on(RoomEvent.LocalTrackPublished, bump)
       .on(RoomEvent.LocalTrackUnpublished, bump)
+      .on(RoomEvent.DataReceived, (payload: Uint8Array, participant?: RemoteParticipant, _kind?: unknown, topic?: string) => {
+        if (cancelled || !topic) return;
+        let data: unknown = null;
+        try { data = JSON.parse(new TextDecoder().decode(payload)); } catch { return; }
+        onDataRef.current?.(topic, data, battlerIdOf(participant?.identity));
+      })
       .on(RoomEvent.Disconnected, () => { if (!cancelled) setStatus("ended"); });
 
     (async () => {
@@ -178,5 +197,18 @@ export function useCountryBattleRoom(opts: {
 
   const disconnect = useCallback(() => { roomRef.current?.disconnect(); }, []);
 
-  return { status, error, version, publishers, attachVideo, hasVideo, disconnect };
+  /** A reliable data message on the room: to one battler (`toUserId`), or to everyone. */
+  const sendData = useCallback((topic: string, payload: unknown, toUserId?: number | null): boolean => {
+    const room = roomRef.current;
+    if (!room || room.state !== "connected") return false;
+    const bytes = new TextEncoder().encode(JSON.stringify(payload));
+    room.localParticipant.publishData(bytes, {
+      reliable: true, topic, ...(toUserId ? { destinationIdentities: [`user_${toUserId}`] } : {}),
+    }).catch(() => undefined);
+    return true;
+  }, []);
+  /** This browser's LiveKit identity (`user_{id}` for a battler), once connected. */
+  const identity = useCallback(() => roomRef.current?.localParticipant.identity ?? "", []);
+
+  return { status, error, version, publishers, attachVideo, hasVideo, disconnect, sendData, identity };
 }

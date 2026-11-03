@@ -114,14 +114,21 @@ export function SoloBattleStrip({ battle, myUserId, onOpenStandings, onToast, on
   );
 }
 
-export function SoloBattleStandingsSheet({ battle, myUserId, onClose }: {
+export function SoloBattleStandingsSheet({ battle, myUserId, onClose, rows: givenRows, onPick, finished: givenFinished, footer }: {
   battle: SoloBattle;
   myUserId: number | null;
   onClose: () => void;
+  /** Chat Battle passes the heartbeat's ranked battlers instead of fetching standings here. */
+  rows?: StandingRow[] | null;
+  /** Tap a name. Without it, the name links to the profile. */
+  onPick?: (row: StandingRow) => void;
+  finished?: boolean;
+  footer?: string;
 }) {
   const { t } = useT();
-  const [rows, setRows] = useState<StandingRow[] | null>(null);
-  const finished = isFinished(battle, Date.now());
+  const [fetched, setRows] = useState<StandingRow[] | null>(null);
+  const rows = givenRows !== undefined ? givenRows : fetched;
+  const finished = givenFinished ?? isFinished(battle, Date.now());
   const nameOf = standingName;
 
   const { tie } = soloOutcome(rows);
@@ -131,12 +138,14 @@ export function SoloBattleStandingsSheet({ battle, myUserId, onClose }: {
     fetchSoloStandings(battle.id, myUserId ?? undefined).then(setRows).catch(() => setRows([]));
   }, [battle.id, myUserId]);
 
+  const fetchHere = givenRows === undefined;
   useEffect(() => {
+    if (!fetchHere) return;
     load();
     // The phones poll this while it is open so a leaderboard moves as gifts land.
     const t = setInterval(load, 8000);
     return () => clearInterval(t);
-  }, [load]);
+  }, [load, fetchHere]);
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 60, background: "rgba(0,0,0,0.65)", display: "grid", placeItems: "center", padding: 16 }}>
@@ -167,7 +176,9 @@ export function SoloBattleStandingsSheet({ battle, myUserId, onClose }: {
                 : <div aria-hidden style={{ width: 30, height: 30, borderRadius: 15, background: "var(--panel)", border: "1px solid var(--gold-border)", color: "var(--gold)", fontWeight: 800, fontSize: 14, display: "grid", placeItems: "center", flex: "none" }}>{(nameOf(r).trim()[0] ?? "?").toUpperCase()}</div>}
               <div style={{ flex: 1, minWidth: 0 }}>
                 {/* The phones let you tap a name to go straight to that person's live. */}
-                {r.user_id
+                {r.user_id && onPick
+                  ? <button type="button" onClick={() => onPick(r)} style={{ fontWeight: 700, background: "none", border: 0, padding: 0, color: "var(--gold)", cursor: "pointer", font: "inherit", textAlign: "left", maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "block" }}>{crowned && i === 0 ? "👑 " : ""}{nameOf(r)}</button>
+                  : r.user_id
                   ? <Link to={`/profile/${r.user_id}`} onClick={onClose} style={{ fontWeight: 700 }}>{crowned && i === 0 ? "👑 " : ""}{nameOf(r)}</Link>
                   : <span style={{ fontWeight: 700 }}>{crowned && i === 0 ? "👑 " : ""}{nameOf(r)}</span>}
                 {r.location && <div className="muted" style={{ fontSize: 12 }}>{r.location}</div>}
@@ -178,7 +189,7 @@ export function SoloBattleStandingsSheet({ battle, myUserId, onClose }: {
           </>
         )}
         <p className="muted" style={{ fontSize: 12, marginTop: 10, marginBottom: 0 }}>
-          {t("scored_by_the_gift_coins_each_person_rec")}</p>
+          {footer ?? t("scored_by_the_gift_coins_each_person_rec")}</p>
       </div>
     </div>
   );

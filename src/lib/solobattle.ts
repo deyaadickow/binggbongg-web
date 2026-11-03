@@ -19,6 +19,12 @@ export interface SoloBattle {
   host_user_id?: number | null;
   /** Only returned by fetchActiveSoloBattleForHost — true once the asker has joined. */
   already_joined?: boolean | null;
+  /** Chat Battle (2026-11-03): true = it runs on one shared room — follow the host into it. */
+  shared?: boolean | null;
+  chat_battle_contest_id?: number | null;
+  room_name?: string | null;
+  /** The host asked about: the battler a follower's screen pins top-left. */
+  home_user_id?: number | null;
 }
 
 export interface StandingRow {
@@ -44,8 +50,10 @@ export async function joinSoloBattle(contestId: number, userId: number): Promise
 
 /** The host's own running Solo Battle, if any. Returns null when there isn't one. */
 export async function fetchActiveSoloBattle(hostUserId: number, viewerUserId?: number): Promise<SoloBattle | null> {
-  const params: Record<string, unknown> = { host_user_id: hostUserId };
-  if (viewerUserId) params.user_id = viewerUserId;
+  // chat=1: also find a Chat Battle the host JOINED (not only one they started), so a battler's
+  // own audience follows them in.
+  const params: Record<string, unknown> = { host_user_id: hostUserId, user_id: viewerUserId ?? 0, chat: 1 };
+  if (viewerUserId) params.viewer_user_id = viewerUserId;
   const res = await post<SoloBattle>("fetchActiveSoloBattleForHost", params).catch(() => null);
   return res?.status ? (res.data ?? null) : null;
 }
