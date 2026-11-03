@@ -1672,5 +1672,17 @@
  "chb_pin_max": "يمكنك تثبيت ما يصل إلى 3 — اضغط على النجمة للإزالة",
  "chb_waiting": "في انتظار بدء المتنافسين لبثهم المباشر…",
  "chb_starred_you": "ميّزك @{name} بنجمة — اضغط على ★ للرد",
- "chb_starred_you_tile": "★ ميّزك بنجمة"
+ "chb_starred_you_tile": "★ ميّزك بنجمة",
+ "chb_starter_bonus": "مكافأة البادئ: {amount}",
+ "chb_starter_bonus_so_far": "مكافأة البادئ حتى الآن: {amount}",
+ "chb_starter_bonus_terms": "أنت من بدأها: تربح {percent}% من أرباح Bingg Bongg على هدايا الآخرين، حتى {cap}",
+ "chb_followers_told": "يتم إبلاغ متابعيك الآن — لديهم دقيقتان للانضمام",
+ "chb_gift_you_sent": "أرسلت %1$s إلى @%2$s",
+ "chb_gift_sent_you": "أرسل لك @%1$s %2$s — قل شكرًا!",
+ "chb_thank_you": "شكرًا",
+ "chb_thanks_line": "شكرًا @%1$s على %2$s! 💛",
+ "chb_gift_line": "أرسل %1$s %3$s إلى %2$s",
+ "chb_alerts_from": "تنبيهات Chat Battle من @{name}",
+ "chb_alerts_off_done": "لن تصلك تنبيهات Chat Battle من @{name} بعد الآن.",
+ "chb_alerts_on_done": "ستصلك تنبيهات Chat Battle من @{name} مرة أخرى."
 }

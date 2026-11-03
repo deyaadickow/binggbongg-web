@@ -15,6 +15,8 @@ import { ScheduleSection } from "../components/ScheduleSection";
 import { showGoldAlert } from "../components/GoldToast";
 import { CountryBattleBadges, CountryBattleBullseye, CountryBattleParticipantsModal } from "../components/CountryBattleBits";
 import { tt, useT  } from "../lib/i18n";
+import { fetchChatBattleAlertMute, setChatBattleAlertMute } from "../lib/chatBattle";
+import { cbText } from "../lib/countryBattle";
 
 interface ProfileUser extends UserSummary {
   refer_code?: string;
@@ -175,6 +177,43 @@ function UserCard({ user, myId, isLoggedIn }: { user: UserSummary; myId?: number
         </button>
       )}
     </div>
+  );
+}
+
+/** Chat Battle round 2 (Steve, 2026-11-03): "Give all members the ability to shutoff the
+ *  notification from each member that they don't want to receive the notification from." The
+ *  web sends no pushes, but a web member's phones get them — this is their switch for one host.
+ *  Shown while you follow them (only followers are alerted) or while they are muted (so it can be
+ *  turned back on); hidden when the server can't answer (not deployed yet). */
+function ChatBattleAlertToggle({ myId, host, following }: { myId: number; host: UserSummary; following: boolean }) {
+  const { t } = useT();
+  const [muted, setMuted] = useState<boolean | null>(null);
+  const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    setMuted(null);
+    fetchChatBattleAlertMute(myId, host.id).then((r) => { if (alive && r) setMuted(r.muted); });
+    return () => { alive = false; };
+  }, [myId, host.id]);
+  if (muted === null || (!following && !muted)) return null;
+  const handle = host.username || displayName(host);
+  async function toggle() {
+    if (busy || muted === null) return;
+    const next = !muted;
+    setBusy(true);
+    setMuted(next);
+    const r = await setChatBattleAlertMute(myId, host.id, next);
+    setBusy(false);
+    if (!r.ok) { setMuted(!next); if (r.message) showGoldAlert(r.message); return; }
+    setMuted(r.muted);
+    showGoldAlert(cbText(t(r.muted ? "chb_alerts_off_done" : "chb_alerts_on_done"), { name: handle }));
+  }
+  return (
+    <label className="chb-alert-toggle">
+      <span aria-hidden>{muted ? "🔕" : "🔔"}</span>
+      <span className="chb-alert-label">{cbText(t("chb_alerts_from"), { name: handle })}</span>
+      <input type="checkbox" className="switch" checked={!muted} disabled={busy} onChange={toggle} />
+    </label>
   );
 }
 
@@ -718,6 +757,8 @@ export function ProfilePage() {
               {t("playlist")}</button>
           )}
         </div>
+
+        {!isMe && isLoggedIn && me && <ChatBattleAlertToggle myId={me.id} host={profile} following={following} />}
 
         {showSchedule && <ScheduleSection profileId={profileId} myId={me?.id} />}
 

@@ -823,6 +823,29 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .chb-chat form { display: flex; gap: 6px; }
 .chb-chat input { flex: 1; min-width: 0; height: 30px; border-radius: 999px; border: 1px solid var(--line); background: #111; color: #fff; padding: 0 10px; font-size: 13px; }
 .chb-chat form .btn { min-height: 30px; padding: 2px 12px; font-size: 12px; }
+/* Chat Battle round 2: the gift on the tile, the gift line at the top of the chat strip, the starter bonus,
+   the per-member alert switch on a profile. */
+.cb-tile-gift { position: absolute; left: 50%; top: 50%; z-index: 3; width: 46%; aspect-ratio: 1; display: grid; place-items: center; font-size: 28px; pointer-events: none; transform: translate(-50%, -50%); animation: cb-tile-gift 5s ease-out forwards; filter: drop-shadow(0 0 8px rgba(255, 200, 80, .8)); }
+.cb-tile-gift img { width: 100%; height: 100%; object-fit: contain; }
+@keyframes cb-tile-gift {
+  0% { transform: translate(-50%, -50%) scale(.2); opacity: 0; }
+  12% { transform: translate(-50%, -50%) scale(1.25); opacity: 1; }
+  22% { transform: translate(-50%, -50%) scale(1); }
+  80% { transform: translate(-50%, -62%) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -80%) scale(.9); opacity: 0; }
+}
+.chb-gift-note { display: flex; align-items: center; gap: 8px; padding: 4px 4px 4px 8px; border-radius: 8px; background: #000; border: 1.5px solid var(--gold); color: #fff; font-size: 12.5px; font-weight: 700; animation: chb-note-in .25s ease-out; }
+.chb-gift-note.got { border-color: var(--gold-bright, var(--gold)); }
+.chb-gn-text { flex: 1; min-width: 0; overflow-wrap: anywhere; line-height: 1.35; }
+.chb-gn-text b { color: var(--gold); }
+.chb-gn-icon { display: inline-block; width: 22px; height: 22px; object-fit: contain; vertical-align: -6px; margin: 0 2px; }
+.chb-gift-note .btn { flex: none; min-height: 30px; padding: 2px 12px; font-size: 12px; }
+.chb-gn-x { flex: none; width: 24px; height: 24px; padding: 0; border: none; background: none; color: var(--text-soft); font-size: 18px; line-height: 1; cursor: pointer; }
+@keyframes chb-note-in { from { transform: translateY(6px); opacity: 0; } to { transform: none; opacity: 1; } }
+.chb-bonus { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--gold); color: var(--gold); font-size: 12px; font-weight: 800; white-space: nowrap; }
+.chb-bonus-end { margin-top: 12px; padding: 8px 10px; border-radius: 10px; border: 1.5px solid var(--gold); color: var(--gold); font-weight: 900; font-size: 17px; }
+.chb-alert-toggle { display: flex; align-items: center; gap: 10px; margin-top: 12px; padding: 8px 12px; border: 1.5px solid var(--gold-border); border-radius: 10px; cursor: pointer; }
+.chb-alert-toggle .chb-alert-label { flex: 1; min-width: 0; color: var(--gold); font-weight: 700; font-size: 14px; overflow-wrap: anywhere; }
 .chb-end { position: fixed; inset: 0; z-index: 55; background: rgba(0,0,0,.72); display: grid; place-items: center; padding: 16px; }
 .chb-end .card { position: relative; width: min(420px, 100%); text-align: center; background: #000; border-color: var(--gold-border); overflow: hidden; }
 .chb-moving { position: fixed; inset: 0; z-index: 70; background: rgba(0,0,0,.8); display: grid; place-items: center; padding: 24px; text-align: center; color: var(--gold); font-weight: 800; font-size: 18px; }

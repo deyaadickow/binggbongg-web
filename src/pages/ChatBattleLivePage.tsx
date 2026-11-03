@@ -13,9 +13,9 @@
 // /chat-battle/0?demo=24|12|6          the screen with fake battlers and no LiveKit or server, for
 //                                      the explainer video. &own=0 = a viewer's screen (home tile
 //                                      instead of own); &end=1 = the podium; &img=/path/ photos.
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { displayName, post, type Gift } from "../lib/api";
+import { displayName, mediaUrl, post, type Gift } from "../lib/api";
 import { useSession } from "../lib/session";
 import { useT } from "../lib/i18n";
 import { GiftSheet } from "../components/GiftSheet";
@@ -30,17 +30,101 @@ import { chatChannel, ensureFirebaseSignIn, observeChat, sendChat, type ChatMess
 import { haptic, sfx } from "../lib/gameSounds";
 import {
   chatBattleHeartbeat, chatBattlePath, chatBattleStage, chatReasonText, checkUserLiveRoom, joinChatBattle, leaveChatBattle,
-  roomHostId, sendChatBattleGift,
-  type ChbBattler, type ChbPerson, type ChbState,
+  bonusText, parseGiftMsg, roomHostId, sendChatBattleGift,
+  type ChbBattler, type ChbGiftInfo, type ChbGiftMsg, type ChbPerson, type ChbState,
 } from "../lib/chatBattle";
 
 const HEARTBEAT_MS = 5000;
 const SPOTLIGHT_MS = 30000;
 const PODIUM_MS = 20000;
+/** How long a gift's icon stays popped up on the tile, and the "You sent" line on screen. */
+const TILE_GIFT_MS = 5000;
+const SENT_NOTE_MS = 5000;
+/** The receiver's "say thanks!" waits longer — it has a button. */
+const GOT_NOTE_MS = 15000;
 /** Room kept free under the grid for the chat strip. */
 const CHAT_RESERVE = 116;
 
 const nameOf = (p: ChbPerson | null | undefined) => p?.name || p?.username || "";
+/** "@jimmy" where there is a username, else the name. */
+const handleOf = (p: ChbPerson | null | undefined) => p?.username || p?.name || "";
+
+// ---- round 2: gift visibility (Steve, 2026-11-03: "Who ever is gifing a gift they will be able
+// to see the gift as well as the member that received the gift so they can thank you for the
+// gift.") ----------------------------------------------------------------------------------------
+
+/** One gift line on screen: the sender's "You sent 🌹 to @jimmy", or the receiver's "@sam sent
+ *  you 🌹 — say thanks!" with a Thank you button. */
+interface GiftNoteData {
+  kind: "sent" | "got";
+  /** The other member: the receiver for "sent", the sender for "got". */
+  who: string;
+  giftName: string;
+  icon: string | null;
+  key: number;
+}
+
+function GiftNote({ note, onThank, onClose }: { note: GiftNoteData; onThank: (() => void) | null; onClose: () => void }) {
+  const { t, tn } = useT();
+  const [broken, setBroken] = useState(false);
+  const gift = note.icon && !broken
+    ? <img className="chb-gn-icon" src={mediaUrl(note.icon)} alt={note.giftName} title={note.giftName} onError={() => setBroken(true)} />
+    : <b>{note.giftName || "🎁"}</b>;
+  return (
+    <div className={`chb-gift-note ${note.kind}`} role="status">
+      <span className="chb-gn-text">
+        {note.kind === "sent" ? tn("chb_gift_you_sent", gift, note.who) : tn("chb_gift_sent_you", note.who, gift)}
+      </span>
+      {note.kind === "got" && onThank && <button type="button" className="btn small" onClick={onThank}>💛 {t("chb_thank_you")}</button>}
+      <button type="button" className="chb-gn-x" onClick={onClose} aria-label={t("close")}>×</button>
+    </div>
+  );
+}
+
+/** The gift's icon popped up on one tile, and the line under the grid — with their timers. */
+function useGiftShow() {
+  const [tileGift, setTileGift] = useState<{ userId: number; icon: string | null; key: number } | null>(null);
+  const [note, setNote] = useState<GiftNoteData | null>(null);
+  const tileTimer = useRef(0);
+  const noteTimer = useRef(0);
+  useEffect(() => () => { window.clearTimeout(tileTimer.current); window.clearTimeout(noteTimer.current); }, []);
+  const popTile = useCallback((userId: number, icon: string | null) => {
+    window.clearTimeout(tileTimer.current);
+    const key = Date.now();
+    setTileGift({ userId, icon, key });
+    tileTimer.current = window.setTimeout(() => setTileGift((cur) => (cur?.key === key ? null : cur)), TILE_GIFT_MS);
+  }, []);
+  const showNote = useCallback((n: Omit<GiftNoteData, "key">) => {
+    window.clearTimeout(noteTimer.current);
+    const key = Date.now();
+    setNote({ ...n, key });
+    noteTimer.current = window.setTimeout(() => setNote((cur) => (cur?.key === key ? null : cur)), n.kind === "got" ? GOT_NOTE_MS : SENT_NOTE_MS);
+  }, []);
+  const closeNote = useCallback(() => { window.clearTimeout(noteTimer.current); setNote(null); }, []);
+  /** The tiles with the popped-up gift on the one it landed on. */
+  const withGift = useCallback(<T extends CbTileData>(tiles: T[]): T[] => (
+    tileGift ? tiles.map((x) => (x.userId === tileGift.userId ? { ...x, gift: { icon: tileGift.icon, key: tileGift.key } } : x)) : tiles
+  ), [tileGift]);
+  return { note, popTile, showNote, closeNote, withGift };
+}
+
+/** A gift line for the chat strip, kept on this screen only (the server writes nothing to the
+ *  Firestore thread for a tile gift). A NEGATIVE sender id draws it as a gift line. */
+function giftLine(t: ReturnType<typeof useT>["t"], msg: ChbGiftMsg): ChatMessage {
+  return {
+    id: `cbg-${msg.from_user_id}-${msg.to_user_id}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    senderUserId: -Math.max(1, msg.gift_id || 1),
+    senderName: msg.from_name ?? "",
+    message: t("chb_gift_line", msg.from_name || "?", msg.to_name || "?", msg.gift_name || "🎁"),
+    sentAt: Date.now(),
+  };
+}
+
+/** Thread + local lines, in time order. */
+function mergeLines(messages: ChatMessage[], local: ChatMessage[]): ChatMessage[] {
+  if (!local.length) return messages;
+  return [...messages, ...local].sort((a, b) => a.sentAt - b.sentAt);
+}
 
 // ---- the pieces both the live screen and the demo use ----------------------------------------
 
@@ -117,7 +201,7 @@ function useRoomChat(room: string | null, enabled: boolean): ChatMessage[] {
 
 /** The small strip under the tiles: the home battler's own viewers' chat (Steve: "each battler
  *  keeps their OWN viewers' chat in a small strip under the tiles"). */
-function ChatStrip({ messages, onSend }: { messages: ChatMessage[]; onSend: ((text: string) => void) | null }) {
+function ChatStrip({ messages, onSend, note }: { messages: ChatMessage[]; onSend: ((text: string) => void) | null; note?: ReactNode }) {
   const { t } = useT();
   const [draft, setDraft] = useState("");
   const logRef = useRef<HTMLDivElement>(null);
@@ -125,6 +209,7 @@ function ChatStrip({ messages, onSend }: { messages: ChatMessage[]; onSend: ((te
   useEffect(() => { logRef.current?.scrollTo({ top: logRef.current.scrollHeight }); }, [messages]);
   return (
     <div className="chb-chat">
+      {note}
       <div ref={logRef} className="chb-chat-log" aria-live="polite">
         {recent.length === 0
           ? <span className="chb-empty">💬 {t("chb_chat_empty")}</span>
@@ -148,6 +233,8 @@ function ChatStrip({ messages, onSend }: { messages: ChatMessage[]; onSend: ((te
 /** The end: confetti, the podium, the winner (or "Tie!"), and where you are being taken. */
 function ChatBattleEnd({ st, note, onClose }: { st: ChbState; note: string | null; onClose: () => void }) {
   const { t } = useT();
+  // Round 2: the starter's bonus, to the starter only (the server sends it to nobody else), once paid.
+  const bonus = st.me.starter_bonus;
   const [burst] = useState(() => Date.now());
   const top = st.battlers.filter((b) => b.score > 0).slice(0, 3);
   const headline = st.tie ? `🤝 ${t("chb_tie")}`
@@ -160,6 +247,9 @@ function ChatBattleEnd({ st, note, onClose }: { st: ChbState; note: string | nul
         <div style={{ color: "var(--gold)", fontWeight: 800, fontSize: 13, marginBottom: 2 }}>🏁 {t("chb_ended")}</div>
         <div style={{ fontWeight: 900, fontSize: 22, color: "var(--gold)", marginBottom: 8, overflowWrap: "anywhere" }}>{headline}</div>
         {top.length > 0 && <Podium tie={st.tie} rows={top.map((b) => ({ name: nameOf(b), value: b.score.toLocaleString() }))} />}
+        {st.finished && bonus?.paid && (
+          <div className="chb-bonus-end">💰 {cbText(t("chb_starter_bonus"), { amount: bonusText(bonus.amount) })}</div>
+        )}
         {note && <p className="muted" style={{ fontSize: 13, margin: "12px 0 0" }}>{note}</p>}
         <button className="btn" style={{ marginTop: 14 }} onClick={onClose}>{t("chb_back")}</button>
       </div>
@@ -281,7 +371,53 @@ function ChatBattleLive({ contestId, home, battlerHint }: { contestId: number; h
     myId, isBattler, pins: grid.star.pins, home: isBattler ? null : home, pool: grid.pool,
     connected: roomHook.status === "live", sendData: roomHook.sendData,
   });
-  onDataRef.current = signals.onData;
+  // ---- round 2: gifts on the tiles ----
+  const giftShow = useGiftShow();
+  const [localLines, setLocalLines] = useState<ChatMessage[]>([]);
+  // Whose strip this screen shows: my own as a battler, the home battler's as a viewer.
+  const stripOwner = isBattler ? myId : home;
+  const stripOwnerRef = useRef(stripOwner);
+  stripOwnerRef.current = stripOwner;
+  useEffect(() => { setLocalLines([]); }, [stripOwner]);
+  /** The gift the receiver's Thank you is for. */
+  const thankRef = useRef<ChbGiftMsg | null>(null);
+  const addLine = useCallback((msg: ChbGiftMsg) => setLocalLines((cur) => [...cur.slice(-19), giftLine(t, msg)]), [t]);
+  /** A cb_gift from the room: the receiver gets "say thanks!", the receiver's own viewers get the
+   *  line in their strip, everyone else ignores it. */
+  const onGiftData = (payload: unknown) => {
+    const msg = parseGiftMsg(payload);
+    if (!msg || msg.from_user_id === myIdRef.current) return;
+    if (roleRef.current === "guest" && msg.to_user_id === myIdRef.current) {
+      giftShow.popTile(msg.to_user_id, msg.icon_url ?? null);
+      giftShow.showNote({ kind: "got", who: msg.from_name || "?", giftName: msg.gift_name || "", icon: msg.icon_url ?? null });
+      addLine(msg);
+      sfx.reveal();
+      haptic([30, 40, 30]);
+      thankRef.current = msg;
+    } else if (stripOwnerRef.current && msg.to_user_id === stripOwnerRef.current) {
+      giftShow.popTile(msg.to_user_id, msg.icon_url ?? null);
+      addLine(msg);
+    }
+  };
+  onDataRef.current = (topic, payload, from) => {
+    if (topic === "cb_gift") onGiftData(payload);
+    else signals.onData(topic, payload, from);
+  };
+  /** What the last confirmed tile gift answered (chat_battle_gift), for onSent. */
+  const lastGiftRef = useRef<ChbGiftInfo | null>(null);
+  const onGiftSent = (toUserId: number, gift: Gift) => {
+    const info = lastGiftRef.current;
+    lastGiftRef.current = null;
+    const icon = info?.icon_url ?? (gift.image ? gift.image : null);
+    const receiver = info?.receiver ?? grid.byId.get(toUserId) ?? null;
+    giftShow.popTile(toUserId, icon);
+    giftShow.showNote({ kind: "sent", who: handleOf(receiver), giftName: info?.gift_name ?? gift.name ?? "", icon });
+    // Published only once the server confirmed the gift (GiftSheet calls onSent on status:true).
+    if (info?.cb_gift) {
+      roomHook.sendData("cb_gift", info.cb_gift);
+      if (toUserId === stripOwnerRef.current) addLine({ ...info.cb_gift, from_name: info.cb_gift.from_name ?? displayName(user ?? undefined) });
+    }
+  };
   const homeStarsKey = signals.homeStars.join(",");
   useEffect(() => { setHomeHold(signals.homeStars); }, [homeStarsKey]); // eslint-disable-line react-hooks/exhaustive-deps
   const heardNow = heardIds({ isBattler, pins: grid.star.pins, home: isBattler ? null : home, homeStars: signals.homeStars, spot, listen });
@@ -440,9 +576,18 @@ function ChatBattleLive({ contestId, home, battlerHint }: { contestId: number; h
   const meRow = st?.battlers.find((b) => b.user_id === myId);
   const homeRow = home ? st?.battlers.find((b) => b.user_id === home) : undefined;
   const chatRoom = (isBattler ? meRow?.chat_room_name : homeRow?.chat_room_name) || st?.room_name || null;
-  const messages = useRoomChat(chatRoom, isLoggedIn);
+  const threadMessages = useRoomChat(chatRoom, isLoggedIn);
+  const messages = useMemo(() => mergeLines(threadMessages, localLines), [threadMessages, localLines]);
   const onSend = isLoggedIn && user && chatRoom
     ? (text: string) => { sendChat(chatChannel(chatRoom, roomHostId(chatRoom)), user.id, displayName(user), text, user.profile_image ?? "").catch(() => undefined); }
+    : null;
+  // The receiver's Thank you: an ordinary chat line in their own strip, nothing more to the server.
+  const onThank = onSend
+    ? () => {
+      const g = thankRef.current;
+      if (g) onSend(t("chb_thanks_line", g.from_name || "", g.gift_name || "🎁"));
+      giftShow.closeNote();
+    }
     : null;
 
   const pl = phaseLines(t, st, now);
@@ -471,6 +616,11 @@ function ChatBattleLive({ contestId, home, battlerHint }: { contestId: number; h
     : st.phase === "joining" && st.phase_ends_at ? cbText(t("chb_join_in"), { time: clock(Date.parse(st.phase_ends_at) - now) })
     : t("cb_join");
   const giftRoom = st.room_name ?? "";
+  // Round 2: the starter's bonus — "so far" while it runs, the paid figure at the end. Starter only.
+  const bonus = me.starter_bonus;
+  const bonusLabel = bonus
+    ? cbText(t(bonus.paid ? "chb_starter_bonus" : "chb_starter_bonus_so_far"), { amount: bonusText(bonus.amount) })
+    : null;
   return (
     <div className="page cb-page" style={{ paddingTop: 10 }}>
       <CbHeader title={t("chb_title")} stage={st.name} sub={pl.sub} line={pl.line}
@@ -479,6 +629,7 @@ function ChatBattleLive({ contestId, home, battlerHint }: { contestId: number; h
         backLabel={isBattler && !ended ? t("cb_leave") : t("chb_back")}
         onBack={back}
         actions={<>
+          {bonusLabel && <span className="chb-bonus" title={cbText(t("chb_starter_bonus_terms"), { percent: bonus?.percent ?? 1, cap: bonusText(bonus?.cap ?? 25) })}>💰 {bonusLabel}</span>}
           <button className="btn small ghost" onClick={() => setBoardOpen(true)}>🏆 {t("leaderboard")}</button>
           {showJoin && <button className="btn small" onClick={join} disabled={joining}>{joinLabel}</button>}
         </>} />
@@ -487,7 +638,7 @@ function ChatBattleLive({ contestId, home, battlerHint }: { contestId: number; h
       {tiles.length === 0
         ? <div className="card cb-empty">{ended ? t("chb_ended") : t("chb_waiting")}</div>
         : (
-          <CountryBattleGrid stage={grid.stage} tiles={tiles} listen={heardNow} reserve={CHAT_RESERVE} phoneFullWidth
+          <CountryBattleGrid stage={grid.stage} tiles={giftShow.withGift(tiles)} listen={heardNow} reserve={CHAT_RESERVE} phoneFullWidth
             onTap={(id) => {
               // A battler's tap stars the tile — they hear only who they starred; a viewer's tap listens.
               if (isBattler) grid.star.toggle(id);
@@ -500,12 +651,17 @@ function ChatBattleLive({ contestId, home, battlerHint }: { contestId: number; h
             attach={roomHook.attachVideo} hasVideo={roomHook.hasVideo} version={roomHook.version}
             flash={flash} onFlashDone={() => setFlash(null)} />
         )}
-      <ChatStrip messages={messages} onSend={onSend} />
+      <ChatStrip messages={messages} onSend={onSend}
+        note={giftShow.note && <GiftNote key={giftShow.note.key} note={giftShow.note} onThank={onThank} onClose={giftShow.closeNote} />} />
       {giftTarget != null && (
         <GiftSheet
           onClose={() => setGiftTarget(null)}
-          onSent={(gift) => { setFlash({ userId: giftTarget, gift }); beat(); }}
-          sendOverride={(_coins, gift) => sendChatBattleGift({ myId, toUserId: giftTarget, giftId: gift.id, roomName: giftRoom, contestId })} />
+          onSent={(gift) => { setFlash({ userId: giftTarget, gift }); onGiftSent(giftTarget, gift); beat(); }}
+          sendOverride={async (_coins, gift) => {
+            const res = await sendChatBattleGift({ myId, toUserId: giftTarget, giftId: gift.id, roomName: giftRoom, contestId });
+            lastGiftRef.current = res.status && res.chat_battle_gift && typeof res.chat_battle_gift === "object" ? res.chat_battle_gift as ChbGiftInfo : null;
+            return res;
+          }} />
       )}
       {boardOpen && (
         <SoloBattleStandingsSheet battle={{ id: contestId, name: st.name, starts_at: st.starts_at, ends_at: st.ends_at }}

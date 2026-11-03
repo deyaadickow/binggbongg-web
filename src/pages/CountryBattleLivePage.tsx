@@ -45,6 +45,9 @@ export interface CbTileData {
   starredMe?: boolean;
   /** Not heard on this screen: a tiny muted icon in the corner opposite the star. */
   muted?: boolean;
+  /** Chat Battle round 2: a gift just landed on this tile — its icon pops up over the tile.
+   *  `key` restarts the animation when a second gift lands before the first one has faded. */
+  gift?: { icon: string | null; key: number } | null;
 }
 
 /** Height the grid may use: from its own top edge (below the site's header and the battle
@@ -105,12 +108,23 @@ function CbTile({ tile, listening, onTap, onGift, attach, hasVideo, version }: {
       {listening && <span className="cb-ear" aria-hidden>🔊</span>}
       {tile.muted && !tile.own && <span className="cb-muted" aria-hidden>🔇</span>}
       {tile.starredMe && <span className="cb-starme">{t("chb_starred_you_tile")}</span>}
+      {tile.gift && <TileGift key={tile.gift.key} icon={tile.gift.icon} />}
       {!tile.own && onGift && (
         <button type="button" className="cb-gift" aria-label="🎁"
           onClick={(e) => { e.stopPropagation(); onGift(); }}>🎁</button>
       )}
       <span className="cb-name">{tile.name}</span>
     </div>
+  );
+}
+
+/** A gift's icon popping up over the tile it landed on (🎁 when it has no icon, or it fails). */
+function TileGift({ icon }: { icon: string | null }) {
+  const [broken, setBroken] = useState(false);
+  return (
+    <span className="cb-tile-gift" aria-hidden>
+      {icon && !broken ? <img src={mediaUrl(icon)} alt="" onError={() => setBroken(true)} /> : "🎁"}
+    </span>
   );
 }
 

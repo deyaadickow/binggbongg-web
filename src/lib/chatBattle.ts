@@ -42,6 +42,16 @@ export interface ChbMe {
   home_room_name: string | null;
   can_join: boolean;
   join_reason: string | null;
+  /** Round 2: null unless I am the STARTER of a battle with bonus terms. `amount` is dollars —
+   *  the running figure while it runs, the paid amount once `paid`. Never shown to anyone else. */
+  starter_bonus?: ChbStarterBonus | null;
+}
+
+export interface ChbStarterBonus {
+  amount: number;
+  paid: boolean;
+  percent: number;
+  cap: number;
 }
 
 export interface ChbState {
@@ -86,6 +96,9 @@ export interface ChbEntry {
   rejoined?: boolean;
   home_room_name?: string | null;
   chat_battle?: ChbState | null;
+  /** Round 2, start only: "queued" = the starter's followers are being told now; "throttled" =
+   *  already told within the hour; "off" = switched off in admin (or not deployed). */
+  follower_alert?: { status: "queued" | "throttled" | "off" | string; next_allowed_at: string | null } | null;
 }
 
 export type ChbResult<T> = { ok: true; data: T } | { ok: false; reason: string; message: string; full: boolean };
@@ -148,8 +161,53 @@ export async function checkUserLiveRoom(userId: number): Promise<ChbLiveRoom | n
   return { ...res.data, chat_battle_contest_id: res.data.chat_battle_contest_id ? Number(res.data.chat_battle_contest_id) : null };
 }
 
+/** Round 2: the "cb_gift" data message, exactly as the server hands it to the sender. */
+export interface ChbGiftMsg {
+  from: string;
+  to: string;
+  from_user_id: number;
+  to_user_id: number;
+  from_name?: string | null;
+  to_name?: string | null;
+  gift_id: number;
+  gift_name?: string | null;
+  icon_url?: string | null;
+  coins?: number;
+}
+
+/** Round 2: what a confirmed tile gift answers (`chat_battle_gift`, absent before the deploy). */
+export interface ChbGiftInfo {
+  contest_id: number;
+  gift_id: number;
+  gift_name?: string | null;
+  icon_url?: string | null;
+  gif_url?: string | null;
+  coins?: number;
+  sender: ChbPerson;
+  receiver: ChbPerson;
+  cb_gift: ChbGiftMsg;
+}
+
+/** A cb_gift payload off the wire, checked — anything malformed is dropped. */
+export function parseGiftMsg(payload: unknown): ChbGiftMsg | null {
+  if (!payload || typeof payload !== "object") return null;
+  const p = payload as Record<string, unknown>;
+  const fromId = Number(p.from_user_id ?? String(p.from ?? "").replace(/^user_/, ""));
+  const toId = Number(p.to_user_id ?? String(p.to ?? "").replace(/^user_/, ""));
+  if (!fromId || !toId) return null;
+  return {
+    from: `user_${fromId}`, to: `user_${toId}`, from_user_id: fromId, to_user_id: toId,
+    from_name: typeof p.from_name === "string" ? p.from_name : null,
+    to_name: typeof p.to_name === "string" ? p.to_name : null,
+    gift_id: Number(p.gift_id ?? 0),
+    gift_name: typeof p.gift_name === "string" ? p.gift_name : null,
+    icon_url: typeof p.icon_url === "string" ? p.icon_url : null,
+    coins: Number(p.coins ?? 0) || undefined,
+  };
+}
+
 /** A gift from a tile's gift box: priced from gift_id on the server (no coins sent), and refused
- *  unless the recipient is a battler of this Chat Battle. */
+ *  unless the recipient is a battler of this Chat Battle. The answer carries `chat_battle_gift`. */
 export async function sendChatBattleGift(input: { myId: number; toUserId: number; giftId: number; roomName: string; contestId: number }) {
   return post("sendCoinsToUser", {
     my_user_id: input.myId,
@@ -158,6 +216,27 @@ export async function sendChatBattleGift(input: { myId: number; toUserId: number
     room_name: input.roomName,
     chat_battle_contest_id: input.contestId,
   });
+}
+
+/** Round 2: is this member's Chat Battle alert muted? `null` = can't tell (not deployed yet,
+ *  signed out, network) — hide the toggle. */
+export async function fetchChatBattleAlertMute(userId: number, hostUserId: number): Promise<{ muted: boolean; is_following: boolean } | null> {
+  const res = await post<{ muted?: boolean; is_following?: boolean }>("fetchChatBattleAlertMute", { user_id: userId, host_user_id: hostUserId }).catch(() => null);
+  if (!res?.status || !res.data) return null;
+  return { muted: !!res.data.muted, is_following: !!res.data.is_following };
+}
+
+/** Round 2: turn Chat Battle alerts from one member off (muted) or back on. user_id is always the
+ *  caller — the server binds it from the session. */
+export async function setChatBattleAlertMute(userId: number, hostUserId: number, muted: boolean): Promise<{ ok: boolean; muted: boolean; message: string }> {
+  const res = await post<{ muted?: boolean }>("setChatBattleAlertMute", { user_id: userId, host_user_id: hostUserId, muted: muted ? 1 : 0 }).catch(() => null);
+  if (!res?.status) return { ok: false, muted: !muted, message: res?.message ?? "" };
+  return { ok: true, muted: res.data?.muted ?? muted, message: res.message ?? "" };
+}
+
+/** Dollars as the starter bonus shows them: "$0.80". */
+export function bonusText(amount: number | null | undefined): string {
+  return `$${(Number(amount) || 0).toFixed(2)}`;
 }
 
 /** The URL of the Chat Battle screen. `home` pins the battler a viewer followed in; `battler`

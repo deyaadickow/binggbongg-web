@@ -16,6 +16,7 @@ import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice } from "../components/Common";
 import { useT } from "../lib/i18n";
 import { PageTitle } from "../components/PageTitle";
+import { chatBattlePath } from "../lib/chatBattle";
 
 interface NotificationRow {
   id: number;
@@ -24,6 +25,22 @@ interface NotificationRow {
   item_id?: number | null;
   created_at?: string | null;
   sender?: UserSummary | null;
+  /** Chat Battle round 2: a follower alert ("@eddie is starting a Chat Battle in 2 minutes").
+   *  The phones get it as a push; a row carrying the battle's id (top level, or in the push's
+   *  `data` as the server sends it) opens the battle as a viewer with the host pinned. */
+  chat_battle_contest_id?: number | string | null;
+  notification_type?: string | null;
+  data?: { type?: string; contest_id?: string | number; chat_battle_contest_id?: string | number; host_user_id?: string | number } | null;
+}
+
+/** Where a Chat Battle alert row leads, or null for every other row. */
+function chatBattleLink(row: NotificationRow): string | null {
+  const d = row.data && typeof row.data === "object" ? row.data : null;
+  const isAlert = row.notification_type === "chat_battle_alert" || d?.type === "chat_battle_alert" || row.chat_battle_contest_id != null;
+  const id = Number(row.chat_battle_contest_id ?? d?.chat_battle_contest_id ?? d?.contest_id ?? 0);
+  if (!isAlert || !id) return null;
+  const host = Number(d?.host_user_id ?? row.sender?.id ?? 0) || null;
+  return chatBattlePath(id, { home: host });
 }
 
 const PAGE = 30;
@@ -81,7 +98,10 @@ function Row({ row }: { row: NotificationRow }) {
     <div className="card pad" style={{ borderColor: "var(--gold-border)", marginBottom: 10 }}>{body}</div>
   );
 
-  // An app notice has nowhere to go; everything else leads to whoever sent it.
+  // A Chat Battle alert opens the battle; an app notice has nowhere to go; everything else leads
+  // to whoever sent it.
+  const battle = chatBattleLink(row);
+  if (battle) return <Link to={battle} style={{ textDecoration: "none", display: "block" }}>{card}</Link>;
   if (isAppNotice || !row.sender?.id) return card;
   return <Link to={`/profile/${row.sender.id}`} style={{ textDecoration: "none", display: "block" }}>{card}</Link>;
 }

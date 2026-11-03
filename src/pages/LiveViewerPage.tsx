@@ -421,6 +421,7 @@ export function LiveViewerPage() {
   // the audience's browsers see it and follow — then this room is left for the battle screen.
   // shared:false (the switch is off) is the old own-room flow, unchanged.
   const [movingToChat, setMovingToChat] = useState(false);
+  const [followersTold, setFollowersTold] = useState(false);
   async function startSolo() {
     if (role !== "host" || !user) { setToast(tt("only_the_host_can_start_a_solo_battle_wi")); return; }
     try {
@@ -428,6 +429,8 @@ export function LiveViewerPage() {
       if (!r.ok) { setToast(chatReasonText(t, r.reason, r.message || tt("couldn_t_start_a_solo_battle_with_unlimi"))); return; }
       if (r.data.shared && (r.data.chat_battle_contest_id ?? r.data.id)) {
         const contestId = Number(r.data.chat_battle_contest_id ?? r.data.id);
+        // Round 2: the server pushes the starter's followers (at most once an hour per host).
+        setFollowersTold(r.data.follower_alert?.status === "queued");
         setMovingToChat(true);
         setTimeout(() => {
           live.disconnect();
@@ -1600,7 +1603,11 @@ export function LiveViewerPage() {
           </form>
         </div>
       </div>
-      {movingToChat && <div className="chb-moving" role="status">💬 {t("chb_moving")}</div>}
+      {movingToChat && (
+        <div className="chb-moving" role="status">
+          <div>💬 {t("chb_moving")}{followersTold && <div style={{ fontSize: 14, fontWeight: 600, marginTop: 10 }}>🔔 {t("chb_followers_told")}</div>}</div>
+        </div>
+      )}
       {soloStandingsOpen && soloBattle && (
         <SoloBattleStandingsSheet battle={soloBattle} myUserId={user?.id ?? null} onClose={() => setSoloStandingsOpen(false)} onPick={openStandingLive} />
       )}
