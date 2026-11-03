@@ -17,7 +17,7 @@ import { useSession } from "../lib/session";
 
 interface FeaturePageVideoRow { id: number; sort: number; title: string; video: string; thumbnail?: string | null; videos?: Record<string, string> }
 /** sources: the same video in English, Tagalog and Indonesian, for the player's switch. */
-interface FeaturePageVideo { id: number; title: string; url: string; poster: string; sources: VideoSources }
+interface FeaturePageVideo { id: number; title: string; url: string; poster: string; sources: VideoSources; trackKey: string }
 
 export function FeatureVideosPage() {
   const { t } = useT();
@@ -36,7 +36,7 @@ export function FeatureVideosPage() {
       const res = await post<FeaturePageVideoRow[]>("fetchFeaturePageVideos", { platform: "web" });
       if (!res.status) throw new Error(res.message || "failed");
       const rows = [...(res.data ?? [])].filter((r) => r.video).sort((a, b) => a.sort - b.sort);
-      setVideos(rows.map((r) => ({ id: r.id, title: r.title, url: mediaUrl(r.video), poster: mediaUrl(r.thumbnail), sources: videoSources(r.videos) })));
+      setVideos(rows.map((r) => ({ id: r.id, title: r.title, url: mediaUrl(r.video), poster: mediaUrl(r.thumbnail), sources: videoSources(r.videos), trackKey: `feature_page_video_${r.id}` })));
     } catch {
       setFailed(true);
     }

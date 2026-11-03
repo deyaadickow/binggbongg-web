@@ -6,6 +6,7 @@ import { VipBadge, VipBadgePopup } from "../components/VipBadge";
 import { isVipReferrer } from "../lib/referral";
 import { BattleBadge, BattleInfoPopup, BattleStreak, battleBadgeExplainer, battleStreakExplainer } from "../components/BattleBadge";
 import { useSession } from "../lib/session";
+import { memberLabel, trackPage } from "../lib/pageTracker";
 import { ReportDialog } from "../components/ReportDialog";
 import { Avatar, Loading, Notice } from "../components/Common";
 import { fetchUserPhotos, type Photo } from "../lib/photos";
@@ -353,6 +354,14 @@ export function ProfilePage() {
       }
     })();
   }, [id, me?.id]);
+
+  // Page history: name whose profile this was (the router already recorded the visit). Your own
+  // profile is profile_self, with nobody to name. Checked against the URL: going from one profile
+  // to another, the previous member is still in state for a render.
+  useEffect(() => {
+    if (!profile || !id || String(profile.id) !== String(id) || String(profile.id) === String(me?.id)) return;
+    trackPage("profile", "member", id, memberLabel(profile));
+  }, [profile?.id, id, me?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!profile || !id) return;

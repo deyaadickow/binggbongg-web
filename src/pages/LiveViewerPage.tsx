@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom"
 import { displayName, giftPrice, mediaUrl, post, type Gift, type UserSummary } from "../lib/api";
 import { TapTapBurst, isTapTapGift, tapTapBurstDuration } from "../components/TapTapBurst";
 import { useSession } from "../lib/session";
+import { memberLabel, trackPage } from "../lib/pageTracker";
 import { chatChannel, ensureFirebaseSignIn, observeChat, sendChat, type ChatMessage } from "../lib/firebase";
 import { useLiveRoom, type LiveRole, type LiveTile } from "../lib/live";
 import { activeBoxingWindow, useBattle, type BattleData } from "../lib/battle";
@@ -695,6 +696,13 @@ export function LiveViewerPage() {
   }
   broadcastersRef.current = broadcasters;
   virtualRef.current = virtual.data;
+
+  // Page history: whose live room this was, once the roster names the host (the router already
+  // recorded the visit under the room name). Only a roster for THIS room's host counts.
+  const hostLabel = members && (!hostUserId || members.host_user_id === hostUserId) ? memberLabel({ username: members.host_username, fullname: members.host_fullname }) : undefined;
+  useEffect(() => {
+    if (roomName && hostLabel) trackPage("live_room", "live", roomName, hostLabel);
+  }, [roomName, hostLabel]);
 
   // Room roster (host + approved guests) — checkHeader only, works before sign-in too.
   useEffect(() => {

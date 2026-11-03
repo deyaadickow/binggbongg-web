@@ -71,6 +71,7 @@ import { PkContestsPage } from "./pages/PkContestsPage";
 import { CountryBattleBoardPage, CountryBattlePage, CountryBattleResultsPage } from "./pages/CountryBattlePages";
 import { CountryBattleLivePage } from "./pages/CountryBattleLivePage";
 import { rememberAdSource } from "./lib/getApp";
+import { PageTracking } from "./components/PageTracking";
 
 /** The ads' landing page (/ph) stands alone — no menu, no sidebar, nothing but the contest and the
  *  download button (Steve, 2026-10-31). Everything else gets the normal site. */
@@ -110,6 +111,8 @@ export default function App() {
       <BrowserRouter>
         <RouteMeta />
         <AdArrival />
+        {/* Member page history (Steve, 2026-11-02): one row per page a signed-in member opens. */}
+        <PageTracking />
         <LandingSwitch>
         <Nav />
         <div className="shell">

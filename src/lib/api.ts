@@ -33,7 +33,10 @@ export class ApiError extends Error {
   }
 }
 
-export async function post<T = unknown>(endpoint: string, params: Record<string, unknown> = {}): Promise<ApiResponse<T>> {
+/** `keepalive` lets a request outlive the page (a tab closed mid-send still delivers it). Only
+ *  for small bodies — browsers cap all keepalive requests in flight at 64 KB together. Used by
+ *  the page-history tracker so the last views before a tab closes are not lost. */
+export async function post<T = unknown>(endpoint: string, params: Record<string, unknown> = {}, opts: { keepalive?: boolean } = {}): Promise<ApiResponse<T>> {
   const body = new URLSearchParams();
   for (const [k, v] of Object.entries(params)) {
     if (v === undefined || v === null) continue;
@@ -44,6 +47,7 @@ export async function post<T = unknown>(endpoint: string, params: Record<string,
     method: "POST",
     headers: { apikey: API_KEY, ...authHeaders, "Content-Type": "application/x-www-form-urlencoded" },
     body,
+    ...(opts.keepalive ? { keepalive: true } : {}),
   });
   if (res.status === 401) throw new ApiError(401, "Please sign in again.");
   // Suspended or blocked (2026-10-09). The server answers 403 with the sentence meant to be

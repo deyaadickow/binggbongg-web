@@ -26,7 +26,7 @@
 import { BingoCardIcon } from "../components/BingoCardIcon";
 import { FeatureIcon } from "../components/ArtIcon";
 import { Link } from "react-router-dom";
-import { useT, type StringKey } from "../lib/i18n";
+import { translate, useT, type StringKey } from "../lib/i18n";
 import { PageTitle } from "../components/PageTitle";
 import { useSession } from "../lib/session";
 import { useEffect, useState } from "react";
@@ -357,7 +357,7 @@ export function FeaturesPage() {
   const feed = shown.flatMap((sec) => sec.features).filter((f) => videos[f.videoKey ?? f.nameKey])
     .map((f) => {
       const vk = f.videoKey ?? f.nameKey;
-      return { key: vk, item: { url: videos[vk], title: t(f.labelKey ?? f.nameKey), sources: featureVideoSources[vk] } };
+      return { key: vk, item: { url: videos[vk], title: t(f.labelKey ?? f.nameKey), sources: featureVideoSources[vk], trackKey: vk, trackLabel: translate("en", f.labelKey ?? f.nameKey) } };
     });
   const watch = (vk: string) => {
     const start = feed.findIndex((x) => x.key === vk);
@@ -443,7 +443,7 @@ export function FeaturesPage() {
                 extras={Object.keys(videos).filter((k) => k.startsWith(vk + "__")).sort()
                   .map((k) => ({ key: k, label: featureVideoLabels[k] ?? t("watch_video") }))}
                 // An extra video (the ads on #1) plays on its own.
-                onWatchExtra={(k) => setPlaying({ items: [{ url: videos[k], title: featureVideoLabels[k] ?? t(f.labelKey ?? f.nameKey), sources: featureVideoSources[k] }], start: 0 })} />
+                onWatchExtra={(k) => setPlaying({ items: [{ url: videos[k], title: featureVideoLabels[k] ?? t(f.labelKey ?? f.nameKey), sources: featureVideoSources[k], trackKey: k, trackLabel: featureVideoLabels[k] ?? translate("en", f.labelKey ?? f.nameKey) }], start: 0 })} />
               );
             })}
           </div>

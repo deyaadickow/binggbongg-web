@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { VIDEO_LANGS, defaultVideoLang, rememberVideoLang, type VideoLang, type VideoSources } from "../lib/featureVideos";
+import { trackPage } from "../lib/pageTracker";
 
-/** One video in the player: its file, its heading, and its other languages. */
-export interface PlayerItem { url: string; title: string; sources?: VideoSources }
+/** One video in the player: its file, its heading, and its other languages. `trackKey` and
+ *  `trackLabel` name it in the member's page history — the feature's key and its ENGLISH name,
+ *  since `title` is in whatever language the member reads. */
+export interface PlayerItem { url: string; title: string; sources?: VideoSources; trackKey?: string; trackLabel?: string }
 
 /** The language to play for one video: the picked one if it has it, else English, else its first. */
 function langFor(item: PlayerItem, want: VideoLang): VideoLang | null {
@@ -31,6 +34,13 @@ export function FeatureVideoPlayer({ items, start = 0, onClose, country }: {
   const [want, setWant] = useState<VideoLang>(() => defaultVideoLang(country));
   const feed = useRef<HTMLDivElement>(null);
   const slides = useRef<(HTMLDivElement | null)[]>([]);
+
+  // Page history: one feature_video row per video actually brought on screen, as the member
+  // scrolls from one feature's video to the next.
+  const shown = items[current];
+  useEffect(() => {
+    if (shown) trackPage("feature_video", "feature", shown.trackKey, shown.trackLabel ?? shown.title);
+  }, [shown?.trackKey, shown?.url]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Open on the tapped video, without an animated scroll past the ones before it.
   useEffect(() => {

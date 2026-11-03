@@ -10,7 +10,8 @@ import { FeatureIcon } from "../components/ArtIcon";
 import { LiveRoomsList } from "../components/LiveRoomsList";
 import { FeatureVideoPlayer } from "../components/FeatureVideoPlayer";
 import { fetchFeatureVideos } from "../lib/featureVideos";
-import { useT, type StringKey } from "../lib/i18n";
+import { translate, useT, type StringKey } from "../lib/i18n";
+import { trackPage } from "../lib/pageTracker";
 
 /** URL slug -> the tile's name key (also its feature-video key), its icon and its two texts. */
 export const LIVE_FEATURES: Record<string, { nameKey: StringKey; labelKey?: StringKey; icon: string; what: StringKey; how: StringKey }> = {
@@ -43,6 +44,10 @@ export function LiveFeaturePage() {
     fetchFeatureVideos(lang).then((v) => { if (live) setVideo(v[f.nameKey] ?? null); });
     return () => { live = false; };
   }, [f, lang]);
+  // Page history: which feature, by the tile's English name whatever language the member reads.
+  useEffect(() => {
+    if (f) trackPage("feature", "feature", slug, translate("en", f.labelKey ?? f.nameKey));
+  }, [f, slug]);
   if (!f) return <Navigate to="/features" replace />;
   const title = t(f.labelKey ?? f.nameKey);
   return (
@@ -62,7 +67,7 @@ export function LiveFeaturePage() {
       </div>
       <h2 style={{ color: "var(--gold)", fontSize: 18, margin: "0 0 10px" }}>{t("fx_live_now")}</h2>
       <LiveRoomsList />
-      {playing && video && <FeatureVideoPlayer items={[{ url: video, title }]} onClose={() => setPlaying(false)} />}
+      {playing && video && <FeatureVideoPlayer items={[{ url: video, title, trackKey: f.nameKey, trackLabel: translate("en", f.labelKey ?? f.nameKey) }]} onClose={() => setPlaying(false)} />}
     </div>
   );
 }

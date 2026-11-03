@@ -5,6 +5,7 @@ import { rememberCopiedLink, videoShareUrl } from "../lib/copiedLink";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { displayName, mediaUrl, post, type Gift, type LiveStream, type Post } from "../lib/api";
 import { useSession } from "../lib/session";
+import { memberLabel, trackPage } from "../lib/pageTracker";
 import { Avatar, Loading, Notice } from "../components/Common";
 import { GiftFlash, PostGiftButton } from "../components/GiftSheet";
 import { appendToFeed, fetchMoreFeed, getFeed } from "../lib/feed";
@@ -85,6 +86,16 @@ export function VideoPage() {
     // The member's ID, not the object: the session replaces the object on every balance
     // refresh, and reloading the post for that unmounted whatever was open over the video.
   }, [id, user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Page history: which video this was — its caption's start, else whose it is. The router already
+  // recorded the visit; this only names it. Checked against the URL so the previous video, still
+  // on screen for a moment after a swipe, is never filed under the next one's id.
+  useEffect(() => {
+    if (!item || !id || String(item.id) !== String(id)) return;
+    const caption = (item.description ?? "").replace(/\s+/g, " ").trim();
+    const owner = memberLabel(item.user);
+    trackPage("video", "video", id, caption ? caption.slice(0, 60) : owner ? `${owner}'s video` : undefined);
+  }, [item?.id, id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Keep the queue topped up: when we're within 2 of the end, fetch another batch.
   useEffect(() => {

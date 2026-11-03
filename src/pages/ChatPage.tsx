@@ -20,6 +20,7 @@ import {
 } from "../lib/dm";
 import { mediaUrl } from "../lib/api";
 import { useSession } from "../lib/session";
+import { memberLabel, trackPage } from "../lib/pageTracker";
 import { TRANSLATION_LANGUAGES, translateChatMessage } from "../lib/translate";
 import { tt, useT  } from "../lib/i18n";
 
@@ -71,6 +72,12 @@ export function ChatPage() {
       }
     })();
   }, [id, user]);
+
+  // Page history: who this chat was with — and nothing else. Never the messages. Checked against
+  // the URL, since going from one chat to another keeps the previous partner for a moment.
+  useEffect(() => {
+    if (id && partner && String(partner.id) === String(id)) trackPage("chat", "member", id, memberLabel(partner));
+  }, [id, partner?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const cid = useMemo(
     () => (myIdentity && partner?.identity ? conversationId(myIdentity, partner.identity) : ""),

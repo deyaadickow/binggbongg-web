@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { post, setAuthHeaders, type UserSummary } from "./api";
+import { signOutPageViews } from "./pageTracker";
 
 interface Session {
   user: UserSummary | null;
@@ -48,6 +49,9 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = useCallback(() => {
+    // Before the headers go: the member's last page views are sent with their own credentials,
+    // then the queue is forgotten so the next person on this browser starts with nothing.
+    signOutPageViews();
     setAuthHeaders(null, null);
     setUser(null);
     setToken(null);

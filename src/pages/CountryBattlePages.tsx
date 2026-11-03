@@ -16,7 +16,7 @@ import { CbPersonRow, CountryBattleParticipants, CountryBattleParticipantsModal,
 import { useSession } from "../lib/session";
 import { fetchFeatureVideos } from "../lib/featureVideos";
 import { FeatureVideoPlayer } from "../components/FeatureVideoPlayer";
-import { useT, type StringKey } from "../lib/i18n";
+import { translate, useT, type StringKey } from "../lib/i18n";
 import {
   cbText, clock, dayTimeline, fetchCountryBattleBoard, fetchCountryBattleStatus, flag, reasonText, roundsText,
   serverNow, stageText, useTick,
@@ -295,7 +295,7 @@ function CountryBattleExplainer({ note }: { note: string }) {
       </div>
 
       <Link to="/country-battle/board" className="btn" style={{ display: "flex", justifyContent: "center" }}>🥇 {t("cb_board")}</Link>
-      {playing && video && <FeatureVideoPlayer items={[{ url: video, title: t("cb_title") }]} onClose={() => setPlaying(false)} />}
+      {playing && video && <FeatureVideoPlayer items={[{ url: video, title: t("cb_title"), trackKey: "country_battle", trackLabel: translate("en", "cb_title") }]} onClose={() => setPlaying(false)} />}
     </div>
   );
 }
