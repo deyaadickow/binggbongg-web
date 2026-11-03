@@ -1828,7 +1828,7 @@ export const fil = {
   chb_alerts_off_done: "Hindi ka na makakatanggap ng alerto ng Chat Battle mula kay @{name}.",
   chb_alerts_on_done: "Makakatanggap ka ulit ng alerto ng Chat Battle mula kay @{name}.",
   cb2_tagline: "Buong bansa maglalaban nang live — 10 minuto, araw-araw.",
-  cb2_explain: "Araw-araw sa parehong oras, magla-live ang mga miyembro sa bansa mo sa isang malaking 10-minutong battle. Sumali kahit kailan sa loob ng 10 minuto, hanggang {n} battler na live nang sabay. May gift box ang bawat tile. Ang top 3 ng araw ay makakakuha ng Country Battle badge, at bawat araw ay mapupunta habambuhay sa Bragging Rights Board. Walang entry fee at walang premyong pera — sa iyo ang mga regalong matatanggap mo.",
+  cb2_explain: "Araw-araw sa parehong oras, magla-live ang mga miyembro sa bansa mo sa isang malaking 10-minutong battle. Sumali kahit kailan sa loob ng 10 minuto, hanggang {n} battler na live nang sabay. May gift box ang bawat tile. Ang top 3 ng araw ay makakakuha ng Country Battle badge, at bawat araw ay mapupunta habambuhay sa Bragging Rights Board.",
   cb2_how_score: "Ang score mo ay ang gift coins na matatanggap mo sa loob ng 10 minuto. Kapag pareho ang score, mas mataas ang unang nakaabot dito.",
   cb2_when_your_time: "{day} nang {time}, oras mo",
   cb2_minutes: "{n}-minutong battle",

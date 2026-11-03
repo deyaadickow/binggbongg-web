@@ -1809,7 +1809,7 @@ export const es = {
   chb_alerts_off_done: "Ya no recibirás alertas de Chat Battle de @{name}.",
   chb_alerts_on_done: "Volverás a recibir alertas de Chat Battle de @{name}.",
   cb2_tagline: "Todo el país compite en vivo: 10 minutos, todos los días.",
-  cb2_explain: "Todos los días a la misma hora, los miembros de tu país se conectan en vivo en una gran batalla de 10 minutos. Únete cuando quieras durante esos 10 minutos, con hasta {n} participantes en vivo a la vez. Cada mosaico tiene una caja de regalo. Los 3 primeros del día reciben una insignia de Batalla de Países y cada día queda para siempre en la Tabla de Honor. Sin cuota de entrada ni premios en dinero: los regalos que recibes son tuyos.",
+  cb2_explain: "Todos los días a la misma hora, los miembros de tu país se conectan en vivo en una gran batalla de 10 minutos. Únete cuando quieras durante esos 10 minutos, con hasta {n} participantes en vivo a la vez. Cada mosaico tiene una caja de regalo. Los 3 primeros del día reciben una insignia de Batalla de Países y cada día queda para siempre en la Tabla de Honor.",
   cb2_how_score: "Tu puntuación son las monedas de regalo que recibes durante los 10 minutos. Si hay empate, queda por delante quien llegó primero a esa puntuación.",
   cb2_when_your_time: "{day} a las {time}, tu hora",
   cb2_minutes: "Batalla de {n} minutos",

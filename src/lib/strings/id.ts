@@ -1823,7 +1823,7 @@ export const id = {
   chb_alerts_off_done: "Kamu tidak akan menerima notifikasi Chat Battle dari @{name} lagi.",
   chb_alerts_on_done: "Kamu akan menerima notifikasi Chat Battle dari @{name} lagi.",
   cb2_tagline: "Satu negara bertarung live — 10 menit, setiap hari.",
-  cb2_explain: "Setiap hari di jam yang sama, member di negaramu live dalam satu battle besar selama 10 menit. Ikut kapan saja selama 10 menit itu, hingga {n} battler live sekaligus. Setiap tile punya kotak hadiah. 3 teratas hari itu mendapat badge Country Battle, dan setiap hari tercatat selamanya di Papan Kebanggaan. Tanpa biaya masuk dan tanpa hadiah uang — hadiah yang kamu terima adalah milikmu.",
+  cb2_explain: "Setiap hari di jam yang sama, member di negaramu live dalam satu battle besar selama 10 menit. Ikut kapan saja selama 10 menit itu, hingga {n} battler live sekaligus. Setiap tile punya kotak hadiah. 3 teratas hari itu mendapat badge Country Battle, dan setiap hari tercatat selamanya di Papan Kebanggaan.",
   cb2_how_score: "Skormu adalah koin hadiah yang kamu terima selama 10 menit. Jika skornya sama, yang lebih dulu mencapainya berada di atas.",
   cb2_when_your_time: "{day} pukul {time} waktumu",
   cb2_minutes: "Battle {n} menit",
