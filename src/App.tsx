@@ -74,6 +74,7 @@ import { CountryBattleLivePage } from "./pages/CountryBattleLivePage";
 import { ChatBattleLivePage } from "./pages/ChatBattleLivePage";
 import { rememberAdSource } from "./lib/getApp";
 import { PageTracking } from "./components/PageTracking";
+import { SignupNudges } from "./components/SignupNudges";
 
 /** The ads' landing page (/ph) stands alone — no menu, no sidebar, nothing but the contest and the
  *  download button (Steve, 2026-10-31). Everything else gets the normal site. */
@@ -124,6 +125,9 @@ export default function App() {
             one element covers every route and nothing can be missed or drift later. */}
         <main className="content cosmic-page">
         <FallbackBack />
+        {/* Easy sign-up (Steve, 2026-11-03): the later, dismissible "verify your email" and
+            "add your name & photo" reminders. Never a wall. */}
+        <SignupNudges />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/exciting-news" element={<ExcitingNewsPage />} />
