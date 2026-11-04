@@ -134,9 +134,6 @@ export function CountryBattlePage() {
             {pl.sub && <div style={{ color: "#fff", fontWeight: 700, fontSize: 14 }}>{pl.sub}</div>}
             <div style={{ color: "var(--gold)", fontWeight: 800, fontSize: 26, fontVariantNumeric: "tabular-nums" }}>{pl.line}</div>
             {showNext && <div className="muted" style={{ fontSize: 13 }}>{cbText(t("cb2_next_in"), { time: clock(Date.parse(daily.next_starts_at!) - now) })}</div>}
-            {battle.room_open && (battle.phase === "joining" || battle.phase === "battle") && (
-              <div className="muted" style={{ fontSize: 12, marginTop: 2 }}>{cbText(t("cb2_places_left"), { n: battle.spaces_left, total: battle.max_battlers })}</div>
-            )}
           </div>
           {battle.phase !== "ended" && (
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -184,7 +181,7 @@ export function CountryBattlePage() {
 
       {isLoggedIn && <CountryBattleReminderToggle initial={daily.me?.reminders_on ?? null} />}
 
-      <Rules t={t} max={battle?.max_battlers} />
+      <Rules t={t} />
 
       <Link to="/country-battle/board" className="btn" style={{ display: "flex", justifyContent: "center" }}>🥇 {t("cb2_board")}</Link>
     </div>
@@ -192,10 +189,10 @@ export function CountryBattlePage() {
 }
 
 /** The new rules, in one card (also the explainer's). */
-function Rules({ t, max }: { t: T; max?: number }) {
+function Rules({ t }: { t: T }) {
   return (
     <div className="card pad" style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
-      <span style={{ color: "rgba(255,255,255,.88)", fontSize: 14 }}>{cbText(t("cb2_explain"), { n: max || 50 })}</span>
+      <span style={{ color: "rgba(255,255,255,.88)", fontSize: 14 }}>{t("cb2_explain")}</span>
       <b style={{ color: "var(--gold)", fontSize: 14 }}>{t("cb2_how_score")}</b>
     </div>
   );

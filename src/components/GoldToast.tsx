@@ -65,7 +65,7 @@ export function useToast() {
  * handlers that have no component to hang state on — so this mounts the card itself and tears
  * it down when OK is pressed.
  */
-export function showGoldAlert(message: string) {
+export function showGoldAlert(message: string, onClose?: () => void) {
   const host = document.createElement("div");
   document.body.appendChild(host);
   const root = createRoot(host);
@@ -73,6 +73,7 @@ export function showGoldAlert(message: string) {
   const close = () => {
     root.unmount();
     host.remove();
+    onClose?.();
   };
 
   root.render(

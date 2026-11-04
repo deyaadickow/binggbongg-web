@@ -1523,7 +1523,6 @@
  "chb_rejoin": "Вернуться",
  "chb_joining": "Подключение…",
  "chb_leave_confirm": "Покинуть Chat Battle? Ваши очки сохранятся, и вы сможете вернуться до окончания битвы.",
- "chb_full": "В этой Chat Battle нет мест.",
  "chb_too_many": "Сейчас идет слишком много Chat Battle. Попробуйте еще раз через пару минут.",
  "chb_already_running": "У вас уже запущена Chat Battle.",
  "chb_started": "Слишком поздно — эта Chat Battle уже началась.",

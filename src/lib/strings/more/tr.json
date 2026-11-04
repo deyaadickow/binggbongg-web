@@ -1524,7 +1524,6 @@
  "chb_rejoin": "Yeniden katıl",
  "chb_joining": "Katılınıyor…",
  "chb_leave_confirm": "Chat Battle'dan ayrılsın mı? Puanın tabloda kalır ve bitmeden önce tekrar katılabilirsin.",
- "chb_full": "Bu Chat Battle dolu.",
  "chb_too_many": "Şu anda çok fazla Chat Battle devam ediyor. Lütfen birkaç dakika sonra tekrar dene.",
  "chb_already_running": "Zaten devam eden bir Chat Battle'ın var.",
  "chb_started": "Çok geç — bu Chat Battle zaten başladı.",

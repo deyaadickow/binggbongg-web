@@ -109,10 +109,13 @@ export interface CbDayState {
   duration_minutes?: number;
   room_name: string | null;
   room_open: boolean;
-  max_battlers: number;
+  /** null = NO LIMIT (Steve 2026-11-03/04). The server may quietly cap a battle, but it never says so here: only a join answers reason "full". */
+  max_battlers: number | null;
   battler_count: number;
   live_count: number;
-  spaces_left: number;
+  /** null = NO LIMIT — show no "places left" / "full" line. */
+  spaces_left: number | null;
+  unlimited?: boolean;
   can_join_now: boolean;
   battlers: (ChbPerson & { score: number; rank: number; is_live: boolean; left: boolean; home_room_name: string | null; chat_room_name: string | null })[];
   live: number[];
@@ -240,6 +243,7 @@ export function dayAsBattleState(d: CbDayState): ChbState {
     battler_count: d.battler_count,
     live_count: d.live_count,
     spaces_left: d.spaces_left,
+    unlimited: d.unlimited,
     can_join_now: d.can_join_now,
     battlers: d.battlers.map((b): ChbBattler => ({ ...b, is_starter: false })),
     live: d.live,

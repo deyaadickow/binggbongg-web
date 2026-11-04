@@ -321,6 +321,9 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
   const [st, setSt] = useState<ChbState | null>(null);
   /** The heartbeat's reason once this battle is gone (not_found / off), else null. */
   const [gone, setGone] = useState<string | null>(null);
+  /** A battler's heartbeat refused with "full": over the server's quiet cap (Steve, 2026-11-04 —
+   *  advertised as no limit). The popup, then the screen closes. */
+  const [overLimit, setOverLimit] = useState(false);
   const [role, setRole] = useState<"guest" | "viewer">(battlerHint && (isLoggedIn || !!demoUserId) ? "guest" : "viewer");
   const [joining, setJoining] = useState(false);
   // A tile tapped to listen to (viewers). Battlers hear their stars; a home viewer always hears home.
@@ -344,13 +347,14 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
     if (!r) return;
     if (r.ok) setSt(r.data);
     else if (srcRef.current.goneReasons.includes(r.reason)) setGone(r.reason);
+    else if (r.reason === "full" && roleRef.current === "guest") setOverLimit(true);
   }, []);
   useEffect(() => {
-    if (gone) return;
+    if (gone || overLimit) return;
     beat();
     const timer = setInterval(beat, HEARTBEAT_MS);
     return () => clearInterval(timer);
-  }, [beat, gone, battleId]);
+  }, [beat, gone, overLimit, battleId]);
   // Once more as each phase turns (lobby opens, gifts start counting, the end), so the screen
   // flips without waiting for the next beat.
   const phaseEnds = st?.phase_ends_at ?? null;
@@ -543,6 +547,12 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
     roomHook.disconnect();
     if (location.key !== "default") navigate(-1); else navigate(srcRef.current.fallbackPath, { replace: true });
   }, [roomHook, location.key, navigate]);
+  useEffect(() => {
+    if (!overLimit) return;
+    leave();
+    roomHook.disconnect();
+    showGoldAlert(srcRef.current.reasonText("full"), goBack);
+  }, [overLimit]); // eslint-disable-line react-hooks/exhaustive-deps
   const back = () => {
     if (isBattler && !ended && !window.confirm(source.leaveConfirm)) return;
     leave();

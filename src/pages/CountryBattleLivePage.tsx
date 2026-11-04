@@ -136,8 +136,8 @@ function CountryBattleDemo({ n, withOwn, phase, imgBase }: { n: number; withOwn:
       contest_id: 0, name: "Philippines · Tue, Nov 3", shared: true, phase, server_now: new Date().toISOString(), created_at: opens,
       starts_at: starts, ends_at: ends, opens_at: opens,
       phase_ends_at: phase === "upcoming" ? opens : phase === "joining" ? starts : phase === "battle" ? ends : null,
-      room_name: null, room_open: phase !== "upcoming", starter: null, max_battlers: 50, battler_count: total, live_count: battlers.length,
-      spaces_left: Math.max(0, 50 - battlers.length), can_join_now: phase === "joining" || phase === "battle",
+      room_name: null, room_open: phase !== "upcoming", starter: null, max_battlers: null, battler_count: total, live_count: battlers.length,
+      spaces_left: null, unlimited: true, can_join_now: phase === "joining" || phase === "battle",
       battlers, live: battlers.map((b) => b.user_id), finished: phase === "ended", tie: false, top3, winner: top3[0] ?? null,
       me: {
         user_id: withOwn ? 1001 : 0, is_battler: withOwn && phase !== "upcoming", is_live: withOwn && phase !== "upcoming", left: false,
@@ -147,9 +147,9 @@ function CountryBattleDemo({ n, withOwn, phase, imgBase }: { n: number; withOwn:
     });
     return makeSource(t, 0, countryRef, {
       heartbeat: async () => ({ ok: true, data: state() }),
-      join: async () => ({ ok: false, reason: "full", message: "", full: true }),
+      join: async () => ({ ok: false, reason: "demo", message: t("cb2_go_live_join"), full: false }),
       leave: async () => undefined,
-      sendGift: async () => ({ status: false, message: t("cb2_full") }),
+      sendGift: async () => ({ status: false, message: t("cb_off") }),
     });
   }, [t, n, withOwn, phase, imgBase]);
   return <GridBattleLive source={source} home={withOwn ? null : 1001} battlerHint={withOwn} demoUserId={withOwn ? 1001 : undefined} />;

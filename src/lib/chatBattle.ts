@@ -69,10 +69,14 @@ export interface ChbState {
   room_name: string | null;
   room_open: boolean;
   starter: ChbPerson | null;
-  max_battlers: number;
+  /** null = NO LIMIT (Steve 2026-11-03/04). The server may quietly cap a battle, but it never says so here: only a join answers reason "full". */
+  max_battlers: number | null;
   battler_count: number;
   live_count: number;
-  spaces_left: number;
+  /** null = NO LIMIT — show no "places left" / "full" line. */
+  spaces_left: number | null;
+  /** true when max_battlers is null (the server sends it; older answers may not). */
+  unlimited?: boolean;
   can_join_now: boolean;
   /** Every battler, best score first. */
   battlers: ChbBattler[];

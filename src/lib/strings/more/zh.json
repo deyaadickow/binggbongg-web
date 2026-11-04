@@ -1524,7 +1524,6 @@
  "chb_rejoin": "重新加入",
  "chb_joining": "正在加入…",
  "chb_leave_confirm": "退出 Chat Battle？你的分数会保留在榜单上，结束前你仍可重新加入。",
- "chb_full": "此 Chat Battle 已满员。",
  "chb_too_many": "当前进行中的 Chat Battle 过多，请几分钟后再试。",
  "chb_already_running": "你已有一个正在进行的 Chat Battle。",
  "chb_started": "来晚了 — 此 Chat Battle 已经开始。",

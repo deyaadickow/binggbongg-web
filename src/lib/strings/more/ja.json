@@ -1523,7 +1523,6 @@
  "chb_rejoin": "再参加",
  "chb_joining": "参加中…",
  "chb_leave_confirm": "Chat Battleから退出しますか？スコアはボードに残り、終了前なら再参加できます。",
- "chb_full": "このChat Battleは満員です。",
  "chb_too_many": "現在開催中のChat Battleが多すぎます。数分後にもう一度お試しください。",
  "chb_already_running": "すでに開催中のChat Battleがあります。",
  "chb_started": "間に合いませんでした — このChat Battleはすでに始まっています。",

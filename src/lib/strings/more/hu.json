@@ -1517,7 +1517,6 @@
  "chb_rejoin": "Újracsatlakozás",
  "chb_joining": "Csatlakozás…",
  "chb_leave_confirm": "Kilépsz a Chat Battle-ből? A pontszámod a táblán marad, és a vége előtt újra csatlakozhatsz.",
- "chb_full": "Ez a Chat Battle megtelt.",
  "chb_too_many": "Jelenleg túl sok Chat Battle fut. Kérjük, próbáld újra pár perc múlva.",
  "chb_already_running": "Már fut egy Chat Battle-öd.",
  "chb_started": "Túl késő — ez a Chat Battle már elindult.",

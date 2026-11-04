@@ -125,7 +125,7 @@ function ChatBattleDemo({ n, withOwn, showEnd, imgBase }: { n: number; withOwn: 
   const fakeState: ChbState = {
     contest_id: 0, name: "Maria's Chat Battle", shared: true, phase: endOpen ? "ended" : "battle",
     server_now: "", created_at: "", starts_at: "", ends_at: "", phase_ends_at: null, room_name: null, room_open: true,
-    starter: battlers[0], max_battlers: 24, battler_count: total, live_count: total, spaces_left: 0, can_join_now: false,
+    starter: battlers[0], max_battlers: null, battler_count: total, live_count: total, spaces_left: null, unlimited: true, can_join_now: false,
     battlers, live, winner: { ...battlers[0], score: battlers[0].score }, tie: false, finished: endOpen,
     me: { user_id: 1001, is_battler: withOwn, is_live: withOwn, left: false, score: withOwn ? battlers[0].score : null, rank: 1, home_room_name: null, can_join: false, join_reason: null },
   };
@@ -138,7 +138,7 @@ function ChatBattleDemo({ n, withOwn, showEnd, imgBase }: { n: number; withOwn: 
         onBack={() => navigate("/battles")}
         actions={<>
           <button className="btn small ghost" onClick={() => setBoardOpen(true)}>🏆 {t("leaderboard")}</button>
-          {!withOwn && <button className="btn small" onClick={() => showGoldAlert(t("chb_full"))}>{cbText(t("chb_join_in"), { time: "1:42" })}</button>}
+          {!withOwn && <button className="btn small" onClick={() => undefined}>{cbText(t("chb_join_in"), { time: "1:42" })}</button>}
         </>} />
       <StarredYouBar ids={demoStarredMe} nameOf={(id) => nameOf(grid.byId.get(id))} onStarBack={(id) => grid.star.toggle(id)} />
       <CountryBattleGrid stage={grid.stage} tiles={demoTiles} listen={demoHeard} reserve={CHAT_RESERVE} phoneFullWidth
