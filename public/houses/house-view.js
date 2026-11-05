@@ -133,7 +133,7 @@ var STRINGS={
   queued:"Queued: {1} coins · about {2} to lay at this speed",queue_empty:"Queue empty · new coins are laid at this speed",
   t_lt1:"under a second",t_sec:"{1} sec",t_min:"{1} min",t_hr:"{1} hours",
   street_of:"Street {1} of {2}",lg_built:"Built",lg_now:"Building now",lg_empty:"Empty lot",
-  street_count:"{1} / 40 houses on this street · {2} streets complete",street_sign:"STREET {1} · BINGG BONGG AVENUE",
+  street_count:"{1} / 40 houses on this street · {2} streets complete",street_count_one:"{1} / 40 houses on this street · {2} street complete",street_sign:"STREET {1} · BINGG BONGG AVENUE",
   ff_one:"House #{1} was finished while you were away",ff_many:"{1} houses were finished while you were away"},
  fil:{house_lbl:"Bahay #{1} · Kalye {2}, lote {3}",of_coins:"/ {1} coins",
   ph_foundation:"Pundasyon",ph_bricks:"Ladrilyo",ph_roof:"Bubong",ph_complete:"Tapos na",
@@ -148,7 +148,7 @@ var STRINGS={
   queued:"Nakapila: {1} coins · mga {2} para mailatag sa bilis na ito",queue_empty:"Walang nakapila · ilalatag ang bagong coins sa bilis na ito",
   t_lt1:"wala pang isang segundo",t_sec:"{1} seg",t_min:"{1} min",t_hr:"{1} oras",
   street_of:"Kalye {1} ng {2}",lg_built:"Tapos",lg_now:"Ginagawa ngayon",lg_empty:"Bakanteng lote",
-  street_count:"{1} / 40 bahay sa kalyeng ito · {2} kalyeng tapos",street_sign:"KALYE {1} · BINGG BONGG AVENUE",
+  street_count:"{1} / 40 bahay sa kalyeng ito · {2} kalyeng tapos",street_count_one:"{1} / 40 bahay sa kalyeng ito · {2} kalyeng tapos",street_sign:"KALYE {1} · BINGG BONGG AVENUE",
   ff_one:"Natapos ang Bahay #{1} habang wala ka",ff_many:"{1} bahay ang natapos habang wala ka"},
  id:{house_lbl:"Rumah #{1} · Jalan {2}, kavling {3}",of_coins:"/ {1} koin",
   ph_foundation:"Fondasi",ph_bricks:"Bata",ph_roof:"Atap",ph_complete:"Selesai",
@@ -163,7 +163,7 @@ var STRINGS={
   queued:"Antrean: {1} koin · sekitar {2} untuk dipasang pada kecepatan ini",queue_empty:"Antrean kosong · koin baru dipasang pada kecepatan ini",
   t_lt1:"kurang dari sedetik",t_sec:"{1} detik",t_min:"{1} menit",t_hr:"{1} jam",
   street_of:"Jalan {1} dari {2}",lg_built:"Selesai",lg_now:"Sedang dibangun",lg_empty:"Kavling kosong",
-  street_count:"{1} / 40 rumah di jalan ini · {2} jalan selesai",street_sign:"JALAN {1} · BINGG BONGG AVENUE",
+  street_count:"{1} / 40 rumah di jalan ini · {2} jalan selesai",street_count_one:"{1} / 40 rumah di jalan ini · {2} jalan selesai",street_sign:"JALAN {1} · BINGG BONGG AVENUE",
   ff_one:"Rumah #{1} selesai saat kamu pergi",ff_many:"{1} rumah selesai saat kamu pergi"},
  es:{house_lbl:"Casa #{1} · Calle {2}, lote {3}",of_coins:"/ {1} monedas",
   ph_foundation:"Cimientos",ph_bricks:"Ladrillos",ph_roof:"Techo",ph_complete:"Terminada",
@@ -178,7 +178,7 @@ var STRINGS={
   queued:"En cola: {1} monedas · unos {2} a esta velocidad",queue_empty:"Cola vacía · las monedas nuevas se colocan a esta velocidad",
   t_lt1:"menos de un segundo",t_sec:"{1} seg",t_min:"{1} min",t_hr:"{1} horas",
   street_of:"Calle {1} de {2}",lg_built:"Construida",lg_now:"En obra",lg_empty:"Lote vacío",
-  street_count:"{1} / 40 casas en esta calle · {2} calles completas",street_sign:"CALLE {1} · BINGG BONGG AVENUE",
+  street_count:"{1} / 40 casas en esta calle · {2} calles completas",street_count_one:"{1} / 40 casas en esta calle · {2} calle completa",street_sign:"CALLE {1} · BINGG BONGG AVENUE",
   ff_one:"La casa #{1} se terminó mientras no estabas",ff_many:"{1} casas se terminaron mientras no estabas"},
  ar:{house_lbl:"البيت رقم {1} · الشارع {2}، القطعة {3}",of_coins:"/ {1} عملة",
   ph_foundation:"الأساس",ph_bricks:"الطوب",ph_roof:"السقف",ph_complete:"مكتمل",
@@ -193,7 +193,7 @@ var STRINGS={
   queued:"في الانتظار: {1} عملة · نحو {2} بهذه السرعة",queue_empty:"لا شيء في الانتظار · تُبنى العملات الجديدة بهذه السرعة",
   t_lt1:"أقل من ثانية",t_sec:"{1} ث",t_min:"{1} د",t_hr:"{1} ساعة",
   street_of:"الشارع {1} من {2}",lg_built:"مبني",lg_now:"قيد البناء",lg_empty:"قطعة فارغة",
-  street_count:"{1} / 40 بيتًا في هذا الشارع · {2} شوارع مكتملة",street_sign:"STREET {1} · BINGG BONGG AVENUE",
+  street_count:"{1} / 40 بيتًا في هذا الشارع · {2} شوارع مكتملة",street_count_one:"{1} / 40 بيتًا في هذا الشارع · {2} شارع مكتمل",street_sign:"STREET {1} · BINGG BONGG AVENUE",
   ff_one:"اكتمل البيت رقم {1} أثناء غيابك",ff_many:"اكتمل {1} بيوت أثناء غيابك"}
 };
 STRINGS.tl=STRINGS.fil;
@@ -859,7 +859,7 @@ function drawStreet(){
   setText(els.streetTitle,T('street_of',fmt(viewStreet+1),fmt(curStreet+1)));
   if(els.stPrev)els.stPrev.disabled=viewStreet<=0;if(els.stNext)els.stNext.disabled=viewStreet>=curStreet;
   var inView=viewStreet<curStreet?PER_STREET:curLot;
-  setText(els.streetCount,T('street_count',inView,fmt(curStreet)));
+  setText(els.streetCount,T(curStreet===1?'street_count_one':'street_count',inView,fmt(curStreet)));
 }
 function scrollStreetToCurrent(){var w=els.streetWrap;if(!w)return;var col=(S.houses%PER_STREET)%20;try{w.scrollTo({left:Math.max(0,12+col*LOT-w.clientWidth/2),behavior:'smooth'});}catch(e){w.scrollLeft=Math.max(0,12+col*LOT-w.clientWidth/2);}}
 
