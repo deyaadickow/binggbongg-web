@@ -1903,4 +1903,5 @@ export const es = {
   ve_resent: "Enviamos un nuevo enlace a %1$s.",
   ve_no_session: "Cierra sesión y vuelve a entrar con tu correo y contraseña.",
   ve_checking: "Comprobando…",
+  featured_videos_tab: "70+ videos destacados",
 };

@@ -2117,4 +2117,5 @@ export const en = {
   ve_resent: "We sent a new link to %1$s.",
   ve_no_session: "Please sign out, then sign in again with your email and password.",
   ve_checking: "Checking…",
+  featured_videos_tab: "70+ Featured Videos",
 } as const;

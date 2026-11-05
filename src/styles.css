@@ -76,6 +76,9 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .nav .links a { padding: 7px 14px; border-radius: 999px; border: 1px solid var(--gold-border); background: #0d0d0d; color: var(--text-soft); font-weight: 600; white-space: nowrap; transition: background .15s, color .15s; }
 .nav .links a:hover { color: var(--gold); background: #1a1a1a; }
 .nav .links a.active { background: var(--gold-border); border-color: var(--gold-border); color: #0d0d0d; font-weight: 800; }
+/* Three chips side by side on a phone (Steve, 2026-11-05: "70+ Featured Videos" joined the row;
+   iOS cc5b37c uses 12.5pt + 8px side padding). */
+@media (max-width: 480px) { .nav .links { gap: 4px; } .nav .links a { font-size: 12.5px; padding: 6px 8px; } }
 .nav .me { display: flex; align-items: center; gap: 8px; }
 
 .page { max-width: 1100px; margin: 0 auto; padding: 20px 16px 48px; }

@@ -32,6 +32,10 @@ export function Nav() {
             only For You and the directory stay up here, centred like the phones. */}
         <NavLink to="/" end>{t("for_you")}</NavLink>
         <NavLink to="/features">{t("everything_bingg_bongg_does")}</NavLink>
+        {/* Steve, 2026-11-05: "Next to 'For You Page' and 'Bingg Bongg features' on main feed page
+            please add '70+ Featured Videos'" — the existing Features Videos page and its player
+            with the language buttons. */}
+        <NavLink to="/feature-videos">{t("featured_videos_tab")}</NavLink>
         <NavLink to="/settings" className="only-narrow">{t("settings")}</NavLink>
       </nav>
       <div className="me">

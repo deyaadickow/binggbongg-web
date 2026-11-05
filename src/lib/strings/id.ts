@@ -1917,4 +1917,5 @@ export const id = {
   ve_resent: "Kami mengirim tautan baru ke %1$s.",
   ve_no_session: "Silakan keluar, lalu masuk lagi dengan email dan kata sandi kamu.",
   ve_checking: "Memeriksa…",
+  featured_videos_tab: "70+ Video Unggulan",
 };

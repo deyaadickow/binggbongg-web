@@ -1922,4 +1922,5 @@ export const fil = {
   ve_resent: "Nagpadala kami ng bagong link sa %1$s.",
   ve_no_session: "Mag-sign out muna, tapos mag-sign in ulit gamit ang email at password mo.",
   ve_checking: "Tinitingnan…",
+  featured_videos_tab: "70+ Itinatampok na Video",
 };
