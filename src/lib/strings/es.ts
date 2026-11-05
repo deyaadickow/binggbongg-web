@@ -440,6 +440,8 @@ export const es = {
   share_after_entry: "¡Ya participas! Comparte tu entrada para que tus amigos voten por ti.",
   vote_sign_in: "Inicia sesión para votar",
   fblurb_go_live: "Transmite desde tu teléfono o desde este navegador. Los espectadores pueden pedir salir contigo en pantalla.",
+  fname_multi_live_24: "Multi-live 24",
+  fblurb_multi_live_24: "Hasta 24 personas en cámara en tu directo. 4 pueden hablar a la vez, los demás levantan la mano. Batalla con todos.",
   fblurb_go_live_from_your_computer: "Transmite tu juego desde una PC con OBS o Streamlabs.",
   fblurb_go_live_on_6_platforms: "Un solo directo, enviado a YouTube, Facebook, Twitch, Instagram y TikTok al mismo tiempo.",
   fblurb_help_and_faq: "Respuestas a lo que más preguntan los miembros.",

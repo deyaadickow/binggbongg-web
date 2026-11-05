@@ -440,6 +440,8 @@ export const id = {
   share_after_entry: "Kamu sudah ikut! Bagikan entrimu supaya teman bisa memilihmu.",
   vote_sign_in: "Masuk untuk memilih",
   fblurb_go_live: "Streaming dari ponselmu atau browser ini. Penonton bisa minta bergabung di layar.",
+  fname_multi_live_24: "Multi-live 24",
+  fblurb_multi_live_24: "Hingga 24 orang di kamera dalam live kamu. 4 bisa bicara bersamaan, yang lain angkat tangan. Battle dengan semuanya.",
   fblurb_go_live_from_your_computer: "Streaming gamemu dari PC dengan OBS atau Streamlabs.",
   fblurb_go_live_on_6_platforms: "Satu live, dikirim ke YouTube, Facebook, Twitch, Instagram dan TikTok sekaligus.",
   fblurb_help_and_faq: "Jawaban atas hal yang paling sering ditanyakan anggota.",

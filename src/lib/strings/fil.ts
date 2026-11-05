@@ -440,6 +440,8 @@ export const fil = {
   share_after_entry: "Kasali ka na! I-share ang entry mo para maiboto ka ng mga kaibigan.",
   vote_sign_in: "Mag-sign in para bumoto",
   fblurb_go_live: "Mag-stream mula sa phone mo o sa browser na ito. Pwedeng humiling ang mga manonood na sumama sa screen.",
+  fname_multi_live_24: "Multi-live 24",
+  fblurb_multi_live_24: "Hanggang 24 na tao sa camera sa live mo. 4 ang puwedeng magsalita nang sabay, ang iba ay magtataas ng kamay. Makipag-battle sa lahat.",
   fblurb_go_live_from_your_computer: "I-stream ang game mo mula sa PC gamit ang OBS o Streamlabs.",
   fblurb_go_live_on_6_platforms: "Isang live, ipinapadala sa YouTube, Facebook, Twitch, Instagram at TikTok nang sabay.",
   fblurb_help_and_faq: "Mga sagot sa madalas itanong ng mga miyembro.",

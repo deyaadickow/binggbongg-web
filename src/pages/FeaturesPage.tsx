@@ -79,6 +79,8 @@ const FEATURES: Section[] = [
     titleKey: "fsec_going_live",
     features: [
       { icon: "🔴", nameKey: "fname_go_live", blurbKey: "fblurb_go_live", to: "/go-live" },
+      // Multi-live 24 (Steve, 2026-11-05): Go Live picks Members on camera 2..24.
+      { icon: "👥", nameKey: "fname_multi_live_24", blurbKey: "fblurb_multi_live_24", to: "/go-live", videoKey: "multi_live" },
       { icon: "🖥️", nameKey: "fname_go_live_from_your_computer", blurbKey: "fblurb_go_live_from_your_computer", to: "/go-live/computer" },
       { icon: "📺", nameKey: "fname_live_now", blurbKey: "fblurb_live_now", to: "/live" },
       { icon: "👀", nameKey: "fname_watch_up_to_6_lives_at_once", blurbKey: "fblurb_watch_up_to_6_lives_at_once", to: "/feature/watch-6-lives", whereKey: "fwhere_the_phone_app" },
