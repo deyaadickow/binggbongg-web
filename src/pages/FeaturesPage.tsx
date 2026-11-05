@@ -96,6 +96,8 @@ const FEATURES: Section[] = [
     titleKey: "fsec_battles",
     features: [
       { icon: "⚔️", nameKey: "fname_n11_battle_modes", blurbKey: "fblurb_n11_battle_modes", to: "/battles", whereKey: "fwhere_the_live_room" },
+      // Build Your Houses (Steve, 2026-11-05): every coin won in a battle lays one brick.
+      { icon: "🏠", nameKey: "fname_build_your_houses", blurbKey: "fblurb_build_your_houses", to: "/houses", videoKey: "build_your_houses" },
       { icon: "🏆", nameKey: "fname_pk_battle_contests", blurbKey: "fblurb_pk_battle_contests", to: "/pk-contests", whereKey: "fwhere_the_live_room" },
       // Steve, 2026-11-01: "we will not start this battle until we have a few thousand members. but we
       // will announce it with one of the feature with a video" — so the tile shows to EVERYONE even

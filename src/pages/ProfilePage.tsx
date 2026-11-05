@@ -5,6 +5,7 @@ import { displayName, mediaUrl, post, type Post, type UserSummary } from "../lib
 import { VipBadge, VipBadgePopup } from "../components/VipBadge";
 import { isVipReferrer } from "../lib/referral";
 import { BattleBadge, BattleInfoPopup, BattleStreak, battleBadgeExplainer, battleStreakExplainer } from "../components/BattleBadge";
+import { HousesPill } from "./HousesPage";
 import { useSession } from "../lib/session";
 import { memberLabel, trackPage } from "../lib/pageTracker";
 import { ReportDialog } from "../components/ReportDialog";
@@ -617,6 +618,8 @@ export function ProfilePage() {
               />
               {/* Steve, 2026-10-29: a VIP Referral Member's gold pill; tapping it says what it is. */}
               {isVipReferrer(profile.is_vip_referrer) && <VipBadge onClick={() => setVipInfo(true)} />}
+              {/* Build Your Houses (Steve, 2026-11-05): "🏠 N houses" opens their house page. */}
+              <HousesPill userId={profile.id} />
               {profile.is_verified === 2 && (
                 <span title={t("verified")} style={{ color: "#4af", fontSize: 16 }}>✓</span>
               )}

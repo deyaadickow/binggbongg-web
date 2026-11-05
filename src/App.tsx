@@ -24,6 +24,7 @@ import { HelpListPage, HelpCampaignPage, StartHelpPage } from "./pages/HelpPages
 import { HomePage } from "./pages/HomePage";
 import { LanguagePage } from "./pages/LanguagePage";
 import { FeaturesPage } from "./pages/FeaturesPage";
+import { HousesPage } from "./pages/HousesPage";
 import { FeatureVideosPage } from "./pages/FeatureVideosPage";
 import { ReferralProgramPage } from "./pages/ReferralProgramPage";
 import { VipReferralPage } from "./pages/VipReferralPage";
@@ -254,6 +255,9 @@ export default function App() {
           <Route path="/settings/verification" element={<ComingSoonPage titleKey="request_verification" noteKey="verification_note" />} />
           <Route path="/settings/language" element={<LanguagePage />} />
           {/* The feature directory (Steve, 2026-10-18) — one tile per feature, grouped. */}
+          {/* Build Your Houses (Steve, 2026-11-05): your own houses, anyone's, and the boards. */}
+          <Route path="/houses" element={<HousesPage />} />
+          <Route path="/houses/:userId" element={<HousesPage />} />
           <Route path="/features" element={<FeaturesPage />} />
           {/* Every feature's 60-second video under its own heading (Steve, 2026-10-29). */}
           <Route path="/feature-videos" element={<FeatureVideosPage />} />

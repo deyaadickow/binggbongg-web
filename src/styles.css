@@ -1007,3 +1007,60 @@ body.signup-black { background: #000; }
   .ml-spk { min-width: 26px; height: 26px; font-size: 13px; bottom: 20px; }
   .ml-score { font-size: 11px; }
 }
+
+/* ---------------- Build Your Houses (Steve, 2026-11-05) — pages/HousesPage.tsx ----------------
+   The house itself, its progress bars, speed bar and street are drawn by the shared renderer
+   (public/houses/house-view.js, its own .hv-* styles). These are the page around it. */
+.bh { max-width: 520px; margin: 0 auto; }
+.bh-sub { font-size: 12px; color: #a59b80; font-weight: 600; margin: -8px 0 10px 52px; }
+.bh-tabs { display: flex; gap: 6px; background: #0c0c0c; border: 1px solid rgba(212,175,55,.38); border-radius: 999px; padding: 4px; margin: 4px 0 12px; }
+.bh-tabs button, .bh-seg button { flex: 1; border: 0; background: transparent; color: #a59b80; font: inherit; font-weight: 800; font-size: 14px; padding: 9px 6px; border-radius: 999px; cursor: pointer; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bh-tabs button.on, .bh-seg button.on { background: linear-gradient(180deg,#FFDD55,#D4AF37); color: #000; }
+.bh-seg { display: flex; gap: 4px; background: #000; border: 1px solid rgba(212,175,55,.38); border-radius: 999px; padding: 3px; margin-bottom: 8px; }
+.bh-seg button { font-size: 13px; padding: 7px 6px; }
+.bh-card { background: #0c0c0c; border: 1px solid rgba(212,175,55,.38); border-radius: 18px; padding: 14px; margin-bottom: 12px; }
+.bh-card h2 { font-size: 16px; font-weight: 900; color: #FFDD55; margin: 0 0 10px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.bh-card h2 small { font-size: 12px; color: #a59b80; font-weight: 700; }
+.bh-owner { display: flex; align-items: center; gap: 12px; }
+.bh-owner .nm { font-weight: 900; color: #FFDD55; font-size: 16px; }
+.bh-owner small { color: #a59b80; font-weight: 700; font-size: 12px; }
+.bh-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.bh-stat { background: #000; border: 1px solid #262626; border-radius: 14px; padding: 10px 12px; min-width: 0; }
+.bh-stat .k { font-size: 11px; color: #a59b80; font-weight: 800; text-transform: uppercase; letter-spacing: .4px; }
+.bh-stat .v { font-size: 22px; font-weight: 900; color: #FFDD55; font-variant-numeric: tabular-nums; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bh-stat .v.sm { font-size: 15px; }
+.bh-pace { margin-top: 10px; border: 1px solid #D4AF37; border-radius: 14px; padding: 12px; background: linear-gradient(180deg,#141005,#000); font-size: 14px; line-height: 1.4; font-weight: 700; color: #fff; }
+.bh-pace b { color: #FFDD55; }
+.bh-pace small { display: block; color: #a59b80; font-size: 12.5px; margin-top: 4px; }
+.bh-rules { font-size: 13.5px; line-height: 1.5; color: #ddd; font-weight: 600; }
+.bh-rules .r { display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px dashed #2a2a2a; padding: 7px 0; }
+.bh-rules .r b { color: #FFDD55; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.bh-rules p { margin: 10px 0 0; color: #bbb; }
+.bh-recent { display: flex; justify-content: space-between; gap: 8px; padding: 6px 0; border-bottom: 1px solid #1c1c1c; font-size: 13px; font-weight: 700; color: #ddd; }
+.bh-recent b { color: #FFDD55; }
+.bh-recent span:last-child { color: #a59b80; font-size: 12px; white-space: nowrap; }
+.bh-lbhead { display: flex; justify-content: space-between; font-size: 11px; color: #a59b80; font-weight: 800; text-transform: uppercase; letter-spacing: .4px; padding: 4px 8px; }
+.bh-lbrow { display: flex; align-items: center; gap: 10px; padding: 9px 8px; border-bottom: 1px solid #1c1c1c; cursor: pointer; color: inherit; width: 100%; background: transparent; border-left: 0; border-right: 0; border-top: 0; font: inherit; text-align: left; }
+.bh-lbrow:hover { background: rgba(255,221,85,.05); }
+.bh-lbrow .rk { width: 30px; text-align: center; font-weight: 900; color: #ccc; font-size: 15px; flex: none; }
+.bh-lbrow .rk.long { font-size: 11px; }
+.bh-lbrow .avatar { width: 38px; height: 38px; flex: none; box-shadow: 0 0 0 1.5px #D4AF37; }
+.bh-lbrow .nm { flex: 1; min-width: 0; }
+.bh-lbrow .nm div { font-weight: 800; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
+.bh-lbrow .nm small { font-size: 11.5px; color: #a59b80; font-weight: 700; }
+.bh-lbrow .cn { text-align: right; font-weight: 900; color: #FFDD55; font-variant-numeric: tabular-nums; font-size: 14px; }
+.bh-lbrow .cn small { display: block; font-size: 10.5px; color: #a59b80; font-weight: 700; }
+.bh-lbrow.top1 .rk { color: #FFDD55; } .bh-lbrow.top2 .rk { color: #d9d9d9; } .bh-lbrow.top3 .rk { color: #d08a4a; }
+.bh-lbrow.top1 { background: linear-gradient(90deg,rgba(255,221,85,.12),transparent); }
+.bh-crown { font-size: 10px; display: block; line-height: 1; color: #FFDD55; }
+.bh-you { position: sticky; bottom: 12px; margin-top: 10px; background: linear-gradient(180deg,#2a2208,#0c0a03); border: 1.5px solid #FFDD55; border-radius: 16px; box-shadow: 0 -6px 24px rgba(0,0,0,.8); overflow: hidden; }
+.bh-you .bh-lbrow { border: 0; }
+.bh-note { font-size: 13px; color: #bbb; font-weight: 600; text-align: center; padding: 18px 8px; line-height: 1.45; }
+.bh-soon { text-align: center; padding: 22px 14px; }
+.bh-soon .ic { font-size: 44px; }
+.bh-soon h3 { margin: 6px 0 6px; color: #FFDD55; font-size: 22px; font-weight: 900; }
+.bh-soon p { margin: 0; color: #ddd; font-size: 14px; line-height: 1.45; }
+.bh-pill { display: inline-flex; align-items: center; gap: 4px; border: 1px solid #D4AF37; border-radius: 999px; padding: 3px 9px; font-size: 12px; font-weight: 800; color: #FFDD55; background: #000; white-space: nowrap; text-decoration: none; }
+.bh-pill:hover { color: #fff; }
+/* The phone-web "Get the app" bar is fixed at the bottom: keep the pinned "You" row above it. */
+body:has(.get-app-bar) .bh-you { bottom: calc(88px + env(safe-area-inset-bottom)); }

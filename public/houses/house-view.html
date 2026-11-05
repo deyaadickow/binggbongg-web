@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Build Your Houses</title>
+<!--
+  Bingg Bongg — Build Your Houses, the shared house renderer page.
+  Served at https://www.binggbongg.com/houses/house-view.html and bundled inside the Android and
+  iOS apps (load it from the app's assets so it works offline). The app talks to it with
+  HouseView.setProgress({...}) via evaluateJavascript / evaluateJavaScript; events come back
+  through window.HouseViewAndroid.onEvent / window.webkit.messageHandlers.houseView.
+  See README.md in this folder.
+
+  Query parameters (all optional):
+    lang=en|fil|tl|id|es|ar   sound=0 (start muted)   speed=380 (parts/sec)   height=380 (px)
+    demo=1   fake data so the page can be opened on its own (app developers, the feature video):
+             parts=65500 (lifetime parts)  from=60000 (lastSeenParts)  live=0 (no fake live gifts)
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;background:#000;color:#fff}
+  body{font-family:"Gilroy","Urbanist",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-weight:600}
+  #hv{max-width:480px;margin:0 auto;padding:12px 12px 24px}
+</style>
+</head>
+<body>
+<div id="hv"></div>
+<script src="house-view.js"></script>
+<script>
+(function(){
+  "use strict";
+  var q={};try{new URLSearchParams(location.search).forEach(function(v,k){q[k]=v;});}catch(e){}
+  HouseView.init({
+    container: document.getElementById('hv'),
+    lang: q.lang || (navigator.language||'en'),
+    sound: q.sound !== '0',
+    speedPartsPerSec: q.speed ? +q.speed : undefined,
+    height: q.height ? +q.height : 380
+  });
+  if (q.demo !== '1') return;
+  // ---- demo: fake member progress + fake live gifts (never used by the real app) ----
+  var parts = q.parts != null ? Math.max(0, +q.parts || 0) : 65500;
+  var from = q.from != null ? Math.max(0, +q.from || 0) : Math.max(0, parts - 5500);
+  HouseView.setProgress({ lifetimeParts: parts, lastSeenParts: from });
+  if (q.live === '0') return;
+  var GIFTS=[['Rose',1,30],['Heart',5,20],['Ice Cream',10,16],['Crown',50,12],['Bongg Burst',100,10],['Sports Car',500,7],['Castle',1000,4]];
+  var FANS=['LilyB','KuyaJun','Mika_88','Ate Liza','JoyJoy','Paolo P','Bea Star','Tala T'];
+  var total=0;GIFTS.forEach(function(g){total+=g[2];});
+  function tick(){
+    if(!document.hidden){
+      var t=Math.random()*total,g=GIFTS[0];for(var i=0;i<GIFTS.length;i++){t-=GIFTS[i][2];if(t<=0){g=GIFTS[i];break;}}
+      var qty=g[1]<=10&&Math.random()<.4?(2+(Math.random()*8|0)):1,coins=g[1]*qty;
+      parts+=coins;HouseView.setProgress({lifetimeParts:parts});
+      HouseView.toast(FANS[Math.random()*FANS.length|0]+' · '+g[0]+(qty>1?' x'+qty:'')+' +'+coins.toLocaleString('en-US'));
+    }
+    setTimeout(tick,600+Math.random()*1600);
+  }
+  setTimeout(tick,2500);
+})();
+</script>
+</body>
+</html>
