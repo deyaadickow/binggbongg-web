@@ -69,6 +69,18 @@ function explain(code: string): { field?: keyof FieldErrors; key: StringKey } {
   }
 }
 
+/** The directory's "Bingg Bongg Features Videos" tile (FeaturesPage). */
+const FEATURE_VIDEOS = "/feature-videos";
+const LANDED = "bb.newSignupLanding.";
+/** True the first time only, per member, so the welcome page is never forced on them again. */
+function firstLanding(uid: number): boolean {
+  try {
+    if (localStorage.getItem(LANDED + uid) === "1") return false;
+    localStorage.setItem(LANDED + uid, "1");
+  } catch { /* private mode: is_new is true only once anyway */ }
+  return true;
+}
+
 const looksLikeEmail = (s: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.trim());
 
 export function LoginPage() {
@@ -101,7 +113,7 @@ export function LoginPage() {
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
   useEffect(() => {
-    if (isLoggedIn) navigate(from, { replace: true });
+    if (isLoggedIn) navigate(landingRef.current ?? from, { replace: true });
   }, [isLoggedIn, navigate]);
 
   // "Black background and gold text" (Steve): the cosmic backdrop is switched off on this page.
@@ -117,13 +129,22 @@ export function LoginPage() {
     setInfo(null);
   }
 
-  function finish(data: UserSummary & { needs_profile?: boolean }, token: string, extra: { email?: string; emailVerified?: boolean } = {}) {
+  // Set when a brand-new member is being sent to the Features Videos page, so the "already
+  // signed in" effect above doesn't send them back to `from` on the same render.
+  const landingRef = useRef<string | null>(null);
+
+  function finish(data: UserSummary & { needs_profile?: boolean }, token: string, extra: { email?: string; emailVerified?: boolean; isNew?: boolean } = {}) {
     const needsProfile = data.needs_profile === true;
     rememberSignupNudges(data.id, { needsProfile, email: extra.emailVerified === false ? extra.email : undefined });
     const { needs_profile: _ignored, ...user } = data;
     void _ignored;
     signIn({ ...user, auth_token: undefined }, token);
-    navigate(from, { replace: true });
+    // Steve, 2026-11-05: "Make Bingg Bongg Featured videos the first landing page for new signups
+    // so they can see how wonderful this app is." Only on the sign-up itself (registration's
+    // is_new), and once per member on this browser.
+    const to = extra.isNew === true && firstLanding(data.id) ? FEATURE_VIDEOS : from;
+    landingRef.current = to;
+    navigate(to, { replace: true });
   }
 
   async function register(credential: string) {
@@ -145,7 +166,7 @@ export function LoginPage() {
       if (!res.status || !res.data) throw new Error(res.message ?? tt("sign_in_was_refused"));
       const token = res.data.auth_token;
       if (!token) throw new Error(tt("no_session_token_came_back"));
-      finish(res.data, token);
+      finish(res.data, token, { isNew: res.is_new === true });
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -176,7 +197,7 @@ export function LoginPage() {
       }
       throw new Error(tt("no_session_token_came_back"));
     }
-    finish(res.data, token, { email: p.email, emailVerified: p.emailVerified });
+    finish(res.data, token, { email: p.email, emailVerified: p.emailVerified, isNew: res.is_new === true });
   }
 
   async function submit(e: FormEvent) {

@@ -5,6 +5,7 @@ import { useSession } from "../lib/session";
 import { Notice } from "../components/Common";
 import { tt, useT  } from "../lib/i18n";
 import { PageTitle } from "../components/PageTitle";
+import { requireVerified } from "../lib/verifyEmail";
 
 /** Camera preview + one button — same startLive endpoint the phones call, then the room page as host. */
 export function GoLivePage() {
@@ -36,6 +37,7 @@ export function GoLivePage() {
 
   async function goLive() {
     if (!user) return;
+    if (!requireVerified()) return; // browse first, verify before doing anything (2026-11-05)
     setBusy(true);
     setError(null);
     try {

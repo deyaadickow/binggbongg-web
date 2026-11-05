@@ -15,6 +15,7 @@ import { Loading, Notice } from "../components/Common";
 import { GoldSelect } from "../components/GoldSelect";
 import { tt, useT  } from "../lib/i18n";
 import { PageTitle } from "../components/PageTitle";
+import { requireVerified } from "../lib/verifyEmail";
 
 export function UploadPhotosPage() {
   const { t } = useT();
@@ -65,6 +66,7 @@ export function UploadPhotosPage() {
 
   async function uploadAll() {
     if (!user || !queue.length || busy) return;
+    if (!requireVerified()) return; // browse first, verify before doing anything (2026-11-05)
     if (!folderId) { setError(tt("pick_a_folder_first")); return; }
     setBusy(true);
     setError("");

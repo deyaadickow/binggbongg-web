@@ -1906,4 +1906,15 @@ export const id = {
   su_nudge_profile_title: "Tambahkan nama & foto",
   su_nudge_profile_text: "Supaya orang tahu itu kamu. Hanya beberapa detik.",
   su_nudge_profile_btn: "Tambah",
+  // Browse first, verify before doing anything (2026-11-05)
+  ve_title: "Verifikasi email kamu untuk melanjutkan",
+  ve_body: "Kami mengirim tautan ke %1$s. Ketuk tautannya, lalu kembali ke sini dan tekan Sudah saya verifikasi.",
+  ve_done_btn: "Sudah saya verifikasi",
+  ve_resend: "Kirim ulang email",
+  ve_not_now: "Nanti saja",
+  ve_thanks: "Terima kasih! Email kamu sudah terverifikasi.",
+  ve_not_yet: "Belum terverifikasi — cek kotak masuk dan folder spam kamu.",
+  ve_resent: "Kami mengirim tautan baru ke %1$s.",
+  ve_no_session: "Silakan keluar, lalu masuk lagi dengan email dan kata sandi kamu.",
+  ve_checking: "Memeriksa…",
 };

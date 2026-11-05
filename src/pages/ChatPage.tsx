@@ -23,6 +23,7 @@ import { useSession } from "../lib/session";
 import { memberLabel, trackPage } from "../lib/pageTracker";
 import { TRANSLATION_LANGUAGES, translateChatMessage } from "../lib/translate";
 import { tt, useT  } from "../lib/i18n";
+import { requireVerified } from "../lib/verifyEmail";
 
 function dayLabel(ms: number): string {
   const d = new Date(ms);
@@ -147,6 +148,8 @@ export function ChatPage() {
   async function send() {
     if (!user || !partner || sending) return;
     if (!pending && !draft.trim()) return;
+    // Direct messages go straight to Firestore, so the server cannot ask for the email (2026-11-05).
+    if (!requireVerified()) return;
     setSending(true);
     setError(null);
     try {

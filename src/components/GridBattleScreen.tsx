@@ -30,6 +30,7 @@ import {
   battleScreenPath, bonusText, chatBattleStage, checkUserLiveRoom, parseGiftMsg, roomHostId,
   type ChbBattler, type ChbGiftInfo, type ChbGiftMsg, type ChbLiveRoom, type ChbPerson, type ChbResult, type ChbState,
 } from "../lib/chatBattle";
+import { requireVerified } from "../lib/verifyEmail";
 
 const HEARTBEAT_MS = 5000;
 export const SPOTLIGHT_MS = 30000;
@@ -633,7 +634,7 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
   const threadMessages = useRoomChat(chatRoom, isLoggedIn);
   const messages = useMemo(() => mergeLines(threadMessages, localLines), [threadMessages, localLines]);
   const onSend = isLoggedIn && user && chatRoom
-    ? (text: string) => { sendChat(chatChannel(chatRoom, roomHostId(chatRoom)), user.id, displayName(user), text, user.profile_image ?? "").catch(() => undefined); }
+    ? (text: string) => { if (!requireVerified()) return; sendChat(chatChannel(chatRoom, roomHostId(chatRoom)), user.id, displayName(user), text, user.profile_image ?? "").catch(() => undefined); }
     : null;
   // The receiver's Thank you: an ordinary chat line in their own strip, nothing more to the server.
   const onThank = onSend

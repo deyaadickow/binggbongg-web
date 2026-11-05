@@ -46,6 +46,7 @@ import { InviteOverlay, WhosPlayingOverlay } from "../components/RoomPeople";
 import { PickerSheet } from "../components/PickerSheet";
 import { TRANSLATION_LANGUAGES, defaultTargetLanguage, languageName, translateChatMessage, type TranslationResult } from "../lib/translate";
 import { tt, useT  } from "../lib/i18n";
+import { requireVerified } from "../lib/verifyEmail";
 
 interface Member { user_id: number; fullname?: string; username?: string; profile_image?: string; country?: string; local_timezone?: string }
 interface RoomMembers { host_user_id: number; host_fullname?: string; host_username?: string; host_profile_image?: string; host_country?: string; host_local_timezone?: string; live_seconds?: number; guests: Member[] }
@@ -915,6 +916,8 @@ export function LiveViewerPage() {
   async function submitChat(e: React.FormEvent) {
     e.preventDefault();
     if (!user || !draft.trim()) return;
+    // Live chat goes straight to Firestore, so the server cannot ask for the email (2026-11-05).
+    if (!requireVerified()) return;
     const text = draft;
     setDraft("");
     try { await sendChat(chatChannel(roomName, hostUserId), user.id, displayName(user), text, user.profile_image ?? ""); }

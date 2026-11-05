@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { post, setAuthHeaders, type UserSummary } from "./api";
 import { signOutPageViews } from "./pageTracker";
 import { signOutEmail } from "./emailAuth";
+import { setVerifyState } from "./verifyEmail";
 
 interface Session {
   user: UserSummary | null;
@@ -10,6 +11,8 @@ interface Session {
   signIn: (user: UserSummary, token: string) => void;
   signOut: () => void;
   refresh: () => Promise<void>;
+  /** Change a few fields of the signed-in member in place (e.g. needs_email_verification). */
+  patchUser: (fields: Partial<UserSummary>) => void;
 }
 
 const STORAGE_KEY = "bb.session";
@@ -22,6 +25,8 @@ function load(): { user: UserSummary; token: string } | null {
     // Install the headers right here, synchronously: a page's own effect (e.g. the wallet
     // refreshing balances) runs BEFORE this provider's effect, and must not fire unauthenticated.
     if (parsed?.user?.id && parsed.token) setAuthHeaders(parsed.token, parsed.user.id);
+    // Same reason: a click before the provider's effect must already know to ask for the email.
+    if (parsed?.user) setVerifyState(parsed.user.needs_email_verification === true, parsed.user.identity ?? "");
     return parsed;
   } catch {
     return null;
@@ -32,6 +37,11 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const initial = load();
   const [user, setUser] = useState<UserSummary | null>(initial?.user ?? null);
   const [token, setToken] = useState<string | null>(initial?.token ?? null);
+
+  // Browse first, verify before doing anything (2026-11-05): lib/verifyEmail.ts reads this.
+  useEffect(() => {
+    setVerifyState(!!token && user?.needs_email_verification === true, user?.identity ?? "");
+  }, [user?.needs_email_verification, user?.identity, token]);
 
   useEffect(() => {
     setAuthHeaders(token, user?.id ?? null);
@@ -58,6 +68,10 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     setAuthHeaders(null, null);
     setUser(null);
     setToken(null);
+  }, []);
+
+  const patchUser = useCallback((fields: Partial<UserSummary>) => {
+    setUser((cur) => (cur ? { ...cur, ...fields } : cur));
   }, []);
 
   const refresh = useCallback(async () => {
@@ -97,7 +111,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, token]);
 
-  const value = useMemo<Session>(() => ({ user, token, isLoggedIn: !!(user && token), signIn, signOut, refresh }), [user, token, signIn, signOut, refresh]);
+  const value = useMemo<Session>(() => ({ user, token, isLoggedIn: !!(user && token), signIn, signOut, refresh, patchUser }), [user, token, signIn, signOut, refresh, patchUser]);
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
 }
 

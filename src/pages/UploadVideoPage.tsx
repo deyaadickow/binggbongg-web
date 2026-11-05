@@ -12,6 +12,7 @@ import { Notice } from "../components/Common";
 import { GoldSelect } from "../components/GoldSelect";
 import { tt, useT  } from "../lib/i18n";
 import { PageTitle } from "../components/PageTitle";
+import { requireVerified } from "../lib/verifyEmail";
 
 interface ContestCat { id: number; name?: string | null }
 interface CountryRow { name?: string | null; states?: { name?: string | null }[] }
@@ -99,6 +100,7 @@ export function UploadVideoPage() {
 
   async function upload() {
     if (!user || !file || busy) return;
+    if (!requireVerified()) return; // browse first, verify before doing anything (2026-11-05)
     if (!catId) { setError(tt("pick_a_category")); return; }
     setBusy(true);
     setError("");

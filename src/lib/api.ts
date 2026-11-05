@@ -4,6 +4,8 @@ export const API_BASE = "https://admin.binggbongg.com/api/";
 export const WEB_BASE = "https://admin.binggbongg.com/";
 export const UPLOAD_BASE = "https://d32kgcvh9dqf5h.cloudfront.net/";
 export const TOKEN_SERVER = "https://binggbongg-livekit-token.onrender.com/";
+import { onVerifyEmailResponse } from "./verifyEmail";
+
 const API_KEY = "123";
 
 export type ApiResponse<T> = { status: boolean; message?: string; data?: T } & Record<string, unknown>;
@@ -64,7 +66,14 @@ export async function post<T = unknown>(endpoint: string, params: Record<string,
     }
   }
   if (!res.ok) throw new ApiError(res.status, `Server error (${res.status})`);
-  return (await res.json()) as ApiResponse<T>;
+  const json = (await res.json()) as ApiResponse<T>;
+  // Browse first, verify before doing anything (2026-11-05). The server refuses a "doing" call
+  // from a member who has not tapped the email link yet. The Verify card (VerifyEmailModal)
+  // explains it, so the caller gets a plain failure with NO message — no second error toast.
+  if (json && json.status === false && json.reason === "verify_email") {
+    if (onVerifyEmailResponse(endpoint, json as { email?: unknown })) return { ...json, message: "" };
+  }
+  return json;
 }
 
 /**
@@ -132,6 +141,9 @@ export async function tokenServer<T = unknown>(path: string, init: { method?: st
 // ---- shapes we actually read (everything else in the payloads is ignored)
 export interface UserSummary {
   id: number;
+  /** Own row only (2026-11-05): an email/password member who has not tapped the link yet. They
+   *  browse freely; doing anything needs the email verified (lib/verifyEmail.ts). */
+  needs_email_verification?: boolean;
   /** Steve, 2026-10-05: "(BBBB) Bingg Bongg Battle Badge" — battles completed, counted one by
    *  one ("just add the battles in real time… just count up one by one"). 0 = no badge yet. */
   battle_badge?: number;

@@ -1911,4 +1911,15 @@ export const fil = {
   su_nudge_profile_title: "Idagdag ang pangalan at litrato mo",
   su_nudge_profile_text: "Para malaman ng mga tao na ikaw ito. Ilang segundo lang.",
   su_nudge_profile_btn: "Idagdag",
+  // Browse first, verify before doing anything (2026-11-05)
+  ve_title: "I-verify ang email mo para makapagpatuloy",
+  ve_body: "Nagpadala kami ng link sa %1$s. I-tap ito, tapos bumalik ka rito at pindutin ang Na-verify ko na.",
+  ve_done_btn: "Na-verify ko na",
+  ve_resend: "Ipadala ulit ang email",
+  ve_not_now: "Mamaya na",
+  ve_thanks: "Salamat! Na-verify na ang email mo.",
+  ve_not_yet: "Hindi pa na-verify — tingnan ang inbox at spam folder mo.",
+  ve_resent: "Nagpadala kami ng bagong link sa %1$s.",
+  ve_no_session: "Mag-sign out muna, tapos mag-sign in ulit gamit ang email at password mo.",
+  ve_checking: "Tinitingnan…",
 };

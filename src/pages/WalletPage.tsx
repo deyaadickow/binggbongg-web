@@ -8,6 +8,7 @@ import { Loading, Notice } from "../components/Common";
 import { WALLET_LINKS } from "./WalletPages";
 import { tt, useT  } from "../lib/i18n";
 import { PageTitle } from "../components/PageTitle";
+import { requireVerified } from "../lib/verifyEmail";
 
 export function WalletPage() {
   const { t, tn } = useT();
@@ -39,6 +40,7 @@ export function WalletPage() {
 
   async function buy() {
     if (!user) return;
+    if (!requireVerified()) return; // before any payment page (2026-11-05)
     setBusy(true);
     setError(null);
     try {

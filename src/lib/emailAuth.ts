@@ -93,6 +93,21 @@ export async function emailVerificationState(expectedEmail: string): Promise<{ v
   return { verified: !!a.currentUser?.emailVerified };
 }
 
+/** "I've verified" (2026-11-05): reload the Firebase user and, when the link HAS been tapped,
+ *  mint a fresh ID token (it carries email_verified true only after the reload) for the
+ *  server's confirmEmailVerified. `null` when this browser holds no Firebase email session. */
+export async function freshVerifiedToken(expectedEmail?: string): Promise<{ verified: boolean; idToken?: string } | null> {
+  const a = auth();
+  await a.authStateReady();
+  const u = a.currentUser;
+  if (!u) return null;
+  if (expectedEmail && (u.email ?? "").toLowerCase() !== expectedEmail.toLowerCase()) return null;
+  await u.reload();
+  const fresh = a.currentUser;
+  if (!fresh?.emailVerified) return { verified: false };
+  return { verified: true, idToken: await fresh.getIdToken(true) };
+}
+
 export async function resendVerification(): Promise<void> {
   const u = auth().currentUser;
   if (!u) throw new Error("no-firebase-user");

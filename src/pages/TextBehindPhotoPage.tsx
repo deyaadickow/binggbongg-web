@@ -22,6 +22,7 @@ import {
   DEFAULT_STYLES, FREE_COLORS, chargeTextPhotoStyle, newClientRef, cutOutPerson, defaultColorFor, drawStyleSample, fetchTextPhotoStyles,
   fitSize, loadTextBehindFonts, photoCanvasFromFile, renderComposite, type TextLayout, type TextPhotoStyle,
 } from "../lib/textBehind";
+import { requireVerified } from "../lib/verifyEmail";
 
 /** The folder the pictures land in on Bingg Bongg Photos — made the first time if it isn't there. */
 const PHOTOS_FOLDER = "Text Behind Photo";
@@ -225,6 +226,7 @@ export function TextBehindPhotoPage() {
 
   async function act(kind: "save" | "photos" | "share") {
     if (!user || !photoRef.current || busy || phase !== "ready" || !text.trim()) return;
+    if (kind === "photos" && !requireVerified()) return; // an upload (2026-11-05)
     setError(""); setNeedCoins(false); setSavedTo(null);
     setBusy(kind);
     try {

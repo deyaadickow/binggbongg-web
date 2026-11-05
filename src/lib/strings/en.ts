@@ -2106,4 +2106,15 @@ export const en = {
   su_nudge_profile_title: "Add your name & photo",
   su_nudge_profile_text: "So people know it's you. Takes a few seconds.",
   su_nudge_profile_btn: "Add now",
+  // Browse first, verify before doing anything (2026-11-05)
+  ve_title: "Verify your email to continue",
+  ve_body: "We sent a link to %1$s. Tap it, then come back and press I've verified.",
+  ve_done_btn: "I've verified",
+  ve_resend: "Resend email",
+  ve_not_now: "Not now",
+  ve_thanks: "Thanks! Your email is verified.",
+  ve_not_yet: "Not verified yet — check your inbox and spam folder.",
+  ve_resent: "We sent a new link to %1$s.",
+  ve_no_session: "Please sign out, then sign in again with your email and password.",
+  ve_checking: "Checking…",
 } as const;

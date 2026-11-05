@@ -1892,4 +1892,15 @@ export const es = {
   su_nudge_profile_title: "Agrega tu nombre y foto",
   su_nudge_profile_text: "Para que la gente sepa que eres tú. Toma unos segundos.",
   su_nudge_profile_btn: "Agregar",
+  // Browse first, verify before doing anything (2026-11-05)
+  ve_title: "Verifica tu correo para continuar",
+  ve_body: "Enviamos un enlace a %1$s. Tócalo, luego vuelve y presiona Ya lo verifiqué.",
+  ve_done_btn: "Ya lo verifiqué",
+  ve_resend: "Reenviar correo",
+  ve_not_now: "Ahora no",
+  ve_thanks: "¡Gracias! Tu correo está verificado.",
+  ve_not_yet: "Aún no está verificado — revisa tu bandeja de entrada y la carpeta de spam.",
+  ve_resent: "Enviamos un nuevo enlace a %1$s.",
+  ve_no_session: "Cierra sesión y vuelve a entrar con tu correo y contraseña.",
+  ve_checking: "Comprobando…",
 };
