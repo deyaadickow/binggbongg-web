@@ -983,3 +983,27 @@ body.signup-black { background: #000; }
 .signup-nudge-btn { flex-shrink: 0; min-height: 38px; padding: 0 14px; display: inline-flex; align-items: center; border-radius: 999px; border: 0; background: var(--gold); color: #000; font-weight: 800; font-size: 14px; font-family: inherit; cursor: pointer; }
 .signup-nudge-btn:hover { color: #000; background: var(--gold-bright); }
 .signup-nudge-x { flex-shrink: 0; width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--gold-border); background: #000; color: var(--gold); font-size: 20px; line-height: 1; cursor: pointer; }
+
+/* ---- Multi-live 24 (2026-11-05): the live room's grid over 4, speakers on top ---------------- */
+.video-grid.ml-on { display: block; aspect-ratio: auto; min-height: 0; padding: 3px; }
+.ml-stage { position: relative; margin: 0 auto; }
+.ml-top { padding-bottom: 3px; margin-bottom: 3px; border-bottom: 2px solid var(--gold); }
+.ml-tile.host { border: 2px solid var(--gold); }
+.ml-tile.own .cb-name { color: var(--gold); font-weight: 800; }
+.ml-spk { position: absolute; left: 3px; bottom: 17px; z-index: 2; min-width: 22px; height: 22px; padding: 0 3px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; gap: 1px; font-size: 11px; line-height: 1; cursor: pointer; background: rgba(0,0,0,.8); border: 1.5px solid rgba(255,255,255,.5); color: #fff; }
+.ml-spk.on { border-color: var(--gold); }
+.ml-spk.hand { background: #000; border: 2px solid #FFD60A; color: #FFD60A; }
+.ml-spk small { font-size: 9px; font-weight: 800; }
+.ml-score { position: absolute; left: 3px; top: 3px; z-index: 2; padding: 1px 5px; border-radius: 999px; background: rgba(0,0,0,.8); border: 1px solid var(--gold); color: var(--gold); font-size: 9px; font-weight: 800; }
+.ml-tile.ml-pulse { animation: ml-pulse .8s ease-in-out infinite; border: 2px solid var(--gold-bright, #FFD84A); }
+@keyframes ml-pulse { 50% { box-shadow: 0 0 0 3px rgba(255, 216, 74, .85); } }
+.ml-hands-pill { display: inline-block; margin: 6px 0 2px 2px; padding: 4px 10px; border-radius: 999px; background: #FFD60A; color: #000; font-weight: 800; font-size: 13px; border: 1px solid #000; cursor: pointer; }
+.ml-battle-bar { display: block; margin: 0 auto 8px; padding: 6px 14px; border-radius: 999px; background: rgba(0,0,0,.9); border: 1px solid var(--gold-border); color: var(--gold); font-weight: 800; font-size: 13px; cursor: pointer; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 600px) { .ml-stage { width: 100% !important; } }
+.live-layout > div:has(> .video-grid.ml-on) { min-width: 0; }
+.ml-stepper { display: flex; align-items: center; justify-content: center; gap: 18px; }
+.ml-stepper b { color: var(--gold); font-size: 28px; min-width: 44px; text-align: center; }
+@media (min-width: 900px) {
+  .ml-spk { min-width: 26px; height: 26px; font-size: 13px; bottom: 20px; }
+  .ml-score { font-size: 11px; }
+}

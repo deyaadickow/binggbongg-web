@@ -47,9 +47,12 @@ import { PickerSheet } from "../components/PickerSheet";
 import { TRANSLATION_LANGUAGES, defaultTargetLanguage, languageName, translateChatMessage, type TranslationResult } from "../lib/translate";
 import { tt, useT  } from "../lib/i18n";
 import { requireVerified } from "../lib/verifyEmail";
+import { ML_MIN_SIZE, mlIsBig, mlName, mlReasonText, mlWrite, normalizeMl, saveRoomSize, type MlMember, type MlState, type MlWriteResult, type RoomBattle } from "../lib/multiLive";
+import { MlMenu, MlSizeSheet, MultiLiveGrid, RoomBattleBar, RoomBattleBoard, RoomBattleEnd, useBattleClock } from "../components/MultiLiveGrid";
+import { showGoldAlert } from "../components/GoldToast";
 
 interface Member { user_id: number; fullname?: string; username?: string; profile_image?: string; country?: string; local_timezone?: string }
-interface RoomMembers { host_user_id: number; host_fullname?: string; host_username?: string; host_profile_image?: string; host_country?: string; host_local_timezone?: string; live_seconds?: number; guests: Member[] }
+interface RoomMembers { host_user_id: number; host_fullname?: string; host_username?: string; host_profile_image?: string; host_country?: string; host_local_timezone?: string; live_seconds?: number; guests: Member[]; multi_live?: unknown }
 interface Watcher { user_id: number; fullname?: string; username?: string; profile_image?: string }
 interface JoinRequest { request_id: number; user_id: number; fullname?: string; username?: string; profile_image?: string }
 
@@ -68,7 +71,23 @@ export function LiveViewerPage() {
   const wantsHost = search.get("host") === "1" && !!user && user.id === hostUserId;
 
   const [role, setRole] = useState<LiveRole>(wantsHost ? "host" : "viewer");
+  const roleRef = useRef(role);
+  roleRef.current = role;
   const [members, setMembers] = useState<RoomMembers | null>(null);
+  // Multi-live 24 (2026-11-05): the server's room state — layout, sound, hands, the room battle.
+  // null = an old server (no migration yet): everything behaves exactly like today.
+  const [ml, setMl] = useState<MlState | null>(null);
+  const mlVersion = useRef(0);
+  const [mlPulse, setMlPulse] = useState(false);
+  const [mlMenu, setMlMenu] = useState<{ title: string; items: { label: string; onPick: () => void; danger?: boolean }[] } | null>(null);
+  const [mlSizeOpen, setMlSizeOpen] = useState(false);
+  const [mlBoardOpen, setMlBoardOpen] = useState(false);
+  const [mlEnd, setMlEnd] = useState<RoomBattle | null>(null);
+  const mlEndShownFor = useRef(0);
+  const mlSeenSelf = useRef(false);
+  const mlAmSpeaker = useRef<boolean | null>(null);
+  const mlGaveBackAt = useRef(0);
+  const loadMembersRef = useRef<() => void>(() => undefined);
   const [roomClosed, setRoomClosed] = useState(false);
   const [watchers, setWatchers] = useState<number | null>(null);
   const [watcherList, setWatcherList] = useState<Watcher[]>([]);
@@ -141,7 +160,8 @@ export function LiveViewerPage() {
     return () => clearTimeout(t);
   }, [giftEffect, giftEffectQueue]);
 
-  const live = useLiveRoom(roomName, role, isLoggedIn && !roomClosed);
+  const mlMe = ml && user ? ml.members.find((m) => m.user_id === user.id) ?? null : null;
+  const live = useLiveRoom(roomName, role, isLoggedIn && !roomClosed, { micAllowed: mlMe && !mlMe.is_host ? mlMe.is_speaker : null });
   const isPublisher = role !== "viewer" && live.status === "live";
 
   // Bingg Bongg Battle (1v1). Result overlay for the two battlers, a toast for everyone else.
@@ -782,6 +802,7 @@ export function LiveViewerPage() {
       if (!alive || !res) return;
       if (!res.status || !res.data) { setRoomClosed(true); return; }
       setMembers(res.data);
+      applyMl(normalizeMl(res.data.multi_live));
       if (typeof res.data.live_seconds === "number") liveClockRef.current = { secs: res.data.live_seconds, at: Date.now() };
       // Viewer who asked to join (or was invited): the moment I'm in guests, publish.
       if (user && role === "viewer" && res.data.guests.some((g) => g.user_id === user.id)) {
@@ -789,10 +810,20 @@ export function LiveViewerPage() {
         setRole("guest");
       }
     }
+    loadMembersRef.current = () => { void load(); };
     load();
+    // Already every 5 s for everyone, which is the contract's poll for big rooms and battles too.
     const t = setInterval(load, MEMBERS_POLL_MS);
     return () => { alive = false; clearInterval(t); };
-  }, [roomName, user, role]);
+  }, [roomName, user, role]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // The server's "ml_state" poke (or our own LiveKit permissions changing): refetch, debounced.
+  useEffect(() => {
+    if (live.mlSignal.seq === 0) return;
+    if (live.mlSignal.v !== null && live.mlSignal.v <= mlVersion.current) return;
+    const t = setTimeout(() => loadMembersRef.current(), 300);
+    return () => clearTimeout(t);
+  }, [live.mlSignal]);
 
   // Watcher count for everyone; join requests for the host.
   useEffect(() => {
@@ -945,10 +976,104 @@ export function LiveViewerPage() {
     } catch (err) { setToast((err as Error).message); }
   }
 
+  // ---- Multi-live 24 --------------------------------------------------------------------------
+  function applyMl(next: MlState | null) {
+    if (!next) return; // one failed / old read never tears the grid down
+    if (next.state_version < mlVersion.current) return;
+    mlVersion.current = next.state_version;
+    setMl(next);
+    const b = next.room_battle;
+    if (b && b.finished && b.battle_id !== mlEndShownFor.current) {
+      mlEndShownFor.current = b.battle_id;
+      setMlEnd(b);
+    }
+    // This browser's own seat and sound, as a guest on camera.
+    if (!user || roleRef.current !== "guest") { mlSeenSelf.current = false; mlAmSpeaker.current = null; return; }
+    const me = next.members.find((m) => m.user_id === user.id);
+    if (!me) {
+      if (mlSeenSelf.current) {
+        mlSeenSelf.current = false;
+        mlAmSpeaker.current = null;
+        setJoinState("none"); // the role change reconnects this browser as a plain viewer
+        setRole("viewer");
+        showGoldAlert(tt("ml_removed_you"));
+      }
+      return;
+    }
+    mlSeenSelf.current = true;
+    const was = mlAmSpeaker.current;
+    mlAmSpeaker.current = me.is_speaker;
+    // No "the host muted you" for a member who gave their own sound back.
+    const selfInitiated = !me.is_speaker && Date.now() - mlGaveBackAt.current < 15000;
+    if (was !== null && was !== me.is_speaker && !selfInitiated) setToast(tt(me.is_speaker ? "ml_sound_on_you" : "ml_sound_off_you"));
+  }
+
+  async function mlDo(route: string, extra: Record<string, unknown> = {}, onOk?: (r: MlWriteResult) => void) {
+    if (!user) return;
+    if (!requireVerified()) return;
+    try {
+      const r = await mlWrite(route, user.id, roomName, extra);
+      if (r.state) applyMl(r.state);
+      if (r.ok) { onOk?.(r); return; }
+      if (r.reason === "speakers_full") { setMlPulse(true); window.setTimeout(() => setMlPulse(false), 4000); }
+      showGoldAlert(mlReasonText(r.reason, r.message, r.memberCount ?? ml?.member_count));
+      if (r.reason === "battle_running") loadMembersRef.current();
+    } catch (e) { setToast((e as Error).message || tt("something_went_wrong")); }
+  }
+  const mlSetSpeaker = (m: MlMember, on: boolean) => mlDo("setLiveSpeaker", { target_user_id: m.user_id, speaker: on ? 1 : 0 });
+
+  /** The speaker icon (Android's onSpeakerTap). */
+  function mlSpeakerTap(m: MlMember) {
+    if (!user) return;
+    const mine = m.user_id === user.id;
+    if (mine && role === "host") { void live.toggleMic(); return; }
+    if (mine && role === "guest") {
+      if (m.is_speaker) {
+        setMlMenu({ title: t("ml_your_sound"), items: [
+          { label: t(live.micOn ? "ml_mute_my_mic" : "ml_unmute_my_mic"), onPick: () => { void live.toggleMic(); } },
+          { label: t("ml_give_sound_back"), onPick: () => { mlGaveBackAt.current = Date.now(); void mlDo("leaveLiveSpeakers"); } },
+        ] });
+      } else if (m.hand_raised) {
+        void mlDo("raiseLiveHand", { raised: 0 }, () => setToast(tt("ml_hand_lowered")));
+      } else {
+        void mlDo("raiseLiveHand", { raised: 1 }, () => setToast(tt("ml_hand_raised")));
+      }
+      return;
+    }
+    if (role === "host") void mlSetSpeaker(m, !m.is_speaker);
+  }
+
+  /** A tap on a tile: the host gets that member's controls; your own tile = your speaker icon. */
+  function mlTileTap(m: MlMember) {
+    if (!user) return;
+    if (role === "host" && m.user_id !== user.id) {
+      setMlMenu({ title: mlName(m), items: [
+        { label: t(m.is_speaker ? "ml_mute" : "ml_turn_sound_on"), onPick: () => { void mlSetSpeaker(m, !m.is_speaker); } },
+        { label: t("ml_remove"), danger: true, onPick: () => { void mlDo("removeLiveMember", { target_user_id: m.user_id }); } },
+      ] });
+    } else if (m.user_id === user.id && role === "guest") mlSpeakerTap(m);
+  }
+
+  /** Host: the raised hands, oldest first — tap one to turn their sound on. */
+  function mlShowHands() {
+    if (!ml) return;
+    const queue = ml.hands.map((id) => ml.members.find((m) => m.user_id === id)).filter((m): m is MlMember => !!m);
+    if (queue.length === 0) { setToast(tt("ml_no_hands")); return; }
+    setMlMenu({ title: t("ml_raised_hands") + " ✋", items: queue.map((m, i) => ({
+      label: `${m.hand_order ?? i + 1}. ${mlName(m)}  🔊`, onPick: () => { void mlSetSpeaker(m, true); },
+    })) });
+  }
+
+  function mlStartBattle() {
+    if (!ml || ml.member_count < 2) { showGoldAlert(tt("ml_battle_needs")); return; }
+    void mlDo("startRoomBattle");
+  }
+
   async function requestToJoin() {
     if (!user) return;
     try {
-      const res = await post<unknown>("requestToJoinLive", { user_id: user.id, room_name: roomName });
+      // multi_live=1: this client can join a big room muted (Multi-live 24).
+      const res = await post<unknown>("requestToJoinLive", { user_id: user.id, room_name: roomName, multi_live: 1 });
       if (!res.status) throw new Error(res.message ?? tt("couldn_t_send_the_request"));
       const st = (res as { member_status?: string }).member_status;
       setJoinState(st === "approved" ? "approved" : "requested");
@@ -960,7 +1085,13 @@ export function LiveViewerPage() {
     if (!user) return;
     try {
       const res = await post("respondToJoinRequest", { user_id: user.id, request_id: r.request_id, approve });
-      if (!res.status) throw new Error(res.message ?? tt("couldn_t_answer_that_request"));
+      if (!res.status) {
+        // full / old_app: a gold popup; an old_app request stays pending (mute a speaker, approve again).
+        const reason = (res as unknown as { reason?: string }).reason ?? null;
+        if (reason === "full" || reason === "old_app") { showGoldAlert(mlReasonText(reason, res.message ?? null)); return; }
+        throw new Error(res.message ?? tt("couldn_t_answer_that_request"));
+      }
+      loadMembersRef.current();
       setJoinRequests((prev) => prev.filter((x) => x.request_id !== r.request_id));
       setToast(approve ? `${displayName(r as Partial<UserSummary>)} is joining.` : "Declined.");
     } catch (err) { setToast((err as Error).message); }
@@ -983,6 +1114,9 @@ export function LiveViewerPage() {
   }
 
   const hostCard = members ? { fullname: members.host_fullname, username: members.host_username, profile_image: members.host_profile_image } : null;
+  const mlBig = mlIsBig(ml);
+  const mlBattle = ml?.room_battle ?? null;
+  const mlSecondsLeft = useBattleClock(mlBattle);
   const orderedTiles = [...live.tiles].sort((a, b) => (a.userId === hostUserId ? -1 : b.userId === hostUserId ? 1 : 0));
   const statusLabel = roomClosed || live.status === "ended" ? "ENDED" : live.status === "live" ? "● LIVE" : live.status === "error" ? "ERROR" : "CONNECTING";
 
@@ -1239,7 +1373,8 @@ export function LiveViewerPage() {
               cancel555(myId, b555.data.battle_555_id).then(() => setToast("5-5-5 cancelled.")).catch((e) => setToast((e as Error).message));
             }} />
           )}
-          <div className={`video-grid count-${Math.min(4, Math.max(1, orderedTiles.length))}`} onDoubleClick={dropHeart}
+          {mlBattle && !mlBattle.finished && <RoomBattleBar b={mlBattle} secondsLeft={mlSecondsLeft} onOpen={() => setMlBoardOpen(true)} />}
+          <div className={mlBig ? "video-grid ml-on" : `video-grid count-${Math.min(4, Math.max(1, orderedTiles.length))}`} onDoubleClick={dropHeart}
             onPointerDown={startRoomHold} onPointerUp={cancelRoomHold} onPointerLeave={cancelRoomHold} onPointerCancel={cancelRoomHold}
             onContextMenu={(e) => { if (roomHoldFired.current) e.preventDefault(); }}
             onClickCapture={(e) => { if (roomHoldFired.current) { e.stopPropagation(); roomHoldFired.current = false; } }}>
@@ -1291,12 +1426,16 @@ export function LiveViewerPage() {
                 ❤️ {tapCount.toLocaleString()}
               </button>
             )}
-            {orderedTiles.length === 0 && (
+            {mlBig && ml && (
+              <MultiLiveGrid state={ml} myId={myId} tiles={live.tiles} pulse={mlPulse} battle={mlBattle} isHost={role === "host"}
+                onSpeaker={mlSpeakerTap} onTap={mlTileTap} onGift={(id) => setGiftTarget(id)} onHands={mlShowHands} />
+            )}
+            {!mlBig && orderedTiles.length === 0 && (
               <div className="tile" style={{ display: "grid", placeItems: "center" }}>
                 <span className="muted">{live.status === "live" ? "Waiting for video…" : "Connecting…"}</span>
               </div>
             )}
-            {orderedTiles.map((t) => <VideoTile key={t.identity} tile={t} user={t.isLocal ? user : (nameOf(t.userId) as Partial<UserSummary> | undefined) ?? { fullname: t.name }} label={t.isLocal ? `${displayName(user)} (you)` : displayName(nameOf(t.userId) as Partial<UserSummary> ?? { fullname: t.name })} />)}
+            {!mlBig && orderedTiles.map((t) => <VideoTile key={t.identity} tile={t} user={t.isLocal ? user : (nameOf(t.userId) as Partial<UserSummary> | undefined) ?? { fullname: t.name }} label={t.isLocal ? `${displayName(user)} (you)` : displayName(nameOf(t.userId) as Partial<UserSummary> ?? { fullname: t.name })} />)}
             {boxing && (
               <div className="boxing-gloves" title={t("boxing_gloves_every_gift_counts_double")}>
                 <img src="/boxing_gloves.png" alt={t("boxing_gloves_double_points")} />
@@ -1494,6 +1633,16 @@ export function LiveViewerPage() {
               {!anyBattleOpen && (
                 <button className="btn small" onClick={() => setMenuOpen(true)}>{t("battle")}</button>
               )}
+              {/* Multi-live 24: everyone on camera for themselves, Chat Battle's rules. */}
+              {role === "host" && ml && !mlBattle && (
+                <button className="btn small" onClick={mlStartBattle}>{t("ml_battle_everyone")}</button>
+              )}
+              {role === "host" && ml && (
+                <button className="btn small" onClick={() => setMlSizeOpen(true)}>{t("ml_menu_size", ml.max_members)}</button>
+              )}
+              {role === "host" && mlBig && ml && (
+                <button className="btn small" onClick={mlShowHands}>{t("ml_menu_hands", ml.hands.length)}</button>
+              )}
               {/* The phones' (G) menu — anyone broadcasting in the room can set its game,
                   which is what setActiveTapGameForRoom itself allows. */}
               {/* Steve, 2026-10-02: "Just add a gold border around Games, Who's playing and
@@ -1516,7 +1665,7 @@ export function LiveViewerPage() {
               )}
               {role === "host" && (
                 <button className="btn small" title={t("invite_someone_you_follow_into_an_open_s")}
-                  onClick={() => { if (live.tiles.length >= 4) setToast(tt("the_room_is_full")); else setInviteOpen(true); }}>{t("invite_2")}</button>
+                  onClick={() => { if (ml ? ml.seats_left <= 0 : live.tiles.length >= 4) setToast(tt(ml ? "ml_room_full" : "the_room_is_full")); else setInviteOpen(true); }}>{t("invite_2")}</button>
               )}
               {role === "host" && (
                 <button
@@ -1621,6 +1770,16 @@ export function LiveViewerPage() {
       {soloStandingsOpen && soloBattle && (
         <SoloBattleStandingsSheet battle={soloBattle} myUserId={user?.id ?? null} onClose={() => setSoloStandingsOpen(false)} onPick={openStandingLive} />
       )}
+      {mlMenu && <MlMenu title={mlMenu.title} items={mlMenu.items} onClose={() => setMlMenu(null)} />}
+      {mlSizeOpen && ml && (
+        <MlSizeSheet current={ml.max_members} min={Math.max(ML_MIN_SIZE, ml.member_count)} max={ml.global_max_members}
+          onClose={() => setMlSizeOpen(false)}
+          onSave={(n) => { void mlDo("setLiveRoomSize", { max_members: n }, () => { saveRoomSize(n); setToast(tt("ml_size_saved", n)); }); }} />
+      )}
+      {mlBoardOpen && mlBattle && (
+        <RoomBattleBoard b={mlBattle} secondsLeft={mlSecondsLeft} isHost={role === "host"} onEnd={() => { void mlDo("endRoomBattle"); }} onClose={() => setMlBoardOpen(false)} />
+      )}
+      {mlEnd && <RoomBattleEnd b={mlEnd} onClose={() => setMlEnd(null)} />}
       {whosPlayingOpen && <WhosPlayingOverlay roomName={roomName} onClose={() => setWhosPlayingOpen(false)} />}
       {mtOpen && (
         <PickerSheet
