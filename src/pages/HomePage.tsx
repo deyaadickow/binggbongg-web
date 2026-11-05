@@ -11,7 +11,7 @@ import { fetchHelpCampaigns, helpFeedSlots, type HelpCampaign } from "../lib/hel
 import { tt, useT  } from "../lib/i18n";
 
 /** A paid ad after every this many videos — the same as Android and iOS. */
-const PAID_AD_EVERY = 5;
+const PAID_AD_EVERY = 20;
 
 export function HomePage() {
   const { t } = useT();
@@ -63,7 +63,7 @@ export function HomePage() {
   useEffect(() => {
     if (!user?.id) { setAds([]); return; }
     let live = true;
-    post<FeedVideoAd[]>("fetchFeedVideoAds", { my_user_id: user.id })
+    post<FeedVideoAd[]>("fetchFeedVideoAds", { my_user_id: user.id, client: "web" })
       .then((r) => { if (live) setAds((r.data ?? []).filter((a) => a.video_path)); })
       .catch(() => undefined);
     return () => { live = false; };
@@ -89,7 +89,7 @@ export function HomePage() {
           const slot = slots.indexOf(i);
           return (
             <Fragment key={p.id}>
-              {/* One paid ad after every 5 videos, taking turns — the phones' cadence. */}
+              {/* One ad after every 20 videos, taking turns (Steve, 2026-11-05: "Once every 20 videos, we don't want to over whelm the members."). */}
               {user && ads.length > 0 && i > 0 && i % PAID_AD_EVERY === 0 && (
                 <PaidAdCard ad={ads[(i / PAID_AD_EVERY - 1) % ads.length]} userId={user.id} />
               )}
