@@ -154,7 +154,7 @@ export function BingoOverlay({ game, myUserId, isHost, strip, onBuy, onEndGame, 
     const ended = was.status === "active" && game.status !== "active";
     if (game.wins.length > was.wins) {
       const w = game.wins[game.wins.length - 1];
-      setShout(`BINGO! ${winLabel(w.pattern)} — ${w.name ?? "A member"}`);
+      setShout(`NUMBER MATCH! ${winLabel(w.pattern)} — ${w.name ?? "A member"}`);
       window.clearTimeout(timers.current.shout);
       timers.current.shout = window.setTimeout(() => setShout(null), 4000);
       setBurst(Date.now());
@@ -395,7 +395,7 @@ export function BingoWinnersOverlay({ bingoGameId, onClose }: { bingoGameId: num
   }, [bingoGameId]);
 
   return (
-    <Overlay title={bingoTitle(`Bingo #${data?.game_no ?? ""}`)} onClose={onClose} back width={460}>
+    <Overlay title={bingoTitle(t("bingo_number", data?.game_no ?? ""))} onClose={onClose} back width={460}>
       {data && (
         <p className="soft" style={{ marginTop: 0 }}>
           {[bingoPlayedOn(data.played_at), t("bingo_players_n", data.players), t("bingo_squares_gifted_n", data.squares_gifted)].filter(Boolean).join(" · ")}

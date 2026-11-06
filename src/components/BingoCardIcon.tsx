@@ -27,5 +27,5 @@ export function BingoCardIcon({ size = 26 }: { size?: number }) {
 
 /** A title with the Bingo card in front, in place of the old 🎱 that's still in the translated strings. */
 export function bingoTitle(text: string, size = 24): ReactNode {
-  return <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}><BingoCardIcon size={size} />{text.replace(/🎱\s*/u, "")}</span>;
+  return <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}><BingoCardIcon size={size} />{text.replace(/(?:🎱|🔢)\s*/u, "")}</span>;
 }
