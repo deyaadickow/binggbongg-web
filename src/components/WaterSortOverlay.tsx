@@ -120,12 +120,12 @@ export function WaterSortOverlay({ roomName, hostName, isHost, onClose }: { room
             {phase === "starting" && <p className="muted">{t("starting")}</p>}
             {phase === "attention" && start && (
               <>
-                <h2 className="card-title" style={{ fontSize: 22 }}>{t("attention")}</h2>
+                <h2 className="card-title" style={{ fontSize: 22 }}>{t("tg_gift_title")}</h2>
                 <p className="soft" style={{ marginTop: 8 }}>{t("tap_game_entry_agreement", start.entry_fee_coins)}</p>
                 <p className="muted" style={{ fontSize: 12, marginTop: 6 }}>Then every pour is {moveCost} coin{moveCost === 1 ? "" : "s"}, gifted to {hostName || t("the_host")} when you finish.</p>
                 <div className="row" style={{ marginTop: 14 }}>
                   <button className="btn ghost" style={{ flex: 1 }} onClick={onClose}>{t("gig_cancel")}</button>
-                  <button className="btn" style={{ flex: 1 }} onClick={agree}>{t("agree")}</button>
+                  <button className="btn" style={{ flex: 1 }} onClick={agree}>{t("tg_gift_button", start.entry_fee_coins)}</button>
                 </div>
               </>
             )}
@@ -675,7 +675,7 @@ export function WaterSortGame({ isHost, hostName, moveCost, active, onFinish, st
 
       <div style={{ padding: "8px 14px calc(12px + env(safe-area-inset-bottom))" }}>
         <button className="btn block" onClick={() => onFinish(pours, solvedCount)} style={{ fontWeight: 800 }}>
-          {isHost ? "Finish" : `Finish — pay ${coinsLabel(coins)} to ${hostName || "the host"}`}
+          {isHost ? "Finish" : `Finish — gift ${coinsLabel(coins)} to ${hostName || "the host"}`}
         </button>
       </div>
     </div>

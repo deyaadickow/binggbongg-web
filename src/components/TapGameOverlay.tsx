@@ -340,11 +340,11 @@ export function TapGameOverlay({ game, roomName, onClose, onToast, hostAvatar, i
               {phase === "starting" && <p className="muted">{t("starting")}</p>}
               {phase === "attention" && start && (
                 <>
-                  <h2 className="card-title" style={{ fontSize: 22 }}>{t("attention")}</h2>
-                  <p className="soft" style={{ marginTop: 8 }}>{t("tap_game_entry_agreement", start.entry_fee_coins)}</p>
+                  <h2 className="card-title" style={{ fontSize: 22 }}>{t("tg_gift_title")}</h2>
+                  <p className="soft" style={{ marginTop: 8 }}>{t("tap_game_entry_agreement", start.entry_fee_coins)} {t("tg_gift_points")}</p>
                   <div className="row" style={{ marginTop: 14 }}>
                     <button className="btn ghost" style={{ flex: 1 }} onClick={onClose}>{t("gig_cancel")}</button>
-                    <button className="btn" style={{ flex: 1 }} onClick={agree}>{t("agree")}</button>
+                    <button className="btn" style={{ flex: 1 }} onClick={agree}>{t("tg_gift_button", start.entry_fee_coins)}</button>
                   </div>
                 </>
               )}
