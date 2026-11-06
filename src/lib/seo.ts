@@ -6,12 +6,12 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
 const SITE = "https://www.binggbongg.com";
-const HOME_TITLE = "Bingg Bongg – Live Streaming, Battles & Videos";
-const HOME_DESC = "Free live streaming app: go live, battle your friends in 20 modes, upload videos, and chat with people worldwide in 60 languages. Android & iPhone.";
+const HOME_TITLE = "Bingg Bongg – The New Social Media App: Live Video, Chat & Friends";
+const HOME_DESC = "Make friends all over the world: go live, chat in 53 languages, share short videos and photos, and join friendly live battles. Free on Android & iPhone.";
 
 const PAGES: Record<string, [string, string]> = {
   // The ads' landing page (Steve, 2026-10-31). No money wording: Meta reviews this page too.
-  "/ph": ["Bingg Bongg – The New Social Media App", "Go live, upload videos, battle other members in 20 modes and make friends all over the world. Free on Google Play and the App Store."],
+  "/ph": ["Bingg Bongg – The New Social Media App", "Go live, chat and share videos with friends all over the world. Free on Google Play and the App Store."],
   "/features": ["Bingg Bongg Features – Every Way to Go Live, Battle and Make Friends", "Every Bingg Bongg feature in one place: going live, 20 battle modes, videos, Green Screen, face filters, translation and more."],
   "/feature-videos": ["Bingg Bongg Feature Videos – See Every Feature in 60 Seconds", "Watch a 60-second video of every Bingg Bongg feature: live streaming, battles, videos, Green Screen and more."],
   "/contests": ["Contests – Bingg Bongg", "Bingg Bongg talent contests, where members vote for their favourites."],

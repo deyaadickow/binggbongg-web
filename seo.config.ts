@@ -77,8 +77,8 @@ function staticPage(root: string): string {
     s.tiles.map((t) => `<li>${t.to ? `<a href="${esc(t.to)}">` : ""}<strong>${esc(t.name)}</strong>${t.to ? "</a>" : ""}${t.blurb ? ` — ${esc(t.blurb)}` : ""}</li>`).join("") +
     "</ul>").join("");
   return `<div class="seo-static">
-<h1>Bingg Bongg — the new social media app: live streaming, battles and videos</h1>
-<p>Bingg Bongg is a free live streaming app. Go live from your phone or your computer, battle your friends in 20 battle modes, upload videos, make videos with Green Screen and face filters, and make friends all over the world — every message translated, in 53 languages.</p>
+<h1>Bingg Bongg — the new social media app: live video, chat and friends</h1>
+<p>Bingg Bongg is a free social media app. Make friends all over the world and chat in 53 languages with every message translated, go live from your phone or your computer, share videos and photos with Green Screen and face filters, and join friendly live battles.</p>
 <p><a href="${PLAY}">Get Bingg Bongg on Google Play</a> · <a href="${APPSTORE}">Download Bingg Bongg on the App Store</a> · <a href="/features">See all ${count} features</a> · <a href="/feature-videos">Watch the feature videos</a></p>
 ${list}
 <p><a href="/live">Live now</a> · <a href="/exciting-news">Exciting News</a> · <a href="/help">Help</a> · <a href="/settings/about">About us</a> · <a href="/settings/faq">FAQ</a> · <a href="/settings/contact">Contact us</a> · <a href="/settings/terms">Terms of Use</a> · <a href="/settings/privacy">Privacy Policy</a></p>
@@ -103,7 +103,7 @@ export function seoStaticContent(): Plugin {
       const home = path.join(out, "index.html");
       if (!fs.existsSync(home)) return;
       const title = "Bingg Bongg – The New Social Media App";
-      const desc = "Go live, upload videos, battle other members in 20 modes and make friends all over the world. Free on Google Play and the App Store.";
+      const desc = "Go live, chat and share videos with friends all over the world. Free on Google Play and the App Store.";
       const url = `${SITE}/ph`;
       let html = fs.readFileSync(home, "utf8");
       html = html
