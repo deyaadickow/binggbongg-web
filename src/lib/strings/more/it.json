@@ -1542,5 +1542,6 @@
  "chb_pin_max": "Puoi fissarne fino a 3 — tocca una stella per rimuoverne uno",
  "chb_waiting": "In attesa che i partecipanti vadano in live…",
  "chb_starred_you": "@{name} ti ha messo una stella — tocca ★ per rispondere",
- "chb_starred_you_tile": "★ Ti ha messo una stella"
+ "chb_starred_you_tile": "★ Ti ha messo una stella",
+ "safety_center": "Centro sicurezza"
 }

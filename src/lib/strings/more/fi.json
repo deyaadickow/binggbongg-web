@@ -1534,5 +1534,6 @@
  "chb_pin_max": "Voit kiinnittää enintään 3 – poista napauttamalla tähteä",
  "chb_waiting": "Odotetaan kisaajien liven alkamista…",
  "chb_starred_you": "@{name} tähditti sinut — napauta ★ vastataksesi",
- "chb_starred_you_tile": "★ tähditti sinut"
+ "chb_starred_you_tile": "★ tähditti sinut",
+ "safety_center": "Turvallisuuskeskus"
 }

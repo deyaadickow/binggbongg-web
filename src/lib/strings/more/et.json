@@ -1540,5 +1540,6 @@
  "chb_pin_max": "Kinnitada saab kuni 3 – puuduta tähte eemaldamiseks",
  "chb_waiting": "Ootame võistlejate otse-eetrisse minekut…",
  "chb_starred_you": "@{name} märkis su tärniga — puuduta ★, et vastata",
- "chb_starred_you_tile": "★ märkis su tärniga"
+ "chb_starred_you_tile": "★ märkis su tärniga",
+ "safety_center": "Turvakeskus"
 }

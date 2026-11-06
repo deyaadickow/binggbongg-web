@@ -1543,5 +1543,6 @@
  "chb_pin_max": "እስከ 3 መሰካት ይችላሉ — አንዱን ለማንሳት ኮከቡን ይንኩ",
  "chb_waiting": "ተወዳዳሪዎች ቀጥታ ስርጭት እስኪገቡ በመጠበቅ ላይ…",
  "chb_starred_you": "@{name} ኮከብ አድርጎዎታል — መልሰው ለማውራት ★ ይንኩ",
- "chb_starred_you_tile": "★ ኮከብ አድርጎዎታል"
+ "chb_starred_you_tile": "★ ኮከብ አድርጎዎታል",
+ "safety_center": "የደህንነት ማዕከል"
 }

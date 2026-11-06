@@ -1538,5 +1538,6 @@
  "chb_pin_max": "Poți fixa maximum 3 — atinge o stea pentru a elimina",
  "chb_waiting": "Așteptăm ca participanții să intre live…",
  "chb_starred_you": "@{name} te-a marcat cu stea — atinge ★ ca să răspunzi",
- "chb_starred_you_tile": "★ te-a marcat cu stea"
+ "chb_starred_you_tile": "★ te-a marcat cu stea",
+ "safety_center": "Centrul de siguranță"
 }

@@ -17,6 +17,7 @@ export const id = {
   a_tax_form_on_file: "Formulir pajak tersimpan (%1$s)",
   about: "Tentang",
   about_us: "Tentang Kami",
+  safety_center: "Pusat Keamanan",
   about_x: "Tentang %1$s",
   accept: "Menerima",
   accept_this_ad: "Terima iklan ini",

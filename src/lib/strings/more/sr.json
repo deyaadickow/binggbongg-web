@@ -1543,5 +1543,6 @@
  "chb_pin_max": "Možeš da zakačiš do 3 — dodirni zvezdicu da ukloniš",
  "chb_waiting": "Čekamo takmičare da se uključe uživo…",
  "chb_starred_you": "@{name} te je označio/la zvezdicom — dodirni ★ da uzvratiš",
- "chb_starred_you_tile": "★ te je označio/la"
+ "chb_starred_you_tile": "★ te je označio/la",
+ "safety_center": "Центар за безбедност"
 }

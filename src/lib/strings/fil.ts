@@ -17,6 +17,7 @@ export const fil = {
   a_tax_form_on_file: "May tax form na nakatala (%1$s)",
   about: "Tungkol sa",
   about_us: "Tungkol Sa Amin",
+  safety_center: "Safety Center",
   about_x: "Tungkol sa %1$s",
   accept: "Tanggapin",
   accept_this_ad: "Tanggapin ang ad na ito",

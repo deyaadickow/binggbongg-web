@@ -1543,5 +1543,6 @@
  "chb_pin_max": "Du kannst bis zu 3 anheften – tippe auf einen Stern, um ihn zu entfernen",
  "chb_waiting": "Warte darauf, dass die Battler live gehen …",
  "chb_starred_you": "@{name} hat dir einen Stern gegeben – tippe auf ★, um zu antworten",
- "chb_starred_you_tile": "★ hat dir einen Stern gegeben"
+ "chb_starred_you_tile": "★ hat dir einen Stern gegeben",
+ "safety_center": "Sicherheitscenter"
 }

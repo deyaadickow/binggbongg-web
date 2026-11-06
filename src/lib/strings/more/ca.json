@@ -1542,5 +1542,6 @@
  "chb_pin_max": "Pots fixar-ne fins a 3: toca una estrella per treure-la",
  "chb_waiting": "Esperant que els participants comencin a emetre…",
  "chb_starred_you": "@{name} t'ha destacat — toca ★ per respondre",
- "chb_starred_you_tile": "★ t'ha destacat"
+ "chb_starred_you_tile": "★ t'ha destacat",
+ "safety_center": "Centre de seguretat"
 }

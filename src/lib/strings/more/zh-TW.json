@@ -1543,5 +1543,6 @@
  "chb_pin_max": "最多可置頂 3 個——點擊星號即可取消置頂",
  "chb_waiting": "正在等待參戰者開播…",
  "chb_starred_you": "@{name} 為你加上了星標 — 點擊 ★ 即可回話",
- "chb_starred_you_tile": "★ 為你加上了星標"
+ "chb_starred_you_tile": "★ 為你加上了星標",
+ "safety_center": "安全中心"
 }

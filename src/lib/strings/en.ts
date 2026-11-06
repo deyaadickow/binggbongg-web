@@ -18,6 +18,7 @@ export const en = {
   a_tax_form_on_file: "A tax form on file (%1$s)",
   about: "About",
   about_us: "About Us",
+  safety_center: "Safety Center",
   about_x: "About %1$s",
   accept: "Accept",
   accept_this_ad: "Accept this ad",

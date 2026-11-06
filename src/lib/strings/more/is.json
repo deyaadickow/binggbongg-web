@@ -1540,5 +1540,6 @@
  "chb_pin_max": "Þú getur fest allt að 3 — pikkaðu á stjörnu til að fjarlægja",
  "chb_waiting": "Bíður eftir að keppendur fari í beina útsendingu…",
  "chb_starred_you": "@{name} stjörnumerkti þig — ýttu á ★ til að svara",
- "chb_starred_you_tile": "★ stjörnumerkti þig"
+ "chb_starred_you_tile": "★ stjörnumerkti þig",
+ "safety_center": "Öryggismiðstöð"
 }

@@ -1539,5 +1539,6 @@
  "chb_pin_max": "Var piespraust līdz 3 — pieskaries zvaigznītei, lai noņemtu",
  "chb_waiting": "Gaidām, kad cīnītāji sāks tiešraidi…",
  "chb_starred_you": "@{name} atzīmēja tevi ar zvaigznīti — pieskaries ★, lai atbildētu",
- "chb_starred_you_tile": "★ atzīmēja tevi"
+ "chb_starred_you_tile": "★ atzīmēja tevi",
+ "safety_center": "Drošības centrs"
 }

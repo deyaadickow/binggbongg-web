@@ -1540,5 +1540,6 @@
  "chb_pin_max": "Du kan feste opptil 3 – trykk på en stjerne for å fjerne én",
  "chb_waiting": "Venter på at deltakerne skal gå live…",
  "chb_starred_you": "@{name} stjernemerket deg — trykk på ★ for å snakke tilbake",
- "chb_starred_you_tile": "★ stjernemerket deg"
+ "chb_starred_you_tile": "★ stjernemerket deg",
+ "safety_center": "Sikkerhetssenter"
 }

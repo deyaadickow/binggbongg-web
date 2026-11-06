@@ -1543,5 +1543,6 @@
  "chb_pin_max": "최대 3개까지 고정할 수 있어요 — 별을 탭하면 고정이 해제돼요",
  "chb_waiting": "참가자들이 라이브를 시작하기를 기다리는 중…",
  "chb_starred_you": "@{name}님이 나를 별표했어요 — ★를 탭해 대화해보세요",
- "chb_starred_you_tile": "★ 나를 별표함"
+ "chb_starred_you_tile": "★ 나를 별표함",
+ "safety_center": "안전 센터"
 }

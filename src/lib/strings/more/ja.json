@@ -1542,5 +1542,6 @@
  "chb_pin_max": "固定できるのは最大3つです — ★をタップすると解除されます",
  "chb_waiting": "対戦相手の配信開始を待っています…",
  "chb_starred_you": "@{name}があなたにスターを付けました — ★をタップして話そう",
- "chb_starred_you_tile": "★ あなたにスターしました"
+ "chb_starred_you_tile": "★ あなたにスターしました",
+ "safety_center": "安全センター"
 }

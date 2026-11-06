@@ -1543,5 +1543,6 @@
  "chb_pin_max": "Bạn có thể ghim tối đa 3 ô — nhấn vào ngôi sao để bỏ ghim",
  "chb_waiting": "Đang chờ người đấu phát trực tiếp…",
  "chb_starred_you": "@{name} đã gắn sao cho bạn — nhấn ★ để trò chuyện lại",
- "chb_starred_you_tile": "★ đã gắn sao cho bạn"
+ "chb_starred_you_tile": "★ đã gắn sao cho bạn",
+ "safety_center": "Trung tâm an toàn"
 }

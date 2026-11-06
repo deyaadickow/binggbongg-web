@@ -1543,5 +1543,6 @@
  "chb_pin_max": "Môžeš pripnúť najviac 3 – ťuknutím na hviezdičku pripnutie zrušíš",
  "chb_waiting": "Čaká sa, kým súťažiaci začnú vysielať…",
  "chb_starred_you": "@{name} ti dal(a) hviezdičku — klepni na ★ a ozvi sa",
- "chb_starred_you_tile": "★ ti dal(a) hviezdičku"
+ "chb_starred_you_tile": "★ ti dal(a) hviezdičku",
+ "safety_center": "Centrum bezpečnosti"
 }

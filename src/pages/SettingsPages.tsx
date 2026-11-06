@@ -899,6 +899,12 @@ export function ContactUsPage() {
   return <LegalPage title={t("contact_us")} endpoint="fetchContactUs" />;
 }
 
+/** The Safety Center (2026-11-06): community rules, age rules, moderation, report and block. */
+export function SafetyCenterPage() {
+  const { t } = useT();
+  return <LegalPage title={t("safety_center")} endpoint="fetchSafetyCenter" />;
+}
+
 export function AboutUsPage() {
   const { t } = useT();
   return <LegalPage title={t("about_us")} endpoint="fetchAboutUs" />;

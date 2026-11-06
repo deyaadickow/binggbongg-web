@@ -81,7 +81,7 @@ function staticPage(root: string): string {
 <p>Bingg Bongg is a free social media app. Make friends all over the world and chat in 53 languages with every message translated, go live from your phone or your computer, share videos and photos with Green Screen and face filters, and join friendly live battles.</p>
 <p><a href="${PLAY}">Get Bingg Bongg on Google Play</a> · <a href="${APPSTORE}">Download Bingg Bongg on the App Store</a> · <a href="/features">See all ${count} features</a> · <a href="/feature-videos">Watch the feature videos</a></p>
 ${list}
-<p><a href="/live">Live now</a> · <a href="/exciting-news">Exciting News</a> · <a href="/help">Help</a> · <a href="/settings/about">About us</a> · <a href="/settings/faq">FAQ</a> · <a href="/settings/contact">Contact us</a> · <a href="/settings/terms">Terms of Use</a> · <a href="/settings/privacy">Privacy Policy</a></p>
+<p><a href="/live">Live now</a> · <a href="/exciting-news">Exciting News</a> · <a href="/help">Help</a> · <a href="/settings/about">About us</a> · <a href="/safety">Safety Center</a> · <a href="/settings/faq">FAQ</a> · <a href="/settings/contact">Contact us</a> · <a href="/settings/terms">Terms of Use</a> · <a href="/settings/privacy">Privacy Policy</a></p>
 <p>© Bingg Bongg Inc.</p>
 </div>`;
 }

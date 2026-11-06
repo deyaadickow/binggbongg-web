@@ -99,6 +99,7 @@ export function sidebarSections(userId: number | null, contestOn = false): SideS
       { to: "/settings/privacy", label: "privacy_policy", icon: "🔒" },
       { to: "/settings/contact", label: "contact_us", icon: "✉️" },
       { to: "/settings/about", label: "about_us", icon: "ℹ️" },
+      { to: "/settings/safety", label: "safety_center", icon: "🛡️" },
       { to: "/settings/app-features", label: "app_features_explainer", icon: "📖" },
       { to: "/settings/faq", label: "faq", icon: "❓" },
 { to: "/settings/delete-account", label: "delete_account", icon: "🗑️", needsLogin: true },
@@ -155,6 +156,7 @@ export function SiteFooter() {
       <div>Sterling Heights, Michigan, USA</div>
       <div className="site-footer-links">
         <NavLink to="/settings/about">{t("about")}</NavLink>
+        <NavLink to="/settings/safety">{t("safety_center")}</NavLink>
         <NavLink to="/settings/contact">{t("contact")}</NavLink>
         <NavLink to="/settings/terms">{t("terms")}</NavLink>
         <NavLink to="/settings/privacy">{t("privacy")}</NavLink>

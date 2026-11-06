@@ -1539,5 +1539,6 @@
  "chb_pin_max": "Podes fixar ata 3: toca nunha estrela para quitar unha",
  "chb_waiting": "Agardando a que os participantes comecen a emitir…",
  "chb_starred_you": "@{name} marcoute con estrela — toca ★ para responder",
- "chb_starred_you_tile": "★ marcoute con estrela"
+ "chb_starred_you_tile": "★ marcoute con estrela",
+ "safety_center": "Centro de seguridade"
 }

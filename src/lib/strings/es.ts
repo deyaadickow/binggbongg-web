@@ -17,6 +17,7 @@ export const es = {
   a_tax_form_on_file: "Un formulario fiscal en archivo (%1$s)",
   about: "Acerca de",
   about_us: "Sobre Nosotros",
+  safety_center: "Centro de seguridad",
   about_x: "Acerca de %1$s",
   accept: "Aceptar",
   accept_this_ad: "Aceptar este anuncio",

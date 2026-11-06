@@ -61,7 +61,7 @@ import { AdReferralEarningsPage, AllVideosEarningsPage, PayoutHistoryPage, Redee
 import { PrintableAdsPage } from "./pages/PrintableAdsPage";
 import { ShopPage, ShopProductPage } from "./pages/ShopPage";
 import { MyRemindersPage } from "./pages/MyRemindersPage";
-import { AccountSettingsPage, AdvertisePage, BlockedProfilesPage, ComingSoonPage, ContestRequestsPage, DeleteAccountPage, FindABattlePage, ModeratorsPage, QrCodePage, ReferralsPage, SettingsHubPage, ShareProfilePage, SimulcastPage, SupportArchivePage, SupportPage, VirtualLookPage, MyVirtualBattlesPage, TermsOfUsePage, PrivacyPolicyPage, ContactUsPage, AboutUsPage, FaqPage, AppFeaturesPage, ToDoListPage } from "./pages/SettingsPages";
+import { AccountSettingsPage, AdvertisePage, BlockedProfilesPage, ComingSoonPage, ContestRequestsPage, DeleteAccountPage, FindABattlePage, ModeratorsPage, QrCodePage, ReferralsPage, SettingsHubPage, ShareProfilePage, SimulcastPage, SupportArchivePage, SupportPage, VirtualLookPage, MyVirtualBattlesPage, TermsOfUsePage, PrivacyPolicyPage, ContactUsPage, AboutUsPage, SafetyCenterPage, FaqPage, AppFeaturesPage, ToDoListPage } from "./pages/SettingsPages";
 import { SellerPage } from "./pages/SellerPage";
 import { AgentPage } from "./pages/AgentPage";
 import { VaultPage } from "./pages/VaultPage";
@@ -272,6 +272,8 @@ export default function App() {
           <Route path="/settings/privacy" element={<PrivacyPolicyPage />} />
           <Route path="/settings/contact" element={<ContactUsPage />} />
           <Route path="/settings/about" element={<AboutUsPage />} />
+          <Route path="/settings/safety" element={<SafetyCenterPage />} />
+          <Route path="/safety" element={<SafetyCenterPage />} />
           <Route path="/settings/faq" element={<FaqPage />} />
           <Route path="/settings/app-features" element={<AppFeaturesPage />} />
           <Route path="/settings/delete-account" element={<DeleteAccountPage />} />

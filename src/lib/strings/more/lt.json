@@ -1540,5 +1540,6 @@
  "chb_pin_max": "Gali prisegti iki 3 – bakstelk žvaigždutę, kad pašalintum",
  "chb_waiting": "Laukiama, kol dalyviai pradės transliaciją…",
  "chb_starred_you": "@{name} pažymėjo tave žvaigždute – bakstelėk ★, kad atsakytum",
- "chb_starred_you_tile": "★ pažymėjo tave"
+ "chb_starred_you_tile": "★ pažymėjo tave",
+ "safety_center": "Saugumo centras"
 }
