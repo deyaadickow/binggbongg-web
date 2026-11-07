@@ -132,7 +132,7 @@ export function BinggBonusOverlay() {
   }, [now, burst]);
 
   const gloves = useMemo(
-    () => (now && !burst ? makeGloves(still ? Math.min(10, now.b.gloves) : Math.min(80, now.b.gloves), now.b.seconds, still, now.ratio) : []),
+    () => (now && !burst ? makeGloves(still ? Math.min(10, now.b.gloves) : Math.min(300, now.b.gloves), now.b.seconds, still, now.ratio) : []),
     [now, still, burst],
   );
   if (!now) return null;

@@ -63,7 +63,7 @@ export function normalizeBinggBonus(raw: unknown, senderId?: number): BinggBonus
     full_name: String(r.full_name ?? ""),
     times: Math.max(1, num(r.times, 1)),
     bonus_coins: Math.max(0, num(r.bonus_coins)),
-    gloves: Math.min(200, Math.max(1, num(r.gloves, 50))),
+    gloves: Math.min(300, Math.max(1, num(r.gloves, 50))),
     seconds: Math.min(30, Math.max(3, num(r.seconds, 10))),
     banner: String(r.banner || "Bingg Bongg Bonus"),
     image: typeof r.image === "string" && /^https:\/\//i.test(r.image.trim()) ? r.image.trim() : null,
