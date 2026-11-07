@@ -131,7 +131,8 @@ export function LiveFishOverlay({ streamerId, streamerName, roomName, active = t
   function tap() {
     if (phase !== "swim") return;
     if (!requireVerified()) return;
-    setPhase("confirm");
+    // Steve, 2026-11-07: "Yes, no popup" — one tap catches the fish and sends the gift.
+    void send();
   }
 
   async function send() {
@@ -178,7 +179,7 @@ export function LiveFishOverlay({ streamerId, streamerName, roomName, active = t
           </div>
         </button>
       </div>
-      {(phase === "confirm" || phase === "sending") && (
+      {phase === "confirm" && (
         <div className="fish-confirm-backdrop">
           <div className="card pad fish-confirm" role="dialog" aria-modal="true">
             <h3>{t("fish_confirm_title")}</h3>
