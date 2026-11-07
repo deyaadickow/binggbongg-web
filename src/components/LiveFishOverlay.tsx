@@ -185,8 +185,8 @@ export function LiveFishOverlay({ streamerId, streamerName, roomName, active = t
             <h3>{t("fish_confirm_title")}</h3>
             <p>{t("fish_confirm_text", who, fish.coins)}</p>
             <div className="fish-confirm-buttons">
-              <button className="btn" onClick={() => setPhase("swim")} disabled={phase === "sending"}>{t("cancel")}</button>
-              <button className="btn fish-send" onClick={send} disabled={phase === "sending"} autoFocus>{t("fish_send_gift")}</button>
+              <button className="btn" onClick={() => setPhase("swim")}>{t("cancel")}</button>
+              <button className="btn fish-send" onClick={send} autoFocus>{t("fish_send_gift")}</button>
             </div>
           </div>
         </div>
