@@ -1561,5 +1561,9 @@
  "fish_switch_help": "Un peix neda pel teu directe; qui l'atrapi t'envia un regal.",
  "fish_catchers_title": "Qui ha atrapat el peix 🐟",
  "fish_catchers_empty": "Encara ningú no ha atrapat el peix.",
- "fish_catcher_count": "%1$s peixos · %2$s monedes"
+ "fish_catcher_count": "%1$s peixos · %2$s monedes",
+ "fp_try_line": "Prova aquesta funció i explica'ns quant t'agrada! ❤️",
+ "fp_idea_line": "Tens una idea que t'agradaria veure a Bingg Bongg? Si la creem, esmentarem el teu nom i ingressarem $100 al teu compte! 💡",
+ "fp_try_it": "PROVA-HO",
+ "fp_share_my_idea": "COMPARTEIX LA MEVA IDEA"
 }

@@ -1559,5 +1559,9 @@
  "fish_switch_help": "En fisk svømmer hen over din live; en seer, der fanger den, sender dig en gave.",
  "fish_catchers_title": "Hvem fangede fisken 🐟",
  "fish_catchers_empty": "Ingen har fanget fisken endnu.",
- "fish_catcher_count": "%1$s fisk · %2$s mønter"
+ "fish_catcher_count": "%1$s fisk · %2$s mønter",
+ "fp_try_line": "Prøv denne funktion, og fortæl os, hvor meget du elsker den! ❤️",
+ "fp_idea_line": "Har du en idé, du gerne vil se på Bingg Bongg? Hvis vi bygger den, nævner vi dit navn og indsætter $100 på din konto! 💡",
+ "fp_try_it": "PRØV DET",
+ "fp_share_my_idea": "DEL MIN IDÉ"
 }

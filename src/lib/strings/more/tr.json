@@ -1562,5 +1562,9 @@
  "fish_switch_help": "Canlı yayınından bir balık yüzer; onu yakalayan izleyici sana bir hediye gönderir.",
  "fish_catchers_title": "Balığı kim yakaladı 🐟",
  "fish_catchers_empty": "Henüz kimse balığı yakalamadı.",
- "fish_catcher_count": "%1$s balık · %2$s jeton"
+ "fish_catcher_count": "%1$s balık · %2$s jeton",
+ "fp_try_line": "Bu özelliği deneyin ve ne kadar sevdiğinizi bize söyleyin! ❤️",
+ "fp_idea_line": "Bingg Bongg'da görmek istediğiniz bir fikriniz mi var? Onu hayata geçirirsek adınızı anacağız ve hesabınıza $100 yatıracağız! 💡",
+ "fp_try_it": "DENE",
+ "fp_share_my_idea": "FİKRİMİ PAYLAŞ"
 }

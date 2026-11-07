@@ -1558,5 +1558,9 @@
  "fish_switch_help": "Un peixe nada polo teu directo; quen o atrape envíache un agasallo.",
  "fish_catchers_title": "Quen atrapou o peixe 🐟",
  "fish_catchers_empty": "Ninguén atrapou o peixe aínda.",
- "fish_catcher_count": "%1$s peixes · %2$s moedas"
+ "fish_catcher_count": "%1$s peixes · %2$s moedas",
+ "fp_try_line": "Proba esta función e dinos canto che encanta! ❤️",
+ "fp_idea_line": "Tes unha idea que che gustaría ver en Bingg Bongg? Se a creamos, mencionaremos o teu nome e ingresaremos $100 na túa conta! 💡",
+ "fp_try_it": "PROBAO",
+ "fp_share_my_idea": "COMPARTIR A MIÑA IDEA"
 }

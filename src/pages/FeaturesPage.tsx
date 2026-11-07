@@ -35,7 +35,7 @@ import { IDEA_SUPPORT_REASON } from "../lib/ideas";
 import { FeatureVideoPlayer, type PlayerItem } from "../components/FeatureVideoPlayer";
 import { useContestOn } from "../lib/contests";
 
-interface Feature {
+export interface Feature {
   icon: string;
   nameKey: StringKey;
   /** The name shown, when it differs from the tile's key (the key also finds its feature video, the
@@ -57,12 +57,12 @@ interface Feature {
   videoKey?: string;
 }
 
-interface Section {
+export interface Section {
   titleKey: StringKey;
   features: Feature[];
 }
 
-const FEATURES: Section[] = [
+export const FEATURES: Section[] = [
   {
     // Steve, 2026-10-25: these two were tabs at the top; they are #1 and #2 here now. The
     // Features Videos page is #3 (2026-10-29).
@@ -241,6 +241,12 @@ const FEATURES: Section[] = [
   },
 ];
 
+/** Where tapping a tile goes — also what the feed's feature promo card's TRY IT opens, so the two
+ *  can never disagree. Undefined: the tile has no link. */
+export function featureHref(f: Feature, userId?: number | null): string | undefined {
+  return f.myProfile ? (userId ? `/profile/${userId}` : "/login") : f.to;
+}
+
 // Steve, 2026-10-25: "add a number on top right corner of each feature starting from #1". The
 // number is the tile's place in the WHOLE directory, so a search keeps #12 as #12. Counted over
 // the tiles actually shown, so a hidden contest tile does not leave the list starting at #2.
@@ -265,7 +271,7 @@ function Tile({ f, number, video, onWatch, extras = [], onWatchExtra }: { f: Fea
   // profile, whose address needs the signed-in id. Signed out, the tile leads to the sign-in
   // page rather than nowhere.
   const { user } = useSession();
-  const to = f.myProfile ? (user ? `/profile/${user.id}` : "/login") : f.to;
+  const to = featureHref(f, user?.id);
   const inner = (
     <div className="card pad" style={{
       borderColor: "var(--gold-border)", height: "100%", position: "relative",

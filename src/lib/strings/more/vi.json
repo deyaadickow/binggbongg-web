@@ -1562,5 +1562,9 @@
  "fish_switch_help": "Một con cá bơi qua buổi live của bạn; người xem bắt được sẽ gửi quà cho bạn.",
  "fish_catchers_title": "Ai đã bắt được cá 🐟",
  "fish_catchers_empty": "Chưa có ai bắt được cá.",
- "fish_catcher_count": "%1$s cá · %2$s xu"
+ "fish_catcher_count": "%1$s cá · %2$s xu",
+ "fp_try_line": "Hãy thử tính năng này và cho chúng tôi biết bạn yêu thích nó đến mức nào! ❤️",
+ "fp_idea_line": "Bạn có ý tưởng muốn thấy trên Bingg Bongg không? Nếu chúng tôi xây dựng nó, chúng tôi sẽ nhắc tên bạn và nạp $100 vào tài khoản của bạn! 💡",
+ "fp_try_it": "THỬ NGAY",
+ "fp_share_my_idea": "CHIA SẺ Ý TƯỞNG"
 }

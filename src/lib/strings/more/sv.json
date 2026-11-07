@@ -1560,5 +1560,9 @@
  "fish_switch_help": "En fisk simmar över din livesändning; en tittare som fångar den skickar dig en gåva.",
  "fish_catchers_title": "Vem fångade fisken 🐟",
  "fish_catchers_empty": "Ingen har fångat fisken än.",
- "fish_catcher_count": "%1$s fiskar · %2$s mynt"
+ "fish_catcher_count": "%1$s fiskar · %2$s mynt",
+ "fp_try_line": "Testa den här funktionen och berätta hur mycket du älskar den! ❤️",
+ "fp_idea_line": "Har du en idé du skulle vilja se på Bingg Bongg? Om vi bygger den nämner vi ditt namn och sätter in $100 på ditt konto! 💡",
+ "fp_try_it": "TESTA",
+ "fp_share_my_idea": "DELA MIN IDÉ"
 }

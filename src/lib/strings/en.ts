@@ -2260,4 +2260,9 @@ export const en = {
   fish_catchers_title: "Who caught the fish 🐟",
   fish_catchers_empty: "No one has caught the fish yet.",
   fish_catcher_count: "%1$s fish · %2$s coins",
+  // Feature promo cards in the For You feed (Steve, 2026-11-07).
+  fp_try_line: "Try this feature and tell us how much you love it! ❤️",
+  fp_idea_line: "Have an idea you'd love to see on Bingg Bongg? If we build it, we'll mention your name and deposit $100 to your account! 💡",
+  fp_try_it: "TRY IT",
+  fp_share_my_idea: "SHARE MY IDEA",
 } as const;

@@ -1562,5 +1562,9 @@
  "fish_switch_help": "Un poisson traverse ton live ; le spectateur qui l'attrape t'envoie un cadeau.",
  "fish_catchers_title": "Qui a attrapé le poisson 🐟",
  "fish_catchers_empty": "Personne n'a encore attrapé le poisson.",
- "fish_catcher_count": "%1$s poissons · %2$s pièces"
+ "fish_catcher_count": "%1$s poissons · %2$s pièces",
+ "fp_try_line": "Essayez cette fonctionnalité et dites-nous à quel point vous l'adorez ! ❤️",
+ "fp_idea_line": "Vous avez une idée que vous aimeriez voir sur Bingg Bongg ? Si nous la réalisons, nous citerons votre nom et déposerons 100 $ sur votre compte ! 💡",
+ "fp_try_it": "ESSAYER",
+ "fp_share_my_idea": "PARTAGER MON IDÉE"
 }

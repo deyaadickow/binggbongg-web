@@ -1559,5 +1559,9 @@
  "fish_switch_help": "Fiskur syndir yfir beina útsendingu þína; áhorfandi sem veiðir hann sendir þér gjöf.",
  "fish_catchers_title": "Hver veiddi fiskinn 🐟",
  "fish_catchers_empty": "Enginn hefur veitt fiskinn enn.",
- "fish_catcher_count": "%1$s fiskar · %2$s myntir"
+ "fish_catcher_count": "%1$s fiskar · %2$s myntir",
+ "fp_try_line": "Prófaðu þennan eiginleika og segðu okkur hversu mikið þú elskar hann! ❤️",
+ "fp_idea_line": "Ertu með hugmynd sem þú vilt sjá á Bingg Bongg? Ef við smíðum hana nefnum við nafnið þitt og leggjum $100 inn á reikninginn þinn! 💡",
+ "fp_try_it": "PRÓFAÐU",
+ "fp_share_my_idea": "DEILA HUGMYNDINNI MINNI"
 }

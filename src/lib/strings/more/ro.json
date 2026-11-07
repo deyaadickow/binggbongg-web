@@ -1557,5 +1557,9 @@
  "fish_switch_help": "Un pește înoată prin live-ul tău; spectatorul care îl prinde îți trimite un cadou.",
  "fish_catchers_title": "Cine a prins peștele 🐟",
  "fish_catchers_empty": "Nimeni nu a prins încă peștele.",
- "fish_catcher_count": "%1$s pești · %2$s monede"
+ "fish_catcher_count": "%1$s pești · %2$s monede",
+ "fp_try_line": "Încearcă această funcție și spune-ne cât de mult îți place! ❤️",
+ "fp_idea_line": "Ai o idee pe care ai vrea să o vezi pe Bingg Bongg? Dacă o construim, îți vom menționa numele și vom depune $100 în contul tău! 💡",
+ "fp_try_it": "ÎNCEARCĂ",
+ "fp_share_my_idea": "TRIMITE IDEEA MEA"
 }

@@ -1562,5 +1562,9 @@
  "fish_switch_help": "Ein Fisch schwimmt durch deinen Livestream; wer ihn fängt, schickt dir ein Geschenk.",
  "fish_catchers_title": "Wer hat den Fisch gefangen 🐟",
  "fish_catchers_empty": "Noch hat niemand den Fisch gefangen.",
- "fish_catcher_count": "%1$s Fische · %2$s Münzen"
+ "fish_catcher_count": "%1$s Fische · %2$s Münzen",
+ "fp_try_line": "Probiere diese Funktion aus und sag uns, wie sehr du sie liebst! ❤️",
+ "fp_idea_line": "Hast du eine Idee, die du gerne auf Bingg Bongg sehen würdest? Wenn wir sie umsetzen, nennen wir deinen Namen und zahlen $100 auf dein Konto ein! 💡",
+ "fp_try_it": "AUSPROBIEREN",
+ "fp_share_my_idea": "MEINE IDEE TEILEN"
 }

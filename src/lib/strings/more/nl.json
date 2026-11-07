@@ -1562,5 +1562,9 @@
  "fish_switch_help": "Er zwemt een vis door je livestream; een kijker die hem vangt stuurt je een cadeau.",
  "fish_catchers_title": "Wie heeft de vis gevangen 🐟",
  "fish_catchers_empty": "Nog niemand heeft de vis gevangen.",
- "fish_catcher_count": "%1$s vissen · %2$s munten"
+ "fish_catcher_count": "%1$s vissen · %2$s munten",
+ "fp_try_line": "Probeer deze functie en vertel ons hoeveel je ervan houdt! ❤️",
+ "fp_idea_line": "Heb je een idee dat je graag op Bingg Bongg zou zien? Als we het bouwen, noemen we je naam en storten we $100 op je account! 💡",
+ "fp_try_it": "PROBEER HET",
+ "fp_share_my_idea": "DEEL MIJN IDEE"
 }

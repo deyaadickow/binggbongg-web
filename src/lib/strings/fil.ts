@@ -2065,4 +2065,9 @@ export const fil = {
   fish_catchers_title: "Sino ang nakahuli ng isda 🐟",
   fish_catchers_empty: "Wala pang nakakahuli ng isda.",
   fish_catcher_count: "%1$s isda · %2$s coins",
+  // Feature promo cards in the For You feed (Steve, 2026-11-07).
+  fp_try_line: "Subukan ang feature na ito at sabihin sa amin kung gaano mo ito kagusto! ❤️",
+  fp_idea_line: "May ideya ka bang gusto mong makita sa Bingg Bongg? Kapag ginawa namin ito, babanggitin namin ang pangalan mo at magdedeposito kami ng $100 sa account mo! 💡",
+  fp_try_it: "SUBUKAN",
+  fp_share_my_idea: "IBAHAGI ANG IDEYA KO",
 };

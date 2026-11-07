@@ -1558,5 +1558,9 @@
  "fish_switch_help": "Pāri tavai tiešraidei peld zivs; skatītājs, kurš to noķer, sūta tev dāvanu.",
  "fish_catchers_title": "Kas noķēra zivi 🐟",
  "fish_catchers_empty": "Zivi vēl neviens nav noķēris.",
- "fish_catcher_count": "%1$s zivis · %2$s monētas"
+ "fish_catcher_count": "%1$s zivis · %2$s monētas",
+ "fp_try_line": "Izmēģiniet šo funkciju un pastāstiet, cik ļoti tā jums patīk! ❤️",
+ "fp_idea_line": "Vai jums ir ideja, ko vēlētos redzēt Bingg Bongg? Ja mēs to izveidosim, mēs pieminēsim jūsu vārdu un iemaksāsim $100 jūsu kontā! 💡",
+ "fp_try_it": "IZMĒĢINIET",
+ "fp_share_my_idea": "DALĪTIES AR IDEJU"
 }

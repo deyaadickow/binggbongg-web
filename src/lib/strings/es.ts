@@ -2046,4 +2046,9 @@ export const es = {
   fish_catchers_title: "Quién atrapó el pez 🐟",
   fish_catchers_empty: "Nadie ha atrapado el pez todavía.",
   fish_catcher_count: "%1$s peces · %2$s monedas",
+  // Feature promo cards in the For You feed (Steve, 2026-11-07).
+  fp_try_line: "¡Prueba esta función y cuéntanos cuánto te encanta! ❤️",
+  fp_idea_line: "¿Tienes una idea que te encantaría ver en Bingg Bongg? ¡Si la creamos, mencionaremos tu nombre y depositaremos $100 en tu cuenta! 💡",
+  fp_try_it: "PRUÉBALO",
+  fp_share_my_idea: "COMPARTIR MI IDEA",
 };

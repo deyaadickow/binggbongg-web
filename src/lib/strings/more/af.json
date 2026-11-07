@@ -1560,5 +1560,9 @@
  "fish_switch_help": "'n Vis swem oor jou lewendige uitsending; 'n kyker wat dit vang, stuur vir jou 'n geskenk.",
  "fish_catchers_title": "Wie het die vis gevang 🐟",
  "fish_catchers_empty": "Niemand het die vis nog gevang nie.",
- "fish_catcher_count": "%1$s vis · %2$s munte"
+ "fish_catcher_count": "%1$s vis · %2$s munte",
+ "fp_try_line": "Probeer hierdie funksie en vertel ons hoe baie jy daarvan hou! ❤️",
+ "fp_idea_line": "Het jy 'n idee wat jy graag op Bingg Bongg wil sien? As ons dit bou, noem ons jou naam en deponeer $100 in jou rekening! 💡",
+ "fp_try_it": "PROBEER DIT",
+ "fp_share_my_idea": "DEEL MY IDEE"
 }

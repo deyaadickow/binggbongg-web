@@ -1553,5 +1553,9 @@
  "fish_switch_help": "Kala ui livelähetyksesi poikki; sen nappaava katsoja lähettää sinulle lahjan.",
  "fish_catchers_title": "Kuka nappasi kalan 🐟",
  "fish_catchers_empty": "Kukaan ei ole vielä napannut kalaa.",
- "fish_catcher_count": "%1$s kalaa · %2$s kolikkoa"
+ "fish_catcher_count": "%1$s kalaa · %2$s kolikkoa",
+ "fp_try_line": "Kokeile tätä ominaisuutta ja kerro meille, kuinka paljon pidät siitä! ❤️",
+ "fp_idea_line": "Onko sinulla idea, jonka haluaisit nähdä Bingg Bonggissa? Jos toteutamme sen, mainitsemme nimesi ja talletamme tilillesi $100! 💡",
+ "fp_try_it": "KOKEILE",
+ "fp_share_my_idea": "JAA IDEANI"
 }

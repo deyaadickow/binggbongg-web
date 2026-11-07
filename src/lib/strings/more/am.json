@@ -1562,5 +1562,9 @@
  "fish_switch_help": "ዓሣ በቀጥታ ስርጭትዎ ላይ ይዋኛል፤ የሚይዘው ተመልካች ስጦታ ይልክልዎታል።",
  "fish_catchers_title": "ዓሣውን ማን ያዘው 🐟",
  "fish_catchers_empty": "እስካሁን ዓሣውን የያዘ የለም።",
- "fish_catcher_count": "%1$s ዓሣ · %2$s ሳንቲሞች"
+ "fish_catcher_count": "%1$s ዓሣ · %2$s ሳንቲሞች",
+ "fp_try_line": "ይህን ባህሪ ይሞክሩት እና ምን ያህል እንደወደዱት ይንገሩን! ❤️",
+ "fp_idea_line": "በBingg Bongg ላይ ማየት የሚፈልጉት ሀሳብ አለዎት? ከገነባነው ስምዎን እንጠቅሳለን እና $100 ወደ መለያዎ እናስገባለን! 💡",
+ "fp_try_it": "ይሞክሩት",
+ "fp_share_my_idea": "ሀሳቤን አጋራ"
 }

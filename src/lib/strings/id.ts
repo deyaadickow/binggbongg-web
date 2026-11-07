@@ -2060,4 +2060,9 @@ export const id = {
   fish_catchers_title: "Siapa yang menangkap ikan 🐟",
   fish_catchers_empty: "Belum ada yang menangkap ikan.",
   fish_catcher_count: "%1$s ikan · %2$s koin",
+  // Feature promo cards in the For You feed (Steve, 2026-11-07).
+  fp_try_line: "Coba fitur ini dan beri tahu kami seberapa besar kamu menyukainya! ❤️",
+  fp_idea_line: "Punya ide yang ingin kamu lihat di Bingg Bongg? Jika kami membuatnya, kami akan menyebut namamu dan menyetor $100 ke akunmu! 💡",
+  fp_try_it: "COBA",
+  fp_share_my_idea: "BAGIKAN IDE SAYA",
 };

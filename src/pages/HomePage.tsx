@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { post, type Post } from "../lib/api";
 import { useSession } from "../lib/session";
 import { PostCard } from "../components/PostCard";
@@ -9,12 +9,21 @@ import { HelpFeedCard } from "../components/HelpFeedCard";
 import { PaidAdCard, type FeedVideoAd } from "../components/PaidAdCard";
 import { fetchHelpCampaigns, helpFeedSlots, type HelpCampaign } from "../lib/help";
 import { tt, useT  } from "../lib/i18n";
+import { FeaturePromoCard } from "../components/FeaturePromoCard";
+import { FEATURES, type Feature } from "./FeaturesPage";
+import { fetchFeatureVideos } from "../lib/featureVideos";
+import { useContestOn } from "../lib/contests";
+import { FEATURE_PROMO_EVERY, IDEA_KEY, markPromoShown, promoForCard, promoSequence, promoVideoKey } from "../lib/featurePromo";
 
 /** A paid ad after every this many videos — the same as Android and iOS. */
 const PAID_AD_EVERY = 20;
+/** Where in each 20 the paid ad goes. The Bingg Bongg feature card took the 20th slot
+ *  (Steve, 2026-11-07), and as both are every 20 the ad would never have shown again — so on the
+ *  web the ad moved to the middle of each 20: after videos 10, 30, 50 … and features after 20, 40, 60 … */
+const PAID_AD_OFFSET = 10;
 
 export function HomePage() {
-  const { t } = useT();
+  const { t, lang } = useT();
   const { user } = useSession();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
@@ -69,6 +78,29 @@ export function HomePage() {
     return () => { live = false; };
   }, [user?.id]);
 
+  // Feature promo cards (Steve, 2026-11-07): the directory's tiles this member can see that have a
+  // feature video, in the app's language. A failed or empty fetch means no cards — the feed is untouched.
+  const [featureVideos, setFeatureVideos] = useState<Record<string, string>>({});
+  useEffect(() => {
+    let live = true;
+    fetchFeatureVideos(lang).then((v) => { if (live) setFeatureVideos(v); });
+    return () => { live = false; };
+  }, [lang]);
+  const hasContest = useContestOn();
+  const promoFeatures = useMemo(() => {
+    const byKey: Record<string, Feature> = {};
+    for (const f of FEATURES.flatMap((sec) => sec.features)) {
+      const vk = promoVideoKey(f);
+      if ((hasContest || !f.contestOnly) && featureVideos[vk] && !byKey[vk]) byKey[vk] = f;
+    }
+    return byKey;
+  }, [featureVideos, hasContest]);
+  const promoKeys = useMemo(() => Object.keys(promoFeatures).filter((k) => k !== IDEA_KEY).sort(), [promoFeatures]);
+  const hasIdea = !!promoFeatures[IDEA_KEY];
+  // Computed once per set of features, so a card never changes feature as more videos load.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const promoSeq = useMemo(() => promoSequence(promoKeys, 300), [promoKeys.join("|")]);
+
   // Indexes only, never a merged array: the video page steps through `posts` in exactly this
   // order, and splicing anything into it would desync which video "next" means.
   const slots = helpFeedSlots(posts.length, help.rows.length, help.everyMin, help.everyMax);
@@ -87,13 +119,21 @@ export function HomePage() {
       <div className="grid">
         {posts.map((p, i) => {
           const slot = slots.indexOf(i);
+          // A Bingg Bongg feature card after every 20th video (i counts member videos only).
+          const promoKey = i > 0 && i % FEATURE_PROMO_EVERY === 0 ? promoForCard(i / FEATURE_PROMO_EVERY, promoSeq, hasIdea) : null;
+          const promo = promoKey ? promoFeatures[promoKey] : undefined;
           return (
             <Fragment key={p.id}>
-              {/* One ad after every 20 videos, taking turns (Steve, 2026-11-05: "Once every 20 videos, we don't want to over whelm the members."). */}
-              {user && ads.length > 0 && i > 0 && i % PAID_AD_EVERY === 0 && (
-                <PaidAdCard ad={ads[(i / PAID_AD_EVERY - 1) % ads.length]} userId={user.id} />
+              {/* One ad in every 20 videos, taking turns (Steve, 2026-11-05: "Once every 20 videos, we don't want to over whelm the members."). */}
+              {user && ads.length > 0 && i >= PAID_AD_OFFSET && i % PAID_AD_EVERY === PAID_AD_OFFSET && (
+                <PaidAdCard ad={ads[Math.floor(i / PAID_AD_EVERY) % ads.length]} userId={user.id} />
               )}
-              {slot !== -1 && help.rows[slot] && <HelpFeedCard campaign={help.rows[slot]} />}
+              {promo && promoKey && (
+                <FeaturePromoCard feature={promo} video={featureVideos[promoKey]}
+                  onSeen={() => markPromoShown(promoKey, promoKeys)} />
+              )}
+              {/* The feature card wins its slot over any other extra card. */}
+              {!promo && slot !== -1 && help.rows[slot] && <HelpFeedCard campaign={help.rows[slot]} />}
               <PostCard post={p} />
             </Fragment>
           );

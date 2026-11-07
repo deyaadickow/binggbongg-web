@@ -1559,5 +1559,9 @@
  "fish_switch_help": "Per tavo tiesioginę transliaciją plaukia žuvis; ją pagavęs žiūrovas atsiunčia tau dovaną.",
  "fish_catchers_title": "Kas pagavo žuvį 🐟",
  "fish_catchers_empty": "Žuvies dar niekas nepagavo.",
- "fish_catcher_count": "%1$s žuvys · %2$s monetų"
+ "fish_catcher_count": "%1$s žuvys · %2$s monetų",
+ "fp_try_line": "Išbandykite šią funkciją ir pasakykite, kaip labai ji jums patinka! ❤️",
+ "fp_idea_line": "Turite idėją, kurią norėtumėte pamatyti Bingg Bongg? Jei ją sukursime, paminėsime jūsų vardą ir įnešime $100 į jūsų paskyrą! 💡",
+ "fp_try_it": "IŠBANDYKITE",
+ "fp_share_my_idea": "PASIDALINTI IDĖJA"
 }

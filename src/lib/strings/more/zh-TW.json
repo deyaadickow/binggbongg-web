@@ -1562,5 +1562,9 @@
  "fish_switch_help": "會有小魚游過你的直播;抓到的觀眾會送你禮物。",
  "fish_catchers_title": "誰抓到了魚 🐟",
  "fish_catchers_empty": "還沒有人抓到魚。",
- "fish_catcher_count": "%1$s 條魚 · %2$s 金幣"
+ "fish_catcher_count": "%1$s 條魚 · %2$s 金幣",
+ "fp_try_line": "試試這個功能，告訴我們你有多喜歡它！❤️",
+ "fp_idea_line": "你有想在 Bingg Bongg 上看到的點子嗎？如果我們採用並實現它，我們會提到你的名字，並在你的帳戶存入 $100！💡",
+ "fp_try_it": "試一試",
+ "fp_share_my_idea": "分享我的點子"
 }
