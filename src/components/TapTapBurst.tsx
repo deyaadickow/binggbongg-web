@@ -210,7 +210,17 @@ interface Icon {
   dir: BurstDirection;
 }
 
-export function TapTapBurst({ gift }: { gift: Gift }) {
+export function TapTapBurst({ gift, imageUrl, sizeMin = ICON_SIZE_MIN, sizeRange = ICON_SIZE_RANGE, hideName = false }: {
+  gift: Gift;
+  /** A ready URL for the icon instead of the gift's own uploaded image (the Bingg Bongg Bonus
+   *  flies the gloves logo from /img through this same effect, 2026-11-07). */
+  imageUrl?: string;
+  /** Icon width range in px — the bonus's wide logo flies bigger than a gift icon. */
+  sizeMin?: number;
+  sizeRange?: number;
+  /** No effect nameplate (the bonus shows its own banner). */
+  hideName?: boolean;
+}) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
 
@@ -235,7 +245,7 @@ export function TapTapBurst({ gift }: { gift: Gift }) {
             topPct: 12 + Math.random() * 76,
             driftPx: 0,
             risePct: 0,
-            size: ICON_SIZE_MIN + Math.random() * ICON_SIZE_RANGE,
+            size: sizeMin + Math.random() * sizeRange,
             spin: (Math.random() - 0.5) * 24,
           });
         }
@@ -279,7 +289,7 @@ export function TapTapBurst({ gift }: { gift: Gift }) {
           topPct: (Math.floor(cell / columns) + 0.1 + Math.random() * 0.8) * (100 / rows),
           driftPx: 0,
           risePct: 0,
-          size: ICON_SIZE_MIN + Math.random() * ICON_SIZE_RANGE,
+          size: sizeMin + Math.random() * sizeRange,
           spin: (Math.random() - 0.5) * 14,
           holdMs: SPOT_HOLD_MIN_MS + Math.random() * (SPOT_HOLD_MAX_MS - SPOT_HOLD_MIN_MS),
         };
@@ -311,13 +321,13 @@ export function TapTapBurst({ gift }: { gift: Gift }) {
       // Steve, 2026-10-06: the apps' 56pt, then raised for Universal, then "Please make them all
       // the same size" — so every effect flies at the bigger size now. (Universal never actually
       // rendered smaller; his Balloons2 artwork is just tall and narrow.)
-      size: ICON_SIZE_MIN + Math.random() * ICON_SIZE_RANGE,
+      size: sizeMin + Math.random() * sizeRange,
       spin: (Math.random() - 0.5) * (d === "up" ? 50 : 30),
       };
     });
-  }, [gift, dir]);
+  }, [gift, dir, sizeMin, sizeRange]);
 
-  const src = gift.image ? mediaUrl(gift.image) : undefined;
+  const src = imageUrl ?? (gift.image ? mediaUrl(gift.image) : undefined);
 
   return (
     <div
@@ -379,7 +389,7 @@ export function TapTapBurst({ gift }: { gift: Gift }) {
           .bb-taptap-icon { animation-duration: 1ms !important; opacity: .9; }
         }
       `}</style>
-      {mounted && (
+      {mounted && !hideName && (
         <div
           style={{
             position: "absolute", top: "20%", left: 0, right: 0, textAlign: "center",

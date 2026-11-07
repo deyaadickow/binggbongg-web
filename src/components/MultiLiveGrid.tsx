@@ -21,7 +21,7 @@ function tileBackdrop(id: number): string {
   return `linear-gradient(160deg, hsl(${hue} 35% 22%), hsl(${(hue + 40) % 360} 30% 9%))`;
 }
 
-function MlTile({ m, me, tile, onSpeaker, onTap, onGift, pulse, score }: {
+function MlTile({ m, me, tile, onSpeaker, onTap, onGift, pulse, score, bombed }: {
   m: MlMember;
   me: boolean;
   tile: LiveTile | undefined;
@@ -30,6 +30,8 @@ function MlTile({ m, me, tile, onSpeaker, onTap, onGift, pulse, score }: {
   onGift: (() => void) | null;
   pulse: boolean;
   score: number | null;
+  /** A bomb is on this member right now (Bingg Bongg Battle). */
+  bombed: boolean;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hasVideo = !!tile && !tile.muted;
@@ -45,21 +47,28 @@ function MlTile({ m, me, tile, onSpeaker, onTap, onGift, pulse, score }: {
   const cls = m.is_speaker ? "on" : m.hand_raised ? "hand" : "off";
   return (
     <div className={`cb-tile ml-tile${me ? " own" : ""}${m.is_host ? " host" : ""}${pulse && m.is_speaker ? " ml-pulse" : ""}${tile?.speaking && m.is_speaker ? " listening" : ""}`}
-      role="button" tabIndex={0} onClick={onTap}
+      role="button" tabIndex={0} onClick={onTap} data-uid={m.user_id}
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onTap(); } }}>
       {realPhoto
         ? <img className="cb-photo" src={photo} alt="" loading="lazy" onError={(e) => ((e.target as HTMLImageElement).style.display = "none")} />
         : <div className="cb-ph" style={{ background: tileBackdrop(m.user_id) }}><i>{initials(name || "?")}</i></div>}
       {hasVideo && <video ref={videoRef} autoPlay playsInline muted style={tile?.isLocal ? { transform: "scaleX(-1)" } : undefined} />}
-      {score !== null && <span className="ml-score">🪙 {score.toLocaleString()}</span>}
-      <button type="button" className={`ml-spk ${cls}`} aria-label={icon}
-        onClick={(e) => { e.stopPropagation(); onSpeaker(); }}>
-        {icon}{m.hand_raised && !m.is_speaker && m.hand_order ? <small>{m.hand_order}</small> : null}
-      </button>
-      {onGift && (
-        <button type="button" className="cb-gift" aria-label="🎁"
-          onClick={(e) => { e.stopPropagation(); onGift(); }}>🎁</button>
-      )}
+      {/* Steve, 2026-11-06: "A small bomb will show in a corner of the tile for anyone that
+          receives it for 40 seconds." Top-left; the score moves over beside it. */}
+      {bombed && <span className="ml-bomb" aria-label="💣">💣</span>}
+      {score !== null && <span className={`ml-score${bombed ? " bombed" : ""}`}>🪙 {score.toLocaleString()}</span>}
+      {/* Steve, 2026-11-06: "Gift box, speaker and watchers/eye should be next to each other on
+          the bottom right of the tile" — speaker then gift, side by side above the name strip. */}
+      <div className="ml-acts">
+        <button type="button" className={`ml-spk ${cls}`} aria-label={icon}
+          onClick={(e) => { e.stopPropagation(); onSpeaker(); }}>
+          {icon}{m.hand_raised && !m.is_speaker && m.hand_order ? <small>{m.hand_order}</small> : null}
+        </button>
+        {onGift && (
+          <button type="button" className="cb-gift" aria-label="🎁"
+            onClick={(e) => { e.stopPropagation(); onGift(); }}>🎁</button>
+        )}
+      </div>
       <span className="cb-name">{m.is_host ? "👑 " : ""}{name}</span>
     </div>
   );
@@ -69,12 +78,14 @@ function MlTile({ m, me, tile, onSpeaker, onTap, onGift, pulse, score }: {
  * The grid. `members` arrive already in display order (host, the other speakers, then everyone
  * else by join time) — rendered in that order, never re-sorted. The top row is the speakers.
  */
-export function MultiLiveGrid({ state, myId, tiles, pulse, battle, onSpeaker, onTap, onGift, onHands, isHost }: {
+export function MultiLiveGrid({ state, myId, tiles, pulse, battle, bombed, onSpeaker, onTap, onGift, onHands, isHost }: {
   state: MlState;
   myId: number | null;
   tiles: LiveTile[];
   pulse: boolean;
   battle: RoomBattle | null;
+  /** Members with a bomb on them right now. */
+  bombed: Set<number>;
   onSpeaker: (m: MlMember) => void;
   onTap: (m: MlMember) => void;
   onGift: (userId: number) => void;
@@ -96,7 +107,7 @@ export function MultiLiveGrid({ state, myId, tiles, pulse, battle, onSpeaker, on
     <MlTile key={m.user_id} m={m} me={m.user_id === myId} tile={byUser.get(m.user_id)}
       onSpeaker={() => onSpeaker(m)} onTap={() => onTap(m)}
       onGift={m.user_id === myId ? null : () => onGift(m.user_id)}
-      pulse={pulse} score={scores ? scores.get(m.user_id) ?? 0 : null} />
+      pulse={pulse} score={scores ? scores.get(m.user_id) ?? 0 : null} bombed={bombed.has(m.user_id)} />
   );
   return (
     <div className="ml-stage" style={{ width: `min(100%, max(320px, calc((100vh - 230px) * ${ratio.toFixed(4)})))` }}>
@@ -177,14 +188,65 @@ export function useBattleClock(b: RoomBattle | null): number {
   return Math.max(0, Math.ceil((endsAt.current - now) / 1000));
 }
 
-/** The gold bar over the tiles: "⚔️ Battle 3:41 · 🏆". Tap = the live leaderboard. */
-export function RoomBattleBar({ b, secondsLeft, onOpen }: { b: RoomBattle; secondsLeft: number; onOpen: () => void }) {
+/**
+ * Bingg Bongg Battle (Steve, 2026-11-06): the double/triple window running now and who has a bomb
+ * on them, each counted down here from the server's seconds_left (the room is re-read every 5 s).
+ */
+export function useRoomBattleExtras(b: RoomBattle | null): { boost: { multiplier: number; secondsLeft: number } | null; bombed: Set<number> } {
+  const running = !!b && !b.finished;
+  const boostEnds = useRef(0);
+  const bombEnds = useRef(new Map<number, number>());
+  const [now, setNow] = useState(Date.now());
+  const boostKey = running && b.boost_now ? `${b.battle_id}:${b.boost_now.multiplier}:${b.boost_now.seconds_left}` : "";
+  const bombKey = running ? `${b.battle_id}:` + b.bombs.map((x) => `${x.user_id}/${x.seconds_left}`).join(",") : "";
+  useEffect(() => { boostEnds.current = running && b.boost_now ? Date.now() + b.boost_now.seconds_left * 1000 : 0; }, [boostKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    const m = new Map<number, number>();
+    if (running) for (const x of b.bombs) m.set(x.user_id, Date.now() + x.seconds_left * 1000);
+    bombEnds.current = m;
+  }, [bombKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!running) return;
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, [running, b?.battle_id]); // eslint-disable-line react-hooks/exhaustive-deps
+  return useMemo(() => {
+    if (!running) return { boost: null, bombed: new Set<number>() };
+    const left = Math.ceil((boostEnds.current - now) / 1000);
+    const boost = b.boost_now && left > 0 ? { multiplier: b.boost_now.multiplier, secondsLeft: left } : null;
+    const bombed = new Set<number>();
+    bombEnds.current.forEach((end, id) => { if (end > now) bombed.add(id); });
+    return { boost, bombed };
+  }, [running, b, now, boostKey, bombKey]); // eslint-disable-line react-hooks/exhaustive-deps
+}
+
+/**
+ * The strip under the live header during ANY battle (Steve, 2026-11-06): "For this and any battle
+ * remove the scrolling text ads and add the 5 minutes timer or the double and triple points there,
+ * it will be the perfect spot for everyone to see." It shows "⚔️ Bingg Bongg Battle 4:12", or
+ * during a window "🥊 DOUBLE POINTS 0:32" / "🥊 TRIPLE POINTS 0:32". Tap = the leaderboard (room
+ * battle). `bombs` is the signed-in member's bomb count — one bomb control with the number in it.
+ */
+export function BattleTopStrip({ secondsLeft, boost, onOpen, bombs, bombArmed, onBomb }: {
+  secondsLeft: number | null;
+  boost: { multiplier: number; secondsLeft: number } | null;
+  onOpen?: () => void;
+  bombs?: number | null;
+  bombArmed?: boolean;
+  onBomb?: () => void;
+}) {
   const { t } = useT();
-  const leader = b.leaderboard[0] && b.leaderboard[0].score > 0 ? b.leaderboard[0] : null;
+  const label = boost
+    ? t(boost.multiplier >= 3 ? "bbb_triple_points" : "bbb_double_points", mmss(boost.secondsLeft))
+    : `⚔️ ${t("bingg_bongg_battle")}${secondsLeft !== null ? ` ${mmss(secondsLeft)}` : ""}`;
   return (
-    <button type="button" className="ml-battle-bar" onClick={onOpen}>
-      {t("ml_battle_bar", mmss(secondsLeft))}{leader ? ` · 🏆 ${mlName(leader)} ${leader.score.toLocaleString()}` : " · 🏆"}
-    </button>
+    <div className={`bb-top-strip${boost ? " boost" : ""}`}>
+      <button type="button" className="bb-top-strip-label" onClick={onOpen} disabled={!onOpen}>{label}</button>
+      {!!bombs && bombs > 0 && onBomb && (
+        <button type="button" className={`bb-bomb-btn${bombArmed ? " armed" : ""}`} aria-label={`💣 ${bombs}`}
+          onClick={(e) => { e.stopPropagation(); onBomb(); }}>💣<b>{bombs}</b></button>
+      )}
+    </div>
   );
 }
 
@@ -193,7 +255,7 @@ export function RoomBattleBoard({ b, secondsLeft, isHost, onEnd, onClose }: { b:
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal-sheet" style={{ maxWidth: 440 }} onClick={(e) => e.stopPropagation()}>
-        <h3 style={{ marginTop: 0 }}>⚔️ {t("ml_battle_title")} · {mmss(secondsLeft)}</h3>
+        <h3 style={{ marginTop: 0 }}>⚔️ {t("bingg_bongg_battle")} · {mmss(secondsLeft)}</h3>
         <p className="muted center" style={{ fontSize: 13, margin: "0 0 12px" }}>{t("ml_battle_hint")}</p>
         <div style={{ display: "flex", flexDirection: "column", gap: 6, maxHeight: "50vh", overflowY: "auto" }}>
           {b.leaderboard.map((r) => (

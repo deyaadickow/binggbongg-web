@@ -1931,7 +1931,7 @@ export const fil = {
   featured_videos_tab: "70+ Itinatampok na Video",
   // Multi-live 24 (2026-11-05) — same keys and words as Android's strings_multi_live.xml.
   ml_members_on_camera: "Mga miyembro sa camera",
-  ml_size_hint: "Ikaw + hanggang %1$s bisita. 4 na tao lang ang puwedeng magsalita nang sabay.",
+  ml_size_hint: "Puwede kang magkaroon ng hanggang 24 na miyembrong live sa room mo at makipag-battle sa lahat nang sabay-sabay. Subukan mo, at mag-enjoy.",
   ml_go_live: "Mag-Live",
   ml_save: "I-save",
   ml_cancel: "Kanselahin",
@@ -1965,6 +1965,17 @@ export const fil = {
   ml_not_ready: "Hindi pa ito available. Pakisubukan ulit mamaya.",
   ml_menu_size: "👥 Mga miyembro sa camera: %1$s",
   ml_menu_hands: "✋ Mga nakataas na kamay (%1$s)",
+  // Bingg Bongg Battle (Steve, 2026-11-06)
+  bbb_double_points: "🥊 DOBLENG PUNTOS %1$s",
+  bbb_triple_points: "🥊 TRIPLENG PUNTOS %1$s",
+  bbb_invite_first: "Mag-imbita muna ng isang tao sa room.",
+  bbb_give_bomb: "💣 Bigyan si %1$s ng bomba",
+  bbb_pick_tile: "💣 I-tap ang tile ng isang kalahok para ibigay ang bomba mo.",
+  bbb_bomb_given: "💣 Naibigay ang bomba kay %1$s!",
+  bbb_no_battle: "Walang battle na tumatakbo ngayon.",
+  bbb_not_in_battle: "Wala sa battle na ito ang member na iyan.",
+  bbb_bomb_running: "May bomba na ang member na iyan. Subukan ulit kapag tapos na ito.",
+  bbb_no_bombs: "Wala ka nang bomba.",
   // Build Your Houses (Steve, 2026-11-05)
   fname_build_your_houses: "Magtayo ng mga Bahay",
   fblurb_build_your_houses: "Bawat coin na napanalunan mo sa battle ay isang ladrilyo. Magtayo ng mga bahay, pati buong kalye.",

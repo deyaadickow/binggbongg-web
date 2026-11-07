@@ -73,6 +73,12 @@ export async function post<T = unknown>(endpoint: string, params: Record<string,
   if (json && json.status === false && json.reason === "verify_email") {
     if (onVerifyEmailResponse(endpoint, json as { email?: unknown })) return { ...json, message: "" };
   }
+  // Bingg Bongg Bonus (2026-11-07): the recipient just crossed a bonus — every gift path goes
+  // through here, so it is published once, centrally (lib/binggBonus). Loaded on demand.
+  if (endpoint === "sendCoinsToUser" && json && json.status && json.bingg_bonus) {
+    const bonus = json.bingg_bonus;
+    void import("./binggBonus").then((m) => m.publishBinggBonus(bonus, params)).catch(() => undefined);
+  }
   return json;
 }
 

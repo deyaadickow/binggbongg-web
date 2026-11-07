@@ -295,7 +295,7 @@ export function BoardGameOverlay({ game, myUserId, onMove, onBuy, onResign, onEn
         {left !== null && <b style={{ fontSize: 15, fontVariantNumeric: "tabular-nums", color: turn && left < 20000 ? "#ff6b6b" : "#fff" }}>⏱ {clock(left)}</b>}
         {helpable && p.user_id !== null && (
           <div style={{ display: "flex", gap: 4, width: "100%" }}>
-            {pill(`+30s · ${game.prices.time}`, () => onBuy(p.user_id!, "time"), "30 more seconds on their clock")}
+            {/* No "+30s" Time power-up any more — Steve, 2026-11-06: "Time will be the confusion, so we will not use any time at all. remove the time from the entire app." */}
             {game.kind === "fourinarow" && game.turn !== p.side && game.blocked_column == null && pill(`⛔ Block · ${game.prices.freeze}`, () => onBuy(p.user_id!, "block"), "Takes their opponent's best column away for one turn")}
             {game.kind !== "fourinarow" && game.turn !== p.side && game.mode === "duel" && pill(`❄ Freeze · ${game.prices.freeze}`, () => onBuy(p.user_id!, "freeze"), "Their opponent can't move for 10 seconds")}
             {game.turn === p.side && !game.hint && pill(`💡 Hint · ${game.prices.hint}`, () => onBuy(p.user_id!, "hint"), "Shows them a good move")}
@@ -442,7 +442,7 @@ export function BoardGameStartDialog({ kind, candidates, onStart, onClose }: {
           )
         ) : mode === "computer" ? (
           <div style={{ marginBottom: 8 }}>
-            <p style={{ fontSize: 13, opacity: 0.85, margin: "0 0 8px" }}>You move first. The computer answers a moment after each of your moves and has no clock — only you are timed. Viewers can buy you +30 seconds or a Hint.</p>
+            <p style={{ fontSize: 13, opacity: 0.85, margin: "0 0 8px" }}>You move first. The computer answers a moment after each of your moves and has no clock — only you are timed. Viewers can buy you a Hint.</p>
             <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
               {(["easy", "medium", "hard"] as AiLevel[]).map((l) => <span key={l}>{chip(level === l, l[0].toUpperCase() + l.slice(1), () => setLevel(l))}</span>)}
             </div>
@@ -455,14 +455,12 @@ export function BoardGameStartDialog({ kind, candidates, onStart, onClose }: {
         <div style={{ fontSize: 13, fontWeight: 600, margin: "12px 0 2px" }}>Your prices</div>
         {mode === "duel" ? (
           <>
-            {price("time", "+30 seconds")}
             {price("freeze", kind === "fourinarow" ? "⛔ Block (their best column, one turn)" : "❄ Freeze (10 seconds)")}
             {price("hint", "💡 Hint")}
             <div style={{ fontSize: 11, opacity: 0.7 }}>Viewers buy these for a player — the coins go to that player.</div>
           </>
         ) : mode === "computer" ? (
           <>
-            {price("time", "+30 seconds")}
             {kind === "fourinarow" && price("freeze", "⛔ Block the computer's best column")}
             {price("hint", "💡 Hint")}
             <div style={{ fontSize: 11, opacity: 0.7 }}>Viewers buy these for you — the coins come to you.</div>

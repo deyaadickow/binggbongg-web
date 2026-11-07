@@ -1912,7 +1912,7 @@ export const es = {
   featured_videos_tab: "70+ videos destacados",
   // Multi-live 24 (2026-11-05) — same keys and words as Android's strings_multi_live.xml.
   ml_members_on_camera: "Miembros en cámara",
-  ml_size_hint: "Tú + hasta %1$s invitados. Solo 4 personas pueden hablar a la vez.",
+  ml_size_hint: "Puedes tener hasta 24 miembros en vivo en tu sala y hacer una batalla con todos a la vez. Pruébalo y diviértete.",
   ml_go_live: "Ir en vivo",
   ml_save: "Guardar",
   ml_cancel: "Cancelar",
@@ -1946,6 +1946,17 @@ export const es = {
   ml_not_ready: "Esto aún no está disponible. Inténtalo de nuevo más tarde.",
   ml_menu_size: "👥 Miembros en cámara: %1$s",
   ml_menu_hands: "✋ Manos levantadas (%1$s)",
+  // Bingg Bongg Battle (Steve, 2026-11-06)
+  bbb_double_points: "🥊 PUNTOS DOBLES %1$s",
+  bbb_triple_points: "🥊 PUNTOS TRIPLES %1$s",
+  bbb_invite_first: "Primero invita a alguien a la sala.",
+  bbb_give_bomb: "💣 Darle una bomba a %1$s",
+  bbb_pick_tile: "💣 Toca el recuadro de un participante para darle tu bomba.",
+  bbb_bomb_given: "💣 ¡Bomba dada a %1$s!",
+  bbb_no_battle: "No hay ninguna batalla en curso ahora.",
+  bbb_not_in_battle: "Ese miembro no está en esta batalla.",
+  bbb_bomb_running: "Ese miembro ya tiene una bomba. Inténtalo cuando termine.",
+  bbb_no_bombs: "No te quedan bombas.",
   // Build Your Houses (Steve, 2026-11-05)
   fname_build_your_houses: "Construye tus casas",
   fblurb_build_your_houses: "Cada moneda que ganas en batallas pone un ladrillo. Construye casas y luego calles enteras.",

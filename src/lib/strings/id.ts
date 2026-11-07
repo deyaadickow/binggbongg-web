@@ -1926,7 +1926,7 @@ export const id = {
   featured_videos_tab: "70+ Video Unggulan",
   // Multi-live 24 (2026-11-05) — same keys and words as Android's strings_multi_live.xml.
   ml_members_on_camera: "Anggota di kamera",
-  ml_size_hint: "Kamu + hingga %1$s tamu. Hanya 4 orang yang bisa bicara bersamaan.",
+  ml_size_hint: "Kamu bisa punya hingga 24 anggota live di room kamu dan battle dengan semuanya sekaligus. Coba sekarang, dan bersenang-senanglah.",
   ml_go_live: "Mulai Live",
   ml_save: "Simpan",
   ml_cancel: "Batal",
@@ -1960,6 +1960,17 @@ export const id = {
   ml_not_ready: "Fitur ini belum tersedia. Silakan coba lagi nanti.",
   ml_menu_size: "👥 Anggota di kamera: %1$s",
   ml_menu_hands: "✋ Tangan terangkat (%1$s)",
+  // Bingg Bongg Battle (Steve, 2026-11-06)
+  bbb_double_points: "🥊 POIN GANDA %1$s",
+  bbb_triple_points: "🥊 POIN TIGA KALI %1$s",
+  bbb_invite_first: "Undang seseorang ke room dulu.",
+  bbb_give_bomb: "💣 Beri %1$s bom",
+  bbb_pick_tile: "💣 Ketuk kotak peserta untuk memberinya bommu.",
+  bbb_bomb_given: "💣 Bom diberikan ke %1$s!",
+  bbb_no_battle: "Tidak ada battle yang berjalan sekarang.",
+  bbb_not_in_battle: "Anggota itu tidak ikut battle ini.",
+  bbb_bomb_running: "Anggota itu sudah punya bom. Coba lagi setelah habis.",
+  bbb_no_bombs: "Bommu sudah habis.",
   // Build Your Houses (Steve, 2026-11-05)
   fname_build_your_houses: "Bangun Rumahmu",
   fblurb_build_your_houses: "Setiap koin yang kamu menangkan di battle memasang satu bata. Bangun rumah, lalu satu jalan penuh.",

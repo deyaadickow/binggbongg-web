@@ -65,7 +65,9 @@ export const BATTLE_KINDS: {
   /** Started from the phone app only: the row explains that instead of starting anything on the web. */
   phonesOnly?: boolean;
 }[] = [
-  { kind: "1v1", number: "#1", title: "bingg_bongg_battle", blurb: "n1v1_5_minutes_most_coins_wins", minPeople: 2,
+  // Steve, 2026-11-06: #1 now starts the room's Bingg Bongg Battle (2 to 24 members); the "fewer
+  // than 2 on camera" check lives in the page so it can say "Invite someone to the room first."
+  { kind: "1v1", number: "#1", title: "bingg_bongg_battle", blurb: "n1v1_5_minutes_most_coins_wins", minPeople: 1,
     info: "challenge_another_live_streamer_to_a_rea" },
   { kind: "gameLimit", number: "#2", title: "game_limit", blurb: "n1v1_first_to_your_coin_target", minPeople: 2,
     info: "same_as_bingg_bongg_battle_but_you_and_y" },

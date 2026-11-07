@@ -129,7 +129,7 @@ export function TriviaOverlay({ game, myUserId, tileFor, onAnswer, onBuy, onEnd,
           {helpable && p.user_id !== null && (
             <div style={{ display: "flex", gap: 4, marginTop: 4, flexWrap: "wrap" }}>
               {pill(`50/50 · ${game.prices["5050"]}`, () => onBuy(p.user_id!, "5050"))}
-              {pill(`+10s · ${game.prices.time}`, () => onBuy(p.user_id!, "time"))}
+              {/* No "+10s" Time power-up any more — Steve, 2026-11-06: "Time will be the confusion, so we will not use any time at all. remove the time from the entire app." */}
             </div>
           )}
         </div>
@@ -301,7 +301,6 @@ export function TriviaStartDialog({ candidates, onStart, onClose }: {
         {mode === "audience" ? price("vote", "🗳 One vote") : (
           <>
             {price("5050", "50/50 (two wrong answers disappear)")}
-            {price("time", "+10 seconds")}
             <div style={{ fontSize: 11, opacity: 0.7 }}>Viewers buy these for a player — the coins go to that player.</div>
           </>
         )}

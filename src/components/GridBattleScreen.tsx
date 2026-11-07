@@ -31,6 +31,8 @@ import {
   type ChbBattler, type ChbGiftInfo, type ChbGiftMsg, type ChbLiveRoom, type ChbPerson, type ChbResult, type ChbState,
 } from "../lib/chatBattle";
 import { requireVerified } from "../lib/verifyEmail";
+import { makeBinggBonusWatcher } from "../lib/binggBonus";
+import { BinggBonusOverlay } from "./BinggBonusOverlay";
 
 const HEARTBEAT_MS = 5000;
 export const SPOTLIGHT_MS = 30000;
@@ -219,15 +221,19 @@ export function useGridBattleTiles(input: {
 }
 
 /** The live chat of one room, read from Firestore like the live room's. */
-function useRoomChat(room: string | null, enabled: boolean): ChatMessage[] {
+function useRoomChat(room: string | null, enabled: boolean, myId: number | null): ChatMessage[] {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const myIdRef = useRef(myId);
+  myIdRef.current = myId;
   useEffect(() => {
     setMessages([]);
     if (!room || !enabled) return;
     let unsub: (() => void) | null = null;
     let cancelled = false;
+    // Bingg Bongg Bonus lines are played (gloves + banner), never shown as chat (lib/binggBonus).
+    const bonusLines = makeBinggBonusWatcher(() => myIdRef.current);
     ensureFirebaseSignIn()
-      .then(() => { if (!cancelled) unsub = observeChat(chatChannel(room, roomHostId(room)), setMessages, () => undefined); })
+      .then(() => { if (!cancelled) unsub = observeChat(chatChannel(room, roomHostId(room)), (all) => setMessages(bonusLines(all)), () => undefined); })
       .catch(() => undefined);
     return () => { cancelled = true; unsub?.(); };
   }, [room, enabled]);
@@ -631,7 +637,7 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
   const meRow = st?.battlers.find((b) => b.user_id === myId);
   const homeRow = home ? st?.battlers.find((b) => b.user_id === home) : undefined;
   const chatRoom = (isBattler ? meRow?.chat_room_name : homeRow?.chat_room_name) || st?.room_name || null;
-  const threadMessages = useRoomChat(chatRoom, isLoggedIn);
+  const threadMessages = useRoomChat(chatRoom, isLoggedIn, myId || null);
   const messages = useMemo(() => mergeLines(threadMessages, localLines), [threadMessages, localLines]);
   const onSend = isLoggedIn && user && chatRoom
     ? (text: string) => { if (!requireVerified()) return; sendChat(chatChannel(chatRoom, roomHostId(chatRoom)), user.id, displayName(user), text, user.profile_image ?? "").catch(() => undefined); }
@@ -707,6 +713,7 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
         )}
       <ChatStrip messages={messages} onSend={onSend}
         note={giftShow.note && <GiftNote key={giftShow.note.key} note={giftShow.note} onThank={onThank} onClose={giftShow.closeNote} />} />
+      <BinggBonusOverlay />
       {giftTarget != null && (
         <GiftSheet
           onClose={() => setGiftTarget(null)}

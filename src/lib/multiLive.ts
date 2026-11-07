@@ -44,7 +44,18 @@ export interface RoomBattle {
   winner: RoomBattleRow | null;
   tie: boolean;
   no_gifts: boolean;
+  // Bingg Bongg Battle (Steve, 2026-11-06): "Double and triple points will appear at random ...
+  // Bombs will be giving out to any member of their choice, A small bomb will show in a corner of
+  // the tile for anyone that receives it for 40 seconds." The leaderboard's score is battle points.
+  /** The battle's random double/triple windows (server times). */
+  boosts: RoomBattleBoost[];
+  /** The window running right now, or null. */
+  boost_now: { multiplier: number; ends_at: string | null; seconds_left: number } | null;
+  /** Battlers with a bomb on them right now. */
+  bombs: { user_id: number; ends_at: string | null; seconds_left: number }[];
 }
+
+export interface RoomBattleBoost { starts_at: string | null; ends_at: string | null; multiplier: number }
 
 export interface MlState {
   room_name: string;
@@ -126,6 +137,16 @@ export function normalizeBattle(raw: unknown): RoomBattle | null {
     winner: b.winner && typeof b.winner === "object" ? row(b.winner as Record<string, unknown>) : null,
     tie: truthy(b.tie),
     no_gifts: truthy(b.no_gifts),
+    boosts: (Array.isArray(b.boosts) ? b.boosts : []).map((x: Record<string, unknown>) => ({
+      starts_at: (x.starts_at as string) ?? null, ends_at: (x.ends_at as string) ?? null, multiplier: num(x.multiplier, 2),
+    })),
+    boost_now: b.boost_now && typeof b.boost_now === "object" ? (() => {
+      const x = b.boost_now as Record<string, unknown>;
+      return { multiplier: num(x.multiplier, 2), ends_at: (x.ends_at as string) ?? null, seconds_left: Math.max(0, num(x.seconds_left)) };
+    })() : null,
+    bombs: (Array.isArray(b.bombs) ? b.bombs : []).map((x: Record<string, unknown>) => ({
+      user_id: num(x.user_id), ends_at: (x.ends_at as string) ?? null, seconds_left: Math.max(0, num(x.seconds_left)),
+    })).filter((x) => x.user_id > 0 && x.seconds_left > 0),
   };
 }
 
@@ -153,6 +174,25 @@ export async function mlWrite(route: string, myUserId: number, roomName: string,
   };
 }
 
+/** Bingg Bongg Battle (Steve, 2026-11-06): "Bombs will be giving out to any member of their
+ *  choice". POST dropRoomBattleBomb -> {status, message, bombs_count, battle, data} or
+ *  {status:false, reason: no_battle|not_in_battle|bomb_running|no_bombs, message}. */
+export async function dropRoomBattleBomb(myUserId: number, roomName: string, targetUserId: number): Promise<MlWriteResult & { bombsCount: number | null }> {
+  const res = await post<unknown>("dropRoomBattleBomb", { my_user_id: myUserId, room_name: roomName, target_user_id: targetUserId });
+  const r = res as unknown as Record<string, unknown>;
+  const data = r.data as Record<string, unknown> | null | undefined;
+  const state = normalizeMl(data);
+  return {
+    ok: !!res.status,
+    message: (r.message as string) ?? null,
+    reason: (r.reason as string) ?? null,
+    state,
+    battle: normalizeBattle(r.battle) ?? normalizeBattle(data?.battle) ?? state?.room_battle ?? null,
+    memberCount: null,
+    bombsCount: r.bombs_count != null ? num(r.bombs_count) : null,
+  };
+}
+
 /** A refusal in the member's language (the server's English message otherwise). */
 export function mlReasonText(reason: string | null, message: string | null, memberCount?: number | null): string {
   const k: Partial<Record<string, StringKey>> = {
@@ -161,6 +201,10 @@ export function mlReasonText(reason: string | null, message: string | null, memb
     battle_running: "ml_battle_running",
     not_ready: "ml_not_ready",
     full: "ml_room_full",
+    no_battle: "bbb_no_battle",
+    not_in_battle: "bbb_not_in_battle",
+    bomb_running: "bbb_bomb_running",
+    no_bombs: "bbb_no_bombs",
   };
   if (reason === "below_current") return tt("ml_size_below", memberCount ?? "");
   const key = reason ? k[reason] : undefined;

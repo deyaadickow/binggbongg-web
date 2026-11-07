@@ -47,9 +47,11 @@ import { PickerSheet } from "../components/PickerSheet";
 import { TRANSLATION_LANGUAGES, defaultTargetLanguage, languageName, translateChatMessage, type TranslationResult } from "../lib/translate";
 import { tt, useT  } from "../lib/i18n";
 import { requireVerified } from "../lib/verifyEmail";
-import { ML_MIN_SIZE, mlIsBig, mlName, mlReasonText, mlWrite, normalizeMl, saveRoomSize, type MlMember, type MlState, type MlWriteResult, type RoomBattle } from "../lib/multiLive";
-import { MlMenu, MlSizeSheet, MultiLiveGrid, RoomBattleBar, RoomBattleBoard, RoomBattleEnd, useBattleClock } from "../components/MultiLiveGrid";
+import { ML_MIN_SIZE, dropRoomBattleBomb, mlIsBig, mlName, mlReasonText, mlWrite, normalizeMl, saveRoomSize, type MlMember, type MlState, type MlWriteResult, type RoomBattle } from "../lib/multiLive";
+import { BattleTopStrip, MlMenu, MlSizeSheet, MultiLiveGrid, RoomBattleBoard, RoomBattleEnd, useBattleClock, useRoomBattleExtras } from "../components/MultiLiveGrid";
 import { showGoldAlert } from "../components/GoldToast";
+import { BinggBonusOverlay } from "../components/BinggBonusOverlay";
+import { makeBinggBonusWatcher } from "../lib/binggBonus";
 
 interface Member { user_id: number; fullname?: string; username?: string; profile_image?: string; country?: string; local_timezone?: string }
 interface RoomMembers { host_user_id: number; host_fullname?: string; host_username?: string; host_profile_image?: string; host_country?: string; host_local_timezone?: string; live_seconds?: number; guests: Member[]; multi_live?: unknown }
@@ -67,6 +69,8 @@ export function LiveViewerPage() {
   const navigate = useNavigate();
   const roomName = decodeURIComponent(roomParam ?? "");
   const { user, isLoggedIn, refresh } = useSession();
+  const myIdRef = useRef<number | null>(null);
+  myIdRef.current = user?.id ?? null;
   const hostUserId = useMemo(() => Number(roomName.match(/^bb-(?:live|priv)-(\d+)-\d+$/)?.[1] ?? 0), [roomName]);
   const wantsHost = search.get("host") === "1" && !!user && user.id === hostUserId;
 
@@ -78,6 +82,11 @@ export function LiveViewerPage() {
   // null = an old server (no migration yet): everything behaves exactly like today.
   const [ml, setMl] = useState<MlState | null>(null);
   const mlVersion = useRef(0);
+  // Bingg Bongg Battle bombs (Steve, 2026-11-06): "Bombs will be giving out to any member of their
+  // choice". The signed-in member's bombs_count (null = not read yet) and whether the bomb control
+  // is armed — the next battler's tile tapped gets the bomb.
+  const [myBombs, setMyBombs] = useState<number | null>(null);
+  const [bombArmed, setBombArmed] = useState(false);
   const [mlPulse, setMlPulse] = useState(false);
   const [mlMenu, setMlMenu] = useState<{ title: string; items: { label: string; onPick: () => void; danger?: boolean }[] } | null>(null);
   const [mlSizeOpen, setMlSizeOpen] = useState(false);
@@ -95,6 +104,11 @@ export function LiveViewerPage() {
   // Steve, 2026-10-29: the live room's hold menu (country, local time, how long live, favourite,
   // share, report, support) and the watchers popup that now carries the Leader Board.
   const [roomMenuOpen, setRoomMenuOpen] = useState(false);
+  // Steve, 2026-11-06: the hold menu is about the tile you held — its member's user id, null when
+  // the hold landed off any tile (then it is about the room, as before).
+  const [heldUserId, setHeldUserId] = useState<number | null>(null);
+  // Members this viewer has silenced with a tile's speaker (identities) — only on this screen.
+  const [quietTiles, setQuietTiles] = useState<Set<string>>(new Set());
   const [watchersOpen, setWatchersOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
   // Steve, 2026-10-29: on your OWN live there is no streamer to report — pick from the room.
@@ -414,7 +428,8 @@ export function LiveViewerPage() {
   // Boxing gloves: 3 fixed 40s double-points windows per 1v1 battle / Best Out Of round.
   const boxing = battle.boxing ?? (series.data?.status === "active" ? activeBoxingWindow(series.data.boxing_windows, series.now) : null);
   const boxingLeft = boxing ? Math.max(0, Math.ceil((boxing.endMs - Math.max(battle.now, series.now)) / 1000)) : null;
-  const anyBattleOpen = (!!battle.battle && battle.battle.status !== "completed") || !!series.data || !!two.data || !!marathon.data || !!b555.data;
+  const anyBattleOpen = (!!battle.battle && battle.battle.status !== "completed") || !!series.data || !!two.data || !!marathon.data || !!b555.data
+    || (!!ml?.room_battle && !ml.room_battle.finished);
 
   // Best Out Of: a participant finalizes the round the moment its clock hits zero (server
   // rejects early calls, so a second or two of drift is harmless). 2v2: same at ends_at.
@@ -864,8 +879,10 @@ export function LiveViewerPage() {
     if (!isLoggedIn || !hostUserId) return;
     let unsub: (() => void) | null = null;
     let cancelled = false;
+    // Bingg Bongg Bonus lines are played (gloves + banner), never shown as chat (lib/binggBonus).
+    const bonusLines = makeBinggBonusWatcher(() => myIdRef.current);
     ensureFirebaseSignIn()
-      .then(() => { if (!cancelled) unsub = observeChat(chatChannel(roomName, hostUserId), setMessages, (e) => setToast(`Chat: ${e.message}`)); })
+      .then(() => { if (!cancelled) unsub = observeChat(chatChannel(roomName, hostUserId), (all) => setMessages(bonusLines(all)), (e) => setToast(`Chat: ${e.message}`)); })
       .catch((e) => setToast(`Chat unavailable: ${(e as Error).message}`));
     return () => { cancelled = true; unsub?.(); };
   }, [roomName, hostUserId, isLoggedIn]);
@@ -969,6 +986,12 @@ export function LiveViewerPage() {
       else if (virtual.data?.status === "active" && virtual.data.participants.some((p) => p.user_id === giftTarget)) tag.virtual_battle_id = virtual.data.virtual_battle_id;
       const res = await post("sendCoinsToUser", { my_user_id: user.id, user_id: giftTarget, coins: giftPrice(gift), gift_id: gift.id, room_name: roomName, ...tag });
       if (!res.status) throw new Error(res.message ?? tt("couldn_t_send_that_gift"));
+      // The gift line the phones play the gift from: a NEGATIVE sender id (the gift's id) in the
+      // RECIPIENT's channel, exactly what the apps post (Steve, 2026-11-06: gifts sent to a phone
+      // did not show on its screen). A virtual battler has no live of their own to show it on.
+      if (!virtualGiftTarget) {
+        void sendChat(chatChannel(roomName, giftTarget), -gift.id, "", `${displayName(user)} sent a ${gift.name ?? "gift"}!`, user.profile_image ?? "").catch(() => {});
+      }
       setToast(`Sent ${gift.name ?? "a gift"} (${giftPrice(gift)} coins) to ${nameOfId(giftTarget) || (virtualGiftTarget ? personName(virtualGiftTarget) : "")}`);
       setGiftTarget(null);
       setVirtualGiftTarget(null);
@@ -1046,6 +1069,8 @@ export function LiveViewerPage() {
   /** A tap on a tile: the host gets that member's controls; your own tile = your speaker icon. */
   function mlTileTap(m: MlMember) {
     if (!user) return;
+    // An armed bomb goes to the tile tapped (Steve, 2026-11-06: "to any member of their choice").
+    if (bombArmed) { setBombArmed(false); void giveBomb(m.user_id); return; }
     if (role === "host" && m.user_id !== user.id) {
       setMlMenu({ title: mlName(m), items: [
         { label: t(m.is_speaker ? "ml_mute" : "ml_turn_sound_on"), onPick: () => { void mlSetSpeaker(m, !m.is_speaker); } },
@@ -1064,9 +1089,26 @@ export function LiveViewerPage() {
     })) });
   }
 
+  // Steve, 2026-11-06: one game named "Bingg Bongg Battle" — "that's how this battle will be
+  // played from 2 to 24 members at the same time".
   function mlStartBattle() {
-    if (!ml || ml.member_count < 2) { showGoldAlert(tt("ml_battle_needs")); return; }
+    if (!ml || ml.member_count < 2) { showGoldAlert(tt("bbb_invite_first")); return; }
     void mlDo("startRoomBattle");
+  }
+
+  /** Bingg Bongg Battle: give one of my bombs to a battler (POST dropRoomBattleBomb). */
+  async function giveBomb(targetUserId: number) {
+    if (!user) return;
+    if (!requireVerified()) return;
+    try {
+      const r = await dropRoomBattleBomb(user.id, roomName, targetUserId);
+      if (r.state) applyMl(r.state);
+      else if (r.battle && ml) applyMl({ ...ml, room_battle: r.battle });
+      if (r.bombsCount !== null) setMyBombs(r.bombsCount);
+      if (r.ok) { setToast(tt("bbb_bomb_given", nameOfId(targetUserId) || mlName(ml?.members.find((x) => x.user_id === targetUserId)))); return; }
+      if (r.reason === "no_bombs") setMyBombs(0);
+      showGoldAlert(mlReasonText(r.reason, r.message));
+    } catch (e) { setToast((e as Error).message || tt("something_went_wrong")); }
   }
 
   async function requestToJoin() {
@@ -1114,9 +1156,34 @@ export function LiveViewerPage() {
   }
 
   const hostCard = members ? { fullname: members.host_fullname, username: members.host_username, profile_image: members.host_profile_image } : null;
-  const mlBig = mlIsBig(ml);
+  // A battle with everyone needs the battle tiles even in a room of 4 (Steve, 2026-11-06).
+  const mlBig = mlIsBig(ml) || (!!ml?.room_battle && !ml.room_battle.finished);
   const mlBattle = ml?.room_battle ?? null;
   const mlSecondsLeft = useBattleClock(mlBattle);
+  const mlRunning = !!mlBattle && !mlBattle.finished;
+  const mlExtras = useRoomBattleExtras(mlBattle);
+  const mlInBattle = (uid: number | null) => !!uid && mlRunning && mlBattle!.leaderboard.some((r) => r.user_id === uid);
+  // The signed-in member's bombs (bombs_count on their user record): read when a room battle starts
+  // and every 30 s while it runs — gifting earns them mid-battle.
+  useEffect(() => {
+    if (!user || !mlRunning) { setBombArmed(false); return; }
+    let alive = true;
+    const read = () => post<{ bombs_count?: number | string }>("fetchUserDetails", { user_id: user.id, my_user_id: user.id })
+      .then((r) => { if (alive && r.status && r.data) setMyBombs(Number(r.data.bombs_count ?? 0) || 0); })
+      .catch(() => {});
+    read();
+    const iv = setInterval(read, 30000);
+    return () => { alive = false; clearInterval(iv); };
+  }, [user?.id, mlRunning, mlBattle?.battle_id]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Every other engine the web shows puts its clock (and boxing gloves' double points) in the same
+  // strip under the header (Steve, 2026-11-06: "For this and any battle").
+  const otherBattleSecs: number | null =
+    battle.battle?.status === "active" ? battle.secondsLeft
+    : series.data?.status === "active" ? secondsUntil(series.data.current_round_ends_at, series.now)
+    : two.data?.status === "active" ? secondsUntil(two.data.ends_at, two.now)
+    : virtual.data?.status === "active" ? secondsUntil(virtual.data.ends_at, virtual.now)
+    : null;
+  const showTopStrip = mlRunning || otherBattleSecs !== null || !!boxing;
   const orderedTiles = [...live.tiles].sort((a, b) => (a.userId === hostUserId ? -1 : b.userId === hostUserId ? 1 : 0));
   const statusLabel = roomClosed || live.status === "ended" ? "ENDED" : live.status === "live" ? "● LIVE" : live.status === "error" ? "ERROR" : "CONNECTING";
 
@@ -1266,7 +1333,8 @@ export function LiveViewerPage() {
     if ((e.target as HTMLElement).closest("button, a, input, textarea, select")) return;
     cancelRoomHold();
     roomHoldFired.current = false;
-    roomHoldTimer.current = window.setTimeout(() => { roomHoldFired.current = true; setRoomMenuOpen(true); }, 1000);
+    const uid = Number((e.target as HTMLElement).closest<HTMLElement>("[data-uid]")?.dataset.uid ?? 0);
+    roomHoldTimer.current = window.setTimeout(() => { roomHoldFired.current = true; setHeldUserId(uid > 0 ? uid : null); setRoomMenuOpen(true); }, 1000);
   }
   function cancelRoomHold() {
     if (roomHoldTimer.current) { window.clearTimeout(roomHoldTimer.current); roomHoldTimer.current = 0; }
@@ -1311,6 +1379,18 @@ export function LiveViewerPage() {
     } catch { /* cancelled */ }
   }
   const roomMenuRows: { label: string; trailing?: string; onPick: () => void }[] = [];
+  // Steve, 2026-11-06: bombs to "any member of their choice" — from the held battler's hold menu too.
+  if (user && myBombs && myBombs > 0 && heldUserId !== null && mlInBattle(heldUserId)) {
+    const who = nameOfId(heldUserId) || mlName(ml?.members.find((x) => x.user_id === heldUserId));
+    const target = heldUserId;
+    roomMenuRows.push({ label: tt("bbb_give_bomb", who), onPick: () => { setRoomMenuOpen(false); void giveBomb(target); } });
+  }
+  // Steve, 2026-11-06: "the rest of the icons should be inside the tile, when you hold the tile
+  // ... add them there". The free-taps count left the video for here. The web counts taps for the
+  // host only, so it shows when the host's tile (or no tile) was held; tap it for who sent them.
+  if (tapCount > 0 && (heldUserId === null || heldUserId === hostUserId)) {
+    roomMenuRows.push({ label: "❤️ " + tapCount.toLocaleString(), onPick: () => { setRoomMenuOpen(false); openTapSenders(); } });
+  }
   if (!isPublisher && hostUserId > 0) {
     roomMenuRows.push({ label: "❤️ " + t("favourite_streamer"), trailing: t(isFavourite ? "switch_on" : "switch_off"), onPick: () => { void toggleFavourite(); } });
   }
@@ -1353,6 +1433,19 @@ export function LiveViewerPage() {
       {live.publishError && <Notice error>{live.publishError}</Notice>}
       {(roomClosed || live.status === "ended") && <Notice>{tn("this_live_has_ended", <Link to="/live">{t("see_who_else_is_live")}</Link>)}</Notice>}
 
+      {/* Steve, 2026-11-06: "For this and any battle remove the scrolling text ads and add the 5
+          minutes timer or the double and triple points there, it will be the perfect spot for
+          everyone to see." The web has no scrolling-text strip under the header, so the battle
+          strip simply sits there while a battle runs and goes away after it; it replaces the old
+          room-battle bar over the tiles and the boxing-gloves badge on the video. */}
+      {showTopStrip && (mlRunning ? (
+        <BattleTopStrip secondsLeft={mlSecondsLeft} boost={mlExtras.boost} onOpen={() => setMlBoardOpen(true)}
+          bombs={user ? myBombs : null} bombArmed={bombArmed}
+          onBomb={() => { const next = !bombArmed; setBombArmed(next); if (next) setToast(tt("bbb_pick_tile")); }} />
+      ) : (
+        <BattleTopStrip secondsLeft={otherBattleSecs} boost={boxing && boxingLeft !== null ? { multiplier: 2, secondsLeft: boxingLeft } : null} />
+      ))}
+
       <div className="live-layout">
         <div>
           {battle.battle && battle.battle.status !== "completed" && (
@@ -1373,7 +1466,6 @@ export function LiveViewerPage() {
               cancel555(myId, b555.data.battle_555_id).then(() => setToast("5-5-5 cancelled.")).catch((e) => setToast((e as Error).message));
             }} />
           )}
-          {mlBattle && !mlBattle.finished && <RoomBattleBar b={mlBattle} secondsLeft={mlSecondsLeft} onOpen={() => setMlBoardOpen(true)} />}
           <div className={mlBig ? "video-grid ml-on" : `video-grid count-${Math.min(4, Math.max(1, orderedTiles.length))}`} onDoubleClick={dropHeart}
             onPointerDown={startRoomHold} onPointerUp={cancelRoomHold} onPointerLeave={cancelRoomHold} onPointerCancel={cancelRoomHold}
             onContextMenu={(e) => { if (roomHoldFired.current) e.preventDefault(); }}
@@ -1420,14 +1512,10 @@ export function LiveViewerPage() {
                 </div>
               </div>
             ))}
-            {tapCount > 0 && (
-              <button type="button" className="live-tap-count" title={t("who_sent_these_hearts")}
-                onClick={(e) => { e.stopPropagation(); openTapSenders(); }}>
-                ❤️ {tapCount.toLocaleString()}
-              </button>
-            )}
+            {/* Steve, 2026-11-06: "the rest of the icons should be inside the tile, when you hold
+                the tile" — the free-taps count moved off the video into the hold menu. */}
             {mlBig && ml && (
-              <MultiLiveGrid state={ml} myId={myId} tiles={live.tiles} pulse={mlPulse} battle={mlBattle} isHost={role === "host"}
+              <MultiLiveGrid state={ml} myId={myId} tiles={live.tiles} pulse={mlPulse} battle={mlBattle} bombed={mlExtras.bombed} isHost={role === "host"}
                 onSpeaker={mlSpeakerTap} onTap={mlTileTap} onGift={(id) => setGiftTarget(id)} onHands={mlShowHands} />
             )}
             {!mlBig && orderedTiles.length === 0 && (
@@ -1435,13 +1523,23 @@ export function LiveViewerPage() {
                 <span className="muted">{live.status === "live" ? "Waiting for video…" : "Connecting…"}</span>
               </div>
             )}
-            {!mlBig && orderedTiles.map((t) => <VideoTile key={t.identity} tile={t} user={t.isLocal ? user : (nameOf(t.userId) as Partial<UserSummary> | undefined) ?? { fullname: t.name }} label={t.isLocal ? `${displayName(user)} (you)` : displayName(nameOf(t.userId) as Partial<UserSummary> ?? { fullname: t.name })} />)}
-            {boxing && (
-              <div className="boxing-gloves" title={t("boxing_gloves_every_gift_counts_double")}>
-                <img src="/boxing_gloves.png" alt={t("boxing_gloves_double_points")} />
-                <span className="clock">{boxingLeft}s</span>
-              </div>
-            )}
+            {!mlBig && orderedTiles.map((tl) => (
+              <VideoTile key={tl.identity} tile={tl}
+                user={tl.isLocal ? user : (nameOf(tl.userId) as Partial<UserSummary> | undefined) ?? { fullname: tl.name }}
+                label={tl.isLocal ? `${displayName(user)} (you)` : displayName(nameOf(tl.userId) as Partial<UserSummary> ?? { fullname: tl.name })}
+                // The web only knows the room's watcher total, so the eye sits on the host's tile.
+                watchers={tl.userId === hostUserId ? watchers : null}
+                onWatchers={() => { setWatchersOpen(true); openLeaderBoard(); }}
+                // Your own tile's speaker is your microphone; anyone else's silences them for you only.
+                soundOff={tl.isLocal ? !live.micOn : quietTiles.has(tl.identity)}
+                onSpeaker={tl.isLocal ? live.toggleMic : () => setQuietTiles((s) => {
+                  const n = new Set(s);
+                  if (n.has(tl.identity)) n.delete(tl.identity); else n.add(tl.identity);
+                  return n;
+                })}
+                onGift={tl.isLocal || !tl.userId || tl.userId === myId ? null : () => setGiftTarget(tl.userId as number)} />
+            ))}
+{/* Boxing gloves' double points now show in the battle strip under the header (Steve, 2026-11-06). */}
           </div>
 
           {/* Viewer-side. Deliberately NOT inside the isPublisher block below: a host would be
@@ -1574,6 +1672,9 @@ export function LiveViewerPage() {
                   <img src="/logo_horizontal.png" alt="Bingg Bongg" style={{ height: 62, maxWidth: "100%" }} />
                 </div>
                 <div style={{ fontWeight: 800, fontSize: 17, color: "var(--gold)", textAlign: "center", marginBottom: 12 }}>{t("this_live")}</div>
+                {heldUserId !== null && nameOfId(heldUserId) && (
+                  <div style={{ color: "var(--gold)", textAlign: "center", fontWeight: 700, marginTop: -8, marginBottom: 10 }}>{nameOfId(heldUserId)}</div>
+                )}
                 {roomLines.length > 0 && (
                   <div style={{ color: "var(--gold)", textAlign: "center", fontSize: 13, marginTop: -4, marginBottom: 12, lineHeight: 1.6 }}>
                     {roomLines.map((line) => <div key={line}>{line}</div>)}
@@ -1634,8 +1735,9 @@ export function LiveViewerPage() {
                 <button className="btn small" onClick={() => setMenuOpen(true)}>{t("battle")}</button>
               )}
               {/* Multi-live 24: everyone on camera for themselves, Chat Battle's rules. */}
-              {role === "host" && ml && !mlBattle && (
-                <button className="btn small" onClick={mlStartBattle}>{t("ml_battle_everyone")}</button>
+              {/* Steve, 2026-11-06: one game named "Bingg Bongg Battle" (was "Battle with everyone"). */}
+              {role === "host" && ml && !mlRunning && (
+                <button className="btn small" onClick={mlStartBattle}>⚔️ {t("bingg_bongg_battle")}</button>
               )}
               {role === "host" && ml && (
                 <button className="btn small" onClick={() => setMlSizeOpen(true)}>{t("ml_menu_size", ml.max_members)}</button>
@@ -1780,6 +1882,7 @@ export function LiveViewerPage() {
         <RoomBattleBoard b={mlBattle} secondsLeft={mlSecondsLeft} isHost={role === "host"} onEnd={() => { void mlDo("endRoomBattle"); }} onClose={() => setMlBoardOpen(false)} />
       )}
       {mlEnd && <RoomBattleEnd b={mlEnd} onClose={() => setMlEnd(null)} />}
+      <BinggBonusOverlay />
       {whosPlayingOpen && <WhosPlayingOverlay roomName={roomName} onClose={() => setWhosPlayingOpen(false)} />}
       {mtOpen && (
         <PickerSheet
@@ -2171,7 +2274,13 @@ export function LiveViewerPage() {
         <BattleMenu peopleOnScreen={broadcasters.length} onClose={() => setMenuOpen(false)} onNotice={setToast} onPick={(k) => {
           setMenuOpen(false);
           if (k === "virtual") { if (role === "host") setPicker("virtual"); else setToast(tt("only_the_live_host_can_start_a_virtual_b")); return; }
-          if (k === "1v1") setBattlePicker(true);
+          // Steve, 2026-11-06: one game named "Bingg Bongg Battle", 2 to 24 members — #1 starts the
+          // room battle with everyone on camera instead of the old 1v1 challenge.
+          if (k === "1v1") {
+            if ((ml ? ml.member_count : broadcasters.length) < 2) { showGoldAlert(tt("bbb_invite_first")); return; }
+            if (!ml) { setBattlePicker(true); return; } // an old server without room battles
+            mlStartBattle();
+          }
           else if (k === "gameLimit") setGameLimitPicker(true);
           else if (k === "hideSeek") setHideSeekMode("choose");
           else if (k === "solo") startSolo();
@@ -2431,7 +2540,23 @@ function BingoStripTile({ tile, label }: { tile: LiveTile; label: string }) {
   );
 }
 
-function VideoTile({ tile, label, user }: { tile: LiveTile; label: string; user?: Partial<UserSummary> | null }) {
+// Steve, 2026-11-06: "names the way they are now. Gift box, speaker and watchers/eye should be
+// next to each other on the bottom right of the tile. the rest of the icons should be inside the
+// tile, when you hold the tile". So the face of a tile is the name (top-left, unchanged) and three
+// black, gold-ringed circles bottom-right: eye, speaker, gift. Everything else is in the hold menu.
+function VideoTile({ tile, label, user, watchers, onWatchers, soundOff, onSpeaker, onGift }: {
+  tile: LiveTile;
+  label: string;
+  user?: Partial<UserSummary> | null;
+  /** The room's watcher count, or null for no eye on this tile. */
+  watchers: number | null;
+  onWatchers: () => void;
+  soundOff: boolean;
+  onSpeaker: () => void;
+  /** null on your own tile — nobody gifts themselves. */
+  onGift: (() => void) | null;
+}) {
+  const { t } = useT();
   const ref = useRef<HTMLVideoElement>(null);
   useEffect(() => {
     const el = ref.current;
@@ -2439,14 +2564,31 @@ function VideoTile({ tile, label, user }: { tile: LiveTile; label: string; user?
     return tile.attach(el);
   }, [tile]);
   return (
-    <div className={`tile${tile.speaking ? " speaking" : ""}`}>
-      <video ref={ref} autoPlay playsInline muted={tile.isLocal} style={tile.isLocal ? { transform: "scaleX(-1)" } : undefined} />
+    <div className={`tile${tile.speaking ? " speaking" : ""}`} data-uid={tile.userId ?? undefined}>
+      <video ref={ref} autoPlay playsInline muted={tile.isLocal || soundOff} style={tile.isLocal ? { transform: "scaleX(-1)" } : undefined} />
       {tile.muted && (
         <div style={{ position: "absolute", inset: 0, background: "#000", display: "grid", placeItems: "center" }}>
           <div style={{ transform: "scale(2.2)" }}><Avatar user={user ?? { fullname: label }} size="lg" /></div>
         </div>
       )}
       <span className="name">{label || "Guest"}{tile.muted ? " · camera off" : ""}</span>
+      {/* A double click on the grid sends a heart; one on these buttons must not. */}
+      <div className="tile-acts" onDoubleClick={(e) => e.stopPropagation()}>
+        {watchers !== null && (
+          <button type="button" className="tile-act eye" title={t("leader_board_top_givers_this_live")}
+            onClick={(e) => { e.stopPropagation(); onWatchers(); }}>👁 {watchers.toLocaleString()}</button>
+        )}
+        <button type="button" className="tile-act" aria-label={soundOff ? "🔇" : "🔊"}
+          onClick={(e) => { e.stopPropagation(); onSpeaker(); }}>{soundOff ? "🔇" : "🔊"}</button>
+        {onGift && (
+          <button type="button" className="tile-act gift" aria-label="🎁"
+            onClick={(e) => { e.stopPropagation(); onGift(); }}>
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="currentColor">
+              <path d="M20 7h-2.2A3 3 0 0 0 12 3.8 3 3 0 0 0 6.2 7H4a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h7V7h2v5h7a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1Zm-11 0a1 1 0 1 1 1-1v1H9Zm6 0h-1V6a1 1 0 1 1 1 1ZM4 13v7a1 1 0 0 0 1 1h6v-8H4Zm9 8h6a1 1 0 0 0 1-1v-7h-7v8Z" />
+            </svg>
+          </button>
+        )}
+      </div>
     </div>
   );
 }

@@ -2126,7 +2126,7 @@ export const en = {
   featured_videos_tab: "70+ Featured Videos",
   // Multi-live 24 (2026-11-05) — same keys and words as Android's strings_multi_live.xml.
   ml_members_on_camera: "Members on camera",
-  ml_size_hint: "You + up to %1$s guests. Only 4 people can talk at the same time.",
+  ml_size_hint: "You can have up to 24 members live in your room and you can battle with all of them at the same time. Try it, and have fun.",
   ml_go_live: "Go Live",
   ml_save: "Save",
   ml_cancel: "Cancel",
@@ -2160,6 +2160,17 @@ export const en = {
   ml_not_ready: "This isn't available yet. Please try again later.",
   ml_menu_size: "👥 Members on camera: %1$s",
   ml_menu_hands: "✋ Raised hands (%1$s)",
+  // Bingg Bongg Battle (Steve, 2026-11-06)
+  bbb_double_points: "🥊 DOUBLE POINTS %1$s",
+  bbb_triple_points: "🥊 TRIPLE POINTS %1$s",
+  bbb_invite_first: "Invite someone to the room first.",
+  bbb_give_bomb: "💣 Give %1$s a bomb",
+  bbb_pick_tile: "💣 Tap a battler's tile to give them your bomb.",
+  bbb_bomb_given: "💣 Bomb given to %1$s!",
+  bbb_no_battle: "There's no battle running right now.",
+  bbb_not_in_battle: "That member isn't in this battle.",
+  bbb_bomb_running: "That member already has a bomb. Try again when it's gone.",
+  bbb_no_bombs: "You have no bombs left.",
   // Build Your Houses (Steve, 2026-11-05)
   fname_build_your_houses: "Build Your Houses",
   fblurb_build_your_houses: "Every coin you win in battles lays one brick. Build houses, then whole streets.",
