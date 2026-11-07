@@ -1127,10 +1127,10 @@ body:has(.get-app-bar) .bh-you { bottom: calc(88px + env(safe-area-inset-bottom)
    The layer never blocks a tap — only the fish itself is tappable. */
 .fish-layer { position: fixed; inset: 0; z-index: 90; pointer-events: none; overflow: hidden; }
 .fish-banner { position: absolute; left: 0; right: 0; margin: 0 auto; width: max-content; max-width: calc(100vw - 32px);
-  top: calc(var(--nav-h, 60px) + 12px); box-sizing: border-box; padding: 8px 18px; border-radius: 999px;
+  bottom: calc(96px + env(safe-area-inset-bottom, 0px)); box-sizing: border-box; padding: 8px 18px; border-radius: 999px;
   background: #000; border: 1.5px solid #D4AF37; color: #F0C420; font-weight: 700; font-size: 14px; line-height: 1.35;
   text-align: center; box-shadow: 0 6px 20px rgba(0, 0, 0, .5); animation: fish-banner-in .35s ease-out both; }
-@keyframes fish-banner-in { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
+@keyframes fish-banner-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 .fish-swim { position: absolute; left: 0; animation-timing-function: linear; animation-fill-mode: both; will-change: transform; }
 .fish-swim.ltr { animation-name: fish-swim-ltr; }
 .fish-swim.rtl { animation-name: fish-swim-rtl; }
