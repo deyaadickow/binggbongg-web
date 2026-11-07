@@ -1544,6 +1544,7 @@
  "chb_starred_you": "@{name} atzīmēja tevi ar zvaigznīti — pieskaries ★, lai atbildētu",
  "chb_starred_you_tile": "★ atzīmēja tevi",
  "safety_center": "Drošības centrs",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 Noķer zivi, lai uzdāvinātu straumētājam dāvanu %1$s monētu vērtībā. Tas tiks ļoti novērtēts!",
  "fish_confirm_title": "Noķert zivi? 🐟",
  "fish_confirm_text": "Nosūti @%1$s dāvanu par %2$s monētām.",

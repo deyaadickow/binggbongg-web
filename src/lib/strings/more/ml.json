@@ -1543,6 +1543,7 @@
  "chb_starred_you": "@{name} നിങ്ങളെ സ്റ്റാർ ചെയ്തു — തിരിച്ചു സംസാരിക്കാൻ ★ ടാപ്പ് ചെയ്യുക",
  "chb_starred_you_tile": "★ നിങ്ങളെ സ്റ്റാർ ചെയ്തു",
  "safety_center": "സുരക്ഷാ കേന്ദ്രം",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 ലൈവ് സ്ട്രീമർക്ക് %1$s നാണയങ്ങളുടെ സമ്മാനം നൽകാൻ മീനിനെ പിടിക്കൂ. അത് ഏറെ വിലമതിക്കപ്പെടും!",
  "fish_confirm_title": "മീനിനെ പിടിക്കണോ? 🐟",
  "fish_confirm_text": "@%1$s-ന് %2$s നാണയങ്ങളുടെ സമ്മാനം അയയ്ക്കുക.",

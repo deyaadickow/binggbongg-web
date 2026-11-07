@@ -1547,6 +1547,7 @@
  "chb_starred_you": "@{name} tě označil/a hvězdičkou – klepni na ★ a odpověz",
  "chb_starred_you_tile": "★ tě označil/a",
  "safety_center": "Centrum bezpečnosti",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 Chyť rybu a dej streamerovi dárek v hodnotě %1$s mincí. Bude to velmi oceněno!",
  "fish_confirm_title": "Chytit rybu? 🐟",
  "fish_confirm_text": "Pošli @%1$s dárek za %2$s mincí.",

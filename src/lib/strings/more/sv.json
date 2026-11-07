@@ -1546,6 +1546,7 @@
  "chb_starred_you": "@{name} stjärnmärkte dig – tryck på ★ för att svara",
  "chb_starred_you_tile": "★ stjärnmärkte dig",
  "safety_center": "Säkerhetscenter",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 Fånga fisken för att ge streamern en gåva värd %1$s mynt. Det kommer att uppskattas mycket!",
  "fish_confirm_title": "Fånga fisken? 🐟",
  "fish_confirm_text": "Skicka @%1$s en gåva på %2$s mynt.",

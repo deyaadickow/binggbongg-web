@@ -1548,6 +1548,7 @@
  "chb_starred_you": "@{name} gaf je een ster — tik op ★ om terug te praten",
  "chb_starred_you_tile": "★ gaf je een ster",
  "safety_center": "Veiligheidscentrum",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 Vang de vis om de streamer een cadeau van %1$s munten te geven. Dat wordt zeer gewaardeerd!",
  "fish_confirm_title": "De vis vangen? 🐟",
  "fish_confirm_text": "Stuur @%1$s een cadeau van %2$s munten.",

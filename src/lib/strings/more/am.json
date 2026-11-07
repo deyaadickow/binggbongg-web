@@ -1548,6 +1548,7 @@
  "chb_starred_you": "@{name} ኮከብ አድርጎዎታል — መልሰው ለማውራት ★ ይንኩ",
  "chb_starred_you_tile": "★ ኮከብ አድርጎዎታል",
  "safety_center": "የደህንነት ማዕከል",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 ለቀጥታ አስተላላፊው %1$s ሳንቲም የሚያወጣ ስጦታ ለመስጠት ዓሣውን ይያዙ። በጣም ይደነቃል!",
  "fish_confirm_title": "ዓሣውን ይያዙ? 🐟",
  "fish_confirm_text": "ለ@%1$s የ%2$s ሳንቲም ስጦታ ይላኩ።",

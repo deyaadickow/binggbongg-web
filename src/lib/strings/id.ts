@@ -2045,6 +2045,7 @@ export const id = {
   hk_behind_game: "Apa di Belakangku?",
   hk_tap_game: "Game Ketuk",
   // Catch the Fish (Steve, 2026-11-07)
+  fish_host_notice: "%1$s baru saja menangkap dan mengirimimu Hadiah Ikan 🐟",
   fish_banner: "🐟 Tangkap ikannya untuk memberi streamer hadiah senilai %1$s koin. Pasti sangat dihargai!",
   fish_confirm_title: "Tangkap ikannya? 🐟",
   fish_confirm_text: "Kirim hadiah %2$s koin ke @%1$s.",

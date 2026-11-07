@@ -1548,6 +1548,7 @@
  "chb_starred_you": "@{name} మిమ్మల్ని స్టార్ చేశారు — మాట్లాడటానికి ★ ట్యాప్ చేయండి",
  "chb_starred_you_tile": "★ మిమ్మల్ని స్టార్ చేశారు",
  "safety_center": "భద్రతా కేంద్రం",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 లైవ్ స్ట్రీమర్‌కు %1$s నాణేల బహుమతి ఇవ్వడానికి చేపను పట్టుకోండి. దీన్ని ఎంతో అభినందిస్తారు!",
  "fish_confirm_title": "చేపను పట్టుకోవాలా? 🐟",
  "fish_confirm_text": "@%1$s కి %2$s నాణేల బహుమతి పంపండి.",

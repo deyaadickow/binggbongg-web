@@ -2245,6 +2245,7 @@ export const en = {
   hk_behind_game: "What's Behind Me?",
   hk_tap_game: "Tap Games",
   // Catch the Fish (Steve, 2026-11-07)
+  fish_host_notice: "%1$s just caught and sent you a Fish Gift 🐟",
   fish_banner: "🐟 Catch the fish to give the live streamer a gift worth %1$s coins. It will be greatly appreciated!",
   fish_confirm_title: "Catch the fish? 🐟",
   fish_confirm_text: "Send @%1$s a %2$s-coin gift.",

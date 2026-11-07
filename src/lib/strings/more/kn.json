@@ -1546,6 +1546,7 @@
  "chb_starred_you": "@{name} ನಿಮ್ಮನ್ನು ಸ್ಟಾರ್ ಮಾಡಿದ್ದಾರೆ — ಮರಳಿ ಮಾತನಾಡಲು ★ ಟ್ಯಾಪ್ ಮಾಡಿ",
  "chb_starred_you_tile": "★ ನಿಮ್ಮನ್ನು ಸ್ಟಾರ್ ಮಾಡಿದ್ದಾರೆ",
  "safety_center": "ಸುರಕ್ಷತಾ ಕೇಂದ್ರ",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 ಲೈವ್ ಸ್ಟ್ರೀಮರ್‌ಗೆ %1$s ನಾಣ್ಯಗಳ ಉಡುಗೊರೆ ನೀಡಲು ಮೀನನ್ನು ಹಿಡಿಯಿರಿ. ಇದು ತುಂಬಾ ಮೆಚ್ಚುಗೆ ಪಡೆಯುತ್ತದೆ!",
  "fish_confirm_title": "ಮೀನನ್ನು ಹಿಡಿಯುವಿರಾ? 🐟",
  "fish_confirm_text": "@%1$s ಅವರಿಗೆ %2$s ನಾಣ್ಯಗಳ ಉಡುಗೊರೆ ಕಳುಹಿಸಿ.",

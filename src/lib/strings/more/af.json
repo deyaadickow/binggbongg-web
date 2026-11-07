@@ -1546,6 +1546,7 @@
  "chb_starred_you": "@{name} het jou gester — tik ★ om terug te praat",
  "chb_starred_you_tile": "★ het jou gester",
  "safety_center": "Veiligheidsentrum",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 Vang die vis om die lewendige stroomer 'n geskenk van %1$s munte te gee. Dit sal baie waardeer word!",
  "fish_confirm_title": "Vang die vis? 🐟",
  "fish_confirm_text": "Stuur @%1$s 'n geskenk van %2$s munte.",

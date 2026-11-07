@@ -1545,6 +1545,7 @@
  "chb_starred_you": "@{name} stjernemerket deg — trykk på ★ for å snakke tilbake",
  "chb_starred_you_tile": "★ stjernemerket deg",
  "safety_center": "Sikkerhetssenter",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 Fang fisken for å gi streameren en gave verdt %1$s mynter. Det blir satt stor pris på!",
  "fish_confirm_title": "Fange fisken? 🐟",
  "fish_confirm_text": "Send @%1$s en gave på %2$s mynter.",

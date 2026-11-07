@@ -1546,6 +1546,7 @@
  "chb_starred_you": "@{name} ติดดาวคุณ — แตะ ★ เพื่อคุยกลับ",
  "chb_starred_you_tile": "★ ติดดาวคุณ",
  "safety_center": "ศูนย์ความปลอดภัย",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 จับปลาเพื่อมอบของขวัญมูลค่า %1$s เหรียญให้สตรีมเมอร์ เขาจะซาบซึ้งมาก!",
  "fish_confirm_title": "จับปลาไหม? 🐟",
  "fish_confirm_text": "ส่งของขวัญ %2$s เหรียญให้ @%1$s",

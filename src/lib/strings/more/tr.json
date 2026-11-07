@@ -1548,6 +1548,7 @@
  "chb_starred_you": "@{name} seni yıldızladı — konuşmak için ★ simgesine dokun",
  "chb_starred_you_tile": "★ seni yıldızladı",
  "safety_center": "Güvenlik Merkezi",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 Canlı yayıncıya %1$s jeton değerinde bir hediye vermek için balığı yakala. Çok makbule geçecek!",
  "fish_confirm_title": "Balığı yakala? 🐟",
  "fish_confirm_text": "@%1$s kullanıcısına %2$s jetonluk bir hediye gönder.",

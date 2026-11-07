@@ -1541,6 +1541,7 @@
  "chb_starred_you": "@{name} megcsillagozott — koppints a ★ gombra a válaszhoz",
  "chb_starred_you_tile": "★ megcsillagozott",
  "safety_center": "Biztonsági központ",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 Kapd el a halat, és adj a streamernek egy %1$s érme értékű ajándékot. Nagyon fogja értékelni!",
  "fish_confirm_title": "Elkapod a halat? 🐟",
  "fish_confirm_text": "Küldj @%1$s részére egy %2$s érmés ajándékot.",

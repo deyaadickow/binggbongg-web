@@ -1547,6 +1547,7 @@
  "chb_starred_you": "@{name} σου έβαλε αστέρι — πάτα ★ για να μιλήσεις",
  "chb_starred_you_tile": "★ σου έβαλε αστέρι",
  "safety_center": "Κέντρο ασφάλειας",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 Πιάσε το ψάρι για να κάνεις στον streamer δώρο αξίας %1$s νομισμάτων. Θα εκτιμηθεί πολύ!",
  "fish_confirm_title": "Να πιάσεις το ψάρι; 🐟",
  "fish_confirm_text": "Στείλε στον @%1$s δώρο %2$s νομισμάτων.",

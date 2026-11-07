@@ -1548,6 +1548,7 @@
  "chb_starred_you": "@{name}님이 나를 별표했어요 — ★를 탭해 대화해보세요",
  "chb_starred_you_tile": "★ 나를 별표함",
  "safety_center": "안전 센터",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 물고기를 잡아 라이브 스트리머에게 %1$s코인 선물을 보내세요. 정말 고마워할 거예요!",
  "fish_confirm_title": "물고기를 잡을까요? 🐟",
  "fish_confirm_text": "@%1$s 님에게 %2$s코인 선물을 보냅니다.",

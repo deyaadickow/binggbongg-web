@@ -1547,6 +1547,7 @@
  "chb_starred_you": "@{name} আপনাকে স্টার করেছেন — কথা বলতে ★ ট্যাপ করুন",
  "chb_starred_you_tile": "★ আপনাকে স্টার করেছেন",
  "safety_center": "নিরাপত্তা কেন্দ্র",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 লাইভ স্ট্রিমারকে %1$s কয়েনের উপহার দিতে মাছটি ধরুন। এটি অনেক প্রশংসিত হবে!",
  "fish_confirm_title": "মাছটি ধরবেন? 🐟",
  "fish_confirm_text": "@%1$s-কে %2$s কয়েনের উপহার পাঠান।",

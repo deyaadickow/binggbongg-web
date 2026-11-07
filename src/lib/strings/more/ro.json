@@ -1543,6 +1543,7 @@
  "chb_starred_you": "@{name} te-a marcat cu stea — atinge ★ ca să răspunzi",
  "chb_starred_you_tile": "★ te-a marcat cu stea",
  "safety_center": "Centrul de siguranță",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 Prinde peștele pentru a-i oferi streamerului un cadou de %1$s monede. Va fi foarte apreciat!",
  "fish_confirm_title": "Prinzi peștele? 🐟",
  "fish_confirm_text": "Trimite-i lui @%1$s un cadou de %2$s monede.",

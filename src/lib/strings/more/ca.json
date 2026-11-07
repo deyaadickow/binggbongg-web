@@ -1547,6 +1547,7 @@
  "chb_starred_you": "@{name} t'ha destacat — toca ★ per respondre",
  "chb_starred_you_tile": "★ t'ha destacat",
  "safety_center": "Centre de seguretat",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 Atrapa el peix per fer al streamer un regal de %1$s monedes. S'agrairà molt!",
  "fish_confirm_title": "Atrapar el peix? 🐟",
  "fish_confirm_text": "Envia a @%1$s un regal de %2$s monedes.",

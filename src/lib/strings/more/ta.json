@@ -1548,6 +1548,7 @@
  "chb_starred_you": "@{name} உங்களை ஸ்டார் செய்துள்ளார் — பதில் பேச ★-ஐத் தட்டவும்",
  "chb_starred_you_tile": "★ உங்களை ஸ்டார் செய்தார்",
  "safety_center": "பாதுகாப்பு மையம்",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 லைவ் ஸ்ட்ரீமருக்கு %1$s நாணயங்கள் மதிப்புள்ள பரிசு அளிக்க மீனைப் பிடியுங்கள். அது மிகவும் பாராட்டப்படும்!",
  "fish_confirm_title": "மீனைப் பிடிக்கவா? 🐟",
  "fish_confirm_text": "@%1$s க்கு %2$s நாணயப் பரிசை அனுப்புங்கள்.",

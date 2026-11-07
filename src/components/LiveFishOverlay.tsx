@@ -229,6 +229,19 @@ export function FishHostControls({ myId, roomName, messages }: { myId: number; r
     return () => { alive = false; };
   }, [myId, roomName, fishLines, tick]);
 
+  // Steve, 2026-11-07: "When someone catches a fish and sends the gift, Please send a message to the host
+  // to let him know. 'Eddie just Caught and sent you a Fish Gift' so he can thank the gifter."
+  const openedAt = useRef(Date.now());
+  const noticed = useRef(new Set<string>());
+  useEffect(() => {
+    for (const m of messages) {
+      if (!isFishChatLine(m.message) || m.sentAt <= openedAt.current || noticed.current.has(m.id)) continue;
+      noticed.current.add(m.id);
+      const who = (m.senderName || "").trim() || m.message.slice(2).trim().split(" ")[0].replace(/^@/, "");
+      if (who) showGoldAlert(t("fish_host_notice", who));
+    }
+  }, [messages, t]);
+
   if (!status || (!status.enabled && status.streamer_on)) return null;
   const isOn = status.streamer_on;
 

@@ -1548,6 +1548,7 @@
  "chb_starred_you": "@{name} vous a mis une étoile — touchez ★ pour répondre",
  "chb_starred_you_tile": "★ vous a mis une étoile",
  "safety_center": "Centre de sécurité",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 Attrape le poisson pour offrir au streamer un cadeau de %1$s pièces. Ce sera très apprécié !",
  "fish_confirm_title": "Attraper le poisson ? 🐟",
  "fish_confirm_text": "Envoyer à @%1$s un cadeau de %2$s pièces.",

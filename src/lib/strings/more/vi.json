@@ -1548,6 +1548,7 @@
  "chb_starred_you": "@{name} đã gắn sao cho bạn — nhấn ★ để trò chuyện lại",
  "chb_starred_you_tile": "★ đã gắn sao cho bạn",
  "safety_center": "Trung tâm an toàn",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 Bắt con cá để tặng người phát trực tiếp món quà trị giá %1$s xu. Họ sẽ rất trân trọng!",
  "fish_confirm_title": "Bắt con cá? 🐟",
  "fish_confirm_text": "Gửi @%1$s món quà %2$s xu.",

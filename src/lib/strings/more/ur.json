@@ -1548,6 +1548,7 @@
  "chb_starred_you": "@{name} نے آپ کو سٹار کیا — بات کرنے کے لیے ★ ٹیپ کریں",
  "chb_starred_you_tile": "★ نے آپ کو سٹار کیا",
  "safety_center": "حفاظتی مرکز",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 لائیو اسٹریمر کو %1$s سکوں کا تحفہ دینے کے لیے مچھلی پکڑیں۔ اس کی بہت قدر کی جائے گی!",
  "fish_confirm_title": "مچھلی پکڑیں؟ 🐟",
  "fish_confirm_text": "@%1$s کو %2$s سکوں کا تحفہ بھیجیں۔",

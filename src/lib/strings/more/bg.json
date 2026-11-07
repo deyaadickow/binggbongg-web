@@ -1548,6 +1548,7 @@
  "chb_starred_you": "@{name} те отбеляза със звезда — докосни ★, за да отговориш",
  "chb_starred_you_tile": "★ те отбеляза със звезда",
  "safety_center": "Център за безопасност",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 Хванете рибата, за да дадете на стриймъра подарък на стойност %1$s монети. Ще бъде много оценено!",
  "fish_confirm_title": "Да хванете рибата? 🐟",
  "fish_confirm_text": "Изпратете на @%1$s подарък от %2$s монети.",

@@ -1545,6 +1545,7 @@
  "chb_starred_you": "@{name} pažymėjo tave žvaigždute – bakstelėk ★, kad atsakytum",
  "chb_starred_you_tile": "★ pažymėjo tave",
  "safety_center": "Saugumo centras",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 Pagauk žuvį ir padovanok transliuotojui %1$s monetų vertės dovaną. Tai bus labai įvertinta!",
  "fish_confirm_title": "Pagauti žuvį? 🐟",
  "fish_confirm_text": "Siųsk @%1$s %2$s monetų dovaną.",

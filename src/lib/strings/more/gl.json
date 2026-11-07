@@ -1544,6 +1544,7 @@
  "chb_starred_you": "@{name} marcoute con estrela — toca ★ para responder",
  "chb_starred_you_tile": "★ marcoute con estrela",
  "safety_center": "Centro de seguridade",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 Atrapa o peixe para darlle ao streamer un agasallo de %1$s moedas. Será moi agradecido!",
  "fish_confirm_title": "Atrapar o peixe? 🐟",
  "fish_confirm_text": "Envía a @%1$s un agasallo de %2$s moedas.",

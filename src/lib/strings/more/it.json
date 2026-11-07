@@ -1547,6 +1547,7 @@
  "chb_starred_you": "@{name} ti ha messo una stella — tocca ★ per rispondere",
  "chb_starred_you_tile": "★ Ti ha messo una stella",
  "safety_center": "Centro sicurezza",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 Cattura il pesce per fare allo streamer un regalo da %1$s monete. Sarà molto apprezzato!",
  "fish_confirm_title": "Catturare il pesce? 🐟",
  "fish_confirm_text": "Invia a @%1$s un regalo da %2$s monete.",

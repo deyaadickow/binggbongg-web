@@ -1548,6 +1548,7 @@
  "chb_starred_you": "@{name} oznaczył(a) Cię gwiazdką — dotknij ★, by odpowiedzieć",
  "chb_starred_you_tile": "★ oznaczył(a) Cię gwiazdką",
  "safety_center": "Centrum bezpieczeństwa",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 Złap rybę, aby dać streamerowi prezent o wartości %1$s monet. Będzie to bardzo docenione!",
  "fish_confirm_title": "Złapać rybę? 🐟",
  "fish_confirm_text": "Wyślij @%1$s prezent za %2$s monet.",

@@ -1548,6 +1548,7 @@
  "chb_starred_you": "@{name} membintangi anda — ketik ★ untuk balas bercakap",
  "chb_starred_you_tile": "★ membintangi anda",
  "safety_center": "Pusat Keselamatan",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 Tangkap ikan untuk memberi penstrim hadiah bernilai %1$s syiling. Ia amat dihargai!",
  "fish_confirm_title": "Tangkap ikan? 🐟",
  "fish_confirm_text": "Hantar hadiah %2$s syiling kepada @%1$s.",

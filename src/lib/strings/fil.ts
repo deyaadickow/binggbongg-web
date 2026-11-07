@@ -2050,6 +2050,7 @@ export const fil = {
   hk_behind_game: "Ano ang Nasa Likod Ko?",
   hk_tap_game: "Tap Games",
   // Catch the Fish (Steve, 2026-11-07)
+  fish_host_notice: "%1$s ay nakahuli at nagpadala sa iyo ng Fish Gift 🐟",
   fish_banner: "🐟 Hulihin ang isda para bigyan ang live streamer ng regalong %1$s coins. Lubos itong pahahalagahan!",
   fish_confirm_title: "Huhulihin ang isda? 🐟",
   fish_confirm_text: "Padalhan si @%1$s ng regalong %2$s coins.",

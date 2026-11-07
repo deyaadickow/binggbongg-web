@@ -1547,6 +1547,7 @@
  "chb_starred_you": "@{name}があなたにスターを付けました — ★をタップして話そう",
  "chb_starred_you_tile": "★ あなたにスターしました",
  "safety_center": "安全センター",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 魚をつかまえて、ライブ配信者に%1$sコインのギフトを贈ろう。とても喜ばれます!",
  "fish_confirm_title": "魚をつかまえますか? 🐟",
  "fish_confirm_text": "@%1$s さんに%2$sコインのギフトを送ります。",

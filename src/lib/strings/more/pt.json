@@ -1548,6 +1548,7 @@
  "chb_starred_you": "@{name} favoritou você — toque em ★ para responder",
  "chb_starred_you_tile": "★ favoritou você",
  "safety_center": "Central de segurança",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 Pegue o peixe para dar ao streamer um presente de %1$s moedas. Será muito apreciado!",
  "fish_confirm_title": "Pegar o peixe? 🐟",
  "fish_confirm_text": "Envie a @%1$s um presente de %2$s moedas.",

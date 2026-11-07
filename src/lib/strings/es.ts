@@ -2031,6 +2031,7 @@ export const es = {
   hk_behind_game: "¿Qué hay detrás de mí?",
   hk_tap_game: "Juegos de toque",
   // Catch the Fish (Steve, 2026-11-07)
+  fish_host_notice: "%1$s acaba de atrapar y enviarte un Regalo Pez 🐟",
   fish_banner: "🐟 Atrapa el pez para darle al streamer un regalo de %1$s monedas. ¡Será muy apreciado!",
   fish_confirm_title: "¿Atrapar el pez? 🐟",
   fish_confirm_text: "Envía a @%1$s un regalo de %2$s monedas.",

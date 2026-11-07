@@ -1544,6 +1544,7 @@
  "chb_starred_you": "@{name} סימן אותך בכוכב — הקש על ★ כדי לדבר בחזרה",
  "chb_starred_you_tile": "★ סימן אותך בכוכב",
  "safety_center": "מרכז הבטיחות",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 תפסו את הדג כדי לתת לסטרימר מתנה בשווי %1$s מטבעות. זה יוערך מאוד!",
  "fish_confirm_title": "לתפוס את הדג? 🐟",
  "fish_confirm_text": "שלחו ל-@%1$s מתנה של %2$s מטבעות.",

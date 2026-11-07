@@ -1545,6 +1545,7 @@
  "chb_starred_you": "@{name} stjörnumerkti þig — ýttu á ★ til að svara",
  "chb_starred_you_tile": "★ stjörnumerkti þig",
  "safety_center": "Öryggismiðstöð",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 Veiddu fiskinn til að gefa streymandanum gjöf að verðmæti %1$s mynta. Það verður vel þegið!",
  "fish_confirm_title": "Veiða fiskinn? 🐟",
  "fish_confirm_text": "Sendu @%1$s gjöf upp á %2$s myntir.",

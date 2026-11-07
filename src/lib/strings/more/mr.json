@@ -1542,6 +1542,7 @@
  "chb_starred_you": "@{name} ने तुम्हाला स्टार केलं — परत बोलण्यासाठी ★ वर टॅप करा",
  "chb_starred_you_tile": "★ तुम्हाला स्टार केलं",
  "safety_center": "सुरक्षा केंद्र",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 लाइव्ह स्ट्रीमरला %1$s नाण्यांची भेट देण्यासाठी मासा पकडा. याचे खूप कौतुक होईल!",
  "fish_confirm_title": "मासा पकडायचा? 🐟",
  "fish_confirm_text": "@%1$s ला %2$s नाण्यांची भेट पाठवा.",

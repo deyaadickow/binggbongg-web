@@ -1539,6 +1539,7 @@
  "chb_starred_you": "@{name} tähditti sinut — napauta ★ vastataksesi",
  "chb_starred_you_tile": "★ tähditti sinut",
  "safety_center": "Turvallisuuskeskus",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 Nappaa kala antaaksesi striimaajalle %1$s kolikon arvoisen lahjan. Sitä arvostetaan suuresti!",
  "fish_confirm_title": "Napataanko kala? 🐟",
  "fish_confirm_text": "Lähetä käyttäjälle @%1$s %2$s kolikon lahja.",

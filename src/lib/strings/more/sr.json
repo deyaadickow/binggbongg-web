@@ -1548,6 +1548,7 @@
  "chb_starred_you": "@{name} te je označio/la zvezdicom — dodirni ★ da uzvratiš",
  "chb_starred_you_tile": "★ te je označio/la",
  "safety_center": "Центар за безбедност",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 Ухвати рибу да стримеру даш поклон вредан %1$s новчића. Биће веома цењено!",
  "fish_confirm_title": "Ухватити рибу? 🐟",
  "fish_confirm_text": "Пошаљи @%1$s поклон од %2$s новчића.",

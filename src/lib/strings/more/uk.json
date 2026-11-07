@@ -1547,6 +1547,7 @@
  "chb_starred_you": "@{name} позначив(-ла) вас зірочкою — торкніться ★, щоб відповісти",
  "chb_starred_you_tile": "★ позначив(-ла) вас",
  "safety_center": "Центр безпеки",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 Спіймайте рибку, щоб зробити стримеру подарунок на %1$s монет. Це буде дуже приємно!",
  "fish_confirm_title": "Спіймати рибку? 🐟",
  "fish_confirm_text": "Надіслати @%1$s подарунок на %2$s монет.",

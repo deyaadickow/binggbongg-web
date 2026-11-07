@@ -1548,6 +1548,7 @@
  "chb_starred_you": "@{name} 为你加星了——点击 ★ 与Ta对话",
  "chb_starred_you_tile": "★ 为你加星",
  "safety_center": "安全中心",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 抓住小鱼,送给主播价值 %1$s 金币的礼物。对方会非常感激!",
  "fish_confirm_title": "要抓这条鱼吗? 🐟",
  "fish_confirm_text": "送给 @%1$s 一份 %2$s 金币的礼物。",

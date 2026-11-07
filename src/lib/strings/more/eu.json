@@ -1548,6 +1548,7 @@
  "chb_starred_you": "@{name}(e)k izarra jarri dizu — sakatu ★ erantzuteko",
  "chb_starred_you_tile": "★ izarra jarri dizu",
  "safety_center": "Segurtasun-zentroa",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 Harrapatu arraina streamerrari %1$s txanponeko oparia emateko. Asko eskertuko da!",
  "fish_confirm_title": "Arraina harrapatu? 🐟",
  "fish_confirm_text": "Bidali @%1$s erabiltzaileari %2$s txanponeko oparia.",

@@ -1545,6 +1545,7 @@
  "chb_starred_you": "@{name} märkis su tärniga — puuduta ★, et vastata",
  "chb_starred_you_tile": "★ märkis su tärniga",
  "safety_center": "Turvakeskus",
+ "fish_host_notice": "%1$s just caught and sent you a Fish Gift 🐟",
  "fish_banner": "🐟 Püüa kala, et teha striimijale %1$s mündi väärtuses kingitus. Seda hinnatakse väga!",
  "fish_confirm_title": "Püüda kala? 🐟",
  "fish_confirm_text": "Saada @%1$s kingitus %2$s mündi eest.",
