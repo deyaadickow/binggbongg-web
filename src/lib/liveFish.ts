@@ -43,6 +43,13 @@ export const FISH_SPRITES = [
   { src: "/img/bb_fish_a.webp", ratio: 266 / 360 },
   { src: "/img/bb_fish_b.webp", ratio: 219 / 360 },
   { src: "/img/bb_fish_c.webp", ratio: 236 / 360 },
+  // Steve, 2026-11-07: "If you have a few more different color fish it will be great."
+  { src: "/img/bb_fish_d.webp", ratio: 242 / 360 },
+  { src: "/img/bb_fish_e.webp", ratio: 237 / 360 },
+  { src: "/img/bb_fish_f.webp", ratio: 281 / 360 },
+  { src: "/img/bb_fish_g.webp", ratio: 482 / 360 },
+  { src: "/img/bb_fish_h.webp", ratio: 438 / 360 },
+  { src: "/img/bb_fish_i.webp", ratio: 261 / 360 },
 ] as const;
 
 /** Every catch posts this ordinary chat line (English on every platform, so the streamer's

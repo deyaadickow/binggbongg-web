@@ -103,7 +103,28 @@ export function LiveFishOverlay({ streamerId, streamerName, roomName, active = t
     return () => { window.clearTimeout(first); window.clearInterval(interval); };
   }, [enabled, every]);
 
-  if (!fish) return null;
+  // Steve, 2026-11-07: "When a fish toggle is on, add a very small fish on the bottom of the page ... for (i)
+  // information about the fish, i mean the banner. and forget about the banner appearing every time a fish appears."
+  const [info, setInfo] = useState(false);
+  const infoIcon = enabled ? (
+    <>
+      <button type="button" className="fish-info" onClick={() => setInfo(true)} aria-label={t("fish_confirm_title")}>
+        <img src="/img/bb_fish_icon.png" alt="" />
+      </button>
+      {info && (
+        <div className="fish-confirm-backdrop" onClick={() => setInfo(false)}>
+          <div className="card pad fish-confirm" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
+            <h3>{t("fish_confirm_title")}</h3>
+            <p>{t("fish_banner", status?.coins ?? 100)}</p>
+            <div className="fish-confirm-buttons">
+              <button className="btn fish-send" onClick={() => setInfo(false)} autoFocus>OK</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  ) : null;
+  if (!fish) return infoIcon ? <div className="fish-layer">{infoIcon}</div> : null;
   const sprite = FISH_SPRITES[fish.sprite];
   const who = streamerName.replace(/^@/, "");
 
@@ -142,9 +163,8 @@ export function LiveFishOverlay({ streamerId, streamerName, roomName, active = t
   const paused = phase !== "swim";
   return (
     <div className="fish-layer">
-      <div className="fish-banner" role="status">
-        {phase === "caught" ? t("fish_caught_you", fish.coins) : t("fish_banner", fish.coins)}
-      </div>
+      {infoIcon}
+      {phase === "caught" && <div className="fish-banner" role="status">{t("fish_caught_you", fish.coins)}</div>}
       <div key={fish.id} className={`fish-swim ${fish.ltr ? "ltr" : "rtl"}${paused ? " paused" : ""}`}
         style={{ top: `${fish.top}%`, animationDuration: `${fish.seconds}s`, ["--fish-w" as string]: `${FISH_WIDTH}px` }}
         onAnimationEnd={(e) => {
