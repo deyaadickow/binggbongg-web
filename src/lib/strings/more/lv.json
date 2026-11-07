@@ -1543,5 +1543,19 @@
  "chb_waiting": "Gaidām, kad cīnītāji sāks tiešraidi…",
  "chb_starred_you": "@{name} atzīmēja tevi ar zvaigznīti — pieskaries ★, lai atbildētu",
  "chb_starred_you_tile": "★ atzīmēja tevi",
- "safety_center": "Drošības centrs"
+ "safety_center": "Drošības centrs",
+ "fish_banner": "🐟 Noķer zivi, lai uzdāvinātu straumētājam dāvanu %1$s monētu vērtībā. Tas tiks ļoti novērtēts!",
+ "fish_confirm_title": "Noķert zivi? 🐟",
+ "fish_confirm_text": "Nosūti @%1$s dāvanu par %2$s monētām.",
+ "fish_send_gift": "SŪTĪT DĀVANU",
+ "fish_caught_you": "🐟 Tu noķēri zivi! Tava dāvana par %1$s monētām ir nosūtīta.",
+ "fish_low_balance": "Noķerot zivi, tiek nosūtīta dāvana par %1$s monētām, bet tev nepietiek monētu.",
+ "fish_already": "Tu jau noķēri šo zivi.",
+ "fish_off": "Šajā istabā zivs ir izslēgta.",
+ "fish_switch_on": "🐟 Noķer zivi: IESL.",
+ "fish_switch_off": "🐟 Noķer zivi: IZSL.",
+ "fish_switch_help": "Pāri tavai tiešraidei peld zivs; skatītājs, kurš to noķer, sūta tev dāvanu.",
+ "fish_catchers_title": "Kas noķēra zivi 🐟",
+ "fish_catchers_empty": "Zivi vēl neviens nav noķēris.",
+ "fish_catcher_count": "%1$s zivis · %2$s monētas"
 }

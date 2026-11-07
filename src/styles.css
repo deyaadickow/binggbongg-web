@@ -1120,3 +1120,55 @@ body:has(.get-app-bar) .bh-you { bottom: calc(88px + env(safe-area-inset-bottom)
 .bbb-banner span { font-size: clamp(13px, 3.4vw, 16px); font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
 @keyframes bbb-bullet { from { opacity: 0; transform: translateX(80vw); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .bbb-banner { animation: none; } }
+
+/* ---- Catch the Fish (Steve, 2026-11-07; components/LiveFishOverlay) ----------------------------
+   The fish swims fully across, off-screen to off-screen, in the fish's `seconds`; its tail and fins
+   swing from a 16-frame sprite sheet (one frame per step, 0.8 s a loop); a gentle bob on top.
+   The layer never blocks a tap — only the fish itself is tappable. */
+.fish-layer { position: fixed; inset: 0; z-index: 90; pointer-events: none; overflow: hidden; }
+.fish-banner { position: absolute; left: 0; right: 0; margin: 0 auto; width: max-content; max-width: calc(100vw - 32px);
+  top: calc(var(--nav-h, 60px) + 12px); box-sizing: border-box; padding: 8px 18px; border-radius: 999px;
+  background: #000; border: 1.5px solid #D4AF37; color: #F0C420; font-weight: 700; font-size: 14px; line-height: 1.35;
+  text-align: center; box-shadow: 0 6px 20px rgba(0, 0, 0, .5); animation: fish-banner-in .35s ease-out both; }
+@keyframes fish-banner-in { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
+.fish-swim { position: absolute; left: 0; animation-timing-function: linear; animation-fill-mode: both; will-change: transform; }
+.fish-swim.ltr { animation-name: fish-swim-ltr; }
+.fish-swim.rtl { animation-name: fish-swim-rtl; }
+.fish-swim.paused { animation-play-state: paused; }
+/* The hit area's padding (28px) is part of its width, so "off-screen" counts it too. */
+@keyframes fish-swim-ltr { from { transform: translate(calc(-1 * var(--fish-w) - 60px), -50%); } to { transform: translate(calc(100vw + 4px), -50%); } }
+@keyframes fish-swim-rtl { from { transform: translate(calc(100vw + 4px), -50%); } to { transform: translate(calc(-1 * var(--fish-w) - 60px), -50%); } }
+.fish-hit { pointer-events: auto; display: block; padding: 28px; margin: 0; border: 0; background: transparent; cursor: pointer;
+  -webkit-tap-highlight-color: transparent; }
+.fish-hit:focus-visible { outline: 2px solid #D4AF37; outline-offset: -6px; border-radius: 24px; }
+.fish-bob { position: relative; animation: fish-bob 1.6s ease-in-out infinite alternate; }
+@keyframes fish-bob { from { transform: translateY(-7px); } to { transform: translateY(7px); } }
+.fish-sprite { width: var(--fish-w); background-repeat: no-repeat; background-size: 1600% 100%; background-position: 0 0;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .45)); animation: fish-frames .8s steps(16) infinite; }
+/* With the sheet at 1600% of the box, frame i sits at i/15 of the way: 16 steps toward 16/15. */
+@keyframes fish-frames { from { background-position: 0 0; } to { background-position: 106.6667% 0; } }
+.fish-swim.rtl .fish-sprite { transform: scaleX(-1); }
+.fish-sprite.caught { animation: fish-frames .8s steps(16) infinite, fish-caught .75s ease-out forwards; }
+@keyframes fish-caught { from { opacity: 1; scale: 1; } 40% { opacity: 1; scale: 1.35; } to { opacity: 0; scale: 1.8; } }
+.fish-burst { position: absolute; left: 50%; top: 50%; width: 0; height: 0; }
+.fish-burst i { position: absolute; left: -6px; top: -6px; width: 12px; height: 12px; border-radius: 50%;
+  background: radial-gradient(circle, #FFDD55 0 35%, #D4AF37 60%, transparent 70%);
+  animation: fish-spark .7s ease-out forwards; transform: rotate(var(--a)) translateX(0); }
+@keyframes fish-spark { to { transform: rotate(var(--a)) translateX(120px) scale(.4); opacity: 0; } }
+.fish-confirm-backdrop { position: fixed; inset: 0; z-index: 110; pointer-events: auto; background: rgba(0, 0, 0, .45);
+  display: flex; align-items: center; justify-content: center; padding: 24px; }
+.fish-confirm { max-width: 420px; width: 100%; text-align: center; background: #000; border-color: var(--gold-border); }
+.fish-confirm h3 { color: var(--gold); font-size: 20px; font-weight: 900; margin: 2px 0 10px; }
+.fish-confirm p { color: #fff; font-size: 16px; margin: 0 0 18px; }
+.fish-confirm-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.fish-confirm-buttons .btn { min-width: 130px; }
+.fish-confirm-buttons .fish-send { background: var(--gold-border); border-color: var(--gold-border); color: #000; font-weight: 900; }
+.fish-sheet { max-width: 480px; }
+.fish-catcher { display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 6px; background: transparent; border: 0;
+  border-bottom: 1px solid var(--line); color: inherit; text-align: left; cursor: pointer; font: inherit; }
+.fish-catcher:hover { background: #151515; }
+.fish-catcher-who { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.fish-catcher-who b, .fish-catcher-who span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fish-catcher-who span { font-size: 13px; }
+.fish-catcher-count { color: var(--gold); font-weight: 700; font-size: 13px; white-space: nowrap; }
+@media (max-width: 600px) { .fish-banner { font-size: 12px; padding: 7px 14px; } }

@@ -1544,5 +1544,19 @@
  "chb_waiting": "Venter på at deltakerne skal gå live…",
  "chb_starred_you": "@{name} stjernemerket deg — trykk på ★ for å snakke tilbake",
  "chb_starred_you_tile": "★ stjernemerket deg",
- "safety_center": "Sikkerhetssenter"
+ "safety_center": "Sikkerhetssenter",
+ "fish_banner": "🐟 Fang fisken for å gi streameren en gave verdt %1$s mynter. Det blir satt stor pris på!",
+ "fish_confirm_title": "Fange fisken? 🐟",
+ "fish_confirm_text": "Send @%1$s en gave på %2$s mynter.",
+ "fish_send_gift": "SEND GAVE",
+ "fish_caught_you": "🐟 Du fanget fisken! Gaven din på %1$s mynter er sendt.",
+ "fish_low_balance": "Å fange fisken sender en gave på %1$s mynter, og du har ikke nok mynter.",
+ "fish_already": "Du har allerede fanget denne fisken.",
+ "fish_off": "Fisken er slått av i dette rommet.",
+ "fish_switch_on": "🐟 Fang fisken: PÅ",
+ "fish_switch_off": "🐟 Fang fisken: AV",
+ "fish_switch_help": "En fisk svømmer over direktesendingen din; en seer som fanger den sender deg en gave.",
+ "fish_catchers_title": "Hvem fanget fisken 🐟",
+ "fish_catchers_empty": "Ingen har fanget fisken ennå.",
+ "fish_catcher_count": "%1$s fisk · %2$s mynter"
 }

@@ -1546,5 +1546,19 @@
  "chb_waiting": "In attesa che i partecipanti vadano in live…",
  "chb_starred_you": "@{name} ti ha messo una stella — tocca ★ per rispondere",
  "chb_starred_you_tile": "★ Ti ha messo una stella",
- "safety_center": "Centro sicurezza"
+ "safety_center": "Centro sicurezza",
+ "fish_banner": "🐟 Cattura il pesce per fare allo streamer un regalo da %1$s monete. Sarà molto apprezzato!",
+ "fish_confirm_title": "Catturare il pesce? 🐟",
+ "fish_confirm_text": "Invia a @%1$s un regalo da %2$s monete.",
+ "fish_send_gift": "INVIA REGALO",
+ "fish_caught_you": "🐟 Hai catturato il pesce! Il tuo regalo da %1$s monete è stato inviato.",
+ "fish_low_balance": "Catturare il pesce invia un regalo da %1$s monete e non hai abbastanza monete.",
+ "fish_already": "Hai già catturato questo pesce.",
+ "fish_off": "Il pesce è disattivato in questa stanza.",
+ "fish_switch_on": "🐟 Cattura il pesce: ON",
+ "fish_switch_off": "🐟 Cattura il pesce: OFF",
+ "fish_switch_help": "Un pesce nuota nella tua diretta; lo spettatore che lo cattura ti invia un regalo.",
+ "fish_catchers_title": "Chi ha catturato il pesce 🐟",
+ "fish_catchers_empty": "Nessuno ha ancora catturato il pesce.",
+ "fish_catcher_count": "%1$s pesci · %2$s monete"
 }

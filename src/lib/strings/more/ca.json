@@ -1546,5 +1546,19 @@
  "chb_waiting": "Esperant que els participants comencin a emetre…",
  "chb_starred_you": "@{name} t'ha destacat — toca ★ per respondre",
  "chb_starred_you_tile": "★ t'ha destacat",
- "safety_center": "Centre de seguretat"
+ "safety_center": "Centre de seguretat",
+ "fish_banner": "🐟 Atrapa el peix per fer al streamer un regal de %1$s monedes. S'agrairà molt!",
+ "fish_confirm_title": "Atrapar el peix? 🐟",
+ "fish_confirm_text": "Envia a @%1$s un regal de %2$s monedes.",
+ "fish_send_gift": "ENVIA EL REGAL",
+ "fish_caught_you": "🐟 Has atrapat el peix! S'ha enviat el teu regal de %1$s monedes.",
+ "fish_low_balance": "Atrapar el peix envia un regal de %1$s monedes i no tens prou monedes.",
+ "fish_already": "Ja has atrapat aquest peix.",
+ "fish_off": "El peix està desactivat en aquesta sala.",
+ "fish_switch_on": "🐟 Atrapa el peix: SÍ",
+ "fish_switch_off": "🐟 Atrapa el peix: NO",
+ "fish_switch_help": "Un peix neda pel teu directe; qui l'atrapi t'envia un regal.",
+ "fish_catchers_title": "Qui ha atrapat el peix 🐟",
+ "fish_catchers_empty": "Encara ningú no ha atrapat el peix.",
+ "fish_catcher_count": "%1$s peixos · %2$s monedes"
 }

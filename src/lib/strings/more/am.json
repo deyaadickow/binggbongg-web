@@ -1547,5 +1547,19 @@
  "chb_waiting": "ተወዳዳሪዎች ቀጥታ ስርጭት እስኪገቡ በመጠበቅ ላይ…",
  "chb_starred_you": "@{name} ኮከብ አድርጎዎታል — መልሰው ለማውራት ★ ይንኩ",
  "chb_starred_you_tile": "★ ኮከብ አድርጎዎታል",
- "safety_center": "የደህንነት ማዕከል"
+ "safety_center": "የደህንነት ማዕከል",
+ "fish_banner": "🐟 ለቀጥታ አስተላላፊው %1$s ሳንቲም የሚያወጣ ስጦታ ለመስጠት ዓሣውን ይያዙ። በጣም ይደነቃል!",
+ "fish_confirm_title": "ዓሣውን ይያዙ? 🐟",
+ "fish_confirm_text": "ለ@%1$s የ%2$s ሳንቲም ስጦታ ይላኩ።",
+ "fish_send_gift": "ስጦታ ላክ",
+ "fish_caught_you": "🐟 ዓሣውን ያዙት! የ%1$s ሳንቲም ስጦታዎ ተልኳል።",
+ "fish_low_balance": "ዓሣውን መያዝ የ%1$s ሳንቲም ስጦታ ይልካል፣ እና በቂ ሳንቲም የለዎትም።",
+ "fish_already": "ይህን ዓሣ አስቀድመው ይዘውታል።",
+ "fish_off": "ዓሣው በዚህ ክፍል ውስጥ ጠፍቷል።",
+ "fish_switch_on": "🐟 ዓሣውን ይያዙ: በርቷል",
+ "fish_switch_off": "🐟 ዓሣውን ይያዙ: ጠፍቷል",
+ "fish_switch_help": "ዓሣ በቀጥታ ስርጭትዎ ላይ ይዋኛል፤ የሚይዘው ተመልካች ስጦታ ይልክልዎታል።",
+ "fish_catchers_title": "ዓሣውን ማን ያዘው 🐟",
+ "fish_catchers_empty": "እስካሁን ዓሣውን የያዘ የለም።",
+ "fish_catcher_count": "%1$s ዓሣ · %2$s ሳንቲሞች"
 }

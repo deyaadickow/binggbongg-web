@@ -1547,5 +1547,19 @@
  "chb_waiting": "참가자들이 라이브를 시작하기를 기다리는 중…",
  "chb_starred_you": "@{name}님이 나를 별표했어요 — ★를 탭해 대화해보세요",
  "chb_starred_you_tile": "★ 나를 별표함",
- "safety_center": "안전 센터"
+ "safety_center": "안전 센터",
+ "fish_banner": "🐟 물고기를 잡아 라이브 스트리머에게 %1$s코인 선물을 보내세요. 정말 고마워할 거예요!",
+ "fish_confirm_title": "물고기를 잡을까요? 🐟",
+ "fish_confirm_text": "@%1$s 님에게 %2$s코인 선물을 보냅니다.",
+ "fish_send_gift": "선물 보내기",
+ "fish_caught_you": "🐟 물고기를 잡았어요! %1$s코인 선물을 보냈습니다.",
+ "fish_low_balance": "물고기를 잡으면 %1$s코인 선물이 전송되는데 코인이 부족합니다.",
+ "fish_already": "이미 이 물고기를 잡았습니다.",
+ "fish_off": "이 방에서는 물고기가 꺼져 있습니다.",
+ "fish_switch_on": "🐟 물고기 잡기: 켜짐",
+ "fish_switch_off": "🐟 물고기 잡기: 꺼짐",
+ "fish_switch_help": "라이브에 물고기가 헤엄쳐 지나갑니다. 잡은 시청자가 선물을 보내 줍니다.",
+ "fish_catchers_title": "물고기를 잡은 사람 🐟",
+ "fish_catchers_empty": "아직 아무도 물고기를 잡지 않았습니다.",
+ "fish_catcher_count": "%1$s마리 · %2$s코인"
 }

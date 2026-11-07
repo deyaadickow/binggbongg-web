@@ -1544,5 +1544,19 @@
  "chb_waiting": "Bíður eftir að keppendur fari í beina útsendingu…",
  "chb_starred_you": "@{name} stjörnumerkti þig — ýttu á ★ til að svara",
  "chb_starred_you_tile": "★ stjörnumerkti þig",
- "safety_center": "Öryggismiðstöð"
+ "safety_center": "Öryggismiðstöð",
+ "fish_banner": "🐟 Veiddu fiskinn til að gefa streymandanum gjöf að verðmæti %1$s mynta. Það verður vel þegið!",
+ "fish_confirm_title": "Veiða fiskinn? 🐟",
+ "fish_confirm_text": "Sendu @%1$s gjöf upp á %2$s myntir.",
+ "fish_send_gift": "SENDA GJÖF",
+ "fish_caught_you": "🐟 Þú veiddir fiskinn! Gjöfin þín upp á %1$s myntir var send.",
+ "fish_low_balance": "Að veiða fiskinn sendir gjöf upp á %1$s myntir og þú átt ekki nógu margar myntir.",
+ "fish_already": "Þú hefur þegar veitt þennan fisk.",
+ "fish_off": "Slökkt er á fiskinum í þessu herbergi.",
+ "fish_switch_on": "🐟 Veiddu fiskinn: KVEIKT",
+ "fish_switch_off": "🐟 Veiddu fiskinn: SLÖKKT",
+ "fish_switch_help": "Fiskur syndir yfir beina útsendingu þína; áhorfandi sem veiðir hann sendir þér gjöf.",
+ "fish_catchers_title": "Hver veiddi fiskinn 🐟",
+ "fish_catchers_empty": "Enginn hefur veitt fiskinn enn.",
+ "fish_catcher_count": "%1$s fiskar · %2$s myntir"
 }

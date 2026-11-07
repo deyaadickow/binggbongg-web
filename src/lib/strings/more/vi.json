@@ -1547,5 +1547,19 @@
  "chb_waiting": "Đang chờ người đấu phát trực tiếp…",
  "chb_starred_you": "@{name} đã gắn sao cho bạn — nhấn ★ để trò chuyện lại",
  "chb_starred_you_tile": "★ đã gắn sao cho bạn",
- "safety_center": "Trung tâm an toàn"
+ "safety_center": "Trung tâm an toàn",
+ "fish_banner": "🐟 Bắt con cá để tặng người phát trực tiếp món quà trị giá %1$s xu. Họ sẽ rất trân trọng!",
+ "fish_confirm_title": "Bắt con cá? 🐟",
+ "fish_confirm_text": "Gửi @%1$s món quà %2$s xu.",
+ "fish_send_gift": "GỬI QUÀ",
+ "fish_caught_you": "🐟 Bạn đã bắt được cá! Món quà %1$s xu của bạn đã được gửi.",
+ "fish_low_balance": "Bắt cá sẽ gửi một món quà %1$s xu, và bạn không đủ xu.",
+ "fish_already": "Bạn đã bắt con cá này rồi.",
+ "fish_off": "Cá đã bị tắt trong phòng này.",
+ "fish_switch_on": "🐟 Bắt cá: BẬT",
+ "fish_switch_off": "🐟 Bắt cá: TẮT",
+ "fish_switch_help": "Một con cá bơi qua buổi live của bạn; người xem bắt được sẽ gửi quà cho bạn.",
+ "fish_catchers_title": "Ai đã bắt được cá 🐟",
+ "fish_catchers_empty": "Chưa có ai bắt được cá.",
+ "fish_catcher_count": "%1$s cá · %2$s xu"
 }

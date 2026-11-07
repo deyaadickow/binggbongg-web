@@ -1545,5 +1545,19 @@
  "chb_waiting": "Väntar på att deltagarna ska gå live…",
  "chb_starred_you": "@{name} stjärnmärkte dig – tryck på ★ för att svara",
  "chb_starred_you_tile": "★ stjärnmärkte dig",
- "safety_center": "Säkerhetscenter"
+ "safety_center": "Säkerhetscenter",
+ "fish_banner": "🐟 Fånga fisken för att ge streamern en gåva värd %1$s mynt. Det kommer att uppskattas mycket!",
+ "fish_confirm_title": "Fånga fisken? 🐟",
+ "fish_confirm_text": "Skicka @%1$s en gåva på %2$s mynt.",
+ "fish_send_gift": "SKICKA GÅVA",
+ "fish_caught_you": "🐟 Du fångade fisken! Din gåva på %1$s mynt har skickats.",
+ "fish_low_balance": "Att fånga fisken skickar en gåva på %1$s mynt, och du har inte tillräckligt med mynt.",
+ "fish_already": "Du har redan fångat den här fisken.",
+ "fish_off": "Fisken är avstängd i det här rummet.",
+ "fish_switch_on": "🐟 Fånga fisken: PÅ",
+ "fish_switch_off": "🐟 Fånga fisken: AV",
+ "fish_switch_help": "En fisk simmar över din livesändning; en tittare som fångar den skickar dig en gåva.",
+ "fish_catchers_title": "Vem fångade fisken 🐟",
+ "fish_catchers_empty": "Ingen har fångat fisken än.",
+ "fish_catcher_count": "%1$s fiskar · %2$s mynt"
 }

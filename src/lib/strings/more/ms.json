@@ -1547,5 +1547,19 @@
  "chb_waiting": "Menunggu peserta untuk siaran langsung…",
  "chb_starred_you": "@{name} membintangi anda — ketik ★ untuk balas bercakap",
  "chb_starred_you_tile": "★ membintangi anda",
- "safety_center": "Pusat Keselamatan"
+ "safety_center": "Pusat Keselamatan",
+ "fish_banner": "🐟 Tangkap ikan untuk memberi penstrim hadiah bernilai %1$s syiling. Ia amat dihargai!",
+ "fish_confirm_title": "Tangkap ikan? 🐟",
+ "fish_confirm_text": "Hantar hadiah %2$s syiling kepada @%1$s.",
+ "fish_send_gift": "HANTAR HADIAH",
+ "fish_caught_you": "🐟 Anda menangkap ikan! Hadiah %1$s syiling anda telah dihantar.",
+ "fish_low_balance": "Menangkap ikan menghantar hadiah %1$s syiling, dan syiling anda tidak mencukupi.",
+ "fish_already": "Anda sudah menangkap ikan ini.",
+ "fish_off": "Ikan dimatikan dalam bilik ini.",
+ "fish_switch_on": "🐟 Tangkap Ikan: HIDUP",
+ "fish_switch_off": "🐟 Tangkap Ikan: MATI",
+ "fish_switch_help": "Seekor ikan berenang merentasi siaran langsung anda; penonton yang menangkapnya menghantar hadiah kepada anda.",
+ "fish_catchers_title": "Siapa yang menangkap ikan 🐟",
+ "fish_catchers_empty": "Belum ada sesiapa yang menangkap ikan.",
+ "fish_catcher_count": "%1$s ikan · %2$s syiling"
 }

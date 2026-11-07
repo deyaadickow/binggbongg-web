@@ -1543,5 +1543,19 @@
  "chb_waiting": "Agardando a que os participantes comecen a emitir…",
  "chb_starred_you": "@{name} marcoute con estrela — toca ★ para responder",
  "chb_starred_you_tile": "★ marcoute con estrela",
- "safety_center": "Centro de seguridade"
+ "safety_center": "Centro de seguridade",
+ "fish_banner": "🐟 Atrapa o peixe para darlle ao streamer un agasallo de %1$s moedas. Será moi agradecido!",
+ "fish_confirm_title": "Atrapar o peixe? 🐟",
+ "fish_confirm_text": "Envía a @%1$s un agasallo de %2$s moedas.",
+ "fish_send_gift": "ENVIAR AGASALLO",
+ "fish_caught_you": "🐟 Atrapaches o peixe! Enviouse o teu agasallo de %1$s moedas.",
+ "fish_low_balance": "Atrapar o peixe envía un agasallo de %1$s moedas e non tes moedas abondo.",
+ "fish_already": "Xa atrapaches este peixe.",
+ "fish_off": "O peixe está desactivado nesta sala.",
+ "fish_switch_on": "🐟 Atrapa o peixe: SI",
+ "fish_switch_off": "🐟 Atrapa o peixe: NON",
+ "fish_switch_help": "Un peixe nada polo teu directo; quen o atrape envíache un agasallo.",
+ "fish_catchers_title": "Quen atrapou o peixe 🐟",
+ "fish_catchers_empty": "Ninguén atrapou o peixe aínda.",
+ "fish_catcher_count": "%1$s peixes · %2$s moedas"
 }

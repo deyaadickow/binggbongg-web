@@ -1547,5 +1547,19 @@
  "chb_waiting": "Lehiakideak zuzenekoa hasteko zain…",
  "chb_starred_you": "@{name}(e)k izarra jarri dizu — sakatu ★ erantzuteko",
  "chb_starred_you_tile": "★ izarra jarri dizu",
- "safety_center": "Segurtasun-zentroa"
+ "safety_center": "Segurtasun-zentroa",
+ "fish_banner": "🐟 Harrapatu arraina streamerrari %1$s txanponeko oparia emateko. Asko eskertuko da!",
+ "fish_confirm_title": "Arraina harrapatu? 🐟",
+ "fish_confirm_text": "Bidali @%1$s erabiltzaileari %2$s txanponeko oparia.",
+ "fish_send_gift": "BIDALI OPARIA",
+ "fish_caught_you": "🐟 Arraina harrapatu duzu! Zure %1$s txanponeko oparia bidali da.",
+ "fish_low_balance": "Arraina harrapatzeak %1$s txanponeko oparia bidaltzen du, eta ez duzu txanpon nahikorik.",
+ "fish_already": "Arrain hau harrapatu duzu dagoeneko.",
+ "fish_off": "Arraina desaktibatuta dago gela honetan.",
+ "fish_switch_on": "🐟 Harrapatu arraina: BAI",
+ "fish_switch_off": "🐟 Harrapatu arraina: EZ",
+ "fish_switch_help": "Arrain bat igerian dabil zure zuzenekoan; harrapatzen duen ikusleak oparia bidaltzen dizu.",
+ "fish_catchers_title": "Nork harrapatu du arraina 🐟",
+ "fish_catchers_empty": "Inork ez du arraina harrapatu oraindik.",
+ "fish_catcher_count": "%1$s arrain · %2$s txanpon"
 }

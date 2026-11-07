@@ -1547,5 +1547,19 @@
  "chb_waiting": "Čekamo takmičare da se uključe uživo…",
  "chb_starred_you": "@{name} te je označio/la zvezdicom — dodirni ★ da uzvratiš",
  "chb_starred_you_tile": "★ te je označio/la",
- "safety_center": "Центар за безбедност"
+ "safety_center": "Центар за безбедност",
+ "fish_banner": "🐟 Ухвати рибу да стримеру даш поклон вредан %1$s новчића. Биће веома цењено!",
+ "fish_confirm_title": "Ухватити рибу? 🐟",
+ "fish_confirm_text": "Пошаљи @%1$s поклон од %2$s новчића.",
+ "fish_send_gift": "ПОШАЉИ ПОКЛОН",
+ "fish_caught_you": "🐟 Ухватио си рибу! Твој поклон од %1$s новчића је послат.",
+ "fish_low_balance": "Хватање рибе шаље поклон од %1$s новчића, а немаш довољно новчића.",
+ "fish_already": "Већ си ухватио ову рибу.",
+ "fish_off": "Риба је искључена у овој соби.",
+ "fish_switch_on": "🐟 Ухвати рибу: УКЉ",
+ "fish_switch_off": "🐟 Ухвати рибу: ИСКЉ",
+ "fish_switch_help": "Риба плива преко твог уживо преноса; гледалац који је ухвати шаље ти поклон.",
+ "fish_catchers_title": "Ко је ухватио рибу 🐟",
+ "fish_catchers_empty": "Још нико није ухватио рибу.",
+ "fish_catcher_count": "%1$s риба · %2$s новчића"
 }

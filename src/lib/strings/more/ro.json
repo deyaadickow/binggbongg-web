@@ -1542,5 +1542,19 @@
  "chb_waiting": "Așteptăm ca participanții să intre live…",
  "chb_starred_you": "@{name} te-a marcat cu stea — atinge ★ ca să răspunzi",
  "chb_starred_you_tile": "★ te-a marcat cu stea",
- "safety_center": "Centrul de siguranță"
+ "safety_center": "Centrul de siguranță",
+ "fish_banner": "🐟 Prinde peștele pentru a-i oferi streamerului un cadou de %1$s monede. Va fi foarte apreciat!",
+ "fish_confirm_title": "Prinzi peștele? 🐟",
+ "fish_confirm_text": "Trimite-i lui @%1$s un cadou de %2$s monede.",
+ "fish_send_gift": "TRIMITE CADOUL",
+ "fish_caught_you": "🐟 Ai prins peștele! Cadoul tău de %1$s monede a fost trimis.",
+ "fish_low_balance": "Prinderea peștelui trimite un cadou de %1$s monede, iar tu nu ai destule monede.",
+ "fish_already": "Ai prins deja acest pește.",
+ "fish_off": "Peștele este dezactivat în această cameră.",
+ "fish_switch_on": "🐟 Prinde peștele: PORNIT",
+ "fish_switch_off": "🐟 Prinde peștele: OPRIT",
+ "fish_switch_help": "Un pește înoată prin live-ul tău; spectatorul care îl prinde îți trimite un cadou.",
+ "fish_catchers_title": "Cine a prins peștele 🐟",
+ "fish_catchers_empty": "Nimeni nu a prins încă peștele.",
+ "fish_catcher_count": "%1$s pești · %2$s monede"
 }

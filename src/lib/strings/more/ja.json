@@ -1546,5 +1546,19 @@
  "chb_waiting": "対戦相手の配信開始を待っています…",
  "chb_starred_you": "@{name}があなたにスターを付けました — ★をタップして話そう",
  "chb_starred_you_tile": "★ あなたにスターしました",
- "safety_center": "安全センター"
+ "safety_center": "安全センター",
+ "fish_banner": "🐟 魚をつかまえて、ライブ配信者に%1$sコインのギフトを贈ろう。とても喜ばれます!",
+ "fish_confirm_title": "魚をつかまえますか? 🐟",
+ "fish_confirm_text": "@%1$s さんに%2$sコインのギフトを送ります。",
+ "fish_send_gift": "ギフトを送る",
+ "fish_caught_you": "🐟 魚をつかまえました!%1$sコインのギフトを送りました。",
+ "fish_low_balance": "魚をつかまえると%1$sコインのギフトが送られますが、コインが足りません。",
+ "fish_already": "この魚はすでにつかまえました。",
+ "fish_off": "このルームでは魚がオフになっています。",
+ "fish_switch_on": "🐟 魚をつかまえよう: オン",
+ "fish_switch_off": "🐟 魚をつかまえよう: オフ",
+ "fish_switch_help": "ライブに魚が泳いできます。つかまえた視聴者からギフトが届きます。",
+ "fish_catchers_title": "魚をつかまえた人 🐟",
+ "fish_catchers_empty": "まだ誰も魚をつかまえていません。",
+ "fish_catcher_count": "%1$s匹 · %2$sコイン"
 }

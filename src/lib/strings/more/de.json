@@ -1547,5 +1547,19 @@
  "chb_waiting": "Warte darauf, dass die Battler live gehen …",
  "chb_starred_you": "@{name} hat dir einen Stern gegeben – tippe auf ★, um zu antworten",
  "chb_starred_you_tile": "★ hat dir einen Stern gegeben",
- "safety_center": "Sicherheitscenter"
+ "safety_center": "Sicherheitscenter",
+ "fish_banner": "🐟 Fang den Fisch, um dem Streamer ein Geschenk im Wert von %1$s Münzen zu machen. Es wird sehr geschätzt!",
+ "fish_confirm_title": "Den Fisch fangen? 🐟",
+ "fish_confirm_text": "Sende @%1$s ein Geschenk für %2$s Münzen.",
+ "fish_send_gift": "GESCHENK SENDEN",
+ "fish_caught_you": "🐟 Du hast den Fisch gefangen! Dein Geschenk für %1$s Münzen wurde gesendet.",
+ "fish_low_balance": "Den Fisch zu fangen sendet ein Geschenk für %1$s Münzen, und du hast nicht genug Münzen.",
+ "fish_already": "Du hast diesen Fisch schon gefangen.",
+ "fish_off": "Der Fisch ist in diesem Raum ausgeschaltet.",
+ "fish_switch_on": "🐟 Fang den Fisch: AN",
+ "fish_switch_off": "🐟 Fang den Fisch: AUS",
+ "fish_switch_help": "Ein Fisch schwimmt durch deinen Livestream; wer ihn fängt, schickt dir ein Geschenk.",
+ "fish_catchers_title": "Wer hat den Fisch gefangen 🐟",
+ "fish_catchers_empty": "Noch hat niemand den Fisch gefangen.",
+ "fish_catcher_count": "%1$s Fische · %2$s Münzen"
 }

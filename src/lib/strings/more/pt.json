@@ -1547,5 +1547,19 @@
  "chb_waiting": "Aguardando os participantes abrirem live…",
  "chb_starred_you": "@{name} favoritou você — toque em ★ para responder",
  "chb_starred_you_tile": "★ favoritou você",
- "safety_center": "Central de segurança"
+ "safety_center": "Central de segurança",
+ "fish_banner": "🐟 Pegue o peixe para dar ao streamer um presente de %1$s moedas. Será muito apreciado!",
+ "fish_confirm_title": "Pegar o peixe? 🐟",
+ "fish_confirm_text": "Envie a @%1$s um presente de %2$s moedas.",
+ "fish_send_gift": "ENVIAR PRESENTE",
+ "fish_caught_you": "🐟 Você pegou o peixe! Seu presente de %1$s moedas foi enviado.",
+ "fish_low_balance": "Pegar o peixe envia um presente de %1$s moedas, e você não tem moedas suficientes.",
+ "fish_already": "Você já pegou este peixe.",
+ "fish_off": "O peixe está desativado nesta sala.",
+ "fish_switch_on": "🐟 Pegue o peixe: LIGADO",
+ "fish_switch_off": "🐟 Pegue o peixe: DESLIGADO",
+ "fish_switch_help": "Um peixe nada pela sua live; o espectador que pegá-lo envia um presente para você.",
+ "fish_catchers_title": "Quem pegou o peixe 🐟",
+ "fish_catchers_empty": "Ninguém pegou o peixe ainda.",
+ "fish_catcher_count": "%1$s peixes · %2$s moedas"
 }

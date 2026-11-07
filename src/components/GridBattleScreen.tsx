@@ -33,6 +33,7 @@ import {
 import { requireVerified } from "../lib/verifyEmail";
 import { makeBinggBonusWatcher } from "../lib/binggBonus";
 import { BinggBonusOverlay } from "./BinggBonusOverlay";
+import { FishHostControls, LiveFishOverlay } from "./LiveFishOverlay";
 
 const HEARTBEAT_MS = 5000;
 export const SPOTLIGHT_MS = 30000;
@@ -675,6 +676,7 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
   const joinLabel = joining ? t("chb_joining") : rejoin ? t("chb_rejoin") : source.joinLabel(st, now);
   const joinNote = !isBattler && !ended && !me.can_join ? source.joinNote?.(st) ?? null : null;
   const giftRoom = st.room_name ?? "";
+  const fishStreamer = homeRow?.chat_room_name ? roomHostId(homeRow.chat_room_name) || homeRow.user_id : 0;
   // Chat Battle round 2: the starter's bonus — "so far" while it runs, the paid figure at the end. Starter only.
   const bonus = me.starter_bonus;
   const bonusLabel = bonus
@@ -691,6 +693,8 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
           {bonusLabel && <span className="chb-bonus" title={cbText(t("chb_starter_bonus_terms"), { percent: bonus?.percent ?? 1, cap: bonusText(bonus?.cap ?? 25) })}>💰 {bonusLabel}</span>}
           {st.phase !== "upcoming" && <button className="btn small ghost" onClick={() => setBoardOpen(true)}>🏆 {t("leaderboard")}</button>}
           {showJoin && <button className="btn small" onClick={join} disabled={joining}>{joinLabel}</button>}
+          {/* Catch the Fish: a battler is a streamer — their switch and who caught it in their own room. */}
+          {isBattler && !demoUserId && myId > 0 && meRow?.chat_room_name && <FishHostControls myId={myId} roomName={meRow.chat_room_name} messages={threadMessages} />}
         </>} />
       {joinNote && <div className="cb-join-note" role="status">{joinNote}</div>}
       {roomHook.error && <Notice error>{roomHook.error}</Notice>}
@@ -714,6 +718,10 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
       <ChatStrip messages={messages} onSend={onSend}
         note={giftShow.note && <GiftNote key={giftShow.note.key} note={giftShow.note} onThank={onThank} onClose={giftShow.closeNote} />} />
       <BinggBonusOverlay />
+      {/* Catch the Fish (Steve, 2026-11-07): a viewer's fish is a gift to the battler whose room
+          they came in through (their home battler's own live room), never a battle gift. */}
+      <LiveFishOverlay streamerId={fishStreamer} roomName={homeRow?.chat_room_name ?? ""}
+        streamerName={homeRow ? handleOf(homeRow) : ""} active={!isBattler && !demoUserId && !ended && fishStreamer > 0} />
       {giftTarget != null && (
         <GiftSheet
           onClose={() => setGiftTarget(null)}

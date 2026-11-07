@@ -1545,5 +1545,19 @@
  "chb_waiting": "Wag vir deelnemers om regstreeks te gaan…",
  "chb_starred_you": "@{name} het jou gester — tik ★ om terug te praat",
  "chb_starred_you_tile": "★ het jou gester",
- "safety_center": "Veiligheidsentrum"
+ "safety_center": "Veiligheidsentrum",
+ "fish_banner": "🐟 Vang die vis om die lewendige stroomer 'n geskenk van %1$s munte te gee. Dit sal baie waardeer word!",
+ "fish_confirm_title": "Vang die vis? 🐟",
+ "fish_confirm_text": "Stuur @%1$s 'n geskenk van %2$s munte.",
+ "fish_send_gift": "STUUR GESKENK",
+ "fish_caught_you": "🐟 Jy het die vis gevang! Jou geskenk van %1$s munte is gestuur.",
+ "fish_low_balance": "Om die vis te vang stuur 'n geskenk van %1$s munte, en jy het nie genoeg munte nie.",
+ "fish_already": "Jy het hierdie vis reeds gevang.",
+ "fish_off": "Die vis is in hierdie kamer afgeskakel.",
+ "fish_switch_on": "🐟 Vang die Vis: AAN",
+ "fish_switch_off": "🐟 Vang die Vis: AF",
+ "fish_switch_help": "'n Vis swem oor jou lewendige uitsending; 'n kyker wat dit vang, stuur vir jou 'n geskenk.",
+ "fish_catchers_title": "Wie het die vis gevang 🐟",
+ "fish_catchers_empty": "Niemand het die vis nog gevang nie.",
+ "fish_catcher_count": "%1$s vis · %2$s munte"
 }

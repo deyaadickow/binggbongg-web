@@ -52,6 +52,7 @@ import { BattleTopStrip, MlMenu, MlSizeSheet, MultiLiveGrid, RoomBattleBoard, Ro
 import { showGoldAlert } from "../components/GoldToast";
 import { BinggBonusOverlay } from "../components/BinggBonusOverlay";
 import { makeBinggBonusWatcher } from "../lib/binggBonus";
+import { FishHostControls, LiveFishOverlay } from "../components/LiveFishOverlay";
 
 interface Member { user_id: number; fullname?: string; username?: string; profile_image?: string; country?: string; local_timezone?: string }
 interface RoomMembers { host_user_id: number; host_fullname?: string; host_username?: string; host_profile_image?: string; host_country?: string; host_local_timezone?: string; live_seconds?: number; guests: Member[]; multi_live?: unknown }
@@ -1776,6 +1777,8 @@ export function LiveViewerPage() {
                   onClick={() => { const next = !voiceThanksGift; setVoiceThanksGift(next); saveVoiceThanksGift(next); }}
                 >{t("voice_thanks")}</button>
               )}
+              {/* Catch the Fish (Steve, 2026-11-07): the streamer's own switch and who caught it. */}
+              {role === "host" && myId !== null && <FishHostControls myId={myId} roomName={roomName} messages={messages} />}
               <span className="spacer" />
               {role === "host"
                 ? <button className="btn small" style={{ borderColor: "var(--red)", color: "var(--red)" }} onClick={endLive}>{t("end_live")}</button>
@@ -1883,6 +1886,10 @@ export function LiveViewerPage() {
       )}
       {mlEnd && <RoomBattleEnd b={mlEnd} onClose={() => setMlEnd(null)} />}
       <BinggBonusOverlay />
+      {/* Catch the Fish (Steve, 2026-11-07): everyone watching but the streamer; the gift goes to the room's host. */}
+      <LiveFishOverlay streamerId={hostUserId} roomName={roomName}
+        streamerName={members?.host_username || (hostCard ? displayName(hostCard) : "")}
+        active={role !== "host" && myId !== hostUserId && !roomClosed && live.status !== "ended"} />
       {whosPlayingOpen && <WhosPlayingOverlay roomName={roomName} onClose={() => setWhosPlayingOpen(false)} />}
       {mtOpen && (
         <PickerSheet

@@ -1547,5 +1547,19 @@
  "chb_waiting": "Wachten tot deelnemers live gaan…",
  "chb_starred_you": "@{name} gaf je een ster — tik op ★ om terug te praten",
  "chb_starred_you_tile": "★ gaf je een ster",
- "safety_center": "Veiligheidscentrum"
+ "safety_center": "Veiligheidscentrum",
+ "fish_banner": "🐟 Vang de vis om de streamer een cadeau van %1$s munten te geven. Dat wordt zeer gewaardeerd!",
+ "fish_confirm_title": "De vis vangen? 🐟",
+ "fish_confirm_text": "Stuur @%1$s een cadeau van %2$s munten.",
+ "fish_send_gift": "CADEAU STUREN",
+ "fish_caught_you": "🐟 Je hebt de vis gevangen! Je cadeau van %1$s munten is verstuurd.",
+ "fish_low_balance": "De vis vangen stuurt een cadeau van %1$s munten, en je hebt niet genoeg munten.",
+ "fish_already": "Je hebt deze vis al gevangen.",
+ "fish_off": "De vis staat uit in deze ruimte.",
+ "fish_switch_on": "🐟 Vang de vis: AAN",
+ "fish_switch_off": "🐟 Vang de vis: UIT",
+ "fish_switch_help": "Er zwemt een vis door je livestream; een kijker die hem vangt stuurt je een cadeau.",
+ "fish_catchers_title": "Wie heeft de vis gevangen 🐟",
+ "fish_catchers_empty": "Nog niemand heeft de vis gevangen.",
+ "fish_catcher_count": "%1$s vissen · %2$s munten"
 }

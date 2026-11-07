@@ -1547,5 +1547,19 @@
  "chb_waiting": "Čaká sa, kým súťažiaci začnú vysielať…",
  "chb_starred_you": "@{name} ti dal(a) hviezdičku — klepni na ★ a ozvi sa",
  "chb_starred_you_tile": "★ ti dal(a) hviezdičku",
- "safety_center": "Centrum bezpečnosti"
+ "safety_center": "Centrum bezpečnosti",
+ "fish_banner": "🐟 Chyť rybu a daj streamerovi darček v hodnote %1$s mincí. Bude to veľmi ocenené!",
+ "fish_confirm_title": "Chytiť rybu? 🐟",
+ "fish_confirm_text": "Pošli @%1$s darček za %2$s mincí.",
+ "fish_send_gift": "POSLAŤ DARČEK",
+ "fish_caught_you": "🐟 Chytil(a) si rybu! Tvoj darček za %1$s mincí bol odoslaný.",
+ "fish_low_balance": "Chytenie ryby pošle darček za %1$s mincí a nemáš dosť mincí.",
+ "fish_already": "Túto rybu si už chytil(a).",
+ "fish_off": "Ryba je v tejto miestnosti vypnutá.",
+ "fish_switch_on": "🐟 Chyť rybu: ZAP",
+ "fish_switch_off": "🐟 Chyť rybu: VYP",
+ "fish_switch_help": "Cez tvoj živý prenos pláva ryba; divák, ktorý ju chytí, ti pošle darček.",
+ "fish_catchers_title": "Kto chytil rybu 🐟",
+ "fish_catchers_empty": "Rybu zatiaľ nikto nechytil.",
+ "fish_catcher_count": "%1$s rýb · %2$s mincí"
 }

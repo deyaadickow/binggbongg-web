@@ -1547,5 +1547,19 @@
  "chb_waiting": "En attente que les participants passent en live…",
  "chb_starred_you": "@{name} vous a mis une étoile — touchez ★ pour répondre",
  "chb_starred_you_tile": "★ vous a mis une étoile",
- "safety_center": "Centre de sécurité"
+ "safety_center": "Centre de sécurité",
+ "fish_banner": "🐟 Attrape le poisson pour offrir au streamer un cadeau de %1$s pièces. Ce sera très apprécié !",
+ "fish_confirm_title": "Attraper le poisson ? 🐟",
+ "fish_confirm_text": "Envoyer à @%1$s un cadeau de %2$s pièces.",
+ "fish_send_gift": "ENVOYER LE CADEAU",
+ "fish_caught_you": "🐟 Tu as attrapé le poisson ! Ton cadeau de %1$s pièces a été envoyé.",
+ "fish_low_balance": "Attraper le poisson envoie un cadeau de %1$s pièces, et tu n'as pas assez de pièces.",
+ "fish_already": "Tu as déjà attrapé ce poisson.",
+ "fish_off": "Le poisson est désactivé dans cette salle.",
+ "fish_switch_on": "🐟 Attrape le poisson : OUI",
+ "fish_switch_off": "🐟 Attrape le poisson : NON",
+ "fish_switch_help": "Un poisson traverse ton live ; le spectateur qui l'attrape t'envoie un cadeau.",
+ "fish_catchers_title": "Qui a attrapé le poisson 🐟",
+ "fish_catchers_empty": "Personne n'a encore attrapé le poisson.",
+ "fish_catcher_count": "%1$s poissons · %2$s pièces"
 }

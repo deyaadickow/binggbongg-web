@@ -1547,5 +1547,19 @@
  "chb_waiting": "Yarışmacıların canlı yayına geçmesi bekleniyor…",
  "chb_starred_you": "@{name} seni yıldızladı — konuşmak için ★ simgesine dokun",
  "chb_starred_you_tile": "★ seni yıldızladı",
- "safety_center": "Güvenlik Merkezi"
+ "safety_center": "Güvenlik Merkezi",
+ "fish_banner": "🐟 Canlı yayıncıya %1$s jeton değerinde bir hediye vermek için balığı yakala. Çok makbule geçecek!",
+ "fish_confirm_title": "Balığı yakala? 🐟",
+ "fish_confirm_text": "@%1$s kullanıcısına %2$s jetonluk bir hediye gönder.",
+ "fish_send_gift": "HEDİYE GÖNDER",
+ "fish_caught_you": "🐟 Balığı yakaladın! %1$s jetonluk hediyen gönderildi.",
+ "fish_low_balance": "Balığı yakalamak %1$s jetonluk bir hediye gönderir ve yeterli jetonun yok.",
+ "fish_already": "Bu balığı zaten yakaladın.",
+ "fish_off": "Bu odada balık kapalı.",
+ "fish_switch_on": "🐟 Balığı Yakala: AÇIK",
+ "fish_switch_off": "🐟 Balığı Yakala: KAPALI",
+ "fish_switch_help": "Canlı yayınından bir balık yüzer; onu yakalayan izleyici sana bir hediye gönderir.",
+ "fish_catchers_title": "Balığı kim yakaladı 🐟",
+ "fish_catchers_empty": "Henüz kimse balığı yakalamadı.",
+ "fish_catcher_count": "%1$s balık · %2$s jeton"
 }

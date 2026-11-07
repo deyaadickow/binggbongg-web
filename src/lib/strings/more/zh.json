@@ -1547,5 +1547,19 @@
  "chb_waiting": "正在等待对战选手开播…",
  "chb_starred_you": "@{name} 为你加星了——点击 ★ 与Ta对话",
  "chb_starred_you_tile": "★ 为你加星",
- "safety_center": "安全中心"
+ "safety_center": "安全中心",
+ "fish_banner": "🐟 抓住小鱼,送给主播价值 %1$s 金币的礼物。对方会非常感激!",
+ "fish_confirm_title": "要抓这条鱼吗? 🐟",
+ "fish_confirm_text": "送给 @%1$s 一份 %2$s 金币的礼物。",
+ "fish_send_gift": "送出礼物",
+ "fish_caught_you": "🐟 你抓到鱼了!你的 %1$s 金币礼物已送出。",
+ "fish_low_balance": "抓鱼会送出 %1$s 金币的礼物,但你的金币不足。",
+ "fish_already": "你已经抓过这条鱼了。",
+ "fish_off": "此直播间已关闭小鱼。",
+ "fish_switch_on": "🐟 抓小鱼:开",
+ "fish_switch_off": "🐟 抓小鱼:关",
+ "fish_switch_help": "会有小鱼游过你的直播;抓到的观众会送你礼物。",
+ "fish_catchers_title": "谁抓到了鱼 🐟",
+ "fish_catchers_empty": "还没有人抓到鱼。",
+ "fish_catcher_count": "%1$s 条鱼 · %2$s 金币"
 }

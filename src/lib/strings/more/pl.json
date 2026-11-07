@@ -1547,5 +1547,19 @@
  "chb_waiting": "Oczekiwanie, aż uczestnicy rozpoczną transmisję…",
  "chb_starred_you": "@{name} oznaczył(a) Cię gwiazdką — dotknij ★, by odpowiedzieć",
  "chb_starred_you_tile": "★ oznaczył(a) Cię gwiazdką",
- "safety_center": "Centrum bezpieczeństwa"
+ "safety_center": "Centrum bezpieczeństwa",
+ "fish_banner": "🐟 Złap rybę, aby dać streamerowi prezent o wartości %1$s monet. Będzie to bardzo docenione!",
+ "fish_confirm_title": "Złapać rybę? 🐟",
+ "fish_confirm_text": "Wyślij @%1$s prezent za %2$s monet.",
+ "fish_send_gift": "WYŚLIJ PREZENT",
+ "fish_caught_you": "🐟 Złapałeś(-aś) rybę! Twój prezent za %1$s monet został wysłany.",
+ "fish_low_balance": "Złapanie ryby wysyła prezent za %1$s monet, a nie masz wystarczająco monet.",
+ "fish_already": "Już złapałeś(-aś) tę rybę.",
+ "fish_off": "Ryba jest wyłączona w tym pokoju.",
+ "fish_switch_on": "🐟 Złap rybę: WŁ.",
+ "fish_switch_off": "🐟 Złap rybę: WYŁ.",
+ "fish_switch_help": "Przez Twoją transmisję przepływa ryba; widz, który ją złapie, wysyła Ci prezent.",
+ "fish_catchers_title": "Kto złapał rybę 🐟",
+ "fish_catchers_empty": "Nikt jeszcze nie złapał ryby.",
+ "fish_catcher_count": "%1$s ryb · %2$s monet"
 }
