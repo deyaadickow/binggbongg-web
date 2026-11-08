@@ -53,6 +53,7 @@ import { showGoldAlert } from "../components/GoldToast";
 import { BinggBonusOverlay } from "../components/BinggBonusOverlay";
 import { makeBinggBonusWatcher } from "../lib/binggBonus";
 import { FishHostControls, LiveFishOverlay } from "../components/LiveFishOverlay";
+import { CountryTranslatePopup } from "../components/CountryTranslatePopup";
 
 interface Member { user_id: number; fullname?: string; username?: string; profile_image?: string; country?: string; local_timezone?: string }
 interface RoomMembers { host_user_id: number; host_fullname?: string; host_username?: string; host_profile_image?: string; host_country?: string; host_local_timezone?: string; live_seconds?: number; guests: Member[]; multi_live?: unknown }
@@ -605,6 +606,37 @@ export function LiveViewerPage() {
     return [{ user_id: members.host_user_id, fullname: members.host_fullname, username: members.host_username, profile_image: members.host_profile_image }, ...members.guests];
   }, [members]);
   const nameOf = useCallback((id: number | null) => broadcasters.find((b) => b.user_id === id), [broadcasters]);
+
+  // ---- Different countries? No problem! (Steve, 2026-11-08) -----------------------------------
+  // "If there are 2 members from different countries, Please send a 10 seconds popup to let them
+  // know that they can turn on the translation to understand each other. in their language."
+  // The roster poll already carries every on-screen member's country (host_country, guests[].country
+  // — tbl_users.country by name), so no extra request. Once per room visit, and again only when a
+  // NEW on-screen member from another country arrives, at most 3 times. Never about yourself, and
+  // skipped when signed out or when either country is blank.
+  const [xcPopup, setXcPopup] = useState<{ name: string; country: string } | null>(null);
+  const xcToldIds = useRef<Set<number>>(new Set());
+  const xcShownCount = useRef(0);
+  useEffect(() => { xcToldIds.current = new Set(); xcShownCount.current = 0; setXcPopup(null); }, [roomName]);
+  const closeXcPopup = useCallback(() => setXcPopup(null), []);
+  useEffect(() => {
+    const norm = (c?: string | null) => (c ?? "").trim().toLowerCase();
+    const mine = norm(user?.country);
+    if (!isLoggedIn || !user || !mine || !members || roomClosed || xcPopup) return;
+    const onScreen: Member[] = [
+      { user_id: members.host_user_id, fullname: members.host_fullname, username: members.host_username, country: members.host_country },
+      ...members.guests,
+    ];
+    const foreign = onScreen.filter((p) => p.user_id !== user.id && norm(p.country) && norm(p.country) !== mine);
+    const fresh = foreign.filter((p) => !xcToldIds.current.has(p.user_id));
+    if (fresh.length === 0) return;
+    // Everyone from another country on screen right now is covered by this one popup.
+    for (const p of foreign) xcToldIds.current.add(p.user_id);
+    if (xcShownCount.current >= 3) return;
+    xcShownCount.current += 1;
+    const who = fresh[0];
+    setXcPopup({ name: displayName(who), country: (who.country ?? "").trim() });
+  }, [members, user, isLoggedIn, roomClosed, xcPopup]);
   const broadcastersRef = useRef<Member[]>([]);
 
   // Bingo's state, from the room's one combined poll (see the RoomGames poll below).
@@ -1890,6 +1922,15 @@ export function LiveViewerPage() {
       <LiveFishOverlay streamerId={hostUserId} roomName={roomName}
         streamerName={members?.host_username || (hostCard ? displayName(hostCard) : "")}
         active={role !== "host" && myId !== hostUserId && !roomClosed && live.status !== "ended"} />
+      {xcPopup && (
+        <CountryTranslatePopup
+          name={xcPopup.name}
+          country={xcPopup.country}
+          translatingInto={mtLang ? languageName(mtLang) : ""}
+          onTurnOn={() => pickMtLang(defaultTargetLanguage() ?? "en")}
+          onClose={closeXcPopup}
+        />
+      )}
       {whosPlayingOpen && <WhosPlayingOverlay roomName={roomName} onClose={() => setWhosPlayingOpen(false)} />}
       {mtOpen && (
         <PickerSheet

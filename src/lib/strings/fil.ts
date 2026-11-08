@@ -2088,4 +2088,8 @@ export const fil = {
   fp_idea_line: "May ideya ka bang gusto mong makita sa Bingg Bongg? Kapag ginawa namin ito, babanggitin namin ang pangalan mo at magdedeposito kami ng $100 sa account mo! 💡",
   fp_try_it: "SUBUKAN",
   fp_share_my_idea: "IBAHAGI ANG IDEYA KO",
+  xc_title: "Magkaibang bansa? Walang problema!",
+  xc_body: "Si %1$s ay mula sa %2$s. I-on ang pagsasalin para makita ang sinasabi niya sa iyong wika.",
+  xc_turn_on: "I-on ang pagsasalin",
+  xc_already_on: "Naka-on ang pagsasalin: ang chat ay ipinapakita sa %1$s.",
 };

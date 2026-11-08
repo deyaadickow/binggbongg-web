@@ -2083,4 +2083,8 @@ export const id = {
   fp_idea_line: "Punya ide yang ingin kamu lihat di Bingg Bongg? Jika kami membuatnya, kami akan menyebut namamu dan menyetor $100 ke akunmu! 💡",
   fp_try_it: "COBA",
   fp_share_my_idea: "BAGIKAN IDE SAYA",
+  xc_title: "Beda negara? Tidak masalah!",
+  xc_body: "%1$s berasal dari %2$s. Aktifkan terjemahan untuk melihat apa yang mereka katakan dalam bahasamu.",
+  xc_turn_on: "Aktifkan terjemahan",
+  xc_already_on: "Terjemahan aktif: obrolan ditampilkan dalam %1$s.",
 };

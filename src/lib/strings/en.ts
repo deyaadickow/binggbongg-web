@@ -2283,4 +2283,9 @@ export const en = {
   fp_idea_line: "Have an idea you'd love to see on Bingg Bongg? If we build it, we'll mention your name and deposit $100 to your account! 💡",
   fp_try_it: "TRY IT",
   fp_share_my_idea: "SHARE MY IDEA",
+  // Different-countries popup in the live room (Steve, 2026-11-08).
+  xc_title: "Different countries? No problem!",
+  xc_body: "%1$s is from %2$s. Turn on translation to see what they say in your language.",
+  xc_turn_on: "Turn on translation",
+  xc_already_on: "Translation is on: chat is shown in %1$s.",
 } as const;
