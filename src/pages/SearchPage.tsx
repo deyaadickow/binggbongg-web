@@ -123,7 +123,7 @@ export function SearchPage() {
                       {t("online_live")}
                     </Link>
                   ) : (
-                    <span className="btn small" style={{ opacity: 0.6, cursor: "default" }}>{t("online_live")}</span>
+                    <span className="btn small" style={{ cursor: "default" }}>{t("online_live")}</span>
                   )}
                 </div>
               </div>
