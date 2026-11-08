@@ -1566,5 +1566,8 @@
  "fp_try_line": "Probiere diese Funktion aus und sag uns, wie sehr du sie liebst! ❤️",
  "fp_idea_line": "Hast du eine Idee, die du gerne auf Bingg Bongg sehen würdest? Wenn wir sie umsetzen, nennen wir deinen Namen und zahlen $100 auf dein Konto ein! 💡",
  "fp_try_it": "AUSPROBIEREN",
- "fp_share_my_idea": "MEINE IDEE TEILEN"
+ "fp_share_my_idea": "MEINE IDEE TEILEN",
+ "online_now": "Jetzt online",
+ "online_now_message": "Nachricht",
+ "online_now_empty": "Gerade ist niemand online"
 }

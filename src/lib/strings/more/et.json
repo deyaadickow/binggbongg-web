@@ -1563,5 +1563,8 @@
  "fp_try_line": "Proovi seda funktsiooni ja ütle meile, kui väga see sulle meeldib! ❤️",
  "fp_idea_line": "Kas sul on idee, mida tahaksid Bingg Bonggis näha? Kui me selle ehitame, mainime sinu nime ja kanname sinu kontole $100! 💡",
  "fp_try_it": "PROOVI",
- "fp_share_my_idea": "JAGA MINU IDEED"
+ "fp_share_my_idea": "JAGA MINU IDEED",
+ "online_now": "Praegu võrgus",
+ "online_now_message": "Sõnum",
+ "online_now_empty": "Praegu pole keegi võrgus"
 }

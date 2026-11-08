@@ -1566,5 +1566,8 @@
  "fp_try_line": "이 기능을 사용해 보고 얼마나 마음에 드는지 알려주세요! ❤️",
  "fp_idea_line": "Bingg Bongg에서 보고 싶은 아이디어가 있나요? 저희가 만들면 회원님의 이름을 소개하고 계정에 $100를 입금해 드립니다! 💡",
  "fp_try_it": "사용해 보기",
- "fp_share_my_idea": "내 아이디어 공유"
+ "fp_share_my_idea": "내 아이디어 공유",
+ "online_now": "지금 접속 중",
+ "online_now_message": "메시지",
+ "online_now_empty": "지금 접속 중인 사람이 없습니다"
 }

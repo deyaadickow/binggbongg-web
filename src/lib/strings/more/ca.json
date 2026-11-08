@@ -1565,5 +1565,8 @@
  "fp_try_line": "Prova aquesta funció i explica'ns quant t'agrada! ❤️",
  "fp_idea_line": "Tens una idea que t'agradaria veure a Bingg Bongg? Si la creem, esmentarem el teu nom i ingressarem $100 al teu compte! 💡",
  "fp_try_it": "PROVA-HO",
- "fp_share_my_idea": "COMPARTEIX LA MEVA IDEA"
+ "fp_share_my_idea": "COMPARTEIX LA MEVA IDEA",
+ "online_now": "En línia ara",
+ "online_now_message": "Missatge",
+ "online_now_empty": "Ara no hi ha ningú en línia"
 }

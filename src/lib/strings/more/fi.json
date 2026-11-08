@@ -1557,5 +1557,8 @@
  "fp_try_line": "Kokeile tätä ominaisuutta ja kerro meille, kuinka paljon pidät siitä! ❤️",
  "fp_idea_line": "Onko sinulla idea, jonka haluaisit nähdä Bingg Bonggissa? Jos toteutamme sen, mainitsemme nimesi ja talletamme tilillesi $100! 💡",
  "fp_try_it": "KOKEILE",
- "fp_share_my_idea": "JAA IDEANI"
+ "fp_share_my_idea": "JAA IDEANI",
+ "online_now": "Paikalla nyt",
+ "online_now_message": "Viesti",
+ "online_now_empty": "Kukaan ei ole nyt paikalla"
 }

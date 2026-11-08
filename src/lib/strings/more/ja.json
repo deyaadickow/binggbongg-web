@@ -1565,5 +1565,8 @@
  "fp_try_line": "この機能を試して、どれだけ気に入ったか教えてください！❤️",
  "fp_idea_line": "Bingg Bonggで実現してほしいアイデアはありますか？採用されたら、お名前を紹介し、あなたのアカウントに$100を入金します！💡",
  "fp_try_it": "試してみる",
- "fp_share_my_idea": "アイデアを送る"
+ "fp_share_my_idea": "アイデアを送る",
+ "online_now": "オンライン中",
+ "online_now_message": "メッセージ",
+ "online_now_empty": "今オンラインの人はいません"
 }

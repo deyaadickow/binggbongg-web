@@ -2051,4 +2051,7 @@ export const es = {
   fp_idea_line: "¿Tienes una idea que te encantaría ver en Bingg Bongg? ¡Si la creamos, mencionaremos tu nombre y depositaremos $100 en tu cuenta! 💡",
   fp_try_it: "PRUÉBALO",
   fp_share_my_idea: "COMPARTIR MI IDEA",
+  online_now: "En línea ahora",
+  online_now_message: "Mensaje",
+  online_now_empty: "No hay nadie en línea ahora",
 };

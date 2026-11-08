@@ -1563,5 +1563,8 @@
  "fp_try_line": "Išbandykite šią funkciją ir pasakykite, kaip labai ji jums patinka! ❤️",
  "fp_idea_line": "Turite idėją, kurią norėtumėte pamatyti Bingg Bongg? Jei ją sukursime, paminėsime jūsų vardą ir įnešime $100 į jūsų paskyrą! 💡",
  "fp_try_it": "IŠBANDYKITE",
- "fp_share_my_idea": "PASIDALINTI IDĖJA"
+ "fp_share_my_idea": "PASIDALINTI IDĖJA",
+ "online_now": "Dabar prisijungę",
+ "online_now_message": "Žinutė",
+ "online_now_empty": "Šiuo metu niekas neprisijungęs"
 }

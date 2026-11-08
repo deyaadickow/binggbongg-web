@@ -1566,5 +1566,8 @@
  "fp_try_line": "試試這個功能，告訴我們你有多喜歡它！❤️",
  "fp_idea_line": "你有想在 Bingg Bongg 上看到的點子嗎？如果我們採用並實現它，我們會提到你的名字，並在你的帳戶存入 $100！💡",
  "fp_try_it": "試一試",
- "fp_share_my_idea": "分享我的點子"
+ "fp_share_my_idea": "分享我的點子",
+ "online_now": "在線",
+ "online_now_message": "私訊",
+ "online_now_empty": "現在沒有人在線"
 }

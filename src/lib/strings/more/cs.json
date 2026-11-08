@@ -1565,5 +1565,8 @@
  "fp_try_line": "Vyzkoušejte tuto funkci a řekněte nám, jak moc se vám líbí! ❤️",
  "fp_idea_line": "Máte nápad, který byste rádi viděli v Bingg Bongg? Pokud ho vytvoříme, zmíníme vaše jméno a vložíme $100 na váš účet! 💡",
  "fp_try_it": "VYZKOUŠET",
- "fp_share_my_idea": "SDÍLET MŮJ NÁPAD"
+ "fp_share_my_idea": "SDÍLET MŮJ NÁPAD",
+ "online_now": "Právě online",
+ "online_now_message": "Zpráva",
+ "online_now_empty": "Právě teď nikdo není online"
 }

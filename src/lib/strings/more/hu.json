@@ -1559,5 +1559,8 @@
  "fp_try_line": "Próbáld ki ezt a funkciót, és mondd el, mennyire szereted! ❤️",
  "fp_idea_line": "Van egy ötleted, amit szívesen látnál a Bingg Bonggon? Ha megépítjük, megemlítjük a neved, és $100-t utalunk a fiókodba! 💡",
  "fp_try_it": "PRÓBÁLD KI",
- "fp_share_my_idea": "ÖTLETEM MEGOSZTÁSA"
+ "fp_share_my_idea": "ÖTLETEM MEGOSZTÁSA",
+ "online_now": "Most online",
+ "online_now_message": "Üzenet",
+ "online_now_empty": "Most senki sincs online"
 }

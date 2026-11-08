@@ -1566,5 +1566,8 @@
  "fp_try_line": "Probatu funtzio hau eta esan iezaguzu zenbat gustatzen zaizun! ❤️",
  "fp_idea_line": "Bingg Bongg-en ikusi nahiko zenukeen ideiarik baduzu? Eraikitzen badugu, zure izena aipatuko dugu eta $100 sartuko ditugu zure kontuan! 💡",
  "fp_try_it": "PROBATU",
- "fp_share_my_idea": "PARTEKATU NIRE IDEIA"
+ "fp_share_my_idea": "PARTEKATU NIRE IDEIA",
+ "online_now": "Konektatuta orain",
+ "online_now_message": "Mezua",
+ "online_now_empty": "Orain ez dago inor konektatuta"
 }

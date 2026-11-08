@@ -1564,5 +1564,8 @@
  "fp_try_line": "Testa den här funktionen och berätta hur mycket du älskar den! ❤️",
  "fp_idea_line": "Har du en idé du skulle vilja se på Bingg Bongg? Om vi bygger den nämner vi ditt namn och sätter in $100 på ditt konto! 💡",
  "fp_try_it": "TESTA",
- "fp_share_my_idea": "DELA MIN IDÉ"
+ "fp_share_my_idea": "DELA MIN IDÉ",
+ "online_now": "Online nu",
+ "online_now_message": "Meddelande",
+ "online_now_empty": "Ingen är online just nu"
 }
