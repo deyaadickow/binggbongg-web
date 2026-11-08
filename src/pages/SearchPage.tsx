@@ -81,7 +81,10 @@ export function SearchPage() {
         <input className="input" placeholder={t("members_videos_hashtags")} value={keyword} onChange={(e) => setKeyword(e.target.value)} />
         <button className="btn" type="submit">{t("search")}</button>
       </form>
-      <div className="tabs">
+      {/* Steve, 2026-11-08: "make the Live, Video, Users and # the same size boxes as All Members,
+          Friends, Following, Followers boxes. so all boxes will look uniform." Both rows are the
+          same 4-column grid; the web has two tabs up here, so they sit in the middle two. */}
+      <div className="tabs search-uniform search-uniform-top">
         <button className={tab === "members" ? "active" : ""} onClick={() => setTab("members")}>{t("members_count", users.length)}</button>
         <button className={tab === "videos" ? "active" : ""} onClick={() => setTab("videos")}>{t("videos_count", posts.length)}</button>
       </div>
@@ -89,7 +92,7 @@ export function SearchPage() {
         <span style={{ display: "inline-block", width: 10, height: 10, borderRadius: "50%", background: "#2ECC40", border: "1.5px solid #000", marginRight: 6, verticalAlign: "middle" }} />
         {t("online_now")}:
       </div>
-      <div className="tabs" style={{ marginBottom: 14 }}>
+      <div className="tabs search-uniform" style={{ marginBottom: 14 }}>
         {(["all", "friends", "following", "followers"] as const).map((s) => (
           <button key={s} className={tab === "online" && scope === s ? "active" : ""}
             onClick={() => { setScope(s); setOnline(null); setTab("online"); }}>

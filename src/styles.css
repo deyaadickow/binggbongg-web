@@ -1221,3 +1221,11 @@ body.signup-black { background: radial-gradient(120% 55% at 50% 0%, #2a2108 0%, 
 .signup-title { font-size: 24px; }
 .signup-label { margin-top: 8px; }
 .signup-cta { margin-top: 18px; }
+
+/* Search: every chip the same size (Steve, 2026-11-08). */
+.tabs.search-uniform { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.tabs.search-uniform > button { min-width: 0; width: 100%; min-height: 36px; padding: 6px 4px; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tabs.search-uniform-top > button:first-child { grid-column: 2; }
+.tabs.search-uniform > button { font-size: clamp(11px, 3.3vw, 14px); padding: 6px 2px; text-overflow: clip; letter-spacing: -.01em; }
+.tabs.search-uniform > button { font-size: clamp(10px, 3vw, 14px); }
+.tabs.search-uniform > button > span { margin-right: 3px !important; width: 7px !important; height: 7px !important; }
