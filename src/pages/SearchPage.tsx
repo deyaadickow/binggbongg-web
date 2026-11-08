@@ -119,7 +119,7 @@ export function SearchPage() {
                       opens their live when they are live now. */}
                   {u.is_live == 1 && u.live_room_name ? (
                     <Link to={`/live/${encodeURIComponent(u.live_room_name)}`} className="btn small">
-                      <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: "#2ECC40", border: "1.5px solid #000" }} />
+                      <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: "#FF2D2D", border: "1.5px solid #000" }} />
                       {t("online_live")}
                     </Link>
                   ) : (

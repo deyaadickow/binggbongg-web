@@ -21,7 +21,8 @@ export function Avatar({ user, size }: { user?: Partial<UserSummary> | null; siz
       {circle}
       <span className="online-dot" aria-label="Online now" title="Online now"
         style={{ position: "absolute", right: 0, bottom: 0, width: "26%", height: "26%", minWidth: 10, minHeight: 10,
-          boxSizing: "border-box", borderRadius: "50%", background: "#2ECC40", border: "2px solid #000" }} />
+          // Steve, 2026-11-08: green = online, red = live (is_live is sent on Online Now rows).
+          boxSizing: "border-box", borderRadius: "50%", background: Number((user as { is_live?: number })?.is_live) === 1 ? "#FF2D2D" : "#2ECC40", border: "2px solid #000" }} />
     </span>
   );
 }
