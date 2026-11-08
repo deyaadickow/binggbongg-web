@@ -1560,5 +1560,9 @@
  "fp_share_my_idea": "JAA IDEANI",
  "online_now": "Paikalla nyt",
  "online_now_message": "Viesti",
- "online_now_empty": "Kukaan ei ole nyt paikalla"
+ "online_now_empty": "Kukaan ei ole nyt paikalla",
+ "online_all_members": "Kaikki jäsenet",
+ "online_friends": "Ystävät",
+ "online_following": "Seuratut",
+ "online_followers": "Seuraajat"
 }

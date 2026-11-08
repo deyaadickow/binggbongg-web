@@ -1569,5 +1569,9 @@
  "fp_share_my_idea": "என் யோசனையைப் பகிர்",
  "online_now": "இப்போது ஆன்லைனில்",
  "online_now_message": "செய்தி",
- "online_now_empty": "இப்போது யாரும் ஆன்லைனில் இல்லை"
+ "online_now_empty": "இப்போது யாரும் ஆன்லைனில் இல்லை",
+ "online_all_members": "அனைத்து உறுப்பினர்கள்",
+ "online_friends": "நண்பர்கள்",
+ "online_following": "பின்தொடர்பவை",
+ "online_followers": "பின்தொடர்பவர்கள்"
 }

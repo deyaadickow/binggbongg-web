@@ -1565,5 +1565,9 @@
  "fp_share_my_idea": "DALĪTIES AR IDEJU",
  "online_now": "Tiešsaistē tagad",
  "online_now_message": "Ziņa",
- "online_now_empty": "Pašlaik neviens nav tiešsaistē"
+ "online_now_empty": "Pašlaik neviens nav tiešsaistē",
+ "online_all_members": "Visi dalībnieki",
+ "online_friends": "Draugi",
+ "online_following": "Seko",
+ "online_followers": "Sekotāji"
 }

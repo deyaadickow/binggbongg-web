@@ -1569,5 +1569,9 @@
  "fp_share_my_idea": "ПОДЕЛИ МОЈУ ИДЕЈУ",
  "online_now": "Сада на мрежи",
  "online_now_message": "Порука",
- "online_now_empty": "Тренутно нико није на мрежи"
+ "online_now_empty": "Тренутно нико није на мрежи",
+ "online_all_members": "Сви чланови",
+ "online_friends": "Пријатељи",
+ "online_following": "Праћени",
+ "online_followers": "Пратиоци"
 }

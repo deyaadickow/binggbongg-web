@@ -1567,5 +1567,9 @@
  "fp_share_my_idea": "แชร์ไอเดียของฉัน",
  "online_now": "ออนไลน์ตอนนี้",
  "online_now_message": "ข้อความ",
- "online_now_empty": "ตอนนี้ไม่มีใครออนไลน์"
+ "online_now_empty": "ตอนนี้ไม่มีใครออนไลน์",
+ "online_all_members": "สมาชิกทั้งหมด",
+ "online_friends": "เพื่อน",
+ "online_following": "กำลังติดตาม",
+ "online_followers": "ผู้ติดตาม"
 }

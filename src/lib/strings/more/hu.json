@@ -1562,5 +1562,9 @@
  "fp_share_my_idea": "ÖTLETEM MEGOSZTÁSA",
  "online_now": "Most online",
  "online_now_message": "Üzenet",
- "online_now_empty": "Most senki sincs online"
+ "online_now_empty": "Most senki sincs online",
+ "online_all_members": "Minden tag",
+ "online_friends": "Barátok",
+ "online_following": "Követés",
+ "online_followers": "Követők"
 }

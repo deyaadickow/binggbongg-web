@@ -1569,5 +1569,9 @@
  "fp_share_my_idea": "KONGSI IDEA SAYA",
  "online_now": "Dalam Talian",
  "online_now_message": "Mesej",
- "online_now_empty": "Tiada sesiapa dalam talian sekarang"
+ "online_now_empty": "Tiada sesiapa dalam talian sekarang",
+ "online_all_members": "Semua Ahli",
+ "online_friends": "Rakan",
+ "online_following": "Mengikuti",
+ "online_followers": "Pengikut"
 }

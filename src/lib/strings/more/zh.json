@@ -1569,5 +1569,9 @@
  "fp_share_my_idea": "分享我的创意",
  "online_now": "在线",
  "online_now_message": "私信",
- "online_now_empty": "现在没有人在线"
+ "online_now_empty": "现在没有人在线",
+ "online_all_members": "全部成员",
+ "online_friends": "朋友",
+ "online_following": "关注",
+ "online_followers": "粉丝"
 }

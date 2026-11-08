@@ -1569,5 +1569,9 @@
  "fp_share_my_idea": "PODZIEL SIĘ POMYSŁEM",
  "online_now": "Teraz online",
  "online_now_message": "Wiadomość",
- "online_now_empty": "Nikt nie jest teraz online"
+ "online_now_empty": "Nikt nie jest teraz online",
+ "online_all_members": "Wszyscy członkowie",
+ "online_friends": "Znajomi",
+ "online_following": "Obserwowani",
+ "online_followers": "Obserwujący"
 }

@@ -1569,5 +1569,9 @@
  "fp_share_my_idea": "CHIA SẺ Ý TƯỞNG",
  "online_now": "Đang trực tuyến",
  "online_now_message": "Nhắn tin",
- "online_now_empty": "Hiện không có ai trực tuyến"
+ "online_now_empty": "Hiện không có ai trực tuyến",
+ "online_all_members": "Tất cả thành viên",
+ "online_friends": "Bạn bè",
+ "online_following": "Đang theo dõi",
+ "online_followers": "Người theo dõi"
 }

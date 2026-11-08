@@ -1566,5 +1566,9 @@
  "fp_share_my_idea": "DEL MIN IDÉ",
  "online_now": "Online nu",
  "online_now_message": "Besked",
- "online_now_empty": "Ingen er online lige nu"
+ "online_now_empty": "Ingen er online lige nu",
+ "online_all_members": "Alle medlemmer",
+ "online_friends": "Venner",
+ "online_following": "Følger",
+ "online_followers": "Følgere"
 }

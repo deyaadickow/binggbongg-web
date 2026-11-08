@@ -1568,5 +1568,9 @@
  "fp_share_my_idea": "ΜΟΙΡΑΣΤΕΙΤΕ ΤΗΝ ΙΔΕΑ ΜΟΥ",
  "online_now": "Συνδεδεμένοι τώρα",
  "online_now_message": "Μήνυμα",
- "online_now_empty": "Κανείς δεν είναι συνδεδεμένος τώρα"
+ "online_now_empty": "Κανείς δεν είναι συνδεδεμένος τώρα",
+ "online_all_members": "Όλα τα μέλη",
+ "online_friends": "Φίλοι",
+ "online_following": "Ακολουθείτε",
+ "online_followers": "Ακόλουθοι"
 }

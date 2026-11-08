@@ -1566,5 +1566,9 @@
  "fp_share_my_idea": "PASIDALINTI IDĖJA",
  "online_now": "Dabar prisijungę",
  "online_now_message": "Žinutė",
- "online_now_empty": "Šiuo metu niekas neprisijungęs"
+ "online_now_empty": "Šiuo metu niekas neprisijungęs",
+ "online_all_members": "Visi nariai",
+ "online_friends": "Draugai",
+ "online_following": "Sekami",
+ "online_followers": "Sekėjai"
 }

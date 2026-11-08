@@ -1564,5 +1564,9 @@
  "fp_share_my_idea": "TRIMITE IDEEA MEA",
  "online_now": "Online acum",
  "online_now_message": "Mesaj",
- "online_now_empty": "Nimeni nu este online acum"
+ "online_now_empty": "Nimeni nu este online acum",
+ "online_all_members": "Toți membrii",
+ "online_friends": "Prieteni",
+ "online_following": "Urmăriți",
+ "online_followers": "Urmăritori"
 }

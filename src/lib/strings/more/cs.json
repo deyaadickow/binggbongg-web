@@ -1568,5 +1568,9 @@
  "fp_share_my_idea": "SDÍLET MŮJ NÁPAD",
  "online_now": "Právě online",
  "online_now_message": "Zpráva",
- "online_now_empty": "Právě teď nikdo není online"
+ "online_now_empty": "Právě teď nikdo není online",
+ "online_all_members": "Všichni členové",
+ "online_friends": "Přátelé",
+ "online_following": "Sledovaní",
+ "online_followers": "Sledující"
 }

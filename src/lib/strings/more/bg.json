@@ -1569,5 +1569,9 @@
  "fp_share_my_idea": "СПОДЕЛИ ИДЕЯТА СИ",
  "online_now": "На линия сега",
  "online_now_message": "Съобщение",
- "online_now_empty": "В момента никой не е на линия"
+ "online_now_empty": "В момента никой не е на линия",
+ "online_all_members": "Всички членове",
+ "online_friends": "Приятели",
+ "online_following": "Следвани",
+ "online_followers": "Последователи"
 }

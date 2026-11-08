@@ -1568,5 +1568,9 @@
  "fp_share_my_idea": "ПОДІЛИТИСЯ ІДЕЄЮ",
  "online_now": "Зараз онлайн",
  "online_now_message": "Повідомлення",
- "online_now_empty": "Зараз нікого немає онлайн"
+ "online_now_empty": "Зараз нікого немає онлайн",
+ "online_all_members": "Усі учасники",
+ "online_friends": "Друзі",
+ "online_following": "Підписки",
+ "online_followers": "Підписники"
 }

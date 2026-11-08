@@ -1569,5 +1569,9 @@
  "fp_share_my_idea": "내 아이디어 공유",
  "online_now": "지금 접속 중",
  "online_now_message": "메시지",
- "online_now_empty": "지금 접속 중인 사람이 없습니다"
+ "online_now_empty": "지금 접속 중인 사람이 없습니다",
+ "online_all_members": "전체 회원",
+ "online_friends": "친구",
+ "online_following": "팔로잉",
+ "online_followers": "팔로워"
 }

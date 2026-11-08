@@ -1567,5 +1567,9 @@
  "fp_share_my_idea": "DEEL MY IDEE",
  "online_now": "Nou aanlyn",
  "online_now_message": "Boodskap",
- "online_now_empty": "Niemand is nou aanlyn nie"
+ "online_now_empty": "Niemand is nou aanlyn nie",
+ "online_all_members": "Alle lede",
+ "online_friends": "Vriende",
+ "online_following": "Volgend",
+ "online_followers": "Volgelinge"
 }

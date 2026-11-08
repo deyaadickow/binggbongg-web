@@ -1567,5 +1567,9 @@
  "fp_share_my_idea": "DELA MIN IDÉ",
  "online_now": "Online nu",
  "online_now_message": "Meddelande",
- "online_now_empty": "Ingen är online just nu"
+ "online_now_empty": "Ingen är online just nu",
+ "online_all_members": "Alla medlemmar",
+ "online_friends": "Vänner",
+ "online_following": "Följer",
+ "online_followers": "Följare"
 }

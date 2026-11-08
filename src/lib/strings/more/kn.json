@@ -1567,5 +1567,9 @@
  "fp_share_my_idea": "ನನ್ನ ಆಲೋಚನೆ ಹಂಚಿಕೊಳ್ಳಿ",
  "online_now": "ಈಗ ಆನ್‌ಲೈನ್",
  "online_now_message": "ಸಂದೇಶ",
- "online_now_empty": "ಈಗ ಯಾರೂ ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ಇಲ್ಲ"
+ "online_now_empty": "ಈಗ ಯಾರೂ ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ಇಲ್ಲ",
+ "online_all_members": "ಎಲ್ಲಾ ಸದಸ್ಯರು",
+ "online_friends": "ಸ್ನೇಹಿತರು",
+ "online_following": "ಅನುಸರಿಸಲಾಗುತ್ತಿದೆ",
+ "online_followers": "ಅನುಯಾಯಿಗಳು"
 }

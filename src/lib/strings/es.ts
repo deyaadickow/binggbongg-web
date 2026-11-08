@@ -2054,4 +2054,8 @@ export const es = {
   online_now: "En línea ahora",
   online_now_message: "Mensaje",
   online_now_empty: "No hay nadie en línea ahora",
+  online_all_members: "Todos los miembros",
+  online_friends: "Amigos",
+  online_following: "Siguiendo",
+  online_followers: "Seguidores",
 };

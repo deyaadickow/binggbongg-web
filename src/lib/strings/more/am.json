@@ -1569,5 +1569,9 @@
  "fp_share_my_idea": "ሀሳቤን አጋራ",
  "online_now": "አሁን መስመር ላይ",
  "online_now_message": "መልእክት",
- "online_now_empty": "አሁን ማንም መስመር ላይ የለም"
+ "online_now_empty": "አሁን ማንም መስመር ላይ የለም",
+ "online_all_members": "ሁሉም አባላት",
+ "online_friends": "ጓደኞች",
+ "online_following": "በመከተል ላይ",
+ "online_followers": "ተከታዮች"
 }

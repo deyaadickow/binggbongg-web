@@ -1564,5 +1564,9 @@
  "fp_share_my_idea": "എന്റെ ആശയം പങ്കിടുക",
  "online_now": "ഇപ്പോൾ ഓൺലൈനിൽ",
  "online_now_message": "സന്ദേശം",
- "online_now_empty": "ഇപ്പോൾ ആരും ഓൺലൈനിൽ ഇല്ല"
+ "online_now_empty": "ഇപ്പോൾ ആരും ഓൺലൈനിൽ ഇല്ല",
+ "online_all_members": "എല്ലാ അംഗങ്ങളും",
+ "online_friends": "സുഹൃത്തുക്കൾ",
+ "online_following": "ഫോളോയിംഗ്",
+ "online_followers": "ഫോളോവേഴ്സ്"
 }

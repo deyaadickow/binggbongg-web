@@ -1867,5 +1867,9 @@
  "fp_share_my_idea": "شارك فكرتي",
  "online_now": "متصل الآن",
  "online_now_message": "رسالة",
- "online_now_empty": "لا أحد متصل الآن"
+ "online_now_empty": "لا أحد متصل الآن",
+ "online_all_members": "كل الأعضاء",
+ "online_friends": "الأصدقاء",
+ "online_following": "المتابَعون",
+ "online_followers": "المتابعون"
 }

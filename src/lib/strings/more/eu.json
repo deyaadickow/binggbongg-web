@@ -1569,5 +1569,9 @@
  "fp_share_my_idea": "PARTEKATU NIRE IDEIA",
  "online_now": "Konektatuta orain",
  "online_now_message": "Mezua",
- "online_now_empty": "Orain ez dago inor konektatuta"
+ "online_now_empty": "Orain ez dago inor konektatuta",
+ "online_all_members": "Kide guztiak",
+ "online_friends": "Lagunak",
+ "online_following": "Jarraitzen",
+ "online_followers": "Jarraitzaileak"
 }

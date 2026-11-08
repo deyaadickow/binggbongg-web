@@ -1568,5 +1568,9 @@
  "fp_share_my_idea": "COMPARTEIX LA MEVA IDEA",
  "online_now": "En línia ara",
  "online_now_message": "Missatge",
- "online_now_empty": "Ara no hi ha ningú en línia"
+ "online_now_empty": "Ara no hi ha ningú en línia",
+ "online_all_members": "Tots els membres",
+ "online_friends": "Amics",
+ "online_following": "Seguint",
+ "online_followers": "Seguidors"
 }

@@ -15,6 +15,8 @@ export function SearchPage() {
   // online in a row, Avatar, Name and Message." The web has no Live chip here, so it comes first.
   const [tab, setTab] = useState<"online" | "members" | "videos">("online");
   const [online, setOnline] = useState<UserSummary[] | null>(null);
+  // Steve, 2026-11-08 redesign: "Online Now" + All Members / Friends / Following / Followers.
+  const [scope, setScope] = useState<"all" | "friends" | "following" | "followers">("all");
   const [users, setUsers] = useState<UserSummary[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
@@ -27,14 +29,14 @@ export function SearchPage() {
     if (tab !== "online") return;
     let alive = true;
     const load = () => {
-      post<UserSummary[]>("fetchOnlineNowMembers", { search: keyword.trim(), ...(user ? { user_id: user.id } : {}) })
+      post<UserSummary[]>("fetchOnlineNowMembers", { search: keyword.trim(), scope, ...(user ? { user_id: user.id } : {}) })
         .then((r) => { if (alive) setOnline(r.data ?? []); })
         .catch(() => { if (alive) setOnline((o) => o ?? []); });
     };
     const first = setTimeout(load, 350);
     const every = setInterval(load, 30000);
     return () => { alive = false; clearTimeout(first); clearInterval(every); };
-  }, [tab, keyword, user?.id]);
+  }, [tab, keyword, scope, user?.id]);
 
   async function run(e?: React.FormEvent) {
     e?.preventDefault();
@@ -67,9 +69,20 @@ export function SearchPage() {
         <button className="btn" type="submit">{t("search")}</button>
       </form>
       <div className="tabs">
-        <button className={tab === "online" ? "active" : ""} onClick={() => setTab("online")}>{t("online_now")}</button>
         <button className={tab === "members" ? "active" : ""} onClick={() => setTab("members")}>{t("members_count", users.length)}</button>
         <button className={tab === "videos" ? "active" : ""} onClick={() => setTab("videos")}>{t("videos_count", posts.length)}</button>
+      </div>
+      <div style={{ textAlign: "center", margin: "12px 0 6px", color: "var(--gold)", fontWeight: 700 }}>
+        <span style={{ display: "inline-block", width: 10, height: 10, borderRadius: "50%", background: "#2ECC40", border: "1.5px solid #000", marginRight: 6, verticalAlign: "middle" }} />
+        {t("online_now")}:
+      </div>
+      <div className="tabs" style={{ marginBottom: 14 }}>
+        {(["all", "friends", "following", "followers"] as const).map((s) => (
+          <button key={s} className={tab === "online" && scope === s ? "active" : ""}
+            onClick={() => { setScope(s); setOnline(null); setTab("online"); }}>
+            {t(s === "all" ? "online_all_members" : s === "friends" ? "online_friends" : s === "following" ? "online_following" : "online_followers")}
+          </button>
+        ))}
       </div>
       {error && <Notice error>{error}</Notice>}
       {tab === "online" ? (

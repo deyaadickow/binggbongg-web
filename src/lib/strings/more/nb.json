@@ -1566,5 +1566,9 @@
  "fp_share_my_idea": "DEL IDEEN MIN",
  "online_now": "Pålogget nå",
  "online_now_message": "Melding",
- "online_now_empty": "Ingen er pålogget akkurat nå"
+ "online_now_empty": "Ingen er pålogget akkurat nå",
+ "online_all_members": "Alle medlemmer",
+ "online_friends": "Venner",
+ "online_following": "Følger",
+ "online_followers": "Følgere"
 }

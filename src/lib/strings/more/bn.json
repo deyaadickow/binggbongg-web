@@ -1568,5 +1568,9 @@
  "fp_share_my_idea": "আমার আইডিয়া শেয়ার করুন",
  "online_now": "এখন অনলাইনে",
  "online_now_message": "মেসেজ",
- "online_now_empty": "এখন কেউ অনলাইনে নেই"
+ "online_now_empty": "এখন কেউ অনলাইনে নেই",
+ "online_all_members": "সব সদস্য",
+ "online_friends": "বন্ধু",
+ "online_following": "ফলোয়িং",
+ "online_followers": "ফলোয়ার"
 }

@@ -1566,5 +1566,9 @@
  "fp_share_my_idea": "JAGA MINU IDEED",
  "online_now": "Praegu võrgus",
  "online_now_message": "Sõnum",
- "online_now_empty": "Praegu pole keegi võrgus"
+ "online_now_empty": "Praegu pole keegi võrgus",
+ "online_all_members": "Kõik liikmed",
+ "online_friends": "Sõbrad",
+ "online_following": "Jälgimine",
+ "online_followers": "Jälgijad"
 }

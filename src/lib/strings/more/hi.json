@@ -1569,5 +1569,9 @@
  "fp_share_my_idea": "मेरा आइडिया साझा करें",
  "online_now": "अभी ऑनलाइन",
  "online_now_message": "मैसेज",
- "online_now_empty": "अभी कोई ऑनलाइन नहीं है"
+ "online_now_empty": "अभी कोई ऑनलाइन नहीं है",
+ "online_all_members": "सभी सदस्य",
+ "online_friends": "मित्र",
+ "online_following": "फ़ॉलो कर रहे हैं",
+ "online_followers": "फ़ॉलोअर्स"
 }

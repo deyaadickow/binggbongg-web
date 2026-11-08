@@ -1566,5 +1566,9 @@
  "fp_share_my_idea": "DEILA HUGMYNDINNI MINNI",
  "online_now": "Á netinu núna",
  "online_now_message": "Skilaboð",
- "online_now_empty": "Enginn er á netinu núna"
+ "online_now_empty": "Enginn er á netinu núna",
+ "online_all_members": "Allir meðlimir",
+ "online_friends": "Vinir",
+ "online_following": "Fylgist með",
+ "online_followers": "Fylgjendur"
 }

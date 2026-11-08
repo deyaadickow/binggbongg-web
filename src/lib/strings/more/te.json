@@ -1569,5 +1569,9 @@
  "fp_share_my_idea": "నా ఆలోచనను పంచుకోండి",
  "online_now": "ఇప్పుడు ఆన్‌లైన్‌లో",
  "online_now_message": "సందేశం",
- "online_now_empty": "ఇప్పుడు ఎవరూ ఆన్‌లైన్‌లో లేరు"
+ "online_now_empty": "ఇప్పుడు ఎవరూ ఆన్‌లైన్‌లో లేరు",
+ "online_all_members": "అందరు సభ్యులు",
+ "online_friends": "స్నేహితులు",
+ "online_following": "ఫాలోయింగ్",
+ "online_followers": "ఫాలోవర్లు"
 }

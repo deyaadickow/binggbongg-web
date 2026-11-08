@@ -1569,5 +1569,9 @@
  "fp_share_my_idea": "DEEL MIJN IDEE",
  "online_now": "Nu online",
  "online_now_message": "Bericht",
- "online_now_empty": "Er is nu niemand online"
+ "online_now_empty": "Er is nu niemand online",
+ "online_all_members": "Alle leden",
+ "online_friends": "Vrienden",
+ "online_following": "Volgend",
+ "online_followers": "Volgers"
 }
