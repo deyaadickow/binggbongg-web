@@ -503,7 +503,7 @@ export function ProfilePage() {
           setTabUsers(items.map((row): UserSummary | null => {
             const u = pick(row);
             // Friends: the server's friends_since — when the follow became mutual.
-            return u ? { ...u, follow_since: String((tab === "friends" ? row.friends_since : row.created_at) ?? "") } : u;
+            return u ? ({ ...u, follow_since: String((tab === "friends" ? row.friends_since : row.created_at) ?? "") } as UserSummary) : u;
           }).filter((u): u is UserSummary => !!u));
         } else {
           // Reposted and Likes are join rows carrying the post under `post`; Videos/Saved/History
