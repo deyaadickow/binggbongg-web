@@ -174,6 +174,7 @@ export interface UserSummary {
   /** fetchOnlineNowMembers: live right now, and the room (Steve, 2026-11-08 Live box). */
   is_live?: number;
   live_room_name?: string | null;
+  country_flag?: string;
   /** IANA zone for this member's local time on the feed's hold menu (Steve, 2026-10-25): the
    *  zone their device reported, else their profile country's. */
   local_timezone?: string;

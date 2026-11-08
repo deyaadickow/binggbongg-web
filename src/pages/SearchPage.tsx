@@ -111,6 +111,7 @@ export function SearchPage() {
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontWeight: 800, color: "var(--gold)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayName(u)}</div>
                     <div style={{ fontSize: 13, color: "var(--gold)", opacity: 0.75 }}>@{u.username ?? ""}</div>
+                    {u.country && <div style={{ fontSize: 13, color: "var(--gold)" }}>{u.country}{u.country_flag ? ` ${u.country_flag}` : ""}</div>}
                   </div>
                 </Link>
                 <div style={{ display: "grid", gap: 6, flex: "none" }}>
