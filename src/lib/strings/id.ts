@@ -1406,6 +1406,8 @@ export const id = {
   idea_rules: "Kalau idemu kami buat, kami umumkan bahwa ide itu darimu dan menambahkan bonus $100 ke dompet Bingg Bongg kamu.\n\n• Satu bonus untuk setiap ide yang kami buat.\n• Ide yang sama dari lebih dari satu anggota: pengirim pertama yang menang.\n• Bingg Bongg yang memutuskan ide mana yang dibuat.\n• Dengan mengirim ide, kamu mengizinkan Bingg Bongg memakainya.\n• Untuk anggota berusia 18 tahun ke atas. Staf tidak bisa ikut.",
   live_badge: "LIVE",
   video_uploaded_from: "Diunggah dari %1$s",
+  video_uploaded_from_on: "Diunggah dari %1$s pada %2$s",
+  video_uploaded_on: "Diunggah pada %1$s",
   member_local_time: "Waktu setempat %1$s: %2$s",
   copy_this_video: "Salin video ini",
   clear_the_screen: "Bersihkan layar",

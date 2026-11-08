@@ -1406,6 +1406,8 @@ export const fil = {
   idea_rules: "Kapag ginawa namin ang ideya mo, iaanunsyo naming galing ito sa iyo at magdadagdag kami ng $100 bonus sa Bingg Bongg wallet mo.\n\n• Isang bonus bawat ideyang gagawin namin.\n• Kapag pareho ang ideya ng higit sa isang miyembro: panalo ang unang nagpadala.\n• Ang Bingg Bongg ang magpapasya kung aling mga ideya ang gagawin.\n• Sa pagpapadala ng ideya, pinapayagan mo ang Bingg Bongg na gamitin ito.\n• Para sa mga miyembrong 18 pataas. Hindi puwede ang staff.",
   live_badge: "LIVE",
   video_uploaded_from: "Na-upload mula sa %1$s",
+  video_uploaded_from_on: "Na-upload mula sa %1$s noong %2$s",
+  video_uploaded_on: "Na-upload noong %1$s",
   member_local_time: "Oras ngayon ni %1$s: %2$s",
   copy_this_video: "Kopyahin ang video na ito",
   clear_the_screen: "Linisin ang screen",

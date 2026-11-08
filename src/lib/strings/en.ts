@@ -1426,6 +1426,8 @@ export const en = {
   idea_rules: "If we build your idea, we'll announce that it came from you and add a $100 bonus to your Bingg Bongg wallet.\n\n• One bonus per idea we build.\n• Same idea from more than one member: the first to send it wins.\n• Bingg Bongg decides which ideas to build.\n• By sending an idea, you let Bingg Bongg use it.\n• Members 18 and over. Staff can't take part.",
   live_badge: "LIVE",
   video_uploaded_from: "Uploaded from %1$s",
+  video_uploaded_from_on: "Uploaded from %1$s on %2$s",
+  video_uploaded_on: "Uploaded on %1$s",
   member_local_time: "%1$s's local time: %2$s",
   this_live: "This Live",
   live_from_country: "%1$s is live from %2$s",

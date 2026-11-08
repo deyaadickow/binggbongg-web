@@ -225,8 +225,23 @@ export function VideoPage() {
     if (country.length === 2) {
       try { country = new Intl.DisplayNames([navigator.language], { type: "region" }).of(country.toUpperCase()) ?? country; } catch { /* keep the code */ }
     }
-    if (country && country.toLowerCase() !== "null") originLines.push(t("video_uploaded_from", country));
     const zone = shown?.user?.local_timezone?.trim();
+    // Steve, 2026-11-07: "On every video uploaded please include the date and time that was
+    // uploaded." In the poster's own time zone when known, else this browser's.
+    let uploaded = "";
+    const raw = String((shown as { created_at?: string } | null)?.created_at ?? "").trim();
+    if (raw.length >= 19) {
+      const d = new Date(raw.slice(0, 19).replace(" ", "T") + "Z");
+      if (!isNaN(d.getTime())) {
+        const opts: Intl.DateTimeFormatOptions = { month: "2-digit", day: "2-digit", year: "numeric", hour: "numeric", minute: "2-digit" };
+        try { uploaded = new Intl.DateTimeFormat(navigator.language, { ...opts, timeZone: zone || undefined }).format(d); }
+        catch { uploaded = new Intl.DateTimeFormat(navigator.language, opts).format(d); }
+      }
+    }
+    const hasCountry = !!country && country.toLowerCase() !== "null";
+    if (hasCountry && uploaded) originLines.push(t("video_uploaded_from_on", country, uploaded));
+    else if (hasCountry) originLines.push(t("video_uploaded_from", country));
+    else if (uploaded) originLines.push(t("video_uploaded_on", uploaded));
     if (zone) {
       try {
         const time = new Intl.DateTimeFormat(navigator.language, { weekday: "short", hour: "numeric", minute: "2-digit", timeZone: zone }).format(new Date());
