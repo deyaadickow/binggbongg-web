@@ -1418,6 +1418,7 @@ export const fil = {
   online_friends: "Mga Kaibigan",
   online_following: "Sinusundan",
   online_followers: "Mga Tagasunod",
+  online_live: "Live",
   member_local_time: "Oras ngayon ni %1$s: %2$s",
   copy_this_video: "Kopyahin ang video na ito",
   clear_the_screen: "Linisin ang screen",

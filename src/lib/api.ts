@@ -171,6 +171,9 @@ export interface UserSummary {
   /** Steve, 2026-11-08: 1 when the member was active in the last 15 minutes. The backend
    *  appends it to every user object; Avatar (components/Common.tsx) draws the green dot. */
   is_online?: number;
+  /** fetchOnlineNowMembers: live right now, and the room (Steve, 2026-11-08 Live box). */
+  is_live?: number;
+  live_room_name?: string | null;
   /** IANA zone for this member's local time on the feed's hold menu (Steve, 2026-10-25): the
    *  zone their device reported, else their profile country's. */
   local_timezone?: string;

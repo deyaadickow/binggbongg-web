@@ -1418,6 +1418,7 @@ export const id = {
   online_friends: "Teman",
   online_following: "Mengikuti",
   online_followers: "Pengikut",
+  online_live: "Langsung",
   member_local_time: "Waktu setempat %1$s: %2$s",
   copy_this_video: "Salin video ini",
   clear_the_screen: "Bersihkan layar",

@@ -2058,4 +2058,5 @@ export const es = {
   online_friends: "Amigos",
   online_following: "Siguiendo",
   online_followers: "Seguidores",
+  online_live: "En vivo",
 };

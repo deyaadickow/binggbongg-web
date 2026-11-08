@@ -1438,6 +1438,7 @@ export const en = {
   online_friends: "Friends",
   online_following: "Following",
   online_followers: "Followers",
+  online_live: "Live",
   member_local_time: "%1$s's local time: %2$s",
   this_live: "This Live",
   live_from_country: "%1$s is live from %2$s",
