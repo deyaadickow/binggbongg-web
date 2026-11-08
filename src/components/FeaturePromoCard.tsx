@@ -49,11 +49,8 @@ export function FeaturePromoCard({ feature, video, onSeen }: { feature: Feature;
       <div className="thumb" role="button" tabIndex={0} aria-label={name}
         onClick={() => setOpen(true)} onKeyDown={(e) => { if (e.key === "Enter") setOpen(true); }}>
         <video ref={player} src={video} muted loop playsInline preload="none" />
-        <span className="fp-pill">Bingg Bongg</span>
-        <div className="fp-text">
-          <b className="fp-name">{name}</b>
-          <span className="fp-line">{t(isIdea ? "fp_idea_line" : "fp_try_line")}</span>
-        </div>
+        {/* No banner over the video, only the button below. Steve, 2026-11-07: "I don't like this
+            big banner blocking the video please remove it. You can leave only the button that says try it." */}
       </div>
       <div className="body" style={{ justifyContent: "center" }}>
         {href ? (
