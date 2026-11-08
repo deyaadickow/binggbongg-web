@@ -1,3 +1,4 @@
+import type React from "react";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { post, setAuthHeaders, type UserSummary } from "../lib/api";
@@ -80,6 +81,20 @@ function firstLanding(uid: number): boolean {
   } catch { /* private mode: is_new is true only once anyway */ }
   return true;
 }
+
+
+/* Gold line icons for the sign-up page (inline so they need no requests and take currentColor). */
+const svg = (d: React.ReactNode) => (
+  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{d}</svg>
+);
+const ICON_LIVE = svg(<><circle cx="12" cy="12" r="3" /><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M5 5a10 10 0 0 0 0 14M19 5a10 10 0 0 1 0 14" /></>);
+const ICON_BATTLE = svg(<><path d="M14.5 17.5 3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2" /><path d="M9.5 17.5 21 6V3h-3L6.5 14.5M11 19l-6-6M8 16l-4 4M5 21l-2-2" /></>);
+const ICON_GAMES = svg(<><rect x="2" y="7" width="20" height="11" rx="5" /><path d="M7 11v3M5.5 12.5h3" /><circle cx="15.5" cy="12" r="1" /><circle cx="18" cy="13.5" r="1" /></>);
+const ICON_FRIENDS = svg(<><circle cx="9" cy="8" r="3.5" /><path d="M2.5 20a6.5 6.5 0 0 1 13 0" /><circle cx="17" cy="9" r="2.5" /><path d="M17 14.5a5 5 0 0 1 4.5 5" /></>);
+const ICON_MAIL = svg(<><rect x="3" y="5" width="18" height="14" rx="3" /><path d="m4 7 8 6 8-6" /></>);
+const ICON_LOCK = svg(<><rect x="4.5" y="10.5" width="15" height="10" rx="2.5" /><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" /></>);
+const ICON_EYE = svg(<><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></>);
+const ICON_EYE_OFF = svg(<><path d="M3 3l18 18M10.6 5.1A10 10 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.2 4M6.6 6.6A17 17 0 0 0 2 12s3.5 7 10 7a10 10 0 0 0 5.4-1.6" /><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" /></>);
 
 const looksLikeEmail = (s: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.trim());
 
@@ -294,12 +309,31 @@ export function LoginPage() {
 
   return (
     <div className="page signup-page">
+      {/* Redesign (Steve, 2026-11-08: "redesign all the pages"): no box any more — the whole
+          screen is the page. The big gold logo, what the app is in four icons, then one tap to
+          switch between Create account and Sign in. */}
+      <div className="signup-hero">
+        <img className="signup-wordmark" src="/logo_horizontal.png" alt="Bingg Bongg" width={640} height={220} />
+        <div className="signup-feats" aria-hidden="true">
+          <span><i>{ICON_LIVE}</i>{t("su_feat_live")}</span>
+          <span><i>{ICON_BATTLE}</i>{t("su_feat_battles")}</span>
+          <span><i>{ICON_GAMES}</i>{t("su_feat_games")}</span>
+          <span><i>{ICON_FRIENDS}</i>{t("su_feat_friends")}</span>
+        </div>
+      </div>
       <form className="signup-card" onSubmit={submit} noValidate>
-        <img className="signup-logo" src="/logo_round.png" alt="" width={64} height={64} />
+        {mode !== "reset" && (
+          <div className="signup-tabs" role="tablist">
+            <button type="button" role="tab" aria-selected={mode === "create"} className={mode === "create" ? "on" : ""} onClick={() => switchMode("create")}>{t("su_create_account")}</button>
+            <button type="button" role="tab" aria-selected={mode === "signin"} className={mode === "signin" ? "on" : ""} onClick={() => switchMode("signin")}>{t("sign_in")}</button>
+          </div>
+        )}
         <h1 className="signup-title">{title}</h1>
         <p className="signup-sub">{subtitle}</p>
 
         <label className="signup-label" htmlFor="su-email">{t("su_email")}</label>
+        <div className="signup-field">
+        <i className="signup-ico">{ICON_MAIL}</i>
         <input
           id="su-email"
           className={`signup-input${fieldErrors.email ? " bad" : ""}`}
@@ -314,6 +348,7 @@ export function LoginPage() {
           aria-invalid={!!fieldErrors.email}
           aria-describedby={fieldErrors.email ? "su-email-err" : undefined}
         />
+        </div>
         {fieldErrors.email && (
           <div id="su-email-err" className="signup-field-err" role="alert">
             {t(fieldErrors.email)}
@@ -326,7 +361,8 @@ export function LoginPage() {
         {mode !== "reset" && (
           <>
             <label className="signup-label" htmlFor="su-password">{t("su_password")}</label>
-            <div className="signup-pw">
+            <div className="signup-pw signup-field">
+              <i className="signup-ico">{ICON_LOCK}</i>
               <input
                 id="su-password"
                 className={`signup-input${fieldErrors.password ? " bad" : ""}`}
@@ -338,8 +374,8 @@ export function LoginPage() {
                 aria-invalid={!!fieldErrors.password}
                 aria-describedby={fieldErrors.password ? "su-password-err" : undefined}
               />
-              <button type="button" className="signup-eye" onClick={() => setShowPassword((s) => !s)} aria-pressed={showPassword}>
-                {showPassword ? t("su_hide") : t("su_show")}
+              <button type="button" className="signup-eye" onClick={() => setShowPassword((s) => !s)} aria-pressed={showPassword} aria-label={showPassword ? t("su_hide") : t("su_show")}>
+                {showPassword ? ICON_EYE_OFF : ICON_EYE}
               </button>
             </div>
             {fieldErrors.password && (
@@ -356,14 +392,13 @@ export function LoginPage() {
           </>
         )}
 
-        <button type="submit" className="signup-cta" disabled={busy}>{cta}</button>
+        <button type="submit" className="signup-cta" disabled={busy}>{cta}{!busy && <span className="signup-cta-arrow" aria-hidden="true">→</span>}</button>
+        {mode === "create" && <p className="signup-free">{t("su_free_fast")}</p>}
 
         {error && <div className="signup-form-err" role="alert">{error}</div>}
         {info && <div className="signup-info" role="status">{info}</div>}
 
         <div className="signup-switch">
-          {mode === "create" && <>{t("su_have_account")} <button type="button" className="signup-inline-link" onClick={() => switchMode("signin")}>{t("sign_in")}</button></>}
-          {mode === "signin" && <>{t("su_new_here")} <button type="button" className="signup-inline-link" onClick={() => switchMode("create")}>{t("su_create_account")}</button></>}
           {mode === "reset" && <button type="button" className="signup-inline-link" onClick={() => switchMode("signin")}>{t("su_back_to_signin")}</button>}
         </div>
 

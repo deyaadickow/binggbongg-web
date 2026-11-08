@@ -1186,3 +1186,38 @@ body:has(.get-app-bar) .bh-you { bottom: calc(88px + env(safe-area-inset-bottom)
 .feature-promo-card .fp-name { color: #D4AF37; font-size: 16px; line-height: 1.2; }
 .feature-promo-card .fp-line { color: #fff; font-size: 13px; font-weight: 600; line-height: 1.3; }
 .feature-promo-card .fp-btn { width: 100%; text-align: center; font-weight: 800; letter-spacing: 0.04em; text-decoration: none; }
+
+/* Sign-up redesign (Steve, 2026-11-08: "redesign all the pages"). The box is gone: big gold
+   logo with a soft glow, four "what's inside" icons, Create account / Sign in tabs, icons in the
+   fields, a gold gradient button. Black background, gold text, as before. */
+body.signup-black { background: radial-gradient(120% 55% at 50% 0%, #2a2108 0%, #0b0902 45%, #000 70%) fixed, #000; }
+.signup-hero { display: flex; flex-direction: column; align-items: center; padding: 8px 0 4px; }
+.signup-wordmark { width: min(300px, 78vw); height: auto; filter: drop-shadow(0 8px 30px rgba(240,196,32,.35)); }
+.signup-feats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 100%; margin-top: 18px; }
+.signup-feats span { display: flex; flex-direction: column; align-items: center; gap: 6px; color: var(--gold-bright); font-size: 13px; font-weight: 800; text-align: center; }
+.signup-feats i { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--gold); background: linear-gradient(180deg, #1c1606, #000); color: var(--gold-bright); box-shadow: 0 0 18px rgba(240,196,32,.18); }
+.signup-card { border: 0; background: transparent; padding: 18px 2px 8px; }
+.signup-tabs { display: grid; grid-template-columns: 1fr 1fr; padding: 4px; margin-bottom: 18px; border: 2px solid var(--gold); border-radius: 999px; background: #000; }
+.signup-tabs button { min-height: 46px; border: 0; border-radius: 999px; background: transparent; color: var(--gold-bright); font-size: 16px; font-weight: 800; font-family: inherit; cursor: pointer; }
+.signup-tabs button.on { background: linear-gradient(180deg, #f7d54a, #d9a816); color: #000; box-shadow: 0 4px 14px rgba(240,196,32,.35); }
+.signup-title { font-size: 26px; }
+.signup-sub { margin: 6px 0 10px; font-size: 15px; }
+.signup-field { position: relative; }
+.signup-ico { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); display: grid; color: var(--gold); pointer-events: none; }
+.signup-field .signup-input { padding-left: 48px; background: #0a0803; }
+.signup-input::placeholder { color: #b9a35a; }
+.signup-pw .signup-input { padding-right: 60px; }
+.signup-eye { min-width: 46px; min-height: 42px; padding: 0; border: 0; background: transparent; display: grid; place-items: center; color: var(--gold-bright); }
+.signup-cta { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 22px; background: linear-gradient(180deg, #f9dc5c 0%, #e9b923 55%, #c99612 100%); box-shadow: 0 8px 28px rgba(240,196,32,.4), inset 0 1px 0 rgba(255,255,255,.5); }
+.signup-cta:hover { background: linear-gradient(180deg, #ffe47a 0%, #f0c420 100%); }
+.signup-cta-arrow { font-size: 22px; line-height: 1; }
+.signup-free { margin: 10px 0 0; text-align: center; color: var(--gold-bright); font-size: 14px; font-weight: 700; opacity: .9; }
+.signup-switch:empty { display: none; }
+.signup-wordmark { width: min(230px, 62vw); }
+.signup-feats { margin-top: 12px; }
+.signup-feats i { width: 46px; height: 46px; }
+.signup-card { padding-top: 14px; }
+.signup-tabs { margin-bottom: 12px; }
+.signup-title { font-size: 24px; }
+.signup-label { margin-top: 8px; }
+.signup-cta { margin-top: 18px; }

@@ -1886,6 +1886,11 @@ export const id = {
   sr_kind_battle: "Battle",
   sr_n_reminded: "🔔 %1$s diingatkan",
   // Easy sign-up (Steve, 2026-11-03): email + password, one black/gold screen.
+  su_feat_live: "Siaran Live",
+  su_feat_battles: "Battle",
+  su_feat_games: "Game",
+  su_feat_friends: "Teman",
+  su_free_fast: "Gratis · cuma 10 detik",
   su_title_create: "Buat akun gratis",
   su_title_signin: "Selamat datang kembali",
   su_title_reset: "Atur ulang kata sandi",

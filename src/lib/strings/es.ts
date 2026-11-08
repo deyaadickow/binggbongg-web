@@ -1859,6 +1859,11 @@ export const es = {
   sr_kind_battle: "Batalla",
   sr_n_reminded: "🔔 %1$s con recordatorio",
   // Easy sign-up (Steve, 2026-11-03): email + password, one black/gold screen.
+  su_feat_live: "En vivo",
+  su_feat_battles: "Batallas",
+  su_feat_games: "Juegos",
+  su_feat_friends: "Amigos",
+  su_free_fast: "Gratis · tarda 10 segundos",
   su_title_create: "Crea tu cuenta gratis",
   su_title_signin: "Bienvenido de nuevo",
   su_title_reset: "Restablece tu contraseña",

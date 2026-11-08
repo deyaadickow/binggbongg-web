@@ -2086,6 +2086,11 @@ export const en = {
   sr_kind_battle: "Battle",
   sr_n_reminded: "🔔 %1$s reminded",
   // Easy sign-up (Steve, 2026-11-03): email + password, one black/gold screen.
+  su_feat_live: "Go Live",
+  su_feat_battles: "Battles",
+  su_feat_games: "Games",
+  su_feat_friends: "Friends",
+  su_free_fast: "Free · takes 10 seconds",
   su_title_create: "Create your free account",
   su_title_signin: "Welcome back",
   su_title_reset: "Reset your password",

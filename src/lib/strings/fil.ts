@@ -1891,6 +1891,11 @@ export const fil = {
   sr_kind_battle: "Battle",
   sr_n_reminded: "🔔 %1$s ang may paalala",
   // Easy sign-up (Steve, 2026-11-03): email + password, one black/gold screen.
+  su_feat_live: "Mag-Live",
+  su_feat_battles: "Laban",
+  su_feat_games: "Laro",
+  su_feat_friends: "Kaibigan",
+  su_free_fast: "Libre · 10 segundo lang",
   su_title_create: "Gumawa ng libreng account",
   su_title_signin: "Maligayang pagbabalik",
   su_title_reset: "I-reset ang password mo",
