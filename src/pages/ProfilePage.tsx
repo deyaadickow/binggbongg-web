@@ -148,14 +148,14 @@ function ProfileThumb({ p, isMe, onClick }: { p: ProfilePost; isMe: boolean; onC
 }
 
 /** "Follower since 11/07/2026" / "Following since …" — the viewer's own date format. */
-function followSinceLine(t: (k: "follower_since" | "following_since", ...a: string[]) => string, tab: string, raw?: string): string | undefined {
-  if (tab !== "followers" && tab !== "following") return undefined;
+function followSinceLine(t: (k: "follower_since" | "following_since" | "friends_since", ...a: string[]) => string, tab: string, raw?: string): string | undefined {
+  if (tab !== "followers" && tab !== "following" && tab !== "friends") return undefined;
   const r = (raw ?? "").trim();
   if (r.length < 19) return undefined;
   const d = new Date(r.slice(0, 19).replace(" ", "T") + "Z");
   if (isNaN(d.getTime())) return undefined;
   const date = new Intl.DateTimeFormat(navigator.language, { month: "2-digit", day: "2-digit", year: "numeric" }).format(d);
-  return t(tab === "followers" ? "follower_since" : "following_since", date);
+  return t(tab === "followers" ? "follower_since" : tab === "friends" ? "friends_since" : "following_since", date);
 }
 
 function UserCard({ user, myId, isLoggedIn, since }: { user: UserSummary; myId?: number; isLoggedIn: boolean; since?: string }) {
@@ -500,9 +500,10 @@ export function ProfilePage() {
             return [from, to].find((u) => u && u.id !== profileId) ?? null;
           };
           // Steve, 2026-11-07: the date each follow began, from the follow row's own created_at.
-          setTabUsers(items.map((row) => {
+          setTabUsers(items.map((row): UserSummary | null => {
             const u = pick(row);
-            return u && tab !== "friends" ? { ...u, follow_since: String(row.created_at ?? "") } : u;
+            // Friends: the server's friends_since — when the follow became mutual.
+            return u ? { ...u, follow_since: String((tab === "friends" ? row.friends_since : row.created_at) ?? "") } : u;
           }).filter((u): u is UserSummary => !!u));
         } else {
           // Reposted and Likes are join rows carrying the post under `post`; Videos/Saved/History

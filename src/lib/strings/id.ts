@@ -1410,6 +1410,7 @@ export const id = {
   video_uploaded_on: "Diunggah pada %1$s",
   follower_since: "Pengikut sejak %1$s",
   following_since: "Mengikuti sejak %1$s",
+  friends_since: "Berteman sejak %1$s",
   member_local_time: "Waktu setempat %1$s: %2$s",
   copy_this_video: "Salin video ini",
   clear_the_screen: "Bersihkan layar",

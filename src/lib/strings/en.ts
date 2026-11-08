@@ -1430,6 +1430,7 @@ export const en = {
   video_uploaded_on: "Uploaded on %1$s",
   follower_since: "Follower since %1$s",
   following_since: "Following since %1$s",
+  friends_since: "Friends since %1$s",
   member_local_time: "%1$s's local time: %2$s",
   this_live: "This Live",
   live_from_country: "%1$s is live from %2$s",

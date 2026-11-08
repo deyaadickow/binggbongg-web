@@ -1410,6 +1410,7 @@ export const fil = {
   video_uploaded_on: "Na-upload noong %1$s",
   follower_since: "Tagasunod mula %1$s",
   following_since: "Sinusundan mula %1$s",
+  friends_since: "Magkaibigan mula %1$s",
   member_local_time: "Oras ngayon ni %1$s: %2$s",
   copy_this_video: "Kopyahin ang video na ito",
   clear_the_screen: "Linisin ang screen",
