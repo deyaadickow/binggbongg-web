@@ -239,7 +239,8 @@ export function VideoPage() {
       }
     }
     const hasCountry = !!country && country.toLowerCase() !== "null";
-    if (hasCountry && uploaded) originLines.push(t("video_uploaded_from_on", country, uploaded));
+    // Steve: the date and time on the next line, under "Uploaded from …".
+    if (hasCountry && uploaded) originLines.push(t("video_uploaded_from", country), uploaded);
     else if (hasCountry) originLines.push(t("video_uploaded_from", country));
     else if (uploaded) originLines.push(t("video_uploaded_on", uploaded));
     if (zone) {
