@@ -147,7 +147,18 @@ function ProfileThumb({ p, isMe, onClick }: { p: ProfilePost; isMe: boolean; onC
   );
 }
 
-function UserCard({ user, myId, isLoggedIn }: { user: UserSummary; myId?: number; isLoggedIn: boolean }) {
+/** "Follower since 11/07/2026" / "Following since …" — the viewer's own date format. */
+function followSinceLine(t: (k: "follower_since" | "following_since", ...a: string[]) => string, tab: string, raw?: string): string | undefined {
+  if (tab !== "followers" && tab !== "following") return undefined;
+  const r = (raw ?? "").trim();
+  if (r.length < 19) return undefined;
+  const d = new Date(r.slice(0, 19).replace(" ", "T") + "Z");
+  if (isNaN(d.getTime())) return undefined;
+  const date = new Intl.DateTimeFormat(navigator.language, { month: "2-digit", day: "2-digit", year: "numeric" }).format(d);
+  return t(tab === "followers" ? "follower_since" : "following_since", date);
+}
+
+function UserCard({ user, myId, isLoggedIn, since }: { user: UserSummary; myId?: number; isLoggedIn: boolean; since?: string }) {
   const [following, setFollowing] = useState(!!user.is_following);
   async function toggle() {
     if (!myId) return;
@@ -171,6 +182,7 @@ function UserCard({ user, myId, isLoggedIn }: { user: UserSummary; myId?: number
           </Link>
         </div>
         {user.username && <div className="muted" style={{ fontSize: 12 }}>@{user.username}</div>}
+        {since && <div style={{ fontSize: 12, opacity: 0.85, marginTop: 2 }}>{since}</div>}
       </div>
       {isLoggedIn && myId !== user.id && (
         <button className={`btn small${following ? " ghost" : ""}`} onClick={toggle} style={{ flexShrink: 0 }}>
@@ -487,7 +499,11 @@ export function ProfilePage() {
             if (tab === "followers") return from ?? null;
             return [from, to].find((u) => u && u.id !== profileId) ?? null;
           };
-          setTabUsers(items.map(pick).filter((u): u is UserSummary => !!u));
+          // Steve, 2026-11-07: the date each follow began, from the follow row's own created_at.
+          setTabUsers(items.map((row) => {
+            const u = pick(row);
+            return u && tab !== "friends" ? { ...u, follow_since: String(row.created_at ?? "") } : u;
+          }).filter((u): u is UserSummary => !!u));
         } else {
           // Reposted and Likes are join rows carrying the post under `post`; Videos/Saved/History
           // are already posts. `?? row` keeps both shapes working through one path.
@@ -829,7 +845,8 @@ export function ProfilePage() {
           ) : (
             <div className="profile-user-list">
               {tabUsers.map((u) => (
-                <UserCard key={u.id} user={u} myId={me?.id} isLoggedIn={isLoggedIn} />
+                <UserCard key={u.id} user={u} myId={me?.id} isLoggedIn={isLoggedIn}
+                  since={followSinceLine(t, tab, (u as UserSummary & { follow_since?: string }).follow_since)} />
               ))}
             </div>
           )
