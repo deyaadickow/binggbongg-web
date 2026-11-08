@@ -79,10 +79,8 @@ export function SearchPage() {
               <div key={u.id} className="card row" style={{ padding: 10 }}>
                 {/* Steve, 2026-11-08: "If they click on the avatar or name, link them to their profile page." */}
                 <Link to={`/profile/${u.id}`} className="row" style={{ flex: 1, minWidth: 0, color: "inherit", gap: 10 }}>
-                  <span style={{ position: "relative", display: "inline-flex" }}>
-                    <Avatar user={u} />
-                    <span style={{ position: "absolute", right: 0, bottom: 0, width: 12, height: 12, borderRadius: "50%", background: "#2ECC40", border: "2px solid #000" }} />
-                  </span>
+                  {/* The green online dot is drawn by Avatar itself (Common.tsx) from is_online. */}
+                  <Avatar user={{ ...u, is_online: 1 }} />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontWeight: 800, color: "var(--gold)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayName(u)}</div>
                     <div style={{ fontSize: 13, color: "var(--gold)", opacity: 0.75 }}>@{u.username ?? ""}</div>

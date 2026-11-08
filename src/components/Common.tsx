@@ -6,10 +6,23 @@ export function Avatar({ user, size }: { user?: Partial<UserSummary> | null; siz
   const name = displayName(user);
   const src = mediaUrl(user?.profile_image);
   const looksReal = src && !/\/$/.test(src);
-  return (
+  const circle = (
     <div className={`avatar ${size ?? ""}`} title={name}>
       {looksReal ? <img src={src} alt={name} onError={(e) => ((e.target as HTMLImageElement).style.display = "none")} /> : initials(name)}
     </div>
+  );
+  // Steve, 2026-11-08: "I really like the green dot when a member is online, please add it to
+  // the rest of the app." The backend appends is_online (0/1, active in the last 15 minutes) to
+  // every user object, so every Avatar wears the dot. Only an online member is wrapped, so an
+  // offline avatar's layout is exactly what it was; the wrapper is the avatar's own size.
+  if (Number(user?.is_online) !== 1) return circle;
+  return (
+    <span className="avatar-wrap" style={{ position: "relative", display: "inline-flex", flex: "none", verticalAlign: "middle" }}>
+      {circle}
+      <span className="online-dot" aria-label="Online now" title="Online now"
+        style={{ position: "absolute", right: 0, bottom: 0, width: "26%", height: "26%", minWidth: 10, minHeight: 10,
+          boxSizing: "border-box", borderRadius: "50%", background: "#2ECC40", border: "2px solid #000" }} />
+    </span>
   );
 }
 

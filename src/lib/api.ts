@@ -168,6 +168,9 @@ export interface UserSummary {
    *  self-only hidden fields — and is what lib/dm.ts builds conversationId from. */
   identity?: string;
   is_verified?: number;
+  /** Steve, 2026-11-08: 1 when the member was active in the last 15 minutes. The backend
+   *  appends it to every user object; Avatar (components/Common.tsx) draws the green dot. */
+  is_online?: number;
   /** IANA zone for this member's local time on the feed's hold menu (Steve, 2026-10-25): the
    *  zone their device reported, else their profile country's. */
   local_timezone?: string;
