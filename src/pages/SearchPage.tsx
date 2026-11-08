@@ -17,6 +17,19 @@ export function SearchPage() {
   const [online, setOnline] = useState<UserSummary[] | null>(null);
   // Steve, 2026-11-08 redesign: "Online Now" + All Members / Friends / Following / Followers.
   const [scope, setScope] = useState<"all" | "friends" | "following" | "followers">("all");
+  // How many are online in each group — a green dot on that box when > 0 (Steve, 2026-11-08).
+  const [counts, setCounts] = useState<Record<string, number>>({});
+  useEffect(() => {
+    let alive = true;
+    const load = () => {
+      post<UserSummary[]>("fetchOnlineNowMembers", { search: "", scope: "all", ...(user ? { user_id: user.id } : {}) })
+        .then((r) => { const c = (r as unknown as { counts?: Record<string, number> }).counts; if (alive && c) setCounts(c); })
+        .catch(() => {});
+    };
+    load();
+    const every = setInterval(load, 30000);
+    return () => { alive = false; clearInterval(every); };
+  }, [user?.id]);
   const [users, setUsers] = useState<UserSummary[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
@@ -80,6 +93,7 @@ export function SearchPage() {
         {(["all", "friends", "following", "followers"] as const).map((s) => (
           <button key={s} className={tab === "online" && scope === s ? "active" : ""}
             onClick={() => { setScope(s); setOnline(null); setTab("online"); }}>
+            {(counts[s] ?? 0) > 0 && <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: "#2ECC40", border: "1.5px solid #000", marginRight: 5, verticalAlign: "middle" }} />}
             {t(s === "all" ? "online_all_members" : s === "friends" ? "online_friends" : s === "following" ? "online_following" : "online_followers")}
           </button>
         ))}
