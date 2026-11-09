@@ -17,12 +17,12 @@ const VIDEO: Announcement = {
   titleFil: "Country Battle simula Disyembre 1",
   messageFil: null,
   image: "",
-  videoEn: CDN + "1794222246_6af1a8a6a1c07_fv_country_battle_dec1_en.mp4",
-  videoFil: CDN + "1794222248_6af1a8a8bc98e_fv_country_battle_dec1_tl.mp4",
-  poster: CDN + "1794222246_6af1a8a6a1c07_fv_country_battle_dec1_en.jpg",
+  videoEn: CDN + "1794225734_6af1b646c2f13_fv_country_battle_dec1_gold_en.mp4",
+  videoFil: CDN + "1794225737_6af1b6493a0e4_fv_country_battle_dec1_gold_tl.mp4",
+  poster: CDN + "1794225734_6af1b646c2f13_fv_country_battle_dec1_gold_en.jpg",
   createdAt: null,
 };
-const POSTER_FIL = CDN + "1794222248_6af1a8a8bc98e_fv_country_battle_dec1_tl.jpg";
+const POSTER_FIL = CDN + "1794225737_6af1b6493a0e4_fv_country_battle_dec1_gold_tl.jpg";
 // The end of December 1 in the Philippines (UTC+8).
 const SHOW_UNTIL = Date.parse("2026-12-02T00:00:00+08:00");
 
