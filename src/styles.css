@@ -1020,6 +1020,15 @@ body.signup-black { background: #000; }
 .bb-top-strip-label { flex: 1; min-width: 0; background: none; border: 0; padding: 0; font: inherit; color: var(--gold); font-weight: 900; font-size: 16px; letter-spacing: .3px; font-variant-numeric: tabular-nums; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
 .bb-top-strip-label:disabled { cursor: default; }
 .bb-top-strip.boost .bb-top-strip-label { color: #fff; }
+/* Sunday Battle Bonus (Steve, 2026-11-09): black card + gold border on /battles, gold pill in battles. */
+.sb-card { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; background: #000; border: 2px solid var(--gold); text-align: center; }
+.sb-card-title { color: #FFDD55; font-size: 18px; font-weight: 900; }
+.sb-card-big { color: var(--gold); font-size: 17px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.sb-card-line { color: rgba(255,255,255,0.9); font-size: 14px; }
+.sb-card-small { color: #FFDD55; font-size: 12px; opacity: .9; }
+.sb-pill-row { display: flex; justify-content: center; margin: -4px 0 8px; }
+.cb-head .sb-pill-row { margin: 0; }
+.sb-pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 12px; border-radius: 999px; background: #000; border: 1.5px solid var(--gold); color: #FFDD55; font-size: 13px; font-weight: 800; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .bb-bomb-btn { flex: none; display: inline-flex; align-items: center; gap: 3px; height: 32px; padding: 0 10px; border-radius: 999px; background: #000; border: 2px solid var(--gold); color: #fff; font: inherit; font-size: 15px; cursor: pointer; }
 .bb-bomb-btn b { color: var(--gold); font-size: 13px; font-weight: 900; }
 .bb-bomb-btn.armed { border-color: #E53935; animation: ml-pulse .8s ease-in-out infinite; }

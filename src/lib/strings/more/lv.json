@@ -1585,5 +1585,14 @@
  "fblurb_announcements": "Skatieties ikdienas video paziņojumu angļu vai tagalu valodā.",
  "cbd1_title": "Country Battle sākas 1. decembrī!",
  "cbd1_sub": "Katru dienu plkst. 20 pēc Filipīnu laika: viena 10 minūšu cīņa visai valstij.",
- "cbd1_watch": "Skatīties video"
+ "cbd1_watch": "Skatīties video",
+ "sb_title": "🔥 Sunday Battle Bonus",
+ "sb_title_on": "🔥 Sunday Battle Bonus ir IESLĒGTS",
+ "sb_rules": "Katru svētdienu: +%1$s%% par katru saņemto battle monētu. %2$s par katrām 1000 monētām, bez ierobežojuma.",
+ "sb_next": "Nākamais: %1$s",
+ "sb_jump": "Pievienojies, kamēr akcija ilgst!",
+ "sb_extra_today": "Tavs papildu ienākums šodien: %1$s",
+ "sb_coins_line": "%1$s battle monētas · +%2$s%% · bez ierobežojuma",
+ "sb_ends": "Beidzas šonakt pusnaktī (Filipīnu laiks)",
+ "sb_pill": "Sunday Bonus +%1$s%% · %2$s"
 }

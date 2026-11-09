@@ -36,6 +36,7 @@ import { fetchActiveTapGame, gameTitle, type TapGameType } from "../lib/tapgame"
 import { TapGameOverlay } from "../components/TapGameOverlay";
 import { HostGamesMenu } from "../components/HostGamesMenu";
 import { SoloBattleStandingsSheet, SoloBattleStrip } from "../components/SoloBattle";
+import { SundayBonusPill } from "../components/SundayBonus";
 import { fetchActiveSoloBattle, type SoloBattle } from "../lib/solobattle";
 import { battleScreenPath, chatBattlePath, chatReasonText, checkUserLiveRoom, startChatBattle } from "../lib/chatBattle";
 import { countryBattlePath } from "../lib/countryBattle";
@@ -1478,6 +1479,9 @@ export function LiveViewerPage() {
       ) : (
         <BattleTopStrip secondsLeft={otherBattleSecs} boost={boxing && boxingLeft !== null ? { multiplier: 2, secondsLeft: boxingLeft } : null} />
       ))}
+      {/* Sunday Battle Bonus (Steve, 2026-11-09): the member's extra today, only on a bonus Sunday
+          and only while some battle runs here; re-read every 30 s and whenever a gift lands. */}
+      {(showTopStrip || !!marathon.data || !!b555.data || !!soloBattle) && <SundayBonusPill bump={giftEffect?.key} />}
 
       <div className="live-layout">
         <div>

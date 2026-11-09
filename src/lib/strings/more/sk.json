@@ -1589,5 +1589,14 @@
  "fblurb_announcements": "Pozrite si denné video oznámenie v angličtine alebo tagalčine.",
  "cbd1_title": "Country Battle sa začína 1. decembra!",
  "cbd1_sub": "Každý deň o 20:00 filipínskeho času: jedna 10-minútová bitka pre celú krajinu.",
- "cbd1_watch": "Pozrieť video"
+ "cbd1_watch": "Pozrieť video",
+ "sb_title": "🔥 Sunday Battle Bonus",
+ "sb_title_on": "🔥 Sunday Battle Bonus je ZAPNUTÝ",
+ "sb_rules": "Každú nedeľu: +%1$s%% za každú battle mincu, ktorú dostaneš. %2$s za každých 1 000 mincí, bez limitu.",
+ "sb_next": "Ďalší: %1$s",
+ "sb_jump": "Pridaj sa, kým akcia trvá!",
+ "sb_extra_today": "Tvoj bonus dnes: %1$s",
+ "sb_coins_line": "%1$s battle mincí · +%2$s%% · bez limitu",
+ "sb_ends": "Končí dnes o polnoci (filipínskeho času)",
+ "sb_pill": "Sunday Bonus +%1$s%% · %2$s"
 }

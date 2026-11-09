@@ -1589,5 +1589,14 @@
  "fblurb_announcements": "观看每日视频公告，可选英语或他加禄语。",
  "cbd1_title": "Country Battle 12 月 1 日开始！",
  "cbd1_sub": "每天菲律宾时间晚上 8 点：全国一起的 10 分钟对战。",
- "cbd1_watch": "观看视频"
+ "cbd1_watch": "观看视频",
+ "sb_title": "🔥 Sunday Battle Bonus",
+ "sb_title_on": "🔥 Sunday Battle Bonus 进行中",
+ "sb_rules": "每周日：你收到的每枚对战金币都 +%1$s%%。每 1,000 枚金币 %2$s，无上限。",
+ "sb_next": "下次：%1$s",
+ "sb_jump": "趁活动期间快来参加！",
+ "sb_extra_today": "你今天的额外收入：%1$s",
+ "sb_coins_line": "%1$s 枚对战金币 · +%2$s%% · 无上限",
+ "sb_ends": "今晚午夜结束（菲律宾时间）",
+ "sb_pill": "Sunday Bonus +%1$s%% · %2$s"
 }

@@ -2109,4 +2109,14 @@ export const fil = {
   cbd1_title: "Simula na ang Country Battle sa Disyembre 1!",
   cbd1_sub: "Araw-araw, alas-8 ng gabi (oras sa Pilipinas): isang 10-minutong battle para sa buong bansa.",
   cbd1_watch: "Panoorin ang video",
+  // Sunday Battle Bonus (Steve, 2026-11-09)
+  sb_title: "🔥 Sunday Battle Bonus",
+  sb_title_on: "🔥 Naka-ON na ang Sunday Battle Bonus",
+  sb_rules: "Tuwing Linggo: +%1$s%% sa bawat battle coin na matatanggap mo. %2$s sa bawat 1,000 coins, walang limitasyon.",
+  sb_next: "Susunod: %1$s",
+  sb_jump: "Sumali ka na habang may promo pa!",
+  sb_extra_today: "Dagdag mo ngayong araw: %1$s",
+  sb_coins_line: "%1$s battle coins · +%2$s%% · walang limitasyon",
+  sb_ends: "Matatapos mamayang hatinggabi (oras sa Pilipinas)",
+  sb_pill: "Sunday Bonus +%1$s%% · %2$s",
 };

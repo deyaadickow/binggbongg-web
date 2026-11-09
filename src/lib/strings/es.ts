@@ -2085,4 +2085,14 @@ export const es = {
   cbd1_title: "¡Country Battle empieza el 1 de diciembre!",
   cbd1_sub: "Todos los días a las 8 PM, hora de Filipinas: una batalla de 10 minutos para todo el país.",
   cbd1_watch: "Ver el video",
+  // Sunday Battle Bonus (Steve, 2026-11-09)
+  sb_title: "🔥 Sunday Battle Bonus",
+  sb_title_on: "🔥 El Sunday Battle Bonus está ACTIVO",
+  sb_rules: "Cada domingo: +%1$s%% en cada moneda de batalla que recibas. %2$s por cada 1.000 monedas, sin límite.",
+  sb_next: "Próximo: %1$s",
+  sb_jump: "¡Súmate mientras dure esta promoción!",
+  sb_extra_today: "Tu extra de hoy: %1$s",
+  sb_coins_line: "%1$s monedas de batalla · +%2$s%% · sin límite",
+  sb_ends: "Termina esta noche a medianoche (hora de Filipinas)",
+  sb_pill: "Sunday Bonus +%1$s%% · %2$s",
 };

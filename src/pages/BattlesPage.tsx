@@ -8,6 +8,7 @@ import { BingoCardIcon } from "../components/BingoCardIcon";
 import { BattleIcon } from "../components/ArtIcon";
 import { Avatar } from "../components/Common";
 import { LiveRoomsList } from "../components/LiveRoomsList";
+import { SundayBonusCard } from "../components/SundayBonus";
 import { post } from "../lib/api";
 import { useT, type StringKey } from "../lib/i18n";
 import { BATTLE_MODES } from "../lib/battleModes";
@@ -78,6 +79,7 @@ export function BattlesPage() {
   return (
     <div className="page" style={{ maxWidth: 760 }}>
       <PageTitle>{t("fx_battles_title")}</PageTitle>
+      <SundayBonusCard />
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {BATTLE_MODES.map((m, i) => (
           <div key={m.name} className="card pad" style={{ borderColor: "var(--gold-border)", display: "flex", gap: 12 }}>

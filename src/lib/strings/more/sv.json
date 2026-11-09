@@ -1587,5 +1587,14 @@
  "fblurb_announcements": "Titta på dagens videomeddelande på engelska eller tagalog.",
  "cbd1_title": "Country Battle startar 1 december!",
  "cbd1_sub": "Varje dag kl. 20 filippinsk tid: en 10-minuters battle för hela landet.",
- "cbd1_watch": "Se videon"
+ "cbd1_watch": "Se videon",
+ "sb_title": "🔥 Sunday Battle Bonus",
+ "sb_title_on": "🔥 Sunday Battle Bonus är PÅ",
+ "sb_rules": "Varje söndag: +%1$s%% på varje battle-mynt du får. %2$s för varje 1 000 mynt, ingen gräns.",
+ "sb_next": "Nästa: %1$s",
+ "sb_jump": "Häng med medan kampanjen pågår!",
+ "sb_extra_today": "Ditt extra i dag: %1$s",
+ "sb_coins_line": "%1$s battle-mynt · +%2$s%% · ingen gräns",
+ "sb_ends": "Slutar i natt vid midnatt (filippinsk tid)",
+ "sb_pill": "Sunday Bonus +%1$s%% · %2$s"
 }

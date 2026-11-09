@@ -1589,5 +1589,14 @@
  "fblurb_announcements": "觀看每日影片公告，可選英語或他加祿語。",
  "cbd1_title": "Country Battle 12 月 1 日開始！",
  "cbd1_sub": "每天菲律賓時間晚上 8 點：全國一起的 10 分鐘對戰。",
- "cbd1_watch": "觀看影片"
+ "cbd1_watch": "觀看影片",
+ "sb_title": "🔥 Sunday Battle Bonus",
+ "sb_title_on": "🔥 Sunday Battle Bonus 進行中",
+ "sb_rules": "每週日：你收到的每枚對戰金幣都 +%1$s%%。每 1,000 枚金幣 %2$s，無上限。",
+ "sb_next": "下次：%1$s",
+ "sb_jump": "趁活動期間快來參加！",
+ "sb_extra_today": "你今天的額外收入：%1$s",
+ "sb_coins_line": "%1$s 枚對戰金幣 · +%2$s%% · 無上限",
+ "sb_ends": "今晚午夜結束（菲律賓時間）",
+ "sb_pill": "Sunday Bonus +%1$s%% · %2$s"
 }

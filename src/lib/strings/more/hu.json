@@ -1582,5 +1582,14 @@
  "fblurb_announcements": "Nézd meg a napi videóközleményt angolul vagy tagalogul.",
  "cbd1_title": "A Country Battle december 1-jén indul!",
  "cbd1_sub": "Minden nap este 8-kor fülöp-szigeteki idő szerint: egy 10 perces csata az egész országnak.",
- "cbd1_watch": "Nézd meg a videót"
+ "cbd1_watch": "Nézd meg a videót",
+ "sb_title": "🔥 Sunday Battle Bonus",
+ "sb_title_on": "🔥 A Sunday Battle Bonus BEKAPCSOLVA",
+ "sb_rules": "Minden vasárnap: +%1$s%% minden kapott battle érmére. %2$s minden 1000 érméért, korlát nélkül.",
+ "sb_next": "Következő: %1$s",
+ "sb_jump": "Csatlakozz, amíg tart a promóció!",
+ "sb_extra_today": "A mai extrád: %1$s",
+ "sb_coins_line": "%1$s battle érme · +%2$s%% · korlát nélkül",
+ "sb_ends": "Ma éjfélkor ér véget (Fülöp-szigeteki idő)",
+ "sb_pill": "Sunday Bonus +%1$s%% · %2$s"
 }

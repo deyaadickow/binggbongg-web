@@ -1589,5 +1589,14 @@
  "fblurb_announcements": "የዕለቱን የቪዲዮ ማስታወቂያ በእንግሊዝኛ ወይም በታጋሎግ ይመልከቱ።",
  "cbd1_title": "Country Battle ታኅሣሥ 1 ይጀምራል!",
  "cbd1_sub": "በየቀኑ ከምሽቱ 2 ሰዓት (የፊሊፒንስ ሰዓት)፦ ለመላው ሀገር የ10 ደቂቃ ውድድር።",
- "cbd1_watch": "ቪዲዮውን ይመልከቱ"
+ "cbd1_watch": "ቪዲዮውን ይመልከቱ",
+ "sb_title": "🔥 Sunday Battle Bonus",
+ "sb_title_on": "🔥 Sunday Battle Bonus በርቷል",
+ "sb_rules": "በየእሁዱ፦ በሚቀበሉት እያንዳንዱ የባትል ሳንቲም ላይ +%1$s%%። በየ1,000 ሳንቲሞች %2$s፣ ገደብ የለም።",
+ "sb_next": "ቀጣይ፦ %1$s",
+ "sb_jump": "ይህ ማስተዋወቂያ እስካለ ድረስ ይቀላቀሉ!",
+ "sb_extra_today": "የዛሬ ተጨማሪዎ፦ %1$s",
+ "sb_coins_line": "%1$s የባትል ሳንቲሞች · +%2$s%% · ገደብ የለም",
+ "sb_ends": "ዛሬ ማታ እኩለ ሌሊት ላይ ያበቃል (የፊሊፒንስ ሰዓት)",
+ "sb_pill": "Sunday Bonus +%1$s%% · %2$s"
 }

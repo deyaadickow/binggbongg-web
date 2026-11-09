@@ -1586,5 +1586,14 @@
  "fblurb_announcements": "Horfðu á myndbandstilkynningu dagsins, á ensku eða tagalog.",
  "cbd1_title": "Country Battle hefst 1. desember!",
  "cbd1_sub": "Á hverjum degi kl. 20 að filippseyskum tíma: einn 10 mínútna bardagi fyrir allt landið.",
- "cbd1_watch": "Horfðu á myndbandið"
+ "cbd1_watch": "Horfðu á myndbandið",
+ "sb_title": "🔥 Sunday Battle Bonus",
+ "sb_title_on": "🔥 Sunday Battle Bonus er Í GANGI",
+ "sb_rules": "Alla sunnudaga: +%1$s%% á hverja battle-mynt sem þú færð. %2$s fyrir hverjar 1.000 myntir, ekkert hámark.",
+ "sb_next": "Næst: %1$s",
+ "sb_jump": "Vertu með á meðan tilboðið stendur!",
+ "sb_extra_today": "Aukalega hjá þér í dag: %1$s",
+ "sb_coins_line": "%1$s battle-myntir · +%2$s%% · ekkert hámark",
+ "sb_ends": "Lýkur í kvöld á miðnætti (filippseyskur tími)",
+ "sb_pill": "Sunday Bonus +%1$s%% · %2$s"
 }

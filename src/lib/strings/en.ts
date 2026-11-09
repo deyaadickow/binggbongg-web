@@ -2305,4 +2305,14 @@ export const en = {
   cbd1_title: "Country Battle starts December 1!",
   cbd1_sub: "Every day at 8 PM Philippine time: one 10-minute battle for the whole country.",
   cbd1_watch: "Watch the video",
+  // Sunday Battle Bonus (Steve, 2026-11-09)
+  sb_title: "🔥 Sunday Battle Bonus",
+  sb_title_on: "🔥 Sunday Battle Bonus is ON",
+  sb_rules: "Every Sunday: +%1$s%% on every battle coin you receive. %2$s for every 1,000 coins, no limit.",
+  sb_next: "Next: %1$s",
+  sb_jump: "Jump on board while this promotion lasts!",
+  sb_extra_today: "Your extra today: %1$s",
+  sb_coins_line: "%1$s battle coins · +%2$s%% · no limit",
+  sb_ends: "Ends tonight at midnight (Philippine time)",
+  sb_pill: "Sunday Bonus +%1$s%% · %2$s",
 } as const;

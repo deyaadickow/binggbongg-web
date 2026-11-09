@@ -1589,5 +1589,14 @@
  "fblurb_announcements": "Tonton video pengumuman harian, dalam bahasa Inggeris atau Tagalog.",
  "cbd1_title": "Country Battle bermula 1 Disember!",
  "cbd1_sub": "Setiap hari jam 8 malam waktu Filipina: satu pertarungan 10 minit untuk seluruh negara.",
- "cbd1_watch": "Tonton video"
+ "cbd1_watch": "Tonton video",
+ "sb_title": "🔥 Sunday Battle Bonus",
+ "sb_title_on": "🔥 Sunday Battle Bonus sedang AKTIF",
+ "sb_rules": "Setiap Ahad: +%1$s%% bagi setiap syiling battle yang anda terima. %2$s bagi setiap 1,000 syiling, tiada had.",
+ "sb_next": "Seterusnya: %1$s",
+ "sb_jump": "Sertai sekarang selagi promosi ini berlangsung!",
+ "sb_extra_today": "Tambahan anda hari ini: %1$s",
+ "sb_coins_line": "%1$s syiling battle · +%2$s%% · tiada had",
+ "sb_ends": "Tamat malam ini pada tengah malam (waktu Filipina)",
+ "sb_pill": "Sunday Bonus +%1$s%% · %2$s"
 }

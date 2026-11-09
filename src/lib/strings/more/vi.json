@@ -1589,5 +1589,14 @@
  "fblurb_announcements": "Xem video thông báo hằng ngày bằng tiếng Anh hoặc tiếng Tagalog.",
  "cbd1_title": "Country Battle bắt đầu ngày 1 tháng 12!",
  "cbd1_sub": "Mỗi ngày lúc 8 giờ tối giờ Philippines: một trận đấu 10 phút cho cả nước.",
- "cbd1_watch": "Xem video"
+ "cbd1_watch": "Xem video",
+ "sb_title": "🔥 Sunday Battle Bonus",
+ "sb_title_on": "🔥 Sunday Battle Bonus đang BẬT",
+ "sb_rules": "Mỗi Chủ nhật: +%1$s%% cho mỗi xu battle bạn nhận được. %2$s cho mỗi 1.000 xu, không giới hạn.",
+ "sb_next": "Tiếp theo: %1$s",
+ "sb_jump": "Tham gia ngay khi khuyến mãi còn diễn ra!",
+ "sb_extra_today": "Phần thêm của bạn hôm nay: %1$s",
+ "sb_coins_line": "%1$s xu battle · +%2$s%% · không giới hạn",
+ "sb_ends": "Kết thúc lúc nửa đêm nay (giờ Philippines)",
+ "sb_pill": "Sunday Bonus +%1$s%% · %2$s"
 }

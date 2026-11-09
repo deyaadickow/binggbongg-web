@@ -1589,5 +1589,14 @@
  "fblurb_announcements": "Günlük video duyurusunu İngilizce veya Tagalogca izleyin.",
  "cbd1_title": "Country Battle 1 Aralık'ta başlıyor!",
  "cbd1_sub": "Her gün Filipinler saatiyle 20.00'de: tüm ülke için 10 dakikalık bir savaş.",
- "cbd1_watch": "Videoyu izle"
+ "cbd1_watch": "Videoyu izle",
+ "sb_title": "🔥 Sunday Battle Bonus",
+ "sb_title_on": "🔥 Sunday Battle Bonus AÇIK",
+ "sb_rules": "Her pazar: aldığın her battle jetonuna +%%%1$s. Her 1.000 jeton için %2$s, sınır yok.",
+ "sb_next": "Sonraki: %1$s",
+ "sb_jump": "Bu kampanya sürerken sen de katıl!",
+ "sb_extra_today": "Bugünkü ekstran: %1$s",
+ "sb_coins_line": "%1$s battle jetonu · +%%%2$s · sınır yok",
+ "sb_ends": "Bu gece yarısı sona eriyor (Filipinler saati)",
+ "sb_pill": "Sunday Bonus +%1$s%% · %2$s"
 }

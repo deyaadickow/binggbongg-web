@@ -12,6 +12,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import { initials, mediaUrl, type Gift } from "../lib/api";
 import { useT } from "../lib/i18n";
 import { GiftFlash } from "./GiftSheet";
+import { SundayBonusPill } from "./SundayBonus";
 import { battlerIdOf } from "../lib/countryBattleRoom";
 import { cbText, gridShape, type CbStage } from "../lib/countryBattle";
 
@@ -389,9 +390,11 @@ export function StarredYouBar({ ids, nameOf, onStarBack }: { ids: number[]; name
 
 /** The battle header. Country Battle's by default; Chat Battle passes its own title, score line,
  *  back label and a row of actions (Join / Leaderboard). */
-export function CbHeader({ stage, sub, line, liveCount, myScore, onBack, isTest, title, scoreText, backLabel, actions }: {
+export function CbHeader({ stage, sub, line, liveCount, myScore, onBack, isTest, title, scoreText, backLabel, actions, bonus = true, bonusBump }: {
   stage: string; sub: string; line: string; liveCount?: number | null; myScore?: number | null; onBack: () => void; isTest?: boolean;
   title?: string; scoreText?: string | null; backLabel?: string; actions?: React.ReactNode;
+  /** The Sunday Battle Bonus pill (only shows on a bonus Sunday); off for the loading/ended shells. */
+  bonus?: boolean; bonusBump?: unknown;
 }) {
   const { t } = useT();
   const score = scoreText ?? (myScore != null ? cbText(t("cb_my_today"), { n: myScore.toLocaleString() }) : null);
@@ -417,6 +420,7 @@ export function CbHeader({ stage, sub, line, liveCount, myScore, onBack, isTest,
             {actions && <span className="cb-head-actions">{actions}</span>}
           </div>
         )}
+        {bonus && <SundayBonusPill bump={bonusBump} />}
       </div>
     </>
   );

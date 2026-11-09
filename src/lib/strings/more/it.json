@@ -1588,5 +1588,14 @@
  "fblurb_announcements": "Guarda il video annuncio del giorno, in inglese o in tagalog.",
  "cbd1_title": "La Country Battle inizia il 1º dicembre!",
  "cbd1_sub": "Ogni giorno alle 20, ora delle Filippine: una battaglia di 10 minuti per tutto il paese.",
- "cbd1_watch": "Guarda il video"
+ "cbd1_watch": "Guarda il video",
+ "sb_title": "🔥 Sunday Battle Bonus",
+ "sb_title_on": "🔥 Il Sunday Battle Bonus è ATTIVO",
+ "sb_rules": "Ogni domenica: +%1$s%% su ogni moneta battle che ricevi. %2$s ogni 1.000 monete, senza limiti.",
+ "sb_next": "Prossimo: %1$s",
+ "sb_jump": "Salta a bordo finché dura la promozione!",
+ "sb_extra_today": "Il tuo extra di oggi: %1$s",
+ "sb_coins_line": "%1$s monete battle · +%2$s%% · senza limiti",
+ "sb_ends": "Termina stanotte a mezzanotte (ora delle Filippine)",
+ "sb_pill": "Sunday Bonus +%1$s%% · %2$s"
 }

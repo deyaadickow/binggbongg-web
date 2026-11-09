@@ -2104,4 +2104,14 @@ export const id = {
   cbd1_title: "Country Battle dimulai 1 Desember!",
   cbd1_sub: "Setiap hari pukul 8 malam waktu Filipina: satu battle 10 menit untuk seluruh negeri.",
   cbd1_watch: "Tonton videonya",
+  // Sunday Battle Bonus (Steve, 2026-11-09)
+  sb_title: "🔥 Sunday Battle Bonus",
+  sb_title_on: "🔥 Sunday Battle Bonus sedang AKTIF",
+  sb_rules: "Setiap hari Minggu: +%1$s%% untuk setiap koin battle yang kamu terima. %2$s untuk setiap 1.000 koin, tanpa batas.",
+  sb_next: "Berikutnya: %1$s",
+  sb_jump: "Ayo ikut selagi promo ini masih berlaku!",
+  sb_extra_today: "Tambahanmu hari ini: %1$s",
+  sb_coins_line: "%1$s koin battle · +%2$s%% · tanpa batas",
+  sb_ends: "Berakhir malam ini pukul 24.00 (waktu Filipina)",
+  sb_pill: "Sunday Bonus +%1$s%% · %2$s",
 };

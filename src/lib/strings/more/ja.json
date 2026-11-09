@@ -1588,5 +1588,14 @@
  "fblurb_announcements": "毎日の動画のお知らせを英語またはタガログ語で見られます。",
  "cbd1_title": "Country Battle は12月1日スタート！",
  "cbd1_sub": "毎日フィリピン時間の午後8時：全国で10分間のバトル。",
- "cbd1_watch": "動画を見る"
+ "cbd1_watch": "動画を見る",
+ "sb_title": "🔥 Sunday Battle Bonus",
+ "sb_title_on": "🔥 Sunday Battle Bonus 開催中",
+ "sb_rules": "毎週日曜日：受け取ったバトルコイン1枚ごとに+%1$s%%。1,000コインごとに%2$s、上限なし。",
+ "sb_next": "次回：%1$s",
+ "sb_jump": "キャンペーン期間中にぜひ参加しよう！",
+ "sb_extra_today": "今日のボーナス：%1$s",
+ "sb_coins_line": "バトルコイン %1$s · +%2$s%% · 上限なし",
+ "sb_ends": "今夜0時に終了（フィリピン時間）",
+ "sb_pill": "Sunday Bonus +%1$s%% · %2$s"
 }

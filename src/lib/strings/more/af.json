@@ -1587,5 +1587,14 @@
  "fblurb_announcements": "Kyk na die daaglikse video-aankondiging, in Engels of Tagalog.",
  "cbd1_title": "Country Battle begin op 1 Desember!",
  "cbd1_sub": "Elke dag om 20:00 Filippynse tyd: een 10-minuut-stryd vir die hele land.",
- "cbd1_watch": "Kyk na die video"
+ "cbd1_watch": "Kyk na die video",
+ "sb_title": "🔥 Sunday Battle Bonus",
+ "sb_title_on": "🔥 Sunday Battle Bonus is AAN",
+ "sb_rules": "Elke Sondag: +%1$s%% op elke battle-munt wat jy ontvang. %2$s vir elke 1 000 munte, geen limiet nie.",
+ "sb_next": "Volgende: %1$s",
+ "sb_jump": "Spring aan boord terwyl hierdie promosie duur!",
+ "sb_extra_today": "Jou ekstra vandag: %1$s",
+ "sb_coins_line": "%1$s battle-munte · +%2$s%% · geen limiet",
+ "sb_ends": "Eindig vanaand om middernag (Filippynse tyd)",
+ "sb_pill": "Sunday Bonus +%1$s%% · %2$s"
 }

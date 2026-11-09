@@ -1584,5 +1584,14 @@
  "fblurb_announcements": "Urmărește anunțul video zilnic, în engleză sau tagalog.",
  "cbd1_title": "Country Battle începe pe 1 decembrie!",
  "cbd1_sub": "În fiecare zi la ora 20, ora Filipinelor: o luptă de 10 minute pentru toată țara.",
- "cbd1_watch": "Vezi videoclipul"
+ "cbd1_watch": "Vezi videoclipul",
+ "sb_title": "🔥 Sunday Battle Bonus",
+ "sb_title_on": "🔥 Sunday Battle Bonus este ACTIV",
+ "sb_rules": "În fiecare duminică: +%1$s%% la fiecare monedă de battle primită. %2$s pentru fiecare 1.000 de monede, fără limită.",
+ "sb_next": "Următorul: %1$s",
+ "sb_jump": "Alătură-te cât timp durează promoția!",
+ "sb_extra_today": "Extra tău de azi: %1$s",
+ "sb_coins_line": "%1$s monede de battle · +%2$s%% · fără limită",
+ "sb_ends": "Se încheie la noapte, la miezul nopții (ora Filipinelor)",
+ "sb_pill": "Sunday Bonus +%1$s%% · %2$s"
 }

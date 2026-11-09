@@ -1589,5 +1589,14 @@
  "fblurb_announcements": "Ikusi eguneko bideo-iragarpena, ingelesez edo tagaloz.",
  "cbd1_title": "Country Battle abenduaren 1ean hasiko da!",
  "cbd1_sub": "Egunero 20:00etan, Filipinetako orduan: 10 minutuko borroka bat herrialde osoarentzat.",
- "cbd1_watch": "Ikusi bideoa"
+ "cbd1_watch": "Ikusi bideoa",
+ "sb_title": "🔥 Sunday Battle Bonus",
+ "sb_title_on": "🔥 Sunday Battle Bonus AKTIBO dago",
+ "sb_rules": "Igandero: +%1$s%% jasotzen duzun borroka-txanpon bakoitzean. %2$s 1.000 txanponeko, mugarik gabe.",
+ "sb_next": "Hurrengoa: %1$s",
+ "sb_jump": "Batu zaitez promozio honek irauten duen bitartean!",
+ "sb_extra_today": "Gaurko zure gehigarria: %1$s",
+ "sb_coins_line": "%1$s borroka-txanpon · +%2$s%% · mugarik gabe",
+ "sb_ends": "Gaur gauerdian amaituko da (Filipinetako ordua)",
+ "sb_pill": "Sunday Bonus +%1$s%% · %2$s"
 }

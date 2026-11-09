@@ -1580,5 +1580,14 @@
  "fblurb_announcements": "Katso päivän videotiedote englanniksi tai tagalogiksi.",
  "cbd1_title": "Country Battle alkaa 1. joulukuuta!",
  "cbd1_sub": "Joka päivä klo 20 Filippiinien aikaa: yksi 10 minuutin taistelu koko maalle.",
- "cbd1_watch": "Katso video"
+ "cbd1_watch": "Katso video",
+ "sb_title": "🔥 Sunday Battle Bonus",
+ "sb_title_on": "🔥 Sunday Battle Bonus on PÄÄLLÄ",
+ "sb_rules": "Joka sunnuntai: +%1$s%% jokaisesta saamastasi battle-kolikosta. %2$s jokaisesta 1 000 kolikosta, ei rajaa.",
+ "sb_next": "Seuraava: %1$s",
+ "sb_jump": "Lähde mukaan, kun kampanja on voimassa!",
+ "sb_extra_today": "Lisäsi tänään: %1$s",
+ "sb_coins_line": "%1$s battle-kolikkoa · +%2$s%% · ei rajaa",
+ "sb_ends": "Päättyy tänä yönä keskiyöllä (Filippiinien aikaa)",
+ "sb_pill": "Sunday Bonus +%1$s%% · %2$s"
 }

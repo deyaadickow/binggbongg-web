@@ -655,7 +655,7 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
   if (gone) {
     return (
       <div className="page cb-page" style={{ paddingTop: 10 }}>
-        <CbHeader title={source.title} stage="" sub="" line={t("chb_ended")} onBack={goBack} backLabel={t("chb_back")} />
+        <CbHeader title={source.title} stage="" sub="" line={t("chb_ended")} onBack={goBack} backLabel={t("chb_back")} bonus={false} />
         <Notice>{source.goneText(gone)}</Notice>
       </div>
     );
@@ -663,7 +663,7 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
   if (!st) {
     return (
       <div className="page cb-page" style={{ paddingTop: 10 }}>
-        <CbHeader title={source.title} stage="" sub="" line="" onBack={goBack} backLabel={t("chb_back")} />
+        <CbHeader title={source.title} stage="" sub="" line="" onBack={goBack} backLabel={t("chb_back")} bonus={false} />
         <Loading />
       </div>
     );
@@ -685,6 +685,7 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
   return (
     <div className="page cb-page" style={{ paddingTop: 10 }}>
       <CbHeader isTest={!!st.is_test} title={source.title} stage={st.name} sub={pl.sub} line={pl.line}
+        bonus={!ended} bonusBump={giftShow.note?.kind === "got" ? giftShow.note.key : 0}
         liveCount={st.phase === "upcoming" ? null : st.live_count}
         scoreText={isBattler ? cbText(t("chb_my_score"), { n: (me.score ?? 0).toLocaleString() }) : null}
         backLabel={isBattler && !ended ? t("cb_leave") : t("chb_back")}

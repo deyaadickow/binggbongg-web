@@ -1589,5 +1589,14 @@
  "fblurb_announcements": "매일의 동영상 공지를 영어 또는 타갈로그어로 시청하세요.",
  "cbd1_title": "Country Battle 12월 1일 시작!",
  "cbd1_sub": "매일 필리핀 시간 오후 8시: 전국이 함께하는 10분 배틀.",
- "cbd1_watch": "영상 보기"
+ "cbd1_watch": "영상 보기",
+ "sb_title": "🔥 Sunday Battle Bonus",
+ "sb_title_on": "🔥 Sunday Battle Bonus 진행 중",
+ "sb_rules": "매주 일요일: 받은 배틀 코인마다 +%1$s%%. 코인 1,000개당 %2$s, 한도 없음.",
+ "sb_next": "다음: %1$s",
+ "sb_jump": "프로모션 기간에 꼭 참여하세요!",
+ "sb_extra_today": "오늘 추가 수익: %1$s",
+ "sb_coins_line": "배틀 코인 %1$s개 · +%2$s%% · 한도 없음",
+ "sb_ends": "오늘 밤 자정에 종료 (필리핀 시간)",
+ "sb_pill": "Sunday Bonus +%1$s%% · %2$s"
 }
