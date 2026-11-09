@@ -61,7 +61,7 @@ function When({ at }: { at?: string | null }) {
   );
 }
 
-function PlayDisc({ size = 72 }: { size?: number }) {
+export function PlayDisc({ size = 72 }: { size?: number }) {
   return (
     <span aria-hidden style={{
       width: size, height: size, borderRadius: "50%", display: "grid", placeItems: "center",
@@ -132,7 +132,7 @@ function Card({ a, filipino, highlight, onPlay, cardRef }: {
 }
 
 /** Full-screen player: black, the video fitted whole, the browser's own controls, sound on. */
-function Player({ a, lang, filipino, onLang, onClose }: {
+export function Player({ a, lang, filipino, onLang, onClose }: {
   a: Announcement; lang: AnnouncementLang; filipino: boolean;
   onLang: (l: AnnouncementLang) => void; onClose: () => void;
 }) {

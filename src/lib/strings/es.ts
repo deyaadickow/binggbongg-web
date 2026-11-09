@@ -2081,4 +2081,8 @@ export const es = {
   ann_video_language: "Idioma del video",
   fname_announcements: "Video anuncios",
   fblurb_announcements: "Mira el video anuncio del día, en inglés o en tagalo.",
+  // Country Battle starts December 1 banner on For You (Steve, 2026-11-09).
+  cbd1_title: "¡Country Battle empieza el 1 de diciembre!",
+  cbd1_sub: "Todos los días a las 8 PM, hora de Filipinas: una batalla de 10 minutos para todo el país.",
+  cbd1_watch: "Ver el video",
 };

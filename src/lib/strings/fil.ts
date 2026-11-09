@@ -2105,4 +2105,8 @@ export const fil = {
   ann_video_language: "Wika ng video",
   fname_announcements: "Mga video anunsyo",
   fblurb_announcements: "Panoorin ang pang-araw-araw na video anunsyo, sa Ingles o Tagalog.",
+  // Country Battle starts December 1 banner on For You (Steve, 2026-11-09).
+  cbd1_title: "Simula na ang Country Battle sa Disyembre 1!",
+  cbd1_sub: "Araw-araw, alas-8 ng gabi (oras sa Pilipinas): isang 10-minutong battle para sa buong bansa.",
+  cbd1_watch: "Panoorin ang video",
 };

@@ -2100,4 +2100,8 @@ export const id = {
   ann_video_language: "Bahasa video",
   fname_announcements: "Video pengumuman",
   fblurb_announcements: "Tonton video pengumuman harian, dalam bahasa Inggris atau Tagalog.",
+  // Country Battle starts December 1 banner on For You (Steve, 2026-11-09).
+  cbd1_title: "Country Battle dimulai 1 Desember!",
+  cbd1_sub: "Setiap hari pukul 8 malam waktu Filipina: satu battle 10 menit untuk seluruh negeri.",
+  cbd1_watch: "Tonton videonya",
 };
