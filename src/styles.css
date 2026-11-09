@@ -832,9 +832,13 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .cb-test { display: block; text-align: center; padding: 6px 10px; margin-bottom: 8px; border-radius: 10px; background: #2a0d0d; border: 1px dashed #ff8a65; color: #ffcc80; font-size: 12px; font-weight: 700; }
 .cb-stage { position: relative; margin: 0 auto; }
 .cb-grid { display: grid; gap: 3px; width: 100%; }
-.cb-tile { position: relative; aspect-ratio: 3 / 4; border-radius: 6px; overflow: hidden; background: #111; border: 1px solid rgba(212,175,55,.35); cursor: pointer; animation: cb-pop .45s ease-out; padding: 0; container-type: inline-size; font: inherit; color: inherit; text-align: left; }
-.cb-tile.own { border: 2px solid var(--gold); box-shadow: 0 0 10px rgba(240,196,32,.55); cursor: default; }
-.cb-tile.listening { border-color: #4CD964; box-shadow: 0 0 0 1px #4CD964; }
+/* Steve, 2026-11-09: "add a gold border around all the video tabs ... and make the host's tab a darker
+   gold border". Every tile #D4AF37 2px (border-box, so nothing shifts); your own tile — or, for a viewer,
+   the host they came in through (.home), and a multi-live room's host — #B8860B 3px, no glow.
+   Who you hear (.listening) is a green ring INSIDE the gold, not a replacement for it. */
+.cb-tile { position: relative; aspect-ratio: 3 / 4; border-radius: 6px; overflow: hidden; background: #111; border: 2px solid #D4AF37; cursor: pointer; animation: cb-pop .45s ease-out; padding: 0; container-type: inline-size; font: inherit; color: inherit; text-align: left; }
+.cb-tile.own { border: 3px solid #B8860B; box-shadow: none; cursor: default; }
+.cb-tile.listening::after { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: 3px; box-shadow: inset 0 0 0 2px #4CD964; pointer-events: none; }
 .cb-tile video, .cb-tile .cb-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .cb-tile .cb-ph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
 .cb-tile .cb-ph i { font-style: normal; width: 46%; aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; background: var(--gold); color: #101010; font-weight: 800; font-size: 15cqw; }
@@ -844,9 +848,9 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .cb-gift:hover { border-color: var(--gold-bright); }
 .cb-ear { position: absolute; top: 3px; left: 3px; z-index: 2; font-size: 11px; line-height: 1; padding: 3px 4px; border-radius: 999px; background: rgba(0,0,0,.75); border: 1px solid #4CD964; }
 .cb-star { position: absolute; top: 3px; left: 3px; z-index: 2; width: 16px; height: 16px; border-radius: 50%; display: grid; place-items: center; background: rgba(0,0,0,.78); color: var(--gold); font-size: 11px; line-height: 1; pointer-events: none; text-shadow: 0 0 4px rgba(240,196,32,.8); }
-.cb-tile.starred { border-color: var(--gold); }
+.cb-tile.starred { border-color: #D4AF37; }
 .cb-tile.starred .cb-ear { display: none; } /* a starred tile is always heard — the star says so */
-.cb-tile.home { border: 2px solid var(--gold); box-shadow: 0 0 10px rgba(240,196,32,.55); }
+.cb-tile.home { border: 3px solid #B8860B; box-shadow: none; }
 .cb-tile.spot { border: 2px solid var(--gold-bright, #FFD84A); animation: cb-pop .45s ease-out, cb-spot 1s ease-in-out infinite; z-index: 1; }
 @keyframes cb-spot { 0%, 100% { box-shadow: 0 0 0 1px var(--gold), 0 0 6px rgba(240,196,32,.5); } 50% { box-shadow: 0 0 0 3px #FFE27A, 0 0 18px rgba(240,196,32,.95); } }
 .cb-head-actions { margin-left: auto; display: inline-flex; gap: 6px; align-items: center; }
@@ -940,7 +944,7 @@ a.cb-badge, a.cb-badge:hover { color: #241500; text-decoration: none; }
 .cb-grid.cols-2 .cb-muted { font-size: 12px; bottom: 24px; right: 6px; }
 .cb-starme { position: absolute; left: 3px; right: 3px; top: 22px; z-index: 2; padding: 1px 3px; border-radius: 4px; background: rgba(0,0,0,.82); border: 1px solid var(--gold); color: var(--gold); font-size: 8.5px; font-weight: 800; line-height: 1.3; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: none; animation: cb-spot 1.2s ease-in-out infinite; }
 .cb-grid.cols-2 .cb-starme { top: 42px; font-size: 11px; }
-.cb-tile.starred-me { border-color: var(--gold); }
+.cb-tile.starred-me { border-color: #D4AF37; }
 .cb-starbar { display: flex; flex-direction: column; gap: 4px; margin: 0 auto 6px; max-width: 980px; }
 .cb-starbar-row { display: flex; align-items: center; gap: 8px; padding: 4px 6px 4px 10px; border-radius: 999px; background: #2A2205; border: 1.5px solid var(--gold); color: var(--gold); font-size: 12.5px; font-weight: 700; }
 .cb-starbar-row span { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -995,7 +999,7 @@ body.signup-black { background: #000; }
 .video-grid.ml-on { display: block; aspect-ratio: auto; min-height: 0; padding: 3px; }
 .ml-stage { position: relative; margin: 0 auto; }
 .ml-top { padding-bottom: 3px; margin-bottom: 3px; border-bottom: 2px solid var(--gold); }
-.ml-tile.host { border: 2px solid var(--gold); }
+.ml-tile.host { border: 3px solid #B8860B; }
 .ml-tile.own .cb-name { color: var(--gold); font-weight: 800; }
 .ml-spk { position: absolute; left: 3px; bottom: 17px; z-index: 2; min-width: 22px; height: 22px; padding: 0 3px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; gap: 1px; font-size: 11px; line-height: 1; cursor: pointer; background: rgba(0,0,0,.8); border: 1.5px solid rgba(255,255,255,.5); color: #fff; }
 .ml-spk.on { border-color: var(--gold); }
