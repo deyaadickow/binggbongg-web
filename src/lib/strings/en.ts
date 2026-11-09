@@ -1770,6 +1770,8 @@ export const en = {
   aa_load_error: "Couldn't load this ad's analytics.",
   pa_sponsored: "Sponsored",
   pa_visit: "Visit website",
+  pa_sound_on: "Tap for sound",
+  pa_sound_off: "Sound off",
   lp_badge: "Philippines · All November",
   lp_title: "Philippine Singing Contest",
   lp_sub: "Free to enter. Upload your song, and Bingg Bongg members vote for the best voices.",

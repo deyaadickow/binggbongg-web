@@ -1573,6 +1573,8 @@ export const fil = {
   aa_load_error: "Hindi ma-load ang analytics ng ad na ito.",
   pa_sponsored: "Sponsored",
   pa_visit: "Bisitahin ang website",
+  pa_sound_on: "I-tap para sa tunog",
+  pa_sound_off: "Patayin ang tunog",
   lp_badge: "Pilipinas · Buong Nobyembre",
   lp_title: "Philippine Singing Contest",
   lp_sub: "Libre ang pagsali. I-upload ang kanta mo, at ang mga miyembro ng Bingg Bongg ang boboto para sa pinakamagagandang boses.",

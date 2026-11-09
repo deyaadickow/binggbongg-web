@@ -1568,6 +1568,8 @@ export const id = {
   aa_load_error: "Tidak dapat memuat analitik iklan ini.",
   pa_sponsored: "Bersponsor",
   pa_visit: "Kunjungi situs",
+  pa_sound_on: "Ketuk untuk suara",
+  pa_sound_off: "Matikan suara",
   lp_badge: "Filipina · Sepanjang November",
   lp_title: "Kontes Menyanyi Filipina",
   lp_sub: "Gratis untuk ikut. Unggah lagumu, dan anggota Bingg Bongg memilih suara terbaik.",

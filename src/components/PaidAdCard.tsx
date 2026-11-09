@@ -7,7 +7,7 @@
 // videos, it is plainly labelled Sponsored, and showing it counts one view — when at least half of
 // it is on screen, not when it merely exists further down the page. The server ignores a repeat
 // from the same member within 20 seconds, so scrolling back and forth can't run a count up.
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { mediaUrl, post } from "../lib/api";
 import { useT } from "../lib/i18n";
 
@@ -25,6 +25,22 @@ export function PaidAdCard({ ad, userId }: { ad: FeedVideoAd; userId: number }) 
   const box = useRef<HTMLDivElement>(null);
   const video = useRef<HTMLVideoElement>(null);
   const counted = useRef(false);
+  // Steve, 2026-11-09, on the Country Battle ad: "didn't have sound." A browser only lets a video
+  // start on its own when it is muted, so the ad starts muted and this gold button turns the sound
+  // on — and plays the ad again from the start, so the member hears all of it.
+  const [soundOn, setSoundOn] = useState(false);
+  const toggleSound = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const v = video.current;
+    if (!v) return;
+    const on = !soundOn;
+    v.muted = !on;
+    if (on) {
+      v.currentTime = 0;
+      v.play().catch(() => undefined);
+    }
+    setSoundOn(on);
+  };
 
   useEffect(() => {
     const el = box.current;
@@ -61,9 +77,14 @@ export function PaidAdCard({ ad, userId }: { ad: FeedVideoAd; userId: number }) 
         onClick={open} onKeyDown={(e) => { if (e.key === "Enter") open(); }}
         style={{ display: "block", cursor: ad.click_url ? "pointer" : "default", position: "relative" }}>
         <video ref={video} src={mediaUrl(ad.video_path)} poster={ad.thumb_path ? mediaUrl(ad.thumb_path) : undefined}
-          muted loop playsInline preload="none" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+          muted={!soundOn} loop playsInline preload="none" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
         <span style={{ position: "absolute", top: 8, left: 8, background: "#000", color: "var(--gold)", border: "1px solid var(--gold)",
           borderRadius: 999, padding: "2px 10px", fontSize: 12, fontWeight: 800 }}>{t("pa_sponsored")}</span>
+        <button type="button" onClick={toggleSound} aria-label={t(soundOn ? "pa_sound_off" : "pa_sound_on")}
+          style={{ position: "absolute", bottom: 8, right: 8, background: "#000", color: "var(--gold)", border: "1px solid var(--gold)",
+            borderRadius: 999, padding: "4px 12px", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>
+          {soundOn ? "🔊" : `🔇 ${t("pa_sound_on")}`}
+        </button>
       </div>
       <div className="body">
         <div className="row" style={{ minWidth: 0, flex: 1, gap: 8 }}>

@@ -1541,6 +1541,8 @@ export const es = {
   aa_load_error: "No se pudieron cargar las estadísticas de este anuncio.",
   pa_sponsored: "Patrocinado",
   pa_visit: "Visitar sitio web",
+  pa_sound_on: "Toca para el sonido",
+  pa_sound_off: "Sin sonido",
   lp_badge: "Filipinas · Todo noviembre",
   lp_title: "Concurso de Canto de Filipinas",
   lp_sub: "Participar es gratis. Sube tu canción y los miembros de Bingg Bongg votan por las mejores voces.",
