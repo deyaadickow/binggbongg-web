@@ -2087,4 +2087,17 @@ export const id = {
   xc_body: "%1$s berasal dari %2$s. Aktifkan terjemahan untuk melihat apa yang mereka katakan dalam bahasamu.",
   xc_turn_on: "Aktifkan terjemahan",
   xc_already_on: "Terjemahan aktif: obrolan ditampilkan dalam %1$s.",
+  // Inbox -> Announcements, the daily video announcement (Steve, 2026-11-09).
+  announcements: "Pengumuman",
+  inbox: "Kotak Masuk",
+  ann_empty: "Belum ada pengumuman. Video pengumuman harian akan muncul di sini.",
+  ann_play_video: "Putar video",
+  ann_english: "Inggris",
+  ann_tagalog: "Tagalog",
+  ann_close: "Tutup",
+  ann_video_failed: "Video ini tidak dapat diputar. Silakan coba lagi nanti.",
+  ann_not_found: "Pengumuman itu sudah tidak tersedia.",
+  ann_video_language: "Bahasa video",
+  fname_announcements: "Video pengumuman",
+  fblurb_announcements: "Tonton video pengumuman harian, dalam bahasa Inggris atau Tagalog.",
 };

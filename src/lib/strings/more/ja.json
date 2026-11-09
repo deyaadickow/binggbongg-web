@@ -1573,5 +1573,17 @@
  "online_friends": "友達",
  "online_following": "フォロー中",
  "online_followers": "フォロワー",
- "online_live": "ライブ"
+ "online_live": "ライブ",
+ "announcements": "お知らせ",
+ "inbox": "受信箱",
+ "ann_empty": "まだお知らせはありません。毎日の動画のお知らせがここに表示されます。",
+ "ann_play_video": "動画を再生",
+ "ann_english": "英語",
+ "ann_tagalog": "タガログ語",
+ "ann_close": "閉じる",
+ "ann_video_failed": "この動画を再生できませんでした。しばらくしてからもう一度お試しください。",
+ "ann_not_found": "そのお知らせはもう表示できません。",
+ "ann_video_language": "動画の言語",
+ "fname_announcements": "動画のお知らせ",
+ "fblurb_announcements": "毎日の動画のお知らせを英語またはタガログ語で見られます。"
 }

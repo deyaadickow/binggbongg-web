@@ -1571,5 +1571,17 @@
  "online_friends": "Venner",
  "online_following": "Følger",
  "online_followers": "Følgere",
- "online_live": "Direkte"
+ "online_live": "Direkte",
+ "announcements": "Kunngjøringer",
+ "inbox": "Innboks",
+ "ann_empty": "Ingen kunngjøringer ennå. Dagens videokunngjøring vises her.",
+ "ann_play_video": "Spill av videoen",
+ "ann_english": "Engelsk",
+ "ann_tagalog": "Tagalog",
+ "ann_close": "Lukk",
+ "ann_video_failed": "Videoen kunne ikke spilles av. Prøv igjen senere.",
+ "ann_not_found": "Den kunngjøringen er ikke lenger tilgjengelig.",
+ "ann_video_language": "Videospråk",
+ "fname_announcements": "Videokunngjøringer",
+ "fblurb_announcements": "Se dagens videokunngjøring på engelsk eller tagalog."
 }

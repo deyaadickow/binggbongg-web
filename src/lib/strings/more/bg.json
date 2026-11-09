@@ -1574,5 +1574,17 @@
  "online_friends": "Приятели",
  "online_following": "Следвани",
  "online_followers": "Последователи",
- "online_live": "На живо"
+ "online_live": "На живо",
+ "announcements": "Съобщения",
+ "inbox": "Входящи",
+ "ann_empty": "Все още няма съобщения. Ежедневното видео съобщение ще се появи тук.",
+ "ann_play_video": "Пусни видеото",
+ "ann_english": "Английски",
+ "ann_tagalog": "Тагалог",
+ "ann_close": "Затвори",
+ "ann_video_failed": "Това видео не може да бъде пуснато. Моля, опитайте отново по-късно.",
+ "ann_not_found": "Това съобщение вече не е налично.",
+ "ann_video_language": "Език на видеото",
+ "fname_announcements": "Видео съобщения",
+ "fblurb_announcements": "Гледайте ежедневното видео съобщение на английски или тагалог."
 }

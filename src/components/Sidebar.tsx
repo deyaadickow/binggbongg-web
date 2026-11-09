@@ -36,6 +36,8 @@ export function sidebarSections(userId: number | null, contestOn = false): SideS
       { to: "/messages", label: "messages", icon: "💬", needsLogin: true },
       // Steve, 2026-10-18: "Add the notification record so members can read it later."
       { to: "/notifications", label: "notifications", icon: "🔔", needsLogin: true },
+      // Steve, 2026-11-09: the daily video announcement, in English and Tagalog.
+      { to: "/announcements", label: "announcements", icon: "📢", needsLogin: true },
       { to: "/upload", label: "upload_video", icon: "🎬", needsLogin: true },
       { to: "/photos-directory", label: "photos", icon: "📷", needsLogin: true },
       { to: "/photos", label: "my_photos", icon: "🖼️", needsLogin: true },

@@ -1574,5 +1574,17 @@
  "online_friends": "ጓደኞች",
  "online_following": "በመከተል ላይ",
  "online_followers": "ተከታዮች",
- "online_live": "ላይቭ"
+ "online_live": "ላይቭ",
+ "announcements": "ማስታወቂያዎች",
+ "inbox": "የገቢ መልዕክት ሳጥን",
+ "ann_empty": "እስካሁን ምንም ማስታወቂያ የለም። የዕለቱ የቪዲዮ ማስታወቂያ እዚህ ይታያል።",
+ "ann_play_video": "ቪዲዮውን አጫውት",
+ "ann_english": "እንግሊዝኛ",
+ "ann_tagalog": "ታጋሎግ",
+ "ann_close": "ዝጋ",
+ "ann_video_failed": "ይህ ቪዲዮ ሊጫወት አልቻለም። እባክዎ ቆየት ብለው እንደገና ይሞክሩ።",
+ "ann_not_found": "ያ ማስታወቂያ ከአሁን በኋላ አይገኝም።",
+ "ann_video_language": "የቪዲዮ ቋንቋ",
+ "fname_announcements": "የቪዲዮ ማስታወቂያዎች",
+ "fblurb_announcements": "የዕለቱን የቪዲዮ ማስታወቂያ በእንግሊዝኛ ወይም በታጋሎግ ይመልከቱ።"
 }

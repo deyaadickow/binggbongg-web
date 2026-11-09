@@ -1573,5 +1573,17 @@
  "online_friends": "বন্ধু",
  "online_following": "ফলোয়িং",
  "online_followers": "ফলোয়ার",
- "online_live": "লাইভ"
+ "online_live": "লাইভ",
+ "announcements": "ঘোষণা",
+ "inbox": "ইনবক্স",
+ "ann_empty": "এখনও কোনো ঘোষণা নেই। প্রতিদিনের ভিডিও ঘোষণা এখানে দেখা যাবে।",
+ "ann_play_video": "ভিডিওটি চালান",
+ "ann_english": "ইংরেজি",
+ "ann_tagalog": "তাগালগ",
+ "ann_close": "বন্ধ করুন",
+ "ann_video_failed": "এই ভিডিওটি চালানো যায়নি। অনুগ্রহ করে পরে আবার চেষ্টা করুন।",
+ "ann_not_found": "সেই ঘোষণাটি আর পাওয়া যাচ্ছে না।",
+ "ann_video_language": "ভিডিওর ভাষা",
+ "fname_announcements": "ভিডিও ঘোষণা",
+ "fblurb_announcements": "প্রতিদিনের ভিডিও ঘোষণা দেখুন, ইংরেজি বা তাগালগে।"
 }

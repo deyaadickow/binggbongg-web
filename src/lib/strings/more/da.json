@@ -1571,5 +1571,17 @@
  "online_friends": "Venner",
  "online_following": "Følger",
  "online_followers": "Følgere",
- "online_live": "Live"
+ "online_live": "Live",
+ "announcements": "Meddelelser",
+ "inbox": "Indbakke",
+ "ann_empty": "Ingen meddelelser endnu. Dagens videomeddelelse vises her.",
+ "ann_play_video": "Afspil videoen",
+ "ann_english": "Engelsk",
+ "ann_tagalog": "Tagalog",
+ "ann_close": "Luk",
+ "ann_video_failed": "Videoen kunne ikke afspilles. Prøv igen senere.",
+ "ann_not_found": "Den meddelelse er ikke længere tilgængelig.",
+ "ann_video_language": "Videosprog",
+ "fname_announcements": "Videomeddelelser",
+ "fblurb_announcements": "Se dagens videomeddelelse på engelsk eller tagalog."
 }

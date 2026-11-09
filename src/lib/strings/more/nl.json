@@ -1574,5 +1574,17 @@
  "online_friends": "Vrienden",
  "online_following": "Volgend",
  "online_followers": "Volgers",
- "online_live": "Live"
+ "online_live": "Live",
+ "announcements": "Mededelingen",
+ "inbox": "Inbox",
+ "ann_empty": "Nog geen mededelingen. De dagelijkse videomededeling verschijnt hier.",
+ "ann_play_video": "Video afspelen",
+ "ann_english": "Engels",
+ "ann_tagalog": "Tagalog",
+ "ann_close": "Sluiten",
+ "ann_video_failed": "Deze video kon niet worden afgespeeld. Probeer het later opnieuw.",
+ "ann_not_found": "Die mededeling is niet meer beschikbaar.",
+ "ann_video_language": "Videotaal",
+ "fname_announcements": "Videomededelingen",
+ "fblurb_announcements": "Bekijk de dagelijkse videomededeling, in het Engels of Tagalog."
 }

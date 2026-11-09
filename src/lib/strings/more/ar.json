@@ -1872,5 +1872,17 @@
  "online_friends": "الأصدقاء",
  "online_following": "المتابَعون",
  "online_followers": "المتابعون",
- "online_live": "مباشر"
+ "online_live": "مباشر",
+ "announcements": "الإعلانات",
+ "inbox": "البريد الوارد",
+ "ann_empty": "لا توجد إعلانات بعد. سيظهر إعلان الفيديو اليومي هنا.",
+ "ann_play_video": "تشغيل الفيديو",
+ "ann_english": "الإنجليزية",
+ "ann_tagalog": "التاغالوغية",
+ "ann_close": "إغلاق",
+ "ann_video_failed": "تعذّر تشغيل هذا الفيديو. يُرجى المحاولة مرة أخرى لاحقًا.",
+ "ann_not_found": "هذا الإعلان لم يعد متاحًا.",
+ "ann_video_language": "لغة الفيديو",
+ "fname_announcements": "إعلانات الفيديو",
+ "fblurb_announcements": "شاهد إعلان الفيديو اليومي بالإنجليزية أو التاغالوغية."
 }

@@ -1573,5 +1573,17 @@
  "online_friends": "Друзі",
  "online_following": "Підписки",
  "online_followers": "Підписники",
- "online_live": "Наживо"
+ "online_live": "Наживо",
+ "announcements": "Оголошення",
+ "inbox": "Вхідні",
+ "ann_empty": "Оголошень поки немає. Тут з'являтиметься щоденне відеооголошення.",
+ "ann_play_video": "Відтворити відео",
+ "ann_english": "Англійська",
+ "ann_tagalog": "Тагальська",
+ "ann_close": "Закрити",
+ "ann_video_failed": "Не вдалося відтворити це відео. Спробуйте пізніше.",
+ "ann_not_found": "Це оголошення більше недоступне.",
+ "ann_video_language": "Мова відео",
+ "fname_announcements": "Відеооголошення",
+ "fblurb_announcements": "Дивіться щоденне відеооголошення англійською або тагальською."
 }

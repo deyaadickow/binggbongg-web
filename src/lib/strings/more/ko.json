@@ -1574,5 +1574,17 @@
  "online_friends": "친구",
  "online_following": "팔로잉",
  "online_followers": "팔로워",
- "online_live": "라이브"
+ "online_live": "라이브",
+ "announcements": "공지사항",
+ "inbox": "받은편지함",
+ "ann_empty": "아직 공지사항이 없습니다. 매일의 동영상 공지가 여기에 표시됩니다.",
+ "ann_play_video": "동영상 재생",
+ "ann_english": "영어",
+ "ann_tagalog": "타갈로그어",
+ "ann_close": "닫기",
+ "ann_video_failed": "이 동영상을 재생할 수 없습니다. 나중에 다시 시도해 주세요.",
+ "ann_not_found": "해당 공지는 더 이상 볼 수 없습니다.",
+ "ann_video_language": "동영상 언어",
+ "fname_announcements": "동영상 공지",
+ "fblurb_announcements": "매일의 동영상 공지를 영어 또는 타갈로그어로 시청하세요."
 }

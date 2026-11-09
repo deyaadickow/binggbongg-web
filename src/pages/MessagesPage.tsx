@@ -9,6 +9,7 @@ import { Avatar, Loading, Notice } from "../components/Common";
 import { observeConversations, type DmConversation } from "../lib/dm";
 import { useSession } from "../lib/session";
 import { useT } from "../lib/i18n";
+import { InboxTabs } from "../components/InboxTabs";
 
 function whenLabel(ms: number): string {
   if (!ms) return "";
@@ -49,6 +50,7 @@ export function MessagesPage() {
   return (
     <div className="page">
       <h2 className="lb-bar title">{t("messages")}</h2>
+      <InboxTabs />
       {error && <Notice error>{error}</Notice>}
       {rows === null && !error && <Loading />}
       {rows?.length === 0 && <Notice>{t("no_messages_yet_open_a_member_s_profile")}</Notice>}

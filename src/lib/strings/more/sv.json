@@ -1572,5 +1572,17 @@
  "online_friends": "Vänner",
  "online_following": "Följer",
  "online_followers": "Följare",
- "online_live": "Live"
+ "online_live": "Live",
+ "announcements": "Meddelanden",
+ "inbox": "Inkorg",
+ "ann_empty": "Inga meddelanden än. Dagens videomeddelande visas här.",
+ "ann_play_video": "Spela upp videon",
+ "ann_english": "Engelska",
+ "ann_tagalog": "Tagalog",
+ "ann_close": "Stäng",
+ "ann_video_failed": "Videon kunde inte spelas upp. Försök igen senare.",
+ "ann_not_found": "Det meddelandet är inte längre tillgängligt.",
+ "ann_video_language": "Videospråk",
+ "fname_announcements": "Videomeddelanden",
+ "fblurb_announcements": "Titta på dagens videomeddelande på engelska eller tagalog."
 }

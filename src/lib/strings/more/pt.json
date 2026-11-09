@@ -1574,5 +1574,17 @@
  "online_friends": "Friends",
  "online_following": "Following",
  "online_followers": "Followers",
- "online_live": "Live"
+ "online_live": "Live",
+ "announcements": "Anúncios",
+ "inbox": "Caixa de entrada",
+ "ann_empty": "Ainda não há anúncios. O vídeo anúncio do dia aparecerá aqui.",
+ "ann_play_video": "Reproduzir o vídeo",
+ "ann_english": "Inglês",
+ "ann_tagalog": "Tagalo",
+ "ann_close": "Fechar",
+ "ann_video_failed": "Não foi possível reproduzir este vídeo. Tente novamente mais tarde.",
+ "ann_not_found": "Esse anúncio não está mais disponível.",
+ "ann_video_language": "Idioma do vídeo",
+ "fname_announcements": "Vídeo anúncios",
+ "fblurb_announcements": "Assista ao vídeo anúncio do dia, em inglês ou tagalo."
 }

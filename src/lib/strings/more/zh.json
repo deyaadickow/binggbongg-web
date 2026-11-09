@@ -1574,5 +1574,17 @@
  "online_friends": "朋友",
  "online_following": "关注",
  "online_followers": "粉丝",
- "online_live": "直播"
+ "online_live": "直播",
+ "announcements": "公告",
+ "inbox": "收件箱",
+ "ann_empty": "暂无公告。每日视频公告将显示在这里。",
+ "ann_play_video": "播放视频",
+ "ann_english": "英语",
+ "ann_tagalog": "他加禄语",
+ "ann_close": "关闭",
+ "ann_video_failed": "无法播放此视频，请稍后再试。",
+ "ann_not_found": "该公告已不再提供。",
+ "ann_video_language": "视频语言",
+ "fname_announcements": "视频公告",
+ "fblurb_announcements": "观看每日视频公告，可选英语或他加禄语。"
 }

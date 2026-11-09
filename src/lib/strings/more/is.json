@@ -1571,5 +1571,17 @@
  "online_friends": "Vinir",
  "online_following": "Fylgist með",
  "online_followers": "Fylgjendur",
- "online_live": "Í beinni"
+ "online_live": "Í beinni",
+ "announcements": "Tilkynningar",
+ "inbox": "Innhólf",
+ "ann_empty": "Engar tilkynningar enn. Myndbandstilkynning dagsins birtist hér.",
+ "ann_play_video": "Spila myndbandið",
+ "ann_english": "Enska",
+ "ann_tagalog": "Tagalog",
+ "ann_close": "Loka",
+ "ann_video_failed": "Ekki tókst að spila þetta myndband. Reyndu aftur síðar.",
+ "ann_not_found": "Þessi tilkynning er ekki lengur í boði.",
+ "ann_video_language": "Tungumál myndbands",
+ "fname_announcements": "Myndbandstilkynningar",
+ "fblurb_announcements": "Horfðu á myndbandstilkynningu dagsins, á ensku eða tagalog."
 }

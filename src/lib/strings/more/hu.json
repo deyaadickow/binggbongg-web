@@ -1567,5 +1567,17 @@
  "online_friends": "Barátok",
  "online_following": "Követés",
  "online_followers": "Követők",
- "online_live": "Élő"
+ "online_live": "Élő",
+ "announcements": "Közlemények",
+ "inbox": "Beérkezett üzenetek",
+ "ann_empty": "Még nincsenek közlemények. A napi videóközlemény itt jelenik meg.",
+ "ann_play_video": "Videó lejátszása",
+ "ann_english": "Angol",
+ "ann_tagalog": "Tagalog",
+ "ann_close": "Bezárás",
+ "ann_video_failed": "Ezt a videót nem sikerült lejátszani. Kérjük, próbáld újra később.",
+ "ann_not_found": "Ez a közlemény már nem érhető el.",
+ "ann_video_language": "A videó nyelve",
+ "fname_announcements": "Videóközlemények",
+ "fblurb_announcements": "Nézd meg a napi videóközleményt angolul vagy tagalogul."
 }

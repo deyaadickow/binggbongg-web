@@ -32,6 +32,8 @@ const ROUTES: ScreenRoute[] = [
   { path: "/messages", screen: "inbox" },
   { path: "/messages/:id", screen: "chat", ref: { param: "id", type: "member", awaitLabel: true } },
   { path: "/notifications", screen: "notifications" },
+  { path: "/announcements", screen: "announcements" },
+  { path: "/announcements/:id", screen: "announcement" },
 
   // Live.
   { path: "/live", screen: "live_now" },

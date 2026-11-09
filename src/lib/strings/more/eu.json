@@ -1574,5 +1574,17 @@
  "online_friends": "Lagunak",
  "online_following": "Jarraitzen",
  "online_followers": "Jarraitzaileak",
- "online_live": "Zuzenean"
+ "online_live": "Zuzenean",
+ "announcements": "Iragarpenak",
+ "inbox": "Sarrera-ontzia",
+ "ann_empty": "Oraindik ez dago iragarpenik. Eguneko bideo-iragarpena hemen agertuko da.",
+ "ann_play_video": "Erreproduzitu bideoa",
+ "ann_english": "Ingelesa",
+ "ann_tagalog": "Tagaloa",
+ "ann_close": "Itxi",
+ "ann_video_failed": "Ezin izan da bideo hau erreproduzitu. Saiatu berriro geroago.",
+ "ann_not_found": "Iragarpen hori ez dago eskuragarri jada.",
+ "ann_video_language": "Bideoaren hizkuntza",
+ "fname_announcements": "Bideo-iragarpenak",
+ "fblurb_announcements": "Ikusi eguneko bideo-iragarpena, ingelesez edo tagaloz."
 }

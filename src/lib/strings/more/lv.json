@@ -1570,5 +1570,17 @@
  "online_friends": "Draugi",
  "online_following": "Seko",
  "online_followers": "Sekotāji",
- "online_live": "Tiešraide"
+ "online_live": "Tiešraide",
+ "announcements": "Paziņojumi",
+ "inbox": "Iesūtne",
+ "ann_empty": "Paziņojumu vēl nav. Šeit parādīsies ikdienas video paziņojums.",
+ "ann_play_video": "Atskaņot video",
+ "ann_english": "Angļu",
+ "ann_tagalog": "Tagalu",
+ "ann_close": "Aizvērt",
+ "ann_video_failed": "Šo video nevarēja atskaņot. Lūdzu, mēģiniet vēlāk vēlreiz.",
+ "ann_not_found": "Šis paziņojums vairs nav pieejams.",
+ "ann_video_language": "Video valoda",
+ "fname_announcements": "Video paziņojumi",
+ "fblurb_announcements": "Skatieties ikdienas video paziņojumu angļu vai tagalu valodā."
 }

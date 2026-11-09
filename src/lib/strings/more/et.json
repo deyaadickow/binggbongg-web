@@ -1571,5 +1571,17 @@
  "online_friends": "Sõbrad",
  "online_following": "Jälgimine",
  "online_followers": "Jälgijad",
- "online_live": "Otse"
+ "online_live": "Otse",
+ "announcements": "Teadaanded",
+ "inbox": "Postkast",
+ "ann_empty": "Teadaandeid veel pole. Igapäevane videoteadaanne ilmub siia.",
+ "ann_play_video": "Esita video",
+ "ann_english": "Inglise",
+ "ann_tagalog": "Tagalogi",
+ "ann_close": "Sulge",
+ "ann_video_failed": "Seda videot ei saanud esitada. Proovi hiljem uuesti.",
+ "ann_not_found": "See teadaanne pole enam saadaval.",
+ "ann_video_language": "Video keel",
+ "fname_announcements": "Videoteadaanded",
+ "fblurb_announcements": "Vaata igapäevast videoteadaannet inglise või tagalogi keeles."
 }

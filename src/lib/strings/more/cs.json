@@ -1573,5 +1573,17 @@
  "online_friends": "Přátelé",
  "online_following": "Sledovaní",
  "online_followers": "Sledující",
- "online_live": "Živě"
+ "online_live": "Živě",
+ "announcements": "Oznámení",
+ "inbox": "Doručená pošta",
+ "ann_empty": "Zatím žádná oznámení. Denní video oznámení se objeví zde.",
+ "ann_play_video": "Přehrát video",
+ "ann_english": "Angličtina",
+ "ann_tagalog": "Tagalština",
+ "ann_close": "Zavřít",
+ "ann_video_failed": "Toto video nelze přehrát. Zkuste to prosím později.",
+ "ann_not_found": "Toto oznámení již není k dispozici.",
+ "ann_video_language": "Jazyk videa",
+ "fname_announcements": "Video oznámení",
+ "fblurb_announcements": "Podívejte se na denní video oznámení v angličtině nebo tagalštině."
 }

@@ -2092,4 +2092,17 @@ export const fil = {
   xc_body: "Si %1$s ay mula sa %2$s. I-on ang pagsasalin para makita ang sinasabi niya sa iyong wika.",
   xc_turn_on: "I-on ang pagsasalin",
   xc_already_on: "Naka-on ang pagsasalin: ang chat ay ipinapakita sa %1$s.",
+  // Inbox -> Announcements, the daily video announcement (Steve, 2026-11-09).
+  announcements: "Mga Anunsyo",
+  inbox: "Inbox",
+  ann_empty: "Wala pang anunsyo. Lalabas dito ang pang-araw-araw na video anunsyo.",
+  ann_play_video: "I-play ang video",
+  ann_english: "Ingles",
+  ann_tagalog: "Tagalog",
+  ann_close: "Isara",
+  ann_video_failed: "Hindi ma-play ang video na ito. Pakisubukang muli mamaya.",
+  ann_not_found: "Hindi na available ang anunsyong iyon.",
+  ann_video_language: "Wika ng video",
+  fname_announcements: "Mga video anunsyo",
+  fblurb_announcements: "Panoorin ang pang-araw-araw na video anunsyo, sa Ingles o Tagalog.",
 };

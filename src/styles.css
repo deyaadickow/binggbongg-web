@@ -1229,3 +1229,9 @@ body.signup-black { background: radial-gradient(120% 55% at 50% 0%, #2a2108 0%, 
 .tabs.search-uniform > button { font-size: clamp(11px, 3.3vw, 14px); padding: 6px 2px; text-overflow: clip; letter-spacing: -.01em; }
 .tabs.search-uniform > button { font-size: clamp(10px, 3vw, 14px); }
 .tabs.search-uniform > button > span { margin-right: 3px !important; width: 7px !important; height: 7px !important; }
+
+/* Inbox sub-tabs (Notifications / Messages / Announcements), as on the phones — 2026-11-09. */
+.inbox-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; background: #0c0c0c; border: 1px solid var(--gold-border); border-radius: 999px; padding: 4px; margin: 4px 0 14px; }
+.inbox-tabs a { display: block; text-align: center; padding: 8px 4px; border-radius: 999px; color: var(--gold); font-weight: 800; font-size: 14px; text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.inbox-tabs a.on { background: linear-gradient(180deg, #FFDD55, #D4AF37); color: #000; }
+@media (max-width: 420px) { .inbox-tabs a { font-size: 12.5px; padding: 8px 2px; } }

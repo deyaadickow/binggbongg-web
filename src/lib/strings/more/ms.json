@@ -1574,5 +1574,17 @@
  "online_friends": "Rakan",
  "online_following": "Mengikuti",
  "online_followers": "Pengikut",
- "online_live": "Langsung"
+ "online_live": "Langsung",
+ "announcements": "Pengumuman",
+ "inbox": "Peti Masuk",
+ "ann_empty": "Belum ada pengumuman. Video pengumuman harian akan muncul di sini.",
+ "ann_play_video": "Main video",
+ "ann_english": "Inggeris",
+ "ann_tagalog": "Tagalog",
+ "ann_close": "Tutup",
+ "ann_video_failed": "Video ini tidak dapat dimainkan. Sila cuba lagi kemudian.",
+ "ann_not_found": "Pengumuman itu tidak lagi tersedia.",
+ "ann_video_language": "Bahasa video",
+ "fname_announcements": "Video pengumuman",
+ "fblurb_announcements": "Tonton video pengumuman harian, dalam bahasa Inggeris atau Tagalog."
 }

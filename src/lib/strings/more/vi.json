@@ -1574,5 +1574,17 @@
  "online_friends": "Bạn bè",
  "online_following": "Đang theo dõi",
  "online_followers": "Người theo dõi",
- "online_live": "Trực tiếp"
+ "online_live": "Trực tiếp",
+ "announcements": "Thông báo",
+ "inbox": "Hộp thư đến",
+ "ann_empty": "Chưa có thông báo nào. Video thông báo hằng ngày sẽ hiển thị ở đây.",
+ "ann_play_video": "Phát video",
+ "ann_english": "Tiếng Anh",
+ "ann_tagalog": "Tiếng Tagalog",
+ "ann_close": "Đóng",
+ "ann_video_failed": "Không thể phát video này. Vui lòng thử lại sau.",
+ "ann_not_found": "Thông báo đó không còn nữa.",
+ "ann_video_language": "Ngôn ngữ video",
+ "fname_announcements": "Video thông báo",
+ "fblurb_announcements": "Xem video thông báo hằng ngày bằng tiếng Anh hoặc tiếng Tagalog."
 }

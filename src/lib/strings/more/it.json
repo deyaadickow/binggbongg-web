@@ -1573,5 +1573,17 @@
  "online_friends": "Amici",
  "online_following": "Seguiti",
  "online_followers": "Follower",
- "online_live": "Live"
+ "online_live": "Live",
+ "announcements": "Annunci",
+ "inbox": "Posta in arrivo",
+ "ann_empty": "Ancora nessun annuncio. Il video annuncio del giorno apparirà qui.",
+ "ann_play_video": "Riproduci il video",
+ "ann_english": "Inglese",
+ "ann_tagalog": "Tagalog",
+ "ann_close": "Chiudi",
+ "ann_video_failed": "Impossibile riprodurre questo video. Riprova più tardi.",
+ "ann_not_found": "Questo annuncio non è più disponibile.",
+ "ann_video_language": "Lingua del video",
+ "fname_announcements": "Video annunci",
+ "fblurb_announcements": "Guarda il video annuncio del giorno, in inglese o in tagalog."
 }

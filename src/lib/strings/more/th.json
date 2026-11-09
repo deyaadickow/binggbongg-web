@@ -1572,5 +1572,17 @@
  "online_friends": "เพื่อน",
  "online_following": "กำลังติดตาม",
  "online_followers": "ผู้ติดตาม",
- "online_live": "ไลฟ์"
+ "online_live": "ไลฟ์",
+ "announcements": "ประกาศ",
+ "inbox": "กล่องข้อความ",
+ "ann_empty": "ยังไม่มีประกาศ วิดีโอประกาศประจำวันจะแสดงที่นี่",
+ "ann_play_video": "เล่นวิดีโอ",
+ "ann_english": "ภาษาอังกฤษ",
+ "ann_tagalog": "ภาษาตากาล็อก",
+ "ann_close": "ปิด",
+ "ann_video_failed": "ไม่สามารถเล่นวิดีโอนี้ได้ โปรดลองอีกครั้งในภายหลัง",
+ "ann_not_found": "ประกาศนั้นไม่มีให้ดูแล้ว",
+ "ann_video_language": "ภาษาของวิดีโอ",
+ "fname_announcements": "วิดีโอประกาศ",
+ "fblurb_announcements": "ดูวิดีโอประกาศประจำวันเป็นภาษาอังกฤษหรือภาษาตากาล็อก"
 }

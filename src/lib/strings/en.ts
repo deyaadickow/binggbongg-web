@@ -2288,4 +2288,17 @@ export const en = {
   xc_body: "%1$s is from %2$s. Turn on translation to see what they say in your language.",
   xc_turn_on: "Turn on translation",
   xc_already_on: "Translation is on: chat is shown in %1$s.",
+  // Inbox -> Announcements, the daily video announcement (Steve, 2026-11-09).
+  announcements: "Announcements",
+  inbox: "Inbox",
+  ann_empty: "No announcements yet. The daily video announcement will show up here.",
+  ann_play_video: "Play the video",
+  ann_english: "English",
+  ann_tagalog: "Tagalog",
+  ann_close: "Close",
+  ann_video_failed: "This video could not be played. Please try again later.",
+  ann_not_found: "That announcement is not available any more.",
+  ann_video_language: "Video language",
+  fname_announcements: "Video announcements",
+  fblurb_announcements: "Watch the daily video announcement, in English or Tagalog.",
 } as const;

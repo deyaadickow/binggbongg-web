@@ -1569,5 +1569,17 @@
  "online_friends": "Prieteni",
  "online_following": "Urmăriți",
  "online_followers": "Urmăritori",
- "online_live": "Live"
+ "online_live": "Live",
+ "announcements": "Anunțuri",
+ "inbox": "Mesaje primite",
+ "ann_empty": "Încă nu există anunțuri. Anunțul video zilnic va apărea aici.",
+ "ann_play_video": "Redă videoclipul",
+ "ann_english": "Engleză",
+ "ann_tagalog": "Tagalog",
+ "ann_close": "Închide",
+ "ann_video_failed": "Acest videoclip nu a putut fi redat. Încearcă din nou mai târziu.",
+ "ann_not_found": "Acel anunț nu mai este disponibil.",
+ "ann_video_language": "Limba videoclipului",
+ "fname_announcements": "Anunțuri video",
+ "fblurb_announcements": "Urmărește anunțul video zilnic, în engleză sau tagalog."
 }

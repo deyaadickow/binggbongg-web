@@ -1574,5 +1574,17 @@
  "online_friends": "స్నేహితులు",
  "online_following": "ఫాలోయింగ్",
  "online_followers": "ఫాలోవర్లు",
- "online_live": "లైవ్"
+ "online_live": "లైవ్",
+ "announcements": "ప్రకటనలు",
+ "inbox": "ఇన్‌బాక్స్",
+ "ann_empty": "ఇంకా ప్రకటనలు లేవు. రోజువారీ వీడియో ప్రకటన ఇక్కడ కనిపిస్తుంది.",
+ "ann_play_video": "వీడియో ప్లే చేయండి",
+ "ann_english": "ఇంగ్లీష్",
+ "ann_tagalog": "తగలాగ్",
+ "ann_close": "మూసివేయండి",
+ "ann_video_failed": "ఈ వీడియోను ప్లే చేయడం సాధ్యపడలేదు. దయచేసి తర్వాత మళ్లీ ప్రయత్నించండి.",
+ "ann_not_found": "ఆ ప్రకటన ఇప్పుడు అందుబాటులో లేదు.",
+ "ann_video_language": "వీడియో భాష",
+ "fname_announcements": "వీడియో ప్రకటనలు",
+ "fblurb_announcements": "రోజువారీ వీడియో ప్రకటనను ఇంగ్లీష్ లేదా తగలాగ్‌లో చూడండి."
 }

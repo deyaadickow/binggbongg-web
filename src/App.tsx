@@ -37,6 +37,7 @@ import { ProfilePage } from "./pages/ProfilePage";
 import { UpcomingPage } from "./pages/UpcomingPage";
 import { MessagesPage } from "./pages/MessagesPage";
 import { NotificationsPage } from "./pages/NotificationsPage";
+import { AnnouncementsPage } from "./pages/AnnouncementsPage";
 import { ChatPage } from "./pages/ChatPage";
 import { DailyFortunePage } from "./pages/DailyFortunePage";
 import { BirthdayPage } from "./pages/BirthdayPage";
@@ -144,6 +145,10 @@ export default function App() {
           <Route path="/messages" element={<MessagesPage />} />
           {/* Steve, 2026-10-18: "Add the notification record so members can read it later." */}
           <Route path="/notifications" element={<NotificationsPage />} />
+          {/* Steve, 2026-11-09: Inbox -> Announcements, the daily video announcement (English + Tagalog).
+              /announcements/:id opens that announcement's video directly — the emails link there. */}
+          <Route path="/announcements" element={<AnnouncementsPage />} />
+          <Route path="/announcements/:id" element={<AnnouncementsPage />} />
           <Route path="/messages/:id" element={<ChatPage />} />
           {/* Lucky numbers + daily horoscope (Steve, 2026-10-09). */}
           <Route path="/lucky" element={<DailyFortunePage />} />

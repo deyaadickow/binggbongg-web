@@ -1574,5 +1574,17 @@
  "online_friends": "ਦੋਸਤ",
  "online_following": "ਫਾਲੋਇੰਗ",
  "online_followers": "ਫਾਲੋਅਰਜ਼",
- "online_live": "ਲਾਈਵ"
+ "online_live": "ਲਾਈਵ",
+ "announcements": "ਘੋਸ਼ਣਾਵਾਂ",
+ "inbox": "ਇਨਬਾਕਸ",
+ "ann_empty": "ਹਾਲੇ ਕੋਈ ਘੋਸ਼ਣਾ ਨਹੀਂ। ਰੋਜ਼ਾਨਾ ਵੀਡੀਓ ਘੋਸ਼ਣਾ ਇੱਥੇ ਦਿਖਾਈ ਦੇਵੇਗੀ।",
+ "ann_play_video": "ਵੀਡੀਓ ਚਲਾਓ",
+ "ann_english": "ਅੰਗਰੇਜ਼ੀ",
+ "ann_tagalog": "ਤਾਗਾਲੋਗ",
+ "ann_close": "ਬੰਦ ਕਰੋ",
+ "ann_video_failed": "ਇਹ ਵੀਡੀਓ ਚਲਾਇਆ ਨਹੀਂ ਜਾ ਸਕਿਆ। ਕਿਰਪਾ ਕਰਕੇ ਬਾਅਦ ਵਿੱਚ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।",
+ "ann_not_found": "ਉਹ ਘੋਸ਼ਣਾ ਹੁਣ ਉਪਲਬਧ ਨਹੀਂ ਹੈ।",
+ "ann_video_language": "ਵੀਡੀਓ ਦੀ ਭਾਸ਼ਾ",
+ "fname_announcements": "ਵੀਡੀਓ ਘੋਸ਼ਣਾਵਾਂ",
+ "fblurb_announcements": "ਰੋਜ਼ਾਨਾ ਵੀਡੀਓ ਘੋਸ਼ਣਾ ਅੰਗਰੇਜ਼ੀ ਜਾਂ ਤਾਗਾਲੋਗ ਵਿੱਚ ਦੇਖੋ।"
 }

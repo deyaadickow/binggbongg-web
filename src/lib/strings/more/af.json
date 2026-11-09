@@ -1572,5 +1572,17 @@
  "online_friends": "Vriende",
  "online_following": "Volgend",
  "online_followers": "Volgelinge",
- "online_live": "Live"
+ "online_live": "Live",
+ "announcements": "Aankondigings",
+ "inbox": "Inkassie",
+ "ann_empty": "Nog geen aankondigings nie. Die daaglikse video-aankondiging sal hier verskyn.",
+ "ann_play_video": "Speel die video",
+ "ann_english": "Engels",
+ "ann_tagalog": "Tagalog",
+ "ann_close": "Maak toe",
+ "ann_video_failed": "Hierdie video kon nie gespeel word nie. Probeer asseblief later weer.",
+ "ann_not_found": "Daardie aankondiging is nie meer beskikbaar nie.",
+ "ann_video_language": "Videotaal",
+ "fname_announcements": "Video-aankondigings",
+ "fblurb_announcements": "Kyk na die daaglikse video-aankondiging, in Engels of Tagalog."
 }

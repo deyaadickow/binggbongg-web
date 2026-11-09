@@ -1571,5 +1571,17 @@
  "online_friends": "Draugai",
  "online_following": "Sekami",
  "online_followers": "Sekėjai",
- "online_live": "Tiesiogiai"
+ "online_live": "Tiesiogiai",
+ "announcements": "Pranešimai",
+ "inbox": "Gautieji",
+ "ann_empty": "Pranešimų dar nėra. Kasdienis vaizdo pranešimas bus rodomas čia.",
+ "ann_play_video": "Paleisti vaizdo įrašą",
+ "ann_english": "Anglų",
+ "ann_tagalog": "Tagalų",
+ "ann_close": "Uždaryti",
+ "ann_video_failed": "Nepavyko paleisti šio vaizdo įrašo. Bandykite vėliau.",
+ "ann_not_found": "Šis pranešimas nebepasiekiamas.",
+ "ann_video_language": "Vaizdo įrašo kalba",
+ "fname_announcements": "Vaizdo pranešimai",
+ "fblurb_announcements": "Žiūrėkite kasdienį vaizdo pranešimą anglų arba tagalų kalba."
 }

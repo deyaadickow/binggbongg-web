@@ -16,6 +16,7 @@ import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice } from "../components/Common";
 import { useT } from "../lib/i18n";
 import { PageTitle } from "../components/PageTitle";
+import { InboxTabs } from "../components/InboxTabs";
 import { chatBattlePath } from "../lib/chatBattle";
 import { countryBattlePath } from "../lib/countryBattle";
 
@@ -153,6 +154,7 @@ export function NotificationsPage() {
   return (
     <div className="page" style={{ maxWidth: 720 }}>
       <PageTitle>{t("notifications")}</PageTitle>
+      <InboxTabs />
       {error && <Notice error>{error}</Notice>}
       {loading && rows.length === 0 && <Loading />}
       {!loading && rows.length === 0 && !error && (

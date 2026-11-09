@@ -1574,5 +1574,17 @@
  "online_friends": "Arkadaşlar",
  "online_following": "Takip Edilenler",
  "online_followers": "Takipçiler",
- "online_live": "Canlı"
+ "online_live": "Canlı",
+ "announcements": "Duyurular",
+ "inbox": "Gelen Kutusu",
+ "ann_empty": "Henüz duyuru yok. Günlük video duyurusu burada görünecek.",
+ "ann_play_video": "Videoyu oynat",
+ "ann_english": "İngilizce",
+ "ann_tagalog": "Tagalogca",
+ "ann_close": "Kapat",
+ "ann_video_failed": "Bu video oynatılamadı. Lütfen daha sonra tekrar deneyin.",
+ "ann_not_found": "Bu duyuru artık mevcut değil.",
+ "ann_video_language": "Video dili",
+ "fname_announcements": "Video duyuruları",
+ "fblurb_announcements": "Günlük video duyurusunu İngilizce veya Tagalogca izleyin."
 }

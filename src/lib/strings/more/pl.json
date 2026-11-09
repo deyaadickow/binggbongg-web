@@ -1574,5 +1574,17 @@
  "online_friends": "Znajomi",
  "online_following": "Obserwowani",
  "online_followers": "Obserwujący",
- "online_live": "Na żywo"
+ "online_live": "Na żywo",
+ "announcements": "Ogłoszenia",
+ "inbox": "Skrzynka odbiorcza",
+ "ann_empty": "Nie ma jeszcze ogłoszeń. Codzienne ogłoszenie wideo pojawi się tutaj.",
+ "ann_play_video": "Odtwórz wideo",
+ "ann_english": "Angielski",
+ "ann_tagalog": "Tagalski",
+ "ann_close": "Zamknij",
+ "ann_video_failed": "Nie udało się odtworzyć tego wideo. Spróbuj ponownie później.",
+ "ann_not_found": "To ogłoszenie nie jest już dostępne.",
+ "ann_video_language": "Język wideo",
+ "fname_announcements": "Ogłoszenia wideo",
+ "fblurb_announcements": "Obejrzyj codzienne ogłoszenie wideo po angielsku lub tagalsku."
 }

@@ -1570,5 +1570,17 @@
  "online_friends": "חברים",
  "online_following": "נעקבים",
  "online_followers": "עוקבים",
- "online_live": "לייב"
+ "online_live": "לייב",
+ "announcements": "הודעות",
+ "inbox": "תיבת דואר נכנס",
+ "ann_empty": "אין עדיין הודעות. הודעת הווידאו היומית תופיע כאן.",
+ "ann_play_video": "הפעל את הסרטון",
+ "ann_english": "אנגלית",
+ "ann_tagalog": "טגלוג",
+ "ann_close": "סגור",
+ "ann_video_failed": "לא ניתן היה להפעיל את הסרטון. נסה שוב מאוחר יותר.",
+ "ann_not_found": "ההודעה הזו אינה זמינה עוד.",
+ "ann_video_language": "שפת הסרטון",
+ "fname_announcements": "הודעות וידאו",
+ "fblurb_announcements": "צפה בהודעת הווידאו היומית, באנגלית או בטגלוג."
 }

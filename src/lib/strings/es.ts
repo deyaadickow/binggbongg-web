@@ -2068,4 +2068,17 @@ export const es = {
   online_following: "Siguiendo",
   online_followers: "Seguidores",
   online_live: "En vivo",
+  // Inbox -> Announcements, the daily video announcement (Steve, 2026-11-09).
+  announcements: "Anuncios",
+  inbox: "Bandeja de entrada",
+  ann_empty: "Aún no hay anuncios. El video anuncio del día aparecerá aquí.",
+  ann_play_video: "Reproducir el video",
+  ann_english: "Inglés",
+  ann_tagalog: "Tagalo",
+  ann_close: "Cerrar",
+  ann_video_failed: "No se pudo reproducir este video. Inténtalo de nuevo más tarde.",
+  ann_not_found: "Ese anuncio ya no está disponible.",
+  ann_video_language: "Idioma del video",
+  fname_announcements: "Video anuncios",
+  fblurb_announcements: "Mira el video anuncio del día, en inglés o en tagalo.",
 };

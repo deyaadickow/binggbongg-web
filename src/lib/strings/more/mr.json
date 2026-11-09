@@ -1568,5 +1568,17 @@
  "online_friends": "मित्र",
  "online_following": "फॉलोइंग",
  "online_followers": "फॉलोअर्स",
- "online_live": "लाइव्ह"
+ "online_live": "लाइव्ह",
+ "announcements": "घोषणा",
+ "inbox": "इनबॉक्स",
+ "ann_empty": "अद्याप कोणत्याही घोषणा नाहीत. दररोजची व्हिडिओ घोषणा येथे दिसेल.",
+ "ann_play_video": "व्हिडिओ प्ले करा",
+ "ann_english": "इंग्रजी",
+ "ann_tagalog": "टागालॉग",
+ "ann_close": "बंद करा",
+ "ann_video_failed": "हा व्हिडिओ प्ले करता आला नाही. कृपया नंतर पुन्हा प्रयत्न करा.",
+ "ann_not_found": "ती घोषणा आता उपलब्ध नाही.",
+ "ann_video_language": "व्हिडिओची भाषा",
+ "fname_announcements": "व्हिडिओ घोषणा",
+ "fblurb_announcements": "दररोजची व्हिडिओ घोषणा इंग्रजी किंवा टागालॉगमध्ये पहा."
 }

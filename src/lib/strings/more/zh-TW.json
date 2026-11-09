@@ -1574,5 +1574,17 @@
  "online_friends": "好友",
  "online_following": "追蹤",
  "online_followers": "粉絲",
- "online_live": "直播"
+ "online_live": "直播",
+ "announcements": "公告",
+ "inbox": "收件匣",
+ "ann_empty": "目前沒有公告。每日影片公告會顯示在這裡。",
+ "ann_play_video": "播放影片",
+ "ann_english": "英語",
+ "ann_tagalog": "他加祿語",
+ "ann_close": "關閉",
+ "ann_video_failed": "無法播放此影片，請稍後再試。",
+ "ann_not_found": "該公告已無法查看。",
+ "ann_video_language": "影片語言",
+ "fname_announcements": "影片公告",
+ "fblurb_announcements": "觀看每日影片公告，可選英語或他加祿語。"
 }

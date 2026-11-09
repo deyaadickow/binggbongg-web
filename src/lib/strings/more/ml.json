@@ -1569,5 +1569,17 @@
  "online_friends": "സുഹൃത്തുക്കൾ",
  "online_following": "ഫോളോയിംഗ്",
  "online_followers": "ഫോളോവേഴ്സ്",
- "online_live": "ലൈവ്"
+ "online_live": "ലൈവ്",
+ "announcements": "അറിയിപ്പുകൾ",
+ "inbox": "ഇൻബോക്സ്",
+ "ann_empty": "ഇതുവരെ അറിയിപ്പുകളൊന്നുമില്ല. ദിവസേനയുള്ള വീഡിയോ അറിയിപ്പ് ഇവിടെ കാണാം.",
+ "ann_play_video": "വീഡിയോ പ്ലേ ചെയ്യുക",
+ "ann_english": "ഇംഗ്ലീഷ്",
+ "ann_tagalog": "തഗാലോഗ്",
+ "ann_close": "അടയ്ക്കുക",
+ "ann_video_failed": "ഈ വീഡിയോ പ്ലേ ചെയ്യാനായില്ല. പിന്നീട് വീണ്ടും ശ്രമിക്കുക.",
+ "ann_not_found": "ആ അറിയിപ്പ് ഇപ്പോൾ ലഭ്യമല്ല.",
+ "ann_video_language": "വീഡിയോയുടെ ഭാഷ",
+ "fname_announcements": "വീഡിയോ അറിയിപ്പുകൾ",
+ "fblurb_announcements": "ദിവസേനയുള്ള വീഡിയോ അറിയിപ്പ് ഇംഗ്ലീഷിലോ തഗാലോഗിലോ കാണുക."
 }

@@ -1565,5 +1565,17 @@
  "online_friends": "Ystävät",
  "online_following": "Seuratut",
  "online_followers": "Seuraajat",
- "online_live": "Live"
+ "online_live": "Live",
+ "announcements": "Tiedotteet",
+ "inbox": "Saapuneet",
+ "ann_empty": "Ei vielä tiedotteita. Päivän videotiedote näkyy täällä.",
+ "ann_play_video": "Toista video",
+ "ann_english": "Englanti",
+ "ann_tagalog": "Tagalog",
+ "ann_close": "Sulje",
+ "ann_video_failed": "Videota ei voitu toistaa. Yritä myöhemmin uudelleen.",
+ "ann_not_found": "Tiedote ei ole enää saatavilla.",
+ "ann_video_language": "Videon kieli",
+ "fname_announcements": "Videotiedotteet",
+ "fblurb_announcements": "Katso päivän videotiedote englanniksi tai tagalogiksi."
 }

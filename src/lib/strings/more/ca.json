@@ -1573,5 +1573,17 @@
  "online_friends": "Amics",
  "online_following": "Seguint",
  "online_followers": "Seguidors",
- "online_live": "En directe"
+ "online_live": "En directe",
+ "announcements": "Anuncis",
+ "inbox": "Safata d'entrada",
+ "ann_empty": "Encara no hi ha anuncis. El vídeo anunci del dia apareixerà aquí.",
+ "ann_play_video": "Reprodueix el vídeo",
+ "ann_english": "Anglès",
+ "ann_tagalog": "Tagal",
+ "ann_close": "Tanca",
+ "ann_video_failed": "No s'ha pogut reproduir aquest vídeo. Torna-ho a provar més tard.",
+ "ann_not_found": "Aquest anunci ja no està disponible.",
+ "ann_video_language": "Idioma del vídeo",
+ "fname_announcements": "Vídeo anuncis",
+ "fblurb_announcements": "Mira el vídeo anunci del dia, en anglès o en tagal."
 }
