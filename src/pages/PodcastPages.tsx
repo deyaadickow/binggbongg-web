@@ -73,7 +73,13 @@ export function PodcastsPage() {
     <div className="page" style={{ maxWidth: 760 }}>
       <PageTitle right={enabled && isLoggedIn ? <Link to="/podcasts/start" className="btn small gold">{t("pod_start")}</Link> : undefined}>
         {t("pod_title")}</PageTitle>
-      {!enabled ? <Notice>{t("pod_off")}</Notice> : (
+      {/* The podcast API is members-only: a signed-out visitor gets a way in, not "not available". */}
+      {!isLoggedIn ? (
+        <div className="card pad" style={{ textAlign: "center", background: "rgba(0,0,0,.88)" }}>
+          <p style={{ margin: "0 0 12px" }}>{t("pod_sign_in_listen")}</p>
+          <Link to="/login" state={{ from: "/podcasts" }} className="btn gold">{t("sign_in")}</Link>
+        </div>
+      ) : !enabled ? <Notice>{t("pod_off")}</Notice> : (
         <>
           <div className="tabs">
             {TABS.map((x) => (
@@ -267,7 +273,12 @@ export function PodcastEpisodePage() {
     return (
       <div className="page" style={{ maxWidth: 560 }}>
         <PageTitle backTo="/podcasts">{t("pod_title")}</PageTitle>
-        <Notice>{t(state === "off" ? "pod_off" : state === "missing" ? "pod_not_found" : "pod_couldnt_load")}</Notice>
+        {!isLoggedIn ? (
+          <div className="card pad" style={{ textAlign: "center", background: "rgba(0,0,0,.88)" }}>
+            <p style={{ margin: "0 0 12px" }}>{t("pod_sign_in_listen")}</p>
+            <Link to="/login" state={{ from: location.pathname }} className="btn gold">{t("sign_in")}</Link>
+          </div>
+        ) : <Notice>{t(state === "off" ? "pod_off" : state === "missing" ? "pod_not_found" : "pod_couldnt_load")}</Notice>}
       </div>
     );
   }
