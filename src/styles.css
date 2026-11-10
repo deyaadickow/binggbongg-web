@@ -1281,23 +1281,23 @@ body.signup-black { background: radial-gradient(120% 55% at 50% 0%, #2a2108 0%, 
 .pay-with { margin: 0 6px 12px; }
 .pay-with-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .pay-with-label { color: var(--gold); font-weight: 700; font-size: 14px; }
-.pay-with-row button { min-width: 64px; padding: 6px 14px; border-radius: 999px; border: 1.5px solid var(--gold-border); background: #000; color: var(--text-soft); font-weight: 700; font-size: 14px; cursor: pointer; }
+.pay-with-row button { min-width: 64px; padding: 6px 14px; border-radius: 999px; border: 1.5px solid var(--gold-border); background: #000; color: var(--gold); font-weight: 700; font-size: 14px; cursor: pointer; }
 .pay-with-row button.on { border-width: 3px; padding: 4px 12px; color: var(--gold-bright); box-shadow: 0 0 10px rgba(212,175,55,.45); }
-.pay-with-hint { margin-top: 6px; font-size: 12px; color: var(--text-soft); }
+.pay-with-hint { margin-top: 6px; font-size: 12px; color: var(--gold); }
 .gift-kind { display: inline-block; margin-top: 4px; padding: 2px 10px; border-radius: 999px; border: 1.5px solid var(--gold-border); background: #000; color: var(--gold-bright); font-size: 13px; font-weight: 700; }
 .wallet-split { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
 .wallet-split-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
 .wallet-split-row .name { color: var(--gold); font-weight: 800; font-size: 15px; }
 .wallet-split-row .val { color: var(--gold); font-weight: 800; font-size: 26px; font-variant-numeric: tabular-nums; }
-.wallet-split-hint { font-size: 12px; color: var(--text-soft); margin-top: -6px; }
-.prelaunch-banner { display: flex; align-items: center; gap: 12px; margin: 0 0 14px; padding: 12px 16px; border-radius: 16px; border: 3px solid var(--gold-border); background: #000; color: #fff; text-align: left; }
-.prelaunch-banner:hover { border-color: var(--gold-bright); color: #fff; }
+.wallet-split-hint { font-size: 12px; color: var(--gold); margin-top: -6px; }
+.prelaunch-banner { display: flex; align-items: center; gap: 12px; margin: 0 0 14px; padding: 12px 16px; border-radius: 16px; border: 3px solid var(--gold-border); background: #000; color: var(--gold); text-align: left; }
+.prelaunch-banner:hover { border-color: var(--gold-bright); color: var(--gold); }
 .prelaunch-banner .pl-ico { font-size: 28px; flex: 0 0 auto; }
 .prelaunch-banner .pl-text { flex: 1; min-width: 0; font-size: 14px; line-height: 1.4; }
 .prelaunch-banner .pl-text b { display: block; color: var(--gold-bright); font-size: 16px; margin-bottom: 2px; }
 .prelaunch-banner .pl-more { color: var(--gold); font-size: 12px; font-weight: 700; display: block; margin-top: 4px; }
 .prelaunch-banner .pl-chev { color: var(--gold); font-size: 24px; flex: 0 0 auto; }
 .prelaunch-page { max-width: 640px; }
-.prelaunch-card { display: flex; flex-direction: column; gap: 12px; padding: 18px; margin-bottom: 14px; border-radius: 18px; border: 3px solid var(--gold-border); background: #000; color: #fff; font-size: 15px; line-height: 1.5; }
+.prelaunch-card { display: flex; flex-direction: column; gap: 12px; padding: 18px; margin-bottom: 14px; border-radius: 18px; border: 3px solid var(--gold-border); background: #000; color: var(--gold); font-size: 15px; line-height: 1.5; }
 .prelaunch-card .big { color: var(--gold-bright); font-size: 18px; font-weight: 800; line-height: 1.35; }
 .prelaunch-card .btn { align-self: flex-start; }
