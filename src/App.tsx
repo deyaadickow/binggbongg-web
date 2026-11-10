@@ -24,6 +24,7 @@ import { HelpListPage, HelpCampaignPage, StartHelpPage } from "./pages/HelpPages
 import { HomePage } from "./pages/HomePage";
 import { LanguagePage } from "./pages/LanguagePage";
 import { FeaturesPage } from "./pages/FeaturesPage";
+import { FreeCoinsPage } from "./pages/FreeCoinsPage";
 import { HousesPage } from "./pages/HousesPage";
 import { FeatureVideosPage } from "./pages/FeatureVideosPage";
 import { ReferralProgramPage } from "./pages/ReferralProgramPage";
@@ -275,6 +276,7 @@ export default function App() {
           <Route path="/houses" element={<HousesPage />} />
           <Route path="/houses/:userId" element={<HousesPage />} />
           <Route path="/features" element={<FeaturesPage />} />
+          <Route path="/free-coins" element={<FreeCoinsPage />} />
           {/* Every feature's 60-second video under its own heading (Steve, 2026-10-29). */}
           <Route path="/feature-videos" element={<FeatureVideosPage />} />
           <Route path="/referral-program" element={<ReferralProgramPage />} />

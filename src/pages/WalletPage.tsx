@@ -9,6 +9,7 @@ import { WALLET_LINKS } from "./WalletPages";
 import { tt, useT  } from "../lib/i18n";
 import { PageTitle } from "../components/PageTitle";
 import { requireVerified } from "../lib/verifyEmail";
+import { useFreeCoinsListed } from "../lib/freeCoins";
 
 export function WalletPage() {
   const { t, tn } = useT();
@@ -16,6 +17,7 @@ export function WalletPage() {
   const [plans, setPlans] = useState<WebCoinPlan[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const freeCoins = useFreeCoinsListed();
 
   useEffect(() => { refresh(); /* fresh balances */ }, []); // eslint-disable-line react-hooks/exhaustive-deps
   // Steve, 2026-09-27 ("Do the same on the web" after the phones' Stripe fix): the coin store
@@ -68,6 +70,17 @@ export function WalletPage() {
       </div>
       {/* Steve, 2026-09-24: the seven links under the phones' Wallet screen, as gold bullet boxes. */}
       <div className="grid wide" style={{ marginTop: 14 }}>
+        {/* Free Coins (Steve, 2026-11-10): what we give you and what you earn. */}
+        {freeCoins && (
+          <Link to="/free-coins" className="card pad wallet-link">
+            <span className="ico">🪙</span>
+            <span style={{ flex: 1, minWidth: 0 }}>
+              <b style={{ color: "var(--gold)" }}>{t("fname_free_coins")}</b>
+              <span className="muted" style={{ display: "block", fontSize: 12 }}>{t("fc_wallet_hint")}</span>
+            </span>
+            <span style={{ color: "var(--gold)", fontSize: 22 }}>›</span>
+          </Link>
+        )}
         {WALLET_LINKS.map((l) => (
           <Link key={l.to} to={l.to} className="card pad wallet-link">
             <span className="ico">{l.icon}</span>

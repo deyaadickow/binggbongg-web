@@ -35,6 +35,7 @@ import { IDEA_SUPPORT_REASON } from "../lib/ideas";
 import { FeatureVideoPlayer, type PlayerItem } from "../components/FeatureVideoPlayer";
 import { useContestOn } from "../lib/contests";
 import { usePodcastEnabled } from "../lib/podcast";
+import { useFreeCoinsListed } from "../lib/freeCoins";
 
 export interface Feature {
   icon: string;
@@ -58,6 +59,8 @@ export interface Feature {
   videoKey?: string;
   /** Shown only while the Bingg Bongg Podcast is switched on (podcast_enabled). */
   podcastOnly?: true;
+  /** Hidden when fetchFreeCoins answers with nothing to list (every reward set to 0). */
+  freeCoinsOnly?: true;
 }
 
 export interface Section {
@@ -156,6 +159,8 @@ export const FEATURES: Section[] = [
   {
     titleKey: "fsec_money",
     features: [
+      // Steve, 2026-11-10: "These are free coins to give away ... This is money you earn".
+      { icon: "🪙", nameKey: "fname_free_coins", blurbKey: "fblurb_free_coins", to: "/free-coins", freeCoinsOnly: true },
       { icon: "🪙", nameKey: "fname_coins_and_gifts", blurbKey: "fblurb_coins_and_gifts", to: "/wallet" },
       // Steve, 2026-10-19: "Add another box for Purchase Coins and link them to the website."
       // On the web the website IS here, so it goes to the Wallet, where the checkout lives.
@@ -368,9 +373,10 @@ export function FeaturesPage() {
   }, [lang]);
   const hasContest = useContestOn();
   const hasPodcast = usePodcastEnabled();
+  const hasFreeCoins = useFreeCoinsListed();
   const shown = FEATURES.map((s) => ({
     ...s,
-    features: s.features.filter((f) => (hasContest || !f.contestOnly) && (hasPodcast || !f.podcastOnly)),
+    features: s.features.filter((f) => (hasContest || !f.contestOnly) && (hasPodcast || !f.podcastOnly) && (hasFreeCoins || !f.freeCoinsOnly)),
   }));
   const numbers = featureNumbers(shown);
   // Every tile's own video, in the directory's order, so the player can scroll from one feature's
