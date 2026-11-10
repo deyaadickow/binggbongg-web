@@ -4,6 +4,7 @@ import { post, type LiveStream } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice } from "../components/Common";
 import { tt, useT  } from "../lib/i18n";
+import { PodcastBadge, isPodcastRoom } from "../components/PodcastBits";
 
 /** Daily Live Badge (Steve, 2026-10-16) — the badge a host earns for the day by streaming to
  *  people who are actually watching. Ring colour per tier, gold text throughout, so it reads
@@ -138,6 +139,7 @@ export function LiveNowPage() {
                 <div className="muted" style={{ fontSize: 13 }}>@{s.host_username ?? ""}</div>
                 <div className="row" style={{ marginTop: 6, gap: 6, flexWrap: "wrap" }}>
                   <span className="pill live">{t("live")}</span>
+                  {isPodcastRoom(s) && <PodcastBadge title={s.podcast_title} />}
                   <LiveBadge tier={s.live_badge_tier} name={s.live_badge_tier_name} minutes={s.live_badge_minutes} />
                 </div>
               </div>

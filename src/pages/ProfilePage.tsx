@@ -13,6 +13,7 @@ import { Avatar, Loading, Notice } from "../components/Common";
 import { fetchUserPhotos, type Photo } from "../lib/photos";
 import { MemberBusinessesPanel, MyBusinessesPanel } from "./BusinessPages";
 import { ScheduleSection } from "../components/ScheduleSection";
+import { PodcastProfileSection } from "../components/PodcastBits";
 import { showGoldAlert, showGoldConfirm } from "../components/GoldToast";
 import { fetchDmStatus, setDmBlock } from "../lib/dm";
 import { CountryBattleBadges } from "../components/CountryBattleBits";
@@ -808,6 +809,10 @@ export function ProfilePage() {
         </div>
 
         {!isMe && isLoggedIn && me && <ChatBattleAlertToggle myId={me.id} host={profile} following={following} />}
+
+        {/* Bingg Bongg Podcast (Steve, 2026-11-10): the host's live podcast + episodes + Follow show.
+            Renders nothing while switched off, on a failed call, or for a member with no podcasts. */}
+        <PodcastProfileSection profileId={profile.id} />
 
         {showSchedule && <ScheduleSection profileId={profileId} myId={me?.id} />}
 

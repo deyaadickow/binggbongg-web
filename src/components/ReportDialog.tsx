@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { fetchReportReasons, reportPost, reportUser, type ReportReason } from "../lib/api";
+import { GoldSelect } from "./GoldSelect";
 
 /**
  * Reporting a member, with a reason and an explanation.
@@ -18,6 +19,7 @@ export function ReportDialog({
   reportedUserId,
   reportedName,
   postId,
+  podcastEpisodeId,
   onClose,
   onDone,
 }: {
@@ -30,6 +32,8 @@ export function ReportDialog({
    * report and an admin can watch it.
    */
   postId?: number;
+  /** A podcast episode: filed as a member report against the host, tagged with the episode. */
+  podcastEpisodeId?: number;
   onClose: () => void;
   onDone: (message: string) => void;
 }) {
@@ -57,7 +61,7 @@ export function ReportDialog({
     try {
       const res = postId
         ? await reportPost({ postId, reason, description: description.trim() })
-        : await reportUser({ reportedUserId: reportedUserId!, reason, description: description.trim() });
+        : await reportUser({ reportedUserId: reportedUserId!, reason, description: description.trim(), podcastEpisodeId });
       // The server's own wording when it has one — it knows which rule was hit.
       onDone(res.message ?? "Thank you. Our team will look at this.");
       onClose();
@@ -74,12 +78,10 @@ export function ReportDialog({
         <h3 style={{ color: "var(--gold)", marginTop: 0 }}>Report {reportedName}</h3>
 
         <label style={{ color: "var(--gold)", fontSize: 13 }}>Reason</label>
-        <select value={reason} onChange={(e) => { setReason(e.target.value); setError(null); }} style={{ width: "100%", marginBottom: 12 }}>
-          <option value="">Select a reason</option>
-          {reasons.map((r) => (
-            <option key={r.id} value={r.reason}>{r.reason}</option>
-          ))}
-        </select>
+        {/* GoldSelect, not a native <select>: the OS draws a native list grey (binggbongg-web-gold-dropdowns). */}
+        <GoldSelect value={reason} placeholder="Select a reason" ariaLabel="Reason"
+          options={reasons.map((r) => ({ value: r.reason, label: r.reason }))}
+          onChange={(v) => { setReason(v); setError(null); }} style={{ width: "100%", marginBottom: 12 }} />
 
         <label style={{ color: "var(--gold)", fontSize: 13 }}>What is wrong?</label>
         <textarea

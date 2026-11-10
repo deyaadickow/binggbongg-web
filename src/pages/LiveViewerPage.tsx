@@ -52,13 +52,16 @@ import { requireVerified } from "../lib/verifyEmail";
 import { ML_MIN_SIZE, dropRoomBattleBomb, mlIsBig, mlName, mlReasonText, mlWrite, normalizeMl, saveRoomSize, type MlMember, type MlState, type MlWriteResult, type RoomBattle } from "../lib/multiLive";
 import { BattleTopStrip, MlMenu, MlSizeSheet, MultiLiveGrid, RoomBattleBoard, RoomBattleEnd, useBattleClock, useRoomBattleExtras } from "../components/MultiLiveGrid";
 import { showGoldAlert } from "../components/GoldToast";
+import { endPodcast } from "../lib/podcast";
 import { BinggBonusOverlay } from "../components/BinggBonusOverlay";
 import { makeBinggBonusWatcher } from "../lib/binggBonus";
 import { FishHostControls, LiveFishOverlay } from "../components/LiveFishOverlay";
 import { CountryTranslatePopup } from "../components/CountryTranslatePopup";
 
 interface Member { user_id: number; fullname?: string; username?: string; profile_image?: string; country?: string; local_timezone?: string }
-interface RoomMembers { host_user_id: number; host_fullname?: string; host_username?: string; host_profile_image?: string; host_country?: string; host_local_timezone?: string; live_seconds?: number; guests: Member[]; multi_live?: unknown }
+interface RoomMembers { host_user_id: number; host_fullname?: string; host_username?: string; host_profile_image?: string; host_country?: string; host_local_timezone?: string; live_seconds?: number; guests: Member[]; multi_live?: unknown;
+  /** Bingg Bongg Podcast (2026-11-10): set while this room is a podcast — the viewers' header tag. */
+  podcast?: { podcast_id: number; title?: string; kind?: string } | null }
 interface Watcher { user_id: number; fullname?: string; username?: string; profile_image?: string }
 interface JoinRequest { request_id: number; user_id: number; fullname?: string; username?: string; profile_image?: string }
 
@@ -179,7 +182,15 @@ export function LiveViewerPage() {
   }, [giftEffect, giftEffectQueue]);
 
   const mlMe = ml && user ? ml.members.find((m) => m.user_id === user.id) ?? null : null;
-  const live = useLiveRoom(roomName, role, isLoggedIn && !roomClosed, { micAllowed: mlMe && !mlMe.is_host ? mlMe.is_speaker : null });
+  // Bingg Bongg Podcast (Steve, 2026-11-10). The host arrives from Start a Podcast with the podcast
+  // in the address (so an AUDIO podcast never turns the camera on, even before the roster loads);
+  // everyone else reads it off fetchLiveRoomMembers.
+  const urlPodcastId = wantsHost ? Number(search.get("podcast") ?? 0) : 0;
+  const podcast = members?.podcast ?? (urlPodcastId > 0
+    ? { podcast_id: urlPodcastId, title: search.get("pt") ?? "", kind: search.get("pk") === "audio" ? "audio" : "video" }
+    : null);
+  const podcastAudio = podcast?.kind === "audio";
+  const live = useLiveRoom(roomName, role, isLoggedIn && !roomClosed, { micAllowed: mlMe && !mlMe.is_host ? mlMe.is_speaker : null, audioOnly: podcastAudio });
   const isPublisher = role !== "viewer" && live.status === "live";
 
   // Bingg Bongg Battle (1v1). Result overlay for the two battlers, a toast for everyone else.
@@ -1176,9 +1187,17 @@ export function LiveViewerPage() {
 
   async function endLive() {
     if (!user) return;
-    if (!window.confirm("End your live for everyone?")) return;
+    if (!window.confirm(podcast ? tt("pod_end_confirm") : "End your live for everyone?")) return;
     live.disconnect();
+    // A podcast is ended as a podcast first (endLive would also end it server-side), so its
+    // recording is published as an episode.
+    if (podcast) await endPodcast(user.id, podcast.podcast_id);
     await post("endLive", { user_id: user.id }).catch(() => undefined);
+    if (podcast) {
+      navigate("/podcasts", { replace: true });
+      showGoldAlert(tt("pod_ended_ready"));
+      return;
+    }
     navigate("/live", { replace: true });
   }
 
@@ -1464,6 +1483,13 @@ export function LiveViewerPage() {
                 onClick={() => { setWatchersOpen(true); openLeaderBoard(); }}>👁 {watchers} watching</button>
             )}{broadcasters.length > 1 ? ` · ${broadcasters.length} on screen` : ""}
           </div>
+          {podcast && (
+            <div style={{ marginTop: 4 }}>
+              <span className="pill" style={{ background: "#000", maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {podcast.title ? t("pod_live_tag", podcast.title) : t("pod_live_badge")}{podcastAudio ? " · 🎧" : ""}
+              </span>
+            </div>
+          )}
         </div>
         <span className={`pill ${statusLabel === "● LIVE" ? "live" : ""}`}>{statusLabel}</span>
       </div>
@@ -1769,9 +1795,10 @@ export function LiveViewerPage() {
 
           {isPublisher && (
             <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
-              <button className="btn small" onClick={live.toggleCamera}>{live.cameraOn ? "📷 Camera off" : "📷 Camera on"}</button>
+              {/* An audio podcast has no camera at all — only the microphone. */}
+              {!podcastAudio && <button className="btn small" onClick={live.toggleCamera}>{live.cameraOn ? "📷 Camera off" : "📷 Camera on"}</button>}
               <button className="btn small" onClick={live.toggleMic}>{live.micOn ? "🎤 Mute" : "🎤 Unmute"}</button>
-              <button className="btn small" onClick={live.flipCamera}>{t("flip")}</button>
+              {!podcastAudio && <button className="btn small" onClick={live.flipCamera}>{t("flip")}</button>}
               {!anyBattleOpen && (
                 <button className="btn small" onClick={() => setMenuOpen(true)}>{t("battle")}</button>
               )}
@@ -2627,7 +2654,7 @@ function VideoTile({ tile, label, user, watchers, onWatchers, soundOff, onSpeake
           <div style={{ transform: "scale(2.2)" }}><Avatar user={user ?? { fullname: label }} size="lg" /></div>
         </div>
       )}
-      <span className="name">{label || "Guest"}{tile.muted ? " · camera off" : ""}</span>
+      <span className="name">{label || "Guest"}{tile.audioOnly ? " · 🎙" : tile.muted ? " · camera off" : ""}</span>
       {/* A double click on the grid sends a heart; one on these buttons must not. */}
       <div className="tile-acts" onDoubleClick={(e) => e.stopPropagation()}>
         {watchers !== null && (

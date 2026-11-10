@@ -34,6 +34,7 @@ import { fetchFeatureVideos, featureVideoLabels, featureVideoSources } from "../
 import { IDEA_SUPPORT_REASON } from "../lib/ideas";
 import { FeatureVideoPlayer, type PlayerItem } from "../components/FeatureVideoPlayer";
 import { useContestOn } from "../lib/contests";
+import { usePodcastEnabled } from "../lib/podcast";
 
 export interface Feature {
   icon: string;
@@ -55,6 +56,8 @@ export interface Feature {
   /** The key its feature video is stored under, when it is not nameKey (Country Battle's tile is
    *  named by cb_title, its video key is "country_battle" on all three platforms). */
   videoKey?: string;
+  /** Shown only while the Bingg Bongg Podcast is switched on (podcast_enabled). */
+  podcastOnly?: true;
 }
 
 export interface Section {
@@ -83,6 +86,8 @@ export const FEATURES: Section[] = [
       { icon: "👥", nameKey: "fname_multi_live_24", blurbKey: "fblurb_multi_live_24", to: "/go-live", videoKey: "multi_live" },
       { icon: "🖥️", nameKey: "fname_go_live_from_your_computer", blurbKey: "fblurb_go_live_from_your_computer", to: "/go-live/computer" },
       { icon: "📺", nameKey: "fname_live_now", blurbKey: "fblurb_live_now", to: "/live" },
+      // Bingg Bongg Podcast (Steve, 2026-11-10). Hidden until podcast_enabled is on.
+      { icon: "🎙", nameKey: "fname_bingg_bongg_podcast", blurbKey: "fblurb_bingg_bongg_podcast", to: "/podcasts", podcastOnly: true },
       { icon: "👀", nameKey: "fname_watch_up_to_6_lives_at_once", blurbKey: "fblurb_watch_up_to_6_lives_at_once", to: "/feature/watch-6-lives", whereKey: "fwhere_the_phone_app" },
       { icon: "🚪", nameKey: "fname_private_rooms", blurbKey: "fblurb_private_rooms", to: "/browse/private-rooms" },
       { icon: "📡", nameKey: "fname_go_live_on_6_platforms", blurbKey: "fblurb_go_live_on_6_platforms", to: "/settings/simulcast" },
@@ -362,9 +367,10 @@ export function FeaturesPage() {
     return () => { live = false; };
   }, [lang]);
   const hasContest = useContestOn();
+  const hasPodcast = usePodcastEnabled();
   const shown = FEATURES.map((s) => ({
     ...s,
-    features: s.features.filter((f) => hasContest || !f.contestOnly),
+    features: s.features.filter((f) => (hasContest || !f.contestOnly) && (hasPodcast || !f.podcastOnly)),
   }));
   const numbers = featureNumbers(shown);
   // Every tile's own video, in the directory's order, so the player can scroll from one feature's

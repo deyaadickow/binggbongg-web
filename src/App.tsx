@@ -78,6 +78,9 @@ import { rememberAdSource } from "./lib/getApp";
 import { PageTracking } from "./components/PageTracking";
 import { SignupNudges } from "./components/SignupNudges";
 import { VerifyEmailModal } from "./components/VerifyEmailModal";
+import { PodcastEpisodePage, PodcastsPage, StartPodcastPage } from "./pages/PodcastPages";
+import { PodcastPlayerProvider } from "./lib/podcastPlayer";
+import { PodcastMiniBar } from "./components/PodcastBits";
 
 /** The ads' landing page (/ph) stands alone — no menu, no sidebar, nothing but the contest and the
  *  download button (Steve, 2026-10-31). Everything else gets the normal site. */
@@ -114,6 +117,9 @@ export default function App() {
   return (
     <SessionProvider>
       <LanguageProvider>
+      {/* Bingg Bongg Podcast (2026-11-10): one audio player above the routes, so an episode keeps
+          playing while the member browses. */}
+      <PodcastPlayerProvider>
       <BrowserRouter>
         <RouteMeta />
         <AdArrival />
@@ -171,6 +177,10 @@ export default function App() {
           {/* Chat Battle (#9, Steve 2026-11-03) — the shared 24-tile battle screen. */}
           <Route path="/chat-battle/:contestId" element={<ChatBattleLivePage />} />
           <Route path="/feature/:slug" element={<LiveFeaturePage />} />
+          {/* Bingg Bongg Podcast (Steve, 2026-11-10). */}
+          <Route path="/podcasts" element={<PodcastsPage />} />
+          <Route path="/podcasts/start" element={<StartPodcastPage />} />
+          <Route path="/podcasts/episode/:id" element={<PodcastEpisodePage />} />
           {/* Your own live Bingg Bongg show (Steve, 2026-10-17). */}
           <Route path="/shows" element={<ShowsPage />} />
           <Route path="/my-show" element={<MyShowPage />} />
@@ -288,8 +298,10 @@ export default function App() {
         </main>
         </div>
         </LandingSwitch>
+        <PodcastMiniBar />
         <GetAppBar />
       </BrowserRouter>
+      </PodcastPlayerProvider>
       </LanguageProvider>
     </SessionProvider>
   );

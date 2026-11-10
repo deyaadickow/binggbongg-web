@@ -25,6 +25,8 @@ export interface LiveTile {
   muted: boolean;
   /** LiveKit's own active-speaker detection — the phones turn the tile border green on this. */
   speaking: boolean;
+  /** An audio-podcast speaker: no video at all, just the photo and the speaking ring. */
+  audioOnly?: boolean;
 }
 
 function userIdOf(p: Participant): number | null {
@@ -37,8 +39,13 @@ export function useLiveRoom(roomName: string, role: LiveRole, enabled: boolean, 
    *  (the token server grants camera only, so asking for the mic would just be refused). null /
    *  undefined = today's behaviour (camera and mic). Read when connecting, and followed live. */
   micAllowed?: boolean | null;
+  /** Bingg Bongg Podcast, audio kind (2026-11-10): host + guests publish the microphone ONLY and
+   *  every speaker gets a tile anyway (avatar + speaking ring, no video). Read when connecting. */
+  audioOnly?: boolean;
 } = {}) {
   const roomRef = useRef<Room | null>(null);
+  const audioOnlyRef = useRef<boolean>(!!opts.audioOnly);
+  audioOnlyRef.current = !!opts.audioOnly;
   const micAllowedRef = useRef<boolean | null | undefined>(opts.micAllowed);
   micAllowedRef.current = opts.micAllowed;
   // A refetch nudge: bumps on the server's ml_state message (with its version) and when LiveKit
@@ -63,6 +70,14 @@ export function useLiveRoom(roomName: string, role: LiveRole, enabled: boolean, 
     const next: LiveTile[] = [];
     const local = room.localParticipant;
     const localPub = local.getTrackPublication(Track.Source.Camera) as LocalTrackPublication | undefined;
+    const audioOnly = audioOnlyRef.current;
+    if (audioOnly && !localPub?.track && local.getTrackPublication(Track.Source.Microphone)) {
+      // An audio podcast: no camera, so the tile is the member's photo with the speaking ring.
+      next.push({
+        identity: local.identity, name: local.name || "You", userId: userIdOf(local), isLocal: true,
+        muted: true, speaking: local.isSpeaking, audioOnly: true, attach: () => () => undefined,
+      });
+    }
     if (localPub?.track) {
       const track = localPub.track;
       next.push({
@@ -78,6 +93,13 @@ export function useLiveRoom(roomName: string, role: LiveRole, enabled: boolean, 
     room.remoteParticipants.forEach((p: RemoteParticipant) => {
       const pub = p.getTrackPublication(Track.Source.Camera);
       const track = pub?.track as RemoteTrack | undefined;
+      if (!pub && audioOnly && p.getTrackPublication(Track.Source.Microphone)) {
+        next.push({
+          identity: p.identity, name: p.name || "", userId: userIdOf(p), isLocal: false,
+          muted: true, speaking: p.isSpeaking, audioOnly: true, attach: () => () => undefined,
+        });
+        return;
+      }
       if (!pub) return; // a viewer publishes nothing — no tile
       next.push({
         identity: p.identity,
@@ -163,7 +185,11 @@ export function useLiveRoom(roomName: string, role: LiveRole, enabled: boolean, 
           // A missing/blocked camera must not kill the session: the room stays up (chat, gifts,
           // heartbeat) and the publisher can retry from the Camera button.
           try {
-            if (role === "guest" && micAllowedRef.current === false) {
+            if (audioOnlyRef.current) {
+              // Audio podcast: microphone only, the camera never turns on.
+              await room.localParticipant.setMicrophoneEnabled(true);
+              setCameraOn(false);
+            } else if (role === "guest" && micAllowedRef.current === false) {
               // A muted member of a big room: camera only (Multi-live 24).
               await room.localParticipant.setCameraEnabled(true);
               setMicOn(false);

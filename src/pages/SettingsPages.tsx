@@ -2,6 +2,7 @@
 // real endpoints work today; the rest are "coming soon" placeholders so every link exists
 // (Steve, 2026-09-24: "add them anyway and work it out one at a time").
 import { useContestOn } from "../lib/contests";
+import { usePodcastEnabled } from "../lib/podcast";
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { API_BASE, currentAuthHeaders, displayName, mediaUrl, post, type UserSummary } from "../lib/api";
@@ -40,9 +41,10 @@ export function SettingsHubPage() {
   const { t } = useT();
   const { user, isLoggedIn, signOut } = useSession();
   const contestOn = useContestOn();
+  const podcastOn = usePodcastEnabled();
   return (
     <Page title={t("settings")}>
-      {sidebarSections(user?.id ?? null, contestOn).map((sec, i) => (
+      {sidebarSections(user?.id ?? null, contestOn, podcastOn).map((sec, i) => (
         <div key={i} className="card" style={{ marginBottom: 12, overflow: "hidden" }}>
           {/* t(), not the bare key. The sidebar has always translated these; this page printed
               them raw, so every language saw "account" / "general" / "get_the_app". The type

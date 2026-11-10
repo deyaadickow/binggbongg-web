@@ -252,6 +252,11 @@ export interface LiveStream {
   live_badge_tier?: number;
   live_badge_tier_name?: string;
   live_badge_minutes?: number;
+  /** Bingg Bongg Podcast (2026-11-10): this room is a podcast — a "🎙 PODCAST" badge on the card. */
+  is_podcast?: boolean | number;
+  podcast_id?: number | null;
+  podcast_kind?: string | null;
+  podcast_title?: string | null;
 }
 
 export interface Gift {
@@ -624,12 +629,15 @@ export async function reportUser(input: {
   reason: string;
   description: string;
   postId?: number;
+  /** Bingg Bongg Podcast (2026-11-10): the episode the complaint is about. */
+  podcastEpisodeId?: number;
 }) {
   return post("reportUser", {
     user_id: input.reportedUserId,
     reason: input.reason,
     description: input.description,
     ...(input.postId ? { post_id: input.postId } : {}),
+    ...(input.podcastEpisodeId ? { podcast_episode_id: input.podcastEpisodeId } : {}),
   });
 }
 

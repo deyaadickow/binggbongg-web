@@ -8,6 +8,7 @@ import { PageTitle } from "../components/PageTitle";
 import { requireVerified } from "../lib/verifyEmail";
 import { ML_MAX_SIZE, ML_MIN_SIZE, saveRoomSize, savedRoomSize } from "../lib/multiLive";
 import { MlSizeStepper } from "../components/MultiLiveGrid";
+import { StartPodcastLink } from "./PodcastPages";
 
 /** Camera preview + one button — same startLive endpoint the phones call, then the room page as host. */
 export function GoLivePage() {
@@ -73,6 +74,8 @@ export function GoLivePage() {
       <button className="btn block" style={{ marginTop: 14, minHeight: 52, fontSize: 17 }} onClick={goLive} disabled={busy}>
         {busy ? "Starting…" : "Go Live"}
       </button>
+      {/* Bingg Bongg Podcast (Steve, 2026-11-10) — right under Go Live, only while switched on. */}
+      <StartPodcastLink />
       {previewError && <p className="muted center" style={{ fontSize: 13, marginTop: 8 }}>{t("you_can_still_go_live_and_turn_the_camer")}</p>}
       <p className="muted center" style={{ fontSize: 13, marginTop: 8 }}>{t("your_followers_see_you_in_live_now_the_m")}</p>
       {/* Steve, 2026-10-03 — the gamers' route in. Someone with a capture card and OBS is not
