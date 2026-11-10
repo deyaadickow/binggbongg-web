@@ -2339,4 +2339,9 @@ export const en = {
   dm_open_off_done: "Messages from members are off.",
   // Testers only (Steve, 2026-11-10: "we will only keep dead coins for us to test with").
   wallet_test_coins: "Test coins: %1$s (for testing, earn nothing)",
+  // Battle Host Bonus (Steve, 2026-11-10).
+  hb_title: "🔥 Battle Host Bonus +%1$s%%",
+  hb_body: "Battle as the host and get an extra %1$s%% on every gift you receive. Limited time!",
+  hb_watch: "Watch the video",
+  hb_skip: "Skip",
 } as const;

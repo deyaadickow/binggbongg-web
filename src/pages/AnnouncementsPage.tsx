@@ -131,10 +131,13 @@ function Card({ a, filipino, highlight, onPlay, cardRef }: {
   );
 }
 
-/** Full-screen player: black, the video fitted whole, the browser's own controls, sound on. */
-export function Player({ a, lang, filipino, onLang, onClose }: {
+/** Full-screen player: black, the video fitted whole, the browser's own controls, sound on.
+ *  `skip` (the Battle Host Bonus video on Go Live) swaps the ✕ for a gold "Skip" at the top right;
+ *  `onEnded` runs when the video plays to its end. */
+export function Player({ a, lang, filipino, onLang, onClose, skip, onEnded }: {
   a: Announcement; lang: AnnouncementLang; filipino: boolean;
   onLang: (l: AnnouncementLang) => void; onClose: () => void;
+  skip?: boolean; onEnded?: () => void;
 }) {
   const { t } = useT();
   const src = videoFor(a, lang) ?? "";
@@ -177,16 +180,23 @@ export function Player({ a, lang, filipino, onLang, onClose }: {
       position: "fixed", inset: 0, zIndex: 2000, background: "#000", display: "flex", flexDirection: "column",
     }}>
       <div style={{ padding: "10px 14px", display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
-        <button onClick={onClose} aria-label={t("ann_close")} style={{
+        {!skip && <button onClick={onClose} aria-label={t("ann_close")} style={{
           width: 40, height: 40, borderRadius: "50%", background: "#000", color: "var(--gold)", flexShrink: 0,
           border: "2px solid var(--gold-border)", fontSize: 20, fontWeight: 700, cursor: "pointer", lineHeight: 1,
-        }}>✕</button>
+        }}>✕</button>}
         <b style={{ color: "var(--gold)", fontSize: 17, flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{title}</b>
+        {skip && (
+          <button type="button" onClick={onClose} style={{
+            flexShrink: 0, minHeight: 40, padding: "0 18px", borderRadius: 999, cursor: "pointer",
+            background: "linear-gradient(180deg,#FFDD55,#D4AF37)", color: "#000", border: 0,
+            fontSize: 16, fontWeight: 900,
+          }}>{t("hb_skip")}</button>
+        )}
       </div>
       <div style={{ flex: 1, minHeight: 0, display: "flex", position: "relative" }}>
         {/* Keyed on the file, so switching language starts the other video from the top. */}
         <video key={src} ref={videoEl} src={src} poster={a.poster ?? undefined} controls playsInline
-          onError={() => setFailed(true)} onPlay={() => setNeedsTap(false)}
+          onError={() => setFailed(true)} onPlay={() => setNeedsTap(false)} onEnded={onEnded}
           style={{ flex: 1, minWidth: 0, width: "100%", height: "100%", objectFit: "contain", background: "#000" }} />
         {needsTap && !failed && (
           <button type="button" onClick={tapToPlay} aria-label={t("ann_play_video")} style={{

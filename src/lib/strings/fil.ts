@@ -2142,4 +2142,8 @@ export const fil = {
   dm_open_on_done: "Makakapagpadala na ulit sa iyo ng mensahe ang mga miyembro.",
   dm_open_off_done: "Naka-off na ang mensahe mula sa mga miyembro.",
   wallet_test_coins: "Test coins: %1$s (para sa testing, walang kinikita)",
+  hb_title: "🔥 Battle Host Bonus +%1$s%%",
+  hb_body: "Mag-battle bilang host at makakuha ng dagdag na %1$s%% sa bawat gift na matatanggap mo. Limitadong panahon lang!",
+  hb_watch: "Panoorin ang video",
+  hb_skip: "Laktawan",
 };

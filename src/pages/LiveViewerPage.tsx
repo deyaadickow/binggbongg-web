@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { HostBonusIntro } from "../components/HostBonus";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { displayName, giftPrice, mediaUrl, post, type Gift, type UserSummary } from "../lib/api";
 import { TapTapBurst, isTapTapGift, tapTapBurstDuration } from "../components/TapTapBurst";
@@ -1450,6 +1451,9 @@ export function LiveViewerPage() {
 
   return (
     <div className="page">
+      {/* Battle Host Bonus video (Steve, 2026-11-10): "when a member goes live the first thing they
+          will see" — own room only, once, over the room (which joins underneath as normal). */}
+      {wantsHost && user && <HostBonusIntro userId={user.id} />}
       <div className="row" style={{ marginBottom: 12 }}>
         <Avatar user={hostCard} />
         <div style={{ flex: 1, minWidth: 0 }}>

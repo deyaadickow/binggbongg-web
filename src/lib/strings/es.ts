@@ -2118,4 +2118,8 @@ export const es = {
   dm_open_on_done: "Los miembros pueden enviarte mensajes de nuevo.",
   dm_open_off_done: "Los mensajes de miembros están desactivados.",
   wallet_test_coins: "Monedas de prueba: %1$s (para pruebas, no generan ganancias)",
+  hb_title: "🔥 Battle Host Bonus +%1$s%%",
+  hb_body: "Haz batallas como anfitrión y recibe un %1$s%% extra en cada regalo que recibas. ¡Por tiempo limitado!",
+  hb_watch: "Ver el video",
+  hb_skip: "Saltar",
 };

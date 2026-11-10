@@ -2137,4 +2137,8 @@ export const id = {
   dm_open_on_done: "Anggota bisa mengirimimu pesan lagi.",
   dm_open_off_done: "Pesan dari anggota dinonaktifkan.",
   wallet_test_coins: "Koin uji: %1$s (untuk pengujian, tidak menghasilkan apa-apa)",
+  hb_title: "🔥 Battle Host Bonus +%1$s%%",
+  hb_body: "Battle sebagai host dan dapatkan tambahan %1$s%% dari setiap hadiah yang kamu terima. Waktu terbatas!",
+  hb_watch: "Tonton videonya",
+  hb_skip: "Lewati",
 };
