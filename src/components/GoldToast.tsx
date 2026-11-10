@@ -40,7 +40,8 @@ export function useToast() {
           background: "#000", borderColor: "var(--gold-border)",
         }}
       >
-        <p style={{ margin: "4px 0 18px", color: "#fff", fontSize: 16 }}>{toast}</p>
+        {/* Steve, 2026-11-10: "When we send out messages please make the text large enough to read." 16px white -> 18px gold, 1.4 line height; a long message scrolls inside the card. */}
+        <p style={{ margin: "4px 0 18px", color: "var(--gold)", fontSize: 18, lineHeight: 1.4, whiteSpace: "pre-wrap", wordBreak: "break-word", maxHeight: "60vh", overflowY: "auto" }}>{toast}</p>
         <button
           className="btn"
           onClick={() => setToast(null)}
@@ -89,7 +90,7 @@ export function showGoldAlert(message: string, onClose?: () => void) {
         className="card pad"
         style={{ maxWidth: 420, width: "100%", textAlign: "center", background: "#000", borderColor: "var(--gold-border)" }}
       >
-        <p style={{ margin: "4px 0 18px", color: "#fff", fontSize: 16 }}>{message}</p>
+        <p style={{ margin: "4px 0 18px", color: "var(--gold)", fontSize: 18, lineHeight: 1.4, whiteSpace: "pre-wrap", wordBreak: "break-word", maxHeight: "60vh", overflowY: "auto" }}>{message}</p>
         <button
           className="btn"
           onClick={close}
@@ -149,7 +150,7 @@ export function showGoldConfirm(opts: {
             className="card pad"
             style={{ maxWidth: 420, width: "100%", textAlign: "center", background: "#000", borderColor: "var(--gold-border)" }}
           >
-            <p style={{ margin: "4px 0 14px", color: "#fff", fontSize: 16, whiteSpace: "pre-wrap" }}>{opts.message}</p>
+            <p style={{ margin: "4px 0 14px", color: "var(--gold)", fontSize: 18, lineHeight: 1.4, whiteSpace: "pre-wrap", wordBreak: "break-word", maxHeight: "60vh", overflowY: "auto" }}>{opts.message}</p>
             {opts.confirmWord && (
               <input
                 className="input"

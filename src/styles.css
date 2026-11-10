@@ -797,6 +797,8 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .lp-langs { display: flex; gap: 6px; background: rgba(0,0,0,.75); border: 1px solid var(--gold-border); border-radius: 999px; padding: 4px; }
 .lp-langs button { border: 0; border-radius: 999px; padding: 6px 16px; background: transparent; color: var(--gold); font: inherit; font-size: 14px; font-weight: 800; cursor: pointer; }
 .lp-langs button.on { background: var(--gold); color: #000; }
+/* Announcement player language switch: large readable text (Steve, 2026-11-10). */
+.ann-langs button { font-size: 17px; padding: 8px 18px; }
 /* The feature-video player's switch holds up to five languages: smaller, one line, scrolls as a last
    resort on a narrow phone, and always left-to-right (it is a list of names, not a sentence). */
 .fv-langs { direction: ltr; gap: 2px; max-width: 100%; overflow-x: auto; scrollbar-width: none; }

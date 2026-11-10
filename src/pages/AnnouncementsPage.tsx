@@ -55,7 +55,7 @@ function When({ at }: { at?: string | null }) {
   const d = new Date(at.replace(" ", "T") + (/Z$|[+-]\d\d:?\d\d$/.test(at) ? "" : "Z"));
   if (Number.isNaN(d.getTime())) return null;
   return (
-    <span className="muted" style={{ fontSize: 12 }}>
+    <span style={{ fontSize: 15, color: "var(--gold)", opacity: 0.8, display: "block", marginTop: 4 }}>
       {d.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })} · {d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}
     </span>
   );
@@ -91,15 +91,17 @@ function Card({ a, filipino, highlight, onPlay, cardRef }: {
       boxShadow: highlight ? "0 0 0 3px rgba(255,221,85,.25)" : undefined,
     }}>
       <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-        <img src="/logo_round.png" alt="" width={40} height={40} style={{ borderRadius: "50%", flexShrink: 0 }} />
+        <img src="/logo_round.png" alt="" width={44} height={44} style={{ borderRadius: "50%", flexShrink: 0 }} />
         <div style={{ flex: 1, minWidth: 0 }}>
-          {title && <strong style={{ color: "var(--gold)", fontSize: 16, display: "block", wordBreak: "break-word" }}>{title}</strong>}
+          {/* Steve, 2026-11-10: "When we send out messages please make the text large enough to
+              read." Title 16 -> 22px bold, message 14px soft-white -> 18px gold at 1.4. */}
+          {title && <strong style={{ color: "var(--gold)", fontSize: 22, fontWeight: 800, lineHeight: 1.25, display: "block", wordBreak: "break-word" }}>{title}</strong>}
           <When at={a.createdAt} />
         </div>
       </div>
 
       {message && (
-        <p style={{ margin: "10px 0 0", color: "var(--text-soft)", fontSize: 14, lineHeight: 1.5, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+        <p style={{ margin: "12px 0 0", color: "var(--gold)", fontSize: 18, lineHeight: 1.4, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
           <Linkified text={message} />
         </p>
       )}
@@ -118,7 +120,7 @@ function Card({ a, filipino, highlight, onPlay, cardRef }: {
           </button>
           <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
             {langs.map((l) => (
-              <button key={l} type="button" className="btn" style={{ flex: "1 1 0", minWidth: 120 }} onClick={() => onPlay(l)}>
+              <button key={l} type="button" className="btn" style={{ flex: "1 1 0", minWidth: 120, fontSize: 17 }} onClick={() => onPlay(l)}>
                 ▶ {l === "fil" ? t("ann_tagalog") : t("ann_english")}
               </button>
             ))}
@@ -184,7 +186,8 @@ export function Player({ a, lang, filipino, onLang, onClose, skip, onEnded }: {
           width: 40, height: 40, borderRadius: "50%", background: "#000", color: "var(--gold)", flexShrink: 0,
           border: "2px solid var(--gold-border)", fontSize: 20, fontWeight: 700, cursor: "pointer", lineHeight: 1,
         }}>✕</button>}
-        <b style={{ color: "var(--gold)", fontSize: 17, flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{title}</b>
+        {/* 17px one line -> 22px, wrapping (never cut with "..."); 2026-11-10. */}
+        <b style={{ color: "var(--gold)", fontSize: 22, lineHeight: 1.25, flex: 1, minWidth: 0, wordBreak: "break-word" }}>{title}</b>
         {skip && (
           <button type="button" onClick={onClose} style={{
             flexShrink: 0, minHeight: 40, padding: "0 18px", borderRadius: 999, cursor: "pointer",
@@ -206,13 +209,13 @@ export function Player({ a, lang, filipino, onLang, onClose, skip, onEnded }: {
         )}
         {failed && (
           <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", padding: 24, pointerEvents: "none" }}>
-            <p style={{ color: "var(--gold)", textAlign: "center", fontWeight: 700 }}>{t("ann_video_failed")}</p>
+            <p style={{ color: "var(--gold)", textAlign: "center", fontWeight: 700, fontSize: 18 }}>{t("ann_video_failed")}</p>
           </div>
         )}
       </div>
       {langs.length > 1 && (
         <div style={{ display: "flex", justifyContent: "center", padding: "10px 14px 14px", flexShrink: 0 }}>
-          <div className="lp-langs" role="group" aria-label={t("ann_video_language")}>
+          <div className="lp-langs ann-langs" role="group" aria-label={t("ann_video_language")}>
             {langs.map((l) => (
               <button key={l} type="button" className={l === lang ? "on" : ""} aria-pressed={l === lang}
                 onClick={() => { if (l !== lang) onLang(l); }}>
@@ -314,7 +317,7 @@ export function AnnouncementsPage() {
   const notFound = wantedId > 0 && !wanted && !loading && (done || pages >= MAX_DEEP_LINK_PAGES || !!error);
   let body: ReactNode;
   if (loading && rows.length === 0) body = <Loading />;
-  else if (rows.length === 0 && !error && !welcome) body = <p className="soft">{t("ann_empty")}</p>;
+  else if (rows.length === 0 && !error && !welcome) body = <p style={{ color: "var(--gold)", fontSize: 18 }}>{t("ann_empty")}</p>;
   else body = null;
 
   return (
