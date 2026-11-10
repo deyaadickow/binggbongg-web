@@ -13,7 +13,8 @@ import { Avatar, Loading, Notice } from "../components/Common";
 import { fetchUserPhotos, type Photo } from "../lib/photos";
 import { MemberBusinessesPanel, MyBusinessesPanel } from "./BusinessPages";
 import { ScheduleSection } from "../components/ScheduleSection";
-import { showGoldAlert } from "../components/GoldToast";
+import { showGoldAlert, showGoldConfirm } from "../components/GoldToast";
+import { fetchDmStatus, setDmBlock } from "../lib/dm";
 import { CountryBattleBadges } from "../components/CountryBattleBits";
 import { tt, useT  } from "../lib/i18n";
 import { fetchChatBattleAlertMute, setChatBattleAlertMute } from "../lib/chatBattle";
@@ -375,6 +376,8 @@ export function ProfilePage() {
   const [showCreatePlaylist, setShowCreatePlaylist] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
   const [showReport, setShowReport] = useState(false);
+  /** Have I stopped messages from this member? Decides "Stop" vs "Allow" in the ⋮ menu. */
+  const [iStoppedThem, setIStoppedThem] = useState(false);
   const [copiedRefer, setCopiedRefer] = useState(false);
   const loadedTabs = useRef(new Set<TabKey>());
   const profileId = Number(id);
@@ -538,6 +541,35 @@ export function ProfilePage() {
     }
   }
 
+  // Message limits (Steve, 2026-11-09). Only i_blocked_them is used here; the server's failure
+  // (not deployed yet) reads as "not stopped".
+  useEffect(() => {
+    setIStoppedThem(false);
+    if (!me || !profile || me.id === profile.id) return;
+    let alive = true;
+    void fetchDmStatus(me.id, profile.id).then((s) => { if (alive) setIStoppedThem(s.i_blocked_them); });
+    return () => { alive = false; };
+  }, [me?.id, profile?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function toggleStopMessages() {
+    if (!me || !profile) return;
+    setShowOptions(false);
+    const handle = profile.username || displayName(profile);
+    const stop = !iStoppedThem;
+    if (stop) {
+      const ok = await showGoldConfirm({
+        message: t("dm_stop_confirm", handle),
+        confirmLabel: t("dm_stop_button"),
+        cancelLabel: t("cancel"),
+      });
+      if (!ok) return;
+    }
+    const r = await setDmBlock(me.id, profile.id, stop);
+    if (!r) { showGoldAlert(t("dm_couldnt_save")); return; }
+    setIStoppedThem(r.i_blocked_them);
+    showGoldAlert(t(r.i_blocked_them ? "dm_stopped_done" : "dm_allowed_done", handle));
+  }
+
   async function handleBlock() {
     if (!me || !profile) return;
     setShowOptions(false);
@@ -581,7 +613,6 @@ export function ProfilePage() {
   if (!profile) return <div className="page"><Loading /></div>;
 
   const isMe = me?.id === profile.id;
-  const isMutualFollow = !isMe && profile.is_following_each_other === 1;
 
   const tabs: { key: TabKey; label: string; count?: number }[] = [
     { key: "videos", label: "Videos", count: profile.postCounts },
@@ -694,6 +725,8 @@ export function ProfilePage() {
                   <button className="btn ghost small" style={{ width: "100%", textAlign: "left", borderRadius: 6 }}
                     onClick={() => { navigator.share?.({ url: `${window.location.origin}/profile/${profile.id}`, title: displayName(profile) }).catch(() => {}); setShowOptions(false); }}>
                     {t("share_profile_2")}</button>
+                  <button className="btn ghost small" style={{ width: "100%", textAlign: "left", borderRadius: 6 }} onClick={() => void toggleStopMessages()}>
+                    {t(iStoppedThem ? "dm_allow_from" : "dm_stop_from", profile.username || displayName(profile))}</button>
                   <button className="btn ghost small" style={{ width: "100%", textAlign: "left", borderRadius: 6 }} onClick={handleReport}>
                     {t("report")}</button>
                   <button className="btn ghost small" style={{ width: "100%", textAlign: "left", borderRadius: 6, color: "#f84" }} onClick={handleBlock}>
@@ -744,13 +777,12 @@ export function ProfilePage() {
               {following ? "Following" : "Follow"}
             </button>
           )}
-          {/* Steve, 2026-10-11: this button pointed at /chat?user=… since the profile page was
-              built, and there has never been a page there — direct messages did not exist on
-              the web. Now they do (lib/dm.ts), so it goes somewhere. Still gated on a mutual
-              follow, same as the phones. */}
-          {isMutualFollow && (
-            <Link to={`/messages/${profile.id}`} className="btn ghost" style={{ flex: 1, textAlign: "center" }}>
-              {t("chat")}</Link>
+          {/* Steve, 2026-11-09: "Please add send a message to members public profile page." This
+              was the Chat button, shown only on a mutual follow; now every signed-in member gets
+              it, and the one-message-until-they-reply limit is enforced in the thread itself. */}
+          {!isMe && isLoggedIn && (
+            <Link to={`/messages/${profile.id}`} className="btn" style={{ flex: 1, textAlign: "center", whiteSpace: "nowrap" }}>
+              ✉️ {t("dm_message")}</Link>
           )}
           <button className="btn ghost small" onClick={() => setShowBattleBoard(true)}>
             {t("battle_board")}</button>

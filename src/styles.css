@@ -546,6 +546,14 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 .dm-rule { height: 1px; background: var(--gold-border); opacity: .45; }
 .dm-composer { display: flex; gap: 8px; align-items: center; }
 .dm-composer .input { flex: 1; }
+/* Message limits (Steve, 2026-11-09): the small black/gold line above the message bar. */
+.dm-limit { margin: 0 0 8px; padding: 8px 12px; background: #000; border: 1.5px solid var(--gold-border); border-radius: 10px; color: var(--gold); font-size: 13px; font-weight: 700; text-align: center; }
+.dm-limit:not(.locked) { border-color: var(--line); color: var(--text-soft); font-weight: 600; }
+.dm-composer .input:disabled { opacity: 0.5; }
+/* Settings → Messages from members. */
+.dm-open-row { display: flex; align-items: center; gap: 12px; padding: 14px; }
+.dm-open-row .dm-open-label { flex: 1; min-width: 0; color: var(--gold); font-weight: 800; font-size: 15px; }
+.dm-open-note { padding: 0 14px 14px; margin: -6px 0 0; color: var(--text-dim); font-size: 13px; }
 
 /* Photos and video in messages — Steve, 2026-10-11: "Add photos and video to the messages." */
 .dm-media { display: block; max-width: 240px; max-height: 300px; width: 100%; border-radius: 8px;

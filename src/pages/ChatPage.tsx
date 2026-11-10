@@ -15,9 +15,10 @@ import { Link, useParams } from "react-router-dom";
 import { Avatar, Loading, Notice } from "../components/Common";
 import { post, type UserSummary } from "../lib/api";
 import {
-  conversationId, markConversationRead, observeMessages, sendMediaMessage, sendMessage,
-  uploadChatMedia, type DmMessage,
+  conversationId, fetchDmStatus, markConversationRead, noteDmSent, observeMessages, sendMediaMessage, sendMessage,
+  uploadChatMedia, type DmMessage, type DmStatus,
 } from "../lib/dm";
+import { displayName } from "../lib/api";
 import { mediaUrl } from "../lib/api";
 import { useSession } from "../lib/session";
 import { memberLabel, trackPage } from "../lib/pageTracker";
@@ -61,6 +62,10 @@ export function ChatPage() {
   const inFlight = useRef<Set<string>>(new Set());
   const bottom = useRef<HTMLDivElement | null>(null);
 
+  // Message limits (Steve, 2026-11-09): one message until they reply, and nothing at all when
+  // they've switched messages off or stopped you. The server decides; null = not asked yet.
+  const [dmStatus, setDmStatus] = useState<DmStatus | null>(null);
+
   useEffect(() => {
     if (!id) return;
     void (async () => {
@@ -98,6 +103,23 @@ export function ChatPage() {
      .catch((e) => { if (!dead) setError(String(e?.message ?? e)); });
     return () => { dead = true; stop?.(); };
   }, [cid, myIdentity]);
+
+  // Has the other member ever written in this thread? Sent to the server as a hint, and a flip
+  // from false to true (they reply while the thread is open) asks again, which unlocks the bar.
+  const theyReplied = useMemo(
+    () => !!partner?.identity && !!messages?.some((m) => m.senderIdentity === partner.identity),
+    [messages, partner?.identity],
+  );
+  const historyLoaded = messages !== null;
+  useEffect(() => {
+    if (!user || !partner || String(partner.id) !== String(id) || !historyLoaded) return;
+    let alive = true;
+    void fetchDmStatus(user.id, partner.id, theyReplied).then((s) => { if (alive) setDmStatus(s); });
+    return () => { alive = false; };
+  }, [user?.id, partner?.id, id, historyLoaded, theyReplied]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // A different conversation starts unknown again.
+  useEffect(() => { setDmStatus(null); }, [id]);
 
   // Opening a thread clears its unread flag, same as the phones.
   useEffect(() => {
@@ -148,6 +170,7 @@ export function ChatPage() {
   async function send() {
     if (!user || !partner || sending) return;
     if (!pending && !draft.trim()) return;
+    if (dmStatus && !dmStatus.can_send) return;
     // Direct messages go straight to Firestore, so the server cannot ask for the email (2026-11-05).
     if (!requireVerified()) return;
     setSending(true);
@@ -161,6 +184,9 @@ export function ChatPage() {
         await sendMessage(user, partner, draft);
       }
       setDraft("");
+      // The server counts the send and answers with what is allowed next (wait_reply after a
+      // first message). Its own failure leaves the bar open — see lib/dm.ts.
+      void noteDmSent(user.id, partner.id).then(setDmStatus);
     } catch (e) {
       setError((e as Error).message || "Couldn't send that.");
     } finally {
@@ -173,6 +199,16 @@ export function ChatPage() {
   if (!myIdentity) return <Notice error>{t("your_session_is_missing_its_chat_identit")}</Notice>;
 
   let lastDay = "";
+
+  const partnerName = displayName(partner);
+  const locked = !!dmStatus && !dmStatus.can_send;
+  // messages_off and blocked read the SAME — a member is never told they were stopped.
+  const notice = !dmStatus ? null
+    : dmStatus.reason === "wait_reply" && locked ? t("dm_wait_reply", partnerName)
+    : (dmStatus.reason === "messages_off" || dmStatus.reason === "blocked" || dmStatus.reason === "no_user") && locked
+      ? t("dm_not_accepting", partnerName)
+    : dmStatus.reason === "first_message" && !locked ? t("dm_first_hint", partnerName)
+    : null;
 
   return (
     <div className="page dm-page">
@@ -247,6 +283,8 @@ export function ChatPage() {
         </div>
       )}
 
+      {notice && <div className={`dm-limit${locked ? " locked" : ""}`} role="status">{notice}</div>}
+
       <div className="dm-composer">
         <input
           ref={filePicker}
@@ -258,7 +296,7 @@ export function ChatPage() {
         <button
           className="btn ghost dm-attach"
           title={t("send_a_photo_or_a_video")}
-          disabled={sending}
+          disabled={sending || locked}
           onClick={() => filePicker.current?.click()}
         >+</button>
         <input
@@ -266,10 +304,11 @@ export function ChatPage() {
           placeholder={pending ? "Caption (optional)" : "Write Something"}
           value={draft}
           maxLength={1000}
+          disabled={locked}
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter") void send(); }}
         />
-        <button className="btn" disabled={(!draft.trim() && !pending) || sending} onClick={() => void send()}>{t("send")}</button>
+        <button className="btn" disabled={(!draft.trim() && !pending) || sending || locked} onClick={() => void send()}>{t("send")}</button>
       </div>
     </div>
   );

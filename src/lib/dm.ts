@@ -320,3 +320,95 @@ export async function uploadChatMedia(
 
   return { key: slot.key, kind };
 }
+
+// ---------------------------------------------------------------------------------------
+// Message limits — Steve, 2026-11-09: "Please add send a message to members public profile
+// page. Members are only allowed to send one message, if the account admin answers that
+// message then the messages will be open to send more messages. Also give the account holder
+// to block messages from any member or all members with an on/off Toggle switch."
+//
+// The rule lives on the server (backend a05402d); the page only asks and obeys. Until that
+// backend is deployed every call below fails — and a failure is read as "can send, reason ok",
+// so messaging keeps working exactly as it did rather than locking everyone out.
+
+export type DmReason = "ok" | "first_message" | "wait_reply" | "messages_off" | "blocked" | "self" | "no_user";
+
+export interface DmStatus {
+  can_send: boolean;
+  reason: DmReason;
+  open: boolean;
+  i_blocked_them: boolean;
+  their_messages_off: boolean;
+}
+
+export interface DmSettings {
+  dm_open: boolean;
+  blocked: UserSummary[];
+}
+
+/** What a failed or unanswered call means: nothing is limited. */
+export const DM_STATUS_OPEN: DmStatus = { can_send: true, reason: "ok", open: true, i_blocked_them: false, their_messages_off: false };
+
+function toStatus(d: Record<string, unknown> | null | undefined): DmStatus {
+  if (!d || typeof d !== "object") return DM_STATUS_OPEN;
+  const reason = String(d.reason ?? "ok") as DmReason;
+  return {
+    can_send: d.can_send === undefined ? true : !!d.can_send && d.can_send !== "0",
+    reason,
+    open: d.open === undefined ? true : !!d.open && d.open !== "0",
+    i_blocked_them: !!d.i_blocked_them && d.i_blocked_them !== "0",
+    their_messages_off: !!d.their_messages_off && d.their_messages_off !== "0",
+  };
+}
+
+/** May I message this member right now? [theyReplied] is true when the loaded thread holds
+ *  ANY message from them — the server uses it as a hint alongside its own record. */
+export async function fetchDmStatus(myId: number, otherId: number, theyReplied?: boolean): Promise<DmStatus> {
+  const res = await post<Record<string, unknown>>("fetchDmStatus", {
+    my_user_id: myId,
+    user_id: otherId,
+    ...(theyReplied ? { they_replied: "true" } : {}),
+  }).catch(() => null);
+  if (!res?.status) return DM_STATUS_OPEN;
+  return toStatus(res.data);
+}
+
+/** Called after EVERY successful send to this member; answers with the new status. */
+export async function noteDmSent(myId: number, otherId: number): Promise<DmStatus> {
+  const res = await post<Record<string, unknown>>("noteDmSent", { my_user_id: myId, user_id: otherId }).catch(() => null);
+  if (!res?.status) return DM_STATUS_OPEN;
+  return toStatus(res.data);
+}
+
+function toSettings(d: Record<string, unknown> | null | undefined): DmSettings | null {
+  if (!d || typeof d !== "object") return null;
+  return {
+    dm_open: d.dm_open === undefined ? true : !!d.dm_open && d.dm_open !== "0",
+    // Rows come as {user_id, username, fullname, profile_image, identity}; the page's member
+    // rows key on `id`, so it is copied across.
+    blocked: Array.isArray(d.blocked)
+      ? (d.blocked as Record<string, unknown>[]).map((b) => ({ ...b, id: Number(b.user_id ?? b.id ?? 0) }) as unknown as UserSummary)
+      : [],
+  };
+}
+
+/** My own switch plus the members I've stopped. null when the server can't answer. */
+export async function fetchDmSettings(myId: number): Promise<DmSettings | null> {
+  const res = await post<Record<string, unknown>>("fetchDmSettings", { my_user_id: myId }).catch(() => null);
+  if (!res?.status) return null;
+  return toSettings(res.data);
+}
+
+/** Messages from members on (true) or off. null on failure. */
+export async function setDmOpen(myId: number, on: boolean): Promise<DmSettings | null> {
+  const res = await post<Record<string, unknown>>("setDmOpen", { my_user_id: myId, on: on ? 1 : 0 }).catch(() => null);
+  if (!res?.status) return null;
+  return toSettings(res.data);
+}
+
+/** Stop (on=true) or allow again (on=false) messages from one member. null on failure. */
+export async function setDmBlock(myId: number, otherId: number, on: boolean): Promise<DmStatus | null> {
+  const res = await post<Record<string, unknown>>("setDmBlock", { my_user_id: myId, user_id: otherId, on: on ? 1 : 0 }).catch(() => null);
+  if (!res?.status) return null;
+  return toStatus(res.data);
+}

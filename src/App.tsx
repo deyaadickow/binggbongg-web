@@ -62,7 +62,7 @@ import { AdReferralEarningsPage, AllVideosEarningsPage, PayoutHistoryPage, Redee
 import { PrintableAdsPage } from "./pages/PrintableAdsPage";
 import { ShopPage, ShopProductPage } from "./pages/ShopPage";
 import { MyRemindersPage } from "./pages/MyRemindersPage";
-import { AccountSettingsPage, AdvertisePage, BlockedProfilesPage, ComingSoonPage, ContestRequestsPage, DeleteAccountPage, FindABattlePage, ModeratorsPage, QrCodePage, ReferralsPage, SettingsHubPage, ShareProfilePage, SimulcastPage, SupportArchivePage, SupportPage, VirtualLookPage, MyVirtualBattlesPage, TermsOfUsePage, PrivacyPolicyPage, ContactUsPage, AboutUsPage, SafetyCenterPage, FaqPage, AppFeaturesPage, ToDoListPage } from "./pages/SettingsPages";
+import { AccountSettingsPage, AdvertisePage, BlockedProfilesPage, MessagesFromMembersPage, ComingSoonPage, ContestRequestsPage, DeleteAccountPage, FindABattlePage, ModeratorsPage, QrCodePage, ReferralsPage, SettingsHubPage, ShareProfilePage, SimulcastPage, SupportArchivePage, SupportPage, VirtualLookPage, MyVirtualBattlesPage, TermsOfUsePage, PrivacyPolicyPage, ContactUsPage, AboutUsPage, SafetyCenterPage, FaqPage, AppFeaturesPage, ToDoListPage } from "./pages/SettingsPages";
 import { SellerPage } from "./pages/SellerPage";
 import { AgentPage } from "./pages/AgentPage";
 import { VaultPage } from "./pages/VaultPage";
@@ -232,6 +232,7 @@ export default function App() {
           <Route path="/settings/referrals" element={<ReferralsPage />} />
           <Route path="/settings/contest-requests" element={<ContestRequestsPage />} />
           <Route path="/settings/blocked" element={<BlockedProfilesPage />} />
+          <Route path="/settings/messages" element={<MessagesFromMembersPage />} />
           <Route path="/settings/moderators" element={<ModeratorsPage />} />
           <Route path="/settings/find-a-battle" element={<FindABattlePage />} />
           <Route path="/settings/simulcast" element={<SimulcastPage />} />

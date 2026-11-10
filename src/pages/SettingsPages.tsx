@@ -16,6 +16,7 @@ import { tt, useT, type StringKey  } from "../lib/i18n";
 import { PageTitle } from "../components/PageTitle";
 import { IDEA_SUPPORT_REASON } from "../lib/ideas";
 import { CountryBattleReminderToggle } from "../components/CountryBattleBits";
+import { fetchDmSettings, setDmBlock, setDmOpen, type DmSettings } from "../lib/dm";
 
 const SITE = "https://www.binggbongg.com";
 
@@ -264,6 +265,76 @@ export function BlockedProfilesPage() {
         {list === null ? <Loading /> : list.length === 0 ? <p className="muted" style={{ padding: 14 }}>{t("you_haven_t_blocked_anyone")}</p>
           : list.map((u) => <UserRow key={u.id} user={u} trailing={<button className="btn small ghost" onClick={() => unblock(u.id)}>{t("unblock")}</button>} />)}
       </div>
+      {el}
+    </Page>
+  );
+}
+
+// ---- Messages from members ------------------------------------------------------------------
+// Steve, 2026-11-09: "Also give the account holder to block messages from any member or all
+// members with an on/off Toggle switch." One switch for everyone, plus the members stopped one at
+// a time from their profile's ⋮ menu, each with an Allow button.
+export function MessagesFromMembersPage() {
+  const { t } = useT();
+  const { user, isLoggedIn } = useSession();
+  const [settings, setSettings] = useState<DmSettings | null | undefined>(undefined);
+  const [busy, setBusy] = useState(false);
+  const { setToast, el } = useToast();
+  useEffect(() => {
+    if (!user) return;
+    let alive = true;
+    void fetchDmSettings(user.id).then((s) => { if (alive) setSettings(s); });
+    return () => { alive = false; };
+  }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  if (!isLoggedIn || !user) return <NeedLogin />;
+
+  async function toggle() {
+    if (!user || !settings || busy) return;
+    const next = !settings.dm_open;
+    setBusy(true);
+    setSettings({ ...settings, dm_open: next });
+    const r = await setDmOpen(user.id, next);
+    setBusy(false);
+    if (!r) { setSettings({ ...settings }); setToast(t("dm_couldnt_save")); return; }
+    setSettings(r);
+    setToast(t(r.dm_open ? "dm_open_on_done" : "dm_open_off_done"));
+  }
+
+  async function allow(u: UserSummary) {
+    if (!user || !settings || busy) return;
+    setBusy(true);
+    const r = await setDmBlock(user.id, u.id, false);
+    setBusy(false);
+    if (!r) { setToast(t("dm_couldnt_save")); return; }
+    setSettings({ ...settings, blocked: settings.blocked.filter((b) => b.id !== u.id) });
+    setToast(t("dm_allowed_done", u.username || displayName(u)));
+  }
+
+  return (
+    <Page title={t("dm_settings_title")}>
+      {settings === undefined ? <Loading />
+        : settings === null ? <Notice error>{t("dm_settings_unavailable")}</Notice>
+        : (
+          <>
+            <div className="card" style={{ marginBottom: 12 }}>
+              <label className="dm-open-row">
+                <span aria-hidden>✉️</span>
+                <span className="dm-open-label">{t("dm_settings_title")}</span>
+                <input type="checkbox" className="switch" checked={settings.dm_open} disabled={busy} onChange={() => void toggle()} />
+              </label>
+              <p className="dm-open-note">{t("dm_settings_note")}</p>
+            </div>
+            <div className="card">
+              <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)" }}><b style={{ color: "var(--gold)" }}>{t("dm_stopped_list")}</b></div>
+              {settings.blocked.length === 0
+                ? <p className="muted" style={{ padding: 14 }}>{t("dm_stopped_none")}</p>
+                : settings.blocked.map((u) => (
+                  <UserRow key={u.id} user={u}
+                    trailing={<button className="btn small" disabled={busy} onClick={(e) => { e.preventDefault(); e.stopPropagation(); void allow(u); }}>{t("dm_allow")}</button>} />
+                ))}
+            </div>
+          </>
+        )}
       {el}
     </Page>
   );

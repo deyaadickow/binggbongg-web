@@ -73,6 +73,8 @@ export function sidebarSections(userId: number | null, contestOn = false): SideS
       { to: "/settings/referrals", label: "referrals", icon: "🤝", needsLogin: true },
       { to: "/settings/contest-requests", label: "contest_pending_requests", icon: "🏆", needsLogin: true },
       { to: "/settings/blocked", label: "blocked_profiles", icon: "🚫", needsLogin: true },
+      // Steve, 2026-11-09: the on/off switch for messages from members, plus who is stopped.
+      { to: "/settings/messages", label: "dm_settings_title", icon: "✉️", needsLogin: true },
       { to: "/settings/moderators", label: "my_moderators", icon: "🛡️", needsLogin: true },
       { to: "/settings/find-a-battle", label: "find_a_battle", icon: "⚔️", needsLogin: true },
       { to: "/settings/simulcast", label: "simulcast", icon: "📺", needsLogin: true },
