@@ -8,6 +8,7 @@ import { PageTitle } from "../components/PageTitle";
 import { requireVerified } from "../lib/verifyEmail";
 import { ML_MAX_SIZE, ML_MIN_SIZE, saveRoomSize, savedRoomSize } from "../lib/multiLive";
 import { MlSizeStepper } from "../components/MultiLiveGrid";
+import { GoLivePointsCard } from "../components/FreePoints";
 
 /** Camera preview + one button — same startLive endpoint the phones call, then the room page as host. */
 export function GoLivePage() {
@@ -62,6 +63,8 @@ export function GoLivePage() {
   return (
     <div className="page" style={{ maxWidth: 560 }}>
       <PageTitle>{t("go_live")}</PageTitle>
+      {/* Free Points v2 (Steve, 2026-11-09): "For a limited time go live streaming and earn 500 points per hour". Only while the server says it is on. */}
+      <GoLivePointsCard myId={user?.id ?? null} />
       <div className="card" style={{ aspectRatio: "9 / 12", background: "#000", display: "grid", placeItems: "center" }}>
         {previewError ? <p className="muted center" style={{ padding: 20 }}>{previewError}</p> : <video ref={videoRef} autoPlay muted playsInline style={{ width: "100%", height: "100%", objectFit: "cover" }} />}
       </div>

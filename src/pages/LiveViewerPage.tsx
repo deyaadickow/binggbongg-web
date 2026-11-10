@@ -37,6 +37,8 @@ import { TapGameOverlay } from "../components/TapGameOverlay";
 import { HostGamesMenu } from "../components/HostGamesMenu";
 import { SoloBattleStandingsSheet, SoloBattleStrip } from "../components/SoloBattle";
 import { SundayBonusPill } from "../components/SundayBonus";
+import { FreePointsIncl, LivePointsPill, LivePointsToast } from "../components/FreePoints";
+import { freePointsUsed, heartbeatLivePoints, walletSplit } from "../lib/freePoints";
 import { fetchActiveSoloBattle, type SoloBattle } from "../lib/solobattle";
 import { battleScreenPath, chatBattlePath, chatReasonText, checkUserLiveRoom, startChatBattle } from "../lib/chatBattle";
 import { countryBattlePath } from "../lib/countryBattle";
@@ -129,6 +131,10 @@ export function LiveViewerPage() {
   const [gifts, setGifts] = useState<Gift[]>([]);
   const [giftTarget, setGiftTarget] = useState<number | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  // Free Points v2: the gold "+500 Free Points for going live!" toast, and a nudge to re-read the pill.
+  const [lpAwarded, setLpAwarded] = useState<number | null>(null);
+  const [lpBump, setLpBump] = useState(0);
+  const clearLpAwarded = useCallback(() => setLpAwarded(null), []);
   // Favourite streamers (Steve, 2026-10-07). Private, silent, and deliberately NOT Follow:
   // follow is about being told, favourite is about ordering what you see on Live Now.
   const [isFavourite, setIsFavourite] = useState(false);
@@ -902,7 +908,14 @@ export function LiveViewerPage() {
   // Heartbeat: keeps the room alive for a host and puts viewers/guests in the watchers list.
   useEffect(() => {
     if (!isLoggedIn || !user || roomClosed) return;
-    const beat = () => post("markWatchingLive", { user_id: user.id, room_name: roomName }).catch(() => undefined);
+    // Free Points v2 (Steve, 2026-11-09): a HOST's beat may complete an hour of live points.
+    const beat = () => post("markWatchingLive", { user_id: user.id, room_name: roomName })
+      .then((res) => {
+        if (roleRef.current !== "host") return;
+        const lp = heartbeatLivePoints(res);
+        if (lp.awarded > 0) { setLpAwarded(lp.awarded); setLpBump((x) => x + 1); }
+      })
+      .catch(() => undefined);
     beat();
     const t = setInterval(beat, HEARTBEAT_MS);
     return () => clearInterval(t);
@@ -1023,10 +1036,13 @@ export function LiveViewerPage() {
       // The gift line the phones play the gift from: a NEGATIVE sender id (the gift's id) in the
       // RECIPIENT's channel, exactly what the apps post (Steve, 2026-11-06: gifts sent to a phone
       // did not show on its screen). A virtual battler has no live of their own to show it on.
+      // Free Points v2 (Steve, 2026-11-09): a gift paid with Free Points says so after its name,
+      // so the streamer isn't confused ("🎁 Rose (Free Points)"); older apps just show the line.
+      const fpTag = freePointsUsed(res) > 0 ? " (Free Points)" : "";
       if (!virtualGiftTarget) {
-        void sendChat(chatChannel(roomName, giftTarget), -gift.id, "", `${displayName(user)} sent a ${gift.name ?? "gift"}!`, user.profile_image ?? "").catch(() => {});
+        void sendChat(chatChannel(roomName, giftTarget), -gift.id, "", `${displayName(user)} sent a ${gift.name ?? "gift"}${fpTag}!`, user.profile_image ?? "").catch(() => {});
       }
-      setToast(`Sent ${gift.name ?? "a gift"} (${giftPrice(gift)} coins) to ${nameOfId(giftTarget) || (virtualGiftTarget ? personName(virtualGiftTarget) : "")}`);
+      setToast(`Sent ${gift.name ?? "a gift"}${fpTag ? ` ${tt("fp_gift_tag")}` : ""} (${giftPrice(gift)} coins) to ${nameOfId(giftTarget) || (virtualGiftTarget ? personName(virtualGiftTarget) : "")}`);
       setGiftTarget(null);
       setVirtualGiftTarget(null);
       refresh();
@@ -1482,6 +1498,9 @@ export function LiveViewerPage() {
       {/* Sunday Battle Bonus (Steve, 2026-11-09): the member's extra today, only on a bonus Sunday
           and only while some battle runs here; re-read every 30 s and whenever a gift lands. */}
       {(showTopStrip || !!marathon.data || !!b555.data || !!soloBattle) && <SundayBonusPill bump={giftEffect?.key} />}
+      {/* Free Points v2 (Steve, 2026-11-09): the host's live points; nothing when it's off. */}
+      {role === "host" && !roomClosed && <LivePointsPill myId={myId} bump={lpBump} />}
+      {lpAwarded !== null && <LivePointsToast points={lpAwarded} onDone={clearLpAwarded} />}
 
       <div className="live-layout">
         <div>
@@ -1866,7 +1885,7 @@ export function LiveViewerPage() {
               <button key={b.user_id} className="btn small" onClick={() => setGiftTarget(b.user_id)}>{t("gift_someone", displayName(b as Partial<UserSummary>))}</button>
             ))}
             <span className="spacer" />
-            <span className="muted" style={{ fontSize: 13 }}>{tn("your_coins_and_buy_more", <b style={{ color: "var(--gold)" }}>{user?.no_redeem_wallet ?? 0}</b>, <Link to="/wallet">{t("buy_more")}</Link>)}</span>
+            <span className="muted" style={{ fontSize: 13 }}>{tn("your_coins_and_buy_more", <b style={{ color: "var(--gold)" }}>{user?.no_redeem_wallet ?? 0}<FreePointsIncl w={walletSplit(user)} /></b>, <Link to="/wallet">{t("buy_more")}</Link>)}</span>
           </div>
 
           {giftTarget && (

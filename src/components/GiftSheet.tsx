@@ -5,6 +5,8 @@ import { useSession } from "../lib/session";
 import { loadGifts } from "../lib/gifts";
 import { TapTapBurst, isTapTapGift, tapTapBurstDuration, burstLabel } from "./TapTapBurst";
 import { tt, useT  } from "../lib/i18n";
+import { walletSplit, type WalletSplit } from "../lib/freePoints";
+import { FreePointsIncl } from "./FreePoints";
 
 /**
  * The gift button on a video, and the gift page it opens.
@@ -115,14 +117,15 @@ export function GiftSheet({ post: item, onClose, onSent, sendOverride }: { post?
   // session user object, and the video page reloads its post whenever that object changes,
   // which tore this sheet down a second after it opened (Steve, 2026-10-15: "I click on the
   // gift box I see it for one second and disappears").
-  const [serverCoins, setServerCoins] = useState<number | null>(null);
-  const coins = serverCoins ?? Number(user?.no_redeem_wallet ?? 0);
+  const [serverWallet, setServerWallet] = useState<WalletSplit | null>(null);
+  const wallet = serverWallet ?? walletSplit(user);
+  const coins = wallet.total; // every kind spends the same for a gift (Free Points v2)
 
   useEffect(() => {
     loadGifts().then(setGifts).catch(() => setNotice({ text: "Couldn't load the gifts. Please try again." }));
     if (user) {
       post<UserSummary>("fetchMyUserDetails", { my_user_id: user.id })
-        .then((r) => { if (r.status && r.data) setServerCoins(Number(r.data.no_redeem_wallet ?? 0)); })
+        .then((r) => { if (r.status && r.data) setServerWallet(walletSplit(r.data)); })
         .catch(() => undefined);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -172,7 +175,7 @@ export function GiftSheet({ post: item, onClose, onSent, sendOverride }: { post?
           <span>{t("purchase_votes")}</span>
           <span className="coin" aria-hidden>🪙</span>
           <span className="spacer" />
-          <b>{coins}</b>
+          <b>{coins}<FreePointsIncl w={wallet} /></b>
         </Link>
         {notice && (
           <div className="gift-notice">

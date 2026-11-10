@@ -1256,3 +1256,13 @@ body.signup-black { background: radial-gradient(120% 55% at 50% 0%, #2a2108 0%, 
 .inbox-tabs a { display: block; text-align: center; padding: 8px 4px; border-radius: 999px; color: var(--gold); font-weight: 800; font-size: 14px; text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .inbox-tabs a.on { background: linear-gradient(180deg, #FFDD55, #D4AF37); color: #000; }
 @media (max-width: 420px) { .inbox-tabs a { font-size: 12.5px; padding: 8px 2px; } }
+
+/* Free Points v2 (Steve, 2026-11-09) — wallet split, gift-sheet "(incl. …)", host pill + toast. */
+.fp-wallet-line { font-size: 22px; font-weight: 800; color: var(--gold); font-variant-numeric: tabular-nums; margin-top: 4px; }
+.fp-explainer { font-size: 12px; color: rgba(255,255,255,0.75); margin-top: 6px; line-height: 1.35; }
+.fp-test { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 6px; }
+.fp-incl { font-size: 12px; font-weight: 600; color: #FFDD55; white-space: nowrap; }
+.fp-pill { white-space: normal; text-align: center; }
+.fp-golive { margin-bottom: 14px; }
+.fp-golive .sb-card-line { color: #FFDD55; font-weight: 800; font-size: 15px; }
+.fp-toast { position: fixed; left: 16px; right: 16px; top: 72px; max-width: 420px; margin: 0 auto; z-index: 40; text-align: center; padding: 12px 16px; border-radius: 14px; background: #000; border: 2px solid var(--gold); color: #FFDD55; font-weight: 800; font-size: 16px; box-shadow: 0 6px 24px rgba(0,0,0,.5); }

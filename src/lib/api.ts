@@ -185,6 +185,11 @@ export interface UserSummary {
   total_likes?: number;
   coin_wallet?: number;
   no_redeem_wallet?: number;
+  /** Free Points v2 (Steve, 2026-11-09), on the caller's OWN row only. no_redeem_wallet stays the
+   *  total; these split it. Missing on an older server -> lib/freePoints falls back to the total. */
+  free_points?: number;
+  test_coins?: number;
+  paid_coins?: number;
   redeem_wallet?: number;
   cash_wallet?: number;
   is_following?: boolean | number;
