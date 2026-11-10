@@ -27,7 +27,8 @@ export function PodcastBadge({ title }: { title?: string | null }) {
 /** The square cover — the episode's own picture, else the host's photo, else a gold mic. */
 export function PodcastCover({ url, host, size, radius = 12 }: { url?: string | null; host?: Partial<PodcastHost> | null; size: number | string; radius?: number }) {
   const [broken, setBroken] = useState(false);
-  const src = mediaUrl(url || host?.profile_image || "");
+  // A picture the member just picked is a local blob: link — mediaUrl() would turn it into a broken address.
+  const src = url?.startsWith("blob:") ? url : mediaUrl(url || host?.profile_image || "");
   return (
     <div style={{
       width: size, height: size, aspectRatio: "1 / 1", borderRadius: radius, overflow: "hidden", flexShrink: 0,
