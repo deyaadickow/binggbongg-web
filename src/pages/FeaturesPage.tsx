@@ -74,6 +74,9 @@ export const FEATURES: Section[] = [
     // Features Videos page is #3 (2026-10-29).
     titleKey: "fsec_featured",
     features: [
+      // Pre-Launch Special (Steve, 2026-11-10): "Every member will receive 10,000 PBBs with
+      // unlimited top ups so they can Play games, Battle and give gifts to anyone."
+      { icon: "🎉", nameKey: "fname_prelaunch", blurbKey: "fblurb_prelaunch", to: "/pre-launch" },
       { icon: "🎤", nameKey: "fname_philippine_singing_contest", blurbKey: "fblurb_philippine_singing_contest", to: "/featured-contest", contestOnly: true },
       { icon: "📣", nameKey: "fname_exciting_news", blurbKey: "fblurb_exciting_news", to: "/exciting-news" },
       // Steve, 2026-10-29: "make another page that's called 'Bingg Bongg Features Videos' and add

@@ -17,6 +17,7 @@ const PAGES: Record<string, [string, string]> = {
   "/contests": ["Contests – Bingg Bongg", "Bingg Bongg talent contests, where members vote for their favourites."],
   "/exciting-news": ["Exciting News – What's New on Bingg Bongg", "Everything new on Bingg Bongg: countries, features and launches."],
   "/live": ["Live Now – Watch Live Streams on Bingg Bongg", "Watch live streams and battles from all over the world on Bingg Bongg, in 53 languages."],
+  "/pre-launch": ["Pre-Launch Special | Bingg Bongg", "Go live, battle and make friends on Bingg Bongg before launch day."],
   "/referral-program": ["Referral Program – Earn 5% for Every Member You Bring | Bingg Bongg", "Share your Bingg Bongg referral code and earn 5% of what every new member earns."],
   "/vip-referral": ["VIP Referral Member – Earn Up to $100 per Member | Bingg Bongg", "Apply to be a Bingg Bongg VIP Referral Member and earn 5% of what every new member earns, up to $100 each."],
   "/help": ["Help – Members Helping Members on Bingg Bongg", "Help campaigns on Bingg Bongg: members supporting members who are going through a hard time."],

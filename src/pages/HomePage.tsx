@@ -6,6 +6,7 @@ import { Loading, Notice, StoreBadges } from "../components/Common";
 import { setFeed } from "../lib/feed";
 import { FeedPhotoCard } from "../components/FeedPhotoCard";
 import { CountryBattleDec1Banner } from "../components/CountryBattleDec1Banner";
+import { PrelaunchBanner } from "../components/PrelaunchBanner";
 import { HelpFeedCard } from "../components/HelpFeedCard";
 import { PaidAdCard, type FeedVideoAd } from "../components/PaidAdCard";
 import { fetchHelpCampaigns, helpFeedSlots, type HelpCampaign } from "../lib/help";
@@ -114,6 +115,8 @@ export function HomePage() {
         <StoreBadges compact />
       </div>
       {error && <Notice error>{error}</Notice>}
+      {/* Pre-Launch Special (Steve, 2026-11-10) — only while fetchPrelaunch says it is on. */}
+      <PrelaunchBanner />
       <CountryBattleDec1Banner />
       {/* One member photo in the feed, the phones' fetchRandomFeedPhoto. Only members past the
           free storage allowance are eligible — that is the server's rule, not ours. */}

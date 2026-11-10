@@ -10,6 +10,8 @@ import { tt, useT  } from "../lib/i18n";
 import { PageTitle } from "../components/PageTitle";
 import { requireVerified } from "../lib/verifyEmail";
 import { useFreeCoinsListed } from "../lib/freeCoins";
+import { PayWithSwitch } from "../components/PayWithSwitch";
+import { PrelaunchBanner } from "../components/PrelaunchBanner";
 
 export function WalletPage() {
   const { t, tn } = useT();
@@ -57,14 +59,32 @@ export function WalletPage() {
     }
   }
 
+  // PBBs = test_coins; BBs = paid_coins, or (older server) everything else in no_redeem_wallet.
+  const pbbs = Math.max(0, Number(user?.test_coins ?? 0) || 0);
+  const bbs = user?.paid_coins != null && Number.isFinite(Number(user.paid_coins))
+    ? Math.max(0, Number(user.paid_coins))
+    : Math.max(0, Number(user?.no_redeem_wallet ?? 0) - pbbs);
+
   if (!isLoggedIn || !user) return <div className="page"><Notice>{tn("sign_in_to_see_your_wallet", <Link to="/login">{t("sign_in")}</Link>)}</Notice></div>;
 
 
   return (
     <div className="page">
       <PageTitle>{t("wallet")}</PageTitle>
+      <PrelaunchBanner />
       <div className="grid">
-        <div className="card pad"><div className="muted">{t("coins_to_gift")}</div><div style={{ fontSize: 28, fontWeight: 800, color: "var(--gold)" }}>{user.no_redeem_wallet ?? 0}</div>{Number(user.test_coins ?? 0) > 0 && <div className="muted" style={{ fontSize: 13, marginTop: 6 }}>{t("wallet_test_coins", Number(user.test_coins))}</div>}</div>
+        {/* BBs and PBBs as two separate lines (Steve, 2026-11-10): BBs = bought (paid_coins),
+            PBBs = practice BBs (test_coins, the dead coins) — they score but pay no one. */}
+        <div className="card pad">
+          <div className="muted">{t("coins_to_gift")}</div>
+          <div className="wallet-split">
+            <div className="wallet-split-row"><span className="name">{t("wallet_bbs")}</span><span className="val">{bbs.toLocaleString()}</span></div>
+            <div className="wallet-split-hint">{t("wallet_bbs_hint")}</div>
+            <div className="wallet-split-row"><span className="name">{t("wallet_pbbs")}</span><span className="val">{pbbs.toLocaleString()}</span></div>
+            <div className="wallet-split-hint">{t("wallet_pbbs_hint")}</div>
+          </div>
+          <div style={{ marginTop: 12 }}><PayWithSwitch hint /></div>
+        </div>
         <div className="card pad"><div className="muted">{t("earned_coins")}</div><div style={{ fontSize: 28, fontWeight: 800, color: "var(--gold)" }}>{user.redeem_wallet ?? 0}</div></div>
         <div className="card pad"><div className="muted">{t("cash_balance")}</div><div style={{ fontSize: 28, fontWeight: 800, color: "var(--gold)" }}>${Number(user.cash_wallet ?? 0).toFixed(2)}</div></div>
       </div>
@@ -106,7 +126,7 @@ export function WalletPage() {
         </div>
       )}
       <div className="center" style={{ marginTop: 18 }}>
-        <button className="btn" onClick={buy} disabled={busy}>{busy ? "Opening…" : "Buy coins"}</button>
+        <button className="btn" onClick={buy} disabled={busy}>{busy ? "Opening…" : t("buy_coins")}</button>
         <p className="muted" style={{ fontSize: 13, marginTop: 8 }}>{t("opens_the_secure_bingg_bongg_checkout_wi")}</p>
       </div>
     </div>
