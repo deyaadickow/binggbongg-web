@@ -2,6 +2,8 @@ import { NavLink, Link } from "react-router-dom";
 import { useSession } from "../lib/session";
 import { Avatar } from "./Common";
 import { useT } from "../lib/i18n";
+import { useSyncExternalStore } from "react";
+import { countSuffix, inboxCountsSnapshot, inboxTotal, subscribeInboxCounts } from "../lib/inboxCounts";
 
 export function Nav() {
   const { t } = useT();
@@ -9,6 +11,7 @@ export function Nav() {
   // moved into the directory, which does its own gating, so these were two API calls firing on
   // every page load to decide nothing. Removed with them.
   const { user, isLoggedIn, signOut } = useSession();
+  const inboxSuffix = countSuffix(inboxTotal(useSyncExternalStore(subscribeInboxCounts, inboxCountsSnapshot)));
   return (
     <header className="nav">
       {/* Steve, 2026-10-20: "We need to add the logo to the web." The site had the mark in
@@ -41,6 +44,12 @@ export function Nav() {
       <div className="me">
         {isLoggedIn && user ? (
           <>
+            {/* Steve, 2026-11-10: "Also please add the total messages on the bottom 'Inbox (5)'".
+                The web has no bottom bar and no single Inbox entry, so it sits up here, where it
+                stays in view at every width. Opens on Notifications, the Inbox's first tab. */}
+            <NavLink to="/notifications" className={({ isActive }) => "btn small ghost inbox-pill" + (isActive ? " on" : "")}>
+              <span>{t("inbox") + (inboxSuffix ? "\u00A0" + inboxSuffix : "")}</span>
+            </NavLink>
             <Link to={`/profile/${user.id}`}><Avatar user={user} /></Link>
             <button className="btn small ghost" onClick={signOut}>{t("sign_out")}</button>
           </>

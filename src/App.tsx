@@ -59,6 +59,7 @@ import { WalletPage } from "./pages/WalletPage";
 import { GoLivePage } from "./pages/GoLivePage";
 import { StreamFromPcPage } from "./pages/StreamFromPcPage";
 import { Sidebar } from "./components/Sidebar";
+import { InboxCountsSync } from "./components/InboxCountsSync";
 import { AdReferralEarningsPage, AllVideosEarningsPage, PayoutHistoryPage, RedeemPage, RepostEarningsPage, RewardingActionsPage, StatementsPage } from "./pages/WalletPages";
 import { PrintableAdsPage } from "./pages/PrintableAdsPage";
 import { ShopPage, ShopProductPage } from "./pages/ShopPage";
@@ -126,6 +127,8 @@ export default function App() {
         <AdArrival />
         {/* Member page history (Steve, 2026-11-02): one row per page a signed-in member opens. */}
         <PageTracking />
+        {/* Inbox counts (2026-11-10): one loader for the tabs and the header's "Inbox (N)". */}
+        <InboxCountsSync />
         <LandingSwitch>
         <Nav />
         <div className="shell">

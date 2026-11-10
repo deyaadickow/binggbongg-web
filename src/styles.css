@@ -1268,6 +1268,10 @@ body.signup-black { background: radial-gradient(120% 55% at 50% 0%, #2a2108 0%, 
 
 /* Inbox sub-tabs (Notifications / Messages / Announcements), as on the phones — 2026-11-09. */
 .inbox-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; background: #0c0c0c; border: 1px solid var(--gold-border); border-radius: 999px; padding: 4px; margin: 4px 0 14px; }
-.inbox-tabs a { display: block; text-align: center; padding: 8px 4px; border-radius: 999px; color: var(--gold); font-weight: 800; font-size: 14px; text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.inbox-tabs a { display: flex; justify-content: center; align-items: baseline; text-align: center; padding: 8px 4px; border-radius: 999px; color: var(--gold); font-weight: 800; font-size: 14px; text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+/* The count never gets cut off — a long label gives way first (2026-11-10). */
+.inbox-tab-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.inbox-tab-count { flex-shrink: 0; }
+.nav .me .inbox-pill { white-space: nowrap; }
 .inbox-tabs a.on { background: linear-gradient(180deg, #FFDD55, #D4AF37); color: #000; }
 @media (max-width: 420px) { .inbox-tabs a { font-size: 12.5px; padding: 8px 2px; } }
