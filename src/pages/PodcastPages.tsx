@@ -8,7 +8,7 @@
 // The episode keeps playing in the site-wide player (lib/podcastPlayer) when the member leaves
 // the page; the mini bar carries it. Fail-safe throughout: switched off or a failed call shows a
 // gold notice, never a crash.
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { mediaUrl, post, type Gift } from "../lib/api";
 import { useSession } from "../lib/session";
@@ -201,6 +201,12 @@ export function PodcastEpisodePage() {
 
   const isCurrent = !!ep && player.episode?.episode_id === ep.episode_id;
 
+  // The picture of a playing video episode: the site-wide player's element is moved into this box, and back
+  // out of sight when the page closes (the sound carries on in the mini bar).
+  const attachVideo = player.attachVideo;
+  const videoBox = useCallback((box: HTMLDivElement | null) => { attachVideo(box); }, [attachVideo]);
+  useEffect(() => () => attachVideo(null), [attachVideo]);
+
   // The sponsor's video, fetched ahead so the tap on Play can start it straight away.
   useEffect(() => {
     if (!ep || !yes(ep.preroll_enabled) || isCurrent || prerollDone.current) return;
@@ -297,11 +303,19 @@ export function PodcastEpisodePage() {
         </div>
       }>{t("pod_title")}</PageTitle>
 
-      {/* The cover is ALWAYS on screen while audio plays (the contract's rule). */}
-      <div style={{ position: "relative", width: "min(100%, 340px)", margin: "0 auto" }}>
-        <PodcastCover url={ep.cover_url || ep.poster_url} host={ep.host} size="100%" radius={18} />
-        {flash && <GiftFlash gift={flash} onDone={() => setFlash(null)} />}
-      </div>
+      {/* A video episode that is playing shows its picture; otherwise the cover is ALWAYS on screen while
+          audio plays (the contract's rule). */}
+      {ep.kind === "video" && isCurrent ? (
+        <div style={{ position: "relative", width: "100%", aspectRatio: "16 / 9", margin: "0 auto", borderRadius: 18, overflow: "hidden", background: "#000", border: "1.5px solid var(--gold-border)" }}>
+          <div ref={videoBox} style={{ position: "absolute", inset: 0 }} onClick={() => player.toggle()} />
+          {flash && <GiftFlash gift={flash} onDone={() => setFlash(null)} />}
+        </div>
+      ) : (
+        <div style={{ position: "relative", width: "min(100%, 340px)", margin: "0 auto" }}>
+          <PodcastCover url={ep.cover_url || ep.poster_url} host={ep.host} size="100%" radius={18} />
+          {flash && <GiftFlash gift={flash} onDone={() => setFlash(null)} />}
+        </div>
+      )}
 
       {/* On a black plate: the cosmic backdrop behind the page made bare gold text hard to read. */}
       <div className="card pad" style={{ marginTop: 14, textAlign: "center", background: "rgba(0,0,0,.88)" }}>

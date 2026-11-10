@@ -1,12 +1,17 @@
 // The one podcast player for the whole site (Bingg Bongg Podcast, Steve 2026-11-10).
 //
-// One HTML5 <audio> lives here, ABOVE the routes, so an episode keeps playing while the member
+// One HTML5 media element lives here, ABOVE the routes, so an episode keeps playing while the member
 // moves around the site — the mini bar (components/PodcastMiniBar) is its remote control on every
 // other page. The Media Session API puts the episode on the phone's lock screen / the OS media
 // controls, with the same -15 s / +30 s the page has.
 //
 // Progress: savePodcastProgress every ~15 s while playing, on pause, on close and when the tab is
 // hidden (keepalive, so a closed tab still saves). recordPodcastPlay once per episode opened.
+//
+// Video podcasts (Steve 2026-11-11: "turn on both audio and video podcast"): the element is a <video>, so
+// the same element plays audio and video episodes. It sits in a hidden holder in <body>; the episode page
+// moves it onto the page with attachVideo(box) and back with attachVideo(null). Moving it between two
+// places in the document never pauses it (taking it OUT of the document would).
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { mediaUrl } from "./api";
 import { hostName, recordPodcastPlay, savePodcastProgress, type PodcastEpisodeDetail } from "./podcast";
@@ -33,12 +38,15 @@ interface PodcastPlayer extends PlayerState {
   seekTo: (seconds: number) => void;
   setRate: (rate: number) => void;
   close: () => void;
+  /** Show the picture of a video episode inside `box` (null puts it back out of sight; sound keeps playing). */
+  attachVideo: (box: HTMLElement | null) => void;
 }
 
 const Ctx = createContext<PodcastPlayer | null>(null);
 
 export function PodcastPlayerProvider({ children }: { children: ReactNode }) {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioRef = useRef<HTMLVideoElement | null>(null);
+  const holderRef = useRef<HTMLDivElement | null>(null);
   const userRef = useRef<number>(0);
   const playedRef = useRef<number>(0); // the episode recordPodcastPlay was sent for
   const lastSaveRef = useRef<number>(0);
@@ -46,14 +54,33 @@ export function PodcastPlayerProvider({ children }: { children: ReactNode }) {
   const episodeRef = useRef<PodcastEpisodeDetail | null>(null);
   episodeRef.current = state.episode;
 
-  const audio = useCallback((): HTMLAudioElement => {
+  const audio = useCallback((): HTMLVideoElement => {
     if (!audioRef.current) {
-      const a = new Audio();
+      const a = document.createElement("video");
       a.preload = "metadata";
+      a.playsInline = true;
+      a.setAttribute("playsinline", "");
+      a.style.width = "100%";
+      a.style.height = "100%";
+      a.style.objectFit = "contain";
+      a.style.background = "#000";
+      a.style.display = "block";
+      const holder = document.createElement("div");
+      holder.setAttribute("aria-hidden", "true");
+      holder.style.cssText = "position:fixed;left:-10000px;top:0;width:2px;height:2px;overflow:hidden;opacity:0;pointer-events:none";
+      holder.appendChild(a);
+      document.body.appendChild(holder);
+      holderRef.current = holder;
       audioRef.current = a;
     }
     return audioRef.current;
   }, []);
+
+  const attachVideo = useCallback((box: HTMLElement | null) => {
+    const a = audio();
+    const target = box ?? holderRef.current;
+    if (target && a.parentElement !== target) target.appendChild(a);
+  }, [audio]);
 
   const save = useCallback((keepalive = false) => {
     const ep = episodeRef.current;
@@ -197,8 +224,8 @@ export function PodcastPlayerProvider({ children }: { children: ReactNode }) {
     }
   }, [state.episode, state.playing, state.position, state.duration, state.rate]);
 
-  const value = useMemo<PodcastPlayer>(() => ({ ...state, load, toggle, play, pause, skip, seekTo, setRate, close }),
-    [state, load, toggle, play, pause, skip, seekTo, setRate, close]);
+  const value = useMemo<PodcastPlayer>(() => ({ ...state, load, toggle, play, pause, skip, seekTo, setRate, close, attachVideo }),
+    [state, load, toggle, play, pause, skip, seekTo, setRate, close, attachVideo]);
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 
@@ -207,5 +234,5 @@ export function usePodcastPlayer(): PodcastPlayer {
   const ctx = useContext(Ctx);
   if (ctx) return ctx;
   const noop = () => undefined;
-  return { episode: null, playing: false, position: 0, duration: 0, rate: 1, error: false, load: noop, toggle: noop, play: noop, pause: noop, skip: noop, seekTo: noop, setRate: noop, close: noop };
+  return { episode: null, playing: false, position: 0, duration: 0, rate: 1, error: false, load: noop, toggle: noop, play: noop, pause: noop, skip: noop, seekTo: noop, setRate: noop, close: noop, attachVideo: noop };
 }
