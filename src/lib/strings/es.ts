@@ -2117,15 +2117,5 @@ export const es = {
   dm_allow: "Permitir",
   dm_open_on_done: "Los miembros pueden enviarte mensajes de nuevo.",
   dm_open_off_done: "Los mensajes de miembros están desactivados.",
-  // Free Points v2 (Steve, 2026-11-09).
-  fp_coins: "Monedas: %1$s",
-  fp_free_points: "⭐ Free Points: %1$s",
-  fp_explainer: "Los Free Points funcionan como monedas para regalos. Cada 1,000 Free Points que recibe un miembro le pagan $1.00.",
-  fp_test_coins: "Monedas de prueba: %1$s",
-  fp_incl: "(incl. %1$s Free Points)",
-  fp_gift_tag: "(Free Points)",
-  fp_live_pill: "⭐ +%1$s Free Points / hora · %2$s/%3$s hoy",
-  fp_live_done: "Free Points de hoy completos ✓",
-  fp_live_awarded: "⭐ ¡+%1$s Free Points por transmitir en vivo!",
-  fp_golive_card: "⭐ Transmite en vivo y gana %1$s Free Points cada hora — hasta %2$s horas al día, por tiempo limitado.",
+  wallet_test_coins: "Monedas de prueba: %1$s (para pruebas, no generan ganancias)",
 };

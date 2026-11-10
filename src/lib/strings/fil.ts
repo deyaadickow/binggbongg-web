@@ -2141,15 +2141,5 @@ export const fil = {
   dm_allow: "Payagan",
   dm_open_on_done: "Makakapagpadala na ulit sa iyo ng mensahe ang mga miyembro.",
   dm_open_off_done: "Naka-off na ang mensahe mula sa mga miyembro.",
-  // Free Points v2 (Steve, 2026-11-09).
-  fp_coins: "Coins: %1$s",
-  fp_free_points: "⭐ Free Points: %1$s",
-  fp_explainer: "Ang Free Points ay parang coins sa pagbibigay ng regalo. Bawat 1,000 Free Points na matatanggap ng isang miyembro ay may bayad na $1.00 sa kanila.",
-  fp_test_coins: "Test coins: %1$s",
-  fp_incl: "(kasama ang %1$s Free Points)",
-  fp_gift_tag: "(Free Points)",
-  fp_live_pill: "⭐ +%1$s Free Points / oras · %2$s/%3$s ngayong araw",
-  fp_live_done: "Tapos na ang Free Points para sa araw na ito ✓",
-  fp_live_awarded: "⭐ +%1$s Free Points dahil nag-live ka!",
-  fp_golive_card: "⭐ Mag-live at kumita ng %1$s Free Points bawat oras — hanggang %2$s oras bawat araw, sa limitadong panahon lang.",
+  wallet_test_coins: "Test coins: %1$s (para sa testing, walang kinikita)",
 };

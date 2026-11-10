@@ -2337,15 +2337,6 @@ export const en = {
   dm_allow: "Allow",
   dm_open_on_done: "Members can send you messages again.",
   dm_open_off_done: "Messages from members are off.",
-  // Free Points v2 (Steve, 2026-11-09).
-  fp_coins: "Coins: %1$s",
-  fp_free_points: "⭐ Free Points: %1$s",
-  fp_explainer: "Free Points work like coins for gifts. Each 1,000 Free Points a member receives pays them $1.00.",
-  fp_test_coins: "Test coins: %1$s",
-  fp_incl: "(incl. %1$s Free Points)",
-  fp_gift_tag: "(Free Points)",
-  fp_live_pill: "⭐ +%1$s Free Points / hour · %2$s/%3$s today",
-  fp_live_done: "Free Points done for today ✓",
-  fp_live_awarded: "⭐ +%1$s Free Points for going live!",
-  fp_golive_card: "⭐ Go live and earn %1$s Free Points every hour — up to %2$s hours a day, for a limited time.",
+  // Testers only (Steve, 2026-11-10: "we will only keep dead coins for us to test with").
+  wallet_test_coins: "Test coins: %1$s (for testing, earn nothing)",
 } as const;

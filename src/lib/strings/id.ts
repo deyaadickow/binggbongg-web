@@ -2136,15 +2136,5 @@ export const id = {
   dm_allow: "Izinkan",
   dm_open_on_done: "Anggota bisa mengirimimu pesan lagi.",
   dm_open_off_done: "Pesan dari anggota dinonaktifkan.",
-  // Free Points v2 (Steve, 2026-11-09).
-  fp_coins: "Koin: %1$s",
-  fp_free_points: "⭐ Free Points: %1$s",
-  fp_explainer: "Free Points bisa dipakai seperti koin untuk hadiah. Setiap 1.000 Free Points yang diterima anggota dibayar $1.00.",
-  fp_test_coins: "Koin uji: %1$s",
-  fp_incl: "(termasuk %1$s Free Points)",
-  fp_gift_tag: "(Free Points)",
-  fp_live_pill: "⭐ +%1$s Free Points / jam · %2$s/%3$s hari ini",
-  fp_live_done: "Free Points hari ini sudah selesai ✓",
-  fp_live_awarded: "⭐ +%1$s Free Points karena siaran langsung!",
-  fp_golive_card: "⭐ Siaran langsung dan dapatkan %1$s Free Points setiap jam — hingga %2$s jam sehari, untuk waktu terbatas.",
+  wallet_test_coins: "Koin uji: %1$s (untuk pengujian, tidak menghasilkan apa-apa)",
 };

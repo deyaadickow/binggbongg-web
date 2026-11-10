@@ -9,8 +9,6 @@ import { WALLET_LINKS } from "./WalletPages";
 import { tt, useT  } from "../lib/i18n";
 import { PageTitle } from "../components/PageTitle";
 import { requireVerified } from "../lib/verifyEmail";
-import { walletSplit } from "../lib/freePoints";
-import { WalletBalance } from "../components/FreePoints";
 
 export function WalletPage() {
   const { t, tn } = useT();
@@ -64,8 +62,7 @@ export function WalletPage() {
     <div className="page">
       <PageTitle>{t("wallet")}</PageTitle>
       <div className="grid">
-        {/* Free Points v2 (Steve, 2026-11-09): Coins + Free Points (+ Test coins) once the server splits it. */}
-        <WalletBalance w={walletSplit(user)} label={t("coins_to_gift")} />
+        <div className="card pad"><div className="muted">{t("coins_to_gift")}</div><div style={{ fontSize: 28, fontWeight: 800, color: "var(--gold)" }}>{user.no_redeem_wallet ?? 0}</div>{Number(user.test_coins ?? 0) > 0 && <div className="muted" style={{ fontSize: 13, marginTop: 6 }}>{t("wallet_test_coins", Number(user.test_coins))}</div>}</div>
         <div className="card pad"><div className="muted">{t("earned_coins")}</div><div style={{ fontSize: 28, fontWeight: 800, color: "var(--gold)" }}>{user.redeem_wallet ?? 0}</div></div>
         <div className="card pad"><div className="muted">{t("cash_balance")}</div><div style={{ fontSize: 28, fontWeight: 800, color: "var(--gold)" }}>${Number(user.cash_wallet ?? 0).toFixed(2)}</div></div>
       </div>
