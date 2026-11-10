@@ -57,7 +57,7 @@ function TwoAccounts({ userId, earnings, cashAccount }: { userId: number; earnin
     ["Earned Cash Account", earnings,
      "What you earned from gifts, battles and videos. This is the money you withdraw."],
     ["Spending Cash Account", cashAccount,
-     "Pays for everything in the app — ads, your show, coins and the shop. Can't be withdrawn."],
+     "Pays for everything in the app — ads, your show, BBs and the shop. Can't be withdrawn."],
   ];
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12, marginBottom: 12 }}>
@@ -559,7 +559,7 @@ export function RewardingActionsPage() {
         {rows.map(([k, v, hint]) => (
           <div key={k as string} className="row" style={{ padding: "12px 14px", borderBottom: "1px solid var(--line)" }}>
             <div style={{ flex: 1 }}><b>{k as string}</b><div className="muted" style={{ fontSize: 12 }}>{hint as string}</div></div>
-            <b style={{ color: "var(--gold)" }}>{s ? `${Number(v ?? 0)} coins` : "…"}</b>
+            <b style={{ color: "var(--gold)" }}>{s ? `${Number(v ?? 0)} BBs` : "…"}</b>
           </div>
         ))}
       </div>

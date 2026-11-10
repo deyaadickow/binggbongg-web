@@ -44,7 +44,7 @@ function CampaignCard({ c }: { c: HelpCampaign }) {
           {c.days_left > 0 ? `${c.days_left} days left` : "Closing today"}
         </div>
         <div style={{ fontWeight: 800, color: "var(--gold)", fontVariantNumeric: "tabular-nums", fontSize: 14 }}>
-          {coins(c.raised_coins)} coins received
+          {coins(c.raised_coins)} BBs received
         </div>
       </div>
       {c.post?.thumbnail && (
@@ -147,7 +147,7 @@ export function HelpCampaignPage() {
         </div>
         <div style={{ fontSize: 22, marginTop: 6, fontWeight: 800, color: "var(--gold)",
                       textAlign: "center", fontVariantNumeric: "tabular-nums" }}>
-          {coins(c.raised_coins)} <span style={{ fontSize: 14, fontWeight: 600 }}>coins received</span>
+          {coins(c.raised_coins)} <span style={{ fontSize: 14, fontWeight: 600 }}>BBs received</span>
           {c.goal_amount ? <span className="muted"> · goal ${c.goal_amount.toLocaleString()}</span> : null}
         </div>
         {c.description && <div className="soft" style={{ fontSize: 14, marginTop: 10, textAlign: "center", whiteSpace: "pre-wrap" }}>{c.description}</div>}

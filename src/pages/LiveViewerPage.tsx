@@ -1038,7 +1038,7 @@ export function LiveViewerPage() {
       if (!virtualGiftTarget) {
         void sendChat(chatChannel(roomName, giftTarget), -gift.id, "", `${displayName(user)} sent a ${gift.name ?? "gift"}!`, user.profile_image ?? "").catch(() => {});
       }
-      setToast(`Sent ${gift.name ?? "a gift"} (${giftPrice(gift)} coins) to ${nameOfId(giftTarget) || (virtualGiftTarget ? personName(virtualGiftTarget) : "")}`);
+      setToast(`Sent ${gift.name ?? "a gift"} (${giftPrice(gift)} BBs) to ${nameOfId(giftTarget) || (virtualGiftTarget ? personName(virtualGiftTarget) : "")}`);
       setGiftTarget(null);
       setVirtualGiftTarget(null);
       refresh();
@@ -1881,8 +1881,8 @@ export function LiveViewerPage() {
               <div style={{ flex: 1 }}>
                 <b style={{ color: "var(--gold)" }}>🎮 {gameTitle(activeGame)}</b>
                 <div className="muted" style={{ fontSize: 12 }}>{role === "host" ? "Running in your room — viewers can play now."
-                  : activeGame.game_mode === "water_sort" ? "The host started Water Sort. 50 coins to join, then 1 coin a pour — all gifted to the host."
-                  : "The host started a game. 50 coins to join, and your score becomes a gift to the host."}</div>
+                  : activeGame.game_mode === "water_sort" ? "The host started Water Sort. 50 BBs to join, then 1 BB a pour — all gifted to the host."
+                  : "The host started a game. 50 BBs to join, and your score becomes a gift to the host."}</div>
               </div>
               <button className="btn small" onClick={() => setGameOpen(true)}>{t("play_now")}</button>
             </div>
@@ -2185,7 +2185,7 @@ export function LiveViewerPage() {
           onGuess={(v: GuessValue) => {
             if (myId === null) return;
             if (guess.my_guess) void guessAct(() => changeGuess(myId, guess, v), "Guess changed.");
-            else void guessAct(() => buyGuess(myId, guess, v), `🔮 Guess in! (${guess.coins_per_guess} coin${guess.coins_per_guess === 1 ? "" : "s"})`);
+            else void guessAct(() => buyGuess(myId, guess, v), `🔮 Guess in! (${guess.coins_per_guess} BB${guess.coins_per_guess === 1 ? "" : "s"})`);
           }}
           onClose={() => setGuessClosedId(guess.guess_game_id)}
           onLock={() => { if (myId !== null) void guessAct(() => lockGuess(myId, guess), "🔒 Guessing is locked."); }}
@@ -2515,7 +2515,7 @@ export function LiveViewerPage() {
               if (!target || target <= 0) { setToast(tt("enter_how_many_coins_wins_it")); return; }
               setGameLimitPicker(false);
               setGameLimitTarget("");
-              try { await battle.inviteOpponent(b.user_id, target); setToast(`Game Limit invite sent to ${displayName(b as Partial<UserSummary>)} — first to ${target.toLocaleString()} coins.`); }
+              try { await battle.inviteOpponent(b.user_id, target); setToast(`Game Limit invite sent to ${displayName(b as Partial<UserSummary>)} — first to ${target.toLocaleString()} BBs.`); }
               catch (e) { setToast((e as Error).message); }
             }}>{displayName(b as Partial<UserSummary>)}</button>
           ))}

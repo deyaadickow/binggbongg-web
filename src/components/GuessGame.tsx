@@ -95,7 +95,7 @@ export function GuessCard({ game, myUserId, onGuess, onLock, onResolve, onCancel
   const tallies = game.tallies ?? [];
   const maxTally = Math.max(1, ...tallies);
   const totalTally = tallies.reduce((x, y) => x + y, 0);
-  const guessLabel = game.my_guess ? "Change guess (free)" : `Guess · ${game.coins_per_guess} coin${game.coins_per_guess === 1 ? "" : "s"}`;
+  const guessLabel = game.my_guess ? "Change guess (free)" : `Guess · ${game.coins_per_guess} BB${game.coins_per_guess === 1 ? "" : "s"}`;
   const { scene, racer } = sceneForGuess(game.template_key, game.kind);
   const racing = game.kind === "pick" && !!racer && game.options.length <= 4;
   const lanes: Lane[] | undefined = racing ? game.options.map((o, i) => {
@@ -107,7 +107,7 @@ export function GuessCard({ game, myUserId, onGuess, onLock, onResolve, onCancel
     <div style={{ position: "fixed", left: 12, bottom: 96, zIndex: 86, width: "min(320px, calc(100vw - 24px))", boxSizing: "border-box", background: "rgba(0,0,0,.9)", border: `2px solid ${gold}`, borderRadius: 16, padding: 10, color: "#fff", maxHeight: "calc(100vh - 200px)", overflowY: "auto" }}>
       <Confetti burst={burst} />
       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-        <b style={{ color: gold, fontSize: 13, flex: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{game.emoji} #{game.game_no} · {game.coins_per_guess} coin{game.coins_per_guess === 1 ? "" : "s"}{game.my_streak > 0 ? ` · 🔥 ${game.my_streak}` : ""}</b>
+        <b style={{ color: gold, fontSize: 13, flex: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{game.emoji} #{game.game_no} · {game.coins_per_guess} BB{game.coins_per_guess === 1 ? "" : "s"}{game.my_streak > 0 ? ` · 🔥 ${game.my_streak}` : ""}</b>
         <MuteButton />
         <button onClick={() => fetchGuessLeaderboard().then(setBoard)} style={{ background: "none", border: "none", color: gold, fontSize: 12, cursor: "pointer" }}>🏅 Top</button>
         <button onClick={() => setCollapsed((c) => !c)} aria-label={collapsed ? "Expand" : "Collapse"} style={{ background: "none", border: "none", color: gold, fontSize: 18, cursor: "pointer" }}>{collapsed ? "+" : "–"}</button>
@@ -153,7 +153,7 @@ export function GuessCard({ game, myUserId, onGuess, onLock, onResolve, onCancel
               })}
             </div>
           )}
-          {game.kind === "pick" && open && viewer && <div style={{ fontSize: 11, opacity: 0.7 }}>{game.my_guess ? "Tap another choice to change it — free until guessing closes." : `Tap your pick — ${game.coins_per_guess} coin${game.coins_per_guess === 1 ? "" : "s"}, one guess each.`}</div>}
+          {game.kind === "pick" && open && viewer && <div style={{ fontSize: 11, opacity: 0.7 }}>{game.my_guess ? "Tap another choice to change it — free until guessing closes." : `Tap your pick — ${game.coins_per_guess} BB${game.coins_per_guess === 1 ? "" : "s"}, one guess each.`}</div>}
 
           {game.kind !== "pick" && open && viewer && (
             <ValueInput key={`g${game.guess_game_id}`} game={game} initial={game.my_guess} label={guessLabel} onSubmit={onGuess} />
@@ -164,7 +164,7 @@ export function GuessCard({ game, myUserId, onGuess, onLock, onResolve, onCancel
 
           {game.is_host && live && (
             <div style={{ display: "flex", flexDirection: "column", gap: 6, borderTop: "1px solid rgba(240,196,32,.3)", paddingTop: 8 }}>
-              <div style={{ opacity: 0.85 }}>💰 {game.coins_total} coins from {game.guesses_count} guess{game.guesses_count === 1 ? "" : "es"}</div>
+              <div style={{ opacity: 0.85 }}>💰 {game.coins_total} BBs from {game.guesses_count} guess{game.guesses_count === 1 ? "" : "es"}</div>
               {open && <button onClick={onLock} style={btn(false)}>🔒 Lock guessing now</button>}
               <div style={{ fontWeight: 700 }}>What really happened?</div>
               {game.kind === "pick" ? (
@@ -195,7 +195,7 @@ export function GuessCard({ game, myUserId, onGuess, onLock, onResolve, onCancel
               {game.my_is_winner === false && <span style={{ textAlign: "center" }}>❌ Not this time — your guess: {game.my_guess_label}</span>}
             </div>
           )}
-          <div style={{ fontSize: 10.5, opacity: 0.6 }}>For fun only — a right guess wins bragging rights, never coins.</div>
+          <div style={{ fontSize: 10.5, opacity: 0.6 }}>For fun only — a right guess wins bragging rights, never BBs.</div>
         </div>
       )}
       {board && (
@@ -268,7 +268,7 @@ export function GuessStartDialog({ people, onStart, onClose }: {
         </div>
         {tpl === null ? (
           <>
-            <p style={{ fontSize: 12, opacity: 0.8, margin: "0 0 10px" }}>Do something on camera and let the room guess what happens. Each viewer gets one guess at your price — the coins come to you. Right guesses win bragging rights, not coins.</p>
+            <p style={{ fontSize: 12, opacity: 0.8, margin: "0 0 10px" }}>Do something on camera and let the room guess what happens. Each viewer gets one guess at your price — the BBs come to you. Right guesses win bragging rights, not BBs.</p>
             <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 6, marginBottom: 6 }}>{cats.map((c) => chip(cat === c, c, () => setCat(c)))}</div>
             <button onClick={() => choose("custom")} style={{ display: "flex", width: "100%", gap: 10, alignItems: "center", padding: "10px 12px", marginBottom: 6, borderRadius: 10, border: `1.5px dashed ${gold}`, background: "transparent", color: gold, fontWeight: 700, cursor: "pointer", textAlign: "left" }}>✏️ Write your own</button>
             {templates !== null && templates.length === 0 && (
@@ -310,7 +310,7 @@ export function GuessStartDialog({ people, onStart, onClose }: {
               </div>
             )}
             <label style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-              <span>Price of a guess: <b style={{ color: gold }}>{price} coin{price === 1 ? "" : "s"}</b></span>
+              <span>Price of a guess: <b style={{ color: gold }}>{price} BB{price === 1 ? "" : "s"}</b></span>
               <input type="range" min={GUESS_PRICE_MIN} max={GUESS_PRICE_MAX} value={price} onChange={(e) => setPrice(Number(e.target.value))} style={{ accentColor: "#F0C420" }} />
             </label>
             <div>

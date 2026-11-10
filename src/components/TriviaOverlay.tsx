@@ -152,7 +152,7 @@ export function TriviaOverlay({ game, myUserId, tileFor, onAnswer, onBuy, onEnd,
   }
   else if (canAnswer) status = "Pick your answer!";
   else if (me && game.my_answer !== null) status = "Answer locked in — waiting for the other side…";
-  else if (iVote) status = `Vote for the audience's answer — ${game.prices.vote} coins a vote.`;
+  else if (iVote) status = `Vote for the audience's answer — ${game.prices.vote} BBs a vote.`;
   else if (game.mode === "computer") status = "🤖 The computer is thinking…";
 
   const podium = !active && game.status !== "cancelled"
@@ -265,7 +265,7 @@ export function TriviaStartDialog({ candidates, onStart, onClose }: {
       <span style={{ fontSize: 13 }}>{label}</span>
       <span><input type="number" min={1} max={1000} value={prices[key]}
                    onChange={(e) => setPrices((p) => ({ ...p, [key]: Math.max(1, Math.min(1000, Number(e.target.value) || 1)) }))}
-                   style={{ width: 70, padding: "4px 6px", borderRadius: 8, border: `1px solid ${gold}`, background: "#111", color: "#fff", textAlign: "right" }} /> coins</span>
+                   style={{ width: 70, padding: "4px 6px", borderRadius: 8, border: `1px solid ${gold}`, background: "#111", color: "#fff", textAlign: "right" }} /> BBs</span>
     </label>
   );
   return (
@@ -296,12 +296,12 @@ export function TriviaStartDialog({ candidates, onStart, onClose }: {
             </div>
           </div>
         )}
-        {mode === "audience" && <p style={{ fontSize: 13, opacity: 0.85, margin: "0 0 8px" }}>Everyone watching plays as one team: they vote for an answer and the most-voted answer is theirs. Every vote's coins come to you.</p>}
+        {mode === "audience" && <p style={{ fontSize: 13, opacity: 0.85, margin: "0 0 8px" }}>Everyone watching plays as one team: they vote for an answer and the most-voted answer is theirs. Every vote's BBs come to you.</p>}
         <div style={{ fontSize: 13, fontWeight: 600, margin: "10px 0 2px" }}>Your prices</div>
         {mode === "audience" ? price("vote", "🗳 One vote") : (
           <>
             {price("5050", "50/50 (two wrong answers disappear)")}
-            <div style={{ fontSize: 11, opacity: 0.7 }}>Viewers buy these for a player — the coins go to that player.</div>
+            <div style={{ fontSize: 11, opacity: 0.7 }}>Viewers buy these for a player — the BBs go to that player.</div>
           </>
         )}
         <button disabled={mode === "duel" && opponent === null}

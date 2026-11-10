@@ -157,12 +157,12 @@ export function gameTitle(g: TapGameType): string {
 export function gameTitleWithRate(g: TapGameType): string {
   const n = Number(g.coin_value ?? 0);
   // A race pays one coin a tap, whatever the host picked — the phones' header says so.
-  if (g.game_mode === "race") return `${gameTitle(g)}, 1 Coin Per Tap`;
+  if (g.game_mode === "race") return `${gameTitle(g)}, 1 BB Per Tap`;
   // Water Sort charges per pour, not per catch — its coin_value is 0 by design.
-  if (g.game_mode === "water_sort") return `${gameTitle(g)}, 1 Coin Per Pour`;
+  if (g.game_mode === "water_sort") return `${gameTitle(g)}, 1 BB Per Pour`;
   if (!(n > 0) || g.game_mode === "puzzle") return gameTitle(g);
   const unit = g.game_mode === "falling_lanes" ? "Pop" : g.game_mode === "hit_me" ? "Hit" : "Catch";
-  return `${gameTitle(g)}, ${n % 1 === 0 ? n : n.toFixed(2)} Coin${n === 1 ? "" : "s"} Per ${unit}`;
+  return `${gameTitle(g)}, ${n % 1 === 0 ? n : n.toFixed(2)} BB${n === 1 ? "" : "s"} Per ${unit}`;
 }
 
 // ---- Host side: choosing which game runs in the room -----------------------------------------

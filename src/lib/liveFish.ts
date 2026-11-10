@@ -55,7 +55,7 @@ export const FISH_SPRITES = [
 /** Every catch posts this ordinary chat line (English on every platform, so the streamer's
  *  screen can spot it whatever language the catcher reads the app in). */
 export const FISH_LINE_PREFIX = "🐟 @";
-export const fishChatLine = (username: string, coins: number) => `${FISH_LINE_PREFIX}${username} caught the fish! (${coins} coins)`;
+export const fishChatLine = (username: string, coins: number) => `${FISH_LINE_PREFIX}${username} caught the fish! (${coins} BBs)`;
 export const isFishChatLine = (message: string | null | undefined) => !!message && message.startsWith(FISH_LINE_PREFIX);
 
 const num = (v: unknown, d = 0) => {

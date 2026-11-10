@@ -122,7 +122,7 @@ export function WaterSortOverlay({ roomName, hostName, isHost, onClose }: { room
               <>
                 <h2 className="card-title" style={{ fontSize: 22 }}>{t("tg_gift_title")}</h2>
                 <p className="soft" style={{ marginTop: 8 }}>{t("tap_game_entry_agreement", start.entry_fee_coins)}</p>
-                <p className="muted" style={{ fontSize: 12, marginTop: 6 }}>Then every pour is {moveCost} coin{moveCost === 1 ? "" : "s"}, gifted to {hostName || t("the_host")} when you finish.</p>
+                <p className="muted" style={{ fontSize: 12, marginTop: 6 }}>Then every pour is {moveCost} BB{moveCost === 1 ? "" : "s"}, gifted to {hostName || t("the_host")} when you finish.</p>
                 <div className="row" style={{ marginTop: 14 }}>
                   <button className="btn ghost" style={{ flex: 1 }} onClick={onClose}>{t("gig_cancel")}</button>
                   <button className="btn" style={{ flex: 1 }} onClick={agree}>{t("tg_gift_button", start.entry_fee_coins)}</button>
@@ -683,4 +683,4 @@ export function WaterSortGame({ isHost, hostName, moveCost, active, onFinish, st
 }
 
 const poursLabel = (n: number) => `${n.toLocaleString()} pour${n === 1 ? "" : "s"}`;
-const coinsLabel = (n: number) => `${Number(n).toLocaleString()} coin${Number(n) === 1 ? "" : "s"}`;
+const coinsLabel = (n: number) => `${Number(n).toLocaleString()} BB${Number(n) === 1 ? "" : "s"}`;

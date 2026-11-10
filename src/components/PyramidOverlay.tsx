@@ -112,7 +112,7 @@ export function PyramidOverlay({ game, myUserId, onSend, onEnd, onClose, tileFor
           {won ? "👑 " : ""}{p.name}
         </div>
         {circle("💰", p.tiers.bags, popped.has(`${p.user_id}:bags`))}{circle("🐶", p.tiers.puppies, popped.has(`${p.user_id}:puppies`))}{circle("🔥", p.tiers.fires, popped.has(`${p.user_id}:fires`))}{circle("❤️", p.tiers.hearts, popped.has(`${p.user_id}:hearts`))}{circle("🌹", p.tiers.flowers, popped.has(`${p.user_id}:flowers`))}
-        <div style={{ fontSize: 10, color: gold, marginTop: 4 }}>{compact(p.coins)} coins</div>
+        <div style={{ fontSize: 10, color: gold, marginTop: 4 }}>{compact(p.coins)} BBs</div>
         {active && (p.user_id === myUserId
           ? <div style={{ marginTop: 4, width: "100%", textAlign: "center", fontSize: 11, fontWeight: 700, color: gold, border: `1px solid ${gold}`, borderRadius: 999, padding: "4px 0" }}>You</div>
           : <button title="Click for 1 Flower — Shift-click for 10" onClick={(e) => onSend(p.user_id, e.shiftKey ? 10 : 1)}
@@ -147,7 +147,7 @@ export function PyramidOverlay({ game, myUserId, onSend, onEnd, onClose, tileFor
             </SceneBanner>
           </div>
           <div style={{ fontSize: 10.5, opacity: 0.9, maxWidth: Math.max(game.players.length * 78, 200), margin: "2px 0 4px" }}>
-            {active ? `🌹 = ${game.coins_per_flower} coin${game.coins_per_flower === 1 ? "" : "s"} · click = 1, Shift-click = 10 · 10 of each = 1 of the next`
+            {active ? `🌹 = ${game.coins_per_flower} BB${game.coins_per_flower === 1 ? "" : "s"} · click = 1, Shift-click = 10 · 10 of each = 1 of the next`
               : winner ? `🏆 ${winner.name} wins${game.reached_top ? " — the pyramid is full!" : "!"}` : "No Flowers this game."}
           </div>
           <div style={{ display: "flex", gap: 4 }}>{game.players.map(column)}</div>
@@ -185,7 +185,7 @@ export function PyramidStartDialog({ candidates, onStart, onClose }: {
             })}
           </div>
         )}
-        <div style={{ fontSize: 22, fontWeight: 700, color: gold }}>🌹 = {price} coin{price === 1 ? "" : "s"}</div>
+        <div style={{ fontSize: 22, fontWeight: 700, color: gold }}>🌹 = {price} BB{price === 1 ? "" : "s"}</div>
         <input type="range" min={1} max={25} value={price} onChange={(e) => setPrice(Number(e.target.value))} style={{ width: "100%" }} />
         <div style={{ fontSize: 13, fontWeight: 600, margin: "12px 0 6px" }}>Game length</div>
         <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>

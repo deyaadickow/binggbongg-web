@@ -291,7 +291,7 @@ export function BoardGameOverlay({ game, myUserId, onMove, onBuy, onResign, onEn
           {won ? "👑 " : ""}{p.is_audience ? "👥 " : ""}{p.is_computer ? "🤖 " : ""}{PIECE[game.kind] ? `${PIECE[game.kind]![p.side]} ` : ""}{p.name}{game.kind === "reversi" && game.counts ? ` · ${game.counts[p.side]}` : ""}{isMe ? " (you)" : ""}
         </b>
         {frozen > 0 && <span style={{ fontSize: 12, color: "#7fd3ff", fontWeight: 700 }}>❄ {Math.ceil(frozen / 1000)}s</span>}
-        <span style={{ fontSize: 11, color: gold }}>{p.coins} coins</span>
+        <span style={{ fontSize: 11, color: gold }}>{p.coins} BBs</span>
         {left !== null && <b style={{ fontSize: 15, fontVariantNumeric: "tabular-nums", color: turn && left < 20000 ? "#ff6b6b" : "#fff" }}>⏱ {clock(left)}</b>}
         {helpable && p.user_id !== null && (
           <div style={{ display: "flex", gap: 4, width: "100%" }}>
@@ -313,7 +313,7 @@ export function BoardGameOverlay({ game, myUserId, onMove, onBuy, onResign, onEn
   if (!active) status = game.status === "cancelled" ? "Game ended — no winner." : game.result === "draw" ? `Draw — ${why(game.reason)}.` : `🏆 ${winner?.name ?? ""} wins — ${why(game.reason)}!`;
   else if (frozenMe) status = "❄ You're frozen — your clock is still running!";
   else if (myTurn) status = placement ? (game.kind === "fourinarow" ? "Your move — click a column." : game.kind === "mancala" ? "Your move — click one of your pits." : "Your move — click a marked square.") : picked ? "Now click where it goes." : "Your move — click a piece.";
-  else if (iVote) status = `Vote for the audience's move — ${game.kind === "fourinarow" ? "click a column" : game.kind === "mancala" ? "click one of their pits" : game.kind === "reversi" ? "click a marked square" : "click a piece, then where it goes"} (${game.prices.vote} coins a vote).`;
+  else if (iVote) status = `Vote for the audience's move — ${game.kind === "fourinarow" ? "click a column" : game.kind === "mancala" ? "click one of their pits" : game.kind === "reversi" ? "click a marked square" : "click a piece, then where it goes"} (${game.prices.vote} BBs a vote).`;
   else if (game.mode === "audience" && game.turn === "two") status = "The audience is voting…";
   else if (game.mode === "computer" && game.turn === "two") status = "🤖 The computer is thinking…";
   else status = `${(game.turn === "one" ? game.players[0] : game.players[1]).name} to move${game.in_check ? " — check!" : ""}`;
@@ -391,7 +391,7 @@ export function BoardGameOverlay({ game, myUserId, onMove, onBuy, onResign, onEn
             </div>
           )}
           {host && game.mode === "audience" && myUserId === game.host_user_id && active && (
-            <div style={{ fontSize: 11, opacity: 0.75 }}>Every vote's coins come to you.</div>
+            <div style={{ fontSize: 11, opacity: 0.75 }}>Every vote's BBs come to you.</div>
           )}
         </div>
       )}
@@ -417,7 +417,7 @@ export function BoardGameStartDialog({ kind, candidates, onStart, onClose }: {
       <span style={{ fontSize: 13 }}>{label}</span>
       <span><input type="number" min={1} max={1000} value={prices[key]}
                    onChange={(e) => setPrices((p) => ({ ...p, [key]: Math.max(1, Math.min(1000, Number(e.target.value) || 1)) }))}
-                   style={{ width: 70, padding: "4px 6px", borderRadius: 8, border: `1px solid ${gold}`, background: "#111", color: "#fff", textAlign: "right" }} /> coins</span>
+                   style={{ width: 70, padding: "4px 6px", borderRadius: 8, border: `1px solid ${gold}`, background: "#111", color: "#fff", textAlign: "right" }} /> BBs</span>
     </label>
   );
   return (
@@ -447,7 +447,7 @@ export function BoardGameStartDialog({ kind, candidates, onStart, onClose }: {
               {(["easy", "medium", "hard"] as AiLevel[]).map((l) => <span key={l}>{chip(level === l, l[0].toUpperCase() + l.slice(1), () => setLevel(l))}</span>)}
             </div>
           </div>
-        ) : <p style={{ fontSize: 13, opacity: 0.85, margin: "0 0 8px" }}>You move first. On the audience's turn everyone watching has 20 seconds to vote, and the most-voted move is played. Every vote's coins come to you.</p>}
+        ) : <p style={{ fontSize: 13, opacity: 0.85, margin: "0 0 8px" }}>You move first. On the audience's turn everyone watching has 20 seconds to vote, and the most-voted move is played. Every vote's BBs come to you.</p>}
         <div style={{ fontSize: 13, fontWeight: 600, margin: "8px 0 6px" }}>{mode === "duel" ? "Each player's clock" : "Your clock"}</div>
         <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
           {[3, 5, 10].map((m) => <span key={m}>{chip(minutes === m, `${m} min`, () => setMinutes(m))}</span>)}
@@ -457,13 +457,13 @@ export function BoardGameStartDialog({ kind, candidates, onStart, onClose }: {
           <>
             {price("freeze", kind === "fourinarow" ? "⛔ Block (their best column, one turn)" : "❄ Freeze (10 seconds)")}
             {price("hint", "💡 Hint")}
-            <div style={{ fontSize: 11, opacity: 0.7 }}>Viewers buy these for a player — the coins go to that player.</div>
+            <div style={{ fontSize: 11, opacity: 0.7 }}>Viewers buy these for a player — the BBs go to that player.</div>
           </>
         ) : mode === "computer" ? (
           <>
             {kind === "fourinarow" && price("freeze", "⛔ Block the computer's best column")}
             {price("hint", "💡 Hint")}
-            <div style={{ fontSize: 11, opacity: 0.7 }}>Viewers buy these for you — the coins come to you.</div>
+            <div style={{ fontSize: 11, opacity: 0.7 }}>Viewers buy these for you — the BBs come to you.</div>
           </>
         ) : price("vote", "🗳 One vote")}
         <button disabled={mode === "duel" && opponent === null}

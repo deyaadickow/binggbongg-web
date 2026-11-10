@@ -107,7 +107,7 @@ function EntryRow({ row, canVote, onVoted, contest, votingOpen, highlighted }: {
             {row.fullname || row.username || "—"}
           </div>
           <div className="muted" style={{ fontSize: 13 }}>
-            {row.vote_count.toLocaleString()} votes · {row.gift_coins.toLocaleString()} gift coins
+            {row.vote_count.toLocaleString()} votes · {row.gift_coins.toLocaleString()} gift BBs
           </div>
           {/* Only ever shown when false, and only then because a contestant who has not met the
               contest's minimum-videos floor cannot win — worth saying plainly rather than

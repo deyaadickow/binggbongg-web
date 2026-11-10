@@ -171,7 +171,7 @@ export function BirthdayPage() {
           <div className="card row" style={{ padding: 12, marginBottom: 10, textAlign: "center" }}>
             <Total value={wishes?.total_wishes ?? 0} label="Wishes" />
             <Total value={wishes?.total_flowers ?? 0} label="Flowers" />
-            <Total value={wishes?.total_coins ?? 0} label="Coins" />
+            <Total value={wishes?.total_coins ?? 0} label="BBs" />
           </div>
 
           {(wishes?.wishes ?? []).length === 0 && <div className="notice">Nobody has wished you yet.</div>}

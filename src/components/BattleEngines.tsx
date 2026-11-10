@@ -294,7 +294,7 @@ export function InviteCard({ title, body, onAnswer, onClose }: { title: string; 
 
 export function describe2v2Invite(i: Invite2v2): string {
   const n = (f?: string, u?: string) => displayName({ fullname: f, username: u } as Partial<UserSummary>);
-  return `${n(i.initiator_fullname, i.initiator_username)} set up a 2v2: you + ${n(i.my_teammate_fullname, i.my_teammate_username)} vs. ${n(i.opponent1_fullname, i.opponent1_username)} & ${n(i.opponent2_fullname, i.opponent2_username)}. 5 minutes, the team with more gift coins wins.`;
+  return `${n(i.initiator_fullname, i.initiator_username)} set up a 2v2: you + ${n(i.my_teammate_fullname, i.my_teammate_username)} vs. ${n(i.opponent1_fullname, i.opponent1_username)} & ${n(i.opponent2_fullname, i.opponent2_username)}. 5 minutes, the team with more gift BBs wins.`;
 }
 
 // ---- strips ------------------------------------------------------------------------------
@@ -400,7 +400,7 @@ export function B555Strip({ d, myUserId, nameOf, onCancel }: { d: B555Data; myUs
   const accepted = d.participants.filter((p) => p.invite_status === "accepted");
   const k = Math.round(d.coins_per_game / 1000);
   return (
-    <Strip title={`${d.games_to_win} Games / ${Math.round(d.seconds_per_game / 60)} Minutes / Reach ${d.coins_per_game.toLocaleString()} coins and win`}
+    <Strip title={`${d.games_to_win} Games / ${Math.round(d.seconds_per_game / 60)} Minutes / Reach ${d.coins_per_game.toLocaleString()} BBs and win`}
       right={d.status === "pending_invites" ? waiting(accepted.length, d.participants.length) : <span className="pill">5-5-5</span>}>
       {(d.status === "active" ? accepted : d.participants).map((p) => {
         const done = !!p.finished_at || (p.games_completed ?? 0) >= d.games_to_win;
@@ -451,7 +451,7 @@ export function WinCelebration({ win }: { win: boolean }) {
 /** "1 coin" / "1,250 coins" — every result row says what its number counts. */
 export function coinsLabel(n: number | null | undefined): string {
   const v = Number(n ?? 0) || 0;
-  return `${v.toLocaleString()} coin${v === 1 ? "" : "s"}`;
+  return `${v.toLocaleString()} BB${v === 1 ? "" : "s"}`;
 }
 
 export function ResultOverlay({ title, rows: given, onClose, onShare, sharing }: {

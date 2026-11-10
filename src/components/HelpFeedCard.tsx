@@ -35,7 +35,7 @@ export function HelpFeedCard({ campaign }: { campaign: HelpCampaign }) {
         </div>
       )}
       <div className="muted" style={{ fontSize: 12, marginTop: 8 }}>
-        {campaign.days_left > 0 ? `${campaign.days_left} days left` : "Closing today"} · {campaign.raised_coins.toLocaleString()} coins
+        {campaign.days_left > 0 ? `${campaign.days_left} days left` : "Closing today"} · {campaign.raised_coins.toLocaleString()} BBs
       </div>
     </Link>
   );

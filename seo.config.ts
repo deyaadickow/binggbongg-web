@@ -61,8 +61,11 @@ function featureSections(root: string, en: Record<string, string>): Section[] {
 // 2026-10-31 as a "social casino": coins, cash prizes, payouts, paying to play and bingo side by
 // side read to it like a casino app. Those features stay in the app and on /features; the crawled
 // copy leaves out the Money section and any tile whose words are about coins or money.
+// 2026-11-10 (Steve: "Coins are not called coins anymore. They are called BBs"): the in-app currency
+// is now "BBs" / "PBBs" (practice BBs), so those words are left out of the crawled copy exactly as
+// "coins" was — the same tiles stay out, and the Pre-Launch tile (free PBBs) never reaches it.
 const LEFT_OUT_SECTIONS = new Set(["fsec_money"]);
-const CASINO_WORDS = /\b(coins?|cash|paid|pays?|paying|payouts?|earn\w*|money|prizes?|bingo|lucky|buy|bought|commission|\$)|\$\d/i;
+const CASINO_WORDS = /\b(coins?|p?bbs?|cash|paid|pays?|paying|payouts?|earn\w*|money|prizes?|bingo|lucky|buy|bought|commission|\$)|\$\d/i;
 
 function staticPage(root: string): string {
   const en = englishStrings(root);

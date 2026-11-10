@@ -232,7 +232,7 @@ function ContestStandingsOverlay({ contest, userId, onClose }: { contest: PkCont
           name={r.label || "—"}
           sub={r.location}
           value={Number(r.score ?? 0).toLocaleString()}
-          valueLabel="coins" />
+          valueLabel="BBs" />
       ))}
     </Overlay>
   );

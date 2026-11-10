@@ -96,7 +96,7 @@ export function SoloBattleStrip({ battle, myUserId, onOpenStandings, onToast, on
             {joinOpen
               ? `Anyone can join for the next ${clock(joinLeft)} — go live and the gifts you receive count.`
               : endsIn !== null && endsIn > 0
-              ? `Running — ${clock(endsIn)} left. Most gift coins wins.`
+              ? `Running — ${clock(endsIn)} left. Most gift BBs wins.`
               : outcome.winner ? `🏁 Finished — 👑 ${standingName(outcome.winner)} wins!`
               : outcome.tie ? "🏁 Finished — 🤝 Tie!"
               : "🏁 Finished — 👑 the winner is top of the leaderboard."}

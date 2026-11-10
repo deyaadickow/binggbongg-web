@@ -138,7 +138,7 @@ export function GiftSheet({ post: item, onClose, onSent, sendOverride }: { post?
     if (!user || busy !== null) return;
     const price = giftPrice(gift);
     if (coins < price) {
-      setNotice({ text: `${gift.name ?? "That gift"} is ${price} coins and you have ${coins}.`, wallet: true });
+      setNotice({ text: `${gift.name ?? "That gift"} is ${price} BBs and you have ${coins}.`, wallet: true });
       return;
     }
     setBusy(gift.id);

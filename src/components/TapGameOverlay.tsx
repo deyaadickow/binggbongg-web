@@ -329,9 +329,9 @@ export function TapGameOverlay({ game, roomName, onClose, onToast, hostAvatar, i
                   <h2 className="card-title" style={{ fontSize: 22 }}>{gameTitle(game)}</h2>
                   <p className="soft" style={{ marginTop: 8 }}>
                     {isHitMe ? t("hm_intro", coinsWord)
-                      : isLanes ? `Balloons fall down 8 lanes — tap them to pop them before they reach the bottom. Every pop is worth ${coinsPer} coin${coinsPer === 1 ? "" : "s"}.`
-                      : isRace ? `Tap as fast as you can: 5 stations, 20 taps each. Reach station 5 for 100 coins — your time goes on the leaderboard.`
-                      : `Tap every ${game.catch_name || "character"} before it disappears. Each catch is worth ${coinsPer} coin${coinsPer === 1 ? "" : "s"}.`}
+                      : isLanes ? `Balloons fall down 8 lanes — tap them to pop them before they reach the bottom. Every pop is worth ${coinsPer} BB${coinsPer === 1 ? "" : "s"}.`
+                      : isRace ? `Tap as fast as you can: 5 stations, 20 taps each. Reach station 5 for 100 BBs — your time goes on the leaderboard.`
+                      : `Tap every ${game.catch_name || "character"} before it disappears. Each catch is worth ${coinsPer} BB${coinsPer === 1 ? "" : "s"}.`}
                   </p>
                   <p className="muted" style={{ fontSize: 12, marginTop: 6 }}>{t("playing_gifts_the_host_50_coins_to_start")}</p>
                   <button className="btn block" style={{ marginTop: 14 }} onClick={() => begin()}>{t("play_now")}</button>
@@ -359,7 +359,7 @@ export function TapGameOverlay({ game, roomName, onClose, onToast, hostAvatar, i
                       ? `🥊 ${t("hm_result", hitMeHost, Number(result.objects_caught).toLocaleString())} · ${
                           Number(result.coins_earned) === 1 ? t("tap_result_worth_one_coin") : t("tap_result_worth_n_coins", Number(result.coins_earned).toLocaleString())}`
                       : isRace
-                      ? `Your ${game.catch_name || "racer"} reached Station ${RACE_STATIONS}\nin ${clock(elapsed)} — ${Number(result.coins_earned).toLocaleString()} coins!`
+                      ? `Your ${game.catch_name || "racer"} reached Station ${RACE_STATIONS}\nin ${clock(elapsed)} — ${Number(result.coins_earned).toLocaleString()} BBs!`
                       // Number then name, so no plural "s" is guessed: "Caught: 24 × Cricket Ball · worth 24 coins".
                       : `${t(isLanes ? "tap_result_popped" : "tap_result_caught", Number(result.objects_caught).toLocaleString(), isLanes ? (game.catch_name || "Balloon") : (game.catch_name || game.display_name || game.name || "Catch"))} · ${
                           Number(result.coins_earned) === 1 ? t("tap_result_worth_one_coin") : t("tap_result_worth_n_coins", Number(result.coins_earned).toLocaleString())}`}
@@ -437,7 +437,7 @@ export function RaceTrack({ emoji, image, caught, elapsed }: { emoji: string; im
           <span style={{ position: "absolute", left: "calc(100% + 13px)", top: "50%", transform: "translate(-50%,-60%)", fontSize: 16 }}>🏁</span>
         </div>
       </div>
-      <div style={{ color: "var(--gold, #F0C420)", fontWeight: 700, fontSize: 12 }}>Station {reached} of {RACE_STATIONS} • {caught} of {RACE_FINISH} coins</div>
+      <div style={{ color: "var(--gold, #F0C420)", fontWeight: 700, fontSize: 12 }}>Station {reached} of {RACE_STATIONS} • {caught} of {RACE_FINISH} BBs</div>
     </div>
   );
 }
