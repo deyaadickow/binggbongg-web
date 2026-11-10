@@ -5,6 +5,8 @@ import { useSession } from "../lib/session";
 import { loadGifts } from "../lib/gifts";
 import { TapTapBurst, isTapTapGift, tapTapBurstDuration, burstLabel } from "./TapTapBurst";
 import { tt, useT  } from "../lib/i18n";
+import { giftKindKey, paidWithOf } from "../lib/payWith";
+import { PayWithSwitch } from "./PayWithSwitch";
 
 /**
  * The gift button on a video, and the gift page it opens.
@@ -84,7 +86,7 @@ export function GiftFlash({ gift, onDone }: { gift: Gift; onDone: () => void }) 
             v.play().catch(() => { v.muted = true; v.play().catch(() => {}); });
           }}
           onEnded={onDone} onError={onDone} />
-        <span className="gift-video-name">{t("you_have_sent")} {gift.name ?? ""}</span>
+        <span className="gift-video-name">{t("you_have_sent")} {gift.name ?? ""}{giftKindKey(gift.paid_with) ? ` · ${t(giftKindKey(gift.paid_with)!)}` : ""}</span>
       </div>
     );
   }
@@ -96,6 +98,8 @@ export function GiftFlash({ gift, onDone }: { gift: Gift; onDone: () => void }) 
         {gift.image ? <img src={mediaUrl(gift.image)} alt="" /> : <span style={{ fontSize: 64 }}>🎁</span>}
         <b>{giftPrice(gift)}</b>
         <span>{gift.name ?? "Gift"}</span>
+        {/* "PBBs gift" / "BBs gift" by what the server says was spent (2026-11-10). */}
+        {giftKindKey(gift.paid_with) && <span className="gift-kind">{t(giftKindKey(gift.paid_with)!)}</span>}
       </div>
     </div>
   );
@@ -152,7 +156,7 @@ export function GiftSheet({ post: item, onClose, onSent, sendOverride }: { post?
       await refresh();
       // Close straight away so the gift shows over the video, as the phones do.
       onClose();
-      onSent?.(gift);
+      onSent?.({ ...gift, paid_with: paidWithOf(res) });
     } catch (err) {
       setNotice({ text: (err as Error).message });
     } finally {
@@ -174,6 +178,7 @@ export function GiftSheet({ post: item, onClose, onSent, sendOverride }: { post?
           <span className="spacer" />
           <b>{coins}</b>
         </Link>
+        <PayWithSwitch hint />
         {notice && (
           <div className="gift-notice">
             {notice.text}{notice.wallet && <> <Link to="/wallet">{t("buy_coins")}</Link></>}

@@ -5,6 +5,7 @@ export const WEB_BASE = "https://admin.binggbongg.com/";
 export const UPLOAD_BASE = "https://d32kgcvh9dqf5h.cloudfront.net/";
 export const TOKEN_SERVER = "https://binggbongg-livekit-token.onrender.com/";
 import { onVerifyEmailResponse } from "./verifyEmail";
+import { payWithHeaders } from "./payWith";
 
 const API_KEY = "123";
 
@@ -24,7 +25,7 @@ export function setAuthHeaders(token: string | null, userId: number | null) {
 /** The headers every authorised call sends, for the two uploads that must build their own
  *  request (multipart / progress) instead of going through post(). */
 export function currentAuthHeaders(): Record<string, string> {
-  return { apikey: API_KEY, ...authHeaders };
+  return { apikey: API_KEY, ...authHeaders, ...payWithHeaders() };
 }
 
 export class ApiError extends Error {
@@ -47,7 +48,8 @@ export async function post<T = unknown>(endpoint: string, params: Record<string,
   }
   const res = await fetch(API_BASE + endpoint, {
     method: "POST",
-    headers: { apikey: API_KEY, ...authHeaders, "Content-Type": "application/x-www-form-urlencoded" },
+    // X-Pay-With: bb while the member picked "Pay with: BBs" (lib/payWith.ts, 2026-11-10).
+    headers: { apikey: API_KEY, ...authHeaders, ...payWithHeaders(), "Content-Type": "application/x-www-form-urlencoded" },
     body,
     ...(opts.keepalive ? { keepalive: true } : {}),
   });
@@ -185,9 +187,11 @@ export interface UserSummary {
   total_likes?: number;
   coin_wallet?: number;
   no_redeem_wallet?: number;
-  /** Dead coins for testers, own row only (part of no_redeem_wallet). The server also sends
-   *  free_points / paid_coins — ignored since 2026-11-10 (Steve: "Make everything coins"). */
+  /** PBBs (practice BBs = the dead coins), own row only (part of no_redeem_wallet). */
   test_coins?: number;
+  /** BBs the member bought (no_redeem_wallet - dead - points), own row only. The Wallet shows
+   *  BBs and PBBs as two lines (Steve, 2026-11-10); absent => no_redeem_wallet - test_coins. */
+  paid_coins?: number;
   redeem_wallet?: number;
   cash_wallet?: number;
   is_following?: boolean | number;
@@ -268,6 +272,8 @@ export interface Gift {
   /** tbl_gifts stores the price as `votes`; the battle ledgers call it coin_price. */
   votes?: number;
   coin_price?: number;
+  /** Set by the client after a send: what the server says was spent ("PBBs gift" / "BBs gift"). */
+  paid_with?: "pbb" | "bb" | "mixed" | null;
   /** Eddie, 2026-09-19: "the gift will appear 100 times one after another" — an admin flag on
    *  individual gifts. A 100-coin TapTap gift bursts 100 copies of its own icon instead of one. */
   is_taptap?: boolean;

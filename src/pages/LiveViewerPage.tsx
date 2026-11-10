@@ -38,6 +38,8 @@ import { TapGameOverlay } from "../components/TapGameOverlay";
 import { HostGamesMenu } from "../components/HostGamesMenu";
 import { SoloBattleStandingsSheet, SoloBattleStrip } from "../components/SoloBattle";
 import { SundayBonusPill } from "../components/SundayBonus";
+import { giftKindKey, paidWithOf } from "../lib/payWith";
+import { PayWithSwitch } from "../components/PayWithSwitch";
 import { fetchActiveSoloBattle, type SoloBattle } from "../lib/solobattle";
 import { battleScreenPath, chatBattlePath, chatReasonText, checkUserLiveRoom, startChatBattle } from "../lib/chatBattle";
 import { countryBattlePath } from "../lib/countryBattle";
@@ -1035,10 +1037,15 @@ export function LiveViewerPage() {
       // The gift line the phones play the gift from: a NEGATIVE sender id (the gift's id) in the
       // RECIPIENT's channel, exactly what the apps post (Steve, 2026-11-06: gifts sent to a phone
       // did not show on its screen). A virtual battler has no live of their own to show it on.
+      // "PBBs gift" / "BBs gift" by what the server says was actually spent (Steve, 2026-11-10);
+      // nothing is added while the server does not say. The chat line stays English like the
+      // phones' (it is shared by everyone in the room) and keeps " sent a " for the TTS reader.
+      const kind = giftKindKey(paidWithOf(res));
+      const kindEn = kind === "gift_pbbs" ? " (PBBs gift)" : kind === "gift_bbs" ? " (BBs gift)" : "";
       if (!virtualGiftTarget) {
-        void sendChat(chatChannel(roomName, giftTarget), -gift.id, "", `${displayName(user)} sent a ${gift.name ?? "gift"}!`, user.profile_image ?? "").catch(() => {});
+        void sendChat(chatChannel(roomName, giftTarget), -gift.id, "", `${displayName(user)} sent a ${gift.name ?? "gift"}!${kindEn}`, user.profile_image ?? "").catch(() => {});
       }
-      setToast(`Sent ${gift.name ?? "a gift"} (${giftPrice(gift)} BBs) to ${nameOfId(giftTarget) || (virtualGiftTarget ? personName(virtualGiftTarget) : "")}`);
+      setToast(`Sent ${gift.name ?? "a gift"} (${giftPrice(gift)} BBs) to ${nameOfId(giftTarget) || (virtualGiftTarget ? personName(virtualGiftTarget) : "")}${kind ? ` · ${tt(kind)}` : ""}`);
       setGiftTarget(null);
       setVirtualGiftTarget(null);
       refresh();
@@ -1907,6 +1914,7 @@ export function LiveViewerPage() {
                 <span className="spacer" />
                 <button className="btn small ghost" onClick={() => setGiftTarget(null)}>{t("close")}</button>
               </div>
+              <div style={{ padding: "10px 6px 0" }}><PayWithSwitch hint /></div>
               <div className="gifts">
                 {gifts.map((g) => (
                   <button key={g.id} onClick={() => sendGift(g)}>
