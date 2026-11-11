@@ -72,10 +72,11 @@ export function prefersTagalog(siteLang: string, country: string | null | undefi
 /** Shown once per member on this browser (the phones keep the same flag per user id). */
 const SEEN_KEY = "host_bonus_video_seen_v1";
 
-export function hostBonusVideoSeen(userId: number): boolean {
-  try { return localStorage.getItem(`${SEEN_KEY}:${userId}`) === "1"; } catch { return false; }
+// Steve, 2026-11-10: a NEW go-live video plays again for members who saw the old one — "seen" is per video URL.
+export function hostBonusVideoSeen(userId: number, video: string): boolean {
+  try { return localStorage.getItem(`${SEEN_KEY}:${userId}:${video}`) === "1"; } catch { return false; }
 }
 
-export function markHostBonusVideoSeen(userId: number): void {
-  try { localStorage.setItem(`${SEEN_KEY}:${userId}`, "1"); } catch { /* private mode */ }
+export function markHostBonusVideoSeen(userId: number, video: string): void {
+  try { localStorage.setItem(`${SEEN_KEY}:${userId}:${video}`, "1"); } catch { /* private mode */ }
 }

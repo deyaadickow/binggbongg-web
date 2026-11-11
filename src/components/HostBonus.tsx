@@ -68,12 +68,18 @@ export function HostBonusIntro({ userId }: { userId: number }) {
   const { user } = useSession();
   const [b, setB] = useState<HostBonus | null>(null);
   useEffect(() => {
-    if (!userId || hostBonusVideoSeen(userId)) return;
+    if (!userId) return;
     let alive = true;
-    fetchHostBonus(userId).then((d) => { if (alive && d && (d.videoEn || d.videoFil)) setB(d); });
+    fetchHostBonus(userId).then((d) => {
+      const v = d ? (d.videoEn || d.videoFil || "") : "";
+      if (alive && d && v && !hostBonusVideoSeen(userId, v)) setB(d);
+    });
     return () => { alive = false; };
   }, [userId]);
-  const close = useCallback(() => { markHostBonusVideoSeen(userId); setB(null); }, [userId]);
+  const close = useCallback(() => {
+    if (b) markHostBonusVideoSeen(userId, b.videoEn || b.videoFil || "");
+    setB(null);
+  }, [userId, b]);
   if (!b) return null;
   return <HostBonusPlayer b={b} tagalog={prefersTagalog(lang, user?.country)} skip onClose={close} />;
 }
