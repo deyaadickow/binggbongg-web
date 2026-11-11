@@ -160,7 +160,8 @@ export function BattleMenu({ peopleOnScreen, onPick, onClose, onNotice }: { peop
   if (info) {
     return (
       <Overlay title={t(info.title)} onClose={() => setInfo(null)} width={560}>
-        <p className="soft" style={{ marginTop: 0, whiteSpace: "pre-line" }}>{t(info.info)}</p>
+        {/* Steve, 2026-11-11: "Please make the text larger and more visible" */}
+        <p style={{ marginTop: 0, whiteSpace: "pre-line", fontSize: 20, fontWeight: 600, lineHeight: 1.45, color: "#fff", textAlign: "center" }}>{t(info.info)}</p>
         <button className="btn ghost block" onClick={() => setInfo(null)}>{t("back")}</button>
       </Overlay>
     );
