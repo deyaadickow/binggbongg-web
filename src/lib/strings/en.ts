@@ -2461,7 +2461,7 @@ export const en = {
   pl_ended: "The Pre-Launch Special has ended. Thank you for playing!",
   pl_tap_for_more: "Tap to learn more",
   fname_prelaunch: "Pre-Launch Special",
-  fblurb_prelaunch: "Every member gets 1,000 FBBs (Free BBs) to practice with: play games, battle and send gifts.",
+  fblurb_prelaunch: "Every member gets 100 FBBs (Free BBs) to practice with: play games, battle and send gifts.",
   // Country Board + Country Battle Recap (Steve, 2026-11-11).
   fname_country_board: "Country Board",
   fblurb_country_board: "Every country's points, live. Help yours climb to #1.",
@@ -2495,7 +2495,7 @@ export const en = {
   cbr_not_participant: "You didn't battle in this one. Join the next Country Battle!",
   bk_country_board_blurb: "Every country's points — help yours reach #1",
   bk_country_board_info: "Countries battle for pride. Every BB or FBB a member sends is 1 point for their country, and every new member is +100. Open the board to see where your country ranks today, this week and of all time — then invite friends to help it climb.",
-  // FBBs 1,000 + referral $100 + Ads for Referrals (Steve, 2026-11-11).
+  // FBBs (100 since Steve 2026-11-11 "make it 100 Free BBs", was 1,000) + referral $100 + Ads for Referrals (Steve, 2026-11-11).
   fc_signup_fbbs_sub: "FBBs to practice with — they never turn into money",
   fname_ads_for_referrals: "Ads for Referrals",
   fblurb_ads_for_referrals: "Download our video ads, post them with your code, and earn up to $100 for every friend.",

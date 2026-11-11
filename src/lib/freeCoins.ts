@@ -28,7 +28,7 @@ const int = (v: unknown): number => {
 function parse(d: unknown): FreeCoins {
   const o = (d && typeof d === "object" ? d : {}) as Record<string, unknown>;
   const list = (v: unknown) => (Array.isArray(v) ? v : []).filter((x) => x && typeof x === "object") as Record<string, unknown>[];
-  // Sign-up Bonus BBs are switched off (Steve, 2026-11-11: the only sign-up gift is 1,000 FBBs),
+  // Sign-up Bonus BBs are switched off (Steve, 2026-11-11: the only sign-up gift is 100 FBBs),
   // so a "signup" row is never listed as BBs even if the server still sends one: the page shows
   // the FBBs a new member gets instead.
   const give = list(o.give)

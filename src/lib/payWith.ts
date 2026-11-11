@@ -1,6 +1,6 @@
 // "Pay with: FBBs | BBs" — one app-wide choice (Steve, 2026-11-10, BBs + FBBs spec).
 //
-// Every member got 10,000 FBBs (free BBs), refilled automatically, during the Pre-Launch Special (since 2026-11-11: 1,000, no refill),
+// Every member got 10,000 FBBs (free BBs), refilled automatically, during the Pre-Launch Special (since 2026-11-11: 100, no refill),
 // and the server spends FBBs FIRST. Without a choice, a member who bought BBs could never pay a
 // streamer real money before launch — the FBBs never run out. So the member picks, once, and every
 // API request carries `X-Pay-With: bb` while "BBs" is picked (Users::spendDeadCoinsFirst on the

@@ -74,7 +74,7 @@ export const FEATURES: Section[] = [
     // Features Videos page is #3 (2026-10-29).
     titleKey: "fsec_featured",
     features: [
-      // Pre-Launch Special (Steve, 2026-11-10; changed 2026-11-11: "We will give everyone 1000 FBBs
+      // Pre-Launch Special (Steve, 2026-11-10; changed 2026-11-11 to 100 FBBs each: "1000 free BBs is too much, make it 100 Free BBs" — "We will give everyone 1000 FBBs
       // from day one, and every new member" — no refill, no wipe).
       { icon: "🎉", nameKey: "fname_prelaunch", blurbKey: "fblurb_prelaunch", to: "/pre-launch" },
       { icon: "🎤", nameKey: "fname_philippine_singing_contest", blurbKey: "fblurb_philippine_singing_contest", to: "/featured-contest", contestOnly: true },

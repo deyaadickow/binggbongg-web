@@ -2252,7 +2252,7 @@ export const id = {
   pl_ended: "Spesial Pra-Peluncuran telah berakhir. Terima kasih sudah bermain!",
   pl_tap_for_more: "Ketuk untuk info lebih lanjut",
   fname_prelaunch: "Spesial Pra-Peluncuran",
-  fblurb_prelaunch: "Setiap anggota mendapat 1.000 FBBs (BBs gratis) untuk latihan: main game, battle, dan kirim hadiah.",
+  fblurb_prelaunch: "Setiap anggota mendapat 100 FBBs (BBs gratis) untuk latihan: main game, battle, dan kirim hadiah.",
   // Country Board + Country Battle Recap (Steve, 2026-11-11).
   fname_country_board: "Papan Negara",
   fblurb_country_board: "Poin setiap negara, langsung. Bantu negaramu naik ke #1.",
@@ -2286,7 +2286,7 @@ export const id = {
   cbr_not_participant: "Kamu tidak ikut battle ini. Ikuti Country Battle berikutnya!",
   bk_country_board_blurb: "Poin setiap negara — bantu negaramu jadi #1",
   bk_country_board_info: "Negara-negara bertanding demi kebanggaan. Setiap BB atau FBB yang dikirim anggota bernilai 1 poin untuk negaranya, dan setiap anggota baru +100. Buka papan untuk melihat peringkat negaramu hari ini, minggu ini, dan sepanjang masa — lalu undang teman untuk membantunya naik.",
-  // FBBs 1,000 + referral $100 + Ads for Referrals (Steve, 2026-11-11).
+  // FBBs (100 since Steve 2026-11-11 "make it 100 Free BBs", was 1,000) + referral $100 + Ads for Referrals (Steve, 2026-11-11).
   fblurb_referral_program: "Dapatkan 5%% dari penghasilan setiap teman yang kamu daftarkan, sampai mencapai $100 — untuk setiap teman.",
   fc_signup_fbbs_sub: "FBBs untuk latihan — tidak pernah menjadi uang",
   fname_ads_for_referrals: "Iklan untuk Referal",

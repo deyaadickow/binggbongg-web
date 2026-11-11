@@ -3,8 +3,9 @@
 // no money will go into any wallet." / "Yes everything will be zero at launch day."
 //
 // Changed 2026-11-11 (Steve: "Forget about the unlimited FBBs until November 29th. We will give
-// everyone 1000 FBBs from day one, and every new member."): every member has exactly 1,000 FBBs,
-// they do NOT refill and are NOT wiped any more; new members in every country get 1,000 once.
+// everyone 1000 FBBs from day one, and every new member."), then the same day "1000 free BBs is
+// too much, make it 100 Free BBs": every member has exactly 100 FBBs, they do NOT refill and are
+// NOT wiped any more; new members in every country get 100 once.
 // Launch is still Tuesday, December 1, when every score starts from zero. The referral bonus is
 // 5% of what each friend earns, until $100 (was $25). fetchPrelaunch says refills: false,
 // fbbs_expire: false, new_member_fbbs, referral_bonus_cap and referral_bonus_percent.
@@ -39,9 +40,9 @@ export const PRELAUNCH_DEFAULTS: Prelaunch = {
   startsAt: null,
   endsAt: Date.parse("2026-11-29T16:00:00Z"),
   launchAt: Date.parse("2026-11-30T16:00:00Z"),
-  grantAmount: 1000,
+  grantAmount: 100,
   refillBelow: 0,
-  newMemberPbbs: 1000,
+  newMemberPbbs: 100,
   referralBonusCap: 100,
   refills: false,
   fbbsExpire: false,
@@ -67,7 +68,7 @@ function parse(d: unknown): Prelaunch {
   const o = (d && typeof d === "object" ? d : {}) as Record<string, unknown>;
   const D = PRELAUNCH_DEFAULTS;
   // A server from before 2026-11-11 sends no `refills` field and still says grant 10000 / cap 25.
-  // Its amounts would contradict the new copy ("1,000 FBBs, no refill", "until $100"), so they
+  // Its amounts would contradict the new copy ("100 FBBs, no refill", "until $100"), so they
   // are ignored until the new backend answers; its dates and `active` are still used.
   const oldServer = o.refills === undefined;
   return {
@@ -77,7 +78,7 @@ function parse(d: unknown): Prelaunch {
     launchAt: utc(o.launch_at) ?? D.launchAt,
     grantAmount: oldServer ? D.grantAmount : num(o.grant_amount, D.grantAmount),
     refillBelow: oldServer ? D.refillBelow : num(o.refill_below, D.refillBelow),
-    newMemberPbbs: num(o.new_member_fbbs ?? o.new_member_pbbs, D.newMemberPbbs),
+    newMemberPbbs: oldServer ? D.newMemberPbbs : num(o.new_member_fbbs ?? o.new_member_pbbs, D.newMemberPbbs),
     referralBonusCap: oldServer ? D.referralBonusCap : num(o.referral_bonus_cap, D.referralBonusCap),
     refills: o.refills === undefined ? D.refills : truthy(o.refills),
     fbbsExpire: o.fbbs_expire === undefined ? D.fbbsExpire : truthy(o.fbbs_expire),

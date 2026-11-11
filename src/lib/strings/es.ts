@@ -2233,7 +2233,7 @@ export const es = {
   pl_ended: "El Especial de Prelanzamiento ha terminado. ¡Gracias por jugar!",
   pl_tap_for_more: "Toca para saber más",
   fname_prelaunch: "Especial de Prelanzamiento",
-  fblurb_prelaunch: "Cada miembro recibe 1,000 FBBs (BBs gratis) para practicar: juega, batalla y envía regalos.",
+  fblurb_prelaunch: "Cada miembro recibe 100 FBBs (BBs gratis) para practicar: juega, batalla y envía regalos.",
   // Country Board + Country Battle Recap (Steve, 2026-11-11).
   fname_country_board: "Tabla de Países",
   fblurb_country_board: "Los puntos de cada país, en vivo. Ayuda al tuyo a llegar al #1.",
@@ -2267,7 +2267,7 @@ export const es = {
   cbr_not_participant: "No participaste en esta. ¡Únete a la próxima Batalla de Países!",
   bk_country_board_blurb: "Los puntos de cada país — ayuda al tuyo a ser el #1",
   bk_country_board_info: "Los países compiten por orgullo. Cada BB o FBB que envía un miembro es 1 punto para su país, y cada miembro nuevo suma +100. Abre la tabla para ver en qué puesto va tu país hoy, esta semana y de siempre, e invita a tus amigos para que lo ayuden a subir.",
-  // FBBs 1,000 + referral $100 + Ads for Referrals (Steve, 2026-11-11).
+  // FBBs (100 since Steve 2026-11-11 "make it 100 Free BBs", was 1,000) + referral $100 + Ads for Referrals (Steve, 2026-11-11).
   fblurb_referral_program: "Gana el 5%% de lo que gane cada amigo que registres, hasta llegar a $100, por cada amigo.",
   fc_signup_fbbs_sub: "FBBs para practicar: nunca se convierten en dinero",
   fname_ads_for_referrals: "Anuncios para referidos",

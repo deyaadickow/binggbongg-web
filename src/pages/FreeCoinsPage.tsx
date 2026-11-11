@@ -92,7 +92,7 @@ export function FreeCoinsPage() {
         <div className="fc-spin" role="status" aria-label={t("loading")} />
       ) : (
         <>
-          {/* Steve, 2026-11-11: sign-up Bonus BBs are off; a new member gets 1,000 FBBs to practice with. */}
+          {/* Steve, 2026-11-11: sign-up Bonus BBs are off; a new member gets 100 FBBs to practice with (the number is fetchPrelaunch new_member_fbbs). */}
           <div className="card pad sb-card fc-card">
             <Row to={isLoggedIn ? "/pre-launch" : "/login"} label={t("fc_signup")} sub={t("fc_signup_fbbs_sub")}
               value={`${num(prelaunch?.newMemberPbbs ?? PRELAUNCH_DEFAULTS.newMemberPbbs)} FBBs`} />

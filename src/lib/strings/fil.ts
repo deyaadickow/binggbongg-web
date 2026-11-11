@@ -2257,7 +2257,7 @@ export const fil = {
   pl_ended: "Tapos na ang Pre-Launch Special. Salamat sa paglalaro!",
   pl_tap_for_more: "I-tap para malaman pa",
   fname_prelaunch: "Pre-Launch Special",
-  fblurb_prelaunch: "Bawat miyembro ay may 1,000 FBBs (Libreng BBs) na pang-practice: maglaro, mag-battle at magpadala ng regalo.",
+  fblurb_prelaunch: "Bawat miyembro ay may 100 FBBs (Libreng BBs) na pang-practice: maglaro, mag-battle at magpadala ng regalo.",
   // Country Board + Country Battle Recap (Steve, 2026-11-11).
   fname_country_board: "Country Board",
   fblurb_country_board: "Puntos ng bawat bansa, live. Tulungan ang bansa mo na umakyat sa #1.",
@@ -2291,7 +2291,7 @@ export const fil = {
   cbr_not_participant: "Hindi ka sumali sa labang ito. Sumali sa susunod na Country Battle!",
   bk_country_board_blurb: "Puntos ng bawat bansa — tulungan ang sa iyo na mag-#1",
   bk_country_board_info: "Naglalaban ang mga bansa para sa karangalan. Bawat BB o FBB na ipinadala ng isang miyembro ay 1 puntos para sa bansa niya, at bawat bagong miyembro ay +100. Buksan ang board para makita ang ranggo ng bansa mo ngayon, ngayong linggo at sa kabuuan — tapos imbitahin ang barkada mo para tumulong itong umakyat.",
-  // FBBs 1,000 + referral $100 + Ads for Referrals (Steve, 2026-11-11).
+  // FBBs (100 since Steve 2026-11-11 "make it 100 Free BBs", was 1,000) + referral $100 + Ads for Referrals (Steve, 2026-11-11).
   fblurb_referral_program: "Kumita ng 5%% ng kinikita ng bawat kaibigang mapa-sign up mo, hanggang umabot ka ng $100 — sa bawat kaibigan.",
   fc_signup_fbbs_sub: "FBBs na pang-practice — hindi ito kailanman nagiging pera",
   fname_ads_for_referrals: "Ads para sa Referral",
