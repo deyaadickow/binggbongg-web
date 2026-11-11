@@ -2,6 +2,13 @@
 // ups so they can Play games, Battle and give gifts to anyone. Every score will count with PBBs but
 // no money will go into any wallet." / "Yes everything will be zero at launch day."
 //
+// Changed 2026-11-11 (Steve: "Forget about the unlimited FBBs until November 29th. We will give
+// everyone 1000 FBBs from day one, and every new member."): every member has exactly 1,000 FBBs,
+// they do NOT refill and are NOT wiped any more; new members in every country get 1,000 once.
+// Launch is still Tuesday, December 1, when every score starts from zero. The referral bonus is
+// 5% of what each friend earns, until $100 (was $25). fetchPrelaunch says refills: false,
+// fbbs_expire: false, new_member_fbbs, referral_bonus_cap and referral_bonus_percent.
+//
 // The server decides everything (backend fetchPrelaunch, checkHeader only, so guests see it too):
 // whether a window is active, its dates (UTC) and amounts. The web shows the banner only while
 // `active` is true. The page itself always renders — with the server's numbers when it answers,
@@ -18,6 +25,11 @@ export interface Prelaunch {
   refillBelow: number;
   newMemberPbbs: number;
   referralBonusCap: number;
+  /** 2026-11-11: false — FBBs no longer refill. */
+  refills: boolean;
+  /** 2026-11-11: false — FBBs are no longer wiped at the end of the window or at launch. */
+  fbbsExpire: boolean;
+  referralBonusPercent: number;
 }
 
 /** The spec's one seeded window: ends 2026-11-29 16:00 UTC (= midnight ending Nov 29, Philippine
@@ -27,10 +39,13 @@ export const PRELAUNCH_DEFAULTS: Prelaunch = {
   startsAt: null,
   endsAt: Date.parse("2026-11-29T16:00:00Z"),
   launchAt: Date.parse("2026-11-30T16:00:00Z"),
-  grantAmount: 10000,
-  refillBelow: 100,
+  grantAmount: 1000,
+  refillBelow: 0,
   newMemberPbbs: 1000,
-  referralBonusCap: 25,
+  referralBonusCap: 100,
+  refills: false,
+  fbbsExpire: false,
+  referralBonusPercent: 5,
 };
 
 /** The server's datetimes are UTC; Laravel may send "2026-11-29 16:00:00" with no zone. */
@@ -46,18 +61,27 @@ const num = (v: unknown, d: number) => {
   return v != null && v !== "" && Number.isFinite(n) ? n : d;
 };
 
+const truthy = (v: unknown) => v === true || v === 1 || v === "1" || v === "true";
+
 function parse(d: unknown): Prelaunch {
   const o = (d && typeof d === "object" ? d : {}) as Record<string, unknown>;
   const D = PRELAUNCH_DEFAULTS;
+  // A server from before 2026-11-11 sends no `refills` field and still says grant 10000 / cap 25.
+  // Its amounts would contradict the new copy ("1,000 FBBs, no refill", "until $100"), so they
+  // are ignored until the new backend answers; its dates and `active` are still used.
+  const oldServer = o.refills === undefined;
   return {
-    active: o.active === true || o.active === 1 || o.active === "1" || o.active === "true",
+    active: truthy(o.active),
     startsAt: utc(o.starts_at),
     endsAt: utc(o.ends_at) ?? D.endsAt,
     launchAt: utc(o.launch_at) ?? D.launchAt,
-    grantAmount: num(o.grant_amount, D.grantAmount),
-    refillBelow: num(o.refill_below, D.refillBelow),
-    newMemberPbbs: num(o.new_member_pbbs, D.newMemberPbbs),
-    referralBonusCap: num(o.referral_bonus_cap, D.referralBonusCap),
+    grantAmount: oldServer ? D.grantAmount : num(o.grant_amount, D.grantAmount),
+    refillBelow: oldServer ? D.refillBelow : num(o.refill_below, D.refillBelow),
+    newMemberPbbs: num(o.new_member_fbbs ?? o.new_member_pbbs, D.newMemberPbbs),
+    referralBonusCap: oldServer ? D.referralBonusCap : num(o.referral_bonus_cap, D.referralBonusCap),
+    refills: o.refills === undefined ? D.refills : truthy(o.refills),
+    fbbsExpire: o.fbbs_expire === undefined ? D.fbbsExpire : truthy(o.fbbs_expire),
+    referralBonusPercent: num(o.referral_bonus_percent, D.referralBonusPercent),
   };
 }
 
@@ -92,9 +116,9 @@ export function usePrelaunch(): Prelaunch | null | undefined {
   return p;
 }
 
-/** The window is shown in Philippine time — the launch market and the spec's dates ("until
- *  Nov 29", "Tuesday, December 1"). ends_at is the midnight that ENDS the last day, so the last
- *  day is the second before it. */
+/** Dates are shown in Philippine time — the launch market ("Tuesday, December 1"). ends_at is the
+ *  midnight that ENDS the last day, so the last day is the second before it (no longer shown since
+ *  2026-11-11: FBBs have no end date). */
 const ZONE = "Asia/Manila";
 
 function fmt(lang: string, t: number, opts: Intl.DateTimeFormatOptions): string {
@@ -105,10 +129,11 @@ function fmt(lang: string, t: number, opts: Intl.DateTimeFormatOptions): string 
 
 export function prelaunchTexts(p: Prelaunch, lang: string) {
   const loc = lang === "tl" ? "fil" : lang;
-  let amount: string;
-  try { amount = p.grantAmount.toLocaleString(loc); } catch { amount = p.grantAmount.toLocaleString("en"); }
+  const n = (v: number) => { try { return v.toLocaleString(loc); } catch { return v.toLocaleString("en"); } };
   return {
-    amount,
+    amount: n(p.grantAmount),
+    newMember: n(p.newMemberPbbs),
+    percent: String(p.referralBonusPercent),
     until: fmt(lang, p.endsAt - 1000, { month: "short", day: "numeric" }),
     launchDay: fmt(lang, p.launchAt, { weekday: "long", month: "long", day: "numeric" }),
     cap: String(p.referralBonusCap),

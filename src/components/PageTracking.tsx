@@ -76,6 +76,7 @@ const ROUTES: ScreenRoute[] = [
   { path: "/gigs", screen: "video_ad_gigs" },
   { path: "/my-gigs", screen: "my_video_ad_gigs" },
   { path: "/referral-program", screen: "referral_program" },
+  { path: "/ads-for-referrals", screen: "ads_for_referrals" },
   { path: "/pre-launch", screen: "pre_launch" },
   { path: "/vip-referral", screen: "vip_referral" },
   { path: "/help", screen: "help" },

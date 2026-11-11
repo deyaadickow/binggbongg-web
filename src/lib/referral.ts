@@ -1,6 +1,6 @@
 // Referral Program (Steve, 2026-10-28) — ReferralProgramController. A referrer earns 5% of what each
-// member they referred earns from battles, games and videos, paid by Bingg Bongg, up to $25 per
-// referred member. The referral code is the member's username. Country pages carry the description
+// member they referred earns from battles, games and videos, paid by Bingg Bongg, up to $100 per
+// referred member (was $25 until 2026-11-11). The referral code is the member's username. Country pages carry the description
 // in their language and the flyers; the member's code is drawn into each flyer's code box here.
 import { post } from "./api";
 

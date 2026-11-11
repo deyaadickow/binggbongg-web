@@ -1345,3 +1345,42 @@ body.signup-black { background: radial-gradient(120% 55% at 50% 0%, #2a2108 0%, 
 .cbd-row-share { flex: 0 0 auto; width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--gold-border); background: #000; color: var(--gold); font-size: 18px; cursor: pointer; display: grid; place-items: center; padding: 0; }
 .cbd-myrow { display: flex; align-items: center; gap: 8px; }
 .cbd-myrow > :first-child { flex: 1; min-width: 0; }
+
+/* Ads for Referrals + the $100 offer popup (2026-11-11). Black + gold, large readable text. */
+.afr-page { max-width: 760px; }
+.afr-offer-top { display: block; width: 100%; max-width: 440px; max-height: 70vh; margin: 0 auto 16px; border-radius: 16px; border: 2.5px solid var(--gold-border); background: #000; }
+.afr-card { background: #000; border: 2.5px solid var(--gold-border); border-radius: 18px; padding: 18px 16px; margin-bottom: 16px; color: var(--gold); }
+.afr-headline { margin: 0 0 12px; color: var(--gold-bright); font-size: 24px; line-height: 1.25; font-weight: 900; text-align: center; }
+.afr-steps { margin: 0; padding-left: 26px; display: flex; flex-direction: column; gap: 10px; font-size: 18px; line-height: 1.45; font-weight: 600; }
+.afr-steps li::marker { color: var(--gold-bright); font-weight: 900; }
+.afr-inline-code { color: var(--gold-bright); font-weight: 900; word-break: break-all; }
+.afr-nolimit { margin: 14px 0 0; font-size: 18px; font-weight: 800; color: var(--gold-bright); line-height: 1.4; }
+.afr-tip { margin: 8px 0 0; font-size: 14px; color: var(--gold); opacity: .9; }
+.afr-code { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; box-shadow: 0 0 24px rgba(240, 196, 32, .18); }
+.afr-code-label { font-size: 14px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+.afr-code-value { font-size: 34px; font-weight: 900; color: var(--gold-bright); word-break: break-all; line-height: 1.1; }
+.afr-code-out { font-size: 18px; font-weight: 700; }
+.afr-big-btn { min-height: 48px; font-size: 17px; padding: 0 26px; }
+.afr-list-title { color: var(--gold-bright); font-size: 22px; font-weight: 900; margin: 6px 0 12px; }
+.afr-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: 14px; }
+@media (min-width: 640px) { .afr-list { grid-template-columns: 1fr 1fr; } }
+.afr-ad { display: flex; gap: 12px; background: #000; border: 2px solid var(--gold-border); border-radius: 16px; padding: 10px; }
+.afr-ad-thumb { position: relative; flex: 0 0 auto; width: 108px; aspect-ratio: 9 / 16; border-radius: 12px; overflow: hidden; border: 1.5px solid var(--gold-border); background: #111; padding: 0; cursor: pointer; }
+.afr-ad-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.afr-ad-noposter { display: block; width: 100%; height: 100%; background: #111; }
+.afr-ad-play { position: absolute; inset: 0; margin: auto; width: 44px; height: 44px; border-radius: 50%; background: rgba(0,0,0,.75); border: 2px solid var(--gold-border); color: var(--gold); display: grid; place-items: center; font-size: 18px; padding-left: 3px; }
+.afr-ad-dur { position: absolute; right: 6px; bottom: 6px; background: rgba(0,0,0,.8); color: var(--gold); font-size: 12px; font-weight: 800; padding: 2px 6px; border-radius: 6px; }
+.afr-ad-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.afr-ad-title { color: var(--gold-bright); font-size: 18px; line-height: 1.3; }
+.afr-chip { border: 1.5px solid var(--gold-border); color: var(--gold); border-radius: 999px; padding: 2px 10px; font-size: 13px; font-weight: 800; }
+.afr-ad-btns { display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: auto; }
+.afr-ad-btns .btn { width: 100%; font-size: 16px; }
+.afr-state { text-align: center; color: var(--gold); border: 2px solid var(--gold-border); border-radius: 14px; padding: 18px 14px; background: #000; font-size: 17px; font-weight: 700; width: 100%; }
+.afr-state-btn { cursor: pointer; font-family: inherit; }
+.afr-offer { position: fixed; inset: 0; z-index: 2500; background: #000; overflow-y: auto; display: flex; justify-content: center; }
+.afr-offer-inner { width: 100%; max-width: 480px; padding: 56px 16px 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
+.afr-offer-x { position: fixed; top: 12px; right: 14px; width: 44px; height: 44px; border-radius: 50%; background: #000; border: 2px solid var(--gold-border); color: var(--gold); font-size: 20px; font-weight: 800; cursor: pointer; display: grid; place-items: center; padding: 0; z-index: 1; }
+.afr-offer-kicker { color: var(--gold); font-size: 16px; font-weight: 800; letter-spacing: .5px; }
+.afr-offer-title { margin: 0; color: var(--gold-bright); font-size: 26px; line-height: 1.2; font-weight: 900; }
+.afr-offer-video { width: 100%; max-height: 62vh; border-radius: 16px; border: 2.5px solid var(--gold-border); background: #000; }
+.afr-offer-btn { min-height: 52px; font-size: 18px; width: 100%; max-width: 400px; }

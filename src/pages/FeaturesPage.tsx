@@ -74,8 +74,8 @@ export const FEATURES: Section[] = [
     // Features Videos page is #3 (2026-10-29).
     titleKey: "fsec_featured",
     features: [
-      // Pre-Launch Special (Steve, 2026-11-10): "Every member will receive 10,000 PBBs with
-      // unlimited top ups so they can Play games, Battle and give gifts to anyone."
+      // Pre-Launch Special (Steve, 2026-11-10; changed 2026-11-11: "We will give everyone 1000 FBBs
+      // from day one, and every new member" — no refill, no wipe).
       { icon: "🎉", nameKey: "fname_prelaunch", blurbKey: "fblurb_prelaunch", to: "/pre-launch" },
       { icon: "🎤", nameKey: "fname_philippine_singing_contest", blurbKey: "fblurb_philippine_singing_contest", to: "/featured-contest", contestOnly: true },
       { icon: "📣", nameKey: "fname_exciting_news", blurbKey: "fblurb_exciting_news", to: "/exciting-news" },
@@ -174,6 +174,9 @@ export const FEATURES: Section[] = [
       { icon: "💸", nameKey: "fname_getting_paid_out", blurbKey: "fblurb_getting_paid_out", to: "/wallet/redeem" },
       { icon: "📅", nameKey: "fname_monthly_statement", blurbKey: "fblurb_monthly_statement", to: "/wallet/statements" },
       { icon: "💸", nameKey: "fname_referral_program", blurbKey: "fblurb_referral_program", to: "/referral-program" },
+      // Ads for Referrals (Steve, 2026-11-11): every downloadable video ad to post with your code,
+      // and the $100 offer video. Right after Referral Program; the phones put it in the same place.
+      { icon: "📣", nameKey: "fname_ads_for_referrals", blurbKey: "fblurb_ads_for_referrals", to: "/ads-for-referrals" },
       { icon: "👑", nameKey: "fname_vip_referral", blurbKey: "fblurb_vip_referral", to: "/vip-referral" },
       { icon: "🤝", nameKey: "fname_share_earn_10", blurbKey: "fblurb_share_earn_10", to: "/settings/referrals" },
       { icon: "💝", nameKey: "fname_who_supported_me", blurbKey: "fblurb_who_supported_me", to: "/support" },

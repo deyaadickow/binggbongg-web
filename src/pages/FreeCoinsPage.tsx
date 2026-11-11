@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { PageTitle } from "../components/PageTitle";
 import { useT, type StringKey } from "../lib/i18n";
 import { useSession } from "../lib/session";
+import { PRELAUNCH_DEFAULTS, usePrelaunch } from "../lib/prelaunch";
 import { fetchFreeCoins, type EarnKey, type FreeCoins, type GiveKey, type GiveRow } from "../lib/freeCoins";
 
 const GIVE_LABEL: Record<GiveKey, StringKey> = {
@@ -57,6 +58,7 @@ function Row({ to, label, sub, value }: { to: string | null; label: string; sub?
 export function FreeCoinsPage() {
   const { t, lang } = useT();
   const { isLoggedIn } = useSession();
+  const prelaunch = usePrelaunch();
   const [data, setData] = useState<FreeCoins | null>(null);
   const [failed, setFailed] = useState(false);
 
@@ -90,6 +92,11 @@ export function FreeCoinsPage() {
         <div className="fc-spin" role="status" aria-label={t("loading")} />
       ) : (
         <>
+          {/* Steve, 2026-11-11: sign-up Bonus BBs are off; a new member gets 1,000 FBBs to practice with. */}
+          <div className="card pad sb-card fc-card">
+            <Row to={isLoggedIn ? "/pre-launch" : "/login"} label={t("fc_signup")} sub={t("fc_signup_fbbs_sub")}
+              value={`${num(prelaunch?.newMemberPbbs ?? PRELAUNCH_DEFAULTS.newMemberPbbs)} FBBs`} />
+          </div>
           {data.give.length > 0 && (
             <div className="card pad sb-card fc-card">
               <b className="sb-card-title">{t("fc_give_title")}</b>

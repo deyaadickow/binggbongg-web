@@ -7,6 +7,7 @@ import { setFeed } from "../lib/feed";
 import { FeedPhotoCard } from "../components/FeedPhotoCard";
 import { CountryBattleDec1Banner } from "../components/CountryBattleDec1Banner";
 import { PrelaunchBanner } from "../components/PrelaunchBanner";
+import { ReferralOfferPopup } from "../components/ReferralOffer";
 import { HelpFeedCard } from "../components/HelpFeedCard";
 import { PaidAdCard, type FeedVideoAd } from "../components/PaidAdCard";
 import { fetchHelpCampaigns, helpFeedSlots, type HelpCampaign } from "../lib/help";
@@ -118,6 +119,8 @@ export function HomePage() {
       {/* Pre-Launch Special (Steve, 2026-11-10) — only while fetchPrelaunch says it is on. */}
       <PrelaunchBanner />
       <CountryBattleDec1Banner />
+      {/* The $100 referral offer video, once per member (2026-11-11). For You only: never over a live room. */}
+      <ReferralOfferPopup />
       {/* One member photo in the feed, the phones' fetchRandomFeedPhoto. Only members past the
           free storage allowance are eligible — that is the server's rule, not ours. */}
       <FeedPhotoCard />
