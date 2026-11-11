@@ -2382,6 +2382,7 @@ export function LiveViewerPage() {
           else if (k === "wordsearch") openWordSearch();
           else if (k === "behind") openBehind();
           else if (k === "bingoBoard") setBingoBoardOpen(true);
+          else if (k === "countryBoard") { setMenuOpen(false); navigate("/country-board"); }
           // The 31-day challenge and the three reference rows open their own overlay off the
           // same `picker` state — they start nothing, so they need no people-picker step.
           else setPicker(k);

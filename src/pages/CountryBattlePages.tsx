@@ -6,14 +6,18 @@
 // /country-battle               today's battle (or the next) for the member's country
 // /country-battle/board         every finished day, newest first
 // /country-battle/board/:dayId  one day's top 100, with your own rank
+//                               (?demo=1: a sample day with MY row and its share icon, no server)
+// /country-battle?demo=1        the Country Board banner with sample numbers (lib/countryBoard)
 //
 // Every time comes from the server (fetchCountryBattleDaily) — nothing is scheduled here.
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { PageTitle } from "../components/PageTitle";
 import { Loading, Notice } from "../components/Common";
 import { TestBanner } from "../components/BattleGrid";
 import { CbPersonRow, CountryBattleReminderToggle, PlacePill } from "../components/CountryBattleBits";
+import { CountryHookBanner, ShareMyRowIcon } from "../components/CountryBoardBits";
+import { demoKind, type DemoKind } from "../lib/countryBoard";
 import { useSession } from "../lib/session";
 import { fetchFeatureVideos } from "../lib/featureVideos";
 import { FeatureVideoPlayer } from "../components/FeatureVideoPlayer";
@@ -60,6 +64,8 @@ export function CountryBattlePage() {
   const { user, isLoggedIn } = useSession();
   const navigate = useNavigate();
   const location = useLocation();
+  const [sp] = useSearchParams();
+  const boardDemo = demoKind(sp.get("demo"));
   const uid = user?.id ?? 0;
   const [daily, setDaily] = useState<CbDaily | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -89,9 +95,9 @@ export function CountryBattlePage() {
   // The directory tile shows to everyone while the switch is off (Steve, 2026-11-01: "we will
   // announce it with one of the feature with a video"), so OFF — or no answer at all — is the
   // explainer, not an error.
-  if (error && !daily) return <CountryBattleExplainer note={t("cb_coming_soon")} />;
+  if (error && !daily) return <CountryBattleExplainer note={t("cb_coming_soon")} demo={boardDemo} />;
   if (!daily) return <div className="page cb-page"><PageTitle>{t("cb_title")}</PageTitle><Loading /></div>;
-  if (!daily.enabled) return <CountryBattleExplainer note={t("cb_coming_soon")} />;
+  if (!daily.enabled) return <CountryBattleExplainer note={t("cb_coming_soon")} demo={boardDemo} />;
 
   const me = battle?.me;
   const country = battle?.country || daily.country || "";
@@ -111,6 +117,7 @@ export function CountryBattlePage() {
     <div className="page cb-page" style={{ maxWidth: 760 }}>
       <PageTitle>{t("cb_title")}</PageTitle>
       {battle?.is_test && <TestBanner />}
+      <CountryHookBanner demo={boardDemo} />
 
       <div className="card pad" style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: 6, marginBottom: 12 }}>
         <span style={{ fontSize: 13, color: "var(--text-soft)", fontWeight: 700, letterSpacing: ".06em", textTransform: "uppercase" }}>{country}</span>
@@ -184,7 +191,18 @@ export function CountryBattlePage() {
       <Rules t={t} />
 
       <Link to="/country-battle/board" className="btn" style={{ display: "flex", justifyContent: "center" }}>🥇 {t("cb2_board")}</Link>
+      <CountryBoardButton demo={boardDemo} />
     </div>
+  );
+}
+
+/** "See the Country Board" (Steve, 2026-11-11) — under the Bragging Rights board button. */
+function CountryBoardButton({ demo }: { demo: DemoKind | null }) {
+  const { t } = useT();
+  return (
+    <Link to={`/country-board${demo ? `?demo=${demo}` : ""}`} className="btn gold" style={{ display: "flex", justifyContent: "center", marginTop: 10, minHeight: 52, fontSize: 17 }}>
+      🗺️ {t("cbd_see_board")}
+    </Link>
   );
 }
 
@@ -200,7 +218,7 @@ function Rules({ t }: { t: T }) {
 
 /** What Country Battle is, for while it is switched off: the announcement page. No Join or Watch —
  *  there is nothing to join. */
-function CountryBattleExplainer({ note }: { note: string }) {
+function CountryBattleExplainer({ note, demo }: { note: string; demo: DemoKind | null }) {
   const { t, lang } = useT();
   const [video, setVideo] = useState<string | null>(null);
   const [playing, setPlaying] = useState(false);
@@ -216,6 +234,7 @@ function CountryBattleExplainer({ note }: { note: string }) {
   return (
     <div className="page cb-page" style={{ maxWidth: 760 }}>
       <PageTitle>{t("cb_title")}</PageTitle>
+      <CountryHookBanner demo={demo} />
       <div className="card pad" style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
         <span style={{ fontSize: 40 }} aria-hidden>🌏</span>
         <b style={{ color: "#FFD84D", fontSize: 20 }}>{t("cb2_tagline")}</b>
@@ -236,6 +255,7 @@ function CountryBattleExplainer({ note }: { note: string }) {
       <Rules t={t} />
 
       <Link to="/country-battle/board" className="btn" style={{ display: "flex", justifyContent: "center" }}>🥇 {t("cb2_board")}</Link>
+      <CountryBoardButton demo={demo} />
       {playing && video && <FeatureVideoPlayer items={[{ url: video, title: t("cb_title"), trackKey: "country_battle", trackLabel: translate("en", "cb_title") }]} onClose={() => setPlaying(false)} />}
     </div>
   );
@@ -308,11 +328,28 @@ export function CountryBattleBoardPage() {
   );
 }
 
+/** ?demo=1 on a day's page: a finished sample day with MY row (#7 of 52) and its share icon. */
+const DEMO_UID = 4551;
+function demoDayTop(dayId: number): CbDayTop {
+  const names = ["maria santos", "juan dela cruz", "angel reyes", "mark bautista", "joy villanueva", "paolo garcia", "Mae", "carlo aquino", "bea castillo", "miguel torres"];
+  return {
+    day: { day_id: dayId || 12, country: "Philippines", date: "2026-12-01", date_label: "Tue, Dec 1", starts_at: "2026-12-01T12:00:00Z", ends_at: "2026-12-01T12:10:00Z", finished: true, participants: 52, is_test: false },
+    rows: names.map((name, i) => ({
+      user_id: i === 6 ? DEMO_UID : 1001 + i, name, username: name.replace(/[^a-z]/gi, "").toLowerCase(), profile_image: null,
+      rank: i + 1, score: [9000, 7350, 6100, 5600, 5100, 4700, 4200, 3900, 3100, 2800][i], badge: i < 3 ? i + 1 : null,
+    })),
+    me: { rank: 7, score: 4200 },
+  };
+}
+
 export function CountryBattleDayPage() {
   const { t } = useT();
   const { id } = useParams();
   const { user } = useSession();
-  const uid = user?.id ?? 0;
+  const [sp] = useSearchParams();
+  const demo = sp.get("demo");
+  const recapDemo = demo ? sp.get("reason") ?? "" : null;
+  const uid = demo ? DEMO_UID : user?.id ?? 0;
   const dayId = Number(id);
   const [top, setTop] = useState<CbDayTop | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -320,11 +357,13 @@ export function CountryBattleDayPage() {
     let live = true;
     setTop(null);
     setError(null);
-    fetchCountryBattleDayTop(uid, dayId)
+    (demo ? Promise.resolve({ ok: true as const, data: demoDayTop(dayId) }) : fetchCountryBattleDayTop(uid, dayId))
       .then((r) => { if (!live) return; if (r.ok) setTop(r.data); else setError(cbReasonText(t, r.reason, r.message)); })
       .catch((e) => { if (live) setError((e as Error).message); });
     return () => { live = false; };
-  }, [uid, dayId, t]);
+  }, [uid, dayId, t, demo]);
+  // Share my result (Steve, 2026-11-11): on a FINISHED day I battled in.
+  const canShare = !!top?.day.finished && !!top.me;
   const mineInList = !!top?.rows.some((r) => r.user_id === uid);
   return (
     <div className="page cb-page" style={{ maxWidth: 760 }}>
@@ -342,6 +381,7 @@ export function CountryBattleDayPage() {
             <div className="card pad row" style={{ marginBottom: 12, borderColor: "var(--gold)" }}>
               <b style={{ color: "var(--gold)", flex: 1 }}>{cbText(t("cb2_your_rank"), { n: top.me.rank })}</b>
               <b style={{ color: "var(--gold)", fontVariantNumeric: "tabular-nums" }}>{top.me.score.toLocaleString()}</b>
+              {canShare && <ShareMyRowIcon dayId={top.day.day_id} demo={recapDemo} />}
             </div>
           )}
           <div className="card pad">
@@ -350,9 +390,14 @@ export function CountryBattleDayPage() {
               ? <span className="muted">{t("no_one_has_scored_yet")}</span>
               : (
                 <div className="cb-people">
-                  {top.rows.map((r) => (
+                  {top.rows.map((r) => (r.user_id === uid && canShare ? (
+                    <div key={r.user_id} className="cbd-myrow">
+                      <CbPersonRow p={r} place={r.rank} num={r.score} me />
+                      <ShareMyRowIcon dayId={top.day.day_id} demo={recapDemo} />
+                    </div>
+                  ) : (
                     <CbPersonRow key={r.user_id} p={r} place={r.rank} num={r.score} me={r.user_id === uid} />
-                  ))}
+                  )))}
                 </div>
               )}
             {top.me && !mineInList && top.rows.length > 0 && (

@@ -46,7 +46,9 @@ export type BattleKind =
   | "challenge31"
   // The trailing unnumbered rows. Android calls them reference rows: they open a screen or an
   // explanation rather than starting anything.
-  | "pkContests" | "gamesExplained" | "lifetimeBoard" | "punishments";
+  | "pkContests" | "gamesExplained" | "lifetimeBoard" | "punishments"
+  // Country Board (Steve, 2026-11-11): opens /country-board.
+  | "countryBoard";
 
 /** Order, numbering and the (i) wording are Android's showBattleMenu, verbatim — the phones
  *  read #1..#9 and web should say the same thing about the same battle. `built: false` is a
@@ -144,6 +146,9 @@ export const BATTLE_KINDS: {
     info: "you_can_play_any_of_our_games_balloon_po" },
   { kind: "lifetimeBoard", title: "lifetime_battle_board_2", blurb: "every_contest_all_time", minPeople: 1, reference: true,
     info: "your_full_battle_history_going_back_to_d" },
+  // Country Board (Steve, 2026-11-11): "Make every country fight for its pride".
+  { kind: "countryBoard", title: "cbd_title", blurb: "bk_country_board_blurb", minPeople: 1, reference: true,
+    info: "bk_country_board_info" },
   { kind: "bingoBoard", title: "bingo_battle_board_2", blurb: "every_bingo_game_ever_played", minPeople: 1, reference: true,
     info: "every_bingg_bongg_bingo_game_ever_played" },
   { kind: "punishments", title: "friendly_punishment_suggestions", blurb: "agree_a_forfeit_before_you_start", minPeople: 1, reference: true,

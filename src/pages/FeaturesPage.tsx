@@ -117,6 +117,9 @@ export const FEATURES: Section[] = [
       // Country Battle v2 (Steve, 2026-11-03): "We will have a lifetime Bragging rights battle board,
       // for every day, and we will show the top 100 with the most score daily."
       { icon: "🏅", nameKey: "cb2_board", blurbKey: "cb2_board_blurb", to: "/country-battle/board" },
+      // Country Board (Steve, 2026-11-11): "Make every country fight for its pride" — every country's
+      // points, and "your country is losing to X by N points".
+      { icon: "🗺️", nameKey: "fname_country_board", blurbKey: "fblurb_country_board", to: "/country-board" },
       { icon: "💣", nameKey: "fname_power_ups", blurbKey: "fblurb_power_ups", to: "/feature/power-ups", whereKey: "fwhere_the_live_room" },
       { icon: "🔍", nameKey: "fname_find_a_battle", blurbKey: "fblurb_find_a_battle", to: "/settings/find-a-battle" },
       { icon: "📊", nameKey: "fname_battle_rankings", blurbKey: "fblurb_battle_rankings", to: "/feature/battle-rankings", whereKey: "fwhere_the_live_room" },

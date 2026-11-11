@@ -1303,3 +1303,45 @@ body.signup-black { background: radial-gradient(120% 55% at 50% 0%, #2a2108 0%, 
 .prelaunch-card { display: flex; flex-direction: column; gap: 12px; padding: 18px; margin-bottom: 14px; border-radius: 18px; border: 3px solid var(--gold-border); background: #000; color: var(--gold); font-size: 15px; line-height: 1.5; }
 .prelaunch-card .big { color: var(--gold-bright); font-size: 18px; font-weight: 800; line-height: 1.35; }
 .prelaunch-card .btn { align-self: flex-start; }
+
+/* ---- Country Board + Country Battle Recap (Steve, 2026-11-11) — black + gold only, big text ---- */
+.cbd-sub { text-align: center; color: var(--gold); font-weight: 700; font-size: 16px; margin: 0 0 12px; }
+.cbd-demo { text-align: center; color: var(--gold); border: 1px dashed var(--gold-border); border-radius: 10px; padding: 8px 12px; margin-bottom: 12px; font-weight: 700; background: #000; }
+.cbd-refresh { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--gold-border); background: #000; color: var(--gold); font-size: 20px; font-weight: 800; cursor: pointer; display: grid; place-items: center; padding: 0; }
+.cbd-refresh:disabled { opacity: .5; }
+.cbd-mine { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; background: #000; border: 2.5px solid var(--gold-bright); border-radius: 18px; padding: 18px 16px; margin-bottom: 16px; box-shadow: 0 0 24px rgba(240, 196, 32, .22); }
+.cbd-mine-flag { font-size: 64px; line-height: 1.1; }
+.cbd-mine-name { color: var(--gold); font-size: 22px; font-weight: 800; }
+.cbd-mine-rank { color: var(--gold-bright); font-size: 32px; font-weight: 900; line-height: 1.15; }
+.cbd-mine-points { color: var(--gold); font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.cbd-hook { color: var(--gold-bright); font-size: 18px; font-weight: 800; margin: 8px 0 4px; line-height: 1.35; overflow-wrap: anywhere; }
+.cbd-mine-btns { display: flex; gap: 10px; flex-wrap: wrap; width: 100%; margin-top: 8px; }
+.cbd-mine-btns > .btn { flex: 1 1 140px; white-space: nowrap; padding: 0 12px; }
+.cbd-big-btn { min-height: 52px; font-size: 17px; }
+.cbd-tabs button { min-height: 48px; font-size: 16px; }
+.cbd-state { display: block; width: 100%; text-align: center; color: var(--gold); font-weight: 700; font-size: 16px; border: 1.5px solid var(--gold-border); border-radius: 12px; padding: 16px; margin-bottom: 14px; background: #000; line-height: 1.4; }
+.cbd-state-btn { cursor: pointer; font: inherit; font-weight: 700; font-size: 16px; }
+.cbd-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.cbd-row { display: flex; align-items: center; gap: 10px; background: #000; border: 1px solid var(--gold-border); border-radius: 12px; padding: 12px 14px; }
+.cbd-row.me { border: 2.5px solid var(--gold-bright); background: rgba(240, 196, 32, .10); }
+.cbd-rank { color: var(--gold); font-weight: 900; font-size: 18px; min-width: 38px; font-variant-numeric: tabular-nums; }
+.cbd-flag { font-size: 28px; line-height: 1; }
+.cbd-name { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.cbd-name b { color: var(--gold); font-size: 17px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cbd-members { color: var(--text-dim); font-size: 13px; }
+.cbd-pts { color: var(--gold-bright); font-size: 22px; font-weight: 900; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cbd-how { text-align: center; color: var(--text-dim); font-size: 14px; margin: 16px 0 8px; }
+.cbd-banner { display: flex; align-items: center; gap: 8px; justify-content: space-between; background: #000; border: 1.5px solid var(--gold-bright); border-radius: 12px; padding: 10px 14px; margin-bottom: 12px; color: var(--gold-bright); font-weight: 800; font-size: 15px; line-height: 1.35; }
+.cbd-banner > span:last-child { font-size: 22px; color: var(--gold); }
+.cbd-sheet { position: fixed; inset: 0; background: rgba(0, 0, 0, .85); z-index: 1200; display: grid; place-items: center; padding: 16px; }
+.cbd-sheet-card { width: min(460px, 100%); max-height: 92vh; overflow-y: auto; background: #000; border: 2px solid var(--gold-border); border-radius: 18px; padding: 16px; }
+.cbd-sheet-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.cbd-sheet-head b { color: var(--gold); font-size: 19px; }
+.cbd-recap-line { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.cbd-recap-line b { color: var(--gold-bright); font-size: 30px; font-weight: 900; }
+.cbd-recap-line span:last-child { color: var(--gold); font-size: 18px; font-weight: 800; }
+.cbd-card-img { display: block; width: 100%; max-width: 360px; margin: 0 auto 10px; border-radius: 12px; border: 1px solid var(--gold-border); }
+.cbd-share-text { color: var(--gold); font-size: 15px; line-height: 1.4; text-align: center; margin: 0 0 12px; overflow-wrap: anywhere; }
+.cbd-row-share { flex: 0 0 auto; width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--gold-border); background: #000; color: var(--gold); font-size: 18px; cursor: pointer; display: grid; place-items: center; padding: 0; }
+.cbd-myrow { display: flex; align-items: center; gap: 8px; }
+.cbd-myrow > :first-child { flex: 1; min-width: 0; }

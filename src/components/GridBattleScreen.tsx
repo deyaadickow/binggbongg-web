@@ -86,6 +86,9 @@ export interface GridBattleSource {
   fallbackPath: string;
   /** The end screen's "not running any more" fallback (viewer, no home). */
   afterEndPath?: string;
+  /** More on the end screen under the podium (Country Battle: "Share my result"). `hold` keeps the
+   *  member on the end screen — the trip home after the podium is skipped once they press it. */
+  endExtra?: (st: ChbState, hold: () => void) => ReactNode;
 }
 
 // ---- gift visibility (Steve, 2026-11-03: "Who ever is gifing a gift they will be able to see the
@@ -274,7 +277,7 @@ export function ChatStrip({ messages, onSend, note }: { messages: ChatMessage[];
 
 /** The end: confetti, the podium (Country Battle: the server's top 3), the winner (or "Tie!"),
  *  and where you are being taken. */
-export function GridBattleEnd({ st, note, onClose }: { st: ChbState; note: string | null; onClose: () => void }) {
+export function GridBattleEnd({ st, note, onClose, extra }: { st: ChbState; note: string | null; onClose: () => void; extra?: ReactNode }) {
   const { t } = useT();
   // Chat Battle round 2: the starter's bonus, to the starter only (the server sends it to nobody else), once paid.
   const bonus = st.me.starter_bonus;
@@ -296,6 +299,7 @@ export function GridBattleEnd({ st, note, onClose }: { st: ChbState; note: strin
         {st.finished && bonus?.paid && (
           <div className="chb-bonus-end">💰 {cbText(t("chb_starter_bonus"), { amount: bonusText(bonus.amount) })}</div>
         )}
+        {extra}
         {note && <p className="muted" style={{ fontSize: 13, margin: "12px 0 0" }}>{note}</p>}
         <button className="btn" style={{ marginTop: 14 }} onClick={onClose}>{t("chb_back")}</button>
       </div>
@@ -589,6 +593,8 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
 
   // Runs once per screen: refs only, so a re-render can never cancel the trip home half-way.
   const afterPodium = useRef(false);
+  /** The member pressed something on the end screen (Share my result): stay there. */
+  const holdEnd = useRef(false);
   const navigateRef = useRef(navigate);
   navigateRef.current = navigate;
   const mountedRef = useRef(true);
@@ -598,7 +604,7 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
     afterPodium.current = true;
     const go = (to: string) => { if (mountedRef.current) navigateRef.current(to, { replace: true }); };
     window.setTimeout(async () => {
-      if (!mountedRef.current) return;
+      if (!mountedRef.current || holdEnd.current) return;
       leftRef.current = true; // the battle is over — nothing to leave
       roomHook.disconnect();
       if (wasBattlerAtEnd.current) {
@@ -740,7 +746,7 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
           rows={st.battlers.map((b) => ({ user_id: b.user_id, label: nameOf(b), username: b.username, profile_image: b.profile_image, score: b.score, location: b.left ? t("chb_left") : null }))}
           finished={st.finished} onPick={spotlight} footer={`${t("chb_tap_spotlight")} · ${t("scored_by_the_gift_coins_each_person_rec")}`} />
       )}
-      {endShown && <GridBattleEnd st={st} note={endNote} onClose={() => { afterPodium.current = true; mountedRef.current = false; leftRef.current = true; goBack(); }} />}
+      {endShown && <GridBattleEnd st={st} note={endNote} extra={source.endExtra?.(st, () => { holdEnd.current = true; })} onClose={() => { afterPodium.current = true; mountedRef.current = false; leftRef.current = true; goBack(); }} />}
     </div>
   );
 }

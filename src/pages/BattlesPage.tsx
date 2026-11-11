@@ -95,6 +95,15 @@ export function BattlesPage() {
           </div>
         ))}
       </div>
+      {/* Country Board (Steve, 2026-11-11): every country's points, "your country is losing to X". */}
+      <Link to="/country-board" className="card pad" style={{ borderColor: "var(--gold-border)", display: "flex", gap: 12, alignItems: "center", marginTop: 10, color: "inherit" }}>
+        <span style={{ fontSize: 28, width: 34, textAlign: "center", flexShrink: 0 }} aria-hidden>🗺️</span>
+        <span style={{ display: "flex", flexDirection: "column", gap: 4, flex: 1, minWidth: 0 }}>
+          <b style={{ color: "var(--gold)", fontSize: 16 }}>{t("cbd_title")}</b>
+          <span style={{ fontSize: 14, color: "rgba(255,255,255,0.85)" }}>{t("bk_country_board_blurb")}</span>
+        </span>
+        <span style={{ color: "var(--gold)", fontSize: 22 }} aria-hidden>›</span>
+      </Link>
       <h2 style={{ color: "var(--gold)", fontSize: 18, margin: "22px 0 10px" }}>{t("fx_live_battles")}</h2>
       <LiveBattles />
     </div>

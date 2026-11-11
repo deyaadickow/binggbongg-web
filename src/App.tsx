@@ -76,6 +76,7 @@ import { LiveFeaturePage } from "./pages/LiveFeaturePage";
 import { PkContestsPage } from "./pages/PkContestsPage";
 import { CountryBattleBoardPage, CountryBattleDayPage, CountryBattlePage } from "./pages/CountryBattlePages";
 import { CountryBattleLivePage } from "./pages/CountryBattleLivePage";
+import { CountryBoardPage } from "./pages/CountryBoardPage";
 import { ChatBattleLivePage } from "./pages/ChatBattleLivePage";
 import { rememberAdSource } from "./lib/getApp";
 import { PageTracking } from "./components/PageTracking";
@@ -179,6 +180,8 @@ export default function App() {
           <Route path="/country-battle/live/:dayId" element={<CountryBattleLivePage />} />
           <Route path="/country-battle/board" element={<CountryBattleBoardPage />} />
           <Route path="/country-battle/board/:id" element={<CountryBattleDayPage />} />
+          {/* Country Board (Steve, 2026-11-11): every country's points, "your country is losing to X". */}
+          <Route path="/country-board" element={<CountryBoardPage />} />
           {/* Chat Battle (#9, Steve 2026-11-03) — the shared 24-tile battle screen. */}
           <Route path="/chat-battle/:contestId" element={<ChatBattleLivePage />} />
           <Route path="/feature/:slug" element={<LiveFeaturePage />} />

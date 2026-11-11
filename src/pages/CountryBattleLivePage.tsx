@@ -13,6 +13,8 @@
 // /country-battle/live/0?demo=24|12|6       fake battlers, no LiveKit or server, for the explainer
 //                                           video. &phase=upcoming|joining|battle|ended, &own=0 =
 //                                           a viewer's screen, &img=/path/ = /path/1.jpg… as photos.
+//                                           &phase=ended: the podium with "Share my result" (a
+//                                           sample recap; &reason=not_finished|not_participant|not_found).
 import { useMemo, useRef } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { useT } from "../lib/i18n";
@@ -22,6 +24,7 @@ import {
   leaveCountryBattleDay, localTime, sendCountryBattleDayGift, serverNow,
 } from "../lib/countryBattle";
 import type { ChbBattler, ChbState } from "../lib/chatBattle";
+import { ShareResultButton } from "../components/CountryBoardBits";
 
 type T = ReturnType<typeof useT>["t"];
 
@@ -31,7 +34,7 @@ export function CountryBattleLivePage() {
   const demo = sp.get("demo");
   if (demo) {
     return <CountryBattleDemo key={sp.toString()} n={Number(demo) || 24} withOwn={sp.get("own") !== "0"}
-      phase={(sp.get("phase") as ChbState["phase"]) || "battle"} imgBase={sp.get("img")} />;
+      phase={(sp.get("phase") as ChbState["phase"]) || "battle"} imgBase={sp.get("img")} recapDemo={sp.get("reason") ?? ""} />;
   }
   return <CountryBattleLive key={dayId} dayId={Number(dayId)} home={Number(sp.get("home")) || null}
     battlerHint={sp.get("battler") === "1"} autoJoin={sp.get("join") === "1"} />;
@@ -55,7 +58,7 @@ function joinNote(t: T, st: ChbState, country: string): string | null {
 }
 
 /** Country Battle's side of the shared screen: its calls and its texts. */
-function makeSource(t: T, dayId: number, countryRef: { current: string }, calls: Pick<GridBattleSource, "heartbeat" | "join" | "leave" | "sendGift">): GridBattleSource {
+function makeSource(t: T, dayId: number, countryRef: { current: string }, calls: Pick<GridBattleSource, "heartbeat" | "join" | "leave" | "sendGift">, recapDemo?: string): GridBattleSource {
   return {
     kind: "country",
     id: dayId,
@@ -75,6 +78,10 @@ function makeSource(t: T, dayId: number, countryRef: { current: string }, calls:
     isThis: (r) => r.country_battle_day_id === dayId,
     noTie: true,
     fallbackPath: "/country-battle",
+    // Country Battle Recap (Steve, 2026-11-11): a battler's "Share my result" under the podium.
+    endExtra: (st, hold) => (st.finished && (st.me.is_battler || (st.me.score ?? 0) > 0)
+      ? <ShareResultButton dayId={dayId} demo={recapDemo} onOpen={hold} />
+      : null),
   };
 }
 
@@ -114,7 +121,7 @@ const DEMO_NAMES = [
 
 /** The real screen on a fake day: the same GridBattleLive, fed by a source that never calls the
  *  server (no room name, so no LiveKit either). */
-function CountryBattleDemo({ n, withOwn, phase, imgBase }: { n: number; withOwn: boolean; phase: ChbState["phase"]; imgBase: string | null }) {
+function CountryBattleDemo({ n, withOwn, phase, imgBase, recapDemo }: { n: number; withOwn: boolean; phase: ChbState["phase"]; imgBase: string | null; recapDemo: string }) {
   const { t } = useT();
   const countryRef = useRef("Philippines");
   const source = useMemo(() => {
@@ -150,7 +157,7 @@ function CountryBattleDemo({ n, withOwn, phase, imgBase }: { n: number; withOwn:
       join: async () => ({ ok: false, reason: "demo", message: t("cb2_go_live_join"), full: false }),
       leave: async () => undefined,
       sendGift: async () => ({ status: false, message: t("cb_off") }),
-    });
-  }, [t, n, withOwn, phase, imgBase]);
+    }, recapDemo);
+  }, [t, n, withOwn, phase, imgBase, recapDemo]);
   return <GridBattleLive source={source} home={withOwn ? null : 1001} battlerHint={withOwn} demoUserId={withOwn ? 1001 : undefined} />;
 }
