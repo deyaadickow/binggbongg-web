@@ -6,8 +6,6 @@ import { Notice } from "../components/Common";
 import { tt, useT  } from "../lib/i18n";
 import { PageTitle } from "../components/PageTitle";
 import { requireVerified } from "../lib/verifyEmail";
-import { ML_MAX_SIZE, ML_MIN_SIZE, saveRoomSize, savedRoomSize } from "../lib/multiLive";
-import { MlSizeStepper } from "../components/MultiLiveGrid";
 import { StartPodcastLink } from "./PodcastPages";
 
 /** Camera preview + one button — same startLive endpoint the phones call, then the room page as host. */
@@ -21,7 +19,6 @@ export function GoLivePage() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   // Multi-live 24 (2026-11-05): the host picks how many are on camera, him included (4 = today).
-  const [size, setSize] = useState(savedRoomSize);
 
   useEffect(() => {
     if (!isLoggedIn) return;
@@ -46,10 +43,11 @@ export function GoLivePage() {
     setBusy(true);
     setError(null);
     try {
-      const res = await post<unknown>("startLive", { user_id: user.id, max_members: size });
+      // Steve, 2026-11-11: no room size any more — every room holds 24 and the server switches it
+      // to the big grid when a 5th person comes in.
+      const res = await post<unknown>("startLive", { user_id: user.id });
       const roomName = (res as { room_name?: string }).room_name;
       if (!res.status || !roomName) throw new Error(res.message ?? tt("couldn_t_start_the_stream"));
-      saveRoomSize(size);
       streamRef.current?.getTracks().forEach((t) => t.stop()); // the room takes the camera over
       navigate(`/live/${encodeURIComponent(roomName)}?host=1`, { replace: true });
     } catch (e) {
@@ -67,10 +65,6 @@ export function GoLivePage() {
         {previewError ? <p className="muted center" style={{ padding: 20 }}>{previewError}</p> : <video ref={videoRef} autoPlay muted playsInline style={{ width: "100%", height: "100%", objectFit: "cover" }} />}
       </div>
       {error && <div style={{ marginTop: 12 }}><Notice error>{error}</Notice></div>}
-      <div className="card pad" style={{ marginTop: 14 }}>
-        <div className="center" style={{ color: "var(--gold)", fontWeight: 800, marginBottom: 8 }}>{t("ml_members_on_camera")}</div>
-        <MlSizeStepper value={size} min={ML_MIN_SIZE} max={ML_MAX_SIZE} onChange={setSize} />
-      </div>
       <button className="btn block" style={{ marginTop: 14, minHeight: 52, fontSize: 17 }} onClick={goLive} disabled={busy}>
         {busy ? "Starting…" : "Go Live"}
       </button>

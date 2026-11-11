@@ -1814,9 +1814,7 @@ export function LiveViewerPage() {
               {role === "host" && ml && !mlRunning && (
                 <button className="btn small" onClick={mlStartBattle}>⚔️ {t("bingg_bongg_battle")}</button>
               )}
-              {role === "host" && ml && (
-                <button className="btn small" onClick={() => setMlSizeOpen(true)}>{t("ml_menu_size", ml.max_members)}</button>
-              )}
+              {/* "Members on camera" removed (Steve, 2026-11-11: "We don't need this page"). */}
               {role === "host" && mlBig && ml && (
                 <button className="btn small" onClick={mlShowHands}>{t("ml_menu_hands", ml.hands.length)}</button>
               )}
