@@ -290,7 +290,7 @@ export function PunishmentsOverlay({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <Overlay title={t("friendly_punishment_suggestions")} onClose={onClose} width={520}>
+    <Overlay title={t("friendly_punishment_suggestions")} onClose={onClose} width={520} back>
       <p className="soft" style={{ marginTop: 0 }}>
         {t("battling_for_fun_agree_what_the_loser_do")}</p>
 
