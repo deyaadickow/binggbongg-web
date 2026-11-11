@@ -59,7 +59,7 @@ export function WalletPage() {
     }
   }
 
-  // PBBs = test_coins; BBs = paid_coins, or (older server) everything else in no_redeem_wallet.
+  // FBBs = test_coins; BBs = paid_coins, or (older server) everything else in no_redeem_wallet.
   const pbbs = Math.max(0, Number(user?.test_coins ?? 0) || 0);
   const bbs = user?.paid_coins != null && Number.isFinite(Number(user.paid_coins))
     ? Math.max(0, Number(user.paid_coins))
@@ -73,8 +73,8 @@ export function WalletPage() {
       <PageTitle>{t("wallet")}</PageTitle>
       <PrelaunchBanner />
       <div className="grid">
-        {/* BBs and PBBs as two separate lines (Steve, 2026-11-10): BBs = bought (paid_coins),
-            PBBs = practice BBs (test_coins, the dead coins) — they score but pay no one. */}
+        {/* BBs and FBBs as two separate lines (Steve, 2026-11-10): BBs = bought (paid_coins),
+            FBBs = free BBs (test_coins, the dead coins) — they score but pay no one. */}
         <div className="card pad">
           <div className="muted">{t("coins_to_gift")}</div>
           <div className="wallet-split">

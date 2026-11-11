@@ -64,8 +64,10 @@ function featureSections(root: string, en: Record<string, string>): Section[] {
 // 2026-11-10 (Steve: "Coins are not called coins anymore. They are called BBs"): the in-app currency
 // is now "BBs" / "PBBs" (practice BBs), so those words are left out of the crawled copy exactly as
 // "coins" was — the same tiles stay out, and the Pre-Launch tile (free PBBs) never reaches it.
+// Same evening (Steve: "Free BBs/ FBBs sounds much better"): PBBs became FBBs (Free BBs) and the
+// giveaway page "Bonus BBs" — the filter catches FBB/FBBs too (and still PBB/PBBs, harmless).
 const LEFT_OUT_SECTIONS = new Set(["fsec_money"]);
-const CASINO_WORDS = /\b(coins?|p?bbs?|cash|paid|pays?|paying|payouts?|earn\w*|money|prizes?|bingo|lucky|buy|bought|commission|\$)|\$\d/i;
+const CASINO_WORDS = /\b(coins?|[pf]?bbs?|cash|paid|pays?|paying|payouts?|earn\w*|money|prizes?|bingo|lucky|buy|bought|commission|\$)|\$\d/i;
 
 function staticPage(root: string): string {
   const en = englishStrings(root);

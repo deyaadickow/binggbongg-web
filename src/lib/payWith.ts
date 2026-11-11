@@ -1,12 +1,12 @@
-// "Pay with: PBBs | BBs" — one app-wide choice (Steve, 2026-11-10, BBs + PBBs spec).
+// "Pay with: FBBs | BBs" — one app-wide choice (Steve, 2026-11-10, BBs + FBBs spec).
 //
-// Every member gets 10,000 PBBs (practice BBs) refilled automatically during the Pre-Launch Special,
-// and the server spends PBBs FIRST. Without a choice, a member who bought BBs could never pay a
-// streamer real money before launch — the PBBs never run out. So the member picks, once, and every
+// Every member gets 10,000 FBBs (free BBs) refilled automatically during the Pre-Launch Special,
+// and the server spends FBBs FIRST. Without a choice, a member who bought BBs could never pay a
+// streamer real money before launch — the FBBs never run out. So the member picks, once, and every
 // API request carries `X-Pay-With: bb` while "BBs" is picked (Users::spendDeadCoinsFirst on the
-// server reads it: bought BBs first, PBBs for any remainder). Anything else = today's order.
+// server reads it: bought BBs first, FBBs for any remainder). Anything else = today's order.
 //
-// Stored per browser (localStorage, wrapped: private windows throw), default PBBs. Kept outside
+// Stored per browser (localStorage, wrapped: private windows throw), default FBBs. Kept outside
 // React so lib/api.ts can read it synchronously on every request without importing React state.
 import { useSyncExternalStore } from "react";
 
@@ -41,7 +41,7 @@ export function usePayWith(): [PayWith, (v: PayWith) => void] {
   return [v, setPayWith];
 }
 
-/** The header every request to the Bingg Bongg API adds (lib/api.ts). Empty for PBBs. */
+/** The header every request to the Bingg Bongg API adds (lib/api.ts). Empty for FBBs. */
 export function payWithHeaders(): Record<string, string> {
   return current === "bb" ? { "X-Pay-With": "bb" } : {};
 }
@@ -58,7 +58,7 @@ export function paidWithOf(res: unknown): PaidWith | null {
   return v === "pbb" || v === "bb" || v === "mixed" ? v : null;
 }
 
-/** "PBBs gift" / "BBs gift" (mixed shows as a BBs gift — some real BBs went to the streamer). */
+/** "FBBs gift" / "BBs gift" (mixed shows as a BBs gift — some real BBs went to the streamer). */
 export function giftKindKey(p: PaidWith | null | undefined): "gift_pbbs" | "gift_bbs" | null {
   if (!p) return null;
   return p === "pbb" ? "gift_pbbs" : "gift_bbs";

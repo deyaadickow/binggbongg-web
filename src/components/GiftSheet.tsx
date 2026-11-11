@@ -98,7 +98,7 @@ export function GiftFlash({ gift, onDone }: { gift: Gift; onDone: () => void }) 
         {gift.image ? <img src={mediaUrl(gift.image)} alt="" /> : <span style={{ fontSize: 64 }}>🎁</span>}
         <b>{giftPrice(gift)}</b>
         <span>{gift.name ?? "Gift"}</span>
-        {/* "PBBs gift" / "BBs gift" by what the server says was spent (2026-11-10). */}
+        {/* "FBBs gift" / "BBs gift" by what the server says was spent (2026-11-10). */}
         {giftKindKey(gift.paid_with) && <span className="gift-kind">{t(giftKindKey(gift.paid_with)!)}</span>}
       </div>
     </div>

@@ -281,7 +281,7 @@ export default function App() {
           <Route path="/houses/:userId" element={<HousesPage />} />
           <Route path="/features" element={<FeaturesPage />} />
           <Route path="/free-coins" element={<FreeCoinsPage />} />
-          {/* Pre-Launch Special (Steve, 2026-11-10): 10,000 free PBBs until launch day. */}
+          {/* Pre-Launch Special (Steve, 2026-11-10): 10,000 free FBBs until launch day. */}
           <Route path="/pre-launch" element={<PrelaunchPage />} />
           {/* Every feature's 60-second video under its own heading (Steve, 2026-10-29). */}
           <Route path="/feature-videos" element={<FeatureVideosPage />} />

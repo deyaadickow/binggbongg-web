@@ -187,10 +187,10 @@ export interface UserSummary {
   total_likes?: number;
   coin_wallet?: number;
   no_redeem_wallet?: number;
-  /** PBBs (practice BBs = the dead coins), own row only (part of no_redeem_wallet). */
+  /** FBBs (free BBs = the dead coins), own row only (part of no_redeem_wallet). */
   test_coins?: number;
   /** BBs the member bought (no_redeem_wallet - dead - points), own row only. The Wallet shows
-   *  BBs and PBBs as two lines (Steve, 2026-11-10); absent => no_redeem_wallet - test_coins. */
+   *  BBs and FBBs as two lines (Steve, 2026-11-10); absent => no_redeem_wallet - test_coins. */
   paid_coins?: number;
   redeem_wallet?: number;
   cash_wallet?: number;
@@ -272,7 +272,7 @@ export interface Gift {
   /** tbl_gifts stores the price as `votes`; the battle ledgers call it coin_price. */
   votes?: number;
   coin_price?: number;
-  /** Set by the client after a send: what the server says was spent ("PBBs gift" / "BBs gift"). */
+  /** Set by the client after a send: what the server says was spent ("FBBs gift" / "BBs gift"). */
   paid_with?: "pbb" | "bb" | "mixed" | null;
   /** Eddie, 2026-09-19: "the gift will appear 100 times one after another" — an admin flag on
    *  individual gifts. A 100-coin TapTap gift bursts 100 copies of its own icon instead of one. */

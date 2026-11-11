@@ -2338,7 +2338,7 @@ export const en = {
   dm_open_on_done: "Members can send you messages again.",
   dm_open_off_done: "Messages from members are off.",
   // Testers only (Steve, 2026-11-10: "we will only keep dead coins for us to test with").
-  wallet_test_coins: "PBBs: %1$s (practice BBs, they pay no one)",
+  wallet_test_coins: "FBBs: %1$s (Free BBs, they pay no one)",
   // Battle Host Bonus (Steve, 2026-11-10).
   hb_title: "🔥 Battle Host Bonus +%1$s%%",
   hb_body: "Battle as the host and get an extra %1$s%% on every gift you receive. Limited time!",
@@ -2415,11 +2415,11 @@ export const en = {
   pod_err_try_again: "Couldn't start your podcast. Please try again.",
   pod_ended_ready: "Your episode will be ready in a few minutes.",
   pod_end_confirm: "End your podcast for everyone?",
-  // Free Coins page (Steve, 2026-11-10).
-  fc_title: "🪙 Free BBs",
-  fname_free_coins: "Free BBs",
-  fblurb_free_coins: "BBs we give you for signing up, uploading, following and inviting, plus the bonuses you earn.",
-  fc_give_title: "Free BBs we give you",
+  // Free Coins page, now "Bonus BBs" (Steve, 2026-11-10).
+  fc_title: "🪙 Bonus BBs",
+  fname_free_coins: "Bonus BBs",
+  fblurb_free_coins: "Bonus BBs we give you for signing up, uploading, following and inviting, plus the bonuses you earn.",
+  fc_give_title: "Bonus BBs we give you",
   fc_earn_title: "Money you earn",
   fc_signup: "New sign-up",
   fc_video_upload: "Upload a video",
@@ -2438,19 +2438,22 @@ export const en = {
   fc_wallet_hint: "BBs we give you and bonuses you earn",
   // BBs + PBBs + Pre-Launch Special (Steve, 2026-11-10: "Coins are not called coins anymore. They are
   // called BBs, BBs is short for Bingg Bongg." / "From practice/dead coins to PBBs Practice BBs.").
-  // "BB", "BBs", "PBB" and "PBBs" are the brand words: NEVER translated in any language.
+  // Renamed the same evening (Steve, 2026-11-10: "We will call all of the free BBs that we give away
+  // "Bonus BBs"" / "Free BBs/ FBBs sounds much better"): PBBs are now FBBs (Free BBs), and the
+  // giveaway page above is "Bonus BBs". Keys keep their old names (pbbs, free_coins).
+  // "BB", "BBs", "FBB" and "FBBs" are the brand words: NEVER translated in any language.
   wallet_bbs: "BBs",
   wallet_bbs_hint: "BBs you buy. A gift paid with BBs pays the streamer.",
-  wallet_pbbs: "PBBs",
-  wallet_pbbs_hint: "Practice BBs: every score counts, but they are not money and pay no one.",
+  wallet_pbbs: "FBBs",
+  wallet_pbbs_hint: "Free BBs: use them to play games, battle and send gifts. Every score counts, but they are not money and pay no one.",
   pay_with: "Pay with:",
-  pay_with_pbbs_hint: "Your gifts use PBBs first. They score, but pay no one.",
+  pay_with_pbbs_hint: "Your gifts use FBBs first. They score, but pay no one.",
   pay_with_bbs_hint: "Your gifts use the BBs you bought first, so the streamer gets paid.",
-  gift_pbbs: "PBBs gift",
+  gift_pbbs: "FBBs gift",
   gift_bbs: "BBs gift",
   pl_title: "Pre-Launch Special",
-  pl_banner: "%1$s free PBBs, refilled automatically, until %2$s. Play games, battle and send gifts free. Launch day is %3$s.",
-  pl_pbbs_explained: "PBBs are practice BBs: every score counts, but they are not money and pay no one. On launch day all PBBs and all scores go back to zero. BBs you buy are never touched.",
+  pl_banner: "%1$s FBBs (Free BBs), refilled automatically, until %2$s. Play games, battle and send gifts free. Launch day is %3$s.",
+  pl_pbbs_explained: "FBBs are Free BBs: use them to play games, battle and send gifts to anyone. They refill automatically and are not money: every score counts, but they pay no one. On launch day all FBBs and all scores go back to zero. BBs you buy are never touched.",
   pl_invite: "Invite your friends with your referral code now — the $%1$s referral commission still stands at launch.",
   pl_invite_button: "Referral Program",
   pl_report: "See something not working? Please report it so we can fix it.",
@@ -2458,5 +2461,5 @@ export const en = {
   pl_ended: "The Pre-Launch Special has ended. Thank you for playing!",
   pl_tap_for_more: "Tap to learn more",
   fname_prelaunch: "Pre-Launch Special",
-  fblurb_prelaunch: "Free PBBs until launch day: play games, battle and send gifts free.",
+  fblurb_prelaunch: "Free BBs (FBBs) until launch day: play games, battle and send gifts free.",
 } as const;

@@ -1037,11 +1037,11 @@ export function LiveViewerPage() {
       // The gift line the phones play the gift from: a NEGATIVE sender id (the gift's id) in the
       // RECIPIENT's channel, exactly what the apps post (Steve, 2026-11-06: gifts sent to a phone
       // did not show on its screen). A virtual battler has no live of their own to show it on.
-      // "PBBs gift" / "BBs gift" by what the server says was actually spent (Steve, 2026-11-10);
+      // "FBBs gift" / "BBs gift" by what the server says was actually spent (Steve, 2026-11-10);
       // nothing is added while the server does not say. The chat line stays English like the
       // phones' (it is shared by everyone in the room) and keeps " sent a " for the TTS reader.
       const kind = giftKindKey(paidWithOf(res));
-      const kindEn = kind === "gift_pbbs" ? " (PBBs gift)" : kind === "gift_bbs" ? " (BBs gift)" : "";
+      const kindEn = kind === "gift_pbbs" ? " (FBBs gift)" : kind === "gift_bbs" ? " (BBs gift)" : "";
       if (!virtualGiftTarget) {
         void sendChat(chatChannel(roomName, giftTarget), -gift.id, "", `${displayName(user)} sent a ${gift.name ?? "gift"}!${kindEn}`, user.profile_image ?? "").catch(() => {});
       }

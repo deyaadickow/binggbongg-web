@@ -1278,7 +1278,7 @@ body.signup-black { background: radial-gradient(120% 55% at 50% 0%, #2a2108 0%, 
 .inbox-tabs a.on { background: linear-gradient(180deg, #FFDD55, #D4AF37); color: #000; }
 @media (max-width: 420px) { .inbox-tabs a { font-size: 12.5px; padding: 8px 2px; } }
 
-/* BBs + PBBs (Steve, 2026-11-10): "Pay with: PBBs | BBs" switch, PBBs/BBs gift label, Pre-Launch
+/* BBs + FBBs (Steve, 2026-11-10): "Pay with: FBBs | BBs" switch, FBBs/BBs gift label, Pre-Launch
    Special banner and page. Black boxes, gold borders, gold text only (no filled buttons). */
 .pay-with { margin: 0 6px 12px; }
 .pay-with-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
