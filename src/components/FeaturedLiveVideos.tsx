@@ -12,13 +12,6 @@ import { mediaUrl, type FeaturedLiveVideo } from "../lib/api";
 import { useT } from "../lib/i18n";
 import { Avatar } from "./Common";
 
-const pillStyle: React.CSSProperties = { background: "#F0C420", borderColor: "#F0C420", color: "#000" };
-
-export function FeaturedPill() {
-  const { t } = useT();
-  return <span className="pill" style={pillStyle}>★ {t("featured_pill")}</span>;
-}
-
 function hostOf(v: FeaturedLiveVideo) {
   return { id: v.host_user_id, fullname: v.host_fullname ?? undefined, username: v.host_username ?? undefined, profile_image: v.host_profile_image ?? undefined };
 }
@@ -37,9 +30,6 @@ export function FeaturedLiveCard({ video, onOpen }: { video: FeaturedLiveVideo; 
         {video.title ? (
           <div style={{ fontSize: 13, marginTop: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{video.title}</div>
         ) : null}
-        <div className="row" style={{ marginTop: 6, gap: 6, flexWrap: "wrap" }}>
-          <FeaturedPill />
-        </div>
       </div>
       <span className="btn small">{t("watch")}</span>
     </button>
@@ -92,7 +82,7 @@ export function FeaturedLivePlayer({ video, onClose }: { video: FeaturedLiveVide
             {video.host_username && <span style={{ fontSize: 12, opacity: .8 }}>@{video.host_username}</span>}
           </span>
         </button>
-        <FeaturedPill />
+        {/* No FEATURED pill (Steve, 2026-11-12: "Please remove the featured banner ... I just want the live to look full.") */}
         <span style={{ flex: 1 }} />
         <button type="button" onClick={onClose} aria-label="Close"
           style={{ width: 40, height: 40, borderRadius: "50%", background: "#000", border: "2px solid var(--gold)", color: "var(--gold)",
