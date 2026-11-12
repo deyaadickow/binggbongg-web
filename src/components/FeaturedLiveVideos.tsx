@@ -7,7 +7,6 @@
 // player dressed like a live room for that account. Deliberately NOT a live room: no LiveKit, no
 // gift button or panel, no chat input, nothing that can charge BBs (Steve: gifts OFF).
 import { useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import { mediaUrl, type FeaturedLiveVideo } from "../lib/api";
 import { useT } from "../lib/i18n";
 import { Avatar } from "./Common";
@@ -38,7 +37,6 @@ export function FeaturedLiveCard({ video, onOpen }: { video: FeaturedLiveVideo; 
 
 /** Full-screen looping player. The close button or Escape closes it. */
 export function FeaturedLivePlayer({ video, onClose }: { video: FeaturedLiveVideo; onClose: () => void }) {
-  const navigate = useNavigate();
   const ref = useRef<HTMLVideoElement>(null);
   const src = video.video_url || mediaUrl(video.video);
   const poster = video.thumbnail_url || mediaUrl(video.thumbnail) || undefined;
@@ -56,7 +54,6 @@ export function FeaturedLivePlayer({ video, onClose }: { video: FeaturedLiveVide
     return () => { window.removeEventListener("keydown", onKey); document.body.style.overflow = prev; };
   }, [onClose]);
 
-  const openProfile = () => { onClose(); navigate(`/profile/${video.host_user_id}`); };
 
   return (
     <div role="dialog" aria-label={name} data-live-swipe="video" style={{ position: "fixed", inset: 0, zIndex: 2000, background: "#000", display: "flex", flexDirection: "column" }}>
@@ -70,32 +67,17 @@ export function FeaturedLivePlayer({ video, onClose }: { video: FeaturedLiveVide
         controls
         style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", background: "#000" }}
       />
-      {/* Top bar, like a live room's: host avatar + name + FEATURED, close on the right. */}
+      {/* Top bar: only the red close X. */}
       <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", gap: 10, padding: "12px 16px",
         background: "linear-gradient(rgba(0,0,0,.75), rgba(0,0,0,0))" }}>
-        <button type="button" onClick={openProfile}
-          style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(0,0,0,.55)", border: "1px solid var(--gold-border)",
-            borderRadius: 999, padding: "4px 12px 4px 4px", color: "var(--gold)", font: "inherit", cursor: "pointer", minWidth: 0 }}>
-          <Avatar user={hostOf(video)} />
-          <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", minWidth: 0 }}>
-            <b style={{ fontSize: 14, maxWidth: "42vw", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</b>
-            {video.host_username && <span style={{ fontSize: 12, opacity: .8 }}>@{video.host_username}</span>}
-          </span>
-        </button>
-        {/* No FEATURED pill (Steve, 2026-11-12: "Please remove the featured banner ... I just want the live to look full.") */}
+        {/* Steve, 2026-11-12: "remove the badge and just keep the X to logout and the x supposed to be red". */}
         <span style={{ flex: 1 }} />
         <button type="button" onClick={onClose} aria-label="Close"
-          style={{ width: 40, height: 40, borderRadius: "50%", background: "#000", border: "2px solid var(--gold)", color: "var(--gold)",
+          style={{ width: 40, height: 40, borderRadius: "50%", background: "#000", border: "2px solid #E53935", color: "#E53935",
             fontSize: 20, fontWeight: 800, cursor: "pointer", flex: "none" }}>
           ✕
         </button>
       </div>
-      {video.title ? (
-        <div style={{ position: "absolute", left: 16, right: 16, bottom: 72, zIndex: 1, color: "var(--gold)", fontWeight: 800, fontSize: 16,
-          textShadow: "0 1px 4px #000", pointerEvents: "none" }}>
-          {video.title}
-        </div>
-      ) : null}
     </div>
   );
 }
