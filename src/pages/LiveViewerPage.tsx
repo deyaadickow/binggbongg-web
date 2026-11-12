@@ -1980,7 +1980,8 @@ export function LiveViewerPage() {
       <LiveFishOverlay streamerId={hostUserId} roomName={roomName}
         streamerName={members?.host_username || (hostCard ? displayName(hostCard) : "")}
         active={role !== "host" && myId !== hostUserId && !roomClosed && live.status !== "ended"} />
-      {xcPopup && (
+      {/* Steve, 2026-11-12: no pop-up messages in the Live button's swipe viewer. */}
+      {xcPopup && !fromSwipe && (
         <CountryTranslatePopup
           name={xcPopup.name}
           country={xcPopup.country}
