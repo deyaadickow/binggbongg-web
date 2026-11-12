@@ -53,12 +53,23 @@ export async function buildSwipeList(userId: number): Promise<LiveSwipeItem[]> {
   ];
 }
 
-/** The feed's Live button: a random real live if anyone is live, else a random featured video,
- *  else (nothing at all) the Live Now list with its empty state, as before. */
+/** Fisher-Yates: a new array in random order. */
+function shuffled<T>(xs: T[]): T[] {
+  const a = [...xs];
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+
+/** The feed's Live button. Steve, 2026-11-12: "Make it always start on the welcome video" / "After the
+ *  welcome video, All other videos will be at random" — it always opens on the admin's #1 Live Section
+ *  video (the Welcome video); swipe up goes through the real lives in random order, then the other
+ *  featured videos in random order, wrapping. No featured videos → the lives at random; nothing at all
+ *  → the Live Now list with its empty state. */
 export async function openRandomLive(navigate: NavigateFunction, userId: number) {
-  const items = await buildSwipeList(userId);
-  if (items.length === 0) { navigate("/live"); return; }
-  const lives = items.filter((x) => x.kind === "live").length;
-  const index = lives > 0 ? Math.floor(Math.random() * lives) : lives + Math.floor(Math.random() * (items.length - lives));
-  goToSwipe(navigate, items, index, false);
+  const all = await buildSwipeList(userId);
+  if (all.length === 0) { navigate("/live"); return; }
+  const lives = shuffled(all.filter((x) => x.kind === "live"));
+  const videos = all.filter((x) => x.kind === "video");
+  const items = videos.length > 0 ? [videos[0], ...lives, ...shuffled(videos.slice(1))] : lives;
+  goToSwipe(navigate, items, 0, false);
 }
