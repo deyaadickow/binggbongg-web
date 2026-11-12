@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import { useT } from "../lib/i18n";
 
 /**
@@ -39,9 +38,8 @@ export function VipBadge({ size = 26, onClick }: { size?: number; onClick?: () =
 }
 
 /** What the pill means, in the app's black and gold popup. `viewerIsVip` swaps "Apply now" for "Got it". */
-export function VipBadgePopup({ viewerIsVip, onClose }: { viewerIsVip: boolean; onClose: () => void }) {
+export function VipBadgePopup({ onClose }: { viewerIsVip?: boolean; onClose: () => void }) {
   const { t } = useT();
-  const navigate = useNavigate();
   const btn: React.CSSProperties = {
     width: "100%", padding: "12px 0", borderRadius: 999, fontWeight: 800, fontSize: 15, cursor: "pointer",
     border: "1.5px solid var(--gold)",
@@ -60,11 +58,8 @@ export function VipBadgePopup({ viewerIsVip, onClose }: { viewerIsVip: boolean; 
         <div style={{ fontWeight: 800, fontSize: 19, marginBottom: 12, textWrap: "balance" }}>{t("vip_badge_label")}</div>
         <p style={{ fontSize: 14, lineHeight: 1.5, margin: 0, textWrap: "balance" }}>{t("vip_badge_body")}</p>
         <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 18 }}>
-          {viewerIsVip ? (
-            <button style={{ ...btn, background: "var(--gold)", color: "#000" }} onClick={onClose}>{t("got_it")}</button>
-          ) : (
-            <button style={{ ...btn, background: "var(--gold)", color: "#000" }} onClick={() => { onClose(); navigate("/vip-referral"); }}>{t("vip_apply_now")}</button>
-          )}
+          {/* No "Apply now" any more (Steve, 2026-11-12: "remove the VIP tile"). */}
+          <button style={{ ...btn, background: "var(--gold)", color: "#000" }} onClick={onClose}>{t("got_it")}</button>
           <button style={{ ...btn, background: "transparent", color: "var(--gold)" }} onClick={onClose}>{t("close")}</button>
         </div>
       </div>

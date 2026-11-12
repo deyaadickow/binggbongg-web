@@ -177,7 +177,7 @@ export const FEATURES: Section[] = [
       // Ads for Referrals (Steve, 2026-11-11): every downloadable video ad to post with your code,
       // and the $100 offer video. Right after Referral Program; the phones put it in the same place.
       { icon: "📣", nameKey: "fname_ads_for_referrals", blurbKey: "fblurb_ads_for_referrals", to: "/ads-for-referrals" },
-      { icon: "👑", nameKey: "fname_vip_referral", blurbKey: "fblurb_vip_referral", to: "/vip-referral" },
+      // VIP Referral Member tile REMOVED (Steve, 2026-11-12: "remove the VIP tile") — every member gets up to $100 now.
       { icon: "🤝", nameKey: "fname_share_earn_10", blurbKey: "fblurb_share_earn_10", to: "/settings/referrals" },
       { icon: "💝", nameKey: "fname_who_supported_me", blurbKey: "fblurb_who_supported_me", to: "/support" },
       // Steve, 2026-10-31: "Can we add analytics for all members?" -> "In the app, for each member".

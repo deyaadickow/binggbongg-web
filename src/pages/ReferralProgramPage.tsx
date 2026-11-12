@@ -184,11 +184,7 @@ export function ReferralProgramPage() {
         📣 {t("fname_ads_for_referrals")} — {t("fblurb_ads_for_referrals")} ›
       </Link>
 
-      {/* Steve, 2026-10-29: VIP Referral Members earn up to $100 per new member (since 2026-11-11 every
-          member does: the normal cap is $100 too). */}
-      <Link to="/vip-referral" style={{ ...card, background: "linear-gradient(135deg,#2a2006,#0b0b0d)", textDecoration: "none", fontSize: 16, fontWeight: 800, lineHeight: 1.45, color: GOLD, display: "block" }}>
-        {me?.vip?.is_vip ? t("vip_card_open_kit") : t("vip_card_become")} ›
-      </Link>
+      {/* VIP Referral link removed (Steve, 2026-11-12: "remove the VIP tile"): every member gets up to $100 now. */}
 
       {!prog.enabled && <div style={{ ...card, borderColor: "#888" }}>{t("rp_paused")}</div>}
       {country && <div style={{ ...card, whiteSpace: "pre-line", fontSize: 16, lineHeight: 1.5 }}>{country.description}</div>}
