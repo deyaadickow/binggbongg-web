@@ -73,8 +73,8 @@ export function FeaturedLivePlayer({ video, onClose }: { video: FeaturedLiveVide
         {/* Steve, 2026-11-12: "remove the badge and just keep the X to logout and the x supposed to be red". */}
         <span style={{ flex: 1 }} />
         <button type="button" onClick={onClose} aria-label="Close"
-          style={{ width: 40, height: 40, borderRadius: "50%", background: "#000", border: "2px solid #E53935", color: "#E53935",
-            fontSize: 20, fontWeight: 800, cursor: "pointer", flex: "none" }}>
+          style={{ width: 44, height: 44, background: "none", border: "none", color: "#FF1E1E", textShadow: "0 0 3px rgba(0,0,0,.7)",
+            fontSize: 26, fontWeight: 900, cursor: "pointer", flex: "none" }}>
           ✕
         </button>
       </div>
