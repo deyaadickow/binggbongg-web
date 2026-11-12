@@ -19,7 +19,7 @@ export type VipInfo = { status: VipStatus; is_vip: boolean; platforms: string | 
 export type ReferralProgram = {
   enabled: boolean; percent: number; cap: number; code_days: number; big_flyer_url: string; countries: ReferralCountry[];
   vip_enabled?: boolean; vip_cap?: number;
-  me: null | { vip?: VipInfo; code: string; country: string; referred_count: number; bonus_earned: number; bonus_possible: number;
+  me: null | { vip?: VipInfo; code: string; invite_url?: string | null; country: string; referred_count: number; bonus_earned: number; bonus_possible: number;
     referred: ReferredMember[]; referred_by: null | { user_id: number; name: string; username: string | null }; can_enter_code: boolean };
 };
 

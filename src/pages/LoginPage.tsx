@@ -8,6 +8,8 @@ import { tt, useT, type StringKey } from "../lib/i18n";
 import { chromeUrl, inAppBrowser, phoneOs, storeUrl } from "../lib/getApp";
 import { authErrorCode, createEmailAccount, sendPasswordReset, signInEmail, type EmailProof } from "../lib/emailAuth";
 import { rememberSignupNudges } from "../components/SignupNudges";
+import { showGoldAlert } from "../components/GoldToast";
+import { cleanCode, forgetInviteCode, rememberedInviteCode } from "../lib/invite";
 
 // Google Identity Services. The web client id must be added to the backend's
 // GOOGLE_SIGNIN_CLIENT_IDS (registration verifies the ID token) — see README.
@@ -98,6 +100,7 @@ const ICON_EYE_OFF = svg(<><path d="M3 3l18 18M10.6 5.1A10 10 0 0 1 12 5c6.5 0 1
 
 const looksLikeEmail = (s: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.trim());
 
+
 export function LoginPage() {
   const { t } = useT();
   const { signIn, isLoggedIn } = useSession();
@@ -126,6 +129,11 @@ export function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  // Invite link (Steve, 2026-11-12): "We also should add an optional referral code at signup." Filled in from
+  // ?ref= or from the invite page this browser opened; only ever sent with a NEW account (the server ignores it
+  // for anyone who already has one).
+  const [referral, setReferral] = useState(() => cleanCode(new URLSearchParams(location.search).get("ref")) || rememberedInviteCode());
+  const referralParam = () => (cleanCode(referral) ? { referral_code: cleanCode(referral) } : {});
 
   useEffect(() => {
     if (isLoggedIn) navigate(landingRef.current ?? from, { replace: true });
@@ -147,6 +155,11 @@ export function LoginPage() {
   // Set when a brand-new member is being sent to the Features Videos page, so the "already
   // signed in" effect above doesn't send them back to `from` on the same render.
   const landingRef = useRef<string | null>(null);
+
+  function referralOutcome(res: { referral_applied?: unknown; referral_error?: unknown }) {
+    if (res.referral_applied === true) forgetInviteCode();
+    else if (res.referral_applied === false && typeof res.referral_error === "string") showGoldAlert(tt("su_referral_not_added", res.referral_error));
+  }
 
   function finish(data: UserSummary & { needs_profile?: boolean }, token: string, extra: { email?: string; emailVerified?: boolean; isNew?: boolean } = {}) {
     const needsProfile = data.needs_profile === true;
@@ -177,8 +190,10 @@ export function LoginPage() {
         login_type: 1,
         username: email.split("@")[0],
         provider_token: credential,
+        ...referralParam(),
       });
       if (!res.status || !res.data) throw new Error(res.message ?? tt("sign_in_was_refused"));
+      referralOutcome(res as never);
       const token = res.data.auth_token;
       if (!token) throw new Error(tt("no_session_token_came_back"));
       finish(res.data, token, { isNew: res.is_new === true });
@@ -193,7 +208,7 @@ export function LoginPage() {
    *  Firebase ID token as the proof. Name and username are left blank — the server makes them
    *  from the email (spec of 2026-11-03), and the member can change them whenever they like. */
   async function registerEmail(p: EmailProof) {
-    const base = { identity: p.email, email: p.email, ...WEB_DEVICE, login_type: 4, provider_token: p.idToken };
+    const base = { identity: p.email, email: p.email, ...WEB_DEVICE, login_type: 4, provider_token: p.idToken, ...referralParam() };
     let res = await post<UserSummary & { needs_profile?: boolean }>("registration", { ...base, fullname: "", username: "" });
     // A server from before the easy sign-up still requires both fields: answer it once with what
     // Android sends. The new server never takes this branch.
@@ -202,6 +217,7 @@ export function LoginPage() {
       res = await post<UserSummary & { needs_profile?: boolean }>("registration", { ...base, fullname: name, username: name });
     }
     if (!res.status || !res.data) throw new Error(res.message ?? tt("sign_in_was_refused"));
+    referralOutcome(res as never);
     const token = res.data.auth_token;
     if (!token) {
       // The server held the session back until the email is verified (the old enforce rule, or
@@ -389,6 +405,26 @@ export function LoginPage() {
             {mode === "signin" && !fieldErrors.password && (
               <button type="button" className="signup-forgot" onClick={() => switchMode("reset")}>{t("su_forgot")}</button>
             )}
+          </>
+        )}
+
+        {mode === "create" && (
+          <>
+            <label className="signup-label" htmlFor="su-referral">{t("su_referral_code")}</label>
+            <div className="signup-field">
+              <i className="signup-ico" aria-hidden style={{ fontStyle: "normal", fontWeight: 900 }}>@</i>
+              <input
+                id="su-referral"
+                className="signup-input"
+                type="text"
+                autoComplete="off"
+                autoCapitalize="none"
+                spellCheck={false}
+                placeholder={t("su_referral_placeholder")}
+                value={referral}
+                onChange={(e) => setReferral(e.target.value)}
+              />
+            </div>
           </>
         )}
 

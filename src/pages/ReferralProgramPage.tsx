@@ -5,6 +5,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { PageTitle } from "../components/PageTitle";
+import { InviteLinkCard } from "../components/InviteLinkCard";
 import { Loading } from "../components/Common";
 import { useSession } from "../lib/session";
 import { useT } from "../lib/i18n";
@@ -174,6 +175,9 @@ export function ReferralProgramPage() {
           );
         })}
       </div>
+
+      {/* Invite / Referral link (Steve, 2026-11-12): one link for every friend, any app. */}
+      {isLoggedIn && code && <InviteLinkCard code={code} url={me?.invite_url} cap={prog.cap} />}
 
       {/* Ads for Referrals (Steve, 2026-11-11): the video ads to download and post with your code. */}
       <Link to="/ads-for-referrals" style={{ ...card, textDecoration: "none", fontSize: 16, fontWeight: 800, lineHeight: 1.45, color: GOLD, display: "block" }}>

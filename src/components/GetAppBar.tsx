@@ -10,7 +10,8 @@ export function GetAppBar() {
   const { isLoggedIn } = useSession();
   const { pathname } = useLocation();
   const os = phoneOs();
-  if (isLoggedIn || !os || pathname === "/login") return null;
+  // The invite page has its own store button, with the inviter's code in the link.
+  if (isLoggedIn || !os || pathname === "/login" || pathname.startsWith("/invite/")) return null;
   return (
     <>
       <div className="get-app-spacer" aria-hidden="true" />

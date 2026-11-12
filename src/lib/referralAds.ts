@@ -25,6 +25,7 @@ export interface ReferralAds {
   offer_video: ReferralVideo | null;
   ads: ReferralVideo[];
   referral_code: string | null;
+  invite_url: string | null;
   percent: number;
   cap: number;
   offer_seen: boolean;
@@ -51,6 +52,7 @@ function clean(d: unknown): ReferralAds {
     offer_video: video(o.offer_video),
     ads: (Array.isArray(o.ads) ? o.ads : []).map(video).filter((v): v is ReferralVideo => !!v),
     referral_code: str(o.referral_code),
+    invite_url: str(o.invite_url),
     percent: num(o.percent, 5),
     cap: num(o.cap, 100),
     offer_seen: isTrue(o.offer_seen),
@@ -190,6 +192,7 @@ export async function demoReferralAds(kind: AdsDemo, lang: string): Promise<Refe
     offer_video: { id: 1, title: fil ? "Ang alok" : "The offer", language: fil ? "fil" : "en", ...(fil ? TL : EN), duration: 62 },
     ads,
     referral_code: kind === "out" ? null : "MaeSings",
+    invite_url: kind === "out" ? null : "https://www.binggbongg.com/invite/MaeSings",
     percent: 5,
     cap: 100,
     offer_seen: false,

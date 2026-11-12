@@ -9,6 +9,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { PageTitle } from "../components/PageTitle";
+import { InviteLinkCard } from "../components/InviteLinkCard";
 import { FeatureVideoPlayer } from "../components/FeatureVideoPlayer";
 import { showGoldAlert } from "../components/GoldToast";
 import { LANGUAGES, useT } from "../lib/i18n";
@@ -143,6 +144,8 @@ export function AdsForReferralsPage() {
           </>
         )}
       </section>
+
+      {code && <InviteLinkCard code={code} url={data?.invite_url} cap={cap} />}
 
       <h2 className="afr-list-title">{t("afr_ads_heading")}</h2>
       {!data && !error && <div className="afr-state" role="status">{t("loading")}</div>}

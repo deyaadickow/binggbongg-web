@@ -1384,3 +1384,30 @@ body.signup-black { background: radial-gradient(120% 55% at 50% 0%, #2a2108 0%, 
 .afr-offer-title { margin: 0; color: var(--gold-bright); font-size: 26px; line-height: 1.2; font-weight: 900; }
 .afr-offer-video { width: 100%; max-height: 62vh; border-radius: 16px; border: 2.5px solid var(--gold-border); background: #000; }
 .afr-offer-btn { min-height: 52px; font-size: 18px; width: 100%; max-width: 400px; }
+
+/* Invite / Referral link (2026-11-12): /invite/:code + the "Your invite link" card. Black and gold. */
+.inv-page { max-width: 520px; margin: 0 auto; padding: 16px 16px 40px; display: flex; flex-direction: column; align-items: stretch; gap: 14px; color: var(--gold); }
+.inv-logo { display: block; height: 44px; margin: 4px auto 0; object-fit: contain; }
+.inv-who { display: flex; align-items: center; gap: 12px; justify-content: center; text-align: left; }
+.inv-avatar { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2.5px solid var(--gold-border); background: #111; flex: 0 0 auto; }
+.inv-avatar-none { display: inline-flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 900; color: var(--gold-bright); }
+.inv-name { display: block; font-size: 20px; font-weight: 900; color: var(--gold-bright); word-break: break-word; }
+.inv-sub { display: block; font-size: 16px; font-weight: 700; }
+.inv-video { width: 100%; max-height: 52vh; aspect-ratio: 9 / 16; object-fit: contain; background: #000; border: 2.5px solid var(--gold-border); border-radius: 18px; }
+.inv-code { background: #000; border: 2.5px solid var(--gold-border); border-radius: 18px; padding: 14px; text-align: center; box-shadow: 0 0 24px rgba(240, 196, 32, .2); }
+.inv-code-hint { display: block; font-size: 16px; font-weight: 800; margin-bottom: 8px; }
+.inv-code-row { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+.inv-code-value { font-size: 30px; font-weight: 900; color: var(--gold-bright); word-break: break-all; line-height: 1.1; }
+.inv-copy { min-height: 44px; padding: 0 18px; border-radius: 22px; border: 2px solid var(--gold-border); background: #000; color: var(--gold-bright); font-size: 16px; font-weight: 800; cursor: pointer; }
+.inv-stores { display: flex; flex-direction: column; gap: 10px; }
+.inv-store-btn { min-height: 54px; font-size: 18px; font-weight: 900; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+.inv-web-btn { min-height: 46px; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+.inv-steps { margin: 0; text-align: left; align-self: center; font-size: 14px; line-height: 1.6; opacity: .95; white-space: pre-line; }
+.inv-state { text-align: center; font-size: 18px; font-weight: 700; padding: 40px 0 10px; }
+.inv-link-card { display: flex; flex-direction: column; gap: 10px; }
+.inv-link-card h2 { margin: 0; color: var(--gold-bright); font-size: 20px; font-weight: 900; }
+.inv-link-card p { margin: 0; font-size: 15px; line-height: 1.5; }
+.inv-link-url { display: block; padding: 10px 12px; border: 1.5px solid var(--gold-border); border-radius: 12px; color: var(--gold-bright); font-weight: 800; word-break: break-all; background: #0a0a0a; }
+.inv-link-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+.inv-link-btns .btn { flex: 1 1 140px; min-height: 46px; }
+.signup-referral-note { font-size: 13px; opacity: .85; margin: 4px 2px 0; }

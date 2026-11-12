@@ -78,6 +78,7 @@ import { CountryBattleBoardPage, CountryBattleDayPage, CountryBattlePage } from 
 import { CountryBattleLivePage } from "./pages/CountryBattleLivePage";
 import { CountryBoardPage } from "./pages/CountryBoardPage";
 import { AdsForReferralsPage } from "./pages/AdsForReferralsPage";
+import { InvitePage } from "./pages/InvitePage";
 import { ChatBattleLivePage } from "./pages/ChatBattleLivePage";
 import { rememberAdSource } from "./lib/getApp";
 import { PageTracking } from "./components/PageTracking";
@@ -292,6 +293,7 @@ export default function App() {
           <Route path="/referral-program" element={<ReferralProgramPage />} />
           {/* Ads for Referrals (Steve, 2026-11-11): downloadable video ads + the $100 offer video. */}
           <Route path="/ads-for-referrals" element={<AdsForReferralsPage />} />
+          <Route path="/invite/:code" element={<InvitePage />} />
           <Route path="/vip-referral" element={<VipReferralPage />} />
           {/* The member's own notepad (Steve, 2026-10-19). */}
           <Route path="/settings/todo" element={<ToDoListPage />} />
