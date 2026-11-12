@@ -1,5 +1,7 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { post, type Post } from "../lib/api";
+import { openRandomLive } from "../lib/liveSwipe";
 import { useSession } from "../lib/session";
 import { PostCard } from "../components/PostCard";
 import { Loading, Notice, StoreBadges } from "../components/Common";
@@ -28,6 +30,15 @@ const PAID_AD_OFFSET = 10;
 export function HomePage() {
   const { t, lang } = useT();
   const { user } = useSession();
+  const navigate = useNavigate();
+  // The feed's Live button (Steve, 2026-11-12): straight into a random live, swipe for the next.
+  // Leaving this page unmounts the feed, so its video is silent for the whole time.
+  const [liveBusy, setLiveBusy] = useState(false);
+  const openLive = () => {
+    if (liveBusy) return;
+    setLiveBusy(true);
+    openRandomLive(navigate, user?.id ?? 0).catch(() => navigate("/live")).finally(() => setLiveBusy(false));
+  };
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -112,6 +123,9 @@ export function HomePage() {
     <div className="page">
       <div className="row" style={{ marginBottom: 14, flexWrap: "wrap" }}>
         <h1 className="page-title" style={{ margin: 0 }}>{t("for_you")}</h1>
+        <button type="button" className="btn small feed-live-btn" onClick={openLive} disabled={liveBusy} aria-busy={liveBusy}>
+          {t("live")}
+        </button>
         <span className="spacer" />
         <StoreBadges compact />
       </div>

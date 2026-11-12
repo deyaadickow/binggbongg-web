@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { fetchFeaturedLiveVideos, post, type FeaturedLiveVideo, type LiveStream } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice } from "../components/Common";
 import { tt, useT  } from "../lib/i18n";
 import { PodcastBadge, isPodcastRoom } from "../components/PodcastBits";
 import { FeaturedLiveCard, FeaturedLivePlayer } from "../components/FeaturedLiveVideos";
+import { LiveSwipeNav } from "../components/LiveSwipe";
+import { swipeStateOf } from "../lib/liveSwipe";
 
 /** Daily Live Badge (Steve, 2026-10-16) — the badge a host earns for the day by streaming to
  *  people who are actually watching. Ring colour per tier, gold text throughout, so it reads
@@ -166,5 +168,35 @@ export function LiveNowPage() {
       )}
       {playing && <FeaturedLivePlayer video={playing} onClose={closePlayer} />}
     </div>
+  );
+}
+
+/** /live-video/:id — one Live Section Video as a page of the feed Live button's swipe list
+ *  (Steve, 2026-11-12). The same full-screen player as Live Now's (no badge, no gifts, no chat,
+ *  no LiveKit); closing it goes back to the feed. Keyed by id so the next video starts fresh. */
+export function LiveVideoPage() {
+  const { id } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const swipe = swipeStateOf(location.state);
+  const carried = swipe?.items[swipe.index];
+  const fromState = carried?.kind === "video" && String(carried.video.id) === id ? carried.video : null;
+  const [fetched, setFetched] = useState<FeaturedLiveVideo | null | undefined>(undefined);
+  useEffect(() => {
+    if (fromState) return;
+    // Opened without the list (a reload in a new tab, a pasted link): look the video up.
+    let alive = true;
+    fetchFeaturedLiveVideos().then((list) => { if (alive) setFetched(list.find((v) => String(v.id) === id) ?? null); });
+    return () => { alive = false; };
+  }, [fromState, id]);
+  const video = fromState ?? fetched;
+  const close = useCallback(() => navigate("/", { replace: true }), [navigate]);
+  useEffect(() => { if (video === null) navigate("/live", { replace: true }); }, [video, navigate]);
+  if (!video) return <Loading />;
+  return (
+    <>
+      <FeaturedLivePlayer key={video.id} video={video} onClose={close} />
+      <LiveSwipeNav zone='[data-live-swipe="video"]' />
+    </>
   );
 }

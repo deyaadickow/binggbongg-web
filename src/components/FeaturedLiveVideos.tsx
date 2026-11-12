@@ -59,7 +59,7 @@ export function FeaturedLivePlayer({ video, onClose }: { video: FeaturedLiveVide
   const openProfile = () => { onClose(); navigate(`/profile/${video.host_user_id}`); };
 
   return (
-    <div role="dialog" aria-label={name} style={{ position: "fixed", inset: 0, zIndex: 2000, background: "#000", display: "flex", flexDirection: "column" }}>
+    <div role="dialog" aria-label={name} data-live-swipe="video" style={{ position: "fixed", inset: 0, zIndex: 2000, background: "#000", display: "flex", flexDirection: "column" }}>
       <video
         ref={ref}
         src={src}

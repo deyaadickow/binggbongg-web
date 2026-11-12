@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { HostBonusIntro } from "../components/HostBonus";
-import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { LiveSwipeNav } from "../components/LiveSwipe";
+import { swipeStateOf } from "../lib/liveSwipe";
 import { displayName, giftPrice, mediaUrl, post, type Gift, type UserSummary } from "../lib/api";
 import { TapTapBurst, isTapTapGift, tapTapBurstDuration } from "../components/TapTapBurst";
 import { useSession } from "../lib/session";
@@ -71,11 +73,22 @@ const HEARTBEAT_MS = 20000;
 const MEMBERS_POLL_MS = 5000;
 
 /** One page for every role: viewer (default), guest (after the host approves), host (?host=1). */
+/** The /live/:room route. Keyed by the room so moving to ANOTHER room (the feed Live button's
+ *  next/previous, or any in-app jump to a different room) unmounts this one first — its own
+ *  cleanup leaves LiveKit, stops the heartbeat and the chat listener — instead of carrying the
+ *  last room's members, chat and battle state into the next one. */
+export function LiveViewerRoute() {
+  const { room } = useParams();
+  return <LiveViewerPage key={room ?? ""} />;
+}
+
 export function LiveViewerPage() {
   const { t, tn } = useT();
   const { room: roomParam } = useParams();
   const [search] = useSearchParams();
   const navigate = useNavigate();
+  // Opened by the feed's Live button (Steve, 2026-11-12): leaving goes back to the feed, not Live Now.
+  const fromSwipe = !!swipeStateOf(useLocation().state);
   const roomName = decodeURIComponent(roomParam ?? "");
   const { user, isLoggedIn, refresh } = useSession();
   const myIdRef = useRef<number | null>(null);
@@ -1213,7 +1226,7 @@ export function LiveViewerPage() {
     // on the server (battle invites / pickers kept including them). Fire and forget.
     if (user) post("leaveLiveRoom", { my_user_id: user.id, room_name: roomName }).catch(() => undefined);
     live.disconnect();
-    navigate("/live", { replace: true });
+    navigate(fromSwipe ? "/" : "/live", { replace: true });
   }
 
   const hostCard = members ? { fullname: members.host_fullname, username: members.host_username, profile_image: members.host_profile_image } : null;
@@ -1383,7 +1396,8 @@ export function LiveViewerPage() {
   // Moved down here from above the hooks (2026-10-29): an early return BEFORE hooks changes
   // their order when the session changes, the crash VideoPage.tsx already fixed.
   if (!isLoggedIn) {
-    return <div className="page"><Notice>{tn("sign_in_to_watch_this_live", <Link to="/login">{t("sign_in")}</Link>)}</Notice></div>;
+    // Signed out: no room to show, but the feed Live button's next/previous still steps on.
+    return <div className="page"><Notice>{tn("sign_in_to_watch_this_live", <Link to="/login">{t("sign_in")}</Link>)}</Notice><LiveSwipeNav zone=".page" /></div>;
   }
 
   // ---- Hold the live for a second (Steve, 2026-10-29) --------------------------------------
@@ -1480,6 +1494,9 @@ export function LiveViewerPage() {
       {/* Battle Host Bonus video (Steve, 2026-11-10): "when a member goes live the first thing they
           will see" — own room only, once, over the room (which joins underneath as normal). */}
       {wantsHost && user && <HostBonusIntro userId={user.id} />}
+      {/* Next / previous live — only when opened by the feed's Live button, and only while just
+          watching: a guest on stage must leave properly (leaveLiveRoom) before going anywhere. */}
+      <LiveSwipeNav zone=".video-grid" enabled={role === "viewer"} />
       <div className="row" style={{ marginBottom: 12 }}>
         <Avatar user={hostCard} />
         <div style={{ flex: 1, minWidth: 0 }}>

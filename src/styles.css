@@ -1411,3 +1411,13 @@ body.signup-black { background: radial-gradient(120% 55% at 50% 0%, #2a2108 0%, 
 .inv-link-btns { display: flex; gap: 10px; flex-wrap: wrap; }
 .inv-link-btns .btn { flex: 1 1 140px; min-height: 46px; }
 .signup-referral-note { font-size: 13px; opacity: .85; margin: 4px 2px 0; }
+
+/* Live button -> random live, next/previous (Steve, 2026-11-12). Small gold ▲/▼ on the right edge
+   for a mouse; a touch screen swipes on the video instead, so the buttons stay out of its way. */
+.live-swipe-btns { position: fixed; right: 14px; top: 50%; transform: translateY(-50%); z-index: 2100;
+  display: flex; flex-direction: column; gap: 10px; }
+.live-swipe-btns button { width: 40px; height: 40px; border-radius: 50%; background: #000; color: var(--gold);
+  border: 2px solid var(--gold); font-size: 16px; font-weight: 800; cursor: pointer; line-height: 1; padding: 0; }
+.live-swipe-btns button:hover { background: var(--gold); color: #000; }
+@media (hover: none), (pointer: coarse) { .live-swipe-btns { display: none; } }
+.feed-live-btn { margin-left: 12px; }

@@ -51,11 +51,11 @@ import { useEffect, type ReactNode } from "react";
 import { post } from "./lib/api";
 import { pixelPageView } from "./lib/pixel";
 import { SearchPage } from "./pages/SearchPage";
-import { LiveNowPage } from "./pages/LiveNowPage";
+import { LiveNowPage, LiveVideoPage } from "./pages/LiveNowPage";
 import { MyShowPage, ShowsPage } from "./pages/ShowsPages";
 import { VideoAdGigPage, MyVideoAdGigsPage } from "./pages/VideoAdGigPages";
 import { CvCPage, CvCBattlePage } from "./pages/CvCPages";
-import { LiveViewerPage } from "./pages/LiveViewerPage";
+import { LiveViewerRoute } from "./pages/LiveViewerPage";
 import { WalletPage } from "./pages/WalletPage";
 import { GoLivePage } from "./pages/GoLivePage";
 import { StreamFromPcPage } from "./pages/StreamFromPcPage";
@@ -200,7 +200,9 @@ export default function App() {
           {/* CvC — country vs country (Steve, 2026-10-17). The board, and one battle. */}
           <Route path="/cvc" element={<CvCPage />} />
           <Route path="/cvc/:id" element={<CvCBattlePage />} />
-          <Route path="/live/:room" element={<LiveViewerPage />} />
+          <Route path="/live/:room" element={<LiveViewerRoute />} />
+          {/* A Live Section Video reached by the feed Live button's swipe (Steve, 2026-11-12). */}
+          <Route path="/live-video/:id" element={<LiveVideoPage />} />
           <Route path="/wallet" element={<WalletPage />} />
           <Route path="/wallet/redeem" element={<RedeemPage />} />
           <Route path="/wallet/payout-history" element={<PayoutHistoryPage />} />
