@@ -17,6 +17,7 @@ import { tt, useT, type StringKey  } from "../lib/i18n";
 import { PageTitle } from "../components/PageTitle";
 import { IDEA_SUPPORT_REASON } from "../lib/ideas";
 import { CountryBattleReminderToggle } from "../components/CountryBattleBits";
+import { InviteLinkCard } from "../components/InviteLinkCard";
 import { fetchDmSettings, setDmBlock, setDmOpen, type DmSettings } from "../lib/dm";
 
 const SITE = "https://www.binggbongg.com";
@@ -123,6 +124,8 @@ export function AccountSettingsPage() {
     <Page title={t("account_settings")}>
       {!me ? <Loading /> : (
         <>
+          {/* Steve, 2026-11-12: "Please add it in settings/Account" — the invite link (code = username). */}
+          <div style={{ marginBottom: 12 }}><InviteLinkCard code={me.username} /></div>
           <div className="card" style={{ marginBottom: 12 }}>
             {TOGGLES.map((tog) => (
               <label key={tog.key} className="row" style={{ padding: "12px 14px", borderBottom: "1px solid var(--line)", cursor: "pointer" }}>
