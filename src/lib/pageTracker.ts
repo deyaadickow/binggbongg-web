@@ -216,6 +216,12 @@ export async function flush(closing = false): Promise<void> {
   const batch = queue.filter((r) => closing || !r.wait || r.wait <= now).slice(0, MAX_PER_CALL);
   if (batch.length === 0) return;
   sending = true;
+  // Out of the stored queue BEFORE sending (Steve, 2026-11-12: "210 pages" in under a minute): a page that
+  // reloads or closes never sees the reply, so the rows used to stay stored and were sent again by the
+  // next page load - 1+2+...+20 = 210 rows for 20 pages. A failed send puts them back.
+  const sent = new Set(batch.map((r) => r.k));
+  queue = queue.filter((r) => !sent.has(r.k));
+  save();
   try {
     const views = batch.map((r) => ({
       screen: r.screen,
@@ -229,13 +235,14 @@ export async function flush(closing = false): Promise<void> {
     // emptied the queue then, and nothing must be resurrected into it.
     failedAt = 0;
     if (owner === me) {
-      const sent = new Set(batch.map((r) => r.k));
       for (const r of batch) if (r.wait && !r.ref_label) sentUnlabelled.set(keyOf(r.screen, r.ref_type, r.ref_id), r.at);
-      queue = queue.filter((r) => !sent.has(r.k));
-      save();
     }
   } catch {
-    /* offline, server error, not deployed yet: the rows stay for the next flush */
+    /* offline, server error, not deployed yet: the rows go back for the next flush */
+    if (owner === me) {
+      queue = [...batch, ...queue].slice(-MAX_QUEUE);
+      save();
+    }
     failedAt = Date.now();
     return;
   } finally {
