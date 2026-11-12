@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { VIDEO_LANGS, defaultVideoLang, rememberVideoLang, type VideoLang, type VideoSources } from "../lib/featureVideos";
 import { trackPage } from "../lib/pageTracker";
+import { WEB_BASE } from "../lib/api";
+import { openDownloadLink } from "../lib/referralAds";
+import { useT } from "../lib/i18n";
 
 /** One video in the player: its file, its heading, and its other languages. `trackKey` and
  *  `trackLabel` name it in the member's page history — the feature's key and its ENGLISH name,
@@ -30,6 +33,7 @@ function langFor(item: PlayerItem, want: VideoLang): VideoLang | null {
 export function FeatureVideoPlayer({ items, start = 0, onClose, country }: {
   items: PlayerItem[]; start?: number; onClose: () => void; country?: string | null;
 }) {
+  const { t } = useT();
   const [current, setCurrent] = useState(start);
   const [want, setWant] = useState<VideoLang>(() => defaultVideoLang(country));
   const feed = useRef<HTMLDivElement>(null);
@@ -97,6 +101,16 @@ export function FeatureVideoPlayer({ items, start = 0, onClose, country }: {
               {items.length > 1 && (
                 <span style={{ color: "var(--gold)", fontSize: 13, opacity: 0.8 }}>{i + 1} / {items.length}</span>
               )}
+              {/* Steve, 2026-11-12: "In Bingg Bongg Featured Videos please add a download Button". The server's
+                  attachment route, so the browser saves the file (in the language playing) instead of opening it. */}
+              <button type="button" aria-label={t("download")} title={t("download")}
+                onClick={() => openDownloadLink(
+                  `${WEB_BASE}feature-videos/download?path=${encodeURIComponent(src)}&name=${encodeURIComponent(item.trackLabel || item.title)}`,
+                  `Bingg Bongg - ${(item.trackLabel || item.title).replace(/[\\/:*?"<>|]+/g, " ").trim()}.mp4`)}
+                style={{
+                  height: 40, padding: "0 14px", borderRadius: 20, background: "#000", color: "var(--gold)",
+                  border: "2px solid var(--gold-border)", fontSize: 14, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap",
+                }}>⬇ {t("download")}</button>
             </div>
             <div style={{ flex: 1, minHeight: 0, display: "flex" }}>
               {/* Only the video on screen plays; its neighbours are loaded, the rest are not. Keyed on
