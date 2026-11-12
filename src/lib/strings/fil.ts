@@ -690,6 +690,7 @@ export const fil = {
   link_copied_paste_it_anywhere: "Nakopya ang link — i-paste ito kahit saan.",
   linked_video: "Naka-link na video",
   live: "● LIVE",
+  featured_pill: "FEATURED",
   live_chat: "Live chat",
   live_now: "Live Ngayon",
   live_now_2: "LIVE NGAYON",

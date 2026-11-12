@@ -690,6 +690,7 @@ export const es = {
   link_copied_paste_it_anywhere: "Enlace copiado: pégalo donde quieras.",
   linked_video: "Video enlazado",
   live: "● EN VIVO",
+  featured_pill: "DESTACADO",
   live_chat: "Chat en vivo",
   live_now: "En vivo ahora",
   live_now_2: "EN VIVO AHORA",

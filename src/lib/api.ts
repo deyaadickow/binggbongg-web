@@ -263,6 +263,36 @@ export interface LiveStream {
   podcast_title?: string | null;
 }
 
+/** Live Section Videos (Steve, 2026-11-12): admin-uploaded videos from @thegoodjudge's account,
+ *  listed AFTER every real live on Live Now with a gold FEATURED pill so the section is never
+ *  empty. Not a live room: no LiveKit, no gifts (gifts_enabled is always false). */
+export interface FeaturedLiveVideo {
+  id: number;
+  title?: string | null;
+  video?: string | null;
+  video_url?: string | null;
+  thumbnail?: string | null;
+  thumbnail_url?: string | null;
+  host_user_id: number;
+  host_username?: string | null;
+  host_fullname?: string | null;
+  host_profile_image?: string | null;
+  is_featured?: boolean;
+  gifts_enabled?: boolean;
+}
+
+/** Any failure (including the 404 before the backend deploy) is an empty list — this must never
+ *  break Live Now. */
+export async function fetchFeaturedLiveVideos(): Promise<FeaturedLiveVideo[]> {
+  try {
+    const res = await post<FeaturedLiveVideo[]>("fetchFeaturedLiveVideos");
+    if (!res.status || !Array.isArray(res.data)) return [];
+    return res.data.filter((v) => v && (v.video_url || v.video));
+  } catch {
+    return [];
+  }
+}
+
 export interface Gift {
   id: number;
   name?: string;

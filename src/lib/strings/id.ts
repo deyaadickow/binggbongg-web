@@ -690,6 +690,7 @@ export const id = {
   link_copied_paste_it_anywhere: "Tautan disalin — tempel di mana saja.",
   linked_video: "Video tertaut",
   live: "● LIVE",
+  featured_pill: "UNGGULAN",
   live_chat: "Chat live",
   live_now: "Live Sekarang",
   live_now_2: "LIVE SEKARANG",

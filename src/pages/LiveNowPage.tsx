@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { post, type LiveStream } from "../lib/api";
+import { fetchFeaturedLiveVideos, post, type FeaturedLiveVideo, type LiveStream } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice } from "../components/Common";
 import { tt, useT  } from "../lib/i18n";
 import { PodcastBadge, isPodcastRoom } from "../components/PodcastBits";
+import { FeaturedLiveCard, FeaturedLivePlayer } from "../components/FeaturedLiveVideos";
 
 /** Daily Live Badge (Steve, 2026-10-16) — the badge a host earns for the day by streaming to
  *  people who are actually watching. Ring colour per tier, gold text throughout, so it reads
@@ -38,6 +39,15 @@ export function LiveNowPage() {
   // it: the main list answers "what is good right now", and letting hours streamed decide that
   // order would promote the longest stream instead of the best one.
   const [topToday, setTopToday] = useState<LiveStream[]>([]);
+  // Live Section Videos (Steve, 2026-11-12): admin videos from @thegoodjudge, shown AFTER every
+  // real live so the section is never empty. Fetched once; any failure is an empty list.
+  const [featured, setFeatured] = useState<FeaturedLiveVideo[]>([]);
+  const [playing, setPlaying] = useState<FeaturedLiveVideo | null>(null);
+  useEffect(() => {
+    let alive = true;
+    fetchFeaturedLiveVideos().then((list) => { if (alive) setFeatured(list); });
+    return () => { alive = false; };
+  }, []);
 
   useEffect(() => {
     let alive = true;
@@ -76,6 +86,9 @@ export function LiveNowPage() {
   }, [user?.id]);
 
   const visible = streams === null ? null : favouritesOnly ? streams.filter((s) => s.is_favourite) : streams;
+  // Not on the favourites filter: that is the member asking for their favourite streamers only.
+  const featuredShown = favouritesOnly ? [] : featured;
+  const closePlayer = useCallback(() => setPlaying(null), []);
 
   return (
     <div className="page">
@@ -121,7 +134,7 @@ export function LiveNowPage() {
           </div>
         </div>
       )}
-      {visible === null ? <Loading /> : visible.length === 0 ? (
+      {visible === null ? <Loading /> : visible.length === 0 && featuredShown.length === 0 ? (
         <Notice>
           {favouritesOnly
             ? (streams && streams.some((s) => s.is_favourite)
@@ -146,8 +159,12 @@ export function LiveNowPage() {
               <span className="btn small">{t("watch")}</span>
             </Link>
           ))}
+          {featuredShown.map((v) => (
+            <FeaturedLiveCard key={`featured-${v.id}`} video={v} onOpen={() => setPlaying(v)} />
+          ))}
         </div>
       )}
+      {playing && <FeaturedLivePlayer video={playing} onClose={closePlayer} />}
     </div>
   );
 }

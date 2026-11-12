@@ -704,6 +704,7 @@ export const en = {
   link_copied_paste_it_anywhere: "Link copied — paste it anywhere.",
   linked_video: "Linked video",
   live: "● LIVE",
+  featured_pill: "FEATURED",
   live_chat: "Live chat",
   live_now: "Live Now",
   live_now_2: "LIVE NOW",
