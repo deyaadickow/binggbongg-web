@@ -292,6 +292,7 @@ export default function App() {
           <Route path="/pre-launch" element={<PrelaunchPage />} />
           {/* Every feature's 60-second video under its own heading (Steve, 2026-10-29). */}
           <Route path="/feature-videos" element={<FeatureVideosPage />} />
+          <Route path="/our-ads" element={<FeatureVideosPage kind="ads" />} />
           <Route path="/referral-program" element={<ReferralProgramPage />} />
           {/* Ads for Referrals (Steve, 2026-11-11): downloadable video ads + the $100 offer video. */}
           <Route path="/ads-for-referrals" element={<AdsForReferralsPage />} />

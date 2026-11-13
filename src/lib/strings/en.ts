@@ -2145,6 +2145,8 @@ export const en = {
   ve_no_session: "Please sign out, then sign in again with your email and password.",
   ve_checking: "Checking…",
   featured_videos_tab: "70+ Featured Videos",
+  our_ads_tab: "Our Ads",
+  fv_language: "Language",
   // Multi-live 24 (2026-11-05) — same keys and words as Android's strings_multi_live.xml.
   ml_members_on_camera: "Members on camera",
   ml_size_hint: "You can have up to 24 members live in your room and you can battle with all of them at the same time. Try it, and have fun.",

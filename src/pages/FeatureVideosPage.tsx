@@ -19,7 +19,9 @@ interface FeaturePageVideoRow { id: number; sort: number; title: string; video: 
 /** sources: the same video in English, Tagalog and Indonesian, for the player's switch. */
 interface FeaturePageVideo { id: number; title: string; url: string; poster: string; sources: VideoSources; trackKey: string }
 
-export function FeatureVideosPage() {
+/** kind "ads" = the Our Ads page (Steve, 2026-11-12: "Next to 70+ Featured Videos create 'Our Ads' button and upload
+ *  all our ads on this page") — the same page and player over the server's tbl_our_ads (fetchOurAds). */
+export function FeatureVideosPage({ kind = "features" }: { kind?: "features" | "ads" } = {}) {
   const { t } = useT();
   const [videos, setVideos] = useState<FeaturePageVideo[] | null>(null);
   const [failed, setFailed] = useState(false);
@@ -33,21 +35,21 @@ export function FeatureVideosPage() {
     setVideos(null);
     try {
       // "platform" keeps the body non-empty — the host's firewall 403s an empty-body POST.
-      const res = await post<FeaturePageVideoRow[]>("fetchFeaturePageVideos", { platform: "web" });
+      const res = await post<FeaturePageVideoRow[]>(kind === "ads" ? "fetchOurAds" : "fetchFeaturePageVideos", { platform: "web" });
       if (!res.status) throw new Error(res.message || "failed");
       const rows = [...(res.data ?? [])].filter((r) => r.video).sort((a, b) => a.sort - b.sort);
-      setVideos(rows.map((r) => ({ id: r.id, title: r.title, url: mediaUrl(r.video), poster: mediaUrl(r.thumbnail), sources: videoSources(r.videos), trackKey: `feature_page_video_${r.id}` })));
+      setVideos(rows.map((r) => ({ id: r.id, title: r.title, url: mediaUrl(r.video), poster: mediaUrl(r.thumbnail), sources: videoSources(r.videos), trackKey: `${kind === "ads" ? "our_ad" : "feature_page_video"}_${r.id}` })));
     } catch {
       setFailed(true);
     }
-  }, []);
+  }, [kind]);
 
   useEffect(() => { load(); }, [load]);
   const closePlayer = useCallback(() => setPlaying(null), []);
 
   return (
     <div className="page" style={{ maxWidth: 1000 }}>
-      <PageTitle backTo="/features">{t("fname_feature_videos_page")}</PageTitle>
+      <PageTitle backTo={kind === "ads" ? "/" : "/features"}>{t(kind === "ads" ? "our_ads_tab" : "fname_feature_videos_page")}</PageTitle>
       {videos && videos.length > 0 && (
         <p className="muted" style={{ marginTop: -4 }}>{t("n_videos", videos.length)}</p>
       )}

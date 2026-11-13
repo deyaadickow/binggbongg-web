@@ -1950,6 +1950,8 @@ export const fil = {
   ve_no_session: "Mag-sign out muna, tapos mag-sign in ulit gamit ang email at password mo.",
   ve_checking: "Tinitingnan…",
   featured_videos_tab: "70+ Itinatampok na Video",
+  our_ads_tab: "Aming mga Ad",
+  fv_language: "Wika",
   // Multi-live 24 (2026-11-05) — same keys and words as Android's strings_multi_live.xml.
   ml_members_on_camera: "Mga miyembro sa camera",
   ml_size_hint: "Puwede kang magkaroon ng hanggang 24 na miyembrong live sa room mo at makipag-battle sa lahat nang sabay-sabay. Subukan mo, at mag-enjoy.",

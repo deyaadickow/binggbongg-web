@@ -59,6 +59,7 @@ const ROUTES: ScreenRoute[] = [
   { path: "/features", screen: "features" },
   { path: "/feature/:slug", screen: "feature", ref: { param: "slug", type: "feature", awaitLabel: true } },
   { path: "/feature-videos", screen: "feature_videos" },
+  { path: "/our-ads", screen: "our_ads" },
   { path: "/photos", screen: "photos" },
   { path: "/photos-directory", screen: "photos_directory" },
   { path: "/photos/:id", screen: "photo_album", ref: { param: "id", type: "member" } },

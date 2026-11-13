@@ -1945,6 +1945,8 @@ export const id = {
   ve_no_session: "Silakan keluar, lalu masuk lagi dengan email dan kata sandi kamu.",
   ve_checking: "Memeriksa…",
   featured_videos_tab: "70+ Video Unggulan",
+  our_ads_tab: "Iklan Kami",
+  fv_language: "Bahasa",
   // Multi-live 24 (2026-11-05) — same keys and words as Android's strings_multi_live.xml.
   ml_members_on_camera: "Anggota di kamera",
   ml_size_hint: "Kamu bisa punya hingga 24 anggota live di room kamu dan battle dengan semuanya sekaligus. Coba sekarang, dan bersenang-senanglah.",

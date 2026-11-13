@@ -97,10 +97,15 @@ export function FeatureVideoPlayer({ items, start = 0, onClose, country }: {
                 width: 40, height: 40, borderRadius: "50%", background: "#000", color: "var(--gold)",
                 border: "2px solid var(--gold-border)", fontSize: 20, fontWeight: 700, cursor: "pointer", lineHeight: 1,
               }}>‹</button>
-              <b style={{ color: "var(--gold)", fontSize: 17, flex: 1, minWidth: 0 }}>{item.title}</b>
+              <b style={{ color: "var(--gold)", fontSize: 17, flex: 1, minWidth: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{item.title}</b>
               {items.length > 1 && (
-                <span style={{ color: "var(--gold)", fontSize: 13, opacity: 0.8 }}>{i + 1} / {items.length}</span>
+                <span className="fv-count" style={{ color: "var(--gold)", fontSize: 13, opacity: 0.8, flexShrink: 0 }}>{i + 1} / {items.length}</span>
               )}
+              {/* Steve, 2026-11-12: "add an 'Language' picker and 'Download' button next to each other on top. when they
+                  pick a language it will stay on that language for every video they watch until they change the language."
+                  The pick is remembered on the device (rememberVideoLang) and every video opens in it when it has it. */}
+              <LangPicker langs={VIDEO_LANGS.filter((l) => item.sources?.[l.code]).map((l) => l.code)}
+                value={lang ?? (VIDEO_LANGS.find((l) => item.sources?.[l.code])?.code ?? null)} onPick={pick} label={t("fv_language")} />
               {/* Steve, 2026-11-12: "In Bingg Bongg Featured Videos please add a download Button". The server's
                   attachment route, so the browser saves the file (in the language playing) instead of opening it. */}
               <button type="button" aria-label={t("download")} title={t("download")}
@@ -124,20 +129,49 @@ export function FeatureVideoPlayer({ items, start = 0, onClose, country }: {
                   style={{ flex: 1, minWidth: 0, objectFit: "contain", background: "#000" }} />
               ) : null}
             </div>
-            {lang && (
-              // Under the video, never over it — the same black and gold pill as the landing page's.
-              <div style={{ display: "flex", justifyContent: "center", padding: "10px 14px 14px", flexShrink: 0 }}>
-                <div className="lp-langs fv-langs" role="group" aria-label="Video language">
-                  {VIDEO_LANGS.filter((l) => item.sources?.[l.code]).map((l) => (
-                    <button key={l.code} type="button" className={l.code === lang ? "on" : ""} aria-pressed={l.code === lang}
-                      onClick={() => { if (l.code !== lang) pick(l.code); }}>{l.label}</button>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         );
       })}
+    </div>
+  );
+}
+
+/** The video's Language picker: a black and gold button that opens the languages this video has. With one language it
+ *  only shows it. Never a native <select> (the web's gold dropdown rule). */
+function LangPicker({ langs, value, onPick, label }: { langs: VideoLang[]; value: VideoLang | null; onPick: (l: VideoLang) => void; label: string }) {
+  const [open, setOpen] = useState(false);
+  const box = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const close = (e: MouseEvent) => { if (!box.current?.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
+  }, [open]);
+  if (!value) return null;
+  const name = (c: VideoLang) => VIDEO_LANGS.find((l) => l.code === c)?.label ?? c;
+  const many = langs.length > 1;
+  return (
+    <div ref={box} style={{ position: "relative", flexShrink: 0 }}>
+      <button type="button" aria-label={`${label}: ${name(value)}`} aria-haspopup={many ? "listbox" : undefined} aria-expanded={many ? open : undefined}
+        onClick={() => many && setOpen((o) => !o)} style={{
+          height: 40, padding: "0 12px", borderRadius: 20, background: "#000", color: "var(--gold)",
+          border: "2px solid var(--gold-border)", fontSize: 14, fontWeight: 700, cursor: many ? "pointer" : "default", whiteSpace: "nowrap",
+        }}>🌐 {name(value)}{many ? " ▾" : ""}</button>
+      {open && (
+        <div role="listbox" aria-label={label} style={{
+          position: "absolute", right: 0, top: 46, zIndex: 5, minWidth: 150, background: "#000",
+          border: "2px solid var(--gold-border)", borderRadius: 14, padding: 4, boxShadow: "0 8px 24px rgba(0,0,0,.6)",
+        }}>
+          {langs.map((c) => (
+            <button key={c} type="button" role="option" aria-selected={c === value}
+              onClick={() => { setOpen(false); if (c !== value) onPick(c); }} style={{
+                display: "block", width: "100%", textAlign: "left", padding: "10px 12px", borderRadius: 10, border: 0,
+                background: c === value ? "var(--gold)" : "transparent", color: c === value ? "#000" : "var(--gold)",
+                fontSize: 15, fontWeight: 700, cursor: "pointer",
+              }}>{name(c)}</button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

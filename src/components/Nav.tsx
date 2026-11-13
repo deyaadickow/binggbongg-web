@@ -39,6 +39,8 @@ export function Nav() {
             please add '70+ Featured Videos'" — the existing Features Videos page and its player
             with the language buttons. */}
         <NavLink to="/feature-videos">{t("featured_videos_tab")}</NavLink>
+        {/* Steve, 2026-11-12: "Next to 70+ Featured Videos create 'Our Ads' button". */}
+        <NavLink to="/our-ads">{t("our_ads_tab")}</NavLink>
         <NavLink to="/settings" className="only-narrow">{t("settings")}</NavLink>
       </nav>
       <div className="me">
