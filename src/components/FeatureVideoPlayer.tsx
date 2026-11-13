@@ -92,15 +92,17 @@ export function FeatureVideoPlayer({ items, start = 0, onClose, country }: {
             display: "flex", flexDirection: "column",
           }}>
             {/* The bar sits ABOVE the video, not over it — over it, it covered the video's own logo. */}
-            <div style={{ padding: "10px 14px", display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+            <div style={{ padding: "10px 14px 6px", display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
               <button onClick={onClose} aria-label="Back" style={{
                 width: 40, height: 40, borderRadius: "50%", background: "#000", color: "var(--gold)",
                 border: "2px solid var(--gold-border)", fontSize: 20, fontWeight: 700, cursor: "pointer", lineHeight: 1,
               }}>‹</button>
-              <b style={{ color: "var(--gold)", fontSize: 17, flex: 1, minWidth: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{item.title}</b>
               {items.length > 1 && (
                 <span className="fv-count" style={{ color: "var(--gold)", fontSize: 13, opacity: 0.8, flexShrink: 0 }}>{i + 1} / {items.length}</span>
               )}
+              {/* The buttons sit on the right; the title has its own line under them (Steve, 2026-11-12: "text is cutoff
+                  when video is playing"). */}
+              <span style={{ flex: 1 }} />
               {/* Steve, 2026-11-12: "add an 'Language' picker and 'Download' button next to each other on top. when they
                   pick a language it will stay on that language for every video they watch until they change the language."
                   The pick is remembered on the device (rememberVideoLang) and every video opens in it when it has it. */}
@@ -117,6 +119,7 @@ export function FeatureVideoPlayer({ items, start = 0, onClose, country }: {
                   border: "2px solid var(--gold-border)", fontSize: 14, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap",
                 }}>⬇ {t("download")}</button>
             </div>
+            <b style={{ color: "var(--gold)", fontSize: 17, lineHeight: 1.25, padding: "0 16px 8px", flexShrink: 0, overflowWrap: "anywhere" }}>{item.title}</b>
             <div style={{ flex: 1, minHeight: 0, display: "flex" }}>
               {/* Only the video on screen plays; its neighbours are loaded, the rest are not. Keyed on
                   the file AND on being on screen: React would otherwise keep the same element when it

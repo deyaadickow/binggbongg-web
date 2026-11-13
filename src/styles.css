@@ -1425,5 +1425,5 @@ body.signup-black { background: radial-gradient(120% 55% at 50% 0%, #2a2108 0%, 
 @media (hover: none), (pointer: coarse) { .live-swipe-btns { display: none; } }
 .feed-live-btn { margin-left: 12px; }
 
-/* The video player's top bar on a narrow phone: back, title, Language, Download — the 1/80 counter makes room. */
-@media (max-width: 480px) { .fv-count { display: none; } }
+/* The video player's top bar on a narrow phone: back, Language, Download (the title has its own line under them). */
+@media (max-width: 360px) { .fv-count { display: none; } }
