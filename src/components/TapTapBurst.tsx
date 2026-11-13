@@ -172,7 +172,9 @@ export function burstLabel(gift: Gift): string | null {
     case "left": return RIGHT_HANDER;
     case "surprise": return SURPRISE;
     case "universal": return UNIVERSAL;
-    case "spot": return SPOT;
+    // Steve, 2026-11-13: "some gift say spot on the screen please remove that" — Spot gifts
+    // still play the Spot effect, they just show no "Spot" word (tile or on-screen pill).
+    case "spot": return null;
     default: return null;
   }
 }
@@ -389,7 +391,7 @@ export function TapTapBurst({ gift, imageUrl, sizeMin = ICON_SIZE_MIN, sizeRange
           .bb-taptap-icon { animation-duration: 1ms !important; opacity: .9; }
         }
       `}</style>
-      {mounted && !hideName && (
+      {mounted && !hideName && burstDirection(gift) !== "spot" && (
         <div
           style={{
             position: "absolute", top: "20%", left: 0, right: 0, textAlign: "center",
