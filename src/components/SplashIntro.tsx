@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 
-// Bingg and Bongg splash, the same 4.5 s video as the phones (Steve, 2026-11-13: "Lady...Bingg...
-// Man...Bongg Bingg Bongg together one after another pink and blue"): a lady says "Bingg" over pink
-// Bingg, a man says "Bongg" over blue Bongg, then both pandas with pink Bingg + blue Bongg + BinggBongg.com.
+// Bingg and Bongg splash, the same 5 s video as the phones (Steve, 2026-11-13: "Lady...Bingg...
+// Man...Bongg Bingg Bongg together one after another pink and blue" / "Keep the same voices"): pink
+// Bingg says "Bingg", blue Bongg says "Bongg", then both pandas, pink "Bingg" then blue "Bongg", + BinggBongg.com.
 // Once per browser tab session. Browsers block autoplay with sound, so it tries with sound
 // first and falls back to muted. Tap to skip; capped at 6.5 s so it can never hold the site.
 const KEY = "bb_splash_seen";
