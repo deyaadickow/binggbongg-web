@@ -14,7 +14,7 @@ import { BarChart, Comparison, longDate } from "./MyAnalyticsPage";
 
 type Range = "today" | "month" | "year";
 interface PeriodParams { range: Range; day?: string; month?: string; year?: number | string }
-type CardFormat = "number" | "duration";
+type CardFormat = "number" | "duration" | "bbs";
 interface Card { key: string; value: number; prev: number | null; format: CardFormat }
 interface Owner { user_id: number; username?: string | null; fullname?: string | null; profile_image?: string | null }
 interface Lifetime {
@@ -56,7 +56,7 @@ function normalise(raw: any): PostAnalytics {
       key: String(c.key),
       value: num(c.value),
       prev: c.prev === null || c.prev === undefined ? null : num(c.prev),
-      format: (c.format === "duration" ? "duration" : "number") as CardFormat,
+      format: (c.format === "duration" || c.format === "bbs" ? c.format : "number") as CardFormat,
     })),
     charts: { views: Array.isArray(raw?.charts?.views) ? raw.charts.views.map(num) : [] },
     countries: (raw?.countries ?? []).map((c: { country?: unknown; views?: unknown; percent?: unknown }) => ({
@@ -84,7 +84,7 @@ function seconds(v: number, t: T): string {
 
 const CARD_LABELS: Record<string, StringKey> = {
   views: "va_views", watch_time: "ma_card_watch_time", likes: "va_likes", comments: "va_comments",
-  saves: "va_saves", reposts: "va_reposts", shares: "va_shares",
+  saves: "va_saves", reposts: "va_reposts", shares: "va_shares", gifts: "va_gifts",
 };
 
 export function PostAnalyticsPage() {
@@ -232,7 +232,7 @@ export function PostAnalyticsPage() {
               return (
                 <Tile key={c.key} onTap={tap} hint={kind ? t(PEOPLE[kind].title) : ""}>
                   <div className="ma-value" style={tap ? TAPPABLE : undefined}>
-                    {c.format === "duration" ? seconds(c.value, t) : c.value.toLocaleString()}{tap ? " ›" : ""}
+                    {c.format === "duration" ? seconds(c.value, t) : c.format === "bbs" ? t("ma_n_coins", c.value.toLocaleString()) : c.value.toLocaleString()}{tap ? " ›" : ""}
                   </div>
                   <div className="muted" style={{ fontSize: 13, marginBottom: 4 }}>{CARD_LABELS[c.key] ? t(CARD_LABELS[c.key]) : c.key}</div>
                   <Comparison value={c.value} prev={c.prev} prevLabel={data.period.prev_label} />
@@ -323,7 +323,7 @@ const PEOPLE: Record<PeopleKind, { title: StringKey; head: StringKey; headOne: S
   rewatches: { title: "va_who_rewatched", head: "va_bd_rewatches", headOne: "va_bd_rewatches_one", empty: "va_nobody_yet" },
   completed: { title: "va_who_completed", head: "va_bd_completed", headOne: "va_bd_completed", empty: "va_nobody_yet" },
 };
-const PERIOD_KINDS: Record<string, PeopleKind> = { views: "views", likes: "likes", comments: "comments", saves: "saves", reposts: "reposts" };
+const PERIOD_KINDS: Record<string, PeopleKind> = { views: "views", likes: "likes", comments: "comments", saves: "saves", reposts: "reposts", gifts: "gifts" };
 
 interface PersonRow {
   user_id: number; username: string | null; fullname: string | null; profile_image: string | null;
