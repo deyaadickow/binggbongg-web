@@ -4,10 +4,11 @@
 // /video/:id/analytics. Anyone can open it, signed in or not — the numbers are the same ones a
 // viewer sees on the video (views, likes, ...), plus watch time and where the viewers are.
 // Backend: PostAnalyticsController::fetchPostAnalytics.
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { mediaUrl, post } from "../lib/api";
 import { Avatar, Loading, Notice } from "../components/Common";
+import { useSession } from "../lib/session";
 import { useT, type StringKey } from "../lib/i18n";
 import { BarChart, Comparison, longDate } from "./MyAnalyticsPage";
 
@@ -96,6 +97,10 @@ export function PostAnalyticsPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [reload, setReload] = useState(0);
+  // Steve, 2026-11-13: "When they click on views inside analytics, let them get a pop-up of who
+  // viewed that video." Only the video's owner (the server refuses anyone else too).
+  const { user } = useSession();
+  const [viewersOpen, setViewersOpen] = useState(false);
 
   const paramsKey = JSON.stringify(params);
   useEffect(() => {
@@ -131,6 +136,9 @@ export function PostAnalyticsPage() {
     const idx = (window.history.state as { idx?: number } | null)?.idx ?? 0;
     if (idx > 0) navigate(-1); else navigate(`/video/${postId}`);
   };
+
+  const isOwner = !!user && !!owner && Number(user.id) === Number(owner.user_id);
+  const openViewers = isOwner ? () => setViewersOpen(true) : undefined;
 
   const lifetimeTiles: { label: StringKey; value: string }[] = life ? [
     { label: "va_views", value: life.views.toLocaleString() },
@@ -182,10 +190,10 @@ export function PostAnalyticsPage() {
           <h2 className="ma-h2">{t("va_all_time")}</h2>
           <div className="ma-cards" style={{ marginBottom: 18 }}>
             {lifetimeTiles.map((tile) => (
-              <div key={tile.label} className="card ma-card">
-                <div className="ma-value">{tile.value}</div>
+              <Tile key={tile.label} onTap={tile.label === "va_views" ? openViewers : undefined} hint={t("va_who_watched")}>
+                <div className="ma-value" style={tile.label === "va_views" && openViewers ? TAPPABLE : undefined}>{tile.value}{tile.label === "va_views" && openViewers ? " ›" : ""}</div>
                 <div className="muted" style={{ fontSize: 13 }}>{t(tile.label)}</div>
-              </div>
+              </Tile>
             ))}
           </div>
 
@@ -212,11 +220,13 @@ export function PostAnalyticsPage() {
 
           <div className="ma-cards">
             {data.cards.map((c) => (
-              <div key={c.key} className="card ma-card">
-                <div className="ma-value">{c.format === "duration" ? seconds(c.value, t) : c.value.toLocaleString()}</div>
+              <Tile key={c.key} onTap={c.key === "views" ? openViewers : undefined} hint={t("va_who_watched")}>
+                <div className="ma-value" style={c.key === "views" && openViewers ? TAPPABLE : undefined}>
+                  {c.format === "duration" ? seconds(c.value, t) : c.value.toLocaleString()}{c.key === "views" && openViewers ? " ›" : ""}
+                </div>
                 <div className="muted" style={{ fontSize: 13, marginBottom: 4 }}>{CARD_LABELS[c.key] ? t(CARD_LABELS[c.key]) : c.key}</div>
                 <Comparison value={c.value} prev={c.prev} prevLabel={data.period.prev_label} />
-              </div>
+              </Tile>
             ))}
           </div>
 
@@ -248,6 +258,129 @@ export function PostAnalyticsPage() {
           </p>
         </div>
       )}
+      {viewersOpen && isOwner && user && (
+        <ViewersModal postId={p?.post_id || postId} userId={Number(user.id)} onClose={() => setViewersOpen(false)} />
+      )}
+    </div>
+  );
+}
+
+const TAPPABLE = { textDecoration: "underline", textDecorationColor: "var(--gold)", textUnderlineOffset: 4, textDecorationThickness: 2 } as const;
+
+/** A stat card; a button when it opens something (the owner's Views), a plain card otherwise. */
+function Tile({ onTap, hint, children }: { onTap?: () => void; hint: string; children: ReactNode }) {
+  if (!onTap) return <div className="card ma-card">{children}</div>;
+  return (
+    <button type="button" className="card ma-card" onClick={onTap} title={hint} aria-label={hint}
+      style={{ textAlign: "left", cursor: "pointer", font: "inherit", color: "inherit", width: "100%" }}>
+      {children}
+    </button>
+  );
+}
+
+interface Viewer {
+  user_id: number; username: string | null; fullname: string | null; profile_image: string | null;
+  is_verified: number; times: number; last_viewed_at: string | null;
+}
+
+/** "2026-11-09 14:27:57" (UTC) -> "4 days ago" in the page's language. */
+function ago(utc: string | null, lang: string): string {
+  if (!utc) return "";
+  const d = new Date(utc.slice(0, 19).replace(" ", "T") + "Z");
+  if (isNaN(d.getTime())) return "";
+  const secs = Math.round((d.getTime() - Date.now()) / 1000);
+  const steps: [Intl.RelativeTimeFormatUnit, number][] = [["second", 60], ["minute", 60], ["hour", 24], ["day", 7], ["week", 4.35], ["month", 12], ["year", Infinity]];
+  let v = secs;
+  for (const [unit, size] of steps) {
+    if (Math.abs(v) < size) {
+      try { return new Intl.RelativeTimeFormat(lang, { numeric: "auto" }).format(Math.round(v), unit); }
+      catch { return new Intl.RelativeTimeFormat(undefined, { numeric: "auto" }).format(Math.round(v), unit); }
+    }
+    v /= size;
+  }
+  return "";
+}
+
+const PAGE = 50;
+
+/** "Who watched": the signed-in members who viewed this video, for its owner only. */
+function ViewersModal({ postId, userId, onClose }: { postId: number; userId: number; onClose: () => void }) {
+  const { t, lang } = useT();
+  const navigate = useNavigate();
+  const [viewers, setViewers] = useState<Viewer[]>([]);
+  const [start, setStart] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const [signedOut, setSignedOut] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let live = true;
+    setLoading(true);
+    setError(null);
+    post<{ viewers?: unknown[]; signed_out_views?: unknown; has_more?: unknown }>("fetchPostViewers", { user_id: userId, post_id: postId, start, count: PAGE })
+      .then((r) => {
+        if (!live) return;
+        if (!r.status || !r.data) { setError(r.message || t("va_viewers_error")); return; }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const rows: Viewer[] = (r.data.viewers ?? []).map((v: any) => ({
+          user_id: num(v.user_id), username: v.username ?? null, fullname: v.fullname ?? null,
+          profile_image: v.profile_image ?? null, is_verified: num(v.is_verified), times: num(v.times),
+          last_viewed_at: v.last_viewed_at ?? null,
+        }));
+        setViewers((cur) => (start === 0 ? rows : [...cur, ...rows]));
+        setSignedOut(num(r.data.signed_out_views));
+        setHasMore(r.data.has_more === true || r.data.has_more === 1 || r.data.has_more === "1" || r.data.has_more === "true");
+      })
+      .catch((e: Error) => { if (live) setError(e?.message || t("va_viewers_error")); })
+      .finally(() => { if (live) setLoading(false); });
+    return () => { live = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [postId, userId, start]);
+
+  return (
+    <div onClick={onClose}
+      style={{ position: "fixed", inset: 0, zIndex: 60, background: "rgba(0,0,0,.75)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+      <div onClick={(e) => e.stopPropagation()} role="dialog" aria-label={t("va_who_watched")}
+        style={{ width: "100%", maxWidth: 420, maxHeight: "85vh", display: "flex", flexDirection: "column", background: "#000",
+                 border: "1.5px solid var(--gold-border)", borderRadius: 16, padding: 16 }}>
+        <div style={{ fontWeight: 800, fontSize: 18, color: "var(--gold)", textAlign: "center", marginBottom: 12 }}>{t("va_who_watched")}</div>
+        <div style={{ overflowY: "auto", flex: 1, minHeight: 0 }}>
+          {viewers.length === 0 && loading ? <Loading /> : error && viewers.length === 0 ? <Notice error>{error}</Notice> : (
+            <>
+              {viewers.length === 0 && <p className="muted" style={{ textAlign: "center" }}>{t("va_no_viewers")}</p>}
+              <div style={{ display: "grid", gap: 8 }}>
+                {viewers.map((v) => (
+                  <button key={v.user_id} type="button" className="card row"
+                    onClick={() => { onClose(); navigate(`/profile/${v.user_id}`); }}
+                    style={{ padding: 10, gap: 10, width: "100%", textAlign: "left", cursor: "pointer", font: "inherit", color: "inherit" }}>
+                    <Avatar user={{ id: v.user_id, fullname: v.fullname ?? undefined, username: v.username ?? undefined, profile_image: v.profile_image ?? undefined }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 800, color: "var(--gold)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {v.fullname || v.username || ""}
+                        {v.is_verified === 2 && <span title={t("verified")} style={{ color: "#4af", marginLeft: 4 }}>✓</span>}
+                      </div>
+                      {v.username ? <div className="muted" style={{ fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>@{v.username}</div> : null}
+                      <div className="muted" style={{ fontSize: 12 }}>
+                        {[v.times > 1 ? t("va_watched_n_times", v.times.toLocaleString()) : "", ago(v.last_viewed_at, lang)].filter(Boolean).join(" · ")}
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+              {error && viewers.length > 0 && <Notice error>{error}</Notice>}
+              {hasMore && (
+                <button type="button" className="btn small" disabled={loading} style={{ width: "100%", marginTop: 10 }}
+                  onClick={() => setStart((n) => n + PAGE)}>{loading ? "…" : t("va_load_more")}</button>
+              )}
+              {signedOut > 0 && (
+                <p className="muted" style={{ fontSize: 12, textAlign: "center", marginTop: 12 }}>{t("va_signed_out_views", signedOut.toLocaleString())}</p>
+              )}
+            </>
+          )}
+        </div>
+        <button type="button" className="btn ghost" style={{ width: "100%", marginTop: 12 }} onClick={onClose}>{t("close")}</button>
+      </div>
     </div>
   );
 }

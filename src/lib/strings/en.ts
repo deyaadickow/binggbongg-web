@@ -2564,4 +2564,10 @@ export const en = {
   va_no_countries: "No views counted by country yet.",
   va_footnote: "Watch time and countries are counted from %1$s.",
   va_load_error: "Couldn't load this video's analytics.",
+  va_who_watched: "Who watched",
+  va_no_viewers: "No signed-in viewers yet.",
+  va_watched_n_times: "Watched %1$s times",
+  va_load_more: "Load more",
+  va_signed_out_views: "+ %1$s views from people who weren't signed in",
+  va_viewers_error: "Couldn't load who watched this video.",
 } as const;
