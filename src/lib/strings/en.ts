@@ -2568,6 +2568,12 @@ export const en = {
   va_no_viewers: "No signed-in viewers yet.",
   va_watched_n_times: "Watched %1$s times",
   va_load_more: "Load more",
-  va_signed_out_views: "+ %1$s views from people who weren't signed in",
+  va_bd_total: "%1$s views:",
+  va_bd_total_one: "1 view:",
+  va_bd_members: "%1$s from %2$s members below",
+  va_bd_members_one: "%1$s from 1 member below",
+  va_bd_signed_out: "%1$s not signed in",
+  va_bd_yours: "%1$s yours",
+  va_bd_not_recorded: "%1$s before %2$s or not recorded",
   va_viewers_error: "Couldn't load who watched this video.",
 } as const;

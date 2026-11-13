@@ -303,6 +303,30 @@ function ago(utc: string | null, lang: string): string {
 
 const PAGE = 50;
 
+interface Breakdown { total_views: number; member_views: number; members: number; signed_out_views: number; your_views: number; not_recorded: number }
+
+/** "14 views: 9 from 5 members below · 3 not signed in · 2 before Oct 4 or not recorded" —
+ *  only the parts above zero; "" when there is nothing to say. */
+function breakdownLine(b: Breakdown, since: string | null, t: T, lang: string): string {
+  const n = (v: number) => v.toLocaleString();
+  const parts: string[] = [];
+  if (b.member_views > 0) parts.push(b.members === 1 ? t("va_bd_members_one", n(b.member_views)) : t("va_bd_members", n(b.member_views), n(b.members)));
+  if (b.signed_out_views > 0) parts.push(t("va_bd_signed_out", n(b.signed_out_views)));
+  if (b.your_views > 0) parts.push(t("va_bd_yours", n(b.your_views)));
+  if (b.not_recorded > 0) {
+    let day = "Oct 4";
+    const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(since ?? "2026-10-04");
+    if (m) {
+      const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+      try { day = d.toLocaleDateString(lang, { month: "short", day: "numeric" }); } catch { /* keep */ }
+    }
+    parts.push(t("va_bd_not_recorded", n(b.not_recorded), day));
+  }
+  if (b.total_views <= 0 && parts.length === 0) return "";
+  const head = b.total_views === 1 ? t("va_bd_total_one") : t("va_bd_total", n(b.total_views));
+  return parts.length ? `${head} ${parts.join(" · ")}` : head;
+}
+
 /** "Who watched": the signed-in members who viewed this video, for its owner only. */
 function ViewersModal({ postId, userId, onClose }: { postId: number; userId: number; onClose: () => void }) {
   const { t, lang } = useT();
@@ -310,7 +334,8 @@ function ViewersModal({ postId, userId, onClose }: { postId: number; userId: num
   const [viewers, setViewers] = useState<Viewer[]>([]);
   const [start, setStart] = useState(0);
   const [hasMore, setHasMore] = useState(false);
-  const [signedOut, setSignedOut] = useState(0);
+  const [breakdown, setBreakdown] = useState<Breakdown | null>(null);
+  const [since, setSince] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -318,7 +343,7 @@ function ViewersModal({ postId, userId, onClose }: { postId: number; userId: num
     let live = true;
     setLoading(true);
     setError(null);
-    post<{ viewers?: unknown[]; signed_out_views?: unknown; has_more?: unknown }>("fetchPostViewers", { user_id: userId, post_id: postId, start, count: PAGE })
+    post<{ viewers?: unknown[]; has_more?: unknown; breakdown?: Record<string, unknown> | null; counting_since?: unknown }>("fetchPostViewers", { user_id: userId, post_id: postId, start, count: PAGE })
       .then((r) => {
         if (!live) return;
         if (!r.status || !r.data) { setError(r.message || t("va_viewers_error")); return; }
@@ -329,7 +354,14 @@ function ViewersModal({ postId, userId, onClose }: { postId: number; userId: num
           last_viewed_at: v.last_viewed_at ?? null,
         }));
         setViewers((cur) => (start === 0 ? rows : [...cur, ...rows]));
-        setSignedOut(num(r.data.signed_out_views));
+        // Steve, 2026-11-13: "Yes, add that line on all platforms." An older server sends no
+        // breakdown; then the line is simply not shown.
+        const b = r.data.breakdown;
+        setBreakdown(b && typeof b === "object" ? {
+          total_views: num(b.total_views), member_views: num(b.member_views), members: num(b.members),
+          signed_out_views: num(b.signed_out_views), your_views: num(b.your_views), not_recorded: num(b.not_recorded),
+        } : null);
+        setSince(typeof r.data.counting_since === "string" ? r.data.counting_since : null);
         setHasMore(r.data.has_more === true || r.data.has_more === 1 || r.data.has_more === "1" || r.data.has_more === "true");
       })
       .catch((e: Error) => { if (live) setError(e?.message || t("va_viewers_error")); })
@@ -345,6 +377,12 @@ function ViewersModal({ postId, userId, onClose }: { postId: number; userId: num
         style={{ width: "100%", maxWidth: 420, maxHeight: "85vh", display: "flex", flexDirection: "column", background: "#000",
                  border: "1.5px solid var(--gold-border)", borderRadius: 16, padding: 16 }}>
         <div style={{ fontWeight: 800, fontSize: 18, color: "var(--gold)", textAlign: "center", marginBottom: 12 }}>{t("va_who_watched")}</div>
+        {breakdown && breakdownLine(breakdown, since, t, lang) && (
+          <div style={{ border: "1.5px solid var(--gold-border)", borderRadius: 10, padding: "8px 12px", marginBottom: 12,
+                        color: "var(--gold)", fontSize: 13, fontWeight: 700, textAlign: "center", lineHeight: 1.45 }}>
+            {breakdownLine(breakdown, since, t, lang)}
+          </div>
+        )}
         <div style={{ overflowY: "auto", flex: 1, minHeight: 0 }}>
           {viewers.length === 0 && loading ? <Loading /> : error && viewers.length === 0 ? <Notice error>{error}</Notice> : (
             <>
@@ -372,9 +410,6 @@ function ViewersModal({ postId, userId, onClose }: { postId: number; userId: num
               {hasMore && (
                 <button type="button" className="btn small" disabled={loading} style={{ width: "100%", marginTop: 10 }}
                   onClick={() => setStart((n) => n + PAGE)}>{loading ? "…" : t("va_load_more")}</button>
-              )}
-              {signedOut > 0 && (
-                <p className="muted" style={{ fontSize: 12, textAlign: "center", marginTop: 12 }}>{t("va_signed_out_views", signedOut.toLocaleString())}</p>
               )}
             </>
           )}
