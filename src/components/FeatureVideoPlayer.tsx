@@ -139,42 +139,55 @@ export function FeatureVideoPlayer({ items, start = 0, onClose, country }: {
   );
 }
 
-/** The video's Language picker: a black and gold button that opens the languages this video has. With one language it
- *  only shows it. Never a native <select> (the web's gold dropdown rule). */
+/** The video's Language picker: a black and gold button that opens the languages this video has in a centred black card
+ *  with a gold border (Steve, 2026-11-12: "Please fix the language picker popup design on all") — "Language" on top, one
+ *  gold-outlined row per language with the playing one filled gold, a gold ✕. With one language it only shows it. */
 function LangPicker({ langs, value, onPick, label }: { langs: VideoLang[]; value: VideoLang | null; onPick: (l: VideoLang) => void; label: string }) {
   const [open, setOpen] = useState(false);
-  const box = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!open) return;
-    const close = (e: MouseEvent) => { if (!box.current?.contains(e.target as Node)) setOpen(false); };
-    document.addEventListener("mousedown", close);
-    return () => document.removeEventListener("mousedown", close);
+    const esc = (e: KeyboardEvent) => { if (e.key === "Escape") { e.stopPropagation(); setOpen(false); } };
+    window.addEventListener("keydown", esc, true);
+    return () => window.removeEventListener("keydown", esc, true);
   }, [open]);
   if (!value) return null;
   const name = (c: VideoLang) => VIDEO_LANGS.find((l) => l.code === c)?.label ?? c;
   const many = langs.length > 1;
   return (
-    <div ref={box} style={{ position: "relative", flexShrink: 0 }}>
-      <button type="button" aria-label={`${label}: ${name(value)}`} aria-haspopup={many ? "listbox" : undefined} aria-expanded={many ? open : undefined}
-        onClick={() => many && setOpen((o) => !o)} style={{
-          height: 40, padding: "0 12px", borderRadius: 20, background: "#000", color: "var(--gold)",
+    <>
+      <button type="button" aria-label={`${label}: ${name(value)}`} aria-haspopup={many ? "dialog" : undefined}
+        onClick={() => many && setOpen(true)} style={{
+          height: 40, padding: "0 12px", borderRadius: 20, background: "#000", color: "var(--gold)", flexShrink: 0,
           border: "2px solid var(--gold-border)", fontSize: 14, fontWeight: 700, cursor: many ? "pointer" : "default", whiteSpace: "nowrap",
         }}>🌐 {name(value)}{many ? " ▾" : ""}</button>
       {open && (
-        <div role="listbox" aria-label={label} style={{
-          position: "absolute", right: 0, top: 46, zIndex: 5, minWidth: 150, background: "#000",
-          border: "2px solid var(--gold-border)", borderRadius: 14, padding: 4, boxShadow: "0 8px 24px rgba(0,0,0,.6)",
+        <div role="dialog" aria-modal="true" aria-label={label} onClick={() => setOpen(false)} style={{
+          position: "fixed", inset: 0, zIndex: 2100, background: "rgba(0,0,0,.7)",
+          display: "flex", alignItems: "center", justifyContent: "center", padding: 24,
         }}>
-          {langs.map((c) => (
-            <button key={c} type="button" role="option" aria-selected={c === value}
-              onClick={() => { setOpen(false); if (c !== value) onPick(c); }} style={{
-                display: "block", width: "100%", textAlign: "left", padding: "10px 12px", borderRadius: 10, border: 0,
-                background: c === value ? "var(--gold)" : "transparent", color: c === value ? "#000" : "var(--gold)",
-                fontSize: 15, fontWeight: 700, cursor: "pointer",
-              }}>{name(c)}</button>
-          ))}
+          <div onClick={(e) => e.stopPropagation()} style={{
+            width: "100%", maxWidth: 320, background: "#000", border: "2px solid var(--gold-border)", borderRadius: 22,
+            padding: "12px 18px 18px", boxShadow: "0 10px 40px rgba(0,0,0,.7)",
+          }}>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <b style={{ flex: 1, color: "var(--gold)", fontSize: 19 }}>🌐 {label}</b>
+              <button type="button" aria-label="Close" onClick={() => setOpen(false)} style={{
+                width: 36, height: 36, background: "transparent", border: 0, color: "var(--gold)", fontSize: 20, fontWeight: 800, cursor: "pointer",
+              }}>✕</button>
+            </div>
+            {langs.map((c) => {
+              const on = c === value;
+              return (
+                <button key={c} type="button" aria-pressed={on} onClick={() => { setOpen(false); if (!on) onPick(c); }} style={{
+                  display: "block", width: "100%", marginTop: 12, height: 50, borderRadius: 25,
+                  border: "2px solid var(--gold-border)", background: on ? "var(--gold)" : "#000", color: on ? "#000" : "var(--gold)",
+                  fontSize: 17, fontWeight: 800, cursor: "pointer",
+                }}>{on ? "✓  " : ""}{name(c)}</button>
+              );
+            })}
+          </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
