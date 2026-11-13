@@ -87,6 +87,7 @@ import { VerifyEmailModal } from "./components/VerifyEmailModal";
 import { PodcastEpisodePage, PodcastsPage, StartPodcastPage } from "./pages/PodcastPages";
 import { PodcastPlayerProvider } from "./lib/podcastPlayer";
 import { PodcastMiniBar } from "./components/PodcastBits";
+import SplashIntro from "./components/SplashIntro";
 
 /** The ads' landing page (/ph) stands alone — no menu, no sidebar, nothing but the contest and the
  *  download button (Steve, 2026-10-31). Everything else gets the normal site. */
@@ -127,6 +128,7 @@ export default function App() {
           playing while the member browses. */}
       <PodcastPlayerProvider>
       <BrowserRouter>
+        <SplashIntro />
         <RouteMeta />
         <AdArrival />
         {/* Member page history (Steve, 2026-11-02): one row per page a signed-in member opens. */}
