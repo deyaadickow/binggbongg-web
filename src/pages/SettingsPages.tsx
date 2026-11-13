@@ -768,6 +768,9 @@ export function SupportPage() {
     setError("");
     try {
       const r = await post<SupportReply>("sendSupportMessage", { message: msg.trim(), reason, user_id: user?.id ?? 0 });
+      // Suspend Messages (Steve, 2026-11-13): a paused member gets the server's sentence ("paused until ...")
+      // instead of a false "sent". Any other refusal shows its message the same way.
+      if (r.status === false) { setError(r.message || tt("failed_to_send_message_please_try_again")); return; }
       if (r.data?.reply) { setReply(r.data); setAskedForPerson(false); }
       setSent(true);
     } catch {
