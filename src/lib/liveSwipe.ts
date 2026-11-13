@@ -61,8 +61,9 @@ function shuffled<T>(xs: T[]): T[] {
 }
 
 /** The feed's Live button. Steve, 2026-11-12: "Make it always start on the welcome video" / "After the
- *  welcome video, All other videos will be at random" — it always opens on the admin's #1 Live Section
- *  video (the Welcome video); swipe up goes through the real lives in random order, then the other
+ *  welcome video, All other videos will be at random" — it always opens on the first Live Section video
+ *  (the Welcome video, or the first one tagged with the viewer's country), then that country's other
+ *  videos; swipe up goes through the real lives in random order, then the other
  *  featured videos in random order, wrapping. No featured videos → the lives at random; nothing at all
  *  → the Live Now list with its empty state. */
 export async function openRandomLive(navigate: NavigateFunction, userId: number) {
@@ -70,6 +71,13 @@ export async function openRandomLive(navigate: NavigateFunction, userId: number)
   if (all.length === 0) { navigate("/live"); return; }
   const lives = shuffled(all.filter((x) => x.kind === "live"));
   const videos = all.filter((x) => x.kind === "video");
-  const items = videos.length > 0 ? [videos[0], ...lives, ...shuffled(videos.slice(1))] : lives;
+  // Steve, 2026-11-12: "what ever country i add on that video will be one of the first video to play when a
+  // member of that country clicks on the live" — the server puts the viewer's country's videos first; the
+  // rest of them stay right after the first video, before the lives and the shuffled rest.
+  const isMine = (x: LiveSwipeItem) => x.kind === "video" && !!x.video.for_your_country;
+  const rest = videos.slice(1);
+  const items = videos.length > 0
+    ? [videos[0], ...rest.filter(isMine), ...lives, ...shuffled(rest.filter((x) => !isMine(x)))]
+    : lives;
   goToSwipe(navigate, items, 0, false);
 }

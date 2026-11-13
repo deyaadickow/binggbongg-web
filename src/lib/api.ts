@@ -279,6 +279,10 @@ export interface FeaturedLiveVideo {
   host_profile_image?: string | null;
   is_featured?: boolean;
   gifts_enabled?: boolean;
+  /** Steve, 2026-11-12: the admin can tag a video with one country; the server lists the viewer's own
+   *  country's videos first and marks them. */
+  country?: string | null;
+  for_your_country?: boolean;
 }
 
 /** Any failure (including the 404 before the backend deploy) is an empty list — this must never
