@@ -18,7 +18,7 @@ type CardFormat = "number" | "duration";
 interface Card { key: string; value: number; prev: number | null; format: CardFormat }
 interface Owner { user_id: number; username?: string | null; fullname?: string | null; profile_image?: string | null }
 interface Lifetime {
-  views: number; likes: number; comments: number; saves: number; shares: number; reposts: number; votes: number;
+  views: number; likes: number; comments: number; saves: number; shares: number; reposts: number; gifts: number;
   watch_time_seconds: number; avg_watch_seconds: number; completion_rate: number | null; rewatches: number; duration_seconds: number | null;
 }
 interface PostAnalytics {
@@ -47,7 +47,7 @@ function normalise(raw: any): PostAnalytics {
     },
     lifetime: {
       views: num(l.views), likes: num(l.likes), comments: num(l.comments), saves: num(l.saves), shares: num(l.shares),
-      reposts: num(l.reposts), votes: num(l.votes), watch_time_seconds: num(l.watch_time_seconds),
+      reposts: num(l.reposts), gifts: num(l.gifts), watch_time_seconds: num(l.watch_time_seconds),
       avg_watch_seconds: num(l.avg_watch_seconds), completion_rate: numOrNull(l.completion_rate),
       rewatches: num(l.rewatches), duration_seconds: numOrNull(l.duration_seconds),
     },
@@ -84,7 +84,7 @@ function seconds(v: number, t: T): string {
 
 const CARD_LABELS: Record<string, StringKey> = {
   views: "va_views", watch_time: "ma_card_watch_time", likes: "va_likes", comments: "va_comments",
-  saves: "va_saves", reposts: "va_reposts", shares: "va_shares", votes: "va_votes",
+  saves: "va_saves", reposts: "va_reposts", shares: "va_shares",
 };
 
 export function PostAnalyticsPage() {
@@ -100,7 +100,9 @@ export function PostAnalyticsPage() {
   // Steve, 2026-11-13: "When they click on views inside analytics, let them get a pop-up of who
   // viewed that video." Only the video's owner (the server refuses anyone else too).
   const { user } = useSession();
-  const [viewersOpen, setViewersOpen] = useState(false);
+  // Steve, 2026-11-13: "Please do the same for the rest... likes, comments, rewatches, saves,
+  // gifts, Watched to the end, reposts, shares." One modal, opened with the kind of list.
+  const [peopleKind, setPeopleKind] = useState<PeopleKind | null>(null);
 
   const paramsKey = JSON.stringify(params);
   useEffect(() => {
@@ -138,21 +140,22 @@ export function PostAnalyticsPage() {
   };
 
   const isOwner = !!user && !!owner && Number(user.id) === Number(owner.user_id);
-  const openViewers = isOwner ? () => setViewersOpen(true) : undefined;
+  const opener = (kind: PeopleKind | undefined) => (isOwner && kind ? () => setPeopleKind(kind) : undefined);
 
-  const lifetimeTiles: { label: StringKey; value: string }[] = life ? [
-    { label: "va_views", value: life.views.toLocaleString() },
-    { label: "va_likes", value: life.likes.toLocaleString() },
-    { label: "va_comments", value: life.comments.toLocaleString() },
-    { label: "va_saves", value: life.saves.toLocaleString() },
-    { label: "va_shares", value: life.shares.toLocaleString() },
-    { label: "va_reposts", value: life.reposts.toLocaleString() },
-    { label: "va_votes", value: life.votes.toLocaleString() },
+  // Steve, 2026-11-13: "Please remove the votes and add Gifts."
+  const lifetimeTiles: { label: StringKey; value: string; kind?: PeopleKind }[] = life ? [
+    { label: "va_views", value: life.views.toLocaleString(), kind: "views" },
+    { label: "va_likes", value: life.likes.toLocaleString(), kind: "likes" },
+    { label: "va_comments", value: life.comments.toLocaleString(), kind: "comments" },
+    { label: "va_saves", value: life.saves.toLocaleString(), kind: "saves" },
+    { label: "va_shares", value: life.shares.toLocaleString(), kind: "shares" },
+    { label: "va_reposts", value: life.reposts.toLocaleString(), kind: "reposts" },
+    { label: "va_gifts", value: t("ma_n_coins", life.gifts.toLocaleString()), kind: "gifts" },
     ...(life.duration_seconds !== null && life.duration_seconds > 0 ? [{ label: "va_duration" as StringKey, value: seconds(life.duration_seconds, t) }] : []),
     { label: "va_watch_time", value: seconds(life.watch_time_seconds, t) },
     { label: "va_avg_watch", value: seconds(life.avg_watch_seconds, t) },
-    ...(life.completion_rate !== null ? [{ label: "va_completion" as StringKey, value: `${life.completion_rate.toLocaleString(undefined, { maximumFractionDigits: 1 })}%` }] : []),
-    { label: "va_rewatches", value: life.rewatches.toLocaleString() },
+    ...(life.completion_rate !== null ? [{ label: "va_completion" as StringKey, value: `${life.completion_rate.toLocaleString(undefined, { maximumFractionDigits: 1 })}%`, kind: "completed" as PeopleKind }] : []),
+    { label: "va_rewatches", value: life.rewatches.toLocaleString(), kind: "rewatches" },
   ] : [];
 
   return (
@@ -189,12 +192,15 @@ export function PostAnalyticsPage() {
         <div style={{ opacity: loading ? 0.55 : 1, transition: "opacity .15s" }}>
           <h2 className="ma-h2">{t("va_all_time")}</h2>
           <div className="ma-cards" style={{ marginBottom: 18 }}>
-            {lifetimeTiles.map((tile) => (
-              <Tile key={tile.label} onTap={tile.label === "va_views" ? openViewers : undefined} hint={t("va_who_watched")}>
-                <div className="ma-value" style={tile.label === "va_views" && openViewers ? TAPPABLE : undefined}>{tile.value}{tile.label === "va_views" && openViewers ? " ›" : ""}</div>
-                <div className="muted" style={{ fontSize: 13 }}>{t(tile.label)}</div>
-              </Tile>
-            ))}
+            {lifetimeTiles.map((tile) => {
+              const tap = opener(tile.kind);
+              return (
+                <Tile key={tile.label} onTap={tap} hint={tile.kind ? t(PEOPLE[tile.kind].title) : ""}>
+                  <div className="ma-value" style={tap ? TAPPABLE : undefined}>{tile.value}{tap ? " ›" : ""}</div>
+                  <div className="muted" style={{ fontSize: 13 }}>{t(tile.label)}</div>
+                </Tile>
+              );
+            })}
           </div>
 
           <div className="row" style={{ gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
@@ -219,15 +225,20 @@ export function PostAnalyticsPage() {
           {error && <Notice error>{error}</Notice>}
 
           <div className="ma-cards">
-            {data.cards.map((c) => (
-              <Tile key={c.key} onTap={c.key === "views" ? openViewers : undefined} hint={t("va_who_watched")}>
-                <div className="ma-value" style={c.key === "views" && openViewers ? TAPPABLE : undefined}>
-                  {c.format === "duration" ? seconds(c.value, t) : c.value.toLocaleString()}{c.key === "views" && openViewers ? " ›" : ""}
-                </div>
-                <div className="muted" style={{ fontSize: 13, marginBottom: 4 }}>{CARD_LABELS[c.key] ? t(CARD_LABELS[c.key]) : c.key}</div>
-                <Comparison value={c.value} prev={c.prev} prevLabel={data.period.prev_label} />
-              </Tile>
-            ))}
+            {data.cards.map((c) => {
+              // The period cards open the same lifetime list.
+              const kind = PERIOD_KINDS[c.key];
+              const tap = opener(kind);
+              return (
+                <Tile key={c.key} onTap={tap} hint={kind ? t(PEOPLE[kind].title) : ""}>
+                  <div className="ma-value" style={tap ? TAPPABLE : undefined}>
+                    {c.format === "duration" ? seconds(c.value, t) : c.value.toLocaleString()}{tap ? " ›" : ""}
+                  </div>
+                  <div className="muted" style={{ fontSize: 13, marginBottom: 4 }}>{CARD_LABELS[c.key] ? t(CARD_LABELS[c.key]) : c.key}</div>
+                  <Comparison value={c.value} prev={c.prev} prevLabel={data.period.prev_label} />
+                </Tile>
+              );
+            })}
           </div>
 
           <div className="card" style={{ padding: 14, margin: "16px 0", background: "#000" }}>
@@ -258,8 +269,8 @@ export function PostAnalyticsPage() {
           </p>
         </div>
       )}
-      {viewersOpen && isOwner && user && (
-        <ViewersModal postId={p?.post_id || postId} userId={Number(user.id)} onClose={() => setViewersOpen(false)} />
+      {peopleKind && isOwner && user && (
+        <PeopleModal kind={peopleKind} postId={p?.post_id || postId} userId={Number(user.id)} onClose={() => setPeopleKind(null)} />
       )}
     </div>
   );
@@ -276,11 +287,6 @@ function Tile({ onTap, hint, children }: { onTap?: () => void; hint: string; chi
       {children}
     </button>
   );
-}
-
-interface Viewer {
-  user_id: number; username: string | null; fullname: string | null; profile_image: string | null;
-  is_verified: number; times: number; last_viewed_at: string | null;
 }
 
 /** "2026-11-09 14:27:57" (UTC) -> "4 days ago" in the page's language. */
@@ -303,110 +309,171 @@ function ago(utc: string | null, lang: string): string {
 
 const PAGE = 50;
 
-interface Breakdown { total_views: number; member_views: number; members: number; signed_out_views: number; your_views: number; not_recorded: number }
+type PeopleKind = "views" | "likes" | "comments" | "saves" | "shares" | "reposts" | "gifts" | "rewatches" | "completed";
+
+/** Per list: its title, the summary line's head (plural / exactly one) and the empty text. */
+const PEOPLE: Record<PeopleKind, { title: StringKey; head: StringKey; headOne: StringKey; empty: StringKey }> = {
+  views: { title: "va_who_watched", head: "va_bd_total", headOne: "va_bd_total_one", empty: "va_no_viewers" },
+  likes: { title: "va_who_liked", head: "va_bd_likes", headOne: "va_bd_likes_one", empty: "va_nobody_yet" },
+  comments: { title: "va_who_commented", head: "va_bd_comments", headOne: "va_bd_comments_one", empty: "va_nobody_yet" },
+  saves: { title: "va_who_saved", head: "va_bd_saves", headOne: "va_bd_saves_one", empty: "va_nobody_yet" },
+  shares: { title: "va_who_shared", head: "va_bd_shares", headOne: "va_bd_shares_one", empty: "va_nobody_yet" },
+  reposts: { title: "va_who_reposted", head: "va_bd_reposts", headOne: "va_bd_reposts_one", empty: "va_nobody_yet" },
+  gifts: { title: "va_who_sent_gifts", head: "va_bd_gifts", headOne: "va_bd_gifts", empty: "va_nobody_yet" },
+  rewatches: { title: "va_who_rewatched", head: "va_bd_rewatches", headOne: "va_bd_rewatches_one", empty: "va_nobody_yet" },
+  completed: { title: "va_who_completed", head: "va_bd_completed", headOne: "va_bd_completed", empty: "va_nobody_yet" },
+};
+const PERIOD_KINDS: Record<string, PeopleKind> = { views: "views", likes: "likes", comments: "comments", saves: "saves", reposts: "reposts" };
+
+interface PersonRow {
+  user_id: number; username: string | null; fullname: string | null; profile_image: string | null;
+  is_verified: number; amount: number; last_at: string | null; comment: string | null;
+}
+/** fetchPostViewers' breakdown and fetchPostEngagers' breakdown, in one shape. */
+interface Breakdown { total: number; listed: number; members: number; signed_out: number; yours: number; not_recorded: number }
 
 /** "14 views: 9 from 5 members below · 3 not signed in · 2 before Oct 4 or not recorded" —
- *  only the parts above zero; "" when there is nothing to say. */
-function breakdownLine(b: Breakdown, since: string | null, t: T, lang: string): string {
-  const n = (v: number) => v.toLocaleString();
+ *  only the parts above zero; "" when there is nothing to say. Gifts are counted in BBs. */
+function breakdownLine(kind: PeopleKind, b: Breakdown, since: string | null, bbs: boolean, t: T, lang: string): string {
+  const n = (v: number) => (bbs ? t("ma_n_coins", v.toLocaleString()) : v.toLocaleString());
   const parts: string[] = [];
-  if (b.member_views > 0) parts.push(b.members === 1 ? t("va_bd_members_one", n(b.member_views)) : t("va_bd_members", n(b.member_views), n(b.members)));
-  if (b.signed_out_views > 0) parts.push(t("va_bd_signed_out", n(b.signed_out_views)));
-  if (b.your_views > 0) parts.push(t("va_bd_yours", n(b.your_views)));
+  if (b.listed > 0) parts.push(b.members === 1 ? t("va_bd_members_one", n(b.listed)) : t("va_bd_members", n(b.listed), b.members.toLocaleString()));
+  if (b.signed_out > 0) parts.push(t("va_bd_signed_out", n(b.signed_out)));
+  if (b.yours > 0) parts.push(t("va_bd_yours", n(b.yours)));
   if (b.not_recorded > 0) {
-    let day = "Oct 4";
-    const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(since ?? "2026-10-04");
+    // Views always have a start date (Oct 4); for the others the server says, or sends null.
+    const from = since ?? (kind === "views" ? "2026-10-04" : null);
+    const m = from ? /^(\d{4})-(\d{2})-(\d{2})/.exec(from) : null;
     if (m) {
       const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+      let day = from!;
       try { day = d.toLocaleDateString(lang, { month: "short", day: "numeric" }); } catch { /* keep */ }
+      parts.push(t(kind === "shares" ? "va_bd_before_not_recorded" : "va_bd_not_recorded", n(b.not_recorded), day));
+    } else {
+      parts.push(t("va_bd_not_recorded_plain", n(b.not_recorded)));
     }
-    parts.push(t("va_bd_not_recorded", n(b.not_recorded), day));
   }
-  if (b.total_views <= 0 && parts.length === 0) return "";
-  const head = b.total_views === 1 ? t("va_bd_total_one") : t("va_bd_total", n(b.total_views));
+  if (b.total <= 0 && parts.length === 0) return "";
+  const head = !bbs && b.total === 1 ? t(PEOPLE[kind].headOne, "1") : t(PEOPLE[kind].head, n(b.total));
   return parts.length ? `${head} ${parts.join(" · ")}` : head;
 }
 
-/** "Who watched": the signed-in members who viewed this video, for its owner only. */
-function ViewersModal({ postId, userId, onClose }: { postId: number; userId: number; onClose: () => void }) {
+const truthy = (v: unknown) => v === true || v === 1 || v === "1" || v === "true";
+
+/** "Who watched" / "Who liked" / ...: the signed-in members behind one number, for the video's
+ *  owner only (the server refuses anyone else). Views come from fetchPostViewers, everything
+ *  else from fetchPostEngagers with a kind. */
+function PeopleModal({ kind, postId, userId, onClose }: { kind: PeopleKind; postId: number; userId: number; onClose: () => void }) {
   const { t, lang } = useT();
   const navigate = useNavigate();
-  const [viewers, setViewers] = useState<Viewer[]>([]);
+  const [rows, setRows] = useState<PersonRow[]>([]);
   const [start, setStart] = useState(0);
   const [hasMore, setHasMore] = useState(false);
   const [breakdown, setBreakdown] = useState<Breakdown | null>(null);
   const [since, setSince] = useState<string | null>(null);
+  const [bbs, setBbs] = useState(kind === "gifts");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const meta = PEOPLE[kind];
 
   useEffect(() => {
     let live = true;
     setLoading(true);
     setError(null);
-    post<{ viewers?: unknown[]; has_more?: unknown; breakdown?: Record<string, unknown> | null; counting_since?: unknown }>("fetchPostViewers", { user_id: userId, post_id: postId, start, count: PAGE })
+    const isViews = kind === "views";
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    post<any>(isViews ? "fetchPostViewers" : "fetchPostEngagers",
+      isViews ? { user_id: userId, post_id: postId, start, count: PAGE } : { user_id: userId, post_id: postId, kind, start, count: PAGE })
       .then((r) => {
         if (!live) return;
         if (!r.status || !r.data) { setError(r.message || t("va_viewers_error")); return; }
+        const d = r.data;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const rows: Viewer[] = (r.data.viewers ?? []).map((v: any) => ({
+        const list: PersonRow[] = ((isViews ? d.viewers : d.rows) ?? []).map((v: any) => ({
           user_id: num(v.user_id), username: v.username ?? null, fullname: v.fullname ?? null,
-          profile_image: v.profile_image ?? null, is_verified: num(v.is_verified), times: num(v.times),
-          last_viewed_at: v.last_viewed_at ?? null,
+          profile_image: v.profile_image ?? null, is_verified: num(v.is_verified),
+          amount: num(isViews ? v.times : v.amount), last_at: (isViews ? v.last_viewed_at : v.last_at) ?? null,
+          comment: typeof v.comment === "string" ? v.comment : null,
         }));
-        setViewers((cur) => (start === 0 ? rows : [...cur, ...rows]));
-        // Steve, 2026-11-13: "Yes, add that line on all platforms." An older server sends no
-        // breakdown; then the line is simply not shown.
-        const b = r.data.breakdown;
-        setBreakdown(b && typeof b === "object" ? {
-          total_views: num(b.total_views), member_views: num(b.member_views), members: num(b.members),
-          signed_out_views: num(b.signed_out_views), your_views: num(b.your_views), not_recorded: num(b.not_recorded),
-        } : null);
-        setSince(typeof r.data.counting_since === "string" ? r.data.counting_since : null);
-        setHasMore(r.data.has_more === true || r.data.has_more === 1 || r.data.has_more === "1" || r.data.has_more === "true");
+        setRows((cur) => (start === 0 ? list : [...cur, ...list]));
+        // An older server sends no breakdown; then the line is simply not shown.
+        const b = d.breakdown;
+        setBreakdown(b && typeof b === "object" ? (isViews ? {
+          total: num(b.total_views), listed: num(b.member_views), members: num(b.members),
+          signed_out: num(b.signed_out_views), yours: num(b.your_views), not_recorded: num(b.not_recorded),
+        } : {
+          total: num(b.total), listed: num(b.listed), members: num(b.members),
+          signed_out: num(b.signed_out), yours: num(b.yours), not_recorded: num(b.not_recorded),
+        }) : null);
+        setSince(typeof d.counting_since === "string" ? d.counting_since : null);
+        if (!isViews && d.unit) setBbs(d.unit === "bbs");
+        setHasMore(truthy(d.has_more));
       })
       .catch((e: Error) => { if (live) setError(e?.message || t("va_viewers_error")); })
       .finally(() => { if (live) setLoading(false); });
     return () => { live = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [postId, userId, start]);
+  }, [kind, postId, userId, start]);
+
+  /** The line under the name, per list. */
+  function subtitle(v: PersonRow): ReactNode {
+    const amount = v.amount.toLocaleString();
+    switch (kind) {
+      case "views": return [v.amount > 1 ? t("va_watched_n_times", amount) : "", ago(v.last_at, lang)].filter(Boolean).join(" · ");
+      case "comments": return (
+        <>
+          {v.comment ? <span style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", overflowWrap: "anywhere", color: "var(--text)" }}>{v.comment}</span> : null}
+          {v.amount > 1 ? <span>{t("va_n_comments", amount)}</span> : null}
+        </>
+      );
+      case "gifts": return t("ma_n_coins", amount);
+      case "rewatches": return t("va_rewatched_n_times", amount);
+      case "completed":
+      case "shares": return v.amount > 1 ? t("va_n_times", amount) : "";
+      default: return ago(v.last_at, lang);
+    }
+  }
+
+  const line = breakdown ? breakdownLine(kind, breakdown, since, bbs, t, lang) : "";
 
   return (
     <div onClick={onClose}
       style={{ position: "fixed", inset: 0, zIndex: 60, background: "rgba(0,0,0,.75)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-      <div onClick={(e) => e.stopPropagation()} role="dialog" aria-label={t("va_who_watched")}
+      <div onClick={(e) => e.stopPropagation()} role="dialog" aria-label={t(meta.title)}
         style={{ width: "100%", maxWidth: 420, maxHeight: "85vh", display: "flex", flexDirection: "column", background: "#000",
                  border: "1.5px solid var(--gold-border)", borderRadius: 16, padding: 16 }}>
-        <div style={{ fontWeight: 800, fontSize: 18, color: "var(--gold)", textAlign: "center", marginBottom: 12 }}>{t("va_who_watched")}</div>
-        {breakdown && breakdownLine(breakdown, since, t, lang) && (
+        <div style={{ fontWeight: 800, fontSize: 18, color: "var(--gold)", textAlign: "center", marginBottom: 12 }}>{t(meta.title)}</div>
+        {line && (
           <div style={{ border: "1.5px solid var(--gold-border)", borderRadius: 10, padding: "8px 12px", marginBottom: 12,
                         color: "var(--gold)", fontSize: 13, fontWeight: 700, textAlign: "center", lineHeight: 1.45 }}>
-            {breakdownLine(breakdown, since, t, lang)}
+            {line}
           </div>
         )}
         <div style={{ overflowY: "auto", flex: 1, minHeight: 0 }}>
-          {viewers.length === 0 && loading ? <Loading /> : error && viewers.length === 0 ? <Notice error>{error}</Notice> : (
+          {rows.length === 0 && loading ? <Loading /> : error && rows.length === 0 ? <Notice error>{error}</Notice> : (
             <>
-              {viewers.length === 0 && <p className="muted" style={{ textAlign: "center" }}>{t("va_no_viewers")}</p>}
+              {rows.length === 0 && <p className="muted" style={{ textAlign: "center" }}>{t(meta.empty)}</p>}
               <div style={{ display: "grid", gap: 8 }}>
-                {viewers.map((v) => (
-                  <button key={v.user_id} type="button" className="card row"
-                    onClick={() => { onClose(); navigate(`/profile/${v.user_id}`); }}
-                    style={{ padding: 10, gap: 10, width: "100%", textAlign: "left", cursor: "pointer", font: "inherit", color: "inherit" }}>
-                    <Avatar user={{ id: v.user_id, fullname: v.fullname ?? undefined, username: v.username ?? undefined, profile_image: v.profile_image ?? undefined }} />
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontWeight: 800, color: "var(--gold)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        {v.fullname || v.username || ""}
-                        {v.is_verified === 2 && <span title={t("verified")} style={{ color: "#4af", marginLeft: 4 }}>✓</span>}
+                {rows.map((v, i) => {
+                  const sub = subtitle(v);
+                  return (
+                    <button key={`${v.user_id}-${i}`} type="button" className="card row"
+                      onClick={() => { onClose(); navigate(`/profile/${v.user_id}`); }}
+                      style={{ padding: 10, gap: 10, width: "100%", textAlign: "left", cursor: "pointer", font: "inherit", color: "inherit" }}>
+                      <Avatar user={{ id: v.user_id, fullname: v.fullname ?? undefined, username: v.username ?? undefined, profile_image: v.profile_image ?? undefined }} />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 800, color: "var(--gold)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {v.fullname || v.username || ""}
+                          {v.is_verified === 2 && <span title={t("verified")} style={{ color: "#4af", marginLeft: 4 }}>✓</span>}
+                        </div>
+                        {v.username ? <div className="muted" style={{ fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>@{v.username}</div> : null}
+                        {sub ? <div className="muted" style={{ fontSize: 12, display: "grid", gap: 2 }}>{sub}</div> : null}
                       </div>
-                      {v.username ? <div className="muted" style={{ fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>@{v.username}</div> : null}
-                      <div className="muted" style={{ fontSize: 12 }}>
-                        {[v.times > 1 ? t("va_watched_n_times", v.times.toLocaleString()) : "", ago(v.last_viewed_at, lang)].filter(Boolean).join(" · ")}
-                      </div>
-                    </div>
-                  </button>
-                ))}
+                    </button>
+                  );
+                })}
               </div>
-              {error && viewers.length > 0 && <Notice error>{error}</Notice>}
+              {error && rows.length > 0 && <Notice error>{error}</Notice>}
               {hasMore && (
                 <button type="button" className="btn small" disabled={loading} style={{ width: "100%", marginTop: 10 }}
                   onClick={() => setStart((n) => n + PAGE)}>{loading ? "…" : t("va_load_more")}</button>
