@@ -21,6 +21,7 @@ interface ScreenRoute {
 const ROUTES: ScreenRoute[] = [
   // The feed and what it opens.
   { path: "/", screen: "feed_for_you" },
+  { path: "/video/:id/analytics", screen: "video_analytics", ref: { param: "id", type: "video" } },
   { path: "/video/:id", screen: "video", ref: { param: "id", type: "video", awaitLabel: true } },
   // /profile/:id is profile_self when :id is the member themself — decided below.
   { path: "/profile/:id", screen: "profile", ref: { param: "id", type: "member", awaitLabel: true } },

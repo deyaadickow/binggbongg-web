@@ -45,6 +45,7 @@ import { DailyFortunePage } from "./pages/DailyFortunePage";
 import { BirthdayPage } from "./pages/BirthdayPage";
 import { SupporterBreakdownPage, SupportersPage } from "./pages/SupportersPage";
 import { MyAnalyticsPage } from "./pages/MyAnalyticsPage";
+import { PostAnalyticsPage } from "./pages/PostAnalyticsPage";
 import { AdAnalyticsPage } from "./pages/AdAnalyticsPage";
 import { LandingPage } from "./pages/LandingPage";
 import { useEffect, type ReactNode } from "react";
@@ -155,6 +156,7 @@ export default function App() {
           <Route path="/business/:id" element={<BusinessPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/video/:id" element={<VideoPage />} />
+          <Route path="/video/:id/analytics" element={<PostAnalyticsPage />} />
           <Route path="/profile/:id" element={<ProfilePage />} />
           <Route path="/upcoming" element={<UpcomingPage />} />
           {/* Steve, 2026-10-11: direct messages — the same Firestore conversations the phones use. */}

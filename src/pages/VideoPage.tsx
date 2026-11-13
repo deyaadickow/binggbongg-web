@@ -311,6 +311,9 @@ export function VideoPage() {
       onPick: () => { closeMenu(false); navigate(`/search?q=${encodeURIComponent(item.sound?.sound_title ?? "")}`); },
     },
     { label: t("copy_this_video"), onPick: () => { void copyLink(); closeMenu(); } },
+    // Steve, 2026-11-13: "please add a analytics button, when they click it they will see all
+    // the analytics for this video."
+    { label: t("va_menu_row"), onPick: () => { closeMenu(false); navigate(`/video/${item.id}/analytics`); } },
     {
       label: t("repost"),
       onPick: () => {
