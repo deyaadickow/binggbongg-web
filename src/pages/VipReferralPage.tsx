@@ -69,7 +69,7 @@ export function VipReferralPage() {
 
   const money = (n: number) => `$${Number.isInteger(n) ? n : n.toFixed(2)}`;
   const vipCap = money(prog.vip_cap ?? 100);
-  const cap = money(prog.cap ?? 25);
+  const cap = money(prog.cap ?? 100);
   const percent = String(prog.percent ?? 5);
   const me = isLoggedIn ? prog.me : null;
   const status = me?.vip?.status ?? "none";
