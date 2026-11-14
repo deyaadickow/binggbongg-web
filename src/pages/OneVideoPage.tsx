@@ -23,8 +23,8 @@ export function OneVideoPage() {
     setItem(undefined);
     const urls = await fetchFeatureVideos(lang || "en");
     const url = urls[ONE_VIDEO_KEY];
-    setItem(url ? { url, title: t("tab_1_video"), sources: featureVideoSources[ONE_VIDEO_KEY] ?? {}, trackKey: "one_video_70_features" } : null);
-  }, [lang, t]);
+    setItem(url ? { url, title: "", sources: featureVideoSources[ONE_VIDEO_KEY] ?? {}, trackKey: "one_video_70_features" } : null);
+  }, [lang]);
 
   useEffect(() => { load(); }, [load]);
   const close = useCallback(() => nav("/"), [nav]);
