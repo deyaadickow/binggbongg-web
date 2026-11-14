@@ -1918,6 +1918,9 @@ export const es = {
   ve_no_session: "Cierra sesión y vuelve a entrar con tu correo y contraseña.",
   ve_checking: "Comprobando…",
   featured_videos_tab: "70+ videos destacados",
+  tab_70_features: "70+ funciones",
+  tab_70_videos: "70+ videos",
+  tab_1_video: "1 video, 70+ funciones",
   our_ads_tab: "Nuestros anuncios",
   fv_language: "Idioma",
   // Multi-live 24 (2026-11-05) — same keys and words as Android's strings_multi_live.xml.

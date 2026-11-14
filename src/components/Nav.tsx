@@ -34,11 +34,13 @@ export function Nav() {
         {/* Steve, 2026-10-25: Contests and Exciting News are directory tiles #1 and #2 now —
             only For You and the directory stay up here, centred like the phones. */}
         <NavLink to="/" end>{t("for_you")}</NavLink>
-        <NavLink to="/features">{t("everything_bingg_bongg_does")}</NavLink>
+        {/* Steve, 2026-11-14: "For You / 70+ Features / 70+ Videos / 1 Video 70+ Features / Our Ads". */}
+        <NavLink to="/features">{t("tab_70_features")}</NavLink>
         {/* Steve, 2026-11-05: "Next to 'For You Page' and 'Bingg Bongg features' on main feed page
             please add '70+ Featured Videos'" — the existing Features Videos page and its player
             with the language buttons. */}
-        <NavLink to="/feature-videos">{t("featured_videos_tab")}</NavLink>
+        <NavLink to="/feature-videos">{t("tab_70_videos")}</NavLink>
+        <NavLink to="/one-video">{t("tab_1_video")}</NavLink>
         {/* Steve, 2026-11-12: "Next to 70+ Featured Videos create 'Our Ads' button". */}
         <NavLink to="/our-ads">{t("our_ads_tab")}</NavLink>
         <NavLink to="/settings" className="only-narrow">{t("settings")}</NavLink>

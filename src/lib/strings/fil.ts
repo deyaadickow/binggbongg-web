@@ -1950,6 +1950,9 @@ export const fil = {
   ve_no_session: "Mag-sign out muna, tapos mag-sign in ulit gamit ang email at password mo.",
   ve_checking: "Tinitingnan…",
   featured_videos_tab: "70+ Itinatampok na Video",
+  tab_70_features: "70+ Features",
+  tab_70_videos: "70+ Video",
+  tab_1_video: "1 Video, 70+ Features",
   our_ads_tab: "Aming mga Ad",
   fv_language: "Wika",
   // Multi-live 24 (2026-11-05) — same keys and words as Android's strings_multi_live.xml.

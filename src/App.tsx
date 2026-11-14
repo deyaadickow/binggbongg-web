@@ -28,6 +28,7 @@ import { FreeCoinsPage } from "./pages/FreeCoinsPage";
 import { PrelaunchPage } from "./pages/PrelaunchPage";
 import { HousesPage } from "./pages/HousesPage";
 import { FeatureVideosPage } from "./pages/FeatureVideosPage";
+import { OneVideoPage } from "./pages/OneVideoPage";
 import { ReferralProgramPage } from "./pages/ReferralProgramPage";
 import { VipReferralPage } from "./pages/VipReferralPage";
 import { FeaturedContestPage } from "./pages/FeaturedContestPage";
@@ -297,6 +298,7 @@ export default function App() {
           {/* Every feature's 60-second video under its own heading (Steve, 2026-10-29). */}
           <Route path="/feature-videos" element={<FeatureVideosPage />} />
           <Route path="/our-ads" element={<FeatureVideosPage kind="ads" />} />
+          <Route path="/one-video" element={<OneVideoPage />} />
           <Route path="/referral-program" element={<ReferralProgramPage />} />
           {/* Ads for Referrals (Steve, 2026-11-11): downloadable video ads + the $100 offer video. */}
           <Route path="/ads-for-referrals" element={<AdsForReferralsPage />} />
