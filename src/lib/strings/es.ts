@@ -1425,7 +1425,7 @@ export const es = {
   vip_title: "Miembro VIP de Referidos",
   vip_card_become: "👑 Hazte Miembro VIP de Referidos: gana hasta $100 por cada miembro nuevo que traigas",
   vip_card_open_kit: "👑 Eres Miembro VIP de Referidos: abre tu kit VIP",
-  vip_pitch: "Hazte Miembro VIP de Referidos. Gana hasta %1$s por cada miembro nuevo que traigas a Bingg Bongg, en lugar de %2$s. Solicítalo aquí y te avisaremos en menos de 24 horas. Cuando te aprobemos, te mostraremos cómo compartir tu código en TikTok, Facebook, Instagram y más, con folletos listos que ya llevan tu código.",
+  vip_pitch: "Hazte Miembro VIP de Referidos. Gana hasta %1$s por cada miembro nuevo que traigas a Bingg Bongg, y obtén la insignia VIP. Solicítalo aquí y te avisaremos en menos de 24 horas. Cuando te aprobemos, te mostraremos cómo compartir tu código en TikTok, Facebook, Instagram y más, con folletos listos que ya llevan tu código.",
   vip_sign_in_to_apply: "Inicia sesión para solicitarlo",
   vip_where_share: "¿Dónde vas a compartir?",
   vip_platform_other: "Otro",

@@ -1452,7 +1452,7 @@ export const id = {
   vip_title: "Anggota Referral VIP",
   vip_card_become: "👑 Jadi Anggota Referral VIP — dapatkan hingga $100 untuk setiap anggota baru yang kamu ajak",
   vip_card_open_kit: "👑 Kamu Anggota Referral VIP — buka kit VIP-mu",
-  vip_pitch: "Jadilah Anggota Referral VIP. Dapatkan hingga %1$s untuk setiap anggota baru yang kamu ajak ke Bingg Bongg, bukan %2$s. Daftar di sini — kami akan memberi tahu kamu dalam 24 jam. Setelah disetujui, kami akan menunjukkan cara membagikan kodemu di TikTok, Facebook, Instagram, dan lainnya, dengan flyer siap pakai yang sudah berisi kodemu.",
+  vip_pitch: "Jadilah Anggota Referral VIP. Dapatkan hingga %1$s untuk setiap anggota baru yang kamu ajak ke Bingg Bongg, dan dapatkan lencana VIP. Daftar di sini — kami akan memberi tahu kamu dalam 24 jam. Setelah disetujui, kami akan menunjukkan cara membagikan kodemu di TikTok, Facebook, Instagram, dan lainnya, dengan flyer siap pakai yang sudah berisi kodemu.",
   vip_sign_in_to_apply: "Masuk untuk mendaftar",
   vip_where_share: "Di mana kamu akan berbagi?",
   vip_platform_other: "Lainnya",

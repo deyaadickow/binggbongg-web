@@ -1654,7 +1654,7 @@ export const en = {
   vip_title: "VIP Referral Member",
   vip_card_become: "👑 Become a VIP Referral Member — earn up to $100 for every new member you bring in",
   vip_card_open_kit: "👑 You're a VIP Referral Member — open your VIP kit",
-  vip_pitch: "Become a VIP Referral Member. Earn up to %1$s for every new member you bring to Bingg Bongg, instead of %2$s. Apply here — we'll let you know within 24 hours. Once you're approved, we'll show you how to share your code on TikTok, Facebook, Instagram and more, with ready-made flyers that already have your code on them.",
+  vip_pitch: "Become a VIP Referral Member. Earn up to %1$s for every new member you bring to Bingg Bongg, and get the VIP badge. Apply here — we'll let you know within 24 hours. Once you're approved, we'll show you how to share your code on TikTok, Facebook, Instagram and more, with ready-made flyers that already have your code on them.",
   vip_sign_in_to_apply: "Sign in to apply",
   vip_where_share: "Where will you share?",
   vip_platform_other: "Other",

@@ -1457,7 +1457,7 @@ export const fil = {
   vip_title: "VIP Referral Member",
   vip_card_become: "👑 Maging VIP Referral Member — kumita ng hanggang $100 sa bawat bagong miyembrong madadala mo",
   vip_card_open_kit: "👑 Isa kang VIP Referral Member — buksan ang iyong VIP kit",
-  vip_pitch: "Maging VIP Referral Member. Kumita ng hanggang %1$s sa bawat bagong miyembrong madadala mo sa Bingg Bongg, sa halip na %2$s. Mag-apply dito — ipapaalam namin sa iyo sa loob ng 24 oras. Kapag naaprubahan ka na, ipapakita namin kung paano i-share ang iyong code sa TikTok, Facebook, Instagram at iba pa, gamit ang mga handang flyer na may code mo na.",
+  vip_pitch: "Maging VIP Referral Member. Kumita ng hanggang %1$s sa bawat bagong miyembrong madadala mo sa Bingg Bongg, at makuha ang VIP badge. Mag-apply dito — ipapaalam namin sa iyo sa loob ng 24 oras. Kapag naaprubahan ka na, ipapakita namin kung paano i-share ang iyong code sa TikTok, Facebook, Instagram at iba pa, gamit ang mga handang flyer na may code mo na.",
   vip_sign_in_to_apply: "Mag-sign in para mag-apply",
   vip_where_share: "Saan ka magse-share?",
   vip_platform_other: "Iba pa",
