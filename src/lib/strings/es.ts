@@ -1174,7 +1174,7 @@ export const es = {
   stream_url_rtmp_or_rtmps: "URL de transmisión (rtmp:// o rtmps://)",
   stream_your_game_from_a_pc_with_obs_stre: "Transmite tu juego desde una PC con OBS, Streamlabs o cualquier programa que envíe RTMP. Pon tu partida y tu cámara en pantalla a la vez: tu computadora arma la imagen y nosotros la enviamos a tu público.",
   supplier: "Proveedor",
-  support: "Apoyo",
+  support: "Soporte",
   support_2: "💝 Apoyar",
   support_archive: "Soporte · Archivo",
   support_intro: "¿Tienes una pregunta o un problema? El Asistente de Bingg Bongg responde al momento, y un miembro del equipo interviene cuando hace falta. Tus preguntas anteriores y sus respuestas están en %1$s.",
