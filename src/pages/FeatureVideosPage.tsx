@@ -39,6 +39,16 @@ export function FeatureVideosPage({ kind = "features" }: { kind?: "features" | "
       if (!res.status) throw new Error(res.message || "failed");
       const rows = [...(res.data ?? [])].filter((r) => r.video).sort((a, b) => a.sort - b.sort);
       setVideos(rows.map((r) => ({ id: r.id, title: r.title, url: mediaUrl(r.video), poster: mediaUrl(r.thumbnail), sources: videoSources(r.videos), trackKey: `${kind === "ads" ? "our_ad" : "feature_page_video"}_${r.id}` })));
+      // ?play=<id> (a scrolling-text link, 2026-11-15): start that video straight away, once.
+      const params = new URLSearchParams(window.location.search);
+      const playId = Number(params.get("play"));
+      if (playId > 0) {
+        const at = rows.findIndex((r) => r.id === playId);
+        if (at >= 0) setPlaying(at);
+        params.delete("play");
+        const q = params.toString();
+        window.history.replaceState(null, "", window.location.pathname + (q ? `?${q}` : ""));
+      }
     } catch {
       setFailed(true);
     }
