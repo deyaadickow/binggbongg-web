@@ -19,7 +19,6 @@ const PAGES: Record<string, [string, string]> = {
   "/live": ["Live Now – Watch Live Streams on Bingg Bongg", "Watch live streams and battles from all over the world on Bingg Bongg, in 53 languages."],
   "/pre-launch": ["Pre-Launch Special | Bingg Bongg", "Go live, battle and make friends on Bingg Bongg before launch day."],
   "/referral-program": ["Referral Program – Earn 5% for Every Member You Bring | Bingg Bongg", "Share your Bingg Bongg referral code and earn 5% of what every new member earns."],
-  "/vip-referral": ["VIP Referral Member – Earn Up to $100 per Member | Bingg Bongg", "Apply to be a Bingg Bongg VIP Referral Member and earn 5% of what every new member earns, up to $100 each."],
   "/help": ["Help – Members Helping Members on Bingg Bongg", "Help campaigns on Bingg Bongg: members supporting members who are going through a hard time."],
   "/shows": ["Your Own Live Show – Bingg Bongg Shows", "Run your own live show on Bingg Bongg, with your own advertisers."],
   "/cvc": ["Country VS Country Challenges – Bingg Bongg", "Help your country win live Country VS Country battles on Bingg Bongg."],

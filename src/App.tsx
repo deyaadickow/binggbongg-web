@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { RouteMeta } from "./lib/seo";
 import { SessionProvider } from "./lib/session";
 import { LanguageProvider } from "./lib/i18n";
@@ -30,7 +30,6 @@ import { HousesPage } from "./pages/HousesPage";
 import { FeatureVideosPage } from "./pages/FeatureVideosPage";
 import { OneVideoPage } from "./pages/OneVideoPage";
 import { ReferralProgramPage } from "./pages/ReferralProgramPage";
-import { VipReferralPage } from "./pages/VipReferralPage";
 import { FeaturedContestPage } from "./pages/FeaturedContestPage";
 import { ExcitingNewsPage } from "./pages/ExcitingNewsPage";
 import { BusinessPage, BusinessTabPage, CreateBusinessPage, MyBusinessesPage } from "./pages/BusinessPages";
@@ -303,7 +302,8 @@ export default function App() {
           {/* Ads for Referrals (Steve, 2026-11-11): downloadable video ads + the $100 offer video. */}
           <Route path="/ads-for-referrals" element={<AdsForReferralsPage />} />
           <Route path="/invite/:code" element={<InvitePage />} />
-          <Route path="/vip-referral" element={<VipReferralPage />} />
+          {/* VIP Referral Members ended 2026-11-14: everyone gets up to $100 now, so old links go to the Referral Program. */}
+          <Route path="/vip-referral" element={<Navigate to="/referral-program" replace />} />
           {/* The member's own notepad (Steve, 2026-10-19). */}
           <Route path="/settings/todo" element={<ToDoListPage />} />
           <Route path="/settings/vault" element={<VaultPage />} />
