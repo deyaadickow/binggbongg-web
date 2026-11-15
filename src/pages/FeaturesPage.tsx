@@ -74,6 +74,8 @@ export const FEATURES: Section[] = [
     // Features Videos page is #3 (2026-10-29).
     titleKey: "fsec_featured",
     features: [
+      // Steve, 2026-11-16: "add the referral program the first one on the list above exciting news."
+      { icon: "💸", nameKey: "fname_referral_program", blurbKey: "fblurb_referral_program", to: "/referral-program" },
       // Pre-Launch Special (Steve, 2026-11-10; changed 2026-11-11 to 100 FBBs each: "1000 free BBs is too much, make it 100 Free BBs" — "We will give everyone 1000 FBBs
       // from day one, and every new member" — no refill, no wipe).
       { icon: "🎉", nameKey: "fname_prelaunch", blurbKey: "fblurb_prelaunch", to: "/pre-launch" },
@@ -173,7 +175,6 @@ export const FEATURES: Section[] = [
       { icon: "💳", nameKey: "fname_purchase_coins", blurbKey: "fblurb_purchase_coins", to: "/wallet" },
       { icon: "💸", nameKey: "fname_getting_paid_out", blurbKey: "fblurb_getting_paid_out", to: "/wallet/redeem" },
       { icon: "📅", nameKey: "fname_monthly_statement", blurbKey: "fblurb_monthly_statement", to: "/wallet/statements" },
-      { icon: "💸", nameKey: "fname_referral_program", blurbKey: "fblurb_referral_program", to: "/referral-program" },
       // Ads for Referrals (Steve, 2026-11-11): every downloadable video ad to post with your code,
       // and the $100 offer video. Right after Referral Program; the phones put it in the same place.
       { icon: "📣", nameKey: "fname_ads_for_referrals", blurbKey: "fblurb_ads_for_referrals", to: "/ads-for-referrals" },
