@@ -10,6 +10,7 @@ import { Loading } from "../components/Common";
 import { useSession } from "../lib/session";
 import { useT } from "../lib/i18n";
 import { enterReferralCode, fetchReferralProgram, flyerWithCode, type CodeBox, type ReferralCountry, type ReferralProgram } from "../lib/referral";
+import { usd } from "../lib/usd";
 
 const GOLD = "#F0C420";
 const card: React.CSSProperties = { background: "#0b0b0d", border: `2px solid ${GOLD}`, borderRadius: 16, padding: 16, color: "#fff" };
@@ -177,16 +178,21 @@ export function ReferralProgramPage() {
       </div>
 
       {/* Invite / Referral link (Steve, 2026-11-12): one link for every friend, any app. */}
-      {isLoggedIn && code && <InviteLinkCard code={code} url={me?.invite_url} cap={prog.cap} />}
+      {isLoggedIn && code && <InviteLinkCard code={code} url={me?.invite_url} percent={prog.percent} cap={prog.total_cap ?? prog.cap} />}
 
       {/* Ads for Referrals (Steve, 2026-11-11): the video ads to download and post with your code. */}
       <Link to="/ads-for-referrals" style={{ ...card, textDecoration: "none", fontSize: 16, fontWeight: 800, lineHeight: 1.45, color: GOLD, display: "block" }}>
         📣 {t("fname_ads_for_referrals")} — {t("fblurb_ads_for_referrals")} ›
       </Link>
 
-      {/* VIP Referral link removed (Steve, 2026-11-12: "remove the VIP tile"): every member gets up to $100 now. */}
-
+      
       {!prog.enabled && <div style={{ ...card, borderColor: "#888" }}>{t("rp_paused")}</div>}
+      {/* One program for every member (Steve, 2026-11-15): as clear as possible. */}
+      <div style={{ ...card, textAlign: "center" }}>
+        <div style={{ fontSize: 24, fontWeight: 900, color: GOLD, lineHeight: 1.25 }}>{t("ref_headline", prog.percent)}</div>
+        <div style={{ fontSize: 17, fontWeight: 700, marginTop: 8 }}>{t("ref_subline", usd(prog.total_cap ?? prog.cap))}</div>
+        <div style={{ fontSize: 14, color: "#EDE6D2", marginTop: 8 }}>{t("ref_signup_only")}</div>
+      </div>
       {country && <div style={{ ...card, whiteSpace: "pre-line", fontSize: 16, lineHeight: 1.5 }}>{country.description}</div>}
 
       <div style={card}>
@@ -198,14 +204,14 @@ export function ReferralProgramPage() {
               <button style={goldBtn} onClick={() => navigator.clipboard.writeText(code).then(() => setToast(t("rp_copied"))).catch(() => undefined)}>{t("rp_copy")}</button>
               <button style={ghostBtn} onClick={() => { const text = t("rp_share_text", code); const nav = navigator as Navigator; if (nav.share) nav.share({ text }).catch(() => undefined); else navigator.clipboard.writeText(text).then(() => setToast(t("rp_copied"))).catch(() => undefined); }}>{t("rp_share")}</button>
             </div>
-            <div style={{ fontSize: 15 }}>👥 {t("rp_referred_n", me!.referred_count)} · 💰 {t("rp_earned", money(me!.bonus_earned))}</div>
+            <div style={{ fontSize: 15 }}>👥 {t("rp_referred_n", me!.referred_count)} · 💰 {t("ref_earned_of", money(me!.bonus_earned), usd(prog.total_cap ?? prog.cap))}</div>
             {me!.referred_by && <div style={{ fontSize: 14, color: "#EDE6D2" }}>{t("rp_referred_by", me!.referred_by.name)}</div>}
             {me!.referred.length > 0 && (
               <div style={{ display: "flex", flexDirection: "column", gap: 4, maxHeight: 220, overflowY: "auto" }}>
                 {me!.referred.map((r) => (
                   <div key={r.user_id} style={{ display: "flex", justifyContent: "space-between", gap: 10, fontSize: 14, padding: "4px 0", borderBottom: "1px solid rgba(240,196,32,.2)" }}>
                     <span>{r.name}{r.username ? <span style={{ opacity: .6 }}> @{r.username}</span> : null}</span>
-                    <span style={{ color: GOLD, fontWeight: 800, whiteSpace: "nowrap" }}>{t("rp_of_cap", money(r.bonus_paid), money(r.bonus_cap ?? prog.cap))}</span>
+                    <span style={{ color: GOLD, fontWeight: 800, whiteSpace: "nowrap" }}>{money(r.bonus_paid)}</span>
                   </div>
                 ))}
               </div>

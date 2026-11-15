@@ -2274,10 +2274,10 @@ export const es = {
   bk_country_board_blurb: "Los puntos de cada país — ayuda al tuyo a ser el #1",
   bk_country_board_info: "Los países compiten por orgullo. Cada BB o FBB que envía un miembro es 1 punto para su país, y cada miembro nuevo suma +100. Abre la tabla para ver en qué puesto va tu país hoy, esta semana y de siempre, e invita a tus amigos para que lo ayuden a subir.",
   // FBBs (100 since Steve 2026-11-11 "make it 100 Free BBs", was 1,000) + referral $100 + Ads for Referrals (Steve, 2026-11-11).
-  fblurb_referral_program: "Gana el 5%% de lo que gane cada amigo que registres, hasta llegar a $100, por cada amigo.",
+  fblurb_referral_program: "Invita a tus amigos. Recibe el 5%% de todo lo que ganen, hasta $1.000.000.",
   fc_signup_fbbs_sub: "FBBs para practicar: nunca se convierten en dinero",
   fname_ads_for_referrals: "Anuncios para referidos",
-  fblurb_ads_for_referrals: "Descarga nuestros anuncios en video, publícalos con tu código y gana hasta $100 por cada amigo.",
+  fblurb_ads_for_referrals: "Descarga nuestros anuncios en video, publícalos con tu código y recibe el 5%% de todo lo que gane cada amigo.",
   afr_headline: "¡Gana hasta $%1$s por cada amigo que registres!",
   afr_step1: "Descarga en tu teléfono cualquier video de abajo.",
   afr_step2: "Publícalo en Facebook, Instagram, TikTok, YouTube… donde quieras.",
@@ -2399,4 +2399,15 @@ export const es = {
   vag_st_declined: "No aprobado",
   vag_st_ended: "Trato terminado",
   vag_you_earned: "Has ganado %1$s",
+  // One referral program (2026-11-15).
+  ref_headline: "Invita a tus amigos. Recibe el %1$s%% de todo lo que ganen.",
+  ref_subline: "Tus amigos se quedan con el 100%% — Bingg Bongg te paga a ti. Hasta %1$s.",
+  ref_signup_only: "Tu amigo añade tu código de referido al registrarse. No se puede añadir ni cambiar después.",
+  ref_earned_of: "%1$s ganados de %2$s",
+  ref_pl_invite: "Invita a tus amigos con tu código de referido: recibe el %1$s%% de todo lo que ganen, hasta %2$s. Tus amigos se quedan con el 100%%.",
+  ref_afr_step4: "Cuando alguien se registra con tu código, recibes el %1$s%% de todo lo que gane en Bingg Bongg, mientras siga ganando — hasta %2$s en total.",
+  ref_inv_explain: "Envía este enlace a tus amigos y seguidores — por SMS, correo, Messenger, WhatsApp o cualquier red social. Verán nuestro video, tu código de referido y la tienda correcta para su teléfono. Recibes el %1$s%% de todo lo que cada amigo gane en Bingg Bongg, hasta %2$s.",
+  su_referral_code: "Código de referido (opcional)",
+  su_referral_placeholder: "¿Quién te invitó? Su nombre de usuario",
+  su_referral_hint: "Añádelo ahora: un código de referido no se puede añadir ni cambiar después.",
 };

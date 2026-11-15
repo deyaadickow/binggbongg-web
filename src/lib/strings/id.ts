@@ -2293,10 +2293,10 @@ export const id = {
   bk_country_board_blurb: "Poin setiap negara — bantu negaramu jadi #1",
   bk_country_board_info: "Negara-negara bertanding demi kebanggaan. Setiap BB atau FBB yang dikirim anggota bernilai 1 poin untuk negaranya, dan setiap anggota baru +100. Buka papan untuk melihat peringkat negaramu hari ini, minggu ini, dan sepanjang masa — lalu undang teman untuk membantunya naik.",
   // FBBs (100 since Steve 2026-11-11 "make it 100 Free BBs", was 1,000) + referral $100 + Ads for Referrals (Steve, 2026-11-11).
-  fblurb_referral_program: "Dapatkan 5%% dari penghasilan setiap teman yang kamu daftarkan, sampai mencapai $100 — untuk setiap teman.",
+  fblurb_referral_program: "Ajak teman. Dapatkan 5%% dari semua yang mereka hasilkan, hingga $1.000.000.",
   fc_signup_fbbs_sub: "FBBs untuk latihan — tidak pernah menjadi uang",
   fname_ads_for_referrals: "Iklan untuk Referal",
-  fblurb_ads_for_referrals: "Unduh iklan video kami, posting dengan kodemu, dan dapatkan hingga $100 untuk setiap teman.",
+  fblurb_ads_for_referrals: "Unduh iklan video kami, posting dengan kodemu, dan dapatkan 5%% dari semua yang dihasilkan setiap teman.",
   afr_headline: "Dapatkan hingga $%1$s untuk setiap teman yang kamu daftarkan!",
   afr_step1: "Unduh video mana saja di bawah ke ponselmu.",
   afr_step2: "Posting di Facebook, Instagram, TikTok, YouTube — di mana saja.",
@@ -2437,4 +2437,13 @@ export const id = {
   vag_st_declined: "Tidak disetujui",
   vag_st_ended: "Kesepakatan berakhir",
   vag_you_earned: "Kamu mendapat %1$s",
+  // One referral program (2026-11-15).
+  ref_headline: "Ajak teman. Dapatkan %1$s%% dari semua yang mereka hasilkan.",
+  ref_subline: "Temanmu tetap dapat 100%% — Bingg Bongg yang membayarmu. Hingga %1$s.",
+  ref_signup_only: "Temanmu memasukkan kode referalmu saat mendaftar. Kode tidak bisa ditambahkan atau diubah nanti.",
+  ref_earned_of: "%1$s didapat dari %2$s",
+  ref_pl_invite: "Ajak teman dengan kode referalmu: dapatkan %1$s%% dari semua yang mereka hasilkan, hingga %2$s. Temanmu tetap dapat 100%%.",
+  ref_afr_step4: "Saat seseorang mendaftar dengan kodemu, kamu dapat %1$s%% dari semua yang mereka hasilkan di Bingg Bongg, selama mereka menghasilkan — hingga total %2$s.",
+  ref_inv_explain: "Kirim tautan ini ke teman dan pengikutmu — lewat SMS, email, Messenger, WhatsApp, atau media sosial apa pun. Mereka akan melihat video kami, kode referalmu, dan toko yang tepat untuk ponsel mereka. Kamu dapat %1$s%% dari semua yang dihasilkan setiap teman di Bingg Bongg, hingga %2$s.",
+  su_referral_hint: "Masukkan sekarang: kode referal tidak bisa ditambahkan atau diubah nanti.",
 };

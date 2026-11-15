@@ -14,6 +14,7 @@ import { FeatureVideoPlayer } from "../components/FeatureVideoPlayer";
 import { showGoldAlert } from "../components/GoldToast";
 import { LANGUAGES, useT } from "../lib/i18n";
 import { useSession } from "../lib/session";
+import { usd } from "../lib/usd";
 import {
   adFileName, adsDemoKind, demoReferralAds, duration, fetchAdFile, fetchReferralAds, openDownloadLink, saveBlob, shareAd,
   type ReferralAds, type ReferralVideo,
@@ -97,7 +98,7 @@ export function AdsForReferralsPage() {
 
   const signedOut = demo === "out" || (!demo && !isLoggedIn);
   const code = signedOut ? null : (data?.referral_code ?? user?.username ?? null);
-  const cap = data?.cap ?? 100;
+  const cap = data?.cap ?? 1000000;
   const percent = data?.percent ?? 5;
 
   function copy() {
@@ -119,12 +120,12 @@ export function AdsForReferralsPage() {
       )}
 
       <section className="afr-card afr-how">
-        <h2 className="afr-headline">{t("afr_headline", cap)}</h2>
+        <h2 className="afr-headline">{t("ref_headline", percent)}</h2>
         <ol className="afr-steps">
           <li>{t("afr_step1")}</li>
           <li>{t("afr_step2")}</li>
           <li>{code ? tn("afr_step3", <b className="afr-inline-code">{code}</b>) : t("afr_step3_out")}</li>
-          <li>{t("afr_step4", percent, cap)}</li>
+          <li>{t("ref_afr_step4", percent, usd(cap))}</li>
         </ol>
         <p className="afr-nolimit">{t("afr_no_limit")}</p>
         <p className="afr-tip">{t("afr_tip")}</p>
@@ -145,7 +146,7 @@ export function AdsForReferralsPage() {
         )}
       </section>
 
-      {code && <InviteLinkCard code={code} url={data?.invite_url} cap={cap} />}
+      {code && <InviteLinkCard code={code} url={data?.invite_url} percent={percent} cap={cap} />}
 
       <h2 className="afr-list-title">{t("afr_ads_heading")}</h2>
       {!data && !error && <div className="afr-state" role="status">{t("loading")}</div>}

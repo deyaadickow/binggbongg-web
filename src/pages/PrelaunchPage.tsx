@@ -6,6 +6,7 @@ import { PageTitle } from "../components/PageTitle";
 import { Loading } from "../components/Common";
 import { useT } from "../lib/i18n";
 import { PRELAUNCH_DEFAULTS, prelaunchTexts, usePrelaunch } from "../lib/prelaunch";
+import { usd } from "../lib/usd";
 
 export function PrelaunchPage() {
   const { t, lang } = useT();
@@ -25,7 +26,7 @@ export function PrelaunchPage() {
         <span>{t("pl_pbbs_explained", x.newMember, x.launchDay)}</span>
       </div>
       <div className="prelaunch-card">
-        <span>{t("pl_invite", x.percent, x.cap)}</span>
+        <span>{t("ref_pl_invite", x.percent, usd(Number(x.cap)))}</span>
         <Link to="/referral-program" className="btn">{t("pl_invite_button")}</Link>
         {/* 2026-11-11: the downloadable video ads to post with your code. */}
         <Link to="/ads-for-referrals" className="btn">📣 {t("fname_ads_for_referrals")}</Link>

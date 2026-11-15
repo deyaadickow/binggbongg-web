@@ -43,7 +43,7 @@ export const PRELAUNCH_DEFAULTS: Prelaunch = {
   grantAmount: 100,
   refillBelow: 0,
   newMemberPbbs: 100,
-  referralBonusCap: 100,
+  referralBonusCap: 1000000,
   refills: false,
   fbbsExpire: false,
   referralBonusPercent: 5,

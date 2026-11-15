@@ -2298,10 +2298,10 @@ export const fil = {
   bk_country_board_blurb: "Puntos ng bawat bansa — tulungan ang sa iyo na mag-#1",
   bk_country_board_info: "Naglalaban ang mga bansa para sa karangalan. Bawat BB o FBB na ipinadala ng isang miyembro ay 1 puntos para sa bansa niya, at bawat bagong miyembro ay +100. Buksan ang board para makita ang ranggo ng bansa mo ngayon, ngayong linggo at sa kabuuan — tapos imbitahin ang barkada mo para tumulong itong umakyat.",
   // FBBs (100 since Steve 2026-11-11 "make it 100 Free BBs", was 1,000) + referral $100 + Ads for Referrals (Steve, 2026-11-11).
-  fblurb_referral_program: "Kumita ng 5%% ng kinikita ng bawat kaibigang mapa-sign up mo, hanggang umabot ka ng $100 — sa bawat kaibigan.",
+  fblurb_referral_program: "Mag-imbita ng mga kaibigan. Makakuha ng 5%% ng lahat ng kinikita nila, hanggang $1,000,000.",
   fc_signup_fbbs_sub: "FBBs na pang-practice — hindi ito kailanman nagiging pera",
   fname_ads_for_referrals: "Ads para sa Referral",
-  fblurb_ads_for_referrals: "I-download ang mga video ad namin, i-post kasama ang code mo, at kumita ng hanggang $100 sa bawat kaibigan.",
+  fblurb_ads_for_referrals: "I-download ang mga video ad namin, i-post ang mga ito kasama ang code mo, at makakuha ng 5%% ng lahat ng kinikita ng bawat kaibigan.",
   afr_headline: "Kumita ng hanggang $%1$s sa bawat kaibigang mapa-sign up mo!",
   afr_step1: "I-download sa phone mo ang kahit anong video sa ibaba.",
   afr_step2: "I-post ito sa Facebook, Instagram, TikTok, YouTube — kahit saan.",
@@ -2442,4 +2442,13 @@ export const fil = {
   vag_st_declined: "Hindi na-approve",
   vag_st_ended: "Tapos na ang deal",
   vag_you_earned: "Kumita ka ng %1$s",
+  // One referral program (2026-11-15).
+  ref_headline: "Mag-imbita ng mga kaibigan. Makakuha ng %1$s%% ng lahat ng kinikita nila.",
+  ref_subline: "Buo pa rin sa mga kaibigan mo ang 100%% — ang Bingg Bongg ang magbabayad sa iyo. Hanggang %1$s.",
+  ref_signup_only: "Ilalagay ng kaibigan mo ang referral code mo kapag nag-sign up sila. Hindi na ito maidadagdag o mababago pagkatapos.",
+  ref_earned_of: "%1$s ang kinita mula sa %2$s",
+  ref_pl_invite: "Mag-imbita ng mga kaibigan gamit ang referral code mo: makakuha ng %1$s%% ng lahat ng kinikita nila, hanggang %2$s. Buo pa rin sa mga kaibigan mo ang 100%%.",
+  ref_afr_step4: "Kapag may nag-sign up gamit ang code mo, makakakuha ka ng %1$s%% ng lahat ng kinikita nila sa Bingg Bongg, hangga't kumikita sila — hanggang %2$s sa kabuuan.",
+  ref_inv_explain: "Ipadala ang link na ito sa mga kaibigan at followers mo — sa text, email, Messenger, WhatsApp o anumang social media. Makikita nila ang video namin, ang referral code mo at ang tamang store para sa phone nila. Makakakuha ka ng %1$s%% ng lahat ng kinikita ng bawat kaibigan sa Bingg Bongg, hanggang %2$s.",
+  su_referral_hint: "Ilagay na ngayon: hindi na maidadagdag o mababago ang referral code pagkatapos.",
 };

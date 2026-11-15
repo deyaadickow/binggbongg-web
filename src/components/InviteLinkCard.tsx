@@ -5,8 +5,9 @@
 import { showGoldAlert } from "./GoldToast";
 import { useT } from "../lib/i18n";
 import { copyText, inviteUrlFor, shareInvite } from "../lib/invite";
+import { usd } from "../lib/usd";
 
-export function InviteLinkCard({ code, url, cap = 100 }: { code: string | null | undefined; url?: string | null; cap?: number }) {
+export function InviteLinkCard({ code, url, percent = 5, cap = 1000000 }: { code: string | null | undefined; url?: string | null; percent?: number; cap?: number }) {
   const { t } = useT();
   const link = url || inviteUrlFor(code);
   if (!code || !link) return null;
@@ -23,7 +24,7 @@ export function InviteLinkCard({ code, url, cap = 100 }: { code: string | null |
   return (
     <section className="afr-card inv-link-card">
       <h2>🔗 {t("inv_your_link")}</h2>
-      <p>{t("inv_link_explain", cap)}</p>
+      <p>{t("ref_inv_explain", percent, usd(cap))}</p>
       <a className="inv-link-url" href={link} target="_blank" rel="noreferrer">{link.replace(/^https:\/\//, "")}</a>
       <div className="inv-link-btns">
         <button className="btn gold" onClick={() => void copy()}>📋 {t("inv_copy_link")}</button>

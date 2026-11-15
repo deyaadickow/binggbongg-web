@@ -79,7 +79,6 @@ import { CountryBattleBoardPage, CountryBattleDayPage, CountryBattlePage } from 
 import { CountryBattleLivePage } from "./pages/CountryBattleLivePage";
 import { CountryBoardPage } from "./pages/CountryBoardPage";
 import { AdsForReferralsPage } from "./pages/AdsForReferralsPage";
-import { VipAgentPage } from "./pages/VipAgentPage";
 import { InvitePage } from "./pages/InvitePage";
 import { ChatBattleLivePage } from "./pages/ChatBattleLivePage";
 import { rememberAdSource } from "./lib/getApp";
@@ -304,7 +303,7 @@ export default function App() {
           <Route path="/ads-for-referrals" element={<AdsForReferralsPage />} />
           <Route path="/invite/:code" element={<InvitePage />} />
           {/* VIP Referral Members ended 2026-11-14: everyone gets up to $100 now, so old links go to the Referral Program. */}
-          <Route path="/vip-agent" element={<VipAgentPage />} />
+          <Route path="/vip-agent" element={<Navigate to="/referral-program" replace />} />
           <Route path="/vip-referral" element={<Navigate to="/referral-program" replace />} />
           {/* The member's own notepad (Steve, 2026-10-19). */}
           <Route path="/settings/todo" element={<ToDoListPage />} />

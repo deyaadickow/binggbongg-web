@@ -80,7 +80,6 @@ const ROUTES: ScreenRoute[] = [
   { path: "/referral-program", screen: "referral_program" },
   { path: "/ads-for-referrals", screen: "ads_for_referrals" },
   { path: "/pre-launch", screen: "pre_launch" },
-  { path: "/vip-agent", screen: "vip_agent" },
   { path: "/help", screen: "help" },
   { path: "/help/start", screen: "help_start" },
   { path: "/help/:id", screen: "help" },

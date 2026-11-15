@@ -70,11 +70,11 @@ export function ReferralOfferPopup() {
   function open() { done(); nav(`/ads-for-referrals${demo ? "?demo=1" : ""}`); }
 
   return createPortal(
-    <div className="afr-offer" role="dialog" aria-modal="true" aria-label={t("afr_headline", data.cap)}>
+    <div className="afr-offer" role="dialog" aria-modal="true" aria-label={t("ref_headline", data.percent ?? 5)}>
       <button className="afr-offer-x" onClick={close} aria-label={t("close")}>✕</button>
       <div className="afr-offer-inner">
         <div className="afr-offer-kicker">{t("afr_offer_kicker")}</div>
-        <h2 className="afr-offer-title">{t("afr_headline", data.cap)}</h2>
+        <h2 className="afr-offer-title">{t("ref_headline", data.percent ?? 5)}</h2>
         <video ref={video} className="afr-offer-video" src={v.video_url} poster={v.poster_url ?? undefined}
           controls playsInline preload="metadata" />
         <button className="btn gold afr-offer-btn" onClick={open}>📣 {t("afr_open_page")}</button>
