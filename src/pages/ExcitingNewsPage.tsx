@@ -39,7 +39,8 @@ const PAGE_SIZE = 6;
 export function ExcitingNewsPage() {
   const { t } = useT();
   const { user } = useSession();
-  const [type, setType] = useState<ExcitingNewsType>("photo");
+  // ?type=video opens straight on the videos (2026-11-15: the feed's scrolling text links to the algorithm video here).
+  const [type, setType] = useState<ExcitingNewsType>(() => (new URLSearchParams(window.location.search).get("type") === "video" ? "video" : "photo"));
   const [search, setSearch] = useState("");
   const [flyers, setFlyers] = useState<ExcitingNewsFlyer[]>([]);
   const [loading, setLoading] = useState(false);
