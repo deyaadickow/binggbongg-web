@@ -144,6 +144,9 @@ export function burstDirection(gift: Gift): BurstDirection | null {
  * ceiling, so a future 5,000-coin gift cannot lock up a browser.
  */
 const MAX_ICONS = 500;
+/** Inside one Dog Race tile (of up to 24): enough to read as the gift's effect, few enough that a
+ *  room of simultaneous gifts does not stall the page. */
+const CONTAINED_MAX_ICONS = 60;
 const FLIGHT_MS = 2600;
 
 /**
@@ -212,7 +215,7 @@ interface Icon {
   dir: BurstDirection;
 }
 
-export function TapTapBurst({ gift, imageUrl, sizeMin = ICON_SIZE_MIN, sizeRange = ICON_SIZE_RANGE, hideName = false }: {
+export function TapTapBurst({ gift, imageUrl, sizeMin = ICON_SIZE_MIN, sizeRange = ICON_SIZE_RANGE, hideName = false, contained = false }: {
   gift: Gift;
   /** A ready URL for the icon instead of the gift's own uploaded image (the Bingg Bongg Bonus
    *  flies the gloves logo from /img through this same effect, 2026-11-07). */
@@ -222,6 +225,11 @@ export function TapTapBurst({ gift, imageUrl, sizeMin = ICON_SIZE_MIN, sizeRange
   sizeRange?: number;
   /** No effect nameplate (the bonus shows its own banner). */
   hideName?: boolean;
+  /** Dog Race (Steve, 2026-11-16: "Each gift will be only on who ever get's the gift for each dog's
+   *  screen"): play inside the nearest positioned box (a race tile) instead of over the whole
+   *  screen. Every distance the effect travels is in the box's own units (cqh/cqw) then, so a
+   *  burst crosses the tile the way it crosses the screen; fewer icons, so 24 tiles stay smooth. */
+  contained?: boolean;
 }) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
@@ -267,8 +275,8 @@ export function TapTapBurst({ gift, imageUrl, sizeMin = ICON_SIZE_MIN, sizeRange
     // cells are reshuffled each time round, so a long shower keeps covering the screen evenly
     // instead of dropping gifts into the same cells in the same order.
     if (dir === "spot") {
-      const total = Math.min(Math.max(giftPrice(gift), 1), MAX_ICONS);
-      const onScreen = spotOnScreen(giftPrice(gift));
+      const total = Math.min(Math.max(giftPrice(gift), 1), contained ? CONTAINED_MAX_ICONS : MAX_ICONS);
+      const onScreen = Math.min(spotOnScreen(giftPrice(gift)), contained ? 12 : Infinity);
       const interval = spotIntervalMs(total, onScreen);
       const columns = Math.max(1, Math.ceil(Math.sqrt(onScreen)));
       const rows = Math.max(1, Math.ceil(onScreen / columns));
@@ -298,7 +306,7 @@ export function TapTapBurst({ gift, imageUrl, sizeMin = ICON_SIZE_MIN, sizeRange
       });
     }
 
-    const count = Math.min(Math.max(giftPrice(gift), 1), MAX_ICONS);
+    const count = Math.min(Math.max(giftPrice(gift), 1), contained ? CONTAINED_MAX_ICONS : MAX_ICONS);
     const stagger = staggerMs(count);
     // Deterministic per-icon scatter: random() inside render would re-roll every paint.
     return Array.from({ length: count }, (_, i) => {
@@ -327,19 +335,25 @@ export function TapTapBurst({ gift, imageUrl, sizeMin = ICON_SIZE_MIN, sizeRange
       spin: (Math.random() - 0.5) * (d === "up" ? 50 : 30),
       };
     });
-  }, [gift, dir, sizeMin, sizeRange]);
+  }, [gift, dir, sizeMin, sizeRange, contained]);
 
   const src = imageUrl ?? (gift.image ? mediaUrl(gift.image) : undefined);
 
   return (
     <div
       aria-hidden="true"
-      style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 8000, overflow: "hidden" }}
+      style={{
+        position: contained ? "absolute" : "fixed", inset: 0, pointerEvents: "none", zIndex: contained ? 6 : 8000, overflow: "hidden",
+        ...(contained ? { containerType: "size" } : {}),
+        // The unit every travel distance is measured in: the screen's, or the tile's own.
+        ["--bb-vh" as string]: contained ? "1cqh" : "1vh",
+        ["--bb-vw" as string]: contained ? "1cqw" : "1vw",
+      }}
     >
       <style>{`
         @keyframes bb-taptap-rise {
           0%   { opacity: 0; transform: translate(0, 0) scale(.6) rotate(0deg); }
-          12%  { opacity: 1; transform: translate(0, -8vh) scale(1) rotate(0deg); }
+          12%  { opacity: 1; transform: translate(0, calc(var(--bb-vh, 1vh) * -8)) scale(1) rotate(0deg); }
           100% { opacity: 0; transform: translate(var(--bb-drift), calc(var(--bb-rise) * -1)) scale(1) rotate(var(--bb-spin)); }
         }
         /* Rainfall: starts above the top edge and travels DOWN past the bottom. It stays solid
@@ -347,7 +361,7 @@ export function TapTapBurst({ gift, imageUrl, sizeMin = ICON_SIZE_MIN, sizeRange
            because it leaves the screen under its own steam. */
         @keyframes bb-taptap-fall {
           0%   { opacity: 0; transform: translate(0, 0) scale(.7) rotate(0deg); }
-          8%   { opacity: 1; transform: translate(0, 4vh) scale(1) rotate(0deg); }
+          8%   { opacity: 1; transform: translate(0, calc(var(--bb-vh, 1vh) * 4)) scale(1) rotate(0deg); }
           88%  { opacity: 1; }
           100% { opacity: 0; transform: translate(var(--bb-drift), var(--bb-rise)) scale(1) rotate(var(--bb-spin)); }
         }
@@ -355,13 +369,13 @@ export function TapTapBurst({ gift, imageUrl, sizeMin = ICON_SIZE_MIN, sizeRange
            Same "stays solid until it leaves" shape as the fall — it exits under its own steam. */
         @keyframes bb-taptap-sweep-right {
           0%   { opacity: 0; transform: translate(0, 0) scale(.7) rotate(0deg); }
-          8%   { opacity: 1; transform: translate(4vw, 0) scale(1) rotate(0deg); }
+          8%   { opacity: 1; transform: translate(calc(var(--bb-vw, 1vw) * 4), 0) scale(1) rotate(0deg); }
           88%  { opacity: 1; }
           100% { opacity: 0; transform: translate(var(--bb-rise), var(--bb-drift)) scale(1) rotate(var(--bb-spin)); }
         }
         @keyframes bb-taptap-sweep-left {
           0%   { opacity: 0; transform: translate(0, 0) scale(.7) rotate(0deg); }
-          8%   { opacity: 1; transform: translate(-4vw, 0) scale(1) rotate(0deg); }
+          8%   { opacity: 1; transform: translate(calc(var(--bb-vw, 1vw) * -4), 0) scale(1) rotate(0deg); }
           88%  { opacity: 1; }
           100% { opacity: 0; transform: translate(calc(var(--bb-rise) * -1), var(--bb-drift)) scale(1) rotate(var(--bb-spin)); }
         }
@@ -394,14 +408,14 @@ export function TapTapBurst({ gift, imageUrl, sizeMin = ICON_SIZE_MIN, sizeRange
       {mounted && !hideName && burstDirection(gift) !== "spot" && (
         <div
           style={{
-            position: "absolute", top: "20%", left: 0, right: 0, textAlign: "center",
+            position: "absolute", top: contained ? "30%" : "20%", left: 0, right: 0, textAlign: "center",
             animation: "bb-taptap-name 2800ms ease-out both",
           }}
         >
           <span style={{
-            display: "inline-block", padding: "9px 18px", borderRadius: 999,
+            display: "inline-block", padding: contained ? "3px 8px" : "9px 18px", borderRadius: 999,
             background: "rgba(0,0,0,.75)", border: "1.5px solid var(--gold)",
-            color: "var(--gold)", fontWeight: 800, fontSize: 20,
+            color: "var(--gold)", fontWeight: 800, fontSize: contained ? 11 : 20,
           }}>{burstLabel(gift) ?? BONGG_BURST}</span>
         </div>
       )}
@@ -426,7 +440,7 @@ export function TapTapBurst({ gift, imageUrl, sizeMin = ICON_SIZE_MIN, sizeRange
             height: icon.size,
             ["--bb-drift" as string]: `${icon.driftPx}px`,
             ["--bb-rise" as string]:
-              `${icon.risePct}${icon.dir === "left" || icon.dir === "right" ? "vw" : "vh"}`,
+              `calc(var(${icon.dir === "left" || icon.dir === "right" ? "--bb-vw, 1vw" : "--bb-vh, 1vh"}) * ${icon.risePct})`,
             ["--bb-spin" as string]: `${icon.spin}deg`,
             // Rising floats and slows (ease-out) because it fights gravity; falling ACCELERATES
             // like real rain (ease-in). A sideways sweep does neither — steady, so linear.

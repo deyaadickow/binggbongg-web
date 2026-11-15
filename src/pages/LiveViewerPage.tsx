@@ -46,6 +46,7 @@ import { fetchActiveSoloBattle, type SoloBattle } from "../lib/solobattle";
 import { battleScreenPath, chatBattlePath, chatReasonText, checkUserLiveRoom, startChatBattle } from "../lib/chatBattle";
 import { countryBattlePath } from "../lib/countryBattle";
 import { Avatar, Notice } from "../components/Common";
+import { DogRaceGrid, DogRaceLobbyCard, DogRaceResults, DogRaceStartDialog, useDogRace } from "../components/DogRace";
 import { WatchersList } from "../components/WatchersList";
 import { ReportDialog } from "../components/ReportDialog";
 import { InviteOverlay, WhosPlayingOverlay } from "../components/RoomPeople";
@@ -378,6 +379,13 @@ export function LiveViewerPage() {
   // Steve, 2026-09-27: Hide & Seek — pick the shape first (free for all 2-4, or 2v2 teams).
   const [hideSeekMode, setHideSeekMode] = useState<"choose" | "2v2" | 1 | 2 | 3 | null>(null);
   const myId = user?.id ?? null;
+  // Dog Race (Steve, 2026-11-16): the host starts it from the Battle menu, the room reserves free
+  // spots in a 2-minute lobby, then the race grid covers the video area and the room gifts dogs.
+  const [dogStartOpen, setDogStartOpen] = useState(false);
+  const dog = useDogRace(roomClosed ? "" : roomName, myId, setToast);
+  const [dogResultsClosedFor, setDogResultsClosedFor] = useState(0);
+  const dogRace = dog.race;
+  const dogOnGrid = !!dogRace && (dogRace.status === "racing" || dogRace.status === "finished") && dogRace.players.length > 0;
   const virtualRef = useRef<VirtualBattleData | null>(null);
   const nameOfId = useCallback((id: number | null | undefined) => {
     const m = broadcastersRef.current.find((b) => b.user_id === id);
@@ -1557,7 +1565,10 @@ export function LiveViewerPage() {
               cancel555(myId, b555.data.battle_555_id).then(() => setToast("5-5-5 cancelled.")).catch((e) => setToast((e as Error).message));
             }} />
           )}
-          <div className={mlBig ? "video-grid ml-on" : `video-grid count-${Math.min(4, Math.max(1, orderedTiles.length))}`} onDoubleClick={dropHeart}
+          {dogRace?.status === "lobby" && (
+            <DogRaceLobbyCard race={dogRace} myId={myId} onChanged={dog.apply} onRefresh={() => { void dog.refresh(); }} onToast={setToast} />
+          )}
+          <div className={(mlBig ? "video-grid ml-on" : `video-grid count-${Math.min(4, Math.max(1, orderedTiles.length))}`) + (dogOnGrid ? " dr-on" : "")} onDoubleClick={dropHeart}
             onPointerDown={startRoomHold} onPointerUp={cancelRoomHold} onPointerLeave={cancelRoomHold} onPointerCancel={cancelRoomHold}
             onContextMenu={(e) => { if (roomHoldFired.current) e.preventDefault(); }}
             onClickCapture={(e) => { if (roomHoldFired.current) { e.stopPropagation(); roomHoldFired.current = false; } }}>
@@ -1631,6 +1642,11 @@ export function LiveViewerPage() {
                 onGift={tl.isLocal || !tl.userId || tl.userId === myId ? null : () => setGiftTarget(tl.userId as number)} />
             ))}
 {/* Boxing gloves' double points now show in the battle strip under the header (Steve, 2026-11-06). */}
+            {dogOnGrid && dogRace && (
+              <DogRaceGrid race={dogRace} myId={myId} roomName={roomName} hostUserId={hostUserId}
+                senderName={user ? displayName(user) : ""} senderPhoto={user?.profile_image ?? ""}
+                onToast={setToast} onGifted={() => { refresh(); }} onRace={dog.apply} />
+            )}
           </div>
 
           {/* Viewer-side. Deliberately NOT inside the isPublisher block below: a host would be
@@ -2377,6 +2393,13 @@ export function LiveViewerPage() {
           }}
         />
       )}
+      {dogStartOpen && myId && (
+        <DogRaceStartDialog userId={myId} roomName={roomName} onClose={() => setDogStartOpen(false)}
+          onStarted={(r) => { if (r) dog.apply(r); else void dog.refresh(); }} onToast={setToast} />
+      )}
+      {dogRace?.status === "finished" && dogResultsClosedFor !== dogRace.id && (
+        <DogRaceResults race={dogRace} myId={myId} onClose={() => setDogResultsClosedFor(dogRace.id)} />
+      )}
       {menuOpen && (
         <BattleMenu peopleOnScreen={broadcasters.length} onClose={() => setMenuOpen(false)} onNotice={setToast} onPick={(k) => {
           setMenuOpen(false);
@@ -2391,6 +2414,7 @@ export function LiveViewerPage() {
           else if (k === "gameLimit") setGameLimitPicker(true);
           else if (k === "hideSeek") setHideSeekMode("choose");
           else if (k === "solo") startSolo();
+          else if (k === "dogRace") { if (role === "host" && myId) setDogStartOpen(true); else setToast(tt("dr_only_host")); }
           else if (k === "bingo") openBingo();
           else if (k === "pyramid") openPyramid();
           else if (k === "checkers" || k === "chess" || k === "fourinarow" || k === "reversi" || k === "mancala") openBoard(k);

@@ -1435,3 +1435,48 @@ body.signup-black { background: radial-gradient(120% 55% at 50% 0%, #2a2108 0%, 
    Inside the chip's corner — the chip row scrolls, so anything outside it would be clipped. */
 .nav .links a.acb-chip { position: relative; }
 .nav .links a.acb-chip .live-dot { position: absolute; top: 1px; right: 3px; width: 8px; height: 8px; border-radius: 50%; background: #ff2d2d; box-shadow: 0 0 0 1.5px #0d0d0d; pointer-events: none; }
+
+/* Dog Race (Steve, 2026-11-16) — black and gold, dog video tiles, no race track. The race covers
+   the room's video area (the host's camera keeps running underneath). */
+.dr-lobby { margin: 0 0 10px; padding: 12px 14px; border-radius: var(--radius); background: #000; border: 1.5px solid var(--gold); color: #fff; }
+.dr-lobby-title { color: var(--gold); font-weight: 800; font-size: 17px; margin-bottom: 8px; }
+.dr-lobby-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.dr-lobby-count { color: var(--gold); font-weight: 700; }
+.dr-lobby-full { color: var(--gold); font-weight: 700; font-size: 13px; }
+.dr-lobby-in { margin-top: 6px; color: var(--gold); font-weight: 700; font-size: 13px; }
+.dr-lobby-names { margin-top: 6px; color: #ddd; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dr-race { position: absolute; inset: 0; z-index: 7; display: flex; flex-direction: column; background: #000; }
+.dr-top { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: #000; border-bottom: 1.5px solid var(--gold-border); }
+.dr-top-title { color: var(--gold); font-weight: 800; font-size: 16px; }
+.dr-top-clock { color: var(--gold); font-weight: 800; font-variant-numeric: tabular-nums; }
+.dr-grid { flex: 1; min-height: 0; display: grid; gap: 3px; padding: 3px; }
+.dr-tile { position: relative; min-width: 0; min-height: 0; overflow: hidden; border-radius: 6px; background: #111; border: 1.5px solid var(--gold-border); }
+.dr-tile.first { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold) inset; }
+.dr-tile > video, .dr-tile > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.dr-tile-blank { position: absolute; inset: 0; display: grid; place-items: center; font-size: 34px; }
+.dr-place { position: absolute; top: 4px; left: 4px; z-index: 3; padding: 1px 7px; border-radius: 999px; background: rgba(0,0,0,.8); color: var(--gold); border: 1px solid var(--gold); font-weight: 800; font-size: 12px; }
+.dr-place.gold { background: var(--gold); color: #000; }
+.dr-place.static { position: static; flex: none; }
+.dr-boost { position: absolute; top: 4px; right: 4px; z-index: 3; padding: 1px 7px; border-radius: 999px; background: #FFD400; color: #000; font-weight: 900; font-size: 11px; animation: dr-boost .35s ease-out; }
+@keyframes dr-boost { 0% { transform: scale(.4); opacity: 0; } 70% { transform: scale(1.15); opacity: 1; } 100% { transform: scale(1); } }
+.dr-tile.boosting { border-color: #FFD400; }
+.dr-strip { position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; display: flex; align-items: center; gap: 4px; padding: 14px 34px 4px 6px; background: linear-gradient(transparent, rgba(0,0,0,.9)); }
+.dr-name { flex: 1; min-width: 0; color: var(--gold); font-weight: 800; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dr-bbs { color: #fff; font-weight: 700; font-size: 11px; font-variant-numeric: tabular-nums; }
+.dr-gift { position: absolute; right: 4px; bottom: 4px; z-index: 4; width: 28px; height: 28px; padding: 0; border-radius: 7px; border: 1.5px solid #fff; background: #D0021B; font-size: 15px; line-height: 1; cursor: pointer; display: grid; place-items: center; }
+.dr-tile.small .dr-place, .dr-tile.small .dr-boost { font-size: 10px; padding: 0 5px; }
+.dr-tile.small .dr-name { font-size: 10px; }
+.dr-tile.small .dr-bbs { display: none; }
+.dr-tile.small .dr-strip { padding: 10px 26px 3px 4px; }
+.dr-tile.small .dr-gift { width: 22px; height: 22px; font-size: 12px; right: 3px; bottom: 3px; }
+.dr-fx-card { position: absolute; inset: 0; z-index: 5; display: grid; place-items: center; pointer-events: none; animation: dr-fx-pop 2.6s ease-out both; }
+.dr-fx-card img { width: 55%; max-width: 120px; height: auto; object-fit: contain; }
+.dr-fx-card span { font-size: 40px; }
+@keyframes dr-fx-pop { 0% { opacity: 0; transform: scale(.3); } 15% { opacity: 1; transform: scale(1.1); } 25% { transform: scale(1); } 80% { opacity: 1; } 100% { opacity: 0; } }
+.dr-results { max-width: 520px; width: 100%; max-height: 88vh; overflow-y: auto; }
+.dr-winner { text-align: center; color: var(--gold); font-weight: 800; font-size: 17px; margin: 0 0 12px; }
+.dr-results-list { display: flex; flex-direction: column; gap: 8px; }
+.dr-result { padding: 8px 10px; border: 1px solid var(--gold-border); border-radius: 10px; background: #111; }
+.dr-result.first { border-color: var(--gold); }
+.dr-gifters { margin-top: 6px; font-size: 12px; color: #ddd; line-height: 1.5; }
+.video-grid.dr-on { min-height: 440px; }

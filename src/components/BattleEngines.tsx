@@ -39,6 +39,8 @@ export function Overlay({ title, children, onClose, width = 440, back = false }:
 
 export type BattleKind =
   | "1v1" | "gameLimit" | "virtual" | "series" | "2v2" | "marathon" | "555" | "solo" | "hideSeek"
+  // Dog Race (Steve, 2026-11-16): free to play, up to 24 dogs, the room gifts them along.
+  | "dogRace"
   | "bingo" | "bingoBoard" | "pyramid" | "checkers" | "chess" | "fourinarow" | "reversi" | "mancala" | "trivia" | "guess" | "trivianight" | "wordsearch" | "behind"
   // Android numbers this one #5 and it belongs between Best Out Of and 5-5-5. It isn't a battle
   // you start against someone in the room — it's a personal 31-day streak you opt into — so it
@@ -89,6 +91,9 @@ export const BATTLE_KINDS: {
   // minPeople is 1. Starting one is host-only, gated at the call site like the phones do.
   { kind: "solo", number: "#9", title: "solo_battle_with_unlimited_players_2", blurb: "anyone_watching_can_join_and_compete", minPeople: 1,
     info: "start_one_instantly_no_admin_needed_ever" },
+  // Dog Race (Steve, 2026-11-16), next to Chat Battle as the contract says. Unnumbered so the
+  // phones' #1..#21 keep their numbers. The room's viewers are the players: nobody else on screen.
+  { kind: "dogRace", title: "dr_title", blurb: "dr_blurb", minPeople: 1, info: "dr_info" },
   // Steve, 2026-09-27: "Hide & Seek" — 5 minutes, scores hidden until the end, 2-4 players free
   // for all or 2v2 teams. Runs on the Best Out Of (single round) and 2v2 engines with hide_scores.
   { kind: "hideSeek", number: "#10", title: "hide_seek_2", blurb: "n5_minutes_scores_hidden_until_the_end", minPeople: 2,
