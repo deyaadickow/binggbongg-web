@@ -1803,5 +1803,17 @@
  "ref_inv_explain": "把这个链接发给你的好友和粉丝 — 通过短信、邮件、Messenger、WhatsApp或任何社交媒体。他们会看到我们的视频、你的推荐码，以及适合他们手机的应用商店。每位好友在Bingg Bongg上赚到的每一笔，你都能得到%1$s%%，最高%2$s。",
  "su_referral_code": "推荐码（选填）",
  "su_referral_placeholder": "谁邀请了你？填写对方的用户名",
- "su_referral_hint": "现在就填写：推荐码之后不能再添加或更改。"
+ "su_referral_hint": "现在就填写：推荐码之后不能再添加或更改。",
+ "acb_tab": "所有国家对决",
+ "acb_search": "搜索国家或参赛者",
+ "acb_live_now": "正在直播",
+ "acb_opening": "开放中 — 立即加入",
+ "acb_starts_at": "{time} 开始",
+ "acb_ended": "已结束",
+ "acb_winner": "冠军：{name}",
+ "acb_leading": "领先：{name} · {n} BBs",
+ "acb_empty": "国家对决每晚 8 PM 开始。",
+ "acb_no_match": "没有符合搜索的对决。",
+ "acb_watch": "观看并支持",
+ "acb_test": "测试"
 }

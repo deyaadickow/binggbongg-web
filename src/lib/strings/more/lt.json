@@ -1800,5 +1800,17 @@
  "ref_inv_explain": "Nusiųsk šią nuorodą draugams ir sekėjams — žinute, el. paštu, per Messenger, WhatsApp ar bet kurį socialinį tinklą. Jie pamatys mūsų vaizdo įrašą, tavo nukreipimo kodą ir tinkamą parduotuvę savo telefonui. Gauni %1$s%% visko, ką kiekvienas draugas uždirba Bingg Bongg, iki %2$s.",
  "su_referral_code": "Nukreipimo kodas (neprivaloma)",
  "su_referral_placeholder": "Kas tave pakvietė? Jo vartotojo vardas",
- "su_referral_hint": "Įvesk jį dabar: nukreipimo kodo vėliau pridėti ar pakeisti negalima."
+ "su_referral_hint": "Įvesk jį dabar: nukreipimo kodo vėliau pridėti ar pakeisti negalima.",
+ "acb_tab": "Visos šalių kovos",
+ "acb_search": "Ieškoti šalies ar dalyvio",
+ "acb_live_now": "DABAR GYVAI",
+ "acb_opening": "Atsidaro — prisijunk dabar",
+ "acb_starts_at": "Prasideda {time}",
+ "acb_ended": "Baigta",
+ "acb_winner": "Nugalėtojas: {name}",
+ "acb_leading": "Pirmauja: {name} · {n} BBs",
+ "acb_empty": "Šalių kovos prasideda kiekvieną vakarą 20 val.",
+ "acb_no_match": "Paieškos neatitinka nė viena kova.",
+ "acb_watch": "Žiūrėk ir palaikyk",
+ "acb_test": "BANDYMAS"
 }

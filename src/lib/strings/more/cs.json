@@ -1802,5 +1802,17 @@
  "ref_inv_explain": "Pošli tento odkaz kamarádům a sledujícím — SMS, e-mailem, přes Messenger, WhatsApp nebo jakoukoli sociální síť. Uvidí naše video, tvůj doporučovací kód a správný obchod pro svůj telefon. Získáš %1$s%% ze všeho, co každý kamarád vydělá na Bingg Bongg, až do %2$s.",
  "su_referral_code": "Doporučovací kód (nepovinné)",
  "su_referral_placeholder": "Kdo tě pozval? Jeho uživatelské jméno",
- "su_referral_hint": "Zadej ho teď: doporučovací kód nelze později přidat ani změnit."
+ "su_referral_hint": "Zadej ho teď: doporučovací kód nelze později přidat ani změnit.",
+ "acb_tab": "Všechny národní bitvy",
+ "acb_search": "Hledat zemi nebo účastníka",
+ "acb_live_now": "PRÁVĚ ŽIVĚ",
+ "acb_opening": "Otevírá se — připoj se",
+ "acb_starts_at": "Začíná v {time}",
+ "acb_ended": "Skončila",
+ "acb_winner": "Vítěz: {name}",
+ "acb_leading": "Vede: {name} · {n} BBs",
+ "acb_empty": "Národní bitvy začínají každý večer ve 20:00.",
+ "acb_no_match": "Hledání neodpovídá žádná bitva.",
+ "acb_watch": "Sledovat a podpořit",
+ "acb_test": "TEST"
 }

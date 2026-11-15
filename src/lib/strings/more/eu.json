@@ -1803,5 +1803,17 @@
  "ref_inv_explain": "Bidali esteka hau zure lagun eta jarraitzaileei — SMS, posta, Messenger, WhatsApp edo edozein sare sozialen bidez. Gure bideoa, zure erreferentzia-kodea eta beren telefonorako denda egokia ikusiko dituzte. Lagun bakoitzak Bingg Bonggen irabazten duen guztiaren %1$s%% jasotzen duzu, gehienez %2$s.",
  "su_referral_code": "Erreferentzia-kodea (aukerakoa)",
  "su_referral_placeholder": "Nork gonbidatu zaitu? Bere erabiltzaile-izena",
- "su_referral_hint": "Gehitu orain: erreferentzia-kode bat ezin da geroago gehitu edo aldatu."
+ "su_referral_hint": "Gehitu orain: erreferentzia-kode bat ezin da geroago gehitu edo aldatu.",
+ "acb_tab": "Herrialdeen gudu guztiak",
+ "acb_search": "Bilatu herrialde bat edo parte-hartzaile bat",
+ "acb_live_now": "ZUZENEAN ORAIN",
+ "acb_opening": "Irekitzen — batu orain",
+ "acb_starts_at": "{time}etan hasiko da",
+ "acb_ended": "Amaituta",
+ "acb_winner": "Irabazlea: {name}",
+ "acb_leading": "Aurretik: {name} · {n} BBs",
+ "acb_empty": "Herrialdeen guduak gauero 8 PM-etan hasten dira.",
+ "acb_no_match": "Ez dago bilaketarekin bat datorren gudurik.",
+ "acb_watch": "Ikusi eta babestu",
+ "acb_test": "PROBA"
 }

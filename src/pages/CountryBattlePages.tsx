@@ -67,15 +67,17 @@ export function CountryBattlePage() {
   const [sp] = useSearchParams();
   const boardDemo = demoKind(sp.get("demo"));
   const uid = user?.id ?? 0;
+  // ?country=Japan — opened from All Country Battles for a country with no battle day yet.
+  const pickCountry = sp.get("country") || undefined;
   const [daily, setDaily] = useState<CbDaily | null>(null);
   const [error, setError] = useState<string | null>(null);
   const now = useTick();
 
   const load = useCallback(() => {
-    fetchCountryBattleDaily(uid)
+    fetchCountryBattleDaily(uid, pickCountry)
       .then((d) => { setDaily(d); setError(null); })
       .catch((e) => setError((e as Error).message));
-  }, [uid]);
+  }, [uid, pickCountry]);
   useEffect(() => {
     load();
     const timer = setInterval(load, 30000);

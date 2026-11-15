@@ -34,6 +34,8 @@ export function Nav() {
         {/* Steve, 2026-10-25: Contests and Exciting News are directory tiles #1 and #2 now —
             only For You and the directory stay up here, centred like the phones. */}
         <NavLink to="/" end>{t("for_you")}</NavLink>
+        {/* Steve, 2026-11-16: "Next to for you page add 'All Country Battles'". */}
+        <NavLink to="/country-battles">{t("acb_tab")}</NavLink>
         {/* Steve, 2026-11-14: "For You / 70+ Features / 70+ Videos / 1 Video 70+ Features / Our Ads". */}
         <NavLink to="/features">{t("tab_70_features")}</NavLink>
         {/* Steve, 2026-11-05: "Next to 'For You Page' and 'Bingg Bongg features' on main feed page

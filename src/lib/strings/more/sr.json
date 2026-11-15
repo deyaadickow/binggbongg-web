@@ -1803,5 +1803,17 @@
  "ref_inv_explain": "Пошаљи овај линк пријатељима и пратиоцима — поруком, имејлом, преко Messenger, WhatsApp или било које друштвене мреже. Видеће наш видео, твој референтни код и праву продавницу за свој телефон. Добијаш %1$s%% од свега што сваки пријатељ заради на Bingg Bongg, до %2$s.",
  "su_referral_code": "Референтни код (опционо)",
  "su_referral_placeholder": "Ко те је позвао? Његово корисничко име",
- "su_referral_hint": "Унеси га сада: референтни код не може касније да се дода ни промени."
+ "su_referral_hint": "Унеси га сада: референтни код не може касније да се дода ни промени.",
+ "acb_tab": "Sve bitke država",
+ "acb_search": "Pretraži državu ili učesnika",
+ "acb_live_now": "UŽIVO SADA",
+ "acb_opening": "Otvara se — uključi se sada",
+ "acb_starts_at": "Počinje u {time}",
+ "acb_ended": "Završeno",
+ "acb_winner": "Pobednik: {name}",
+ "acb_leading": "Vodi: {name} · {n} BBs",
+ "acb_empty": "Bitke država počinju svake večeri u 20 h.",
+ "acb_no_match": "Nijedna bitka ne odgovara pretrazi.",
+ "acb_watch": "Gledaj i podrži",
+ "acb_test": "TEST"
 }

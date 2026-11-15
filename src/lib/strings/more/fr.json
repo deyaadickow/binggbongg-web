@@ -1803,5 +1803,17 @@
  "ref_inv_explain": "Envoyez ce lien à vos amis et abonnés — par SMS, e-mail, Messenger, WhatsApp ou n'importe quel réseau social. Ils verront notre vidéo, votre code de parrainage et la bonne boutique pour leur téléphone. Vous recevez %1$s %% de tout ce que chaque ami gagne sur Bingg Bongg, jusqu'à %2$s.",
  "su_referral_code": "Code de parrainage (facultatif)",
  "su_referral_placeholder": "Qui vous a invité ? Son nom d'utilisateur",
- "su_referral_hint": "Ajoutez-le maintenant : un code de parrainage ne peut pas être ajouté ni modifié plus tard."
+ "su_referral_hint": "Ajoutez-le maintenant : un code de parrainage ne peut pas être ajouté ni modifié plus tard.",
+ "acb_tab": "Tous les Country Battles",
+ "acb_search": "Chercher un pays ou un participant",
+ "acb_live_now": "EN DIRECT",
+ "acb_opening": "Ouverture — rejoins maintenant",
+ "acb_starts_at": "Commence à {time}",
+ "acb_ended": "Terminé",
+ "acb_winner": "Gagnant : {name}",
+ "acb_leading": "En tête : {name} · {n} BBs",
+ "acb_empty": "Les Country Battles commencent chaque soir à 20 h.",
+ "acb_no_match": "Aucune battle ne correspond à ta recherche.",
+ "acb_watch": "Regarder et soutenir",
+ "acb_test": "TEST"
 }

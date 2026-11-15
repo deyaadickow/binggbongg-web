@@ -1799,5 +1799,17 @@
  "ref_inv_explain": "Nosūti šo saiti saviem draugiem un sekotājiem — ar īsziņu, e-pastu, Messenger, WhatsApp vai jebkurā sociālajā tīklā. Viņi redzēs mūsu video, tavu uzaicinājuma kodu un pareizo veikalu savam tālrunim. Tu saņem %1$s %% no visa, ko katrs draugs nopelna Bingg Bongg, līdz %2$s.",
  "su_referral_code": "Uzaicinājuma kods (nav obligāts)",
  "su_referral_placeholder": "Kas tevi uzaicināja? Viņa lietotājvārds",
- "su_referral_hint": "Pievieno to tagad: uzaicinājuma kodu nevar pievienot vai mainīt vēlāk."
+ "su_referral_hint": "Pievieno to tagad: uzaicinājuma kodu nevar pievienot vai mainīt vēlāk.",
+ "acb_tab": "Visas valstu cīņas",
+ "acb_search": "Meklēt valsti vai dalībnieku",
+ "acb_live_now": "TIEŠRAIDĒ TAGAD",
+ "acb_opening": "Atveras — pievienojies tagad",
+ "acb_starts_at": "Sākas {time}",
+ "acb_ended": "Beigusies",
+ "acb_winner": "Uzvarētājs: {name}",
+ "acb_leading": "Vadībā: {name} · {n} BBs",
+ "acb_empty": "Valstu cīņas sākas katru vakaru plkst. 20.",
+ "acb_no_match": "Meklēšanai neatbilst neviena cīņa.",
+ "acb_watch": "Skaties un atbalsti",
+ "acb_test": "TESTS"
 }

@@ -1803,5 +1803,17 @@
  "ref_inv_explain": "Schick diesen Link an deine Freunde und Follower — per SMS, E-Mail, Messenger, WhatsApp oder in jedem sozialen Netzwerk. Sie sehen unser Video, deinen Empfehlungscode und den richtigen Store für ihr Handy. Du erhältst %1$s %% von allem, was jeder Freund auf Bingg Bongg verdient, bis zu %2$s.",
  "su_referral_code": "Empfehlungscode (optional)",
  "su_referral_placeholder": "Wer hat dich eingeladen? Sein oder ihr Benutzername",
- "su_referral_hint": "Jetzt eingeben: Ein Empfehlungscode kann später nicht hinzugefügt oder geändert werden."
+ "su_referral_hint": "Jetzt eingeben: Ein Empfehlungscode kann später nicht hinzugefügt oder geändert werden.",
+ "acb_tab": "Alle Country Battles",
+ "acb_search": "Land oder Teilnehmer suchen",
+ "acb_live_now": "JETZT LIVE",
+ "acb_opening": "Öffnet — jetzt beitreten",
+ "acb_starts_at": "Startet um {time}",
+ "acb_ended": "Beendet",
+ "acb_winner": "Gewinner: {name}",
+ "acb_leading": "Vorne: {name} · {n} BBs",
+ "acb_empty": "Country Battles starten jeden Abend um 20 Uhr.",
+ "acb_no_match": "Keine Battles passen zu deiner Suche.",
+ "acb_watch": "Zuschauen & unterstützen",
+ "acb_test": "TEST"
 }

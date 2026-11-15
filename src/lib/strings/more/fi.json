@@ -1794,5 +1794,17 @@
  "ref_inv_explain": "Lähetä tämä linkki ystävillesi ja seuraajillesi — tekstiviestillä, sähköpostilla, Messengerissä, WhatsAppissa tai missä tahansa somessa. He näkevät videomme, suosituskoodisi ja oikean kaupan puhelimelleen. Saat %1$s %% kaikesta, mitä jokainen ystävä ansaitsee Bingg Bonggissa, enintään %2$s.",
  "su_referral_code": "Suosituskoodi (valinnainen)",
  "su_referral_placeholder": "Kuka kutsui sinut? Hänen käyttäjänimensä",
- "su_referral_hint": "Lisää se nyt: suosituskoodia ei voi lisätä tai muuttaa myöhemmin."
+ "su_referral_hint": "Lisää se nyt: suosituskoodia ei voi lisätä tai muuttaa myöhemmin.",
+ "acb_tab": "Kaikki Country Battlet",
+ "acb_search": "Hae maata tai osallistujaa",
+ "acb_live_now": "LIVENÄ NYT",
+ "acb_opening": "Avautuu — liity nyt",
+ "acb_starts_at": "Alkaa klo {time}",
+ "acb_ended": "Päättynyt",
+ "acb_winner": "Voittaja: {name}",
+ "acb_leading": "Johdossa: {name} · {n} BBs",
+ "acb_empty": "Country Battlet alkavat joka ilta klo 20.",
+ "acb_no_match": "Haullasi ei löytynyt battleja.",
+ "acb_watch": "Katso ja tue",
+ "acb_test": "TESTI"
 }

@@ -1803,5 +1803,17 @@
  "ref_inv_explain": "把這個連結傳給你的好友和粉絲 — 透過簡訊、電子郵件、Messenger、WhatsApp或任何社群媒體。他們會看到我們的影片、你的推薦碼，以及適合他們手機的應用程式商店。每位好友在Bingg Bongg上賺到的每一筆，你都能得到%1$s%%，最高%2$s。",
  "su_referral_code": "推薦碼（選填）",
  "su_referral_placeholder": "誰邀請了你？填寫對方的使用者名稱",
- "su_referral_hint": "現在就填寫：推薦碼之後不能再新增或更改。"
+ "su_referral_hint": "現在就填寫：推薦碼之後不能再新增或更改。",
+ "acb_tab": "所有國家爭霸賽",
+ "acb_search": "搜尋國家或參賽者",
+ "acb_live_now": "正在直播",
+ "acb_opening": "開放中 — 立即加入",
+ "acb_starts_at": "{time} 開始",
+ "acb_ended": "已結束",
+ "acb_winner": "冠軍：{name}",
+ "acb_leading": "領先：{name} · {n} BBs",
+ "acb_empty": "國家爭霸賽每晚 8 PM 開始。",
+ "acb_no_match": "沒有符合搜尋的對戰。",
+ "acb_watch": "觀看並支持",
+ "acb_test": "測試"
 }

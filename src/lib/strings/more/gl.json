@@ -1799,5 +1799,17 @@
  "ref_inv_explain": "Envía esta ligazón aos teus amigos e seguidores — por SMS, correo, Messenger, WhatsApp ou calquera rede social. Verán o noso vídeo, o teu código de referencia e a tenda axeitada para o seu teléfono. Recibes o %1$s%% de todo o que cada amigo gañe en Bingg Bongg, ata %2$s.",
  "su_referral_code": "Código de referencia (opcional)",
  "su_referral_placeholder": "Quen te convidou? O seu nome de usuario",
- "su_referral_hint": "Engádeo agora: un código de referencia non se pode engadir nin cambiar despois."
+ "su_referral_hint": "Engádeo agora: un código de referencia non se pode engadir nin cambiar despois.",
+ "acb_tab": "Todas as batallas de países",
+ "acb_search": "Busca un país ou un participante",
+ "acb_live_now": "EN DIRECTO AGORA",
+ "acb_opening": "Ábrese — únete xa",
+ "acb_starts_at": "Comeza ás {time}",
+ "acb_ended": "Rematada",
+ "acb_winner": "Gañador: {name}",
+ "acb_leading": "Vai primeiro: {name} · {n} BBs",
+ "acb_empty": "As batallas de países comezan cada noite ás 8 PM.",
+ "acb_no_match": "Ningunha batalla coincide coa busca.",
+ "acb_watch": "Ver e apoiar",
+ "acb_test": "PROBA"
 }

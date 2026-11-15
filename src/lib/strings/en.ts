@@ -2655,4 +2655,17 @@ export const en = {
   vag_st_declined: "Not approved",
   vag_st_ended: "Deal ended",
   vag_you_earned: "You earned %1$s",
+  // All Country Battles (Steve, 2026-11-16).
+  acb_tab: "All Country Battles",
+  acb_search: "Search a country or a battler",
+  acb_live_now: "LIVE NOW",
+  acb_opening: "Opening — join now",
+  acb_starts_at: "Starts at {time}",
+  acb_ended: "Ended",
+  acb_winner: "Winner: {name}",
+  acb_leading: "Leading: {name} · {n} BBs",
+  acb_empty: "Country Battles start every night at 8 PM.",
+  acb_no_match: "No battles match your search.",
+  acb_watch: "Watch & support",
+  acb_test: "TEST",
 } as const;

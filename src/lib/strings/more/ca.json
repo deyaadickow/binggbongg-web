@@ -1802,5 +1802,17 @@
  "ref_inv_explain": "Envia aquest enllaç als teus amics i seguidors — per SMS, correu, Messenger, WhatsApp o qualsevol xarxa social. Veuran el nostre vídeo, el teu codi de referència i la botiga adequada per al seu telèfon. Reps el %1$s%% de tot el que cada amic guanyi a Bingg Bongg, fins a %2$s.",
  "su_referral_code": "Codi de referència (opcional)",
  "su_referral_placeholder": "Qui et va convidar? El seu nom d'usuari",
- "su_referral_hint": "Afegeix-lo ara: un codi de referència no es pot afegir ni canviar més tard."
+ "su_referral_hint": "Afegeix-lo ara: un codi de referència no es pot afegir ni canviar més tard.",
+ "acb_tab": "Tots els Country Battles",
+ "acb_search": "Cerca un país o un participant",
+ "acb_live_now": "EN DIRECTE ARA",
+ "acb_opening": "S'obre — uneix-t'hi ara",
+ "acb_starts_at": "Comença a les {time}",
+ "acb_ended": "Acabada",
+ "acb_winner": "Guanyador: {name}",
+ "acb_leading": "Va primer: {name} · {n} BBs",
+ "acb_empty": "Els Country Battles comencen cada nit a les 8 PM.",
+ "acb_no_match": "Cap batalla coincideix amb la cerca.",
+ "acb_watch": "Mira i dona suport",
+ "acb_test": "PROVA"
 }

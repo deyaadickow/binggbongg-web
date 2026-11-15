@@ -1803,5 +1803,17 @@
  "ref_inv_explain": "Envie este link para seus amigos e seguidores — por SMS, e-mail, Messenger, WhatsApp ou qualquer rede social. Eles verão nosso vídeo, seu código de indicação e a loja certa para o celular deles. Você ganha %1$s%% de tudo o que cada amigo ganhar no Bingg Bongg, até %2$s.",
  "su_referral_code": "Código de indicação (opcional)",
  "su_referral_placeholder": "Quem convidou você? O nome de usuário da pessoa",
- "su_referral_hint": "Adicione agora: um código de indicação não pode ser adicionado nem alterado depois."
+ "su_referral_hint": "Adicione agora: um código de indicação não pode ser adicionado nem alterado depois.",
+ "acb_tab": "Todas as Batalhas de Países",
+ "acb_search": "Pesquise um país ou participante",
+ "acb_live_now": "AO VIVO AGORA",
+ "acb_opening": "Abrindo — entre agora",
+ "acb_starts_at": "Começa às {time}",
+ "acb_ended": "Encerrada",
+ "acb_winner": "Vencedor: {name}",
+ "acb_leading": "Na liderança: {name} · {n} BBs",
+ "acb_empty": "As Batalhas de Países começam toda noite às 20h.",
+ "acb_no_match": "Nenhuma batalha corresponde à sua pesquisa.",
+ "acb_watch": "Assista e apoie",
+ "acb_test": "TESTE"
 }

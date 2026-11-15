@@ -2410,4 +2410,17 @@ export const es = {
   su_referral_code: "Código de referido (opcional)",
   su_referral_placeholder: "¿Quién te invitó? Su nombre de usuario",
   su_referral_hint: "Añádelo ahora: un código de referido no se puede añadir ni cambiar después.",
+  // All Country Battles (Steve, 2026-11-16).
+  acb_tab: "Todas las Batallas de Países",
+  acb_search: "Busca un país o un participante",
+  acb_live_now: "EN VIVO AHORA",
+  acb_opening: "Abriendo — únete ya",
+  acb_starts_at: "Empieza a las {time}",
+  acb_ended: "Terminada",
+  acb_winner: "Ganador: {name}",
+  acb_leading: "Va ganando: {name} · {n} BBs",
+  acb_empty: "Las Batallas de Países empiezan cada noche a las 8 PM.",
+  acb_no_match: "Ninguna batalla coincide con tu búsqueda.",
+  acb_watch: "Ver y apoyar",
+  acb_test: "PRUEBA",
 };

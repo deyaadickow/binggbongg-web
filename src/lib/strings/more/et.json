@@ -1800,5 +1800,17 @@
  "ref_inv_explain": "Saada see link oma sõpradele ja jälgijatele — SMS-i, e-posti, Messengeri, WhatsAppi või mis tahes sotsiaalmeedia kaudu. Nad näevad meie videot, sinu soovituskoodi ja oma telefoni jaoks õiget poodi. Saad %1$s %% kõigest, mida iga sõber Bingg Bonggis teenib, kuni %2$s.",
  "su_referral_code": "Soovituskood (valikuline)",
  "su_referral_placeholder": "Kes sind kutsus? Tema kasutajanimi",
- "su_referral_hint": "Lisa see kohe: soovituskoodi ei saa hiljem lisada ega muuta."
+ "su_referral_hint": "Lisa see kohe: soovituskoodi ei saa hiljem lisada ega muuta.",
+ "acb_tab": "Kõik riikide lahingud",
+ "acb_search": "Otsi riiki või osalejat",
+ "acb_live_now": "PRAEGU OTSE",
+ "acb_opening": "Avaneb — liitu kohe",
+ "acb_starts_at": "Algab kell {time}",
+ "acb_ended": "Lõppenud",
+ "acb_winner": "Võitja: {name}",
+ "acb_leading": "Juhib: {name} · {n} BBs",
+ "acb_empty": "Riikide lahingud algavad igal õhtul kell 20.",
+ "acb_no_match": "Otsingule ei vasta ükski lahing.",
+ "acb_watch": "Vaata ja toeta",
+ "acb_test": "TEST"
 }

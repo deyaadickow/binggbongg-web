@@ -1801,5 +1801,17 @@
  "ref_inv_explain": "Stuur hierdie skakel na jou vriende en volgelinge — per SMS, e-pos, Messenger, WhatsApp of enige sosiale media. Hulle sien ons video, jou verwysingskode en die regte winkel vir hul foon. Jy kry %1$s%% van alles wat elke vriend op Bingg Bongg verdien, tot %2$s.",
  "su_referral_code": "Verwysingskode (opsioneel)",
  "su_referral_placeholder": "Wie het jou genooi? Hul gebruikersnaam",
- "su_referral_hint": "Voeg dit nou by: 'n verwysingskode kan nie later bygevoeg of verander word nie."
+ "su_referral_hint": "Voeg dit nou by: 'n verwysingskode kan nie later bygevoeg of verander word nie.",
+ "acb_tab": "Alle Landstryde",
+ "acb_search": "Soek 'n land of 'n deelnemer",
+ "acb_live_now": "NOU REGSTREEKS",
+ "acb_opening": "Gaan oop — sluit nou aan",
+ "acb_starts_at": "Begin om {time}",
+ "acb_ended": "Verby",
+ "acb_winner": "Wenner: {name}",
+ "acb_leading": "Voor: {name} · {n} BBs",
+ "acb_empty": "Landstryde begin elke aand om 8 PM.",
+ "acb_no_match": "Geen stryde pas by jou soektog nie.",
+ "acb_watch": "Kyk en ondersteun",
+ "acb_test": "TOETS"
 }

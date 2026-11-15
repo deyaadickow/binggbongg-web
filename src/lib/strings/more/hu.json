@@ -1796,5 +1796,17 @@
  "ref_inv_explain": "Küldd el ezt a linket a barátaidnak és követőidnek — SMS-ben, e-mailben, Messengeren, WhatsAppon vagy bármilyen közösségi médiában. Látják a videónkat, az ajánlókódodat és a telefonjukhoz illő áruházat. %1$s%%-ot kapsz mindenből, amit minden barátod a Bingg Bonggon keres, legfeljebb %2$s összegig.",
  "su_referral_code": "Ajánlókód (nem kötelező)",
  "su_referral_placeholder": "Ki hívott meg? Az ő felhasználóneve",
- "su_referral_hint": "Add meg most: az ajánlókódot később nem lehet hozzáadni vagy megváltoztatni."
+ "su_referral_hint": "Add meg most: az ajánlókódot később nem lehet hozzáadni vagy megváltoztatni.",
+ "acb_tab": "Összes országcsata",
+ "acb_search": "Ország vagy résztvevő keresése",
+ "acb_live_now": "MOST ÉLŐBEN",
+ "acb_opening": "Nyílik — csatlakozz most",
+ "acb_starts_at": "Kezdés: {time}",
+ "acb_ended": "Véget ért",
+ "acb_winner": "Győztes: {name}",
+ "acb_leading": "Vezet: {name} · {n} BBs",
+ "acb_empty": "Az országcsaták minden este 20 órakor kezdődnek.",
+ "acb_no_match": "Nincs a keresésnek megfelelő csata.",
+ "acb_watch": "Nézd és támogasd",
+ "acb_test": "TESZT"
 }

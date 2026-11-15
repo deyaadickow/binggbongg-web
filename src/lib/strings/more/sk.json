@@ -1803,5 +1803,17 @@
  "ref_inv_explain": "Pošli tento odkaz kamarátom a sledovateľom — SMS, e-mailom, cez Messenger, WhatsApp alebo akúkoľvek sociálnu sieť. Uvidia naše video, tvoj referenčný kód a správny obchod pre svoj telefón. Získaš %1$s%% zo všetkého, čo každý kamarát zarobí na Bingg Bongg, až do %2$s.",
  "su_referral_code": "Referenčný kód (nepovinné)",
  "su_referral_placeholder": "Kto ťa pozval? Jeho používateľské meno",
- "su_referral_hint": "Zadaj ho teraz: referenčný kód neskôr nemožno pridať ani zmeniť."
+ "su_referral_hint": "Zadaj ho teraz: referenčný kód neskôr nemožno pridať ani zmeniť.",
+ "acb_tab": "Všetky súboje krajín",
+ "acb_search": "Hľadať krajinu alebo účastníka",
+ "acb_live_now": "PRÁVE NAŽIVO",
+ "acb_opening": "Otvára sa — pridaj sa",
+ "acb_starts_at": "Začína o {time}",
+ "acb_ended": "Skončil",
+ "acb_winner": "Víťaz: {name}",
+ "acb_leading": "Vedie: {name} · {n} BBs",
+ "acb_empty": "Súboje krajín začínajú každý večer o 20:00.",
+ "acb_no_match": "Hľadaniu nezodpovedá žiadny súboj.",
+ "acb_watch": "Sledovať a podporiť",
+ "acb_test": "TEST"
 }

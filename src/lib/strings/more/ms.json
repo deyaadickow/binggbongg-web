@@ -1803,5 +1803,17 @@
  "ref_inv_explain": "Hantar pautan ini kepada rakan dan pengikut anda — melalui SMS, e-mel, Messenger, WhatsApp atau mana-mana media sosial. Mereka akan melihat video kami, kod rujukan anda dan kedai yang betul untuk telefon mereka. Anda dapat %1$s%% daripada semua yang diperoleh setiap rakan di Bingg Bongg, sehingga %2$s.",
  "su_referral_code": "Kod Rujukan (pilihan)",
  "su_referral_placeholder": "Siapa yang menjemput anda? Nama pengguna mereka",
- "su_referral_hint": "Masukkan sekarang: kod rujukan tidak boleh ditambah atau diubah kemudian."
+ "su_referral_hint": "Masukkan sekarang: kod rujukan tidak boleh ditambah atau diubah kemudian.",
+ "acb_tab": "Semua Pertarungan Negara",
+ "acb_search": "Cari negara atau peserta",
+ "acb_live_now": "LIVE SEKARANG",
+ "acb_opening": "Dibuka — sertai sekarang",
+ "acb_starts_at": "Bermula pada {time}",
+ "acb_ended": "Tamat",
+ "acb_winner": "Pemenang: {name}",
+ "acb_leading": "Mendahului: {name} · {n} BBs",
+ "acb_empty": "Pertarungan Negara bermula setiap malam pada 8 PM.",
+ "acb_no_match": "Tiada pertarungan sepadan dengan carian anda.",
+ "acb_watch": "Tonton & sokong",
+ "acb_test": "UJIAN"
 }

@@ -77,6 +77,7 @@ import { LiveFeaturePage } from "./pages/LiveFeaturePage";
 import { PkContestsPage } from "./pages/PkContestsPage";
 import { CountryBattleBoardPage, CountryBattleDayPage, CountryBattlePage } from "./pages/CountryBattlePages";
 import { CountryBattleLivePage } from "./pages/CountryBattleLivePage";
+import { AllCountryBattlesPage } from "./pages/AllCountryBattlesPage";
 import { CountryBoardPage } from "./pages/CountryBoardPage";
 import { AdsForReferralsPage } from "./pages/AdsForReferralsPage";
 import { InvitePage } from "./pages/InvitePage";
@@ -183,6 +184,8 @@ export default function App() {
           {/* Country Battle v2 (Steve, 2026-11-03) — the page, the daily battle screen, the lifetime
               Bragging Rights board (every day) and one day's top 100. */}
           <Route path="/country-battle" element={<CountryBattlePage />} />
+          {/* All Country Battles (Steve, 2026-11-16): every country's battle, search on top, watch any. */}
+          <Route path="/country-battles" element={<AllCountryBattlesPage />} />
           <Route path="/country-battle/live/:dayId" element={<CountryBattleLivePage />} />
           <Route path="/country-battle/board" element={<CountryBattleBoardPage />} />
           <Route path="/country-battle/board/:id" element={<CountryBattleDayPage />} />

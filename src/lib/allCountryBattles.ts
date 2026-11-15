@@ -1,0 +1,127 @@
+// All Country Battles (Steve, 2026-11-16): "Next to for you page add 'All Country Battles' when i
+// click on it, it will link me to a page where all the country battles are there with search on top
+// incase there is 100 battles. and anyone can click on any battle from any country to watch and
+// support anyone."
+//
+// One call, fetchAllCountryBattles {search}. Never an empty POST body (the host WAF 403s it), so
+// `search` is always sent, "" when the box is empty.
+import { post } from "./api";
+import { flag, noteServerNow } from "./countryBattle";
+import { flagOf } from "./countryChallenges";
+
+export type AcbPhase = "battle" | "joining" | "upcoming" | "scheduled" | "ended";
+
+export interface AcbPerson { user_id: number; name: string; username: string; profile_image: string; score: number }
+
+export interface AcbBattle {
+  day_id: number | null;
+  country: string;
+  is_test: boolean;
+  phase: AcbPhase;
+  opens_at: string | null;
+  starts_at: string | null;
+  ends_at: string | null;
+  phase_ends_at: string | null;
+  start_time: string | null;
+  timezone: string | null;
+  duration_minutes: number;
+  live_count: number;
+  room_open: boolean;
+  can_watch: boolean;
+  can_battle: boolean;
+  is_my_country: boolean;
+  leader: AcbPerson | null;
+  winner: AcbPerson | null;
+  next_starts_at: string | null;
+}
+
+export interface AcbList { enabled: boolean; server_now: string; battles: AcbBattle[] }
+
+const PHASES: AcbPhase[] = ["battle", "joining", "upcoming", "scheduled", "ended"];
+const str = (v: unknown): string | null => (typeof v === "string" && v !== "" ? v : null);
+
+function person(v: unknown): AcbPerson | null {
+  if (!v || typeof v !== "object") return null;
+  const p = v as Record<string, unknown>;
+  const id = Number(p.user_id) || 0;
+  if (!id && !p.name && !p.username) return null;
+  return {
+    user_id: id,
+    name: String(p.name ?? "") || String(p.username ?? ""),
+    username: String(p.username ?? ""),
+    profile_image: String(p.profile_image ?? ""),
+    score: Number(p.score) || 0,
+  };
+}
+
+function battle(v: Record<string, unknown>): AcbBattle {
+  const phase = PHASES.includes(v.phase as AcbPhase) ? (v.phase as AcbPhase) : "scheduled";
+  return {
+    day_id: Number(v.day_id) > 0 ? Number(v.day_id) : null,
+    country: String(v.country ?? ""),
+    is_test: flag(v.is_test),
+    phase,
+    opens_at: str(v.opens_at),
+    starts_at: str(v.starts_at),
+    ends_at: str(v.ends_at),
+    phase_ends_at: str(v.phase_ends_at),
+    start_time: str(v.start_time),
+    timezone: str(v.timezone),
+    duration_minutes: Number(v.duration_minutes) || 10,
+    live_count: Number(v.live_count) || 0,
+    room_open: flag(v.room_open),
+    can_watch: v.can_watch === undefined ? true : flag(v.can_watch),
+    can_battle: flag(v.can_battle),
+    is_my_country: flag(v.is_my_country),
+    leader: person(v.leader),
+    // `winner` may be a person or just a name.
+    winner: typeof v.winner === "string" && v.winner
+      ? { user_id: 0, name: v.winner, username: "", profile_image: "", score: 0 }
+      : person(v.winner),
+    next_starts_at: str(v.next_starts_at),
+  };
+}
+
+export async function fetchAllCountryBattles(search: string): Promise<AcbList> {
+  const res = await post<{ enabled?: unknown; server_now?: string; battles?: unknown[] }>("fetchAllCountryBattles", { search: search.trim() });
+  const d = res.status && res.data ? res.data : null;
+  if (!d) throw new Error(res.message || "");
+  noteServerNow(d.server_now);
+  return {
+    enabled: d.enabled === undefined ? true : flag(d.enabled),
+    server_now: d.server_now ?? "",
+    battles: (Array.isArray(d.battles) ? d.battles : [])
+      .filter((x): x is Record<string, unknown> => !!x && typeof x === "object")
+      .map(battle),
+  };
+}
+
+// ---- the flag from a country NAME -----------------------------------------------------------
+// The battles carry "Philippines", not "PH". The browser already knows every region's English
+// name, so the reverse map is built from it once — no list to maintain.
+let nameToCode: Map<string, string> | null = null;
+const ALIASES: Record<string, string> = {
+  "usa": "US", "united states of america": "US", "uk": "GB", "great britain": "GB", "england": "GB",
+  "south korea": "KR", "korea": "KR", "russia": "RU", "vietnam": "VN", "viet nam": "VN",
+  "czech republic": "CZ", "ivory coast": "CI", "turkey": "TR", "türkiye": "TR", "uae": "AE",
+};
+
+export function countryFlag(name: string): string {
+  const key = name.trim().toLowerCase();
+  if (!key) return "";
+  if (key.length === 2) return flagOf(key);
+  if (!nameToCode) {
+    nameToCode = new Map();
+    try {
+      const dn = new Intl.DisplayNames(["en"], { type: "region" });
+      for (let a = 65; a <= 90; a++) {
+        for (let b = 65; b <= 90; b++) {
+          const code = String.fromCharCode(a, b);
+          const n = dn.of(code);
+          if (n && n !== code) nameToCode.set(n.toLowerCase(), code);
+        }
+      }
+    } catch { /* no Intl.DisplayNames: aliases only */ }
+  }
+  return flagOf(ALIASES[key] ?? nameToCode.get(key) ?? "");
+}

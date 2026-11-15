@@ -1798,5 +1798,17 @@
  "ref_inv_explain": "Trimite acest link prietenilor și urmăritorilor tăi — prin SMS, e-mail, Messenger, WhatsApp sau orice rețea socială. Vor vedea videoclipul nostru, codul tău de recomandare și magazinul potrivit pentru telefonul lor. Primești %1$s%% din tot ce câștigă fiecare prieten pe Bingg Bongg, până la %2$s.",
  "su_referral_code": "Cod de recomandare (opțional)",
  "su_referral_placeholder": "Cine te-a invitat? Numele lui de utilizator",
- "su_referral_hint": "Adaugă-l acum: un cod de recomandare nu poate fi adăugat sau schimbat mai târziu."
+ "su_referral_hint": "Adaugă-l acum: un cod de recomandare nu poate fi adăugat sau schimbat mai târziu.",
+ "acb_tab": "Toate Country Battle",
+ "acb_search": "Caută o țară sau un participant",
+ "acb_live_now": "LIVE ACUM",
+ "acb_opening": "Se deschide — intră acum",
+ "acb_starts_at": "Începe la {time}",
+ "acb_ended": "Încheiat",
+ "acb_winner": "Câștigător: {name}",
+ "acb_leading": "Conduce: {name} · {n} BBs",
+ "acb_empty": "Country Battle începe în fiecare seară la ora 20.",
+ "acb_no_match": "Nicio bătălie nu corespunde căutării.",
+ "acb_watch": "Urmărește și susține",
+ "acb_test": "TEST"
 }

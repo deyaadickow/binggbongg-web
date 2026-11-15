@@ -47,6 +47,7 @@ const ROUTES: ScreenRoute[] = [
   { path: "/battles", screen: "battles" },
   { path: "/pk-contests", screen: "pk_contests" },
   { path: "/country-battle", screen: "country_battle" },
+  { path: "/country-battles", screen: "all_country_battles" },
   { path: "/country-battle/live/:dayId", screen: "country_battle_live" },
   { path: "/country-battle/board", screen: "country_battle_board" },
   { path: "/country-battle/board/:id", screen: "country_battle_board" },

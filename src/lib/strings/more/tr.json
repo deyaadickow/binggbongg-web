@@ -1803,5 +1803,17 @@
  "ref_inv_explain": "Bu bağlantıyı arkadaşlarına ve takipçilerine gönder — mesajla, e-postayla, Messenger, WhatsApp veya herhangi bir sosyal medyadan. Videomuzu, yönlendirme kodunu ve telefonlarına uygun mağazayı görürler. Her arkadaşının Bingg Bongg'da kazandığı her şeyin %1$s%%'ini alırsın, en fazla %2$s.",
  "su_referral_code": "Yönlendirme kodu (isteğe bağlı)",
  "su_referral_placeholder": "Seni kim davet etti? Onun kullanıcı adı",
- "su_referral_hint": "Şimdi ekle: yönlendirme kodu sonradan eklenemez veya değiştirilemez."
+ "su_referral_hint": "Şimdi ekle: yönlendirme kodu sonradan eklenemez veya değiştirilemez.",
+ "acb_tab": "Tüm Ülke Savaşları",
+ "acb_search": "Ülke veya yarışmacı ara",
+ "acb_live_now": "ŞU AN CANLI",
+ "acb_opening": "Açılıyor — hemen katıl",
+ "acb_starts_at": "{time} başlıyor",
+ "acb_ended": "Bitti",
+ "acb_winner": "Kazanan: {name}",
+ "acb_leading": "Önde: {name} · {n} BBs",
+ "acb_empty": "Ülke Savaşları her akşam saat 20:00'de başlar.",
+ "acb_no_match": "Aramanla eşleşen savaş yok.",
+ "acb_watch": "İzle ve destekle",
+ "acb_test": "TEST"
 }

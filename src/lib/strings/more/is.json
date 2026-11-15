@@ -1800,5 +1800,17 @@
  "ref_inv_explain": "Sendu þennan hlekk til vina þinna og fylgjenda — með SMS, tölvupósti, Messenger, WhatsApp eða á hvaða samfélagsmiðli sem er. Þeir sjá myndbandið okkar, tilvísunarkóðann þinn og réttu verslunina fyrir símann sinn. Þú færð %1$s %% af öllu sem hver vinur vinnur sér inn á Bingg Bongg, allt að %2$s.",
  "su_referral_code": "Tilvísunarkóði (valfrjálst)",
  "su_referral_placeholder": "Hver bauð þér? Notandanafn viðkomandi",
- "su_referral_hint": "Bættu honum við núna: ekki er hægt að bæta tilvísunarkóða við eða breyta honum síðar."
+ "su_referral_hint": "Bættu honum við núna: ekki er hægt að bæta tilvísunarkóða við eða breyta honum síðar.",
+ "acb_tab": "Allar landskeppnir",
+ "acb_search": "Leita að landi eða keppanda",
+ "acb_live_now": "Í BEINNI NÚNA",
+ "acb_opening": "Opnast — taktu þátt núna",
+ "acb_starts_at": "Hefst kl. {time}",
+ "acb_ended": "Lokið",
+ "acb_winner": "Sigurvegari: {name}",
+ "acb_leading": "Í forystu: {name} · {n} BBs",
+ "acb_empty": "Landskeppnir hefjast öll kvöld kl. 20.",
+ "acb_no_match": "Engar keppnir passa við leitina.",
+ "acb_watch": "Horfa og styðja",
+ "acb_test": "PRÓFUN"
 }

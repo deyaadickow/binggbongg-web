@@ -2446,4 +2446,17 @@ export const id = {
   ref_afr_step4: "Saat seseorang mendaftar dengan kodemu, kamu dapat %1$s%% dari semua yang mereka hasilkan di Bingg Bongg, selama mereka menghasilkan — hingga total %2$s.",
   ref_inv_explain: "Kirim tautan ini ke teman dan pengikutmu — lewat SMS, email, Messenger, WhatsApp, atau media sosial apa pun. Mereka akan melihat video kami, kode referalmu, dan toko yang tepat untuk ponsel mereka. Kamu dapat %1$s%% dari semua yang dihasilkan setiap teman di Bingg Bongg, hingga %2$s.",
   su_referral_hint: "Masukkan sekarang: kode referal tidak bisa ditambahkan atau diubah nanti.",
+  // All Country Battles (Steve, 2026-11-16).
+  acb_tab: "Semua Country Battle",
+  acb_search: "Cari negara atau peserta battle",
+  acb_live_now: "LIVE SEKARANG",
+  acb_opening: "Dibuka — ayo gabung",
+  acb_starts_at: "Mulai pukul {time}",
+  acb_ended: "Selesai",
+  acb_winner: "Pemenang: {name}",
+  acb_leading: "Memimpin: {name} · {n} BBs",
+  acb_empty: "Country Battle dimulai setiap malam pukul 8 PM.",
+  acb_no_match: "Tidak ada battle yang cocok dengan pencarianmu.",
+  acb_watch: "Tonton & dukung",
+  acb_test: "UJI",
 };

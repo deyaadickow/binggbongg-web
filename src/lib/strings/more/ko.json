@@ -1803,5 +1803,17 @@
  "ref_inv_explain": "이 링크를 친구와 팔로워에게 보내세요 — 문자, 이메일, Messenger, WhatsApp 또는 어떤 소셜 미디어로든요. 친구는 저희 영상, 당신의 추천 코드, 그리고 자기 휴대폰에 맞는 스토어를 보게 돼요. 친구 한 명 한 명이 Bingg Bongg에서 버는 모든 금액의 %1$s%%를 받아요, 최대 %2$s까지.",
  "su_referral_code": "추천 코드 (선택)",
  "su_referral_placeholder": "누가 초대했나요? 그 사람의 사용자 이름",
- "su_referral_hint": "지금 입력하세요: 추천 코드는 나중에 추가하거나 바꿀 수 없어요."
+ "su_referral_hint": "지금 입력하세요: 추천 코드는 나중에 추가하거나 바꿀 수 없어요.",
+ "acb_tab": "모든 국가 배틀",
+ "acb_search": "국가 또는 참가자 검색",
+ "acb_live_now": "지금 라이브",
+ "acb_opening": "오픈 중 — 지금 참여",
+ "acb_starts_at": "{time} 시작",
+ "acb_ended": "종료",
+ "acb_winner": "우승: {name}",
+ "acb_leading": "선두: {name} · {n} BBs",
+ "acb_empty": "국가 배틀은 매일 밤 8 PM에 시작됩니다.",
+ "acb_no_match": "검색과 일치하는 배틀이 없습니다.",
+ "acb_watch": "시청하고 응원하기",
+ "acb_test": "테스트"
 }

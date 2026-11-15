@@ -1803,5 +1803,17 @@
  "ref_inv_explain": "Stuur deze link naar je vrienden en volgers — via sms, e-mail, Messenger, WhatsApp of elk social medium. Ze zien onze video, je verwijzingscode en de juiste winkel voor hun telefoon. Je krijgt %1$s%% van alles wat elke vriend verdient op Bingg Bongg, tot %2$s.",
  "su_referral_code": "Verwijzingscode (optioneel)",
  "su_referral_placeholder": "Wie heeft je uitgenodigd? Hun gebruikersnaam",
- "su_referral_hint": "Vul hem nu in: een verwijzingscode kan later niet meer worden toegevoegd of gewijzigd."
+ "su_referral_hint": "Vul hem nu in: een verwijzingscode kan later niet meer worden toegevoegd of gewijzigd.",
+ "acb_tab": "Alle Country Battles",
+ "acb_search": "Zoek een land of deelnemer",
+ "acb_live_now": "NU LIVE",
+ "acb_opening": "Gaat open — doe nu mee",
+ "acb_starts_at": "Begint om {time}",
+ "acb_ended": "Afgelopen",
+ "acb_winner": "Winnaar: {name}",
+ "acb_leading": "Aan kop: {name} · {n} BBs",
+ "acb_empty": "Country Battles beginnen elke avond om 20.00 uur.",
+ "acb_no_match": "Geen battles gevonden voor je zoekopdracht.",
+ "acb_watch": "Kijk en steun",
+ "acb_test": "TEST"
 }

@@ -2451,4 +2451,17 @@ export const fil = {
   ref_afr_step4: "Kapag may nag-sign up gamit ang code mo, makakakuha ka ng %1$s%% ng lahat ng kinikita nila sa Bingg Bongg, hangga't kumikita sila — hanggang %2$s sa kabuuan.",
   ref_inv_explain: "Ipadala ang link na ito sa mga kaibigan at followers mo — sa text, email, Messenger, WhatsApp o anumang social media. Makikita nila ang video namin, ang referral code mo at ang tamang store para sa phone nila. Makakakuha ka ng %1$s%% ng lahat ng kinikita ng bawat kaibigan sa Bingg Bongg, hanggang %2$s.",
   su_referral_hint: "Ilagay na ngayon: hindi na maidadagdag o mababago ang referral code pagkatapos.",
+  // All Country Battles (Steve, 2026-11-16).
+  acb_tab: "Lahat ng Country Battle",
+  acb_search: "Maghanap ng bansa o battler",
+  acb_live_now: "LIVE NGAYON",
+  acb_opening: "Nagbubukas na — sumali na",
+  acb_starts_at: "Magsisimula nang {time}",
+  acb_ended: "Tapos na",
+  acb_winner: "Nanalo: {name}",
+  acb_leading: "Nangunguna: {name} · {n} BBs",
+  acb_empty: "Nagsisimula ang Country Battle tuwing gabi nang 8 PM.",
+  acb_no_match: "Walang battle na tugma sa hinanap mo.",
+  acb_watch: "Manood at sumuporta",
+  acb_test: "TEST",
 };

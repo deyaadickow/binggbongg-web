@@ -1803,5 +1803,17 @@
  "ref_inv_explain": "Gửi liên kết này cho bạn bè và người theo dõi của bạn — qua tin nhắn, email, Messenger, WhatsApp hoặc bất kỳ mạng xã hội nào. Họ sẽ thấy video của chúng tôi, mã giới thiệu của bạn và đúng cửa hàng cho điện thoại của họ. Bạn nhận %1$s%% mọi thứ mỗi người bạn kiếm được trên Bingg Bongg, tối đa %2$s.",
  "su_referral_code": "Mã giới thiệu (không bắt buộc)",
  "su_referral_placeholder": "Ai đã mời bạn? Tên người dùng của họ",
- "su_referral_hint": "Nhập ngay bây giờ: mã giới thiệu không thể thêm hoặc thay đổi sau này."
+ "su_referral_hint": "Nhập ngay bây giờ: mã giới thiệu không thể thêm hoặc thay đổi sau này.",
+ "acb_tab": "Tất cả Đại chiến Quốc gia",
+ "acb_search": "Tìm quốc gia hoặc người thi đấu",
+ "acb_live_now": "ĐANG LIVE",
+ "acb_opening": "Đang mở — tham gia ngay",
+ "acb_starts_at": "Bắt đầu lúc {time}",
+ "acb_ended": "Đã kết thúc",
+ "acb_winner": "Người thắng: {name}",
+ "acb_leading": "Dẫn đầu: {name} · {n} BBs",
+ "acb_empty": "Đại chiến Quốc gia bắt đầu mỗi tối lúc 8 giờ tối.",
+ "acb_no_match": "Không có trận nào khớp với tìm kiếm.",
+ "acb_watch": "Xem và ủng hộ",
+ "acb_test": "THỬ NGHIỆM"
 }

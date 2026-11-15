@@ -1802,5 +1802,17 @@
  "ref_inv_explain": "このリンクを友だちやフォロワーに送ろう — メッセージ、メール、Messenger、WhatsApp、どんなSNSでもOK。相手には私たちの動画、あなたの紹介コード、スマホに合ったストアが表示されます。友だち一人ひとりがBingg Bonggで稼いだ金額の%1$s%%があなたにもらえます（最大%2$sまで）。",
  "su_referral_code": "紹介コード（任意）",
  "su_referral_placeholder": "誰に招待されましたか？その人のユーザー名",
- "su_referral_hint": "今すぐ入力してください：紹介コードはあとから追加・変更できません。"
+ "su_referral_hint": "今すぐ入力してください：紹介コードはあとから追加・変更できません。",
+ "acb_tab": "すべてのカントリーバトル",
+ "acb_search": "国名または参加者を検索",
+ "acb_live_now": "ただいまライブ中",
+ "acb_opening": "オープン中 — 今すぐ参加",
+ "acb_starts_at": "{time} 開始",
+ "acb_ended": "終了",
+ "acb_winner": "優勝: {name}",
+ "acb_leading": "トップ: {name} · {n} BBs",
+ "acb_empty": "カントリーバトルは毎晩8 PMに始まります。",
+ "acb_no_match": "検索に一致するバトルはありません。",
+ "acb_watch": "視聴して応援",
+ "acb_test": "テスト"
 }

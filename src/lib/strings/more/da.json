@@ -1800,5 +1800,17 @@
  "ref_inv_explain": "Send dette link til dine venner og følgere — via sms, e-mail, Messenger, WhatsApp eller et hvilket som helst socialt medie. De ser vores video, din henvisningskode og den rigtige butik til deres telefon. Du får %1$s %% af alt, hvad hver ven tjener på Bingg Bongg, op til %2$s.",
  "su_referral_code": "Henvisningskode (valgfri)",
  "su_referral_placeholder": "Hvem inviterede dig? Deres brugernavn",
- "su_referral_hint": "Tilføj den nu: en henvisningskode kan ikke tilføjes eller ændres senere."
+ "su_referral_hint": "Tilføj den nu: en henvisningskode kan ikke tilføjes eller ændres senere.",
+ "acb_tab": "Alle Country Battles",
+ "acb_search": "Søg efter et land eller en deltager",
+ "acb_live_now": "LIVE NU",
+ "acb_opening": "Åbner — deltag nu",
+ "acb_starts_at": "Starter kl. {time}",
+ "acb_ended": "Slut",
+ "acb_winner": "Vinder: {name}",
+ "acb_leading": "Fører: {name} · {n} BBs",
+ "acb_empty": "Country Battles starter hver aften kl. 20.",
+ "acb_no_match": "Ingen battles matcher din søgning.",
+ "acb_watch": "Se med og støt",
+ "acb_test": "TEST"
 }

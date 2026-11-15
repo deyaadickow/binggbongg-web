@@ -1801,5 +1801,17 @@
  "ref_inv_explain": "Skicka den här länken till dina vänner och följare — via sms, e-post, Messenger, WhatsApp eller vilket socialt medium som helst. De ser vår video, din värvningskod och rätt butik för deras telefon. Du får %1$s %% av allt varje vän tjänar på Bingg Bongg, upp till %2$s.",
  "su_referral_code": "Värvningskod (valfritt)",
  "su_referral_placeholder": "Vem bjöd in dig? Hens användarnamn",
- "su_referral_hint": "Lägg till den nu: en värvningskod kan inte läggas till eller ändras senare."
+ "su_referral_hint": "Lägg till den nu: en värvningskod kan inte läggas till eller ändras senare.",
+ "acb_tab": "Alla Country Battles",
+ "acb_search": "Sök efter ett land eller en deltagare",
+ "acb_live_now": "LIVE NU",
+ "acb_opening": "Öppnar — gå med nu",
+ "acb_starts_at": "Startar kl. {time}",
+ "acb_ended": "Slut",
+ "acb_winner": "Vinnare: {name}",
+ "acb_leading": "Leder: {name} · {n} BBs",
+ "acb_empty": "Country Battles startar varje kväll kl. 20.",
+ "acb_no_match": "Inga battles matchar din sökning.",
+ "acb_watch": "Titta och stötta",
+ "acb_test": "TEST"
 }

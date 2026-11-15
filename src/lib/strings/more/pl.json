@@ -1803,5 +1803,17 @@
  "ref_inv_explain": "Wyślij ten link znajomym i obserwującym — SMS-em, e-mailem, przez Messenger, WhatsApp lub dowolne media społecznościowe. Zobaczą nasz film, Twój kod polecającego i właściwy sklep na swój telefon. Dostajesz %1$s%% wszystkiego, co każdy znajomy zarobi w Bingg Bongg, do %2$s.",
  "su_referral_code": "Kod polecającego (opcjonalnie)",
  "su_referral_placeholder": "Kto Cię zaprosił? Jego nazwa użytkownika",
- "su_referral_hint": "Wpisz go teraz: kodu polecającego nie można później dodać ani zmienić."
+ "su_referral_hint": "Wpisz go teraz: kodu polecającego nie można później dodać ani zmienić.",
+ "acb_tab": "Wszystkie Bitwy Krajowe",
+ "acb_search": "Szukaj kraju lub uczestnika",
+ "acb_live_now": "NA ŻYWO TERAZ",
+ "acb_opening": "Otwiera się — dołącz teraz",
+ "acb_starts_at": "Start o {time}",
+ "acb_ended": "Zakończona",
+ "acb_winner": "Zwycięzca: {name}",
+ "acb_leading": "Prowadzi: {name} · {n} BBs",
+ "acb_empty": "Bitwy Krajowe zaczynają się każdego wieczoru o 20:00.",
+ "acb_no_match": "Żadna bitwa nie pasuje do wyszukiwania.",
+ "acb_watch": "Oglądaj i wspieraj",
+ "acb_test": "TEST"
 }
