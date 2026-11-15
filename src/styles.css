@@ -1430,3 +1430,8 @@ body.signup-black { background: radial-gradient(120% 55% at 50% 0%, #2a2108 0%, 
 
 /* The video player's top bar on a narrow phone: back, Language, Download (the title has its own line under them). */
 @media (max-width: 360px) { .fv-count { display: none; } }
+
+/* All Country Battles chip: a red dot while at least one battle is live (Steve, 2026-11-16).
+   Inside the chip's corner — the chip row scrolls, so anything outside it would be clipped. */
+.nav .links a.acb-chip { position: relative; }
+.nav .links a.acb-chip .live-dot { position: absolute; top: 1px; right: 3px; width: 8px; height: 8px; border-radius: 50%; background: #ff2d2d; box-shadow: 0 0 0 1.5px #0d0d0d; pointer-events: none; }

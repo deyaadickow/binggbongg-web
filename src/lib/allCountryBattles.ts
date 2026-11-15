@@ -5,6 +5,7 @@
 //
 // One call, fetchAllCountryBattles {search}. Never an empty POST body (the host WAF 403s it), so
 // `search` is always sent, "" when the box is empty.
+import { useEffect, useState } from "react";
 import { post } from "./api";
 import { flag, noteServerNow } from "./countryBattle";
 import { flagOf } from "./countryChallenges";
@@ -124,4 +125,34 @@ export function countryFlag(name: string): string {
     } catch { /* no Intl.DisplayNames: aliases only */ }
   }
   return flagOf(ALIASES[key] ?? nameToCode.get(key) ?? "");
+}
+
+// ---- the red dot on the "All Country Battles" chip ------------------------------------------
+// Steve, 2026-11-16: "When any battle is in progress please add a red dot in the button. means
+// atleat one live is going on." Asked on mount, when the tab comes back, and every 60 s while it
+// is in view. A failed call keeps the last answer for at most 2 minutes, then the dot goes.
+export async function fetchCountryBattlesLive(): Promise<{ live: boolean; live_count: number }> {
+  const res = await post<{ live?: unknown; live_count?: unknown }>("fetchCountryBattlesLive", { any: 1 });
+  if (!res.status || !res.data) throw new Error(res.message || "");
+  const live_count = Number(res.data.live_count) || 0;
+  return { live: flag(res.data.live) || live_count > 0, live_count };
+}
+
+export function useAnyCountryBattleLive(): boolean {
+  const [live, setLive] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    let lastOk = 0;
+    const ask = () => {
+      if (document.visibilityState !== "visible") return;
+      fetchCountryBattlesLive()
+        .then((r) => { if (alive) { lastOk = Date.now(); setLive(r.live); } })
+        .catch(() => { if (alive && Date.now() - lastOk > 120000) setLive(false); });
+    };
+    ask();
+    const timer = setInterval(ask, 60000);
+    document.addEventListener("visibilitychange", ask);
+    return () => { alive = false; clearInterval(timer); document.removeEventListener("visibilitychange", ask); };
+  }, []);
+  return live;
 }

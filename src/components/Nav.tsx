@@ -3,6 +3,7 @@ import { useSession } from "../lib/session";
 import { Avatar } from "./Common";
 import { useT } from "../lib/i18n";
 import { useSyncExternalStore } from "react";
+import { useAnyCountryBattleLive } from "../lib/allCountryBattles";
 import { countSuffix, inboxCountsSnapshot, inboxTotal, subscribeInboxCounts } from "../lib/inboxCounts";
 
 export function Nav() {
@@ -11,6 +12,8 @@ export function Nav() {
   // moved into the directory, which does its own gating, so these were two API calls firing on
   // every page load to decide nothing. Removed with them.
   const { user, isLoggedIn, signOut } = useSession();
+  // Steve, 2026-11-16: a red dot on the chip while at least one Country Battle is live.
+  const battleLive = useAnyCountryBattleLive();
   const inboxSuffix = countSuffix(inboxTotal(useSyncExternalStore(subscribeInboxCounts, inboxCountsSnapshot)));
   return (
     <header className="nav">
@@ -35,7 +38,10 @@ export function Nav() {
             only For You and the directory stay up here, centred like the phones. */}
         <NavLink to="/" end>{t("for_you")}</NavLink>
         {/* Steve, 2026-11-16: "Next to for you page add 'All Country Battles'". */}
-        <NavLink to="/country-battles">{t("acb_tab")}</NavLink>
+        <NavLink to="/country-battles" className="acb-chip">
+          {t("acb_tab")}
+          {battleLive && <span className="live-dot" aria-hidden />}
+        </NavLink>
         {/* Steve, 2026-11-14: "For You / 70+ Features / 70+ Videos / 1 Video 70+ Features / Our Ads". */}
         <NavLink to="/features">{t("tab_70_features")}</NavLink>
         {/* Steve, 2026-11-05: "Next to 'For You Page' and 'Bingg Bongg features' on main feed page
