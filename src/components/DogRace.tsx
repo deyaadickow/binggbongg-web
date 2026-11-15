@@ -372,7 +372,9 @@ function DogTile({ p, boosting, place, first, canGift, onGift, fx, boostText, sm
         <span className="dr-bbs">{p.bbs.toLocaleString()}</span>
       </div>
       {canGift && (
-        <button type="button" className="dr-gift" aria-label="Gift" onClick={(e) => { e.stopPropagation(); onGift(); }}>🎁</button>
+        // Steve, 2026-11-16: "We need to add our original red gift box" — the same gift box every
+        // Chat Battle / Country Battle tile carries (BattleGrid's .cb-gift), not a new icon.
+        <button type="button" className="cb-gift dr-gift" aria-label="🎁" onClick={(e) => { e.stopPropagation(); onGift(); }}>🎁</button>
       )}
     </div>
   );
@@ -407,8 +409,13 @@ export function DogRaceResults({ race, myId, onClose }: { race: DogRaceState; my
               <div className="row">
                 <span className={`dr-place static${p.place === 1 ? " gold" : ""}`}>{placeLabel(p.place, lang, t)}</span>
                 <Avatar user={{ fullname: p.fullname, username: p.username, profile_image: p.profile } as Partial<UserSummary>} />
-                <b style={{ flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{nameOf(p)}</b>
-                <span style={{ color: "var(--gold)", fontWeight: 800, whiteSpace: "nowrap" }}>{t("dr_bbs", p.bbs.toLocaleString())}</span>
+                {/* Steve, 2026-11-16: the BBs once per player — name, @username under it, the
+                    score once on the right. */}
+                <span className="dr-result-who">
+                  <b>{p.fullname || p.username}</b>
+                  {p.fullname && p.username && <span className="muted">@{p.username}</span>}
+                </span>
+                <span className="dr-result-bbs">{t("dr_bbs", p.bbs.toLocaleString())}</span>
               </div>
               <div className="dr-gifters">
                 {p.gifters.length === 0
