@@ -38,7 +38,6 @@ function DealBox({ deal }: { deal: VipAgentDeal }) {
       <div style={grid}>
         {field("vag_inf_min", num(deal.min_followers))}
         {field("vag_inf_percent", `${deal.percent}%`)}
-        {field("vag_inf_months", deal.months > 0 ? String(deal.months) : t("vag_inf_months_none"))}
         {field("vag_inf_total", money(deal.total_cap))}
       </div>
       <div style={{ ...grid, marginTop: 12 }}>
