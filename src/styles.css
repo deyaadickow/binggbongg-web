@@ -1487,3 +1487,7 @@ body.signup-black { background: radial-gradient(120% 55% at 50% 0%, #2a2108 0%, 
 .dr-result-bbs { color: var(--gold); font-weight: 900; font-size: 16px; white-space: nowrap; }
 .dr-gifters { margin-top: 6px; font-size: 12px; color: #ddd; line-height: 1.5; }
 .video-grid.dr-on { min-height: 440px; }
+/* The race leader's score: a blinking red border (Steve, 2026-11-16), steady for reduced motion. */
+.dr-bbs.leader { border: 2px solid #FF1A1A; animation: dr-leader-blink 1s ease-in-out infinite; }
+@keyframes dr-leader-blink { 0%, 100% { border-color: #FF1A1A; } 50% { border-color: rgba(255, 26, 26, .15); } }
+@media (prefers-reduced-motion: reduce) { .dr-bbs.leader { animation: none; border-color: #FF1A1A; } }

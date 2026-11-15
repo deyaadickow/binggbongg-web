@@ -291,7 +291,7 @@ export function DogRaceGrid({ race, myId, roomName, hostUserId, senderName, send
       <div className="dr-grid" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)`, gridTemplateRows: `repeat(${rows}, 1fr)` }}>
         {race.players.map((p) => (
           <DogTile key={p.user_id} p={p} boosting={(boost[p.user_id] ?? 0) > Date.now() || !!fx[p.user_id]}
-            place={placeLabel(p.place, lang, t)} first={p.place === 1 && p.bbs > 0}
+            place={placeLabel(p.place, lang, t)} first={p.place === 1 && p.bbs > 0} leader={racing && p.place === 1 && p.bbs > 0}
             canGift={racing && p.user_id !== myId} onGift={() => openGift(p)} fx={fx[p.user_id] ?? null}
             boostText={t("dr_boost")} small={race.players.length > 9} />
         ))}
@@ -326,8 +326,11 @@ export function DogRaceGrid({ race, myId, roomName, hostUserId, senderName, send
   );
 }
 
-function DogTile({ p, boosting, place, first, canGift, onGift, fx, boostText, small }: {
-  p: DogRacePlayer; boosting: boolean; place: string; first: boolean; canGift: boolean; onGift: () => void;
+function DogTile({ p, boosting, place, first, leader, canGift, onGift, fx, boostText, small }: {
+  p: DogRacePlayer; boosting: boolean; place: string; first: boolean;
+  /** Steve, 2026-11-16: "When racing, first place leader should have a blinking red border around
+   *  his score" — racing only, 1st with BBs, so it moves with the leader. */
+  leader: boolean; canGift: boolean; onGift: () => void;
   fx: TileFx | null; boostText: string; small: boolean;
 }) {
   const ref = useRef<HTMLVideoElement>(null);
@@ -369,7 +372,7 @@ function DogTile({ p, boosting, place, first, canGift, onGift, fx, boostText, sm
         ))}
       <div className="dr-strip">
         <span className="dr-name">{nameOf(p)}</span>
-        <span className="dr-bbs">{p.bbs.toLocaleString()}</span>
+        <span className={`dr-bbs${leader ? " leader" : ""}`}>{p.bbs.toLocaleString()}</span>
       </div>
       {canGift && (
         // Steve, 2026-11-16: "We need to add our original red gift box" — the same gift box every
