@@ -23,7 +23,8 @@ const greyed: React.CSSProperties = { ...input, background: "#1c1c1f", border: "
 const grid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12 };
 
 const num = (n: number) => n.toLocaleString("en-US");
-const money = (n: number) => "$" + n.toLocaleString("en-US", { maximumFractionDigits: 2 });
+// $5,000 for whole dollars, $342.50 (never $342.5) when there are cents.
+const money = (n: number) => { const d = Number.isInteger(n) ? 0 : 2; return "$" + n.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }); };
 
 function DealBox({ deal }: { deal: VipAgentDeal }) {
   const { t } = useT();
