@@ -3,7 +3,7 @@ import { ReportDialog } from "../components/ReportDialog";
 import { CommentsPanel } from "../components/CommentsPanel";
 import { rememberCopiedLink, videoShareUrl } from "../lib/copiedLink";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { displayName, mediaUrl, post, remixAllowed, type Gift, type LiveStream, type Post } from "../lib/api";
+import { displayName, mediaUrl, post, ratePost, remixAllowed, type Gift, type LiveStream, type Post } from "../lib/api";
 import { useSession } from "../lib/session";
 import { memberLabel, trackPage } from "../lib/pageTracker";
 import { Avatar, Loading, Notice } from "../components/Common";
@@ -12,6 +12,7 @@ import { appendToFeed, fetchMoreFeed, getFeed } from "../lib/feed";
 import { tt, useT  } from "../lib/i18n";
 import { showGoldAlert } from "../components/GoldToast";
 import { AutoCaptionOverlay, CcButton, EditCaptionsDialog } from "../components/AutoCaptions";
+import { HEART_RED, HeartRatingPanel, ratingLine } from "../components/HeartRating";
 import { parseCaptions, setPostAutoCaptions, shownCaptions, updatePostAutoCaptions, type CaptionLine } from "../lib/autoCaptions";
 
 const AUTO_KEY = "bb.autoplayNext";
@@ -156,12 +157,75 @@ export function VideoPage() {
     if (advanceAfterGift.current) { advanceAfterGift.current = false; goNext(); }
   }, [goNext]);
 
+  // ---- 1-10 heart rating (Steve, 2026-11-16) ----------------------------------------------
+  // Liking opens the row of ten numbered hearts; a long press (or right-click) on the red heart
+  // reopens it to change the rating. Unliking drops the rating, as the server does.
+  const [ratingOpen, setRatingOpen] = useState(false);
+  const heartRef = useRef<HTMLButtonElement>(null);
+  const heartHoldTimer = useRef(0);
+  const heartHoldFired = useRef(false);
+  const myRating = Math.round(Number(item?.my_rating ?? 0) || 0);
+  // The video moved on (arrows, wheel, auto-next, a link): the row belongs to the old one.
+  useEffect(() => { setRatingOpen(false); }, [item?.id]);
+
   async function toggleLike() {
     if (!item || !user) return;
     const endpoint = liked ? "dislikePost" : "likePost";
-    setLiked(!liked);
-    try { await post(endpoint, { user_id: user.id, post_id: item.id }); } catch { setLiked(liked); }
+    const wasLiked = liked;
+    setLiked(!wasLiked);
+    if (!wasLiked) setRatingOpen(true);
+    else {
+      setRatingOpen(false);
+      // dislikePost deletes this member's rating, so take it out of the average shown too.
+      setItem((cur) => {
+        if (!cur || cur.id !== item.id) return cur;
+        const mine = Math.round(Number(cur.my_rating ?? 0) || 0);
+        if (!mine) return cur;
+        const c = Math.round(Number(cur.rating_count ?? 0) || 0);
+        const a = Number(cur.rating_avg ?? 0) || 0;
+        return c > 1 ? { ...cur, my_rating: 0, rating_count: c - 1, rating_avg: (a * c - mine) / (c - 1) }
+                     : { ...cur, my_rating: 0, rating_count: 0, rating_avg: 0 };
+      });
+    }
+    try { await post(endpoint, { user_id: user.id, post_id: item.id }); } catch { setLiked(wasLiked); }
   }
+
+  function rate(n: number) {
+    if (!item || !user) return;
+    const postId = item.id;
+    setItem((cur) => (cur && cur.id === postId ? { ...cur, my_rating: n } : cur));
+    // Silent on failure: until the backend is deployed this route does not exist, and the like
+    // already went through on its own.
+    void ratePost(user.id, postId, n).then((r) => {
+      if (!r) return;
+      setItem((cur) => (cur && cur.id === postId ? { ...cur, my_rating: r.my_rating, rating_avg: r.rating_avg, rating_count: r.rating_count } : cur));
+    });
+  }
+
+  function goSignIn() { navigate("/login", { state: { from: location.pathname + location.search } }); }
+
+  /** Long press / right-click: like if not yet liked (which opens the row), else reopen it. */
+  function openRating() {
+    if (!isLoggedIn) { goSignIn(); return; }
+    if (!liked) { void toggleLike(); return; }
+    setRatingOpen(true);
+  }
+
+  function heartDown(e: React.PointerEvent) {
+    if (e.button !== 0) return;
+    window.clearTimeout(heartHoldTimer.current);
+    heartHoldFired.current = false;
+    heartHoldTimer.current = window.setTimeout(() => {
+      heartHoldTimer.current = 0;
+      heartHoldFired.current = true;
+      openRating();
+    }, 500);
+  }
+
+  function heartUp() {
+    if (heartHoldTimer.current) { window.clearTimeout(heartHoldTimer.current); heartHoldTimer.current = 0; }
+  }
+  useEffect(() => () => window.clearTimeout(heartHoldTimer.current), []);
 
   const watchClockStop = useCallback(() => {
     if (watchStartedAt.current === 0) return;
@@ -439,6 +503,15 @@ export function VideoPage() {
                   {originLines.map((line) => <div key={line}>{line}</div>)}
                 </div>
               )}
+              {(() => {
+                // Steve, 2026-11-16: the video's average rating, a plain label — not a button.
+                const line = ratingLine(t, item.rating_avg, item.rating_count);
+                return line ? (
+                  <div style={{ color: "var(--gold)", textAlign: "center", fontSize: 15, fontWeight: 800, marginTop: -4, marginBottom: 12 }}>
+                    {line}
+                  </div>
+                ) : null;
+              })()}
               {menuRows.map((r) => (
                 <button
                   key={r.label}
@@ -537,14 +610,32 @@ export function VideoPage() {
           {item.hashtags && <div className="muted" style={{ fontSize: 13 }}>{item.hashtags}</div>}
           <div className="muted" style={{ fontSize: 12, marginTop: 6 }}>{index >= 0 ? `${t("n_of_m", index + 1, feed.length)}${loadingMore ? t("dot_loading_more") : ""}` : ""} · {auto ? t("auto_plays_the_next_video") : t("repeats_this_video")} · {t("arrow_keys_or_scroll_to_move")}</div>
         </div>
-        <button className="btn small" title={isLoggedIn ? "" : "Sign in to like"}
+        <button ref={heartRef} className="btn small" title={isLoggedIn ? (liked ? t("hr_rate_this_video") : "") : "Sign in to like"}
+          onPointerDown={heartDown}
+          onPointerUp={heartUp}
+          onPointerLeave={heartUp}
+          onPointerCancel={heartUp}
+          onContextMenu={(e) => {
+            // Desktop right-click, or the touch long-press menu: the same as holding the heart.
+            e.preventDefault();
+            heartUp();
+            if (heartHoldFired.current || ratingOpen) return;
+            heartHoldFired.current = true;
+            openRating();
+          }}
           onClick={() => {
+            // The click that ends a long press must not unlike what the press just rated.
+            if (heartHoldFired.current) { heartHoldFired.current = false; return; }
             // Same as the gift button: signed out goes to Sign in and comes straight back.
-            if (!isLoggedIn) { navigate("/login", { state: { from: location.pathname + location.search } }); return; }
+            if (!isLoggedIn) { goSignIn(); return; }
             toggleLike();
-          }}>
-          {liked ? "♥" : "♡"} {likes}
+          }}
+          style={{ touchAction: "manipulation", WebkitTouchCallout: "none", userSelect: "none" }}>
+          <span style={{ color: liked ? HEART_RED : undefined }}>{liked ? "♥" : "♡"}</span> {likes}
         </button>
+        {ratingOpen && (
+          <HeartRatingPanel anchorRef={heartRef} current={myRating} onRate={rate} onClose={() => setRatingOpen(false)} />
+        )}
         <PostGiftButton post={item} onSent={setSentGift} onOpenChange={onGiftSheetOpenChange} />
       </div>
       {/* Steve, 2026-10-21: "Yes add the web too." The web had no comments at all until now —

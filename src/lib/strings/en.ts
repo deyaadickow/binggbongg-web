@@ -2802,4 +2802,10 @@ export const en = {
   fblurb_text_post: "Write up to 300 characters on a beautiful background with your favourite music, and post it as a video.",
   fname_photo_slideshow: "Photo Slideshows",
   fblurb_photo_slideshow: "Turn 2 to 35 photos into a video with slow zooms, smooth fades and music.",
+  hr_just_like: "Just like",
+  hr_love_it: "Love it",
+  hr_you_rated: "You rated %1$s ♥",
+  hr_rate_this_video: "Rate this video",
+  hr_rating_line: "♥ %1$s rating · %2$s ratings",
+  hr_rating_line_one: "♥ %1$s rating · 1 rating",
 } as const;

@@ -254,6 +254,28 @@ export interface Post {
   auto_captions_on?: number | null;
   /** "video" (default) | "text" | "slideshow" — the last two are rendered to an mp4 on the device. */
   post_kind?: string | null;
+  /** 1-10 heart rating (Steve, 2026-11-16). All three can be missing on an older server, and
+   *  `rating_avg` arrives as a STRING from raw-row endpoints — always read it through Number().
+   *  `my_rating` 0 = not rated by the caller. */
+  rating_avg?: number | string | null;
+  rating_count?: number | string | null;
+  my_rating?: number | string | null;
+}
+
+/** The like's 1-10 rating (Steve, 2026-11-16). Sending again changes it; unliking (dislikePost)
+ *  deletes it on the server. Returns the post's new average, or null on ANY failure — callers
+ *  ignore that silently, because until the backend is deployed the route does not exist and the
+ *  like itself must still work. */
+export async function ratePost(userId: number, postId: number, rating: number): Promise<{ my_rating: number; rating_avg: number; rating_count: number } | null> {
+  try {
+    const res = await post<{ post_id?: number; my_rating?: number | string; rating_avg?: number | string; rating_count?: number | string }>(
+      "ratePost", { user_id: userId, post_id: postId, rating });
+    if (!res.status || !res.data) return null;
+    const d = res.data;
+    return { my_rating: Number(d.my_rating ?? rating) || rating, rating_avg: Number(d.rating_avg ?? 0) || 0, rating_count: Number(d.rating_count ?? 0) || 0 };
+  } catch {
+    return null;
+  }
 }
 
 /** A row of tbl_sound: an admin library song, or a member's "Original sound by ...". */
