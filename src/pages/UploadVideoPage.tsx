@@ -13,9 +13,15 @@ import { GoldSelect } from "../components/GoldSelect";
 import { tt, useT  } from "../lib/i18n";
 import { PageTitle } from "../components/PageTitle";
 import { requireVerified } from "../lib/verifyEmail";
+import { showGoldAlert } from "../components/GoldToast";
 
 interface ContestCat { id: number; name?: string | null }
 interface CountryRow { name?: string | null; states?: { name?: string | null }[] }
+/** Sent by the recorder (RemixRecorderPage): a Duet / Stitch of another post, or a video made with
+ *  "Use this sound". Steve, 2026-11-16. */
+type Remix =
+  | { type: "duet" | "stitch"; postId: number; userName?: string; soundId?: number | null }
+  | { type?: undefined; soundId: number; soundTitle?: string };
 
 /** A sanity ceiling only — the server has the real say. Catches a wrong file before any bytes move. */
 const MAX_MB = 512;
@@ -47,6 +53,10 @@ export function UploadVideoPage() {
   const [canComment, setCanComment] = useState(true);
   const [canSave, setCanSave] = useState(true);
   const [allowRepost, setAllowRepost] = useState(true);
+  // Duet / Stitch (Steve, 2026-11-16): whether other members may duet or stitch THIS video.
+  const [canDuet, setCanDuet] = useState(true);
+  const [canStitch, setCanStitch] = useState(true);
+  const [remix, setRemix] = useState<Remix | null>(null);
 
   const [busy, setBusy] = useState(false);
   const [stage, setStage] = useState("");
@@ -64,7 +74,9 @@ export function UploadVideoPage() {
   }, []);
 
   useEffect(() => {
-    const gs = (location.state as { greenScreen?: { file: File; duration: number; thumb: Blob | null } } | null)?.greenScreen;
+    const st = location.state as { greenScreen?: { file: File; duration: number; thumb: Blob | null }; remix?: Remix } | null;
+    const gs = st?.greenScreen;
+    setRemix(st?.remix ?? null);
     if (!gs?.file) return;
     setFile(gs.file);
     setDuration(gs.duration);
@@ -85,6 +97,7 @@ export function UploadVideoPage() {
     setError("");
     setDuration(null);
     recordedThumbRef.current = null;
+    setRemix(null); // a different file is no longer that duet / stitch / sound
     if (f.size > MAX_MB * 1024 * 1024) {
       setError(`That file is ${(f.size / 1024 / 1024).toFixed(0)}MB — the limit is ${MAX_MB}MB.`);
       return;
@@ -138,8 +151,18 @@ export function UploadVideoPage() {
         ...(linkedUrl.trim() ? { linked_url: linkedUrl.trim() } : {}),
         ...(country ? { country } : {}),
         ...(state ? { state } : {}),
+        can_duet: canDuet ? 1 : 0,
+        can_stitch: canStitch ? 1 : 0,
+        // A duet keeps the original's sound (so it shows on that sound's page); a stitch and a
+        // plain upload send none and the server uses the video itself as an "Original sound".
+        ...(remix?.soundId ? { sound_id: remix.soundId } : {}),
+        ...(remix?.type ? { remix_type: remix.type, remix_post_id: remix.postId } : {}),
       });
-      if (!res.status) throw new Error(res.message ?? tt("couldn_t_publish_that_video"));
+      if (!res.status) {
+        const msg = res.message || tt("couldn_t_publish_that_video");
+        showGoldAlert(msg);
+        throw new Error(msg);
+      }
       setDone(true);
     } catch (e) {
       setError((e as Error).message);
@@ -162,7 +185,7 @@ export function UploadVideoPage() {
           <p className="soft" style={{ marginTop: 0 }}>{t("uploaded_it_will_appear_on_your_profile")}</p>
           <div className="row">
             <button className="btn" onClick={() => navigate(`/profile/${user.id}`)}>{t("see_my_profile")}</button>
-            <button className="btn ghost" onClick={() => { setDone(false); setFile(null); setDuration(null); setDescription(""); setLinkedUrl(""); }}>{t("upload_another")}</button>
+            <button className="btn ghost" onClick={() => { setDone(false); setFile(null); setRemix(null); setDuration(null); setDescription(""); setLinkedUrl(""); }}>{t("upload_another")}</button>
           </div>
         </div>
       </div>
@@ -196,6 +219,15 @@ export function UploadVideoPage() {
           </div>
         )}
       </div>
+
+      {remix && (
+        <div className="card pad" style={{ marginBottom: 12, color: "var(--gold)", fontWeight: 700, textAlign: "center",
+          whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+          {remix.type === "duet" ? `Duet with @${remix.userName ?? ""}`
+            : remix.type === "stitch" ? `Stitched from @${remix.userName ?? ""}`
+            : `♪ ${("soundTitle" in remix && remix.soundTitle) || "Sound"}`}
+        </div>
+      )}
 
       <div className="card pad" style={{ marginBottom: 12 }}>
         <label className="soft" style={{ fontSize: 13 }}>{t("category")}</label>
@@ -252,6 +284,8 @@ export function UploadVideoPage() {
           ["Allow comments", canComment, setCanComment],
           ["Allow saving", canSave, setCanSave],
           ["Allow reposting", allowRepost, setAllowRepost],
+          ["Allow Duet", canDuet, setCanDuet],
+          ["Allow Stitch", canStitch, setCanStitch],
         ] as [string, boolean, (v: boolean) => void][]).map(([label, val, set]) => (
           <label key={label} className="row" style={{ padding: "12px 14px", borderBottom: "1px solid var(--line)", cursor: "pointer" }}>
             <div style={{ flex: 1, fontWeight: 700 }}>{label}</div>

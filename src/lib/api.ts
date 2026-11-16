@@ -232,10 +232,44 @@ export interface Post {
    *  The server also sends null when the linked video has since been deleted, so a tab is
    *  never drawn for something that would open nothing. */
   linked_video?: { id: number; thumbnail?: string; user_name?: string; url?: string } | null;
-  /** The song on this video. fetchPosts has always eager-loaded it; nothing on the web read it
-   *  until the feed's hold-to-open menu (Steve, 2026-10-19) needed somewhere for "the turning
-   *  record" to go. `sound` is the file, `sound_title` the name members see. */
-  sound?: { id?: number; sound_title?: string; sound?: string; singer?: string } | null;
+  /** The song on this video. fetchPosts has always eager-loaded it. `sound` is the audio file,
+   *  `title` the name members see. (This was typed `sound_title` until 2026-11-16 — that is only
+   *  the uploadPost PARAM name; tbl_sound's column is `title`, so the turning-record row always
+   *  searched for nothing.) */
+  sound?: Sound | null;
+  sound_id?: number | null;
+  /** Duet / Stitch (Steve, 2026-11-16). `can_duet` existed before; a missing `can_stitch` counts
+   *  as allowed. `remix_of` is set on a duet or stitch and names the original. */
+  can_duet?: number | null;
+  can_stitch?: number | null;
+  remix_type?: "duet" | "stitch" | null;
+  remix_post_id?: number | null;
+  remix_of?: { type: "duet" | "stitch"; id: number; user_id: number; user_name?: string; thumbnail?: string } | null;
+}
+
+/** A row of tbl_sound: an admin library song, or a member's "Original sound by ...". */
+export interface Sound {
+  id?: number;
+  title?: string | null;
+  sound?: string | null;
+  singer?: string | null;
+  image?: string | null;
+  duration?: string | null;
+  video_count?: number | null;
+}
+
+/** The posts that use one sound, newest first, and the sound itself. */
+export async function fetchPostsBySound(soundId: number, start: number, count: number, myUserId?: number | null): Promise<{ sound: Sound | null; posts: Post[] }> {
+  const res = await post<Post[]>("fetchPostsBySound", { sound_id: soundId, start, count, ...(myUserId ? { my_user_id: myUserId } : {}) });
+  if (!res.status) throw new Error(res.message || "That sound isn't available.");
+  return { sound: (res.sound as Sound | undefined) ?? null, posts: Array.isArray(res.data) ? res.data : [] };
+}
+
+/** Is Duet / Stitch allowed on this post? A missing flag means yes. */
+export function remixAllowed(p: Post | null | undefined, type: "duet" | "stitch"): boolean {
+  if (!p) return false;
+  const v = type === "duet" ? p.can_duet : p.can_stitch;
+  return v === undefined || v === null || Number(v) !== 0;
 }
 
 export interface LiveStream {

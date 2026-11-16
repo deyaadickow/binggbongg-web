@@ -3,7 +3,7 @@ import { ReportDialog } from "../components/ReportDialog";
 import { CommentsPanel } from "../components/CommentsPanel";
 import { rememberCopiedLink, videoShareUrl } from "../lib/copiedLink";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { displayName, mediaUrl, post, type Gift, type LiveStream, type Post } from "../lib/api";
+import { displayName, mediaUrl, post, remixAllowed, type Gift, type LiveStream, type Post } from "../lib/api";
 import { useSession } from "../lib/session";
 import { memberLabel, trackPage } from "../lib/pageTracker";
 import { Avatar, Loading, Notice } from "../components/Common";
@@ -306,10 +306,21 @@ export function VideoPage() {
       trailing: auto ? t("switch_on") : t("switch_off"),
       onPick: () => toggleAuto(),
     },
-    {
+    // The turning record opens the sound page (2026-11-16; it used to search for a field that
+    // never existed, so it always searched for nothing). No sound, no row.
+    ...(item.sound?.id ? [{
       label: t("the_turning_record"),
-      onPick: () => { closeMenu(false); navigate(`/search?q=${encodeURIComponent(item.sound?.sound_title ?? "")}`); },
-    },
+      onPick: () => { closeMenu(false); navigate(`/sound/${item.sound!.id}`); },
+    }] : []),
+    // Duet / Stitch (Steve, 2026-11-16). Hidden when the creator turned it off.
+    ...(["duet", "stitch"] as const).filter((k) => remixAllowed(item, k)).map((k) => ({
+      label: k === "duet" ? "Duet" : "Stitch",
+      onPick: () => {
+        closeMenu(false);
+        if (!isLoggedIn || !user) { navigate("/login", { state: { from: location.pathname } }); return; }
+        navigate(`/record/${k}/${item.id}`);
+      },
+    })),
     { label: t("copy_this_video"), onPick: () => { void copyLink(); closeMenu(); } },
     // Steve, 2026-11-13: "please add a analytics button, when they click it they will see all
     // the analytics for this video."
@@ -460,9 +471,23 @@ export function VideoPage() {
         ) : (
           <Link to={`/profile/${item.user_id}`}><Avatar user={item.user} /></Link>
         )}
-        <div style={{ flex: 1 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
           <Link to={`/profile/${item.user_id}`} style={{ fontWeight: 800, color: "var(--text)" }}>{displayName(item.user)}</Link>
           <div className="soft">{item.description}</div>
+          {/* Steve, 2026-11-16: "Duet with @name" / "Stitched from @name" opens the original. */}
+          {item.remix_of && (
+            <Link to={`/video/${item.remix_of.id}`} style={{ display: "block", color: "var(--gold)", fontWeight: 700, fontSize: 13, marginTop: 4,
+              whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              {item.remix_of.type === "duet" ? "Duet with" : "Stitched from"} @{item.remix_of.user_name ?? ""}
+            </Link>
+          )}
+          {/* Steve, 2026-11-16 ("Show the sound line"): the sound, one line, opens its page. */}
+          {item.sound?.id && item.sound.title?.trim() && (
+            <Link to={`/sound/${item.sound.id}`} style={{ display: "block", color: "var(--gold)", fontSize: 13, marginTop: 4, maxWidth: "100%",
+              whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              ♪ {item.sound.title.trim()}
+            </Link>
+          )}
           {item.hashtags && <div className="muted" style={{ fontSize: 13 }}>{item.hashtags}</div>}
           <div className="muted" style={{ fontSize: 12, marginTop: 6 }}>{index >= 0 ? `${t("n_of_m", index + 1, feed.length)}${loadingMore ? t("dot_loading_more") : ""}` : ""} · {auto ? t("auto_plays_the_next_video") : t("repeats_this_video")} · {t("arrow_keys_or_scroll_to_move")}</div>
         </div>

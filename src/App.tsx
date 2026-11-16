@@ -5,6 +5,8 @@ import { LanguageProvider } from "./lib/i18n";
 import { Nav } from "./components/Nav";
 import { UploadVideoPage } from "./pages/UploadVideoPage";
 import { GreenScreenPage } from "./pages/GreenScreenPage";
+import { SoundPage } from "./pages/SoundPage";
+import { RemixRecorderPage } from "./pages/RemixRecorderPage";
 import { CreateVideoAdPage } from "./pages/CreateVideoAdPage";
 import { UploadPhotosPage } from "./pages/UploadPhotosPage";
 import { CartoonPage } from "./pages/CartoonPage";
@@ -222,6 +224,8 @@ export default function App() {
           <Route path="/go-live/computer" element={<StreamFromPcPage />} />
           <Route path="/upload" element={<UploadVideoPage />} />
           <Route path="/green-screen" element={<GreenScreenPage />} />
+          <Route path="/sound/:id" element={<SoundPage />} />
+          <Route path="/record/:mode/:id" element={<RemixRecorderPage />} />
           <Route path="/photos" element={<MyPhotosPage />} />
           <Route path="/photos-directory" element={<PhotosDirectoryPage />} />
 
