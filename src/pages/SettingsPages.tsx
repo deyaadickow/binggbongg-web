@@ -736,7 +736,6 @@ export function SupportPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [reply, setReply] = useState<SupportReply | null>(null);
-  const [askedForPerson, setAskedForPerson] = useState(false);
   const [reasons, setReasons] = useState<SupportReasonRow[]>([]);
   const [reason, setReason] = useState("");
   const { user } = useSession();
@@ -790,12 +789,6 @@ export function SupportPage() {
     }
   }
 
-  async function askForPerson() {
-    if (!reply || !user) return;
-    setAskedForPerson(true);
-    await post("supportAssistantFeedback", { message_id: reply.id, user_id: user.id }).catch(() => undefined);
-  }
-
   const byAssistant = reply?.replied_by === "assistant";
   const replyCard = reply?.reply ? (
     <div className="card pad" style={{ marginBottom: 12, borderColor: "var(--gold-border)" }}>
@@ -804,16 +797,14 @@ export function SupportPage() {
       </div>
       <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{reply.reply}</p>
       {byAssistant && <BeaRepeatButton bea={bea} />}
-      {byAssistant && (
-        <div style={{ marginTop: 10 }}>
-          {reply.needs_human || askedForPerson ? (
-            <p className="muted" style={{ margin: 0, fontSize: 13 }}>{t("a_bingg_bongg_team_member_will_get_back")}</p>
-          ) : (
-            <button className="btn small" onClick={askForPerson} style={{ background: "transparent", color: "var(--gold)" }}>
-              {t("this_didn_t_help_talk_to_a_person")}</button>
-          )}
-        </div>
+      {/* Steve, 2026-11-16: "Remove the button that says, This didn't help" / "a button for them
+          to click and they will be able to see the entire conversation". */}
+      {byAssistant && reply.needs_human && (
+        <p className="muted" style={{ margin: "10px 0 0", fontSize: 13 }}>{t("a_bingg_bongg_team_member_will_get_back")}</p>
       )}
+      <div style={{ marginTop: 10 }}>
+        <Link to="/settings/support/archive" className="btn small" style={{ background: "transparent", color: "var(--gold)", borderColor: "var(--gold-border)" }}>💬 See the Whole Conversation</Link>
+      </div>
     </div>
   ) : null;
 
@@ -827,10 +818,11 @@ export function SupportPage() {
       </div>
       {sent && replyCard}
       {sent ? (
-        <div className="card pad">
-          <p className="soft" style={{ margin: 0 }}>
+        // "only one popup is needed the one with white text and repeat the answer" (Steve, 2026-11-16).
+        <div className={byAssistant ? "" : "card pad"}>
+          {!byAssistant && <p className="soft" style={{ margin: 0 }}>
             {reply?.reply ? "Message sent. Ask another question any time." : "Message sent. The Bingg Bongg team will get back to you."}
-          </p>
+          </p>}
           <button className="btn small" onClick={() => { bea.stop(); setSent(false); setMsg(""); }} style={{ marginTop: 10, background: "transparent", color: "var(--gold)" }}>{t("send_another_message")}</button>
         </div>
       ) : (
