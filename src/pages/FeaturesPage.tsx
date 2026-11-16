@@ -155,6 +155,10 @@ export const FEATURES: Section[] = [
       { icon: "🎬", nameKey: "fname_videos", blurbKey: "fblurb_videos", to: "/upload" },
       // Steve, 2026-10-30: "Build the green screen for feed videos on all platforms".
       { icon: "🟩", nameKey: "fname_green_screen", blurbKey: "fblurb_green_screen", to: "/green-screen" },
+      // Steve, 2026-11-16: "Build all three on all 3 platforms" — the editor, Text posts, Photo slideshows.
+      { icon: "🎞️", nameKey: "fname_video_editor", blurbKey: "fblurb_video_editor", to: "/editor" },
+      { icon: "🔤", nameKey: "fname_text_post", blurbKey: "fblurb_text_post", to: "/text-post" },
+      { icon: "🖼️", nameKey: "fname_photo_slideshow", blurbKey: "fblurb_photo_slideshow", to: "/slideshow" },
       { icon: "🖼️", nameKey: "fname_photos", blurbKey: "fblurb_photos", to: "/photos" },
       { icon: "✨", nameKey: "fname_photo_styles", blurbKey: "fblurb_photo_styles", to: "/cartoon" },
       // Steve, 2026-11-02: big words behind the person in a photo, drawn on the device.

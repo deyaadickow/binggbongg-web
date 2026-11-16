@@ -7,6 +7,9 @@ import { UploadVideoPage } from "./pages/UploadVideoPage";
 import { GreenScreenPage } from "./pages/GreenScreenPage";
 import { SoundPage } from "./pages/SoundPage";
 import { RemixRecorderPage } from "./pages/RemixRecorderPage";
+import { EditorPage } from "./pages/EditorPage";
+import { TextPostPage } from "./pages/TextPostPage";
+import { SlideshowPage } from "./pages/SlideshowPage";
 import { CreateVideoAdPage } from "./pages/CreateVideoAdPage";
 import { UploadPhotosPage } from "./pages/UploadPhotosPage";
 import { CartoonPage } from "./pages/CartoonPage";
@@ -226,6 +229,9 @@ export default function App() {
           <Route path="/green-screen" element={<GreenScreenPage />} />
           <Route path="/sound/:id" element={<SoundPage />} />
           <Route path="/record/:mode/:id" element={<RemixRecorderPage />} />
+          <Route path="/editor" element={<EditorPage />} />
+          <Route path="/text-post" element={<TextPostPage />} />
+          <Route path="/slideshow" element={<SlideshowPage />} />
           <Route path="/photos" element={<MyPhotosPage />} />
           <Route path="/photos-directory" element={<PhotosDirectoryPage />} />
 
