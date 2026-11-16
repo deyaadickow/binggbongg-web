@@ -46,6 +46,21 @@ export function countShape(n: number): { cap: number; cols: number } {
   return { cap: 24, cols: 4 };
 }
 
+/**
+ * "Please do not leave any empty spot, always give the host a bigger tile if there is room"
+ * (Steve, 2026-11-16): the first tile (own / followed host) spans the spots the last row would
+ * leave empty — 1 left over: 2 wide, 2: 3 wide, 3: a 2x2 block.
+ */
+export function hostSpan(n: number, cols: number): { cols: number; rows: number; alone: boolean } {
+  const one = { cols: 1, rows: 1, alone: false };
+  if (n <= 1 || cols <= 1) return one;
+  const rows = Math.ceil(n / cols);
+  const empty = cols * rows - n;
+  const s = empty === 1 ? { cols: 2, rows: 1 } : empty === 2 && cols >= 3 ? { cols: 3, rows: 1 }
+    : empty === 3 && rows >= 2 ? { cols: 2, rows: 2 } : null;
+  return s ? { ...s, alone: s.cols >= cols } : one;
+}
+
 /** A 0/1, "0"/"1" or boolean flag off the wire. */
 export const flag = (v: unknown): boolean => v === true || v === 1 || v === "1" || v === "true";
 

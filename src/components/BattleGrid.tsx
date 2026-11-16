@@ -14,7 +14,7 @@ import { useT } from "../lib/i18n";
 import { GiftFlash } from "./GiftSheet";
 import { SundayBonusPill } from "./SundayBonus";
 import { battlerIdOf } from "../lib/countryBattleRoom";
-import { cbText, gridShape, type CbStage } from "../lib/countryBattle";
+import { cbText, gridShape, hostSpan, type CbStage } from "../lib/countryBattle";
 
 export function TestBanner() {
   const { t } = useT();
@@ -70,8 +70,11 @@ function useAvailableHeight(ref: React.RefObject<HTMLDivElement | null>, reserve
   return h;
 }
 
-function CbTile({ tile, listening, onTap, onGift, attach, hasVideo, version }: {
+function CbTile({ tile, listening, onTap, onGift, attach, hasVideo, version, span }: {
   tile: CbTileData;
+  /** Country Battle's host tile over the spots the last row would leave empty: columns, rows,
+   *  and whether it fills its rows alone (then its 3:4-per-cell shape sets the rows' height). */
+  span?: { cols: number; rows: number; alone: boolean };
   listening: boolean;
   onTap?: () => void;
   onGift?: () => void;
@@ -92,6 +95,10 @@ function CbTile({ tile, listening, onTap, onGift, attach, hasVideo, version }: {
     <div className={`cb-tile${tile.own ? " own" : ""}${tile.home ? " home" : ""}${tile.spot ? " spot" : ""}${tile.starred ? " starred" : ""}${tile.starredMe ? " starred-me" : ""}${listening ? " listening" : ""}`}
       role={tile.own ? undefined : "button"} tabIndex={tile.own ? undefined : 0}
       onClick={tile.own ? undefined : onTap}
+      style={span && (span.cols > 1 || span.rows > 1) ? {
+        gridColumn: `span ${span.cols}`, gridRow: `span ${span.rows}`,
+        ...(span.alone ? { aspectRatio: `${span.cols * 3} / ${span.rows * 4}` } : { aspectRatio: "auto", alignSelf: "stretch" }),
+      } : undefined}
       onKeyDown={(e) => { if (!tile.own && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); onTap?.(); } }}>
       {/* The member's photo while their video connects (and for good, if it never does). */}
       {realPhoto
@@ -152,6 +159,8 @@ export function CountryBattleGrid({ stage, shape, tiles, listen, onTap, onGift, 
   // Each tile is 3:4, so the whole grid is (cols*3):(rows*4). It is as wide as the page allows,
   // but never so wide that its last row falls below the bottom of the screen.
   const ratio = (cols * 3) / (rows * 4);
+  // Country Battle: no empty spot — the first (host) tile takes them (hostSpan).
+  const span = shape ? hostSpan(tiles.length, cols) : null;
   const stageRef = useRef<HTMLDivElement>(null);
   // Full phone width is for 4 across; fewer columns fit the screen's height instead.
   const avail = useAvailableHeight(stageRef, reserve, phoneFullWidth && (!shape || cols >= 4));
@@ -165,7 +174,7 @@ export function CountryBattleGrid({ stage, shape, tiles, listen, onTap, onGift, 
             onGift={onGift ? () => onGift(tile.userId) : undefined}
             attach={attach ? (el) => attach(tile.userId, el) : undefined}
             hasVideo={hasVideo ? hasVideo(tile.userId) : false}
-            version={version} />
+            version={version} span={span && tile === tiles[0] ? span : undefined} />
         ))}
       </div>
       {/* The gift just sent, over the whole grid — a tile is too small to hold the card. */}
