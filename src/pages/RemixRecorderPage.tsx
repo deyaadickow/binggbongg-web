@@ -26,82 +26,12 @@ import { fetchPostsBySound, mediaUrl, post, remixAllowed, type Post, type Sound 
 import { useSession } from "../lib/session";
 import { Notice } from "../components/Common";
 import { PageTitle } from "../components/PageTitle";
+import { corsUrl, drawCover, fmt, loadCrossOrigin, pickMime, waitSeek } from "../lib/videoKit";
 
 type Mode = "sound" | "duet" | "stitch";
 const MAX_SECONDS = 60;
 const STITCH_MAX = 5;
 const HIDDEN_MEDIA = { position: "absolute", left: 0, top: 0, width: 2, height: 2, opacity: 0.01, pointerEvents: "none" } as const;
-
-function pickMime(): string | null {
-  if (typeof MediaRecorder === "undefined") return null;
-  return ["video/mp4;codecs=avc1.42E01F,mp4a.40.2", "video/mp4;codecs=avc1,mp4a.40.2", "video/mp4"]
-    .find((m) => MediaRecorder.isTypeSupported(m)) ?? null;
-}
-
-/** Aspect-fill into a box at (x, y): one scale for both axes, centred, overflow cropped. */
-function drawCover(ctx: CanvasRenderingContext2D, src: CanvasImageSource, sw: number, sh: number, x: number, y: number, w: number, h: number, mirror = false) {
-  if (!sw || !sh) return;
-  const s = Math.max(w / sw, h / sh);
-  const dw = sw * s;
-  const dh = sh * s;
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(x, y, w, h);
-  ctx.clip();
-  if (mirror) { ctx.translate(x * 2 + w, 0); ctx.scale(-1, 1); }
-  ctx.drawImage(src, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
-  ctx.restore();
-}
-
-function fmt(sec: number) {
-  const s = Math.max(0, Math.floor(sec));
-  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
-}
-
-/** Cache-busts the browser layer (the feed player's non-CORS copy of the same URL); S3 ignores it. */
-function corsUrl(url: string): string {
-  return url.startsWith("blob:") ? url : url + (url.includes("?") ? "&" : "?") + "bbcors=1";
-}
-
-/** Put a CloudFront file into a media element in a way a canvas may record: blob first, a
- *  crossOrigin load if the fetch fails. Resolves once metadata is in. */
-async function loadCrossOrigin(el: HTMLMediaElement, url: string, onBlobUrl: (u: string) => void): Promise<void> {
-  const waitMeta = () => new Promise<void>((resolve, reject) => {
-    const ok = () => { cleanup(); resolve(); };
-    const bad = () => { cleanup(); reject(new Error("That video couldn't be loaded.")); };
-    const cleanup = () => { el.removeEventListener("loadedmetadata", ok); el.removeEventListener("error", bad); };
-    el.addEventListener("loadedmetadata", ok);
-    el.addEventListener("error", bad);
-  });
-  el.preload = "auto";
-  try {
-    const res = await fetch(corsUrl(url), { mode: "cors", cache: "no-store" });
-    if (!res.ok) throw new Error();
-    const blobUrl = URL.createObjectURL(await res.blob());
-    onBlobUrl(blobUrl);
-    el.removeAttribute("crossorigin");
-    const meta = waitMeta();
-    el.src = blobUrl;
-    el.load();
-    await meta;
-    return;
-  } catch { /* fall through to a crossOrigin stream */ }
-  el.crossOrigin = "anonymous";
-  const meta = waitMeta();
-  el.src = corsUrl(url);
-  el.load();
-  await meta;
-}
-
-function waitSeek(el: HTMLMediaElement, t: number): Promise<void> {
-  return new Promise((resolve) => {
-    if (Math.abs(el.currentTime - t) < 0.01) { resolve(); return; }
-    const done = () => { el.removeEventListener("seeked", done); resolve(); };
-    el.addEventListener("seeked", done);
-    el.currentTime = t;
-    window.setTimeout(done, 3000);
-  });
-}
 
 export function RemixRecorderPage() {
   const { mode: modeParam, id } = useParams();
