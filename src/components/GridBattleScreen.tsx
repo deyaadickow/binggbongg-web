@@ -23,7 +23,7 @@ import { Confetti, Podium } from "./GameShow";
 import { SoloBattleStandingsSheet } from "./SoloBattle";
 import { CbHeader, CountryBattleGrid, StarredYouBar, heardIds, useRotation, useStarPins, useStarSignals, type CbTileData } from "./BattleGrid";
 import { useCountryBattleRoom } from "../lib/countryBattleRoom";
-import { cbText, gridShape, serverNow, useTick } from "../lib/countryBattle";
+import { cbText, countShape, gridShape, serverNow, useTick } from "../lib/countryBattle";
 import { chatChannel, ensureFirebaseSignIn, observeChat, sendChat, type ChatMessage } from "../lib/firebase";
 import { haptic, sfx } from "../lib/gameSounds";
 import {
@@ -184,6 +184,8 @@ export function useGridBattleTiles(input: {
   onPinFull: () => void;
   /** Also never rotated out: on a follower's screen, the members their host starred. */
   extraHold?: number[];
+  /** Country Battle: the grid's shape follows the tile count, 2 to 24 (countShape). */
+  byCount?: boolean;
 }) {
   const { battlers, live, publishers, myId, isBattler, home, giftTarget, spot } = input;
   const byId = useMemo(() => new Map(battlers.map((b) => [b.user_id, b])), [battlers]);
@@ -198,7 +200,8 @@ export function useGridBattleTiles(input: {
   const pinnedId = isBattler ? myId : homeRow && !homeRow.left ? homeRow.user_id : null;
   const total = liveIds.size + (pinnedId != null && !liveIds.has(pinnedId) ? 1 : 0);
   const stage = chatBattleStage(total);
-  const { cap } = gridShape(stage);
+  const shape = input.byCount ? countShape(total) : gridShape(stage);
+  const { cap } = shape;
   const pool = useMemo(
     () => [...liveIds].filter((id) => id !== pinnedId && id !== myId).sort((a, b) => a - b),
     [liveIds, pinnedId, myId],
@@ -221,7 +224,7 @@ export function useGridBattleTiles(input: {
       return { userId: id, name: nameOf(b), photo: b?.profile_image ?? null, spot: spot === id, starred: star.pins.includes(id) };
     }),
   ];
-  return { tiles, stage, shown, pinnedId, star, byId, pool };
+  return { tiles, stage, shape, shown, pinnedId, star, byId, pool };
 }
 
 /** The live chat of one room, read from Firestore like the live room's. */
@@ -414,6 +417,7 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
     battlers: st?.battlers ?? [], live: st?.live ?? [], publishers: publisherIds, myId, isBattler,
     home: isBattler ? null : home, giftTarget, spot, onPinFull: () => showGoldAlert(t("chb_pin_max")),
     extraHold: isBattler ? [] : homeHold,
+    byCount: source.kind === "country",
   });
   const { shown, pinnedId } = grid;
   // Sound follows the star: who this screen hears, and who starred me.
@@ -709,7 +713,7 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
       {tiles.length === 0
         ? <div className="card cb-empty">{ended ? t("chb_ended") : source.emptyText(st, now)}</div>
         : (
-          <CountryBattleGrid stage={grid.stage} tiles={giftShow.withGift(tiles)} listen={heardNow} reserve={CHAT_RESERVE} phoneFullWidth
+          <CountryBattleGrid stage={grid.stage} shape={source.kind === "country" ? grid.shape : undefined} tiles={giftShow.withGift(tiles)} listen={heardNow} reserve={CHAT_RESERVE} phoneFullWidth
             onTap={(id) => {
               // A battler's tap stars the tile — they hear only who they starred; a viewer's tap listens.
               if (isBattler) grid.star.toggle(id);

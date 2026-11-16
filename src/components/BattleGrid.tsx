@@ -128,7 +128,7 @@ function tileBackdrop(id: number): string {
   return `linear-gradient(160deg, hsl(${hue} 35% 22%), hsl(${(hue + 40) % 360} 30% 9%))`;
 }
 
-export function CountryBattleGrid({ stage, tiles, listen, onTap, onGift, attach, hasVideo, version = 0, flash, onFlashDone, reserve, phoneFullWidth }: {
+export function CountryBattleGrid({ stage, shape, tiles, listen, onTap, onGift, attach, hasVideo, version = 0, flash, onFlashDone, reserve, phoneFullWidth }: {
   stage: CbStage;
   tiles: CbTileData[];
   /** Who is heard on this screen (one tapped tile, or the starred members). */
@@ -144,14 +144,17 @@ export function CountryBattleGrid({ stage, tiles, listen, onTap, onGift, attach,
   reserve?: number;
   /** On a phone-width screen, use the full width rather than shrinking to fit the height. */
   phoneFullWidth?: boolean;
+  /** Country Battle: the shape for the tile count (countShape); else the stage's. */
+  shape?: { cap: number; cols: number };
 }) {
-  const { cols } = gridShape(stage);
+  const { cols } = shape ?? gridShape(stage);
   const rows = Math.max(1, Math.ceil(tiles.length / cols));
   // Each tile is 3:4, so the whole grid is (cols*3):(rows*4). It is as wide as the page allows,
   // but never so wide that its last row falls below the bottom of the screen.
   const ratio = (cols * 3) / (rows * 4);
   const stageRef = useRef<HTMLDivElement>(null);
-  const avail = useAvailableHeight(stageRef, reserve, phoneFullWidth);
+  // Full phone width is for 4 across; fewer columns fit the screen's height instead.
+  const avail = useAvailableHeight(stageRef, reserve, phoneFullWidth && (!shape || cols >= 4));
   const heard = new Set(Array.isArray(listen) ? listen : listen != null ? [listen] : []);
   return (
     <div ref={stageRef} className="cb-stage" style={{ width: avail ? `min(100%, ${Math.round(avail * ratio)}px)` : "100%", minWidth: Math.min(240, cols * 70) }}>

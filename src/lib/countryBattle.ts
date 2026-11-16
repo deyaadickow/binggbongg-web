@@ -27,6 +27,25 @@ export function gridShape(stage: CbStage): { cap: number; cols: number } {
   return { cap: 24, cols: 4 };
 }
 
+/**
+ * Country Battle camera tiles from 2 to 24 (Steve, 2026-11-16: "add the camera tiles from 2 to 24
+ * on the screen for the country battle"): the grid follows how many have a tile — ≤4 2x2, ≤6 2x3,
+ * ≤9 3x3, ≤12 3x4, ≤16 4x4, ≤20 4x5, ≤24 4x6 (the Dog Race shapes; more live = the rotation).
+ * Two tiles sit side by side here, not 1x2 as on the phones: web tiles keep a 3:4 shape, so two
+ * stacked would each be less than half as big.
+ */
+export function countShape(n: number): { cap: number; cols: number } {
+  if (n <= 1) return { cap: 1, cols: 1 };
+  if (n <= 2) return { cap: 2, cols: 2 };
+  if (n <= 4) return { cap: 4, cols: 2 };
+  if (n <= 6) return { cap: 6, cols: 2 };
+  if (n <= 9) return { cap: 9, cols: 3 };
+  if (n <= 12) return { cap: 12, cols: 3 };
+  if (n <= 16) return { cap: 16, cols: 4 };
+  if (n <= 20) return { cap: 20, cols: 4 };
+  return { cap: 24, cols: 4 };
+}
+
 /** A 0/1, "0"/"1" or boolean flag off the wire. */
 export const flag = (v: unknown): boolean => v === true || v === 1 || v === "1" || v === "true";
 
