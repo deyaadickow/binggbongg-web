@@ -1,7 +1,7 @@
 // Settings on the web — one page per row of the phones' Settings screen. The ones wired to
 // real endpoints work today; the rest are "coming soon" placeholders so every link exists
 // (Steve, 2026-09-24: "add them anyway and work it out one at a time").
-import { BeaCard, BeaRepeatButton, useBea } from "../components/Bea";
+import { BEA_LANGUAGES, BeaCard, BeaRepeatButton, beaLanguage, setBeaLanguage, useBea } from "../components/Bea";
 import { useContestOn } from "../lib/contests";
 import { usePodcastEnabled } from "../lib/podcast";
 import { useCallback, useEffect, useState } from "react";
@@ -730,7 +730,8 @@ export function SupportPage() {
   const { t, tn, lang } = useT();
   // Bea, the talking Assistant (Steve, 2026-11-16).
   const bea = useBea();
-  useEffect(() => { bea.greetOnce(lang); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const [beaLang, setBeaLang] = useState(beaLanguage);
+  useEffect(() => { bea.greetOnce(beaLang || lang); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const [msg, setMsg] = useState("");
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -770,7 +771,7 @@ export function SupportPage() {
     setBusy(true);
     setError("");
     try {
-      const r = await post<SupportReply>("sendSupportMessage", { message: msg.trim(), reason, user_id: user?.id ?? 0 });
+      const r = await post<SupportReply>("sendSupportMessage", { message: msg.trim(), reason, reply_language: beaLang, user_id: user?.id ?? 0 });
       // Suspend Messages (Steve, 2026-11-13): a paused member gets the server's sentence ("paused until ...")
       // instead of a false "sent". Any other refusal shows its message the same way.
       if (r.status === false) { setError(r.message || tt("failed_to_send_message_please_try_again")); return; }
@@ -797,14 +798,11 @@ export function SupportPage() {
       </div>
       <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{reply.reply}</p>
       {byAssistant && <BeaRepeatButton bea={bea} />}
-      {/* Steve, 2026-11-16: "Remove the button that says, This didn't help" / "a button for them
-          to click and they will be able to see the entire conversation". */}
+      {/* Steve, 2026-11-16: "Remove the button that says, This didn't help". The whole conversation
+          is under Archive at the top ("no need to have 2 buttons that does the same thing"). */}
       {byAssistant && reply.needs_human && (
         <p className="muted" style={{ margin: "10px 0 0", fontSize: 13 }}>{t("a_bingg_bongg_team_member_will_get_back")}</p>
       )}
-      <div style={{ marginTop: 10 }}>
-        <Link to="/settings/support/archive" className="btn small" style={{ background: "transparent", color: "var(--gold)", borderColor: "var(--gold-border)" }}>💬 See the Whole Conversation</Link>
-      </div>
     </div>
   ) : null;
 
@@ -814,7 +812,16 @@ export function SupportPage() {
           ... when they click on Archive they will see all the old messages and their answers." */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
         <PageTitle>{t("support")}</PageTitle>
-        <Link to="/settings/support/archive" className="btn small" style={{ background: "transparent", color: "var(--gold)", borderColor: "var(--gold-border)" }}>{t("archive")}</Link>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <GoldSelect value={beaLang} options={BEA_LANGUAGES} ariaLabel="Bea's language" style={{ width: 170 }}
+            onChange={(code) => {
+              if (code === beaLang) return;
+              setBeaLang(code);
+              setBeaLanguage(code);
+              bea.greetAgain(code || lang);
+            }} />
+          <Link to="/settings/support/archive" className="btn small" style={{ background: "transparent", color: "var(--gold)", borderColor: "var(--gold-border)" }}>{t("archive")}</Link>
+        </div>
       </div>
       {sent && replyCard}
       {sent ? (

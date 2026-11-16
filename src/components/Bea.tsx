@@ -15,6 +15,28 @@ const POSTER = UPLOAD_BASE + "uploads/assistant/bea_poster.jpg";
 const MUTE_KEY = "bea_muted";
 let greeted = false;
 
+/** Bea's languages on Support (Steve, 2026-11-16: "Add a language picker next to Archive button as
+ *  well, once they change the language, it will stay until they change it again"). Codes match the
+ *  server's SupportAssistant::LANGUAGES; "" = Auto (she answers in the language they type in). */
+export const BEA_LANGUAGES: { value: string; label: string }[] = [
+  { value: "", label: "🌐 Auto" }, { value: "en", label: "🌐 English" },
+  { value: "fil", label: "🌐 Filipino (Tagalog)" }, { value: "id", label: "🌐 Bahasa Indonesia" },
+  { value: "es", label: "🌐 Español" }, { value: "pt", label: "🌐 Português" }, { value: "fr", label: "🌐 Français" },
+  { value: "de", label: "🌐 Deutsch" }, { value: "it", label: "🌐 Italiano" }, { value: "ar", label: "🌐 العربية" },
+  { value: "hi", label: "🌐 हिन्दी" }, { value: "ja", label: "🌐 日本語" }, { value: "ko", label: "🌐 한국어" },
+  { value: "zh", label: "🌐 中文" }, { value: "vi", label: "🌐 Tiếng Việt" }, { value: "th", label: "🌐 ไทย" },
+  { value: "ms", label: "🌐 Bahasa Melayu" }, { value: "tr", label: "🌐 Türkçe" }, { value: "ru", label: "🌐 Русский" },
+  { value: "nl", label: "🌐 Nederlands" }, { value: "pl", label: "🌐 Polski" },
+];
+
+export function beaLanguage(): string {
+  try { return localStorage.getItem("bea_language") ?? ""; } catch { return ""; }
+}
+
+export function setBeaLanguage(code: string) {
+  try { localStorage.setItem("bea_language", code); } catch { /* private window: this visit only */ }
+}
+
 function readMuted(): boolean {
   try { return localStorage.getItem(MUTE_KEY) === "1"; } catch { return false; }
 }
@@ -34,6 +56,8 @@ export interface BeaVoice {
   stop: () => void;
   toggleMute: () => void;
   greetOnce: (language: string) => void;
+  /** Her hello once more, after the member picks another language. */
+  greetAgain: (language: string) => void;
 }
 
 export function useBea(): BeaVoice {
@@ -96,9 +120,15 @@ export function useBea(): BeaVoice {
       .catch(() => undefined);
   }, [play]);
 
+  const greetAgain = useCallback((language: string) => {
+    stop();
+    greeted = false;
+    greetOnce(language);
+  }, [stop, greetOnce]);
+
   useEffect(() => stop, [stop]);
   const faceVisible = hello !== null || greetingVoice;
-  return { talking, faceVisible, lastAnswer, repeatAnswer, hello, endHello, muted, play, stop, toggleMute, greetOnce };
+  return { talking, faceVisible, lastAnswer, repeatAnswer, hello, endHello, muted, play, stop, toggleMute, greetOnce, greetAgain };
 }
 
 function BeaVideo({ talking, hello, onHelloEnd, width, height }: { talking: boolean; hello?: string | null; onHelloEnd?: () => void; width: number; height: number }) {
