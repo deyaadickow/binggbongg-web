@@ -1,7 +1,7 @@
 // Settings on the web — one page per row of the phones' Settings screen. The ones wired to
 // real endpoints work today; the rest are "coming soon" placeholders so every link exists
 // (Steve, 2026-09-24: "add them anyway and work it out one at a time").
-import { BeaCard, BeaPortrait, useBea } from "../components/Bea";
+import { BeaCard, BeaRepeatButton, useBea } from "../components/Bea";
 import { useContestOn } from "../lib/contests";
 import { usePodcastEnabled } from "../lib/podcast";
 import { useCallback, useEffect, useState } from "react";
@@ -803,6 +803,7 @@ export function SupportPage() {
         {byAssistant ? "💝 Bea · Bingg Bongg Assistant" : "Admin support replied"}
       </div>
       <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{reply.reply}</p>
+      {byAssistant && <BeaRepeatButton bea={bea} />}
       {byAssistant && (
         <div style={{ marginTop: 10 }}>
           {reply.needs_human || askedForPerson ? (
@@ -824,7 +825,6 @@ export function SupportPage() {
         <PageTitle>{t("support")}</PageTitle>
         <Link to="/settings/support/archive" className="btn small" style={{ background: "transparent", color: "var(--gold)", borderColor: "var(--gold-border)" }}>{t("archive")}</Link>
       </div>
-      {sent && byAssistant && <BeaPortrait bea={bea} />}
       {sent && replyCard}
       {sent ? (
         <div className="card pad">

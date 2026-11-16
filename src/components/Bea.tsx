@@ -21,6 +21,11 @@ function readMuted(): boolean {
 
 export interface BeaVoice {
   talking: boolean;
+  /** Steve, 2026-11-16: "After the welcome message let Bea disappear" — the face shows only for her hello. */
+  faceVisible: boolean;
+  /** The last answer's voice, for "Repeat the Answer". */
+  lastAnswer: string | null;
+  repeatAnswer: () => void;
   /** Her HeyGen hello video (with sound) while it plays, else null. */
   hello: string | null;
   endHello: () => void;
@@ -34,6 +39,8 @@ export interface BeaVoice {
 export function useBea(): BeaVoice {
   const [talking, setTalking] = useState(false);
   const [hello, setHello] = useState<string | null>(null);
+  const [greetingVoice, setGreetingVoice] = useState(false);
+  const [lastAnswer, setLastAnswer] = useState<string | null>(null);
   const [muted, setMuted] = useState(readMuted);
   const audio = useRef<HTMLAudioElement | null>(null);
   const mutedRef = useRef(muted);
@@ -42,23 +49,30 @@ export function useBea(): BeaVoice {
   const endHello = useCallback(() => setHello(null), []);
   const stop = useCallback(() => {
     setHello(null);
+    setGreetingVoice(false);
     const a = audio.current;
     if (a) { a.pause(); a.src = ""; }
     audio.current = null;
     setTalking(false);
   }, []);
 
-  const play = useCallback((key: string) => {
+  const play = useCallback((key: string, greeting = false) => {
     stop();
-    if (mutedRef.current || !key) return;
+    if (!key) return;
+    if (!greeting) setLastAnswer(key);
+    if (mutedRef.current) return;
+    if (greeting) setGreetingVoice(true);
+    const done = () => { setTalking(false); if (greeting) setGreetingVoice(false); };
     const a = new Audio(key.startsWith("http") ? key : UPLOAD_BASE + key);
     a.onplaying = () => setTalking(true);
     a.onpause = () => setTalking(false);
-    a.onended = () => setTalking(false);
-    a.onerror = () => setTalking(false);
+    a.onended = done;
+    a.onerror = done;
     audio.current = a;
-    a.play().catch(() => setTalking(false));
+    a.play().catch(done);
   }, [stop]);
+
+  const repeatAnswer = useCallback(() => { if (lastAnswer) play(lastAnswer); }, [lastAnswer, play]);
 
   const toggleMute = useCallback(() => {
     setMuted((m) => {
@@ -77,13 +91,14 @@ export function useBea(): BeaVoice {
         if (!r.status || mutedRef.current) return;
         // Steve, 2026-11-16: "If a welcome message is better from heygen we can get it and pay for it once."
         if (r.data?.video) setHello(UPLOAD_BASE + r.data.video);
-        else if (r.data?.audio) play(r.data.audio);
+        else if (r.data?.audio) play(r.data.audio, true);
       })
       .catch(() => undefined);
   }, [play]);
 
   useEffect(() => stop, [stop]);
-  return { talking, hello, endHello, muted, play, stop, toggleMute, greetOnce };
+  const faceVisible = hello !== null || greetingVoice;
+  return { talking, faceVisible, lastAnswer, repeatAnswer, hello, endHello, muted, play, stop, toggleMute, greetOnce };
 }
 
 function BeaVideo({ talking, hello, onHelloEnd, width, height }: { talking: boolean; hello?: string | null; onHelloEnd?: () => void; width: number; height: number }) {
@@ -113,6 +128,16 @@ function VoiceButton({ bea }: { bea: BeaVoice }) {
 
 /** Top of the Support form: Bea on camera, her name, online/talking, and the voice switch. */
 export function BeaCard({ bea }: { bea: BeaVoice }) {
+  if (!bea.faceVisible) {
+    // After her hello: just her name and the voice switch.
+    return (
+      <div style={{ display: "flex", alignItems: "center", gap: 10, background: "#000", border: "2px solid var(--gold)", borderRadius: 14, padding: "10px 14px", marginBottom: 12 }}>
+        <span style={{ fontSize: 20, fontWeight: 800, color: "var(--gold)" }}>Bea</span>
+        <span style={{ fontSize: 13, fontWeight: 600, color: "#fff", flex: 1 }}>Bingg Bongg Assistant</span>
+        <VoiceButton bea={bea} />
+      </div>
+    );
+  }
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 14, background: "#000", border: "2px solid var(--gold)", borderRadius: 16, padding: 12, marginBottom: 12 }}>
       <BeaVideo talking={bea.talking} hello={bea.hello} onHelloEnd={bea.endHello} width={112} height={196} />
@@ -123,6 +148,17 @@ export function BeaCard({ bea }: { bea: BeaVoice }) {
         <div style={{ marginTop: 4 }}><VoiceButton bea={bea} /></div>
       </div>
     </div>
+  );
+}
+
+/** "Repeat the Answer" (Steve, 2026-11-16). */
+export function BeaRepeatButton({ bea }: { bea: BeaVoice }) {
+  if (!bea.lastAnswer) return null;
+  return (
+    <button type="button" className="btn small" onClick={bea.repeatAnswer}
+      style={{ marginTop: 10, background: "#000", color: "var(--gold)", borderColor: "var(--gold)" }}>
+      ↻ Repeat the Answer
+    </button>
   );
 }
 
