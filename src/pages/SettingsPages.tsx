@@ -737,6 +737,24 @@ export function SupportPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [reply, setReply] = useState<SupportReply | null>(null);
+  const [translating, setTranslating] = useState(false);
+
+  // Steve, 2026-11-16: "when i switch the language to Tagalog the same message should change to
+  // Tagalog" — the answer on screen becomes the picked language ("" = as first written) and Bea reads it.
+  function translateReply(code: string) {
+    if (!reply || reply.replied_by !== "assistant" || !reply.voice_token) return;
+    setTranslating(true);
+    post<{ reply?: string; audio?: string | null }>("supportTranslateReply",
+      { message_id: reply.id, voice_token: reply.voice_token, language: code, user_id: user?.id ?? 0 })
+      .then((r) => {
+        if (!r.status || !r.data?.reply) return;
+        const text = r.data.reply;
+        setReply((cur) => (cur ? { ...cur, reply: text } : cur));
+        if (r.data.audio) bea.play(r.data.audio);
+      })
+      .catch(() => undefined)
+      .finally(() => setTranslating(false));
+  }
   const [reasons, setReasons] = useState<SupportReasonRow[]>([]);
   const [reason, setReason] = useState("");
   const { user } = useSession();
@@ -796,7 +814,8 @@ export function SupportPage() {
       <div style={{ fontSize: 12, fontWeight: 800, color: "var(--gold)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 6 }}>
         {byAssistant ? "💝 Bea · Bingg Bongg Assistant" : "Admin support replied"}
       </div>
-      <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{reply.reply}</p>
+      <p style={{ margin: 0, whiteSpace: "pre-wrap", opacity: translating ? 0.4 : 1 }}>{reply.reply}</p>
+      {translating && <p style={{ margin: "8px 0 0", fontSize: 13, fontWeight: 700, color: "var(--gold)" }}>Translating…</p>}
       {byAssistant && <BeaRepeatButton bea={bea} />}
       {/* Steve, 2026-11-16: "Remove the button that says, This didn't help". The whole conversation
           is under Archive at the top ("no need to have 2 buttons that does the same thing"). */}
@@ -818,7 +837,8 @@ export function SupportPage() {
               if (code === beaLang) return;
               setBeaLang(code);
               setBeaLanguage(code);
-              bea.greetAgain(code || lang);
+              if (sent && reply?.replied_by === "assistant") { bea.stop(); translateReply(code); }
+              else bea.greetAgain(code || lang);
             }} />
           <Link to="/settings/support/archive" className="btn small" style={{ background: "transparent", color: "var(--gold)", borderColor: "var(--gold-border)" }}>{t("archive")}</Link>
         </div>
