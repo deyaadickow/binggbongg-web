@@ -1,6 +1,7 @@
 // Settings on the web — one page per row of the phones' Settings screen. The ones wired to
 // real endpoints work today; the rest are "coming soon" placeholders so every link exists
 // (Steve, 2026-09-24: "add them anyway and work it out one at a time").
+import { BeaCard, BeaPortrait, useBea } from "../components/Bea";
 import { useContestOn } from "../lib/contests";
 import { usePodcastEnabled } from "../lib/podcast";
 import { useCallback, useEffect, useState } from "react";
@@ -721,12 +722,15 @@ export function ContestRequestsPage() {
 // Support (Steve, 2026-09-26: "Bingg Bongg Assistant" — Claude answers members instantly, in
 // their language; money / account / safety topics are handed to a person). The reply comes back
 // on the send call itself (data.reply) and on getUserSupport for the latest message.
-interface SupportReply { id: number; reply?: string | null; replied_by?: string | null; needs_human?: boolean }
+interface SupportReply { id: number; reply?: string | null; replied_by?: string | null; needs_human?: boolean; language?: string | null; voice_token?: string | null }
 /** "Reason For This Support" (Steve, 2026-10-17) — the list is the server's, so he can add a
  *  reason from the admin panel without a release on any platform. */
 interface SupportReasonRow { id: number; label: string }
 export function SupportPage() {
-  const { t, tn } = useT();
+  const { t, tn, lang } = useT();
+  // Bea, the talking Assistant (Steve, 2026-11-16).
+  const bea = useBea();
+  useEffect(() => { bea.greetOnce(lang); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const [msg, setMsg] = useState("");
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -773,6 +777,12 @@ export function SupportPage() {
       if (r.status === false) { setError(r.message || tt("failed_to_send_message_please_try_again")); return; }
       if (r.data?.reply) { setReply(r.data); setAskedForPerson(false); }
       setSent(true);
+      // Bea speaks the Assistant's answer: the text shows at once, her voice follows.
+      if (r.data?.replied_by === "assistant" && r.data.voice_token) {
+        post<{ audio?: string | null }>("supportReplyVoice", { message_id: r.data.id, voice_token: r.data.voice_token, user_id: user?.id ?? 0 })
+          .then((v) => { if (v.status && v.data?.audio) bea.play(v.data.audio); })
+          .catch(() => undefined);
+      }
     } catch {
       setError(tt("failed_to_send_message_please_try_again"));
     } finally {
@@ -790,7 +800,7 @@ export function SupportPage() {
   const replyCard = reply?.reply ? (
     <div className="card pad" style={{ marginBottom: 12, borderColor: "var(--gold-border)" }}>
       <div style={{ fontSize: 12, fontWeight: 800, color: "var(--gold)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 6 }}>
-        {byAssistant ? "💝 Bingg Bongg Assistant" : "Admin support replied"}
+        {byAssistant ? "💝 Bea · Bingg Bongg Assistant" : "Admin support replied"}
       </div>
       <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{reply.reply}</p>
       {byAssistant && (
@@ -814,16 +824,18 @@ export function SupportPage() {
         <PageTitle>{t("support")}</PageTitle>
         <Link to="/settings/support/archive" className="btn small" style={{ background: "transparent", color: "var(--gold)", borderColor: "var(--gold-border)" }}>{t("archive")}</Link>
       </div>
+      {sent && byAssistant && <BeaPortrait bea={bea} />}
       {sent && replyCard}
       {sent ? (
         <div className="card pad">
           <p className="soft" style={{ margin: 0 }}>
             {reply?.reply ? "Message sent. Ask another question any time." : "Message sent. The Bingg Bongg team will get back to you."}
           </p>
-          <button className="btn small" onClick={() => { setSent(false); setMsg(""); }} style={{ marginTop: 10, background: "transparent", color: "var(--gold)" }}>{t("send_another_message")}</button>
+          <button className="btn small" onClick={() => { bea.stop(); setSent(false); setMsg(""); }} style={{ marginTop: 10, background: "transparent", color: "var(--gold)" }}>{t("send_another_message")}</button>
         </div>
       ) : (
         <div className="card pad">
+          <BeaCard bea={bea} />
           {/* Steve, 2026-10-17: black plate, white border, gold text, centred — the dimmed
               grey was hard to read. */}
           <p style={{ marginTop: 0, marginBottom: 12, fontSize: 13, textAlign: "center", color: "var(--gold)", background: "#000", border: "1.5px solid #fff", borderRadius: 12, padding: 12 }}>
@@ -898,7 +910,7 @@ export function SupportArchivePage() {
             {row.reply ? (
               <>
                 <div style={{ fontSize: 12, fontWeight: 800, color: "var(--gold)", marginBottom: 4 }}>
-                  {byAssistant ? "Bingg Bongg Assistant" : "Bingg Bongg Support"}{row.replied_at ? ` · ${prettyDate(row.replied_at)}` : ""}
+                  {byAssistant ? "Bea · Bingg Bongg Assistant" : "Bingg Bongg Support"}{row.replied_at ? ` · ${prettyDate(row.replied_at)}` : ""}
                 </div>
                 <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{row.reply}</p>
                 {byAssistant && row.needs_human && <p className="muted" style={{ margin: "8px 0 0", fontSize: 13 }}>{t("a_bingg_bongg_team_member_will_follow_up")}</p>}
