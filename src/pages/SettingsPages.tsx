@@ -775,7 +775,7 @@ export function SupportPage() {
       // Suspend Messages (Steve, 2026-11-13): a paused member gets the server's sentence ("paused until ...")
       // instead of a false "sent". Any other refusal shows its message the same way.
       if (r.status === false) { setError(r.message || tt("failed_to_send_message_please_try_again")); return; }
-      if (r.data?.reply) { setReply(r.data); setAskedForPerson(false); }
+      if (r.data?.reply) setReply(r.data);
       setSent(true);
       // Bea speaks the Assistant's answer: the text shows at once, her voice follows.
       if (r.data?.replied_by === "assistant" && r.data.voice_token) {
@@ -823,6 +823,7 @@ export function SupportPage() {
           <Link to="/settings/support/archive" className="btn small" style={{ background: "transparent", color: "var(--gold)", borderColor: "var(--gold-border)" }}>{t("archive")}</Link>
         </div>
       </div>
+      {sent && <div className="card pad" style={{ marginBottom: 12 }}><BeaCard bea={bea} /></div>}
       {sent && replyCard}
       {sent ? (
         // "only one popup is needed the one with white text and repeat the answer" (Steve, 2026-11-16).

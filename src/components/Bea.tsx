@@ -158,16 +158,8 @@ function VoiceButton({ bea }: { bea: BeaVoice }) {
 
 /** Top of the Support form: Bea on camera, her name, online/talking, and the voice switch. */
 export function BeaCard({ bea }: { bea: BeaVoice }) {
-  if (!bea.faceVisible) {
-    // After her hello: just her name and the voice switch.
-    return (
-      <div style={{ display: "flex", alignItems: "center", gap: 10, background: "#000", border: "2px solid var(--gold)", borderRadius: 14, padding: "10px 14px", marginBottom: 12 }}>
-        <span style={{ fontSize: 20, fontWeight: 800, color: "var(--gold)" }}>Bea</span>
-        <span style={{ fontSize: 13, fontWeight: 600, color: "#fff", flex: 1 }}>Bingg Bongg Assistant</span>
-        <VoiceButton bea={bea} />
-      </div>
-    );
-  }
+  // Steve, 2026-11-16: "keep Bea there the page it looks much better while the conversation is
+  // happening" — her full card always shows.
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 14, background: "#000", border: "2px solid var(--gold)", borderRadius: 16, padding: 12, marginBottom: 12 }}>
       <BeaVideo talking={bea.talking} hello={bea.hello} onHelloEnd={bea.endHello} width={112} height={196} />
