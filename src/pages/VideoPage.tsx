@@ -377,7 +377,8 @@ export function VideoPage() {
                 {t("this_video")}
               </div>
               {originLines.length > 0 && (
-                <div style={{ color: "var(--gold)", textAlign: "center", fontSize: 13, marginTop: -4, marginBottom: 12, lineHeight: 1.5 }}>
+                // Steve, 2026-11-16: "Please make the uploaded date and time larger / more visible".
+                <div style={{ color: "#FFDD55", textAlign: "center", fontSize: 17, fontWeight: 700, marginTop: -4, marginBottom: 12, lineHeight: 1.45 }}>
                   {originLines.map((line) => <div key={line}>{line}</div>)}
                 </div>
               )}
