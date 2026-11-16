@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ReportDialog } from "../components/ReportDialog";
 import { CommentsPanel } from "../components/CommentsPanel";
 import { rememberCopiedLink, videoShareUrl } from "../lib/copiedLink";
@@ -11,6 +11,8 @@ import { GiftFlash, PostGiftButton } from "../components/GiftSheet";
 import { appendToFeed, fetchMoreFeed, getFeed } from "../lib/feed";
 import { tt, useT  } from "../lib/i18n";
 import { showGoldAlert } from "../components/GoldToast";
+import { AutoCaptionOverlay, CcButton, EditCaptionsDialog } from "../components/AutoCaptions";
+import { parseCaptions, setPostAutoCaptions, shownCaptions, updatePostAutoCaptions, type CaptionLine } from "../lib/autoCaptions";
 
 const AUTO_KEY = "bb.autoplayNext";
 
@@ -294,6 +296,17 @@ export function VideoPage() {
     showGoldAlert(tt("copied"));
   }
 
+  // Automatic captions (Steve, 2026-11-16): the spoken words under the video, the viewer's CC
+  // switch, and for the creator "Edit captions" / "Captions on/off" in the hold menu.
+  const captionLines = useMemo(() => shownCaptions(item),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [item?.id, item?.auto_captions, item?.auto_captions_status, item?.auto_captions_on]);
+  const [editCaptions, setEditCaptions] = useState<CaptionLine[] | null>(null);
+  const [captionBusy, setCaptionBusy] = useState(false);
+  const mergeCaptions = useCallback((data: Partial<Post>) => {
+    setItem((cur) => (cur && cur.id === data.id ? { ...cur, ...data } : cur));
+  }, []);
+
   if (error) return <div className="page"><Notice error>{error}</Notice></div>;
   if (!item) return <div className="page"><Loading /></div>;
 
@@ -321,6 +334,37 @@ export function VideoPage() {
         navigate(`/record/${k}/${item.id}`);
       },
     })),
+    // The creator's own video: fix the automatic captions, or switch them off. Only once the
+    // server sends the fields (a post from before the deploy has none) and only on real videos.
+    ...(user && Number(item.user_id) === Number(user.id) && item.auto_captions_status !== undefined && (item.post_kind ?? "video") === "video" ? [
+      {
+        label: t("ac_edit_captions"),
+        onPick: () => {
+          const lines = parseCaptions(item.auto_captions);
+          const st = item.auto_captions_status;
+          if (st === "queued" || st === "working") { showGoldAlert(tt("ac_being_written")); return; }
+          if (!lines.length) { showGoldAlert(st === "failed" ? tt("ac_failed") : st === "off" ? tt("ac_turn_on_first") : tt("ac_no_words")); return; }
+          closeMenu(false);
+          setEditCaptions(lines);
+        },
+      },
+      {
+        label: t("ac_captions"),
+        trailing: Number(item.auto_captions_on ?? 0) === 1 ? t("switch_on") : t("switch_off"),
+        onPick: () => {
+          if (captionBusy) return;
+          const on = Number(item.auto_captions_on ?? 0) !== 1;
+          setCaptionBusy(true);
+          setPostAutoCaptions(user.id, item.id, on)
+            .then((data) => {
+              mergeCaptions(data);
+              if (on && (data.auto_captions_status === "queued" || data.auto_captions_status === "working")) showGoldAlert(tt("ac_being_written"));
+            })
+            .catch((e) => showGoldAlert((e as Error).message))
+            .finally(() => setCaptionBusy(false));
+        },
+      },
+    ] : []),
     { label: t("copy_this_video"), onPick: () => { void copyLink(); closeMenu(); } },
     // Steve, 2026-11-13: "please add a analytics button, when they click it they will see all
     // the analytics for this video."
@@ -367,6 +411,8 @@ export function VideoPage() {
             goNext();
           }} />
         {sentGift && <GiftFlash gift={sentGift} onDone={clearSentGift} />}
+        {captionLines.length > 0 && <AutoCaptionOverlay key={item.id} lines={captionLines} videoRef={videoRef} />}
+        {captionLines.length > 0 && !chromeHidden && <CcButton style={{ position: "absolute", top: 12, right: 12, zIndex: 3 }} />}
 
         {menuOpen && (
           // Steve, 2026-10-19: "Also add the Bingg Bongg logo on top of this popup." The same
@@ -505,6 +551,18 @@ export function VideoPage() {
           see CommentsPanel. Keyed on the post so moving down the feed resets the list rather
           than showing the previous video's comments under the new one. */}
       <CommentsPanel key={item.id} postId={item.id} totalComments={item.total_comments} />
+      {editCaptions && user && (
+        <EditCaptionsDialog
+          lines={editCaptions}
+          onClose={() => setEditCaptions(null)}
+          onSave={async (lines) => {
+            const data = await updatePostAutoCaptions(user.id, item.id, lines);
+            mergeCaptions(data);
+            setEditCaptions(null);
+            showGoldAlert(tt("ac_saved"));
+          }}
+        />
+      )}
       {showReport && (
         <ReportDialog
           postId={item.id}

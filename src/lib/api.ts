@@ -245,6 +245,15 @@ export interface Post {
   remix_type?: "duet" | "stitch" | null;
   remix_post_id?: number | null;
   remix_of?: { type: "duet" | "stitch"; id: number; user_id: number; user_name?: string; thumbnail?: string } | null;
+  /** Automatic captions (Steve, 2026-11-16). `auto_captions` is a JSON STRING of
+   *  [{"s":1.02,"e":3.25,"t":"words"}] in seconds; missing fields mean no captions. Not the same
+   *  thing as the creator's own typed coloured `captions`. */
+  auto_captions?: string | null;
+  auto_captions_status?: "queued" | "working" | "done" | "none" | "failed" | "off" | null;
+  auto_captions_lang?: string | null;
+  auto_captions_on?: number | null;
+  /** "video" (default) | "text" | "slideshow" — the last two are rendered to an mp4 on the device. */
+  post_kind?: string | null;
 }
 
 /** A row of tbl_sound: an admin library song, or a member's "Original sound by ...". */

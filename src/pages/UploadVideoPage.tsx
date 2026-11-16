@@ -57,6 +57,10 @@ export function UploadVideoPage() {
   const [canDuet, setCanDuet] = useState(true);
   const [canStitch, setCanStitch] = useState(true);
   const [remix, setRemix] = useState<Remix | null>(null);
+  // Automatic captions (Steve, 2026-11-16): on by default. Text posts and slideshows are rendered
+  // on the device and have no speech, so they say what they are instead (post_kind).
+  const [autoCaptions, setAutoCaptions] = useState(true);
+  const [postKind, setPostKind] = useState<"video" | "text" | "slideshow">("video");
 
   const [busy, setBusy] = useState(false);
   const [stage, setStage] = useState("");
@@ -74,9 +78,10 @@ export function UploadVideoPage() {
   }, []);
 
   useEffect(() => {
-    const st = location.state as { greenScreen?: { file: File; duration: number; thumb: Blob | null }; remix?: Remix } | null;
+    const st = location.state as { greenScreen?: { file: File; duration: number; thumb: Blob | null }; remix?: Remix; postKind?: "text" | "slideshow" } | null;
     const gs = st?.greenScreen;
     setRemix(st?.remix ?? null);
+    setPostKind(st?.postKind === "text" || st?.postKind === "slideshow" ? st.postKind : "video");
     if (!gs?.file) return;
     setFile(gs.file);
     setDuration(gs.duration);
@@ -98,6 +103,7 @@ export function UploadVideoPage() {
     setDuration(null);
     recordedThumbRef.current = null;
     setRemix(null); // a different file is no longer that duet / stitch / sound
+    setPostKind("video");
     if (f.size > MAX_MB * 1024 * 1024) {
       setError(`That file is ${(f.size / 1024 / 1024).toFixed(0)}MB — the limit is ${MAX_MB}MB.`);
       return;
@@ -151,6 +157,8 @@ export function UploadVideoPage() {
         ...(linkedUrl.trim() ? { linked_url: linkedUrl.trim() } : {}),
         ...(country ? { country } : {}),
         ...(state ? { state } : {}),
+        post_kind: postKind,
+        ...(postKind === "video" ? { auto_captions: autoCaptions ? 1 : 0 } : {}),
         can_duet: canDuet ? 1 : 0,
         can_stitch: canStitch ? 1 : 0,
         // A duet keeps the original's sound (so it shows on that sound's page); a stitch and a
@@ -185,7 +193,7 @@ export function UploadVideoPage() {
           <p className="soft" style={{ marginTop: 0 }}>{t("uploaded_it_will_appear_on_your_profile")}</p>
           <div className="row">
             <button className="btn" onClick={() => navigate(`/profile/${user.id}`)}>{t("see_my_profile")}</button>
-            <button className="btn ghost" onClick={() => { setDone(false); setFile(null); setRemix(null); setDuration(null); setDescription(""); setLinkedUrl(""); }}>{t("upload_another")}</button>
+            <button className="btn ghost" onClick={() => { setDone(false); setFile(null); setRemix(null); setPostKind("video"); setDuration(null); setDescription(""); setLinkedUrl(""); }}>{t("upload_another")}</button>
           </div>
         </div>
       </div>
@@ -206,6 +214,12 @@ export function UploadVideoPage() {
               <button className="btn" onClick={() => fileRef.current?.click()}>{t("choose_video")}</button>
               <button className="btn" onClick={() => navigate("/green-screen")}>🟩 {t("gs_record_with")}</button>
             </div>
+            {/* Steve, 2026-11-16: the editor, Text posts and Photo slideshows. */}
+            <div className="row" style={{ gap: 10, flexWrap: "wrap", marginTop: 10 }}>
+              <button className="btn" onClick={() => navigate("/editor")}>🎞️ {t("ed_title")}</button>
+              <button className="btn" onClick={() => navigate("/text-post")}>🔤 {t("tp_title")}</button>
+              <button className="btn" onClick={() => navigate("/slideshow")}>🖼️ {t("ss_title")}</button>
+            </div>
           </>
         ) : (
           <div className="row" style={{ alignItems: "center" }}>
@@ -219,6 +233,12 @@ export function UploadVideoPage() {
           </div>
         )}
       </div>
+
+      {postKind !== "video" && file && (
+        <div className="card pad" style={{ marginBottom: 12, color: "var(--gold)", fontWeight: 700, textAlign: "center" }}>
+          {postKind === "text" ? t("tp_title") : t("ss_title")}
+        </div>
+      )}
 
       {remix && (
         <div className="card pad" style={{ marginBottom: 12, color: "var(--gold)", fontWeight: 700, textAlign: "center",
@@ -286,6 +306,7 @@ export function UploadVideoPage() {
           ["Allow reposting", allowRepost, setAllowRepost],
           ["Allow Duet", canDuet, setCanDuet],
           ["Allow Stitch", canStitch, setCanStitch],
+          ...(postKind === "video" ? [[t("ac_auto_captions"), autoCaptions, setAutoCaptions]] : []),
         ] as [string, boolean, (v: boolean) => void][]).map(([label, val, set]) => (
           <label key={label} className="row" style={{ padding: "12px 14px", borderBottom: "1px solid var(--line)", cursor: "pointer" }}>
             <div style={{ flex: 1, fontWeight: 700 }}>{label}</div>
