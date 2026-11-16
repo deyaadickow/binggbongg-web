@@ -753,6 +753,15 @@ export interface VideoComment {
    *  (Comments::getVoiceUrlAttribute), so it is played as-is rather than through mediaUrl. */
   voice_url?: string | null;
   voice_type?: string | null;
+  /** Steve, 2026-11-16: a photo, video or recorded voice message attached to the comment.
+   *  media_url / media_thumbnail_url are already absolute. A voice message ALSO fills voice_url
+   *  (voice_type "recorded") for older phones; show it once, as the voice-message player. */
+  media_type?: "photo" | "video" | "voice" | null;
+  media_url?: string | null;
+  media_thumbnail_url?: string | null;
+  media_duration?: number | null;
+  media_width?: number | null;
+  media_height?: number | null;
 }
 
 /** The four voices a comment can be spoken in — the same presets Text to Voice ships, so a
@@ -797,14 +806,25 @@ export async function addCommentOnPost(input: {
    *  both (`comment` is required_without:sticker_url), and a sticker has nothing to speak, so a
    *  voice never rides along with one. */
   stickerUrl?: string | null;
+  /** A photo / video / voice message already uploaded (lib/commentMedia uploadPending). */
+  media?: {
+    media_type: string;
+    media_path: string;
+    media_thumbnail?: string;
+    media_duration?: number;
+    media_width?: number;
+    media_height?: number;
+  } | null;
 }) {
+  const voiceType = input.media?.media_type === "voice" ? null : input.voiceType;
   return post<VideoComment>("addCommentOnPost", {
     post_id: input.postId,
     user_id: input.userId,
     comment: input.comment || undefined,
     sticker_url: input.stickerUrl || undefined,
-    voice_type: input.voiceType || undefined,
-    language: input.voiceType ? input.language || "en" : undefined,
+    voice_type: voiceType || undefined,
+    language: voiceType ? input.language || "en" : undefined,
+    ...(input.media ?? {}),
   });
 }
 
