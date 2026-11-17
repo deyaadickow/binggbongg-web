@@ -36,7 +36,9 @@ export function Nav() {
             member reaches their own account when the sidebar is off screen. */}
         {/* Steve, 2026-10-25: Contests and Exciting News are directory tiles #1 and #2 now —
             only For You and the directory stay up here, centred like the phones. */}
-        <NavLink to="/" end>{t("for_you")}</NavLink>
+        {/* Steve, 2026-11-17: "The for you on top and on bottom do the same thing? if yes, remove the
+            bottom one." The phones dropped their For You chip; this is the web's copy of it. The
+            feed's own For You tab and the logo both lead to the feed. */}
         {/* Steve, 2026-11-16: "Next to for you page add 'All Country Battles'". */}
         <NavLink to="/country-battles" className="acb-chip">
           {t("acb_tab")}

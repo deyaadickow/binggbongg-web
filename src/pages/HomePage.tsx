@@ -5,7 +5,6 @@ import { fetchFeedBatch, findingUserId, type FeedTab } from "../lib/finding";
 import { openRandomLive } from "../lib/liveSwipe";
 import { useSession } from "../lib/session";
 import { PostCard } from "../components/PostCard";
-import { StoryRow } from "../components/Stories";
 import { Loading, Notice, StoreBadges } from "../components/Common";
 import { getFeedSource, setFeed, setFeedSource } from "../lib/feed";
 import { FeedPhotoCard } from "../components/FeedPhotoCard";
@@ -133,8 +132,8 @@ export function HomePage() {
 
   return (
     <div className="page">
-      {/* Stories (Steve, 2026-11-17): the row of round avatars at the very top. Guests don't see it. */}
-      <StoryRow />
+      {/* Stories row removed (Steve, 2026-11-17): "we don't need this one on main feed please remove
+          it." Stories stay on their own page from the directory and the ring on profiles. */}
       <div className="row" style={{ marginBottom: 14, flexWrap: "wrap" }}>
         {/* The three feeds side by side (Steve, 2026-11-16), gold underline on the active one. */}
         <div className="fnd-feed-tabs" role="tablist">
