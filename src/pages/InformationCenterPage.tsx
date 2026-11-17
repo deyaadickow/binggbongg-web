@@ -9,7 +9,7 @@
 // Top: a rotating banner over the 70+ Videos (the same fetchFeaturePageVideos list as /feature-videos),
 // a new one every 12 s; clicking one plays it on /feature-videos?play=<id>. Below: one full-width
 // gold button per destination, text wrapping onto a second line rather than being cut off.
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { post, mediaUrl } from "../lib/api";
 import { useT, type StringKey } from "../lib/i18n";
@@ -46,14 +46,31 @@ function InfoBanner() {
     return () => window.clearInterval(timer);
   }, [count, at]); // `at` restarts the 12 s after a dot is clicked
 
+  // Steve, 2026-11-17: "Make it where i can just swipe it to the left or right to get the next
+  // banner." Left = next, right = previous (finger or mouse); a plain click still plays it.
+  const swipeStart = useRef<{ x: number; y: number } | null>(null);
+  const swiped = useRef(false);
+  const onDown = (e: React.PointerEvent) => { swipeStart.current = { x: e.clientX, y: e.clientY }; swiped.current = false; };
+  const onUp = (e: React.PointerEvent) => {
+    const s0 = swipeStart.current;
+    swipeStart.current = null;
+    if (!s0 || count < 2) return;
+    const dx = e.clientX - s0.x;
+    if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(e.clientY - s0.y)) return;
+    swiped.current = true;
+    setAt((i) => (i + (dx < 0 ? 1 : -1) + count) % count);
+  };
+
   if (!banners || banners.length === 0) return null;
   return (
-    <div className="ic-banner">
+    <div className="ic-banner" onPointerDown={onDown} onPointerUp={onUp}
+      onPointerCancel={() => { swipeStart.current = null; }}>
       {banners.map((b, i) => (
         <button key={b.id} type="button" className={"ic-slide" + (i === at ? " on" : "")}
           tabIndex={i === at ? 0 : -1} aria-hidden={i !== at}
-          onClick={() => navigate(`/feature-videos?play=${b.id}`)} aria-label={b.title}>
-          <img src={b.poster} alt="" loading={i === 0 ? "eager" : "lazy"} />
+          onClick={() => { if (swiped.current) { swiped.current = false; return; } navigate(`/feature-videos?play=${b.id}`); }}
+          aria-label={b.title}>
+          <img src={b.poster} alt="" draggable={false} loading={i === 0 ? "eager" : "lazy"} />
           <span className="ic-slide-title">{b.title}</span>
           <span className="ic-play" aria-hidden>▶</span>
         </button>

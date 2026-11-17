@@ -1814,3 +1814,6 @@ body:has(.story-viewer) .get-app-bar { display: none; }
 @media (max-width: 600px) {
   .nav .links a.info-center-chip { min-width: 0; flex: 1 1 auto; }
 }
+
+/* Swipeable Information Center banner (Steve, 2026-11-17): vertical page scroll stays native. */
+.ic-banner { touch-action: pan-y; user-select: none; }
