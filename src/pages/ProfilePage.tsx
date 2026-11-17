@@ -22,6 +22,8 @@ import { fetchChatBattleAlertMute, setChatBattleAlertMute } from "../lib/chatBat
 import { cbText } from "../lib/countryBattle";
 import { StoryRingAvatar } from "../components/Stories";
 import { PlaylistsPanel } from "../components/Playlists";
+import { QaPanel } from "../components/QaPanel";
+import { countDrafts, onDraftsChanged } from "../lib/drafts";
 import { playlistsFor, socialCall, socialUser, type PlaylistRow } from "../lib/social";
 import { LockBadge, SubscribeButton } from "../components/Creators";
 import { SeriesGrid } from "./CreatorPages";
@@ -73,8 +75,8 @@ interface BattleCareer {
   opponents?: BattleOpponent[];
 }
 
-type TabKey = "videos" | "photos" | "likes" | "reposted" | "playlists" | "series" | "saved" | "history" | "following" | "followers" | "friends" | "business";
-const TAB_KEYS: TabKey[] = ["videos", "photos", "likes", "reposted", "playlists", "series", "saved", "history", "following", "followers", "friends", "business"];
+type TabKey = "videos" | "photos" | "qa" | "likes" | "reposted" | "playlists" | "series" | "saved" | "history" | "following" | "followers" | "friends" | "business";
+const TAB_KEYS: TabKey[] = ["videos", "photos", "qa", "likes", "reposted", "playlists", "series", "saved", "history", "following", "followers", "friends", "business"];
 
 const USER_TABS: TabKey[] = ["following", "followers", "friends"];
 
@@ -335,6 +337,10 @@ export function ProfilePage() {
   const [playlists, setPlaylists] = useState<PlaylistRow[]>([]);
   const [playlistCreate, setPlaylistCreate] = useState(0);
   const [series, setSeries] = useState<Series[] | null>(null);
+  // Q&A (2026-11-17): how many questions, once the tab has loaded them.
+  const [qaCount, setQaCount] = useState<number | null>(null);
+  // Drafts (2026-11-17): saved on this browser; a "Drafts (N)" tile leads your own videos.
+  const [draftCount, setDraftCount] = useState(0);
   const [showBattleBoard, setShowBattleBoard] = useState(false);
   /** Open by default: the point of the card is that people SEE what is scheduled. */
   const [showSchedule, setShowSchedule] = useState(true);
@@ -359,6 +365,7 @@ export function ProfilePage() {
     setTabPhotos([]);
     setPhotoCount(null);
     setSeries(null);
+    setQaCount(null);
 
     (async () => {
       try {
@@ -400,7 +407,7 @@ export function ProfilePage() {
       fetchUserSeries(Number(id)).then(setSeries).catch(() => setSeries([])).finally(() => setTabLoading(false));
       return;
     }
-    if (tab === "business" || tab === "playlists") {
+    if (tab === "business" || tab === "playlists" || tab === "qa") {
       setTabLoading(false);
       return;
     }
@@ -436,7 +443,7 @@ export function ProfilePage() {
     // own validator on 2026-09-26. Three of these used to name routes that DO NOT EXIST —
     // fetchRepostVideos, fetchFriendsList and fetchUserWatchHistory — so those tabs 404'd and
     // rendered empty forever. A guessed endpoint name fails exactly like a missing feature.
-    const endpointMap: Record<Exclude<TabKey, "photos" | "business" | "playlists" | "series">, [string, Record<string, unknown>]> = {
+    const endpointMap: Record<Exclude<TabKey, "photos" | "business" | "playlists" | "series" | "qa">, [string, Record<string, unknown>]> = {
       videos: ["fetchUserPosts", { user_id: id, ...base }],
       // NOT fetchUserPostsWithLikes: that returns THIS member's own posts that have received
       // likes, whereas the "Likes" count beside the tab is likedVideosCounts — the videos they
@@ -578,6 +585,14 @@ export function ProfilePage() {
     }
   }
 
+  const socialMeId = socialMe?.id ?? 0;
+  useEffect(() => {
+    if (!socialMeId || socialMeId !== Number(id)) { setDraftCount(0); return; }
+    const refresh = () => { void countDrafts(socialMeId).then(setDraftCount); };
+    refresh();
+    return onDraftsChanged(refresh);
+  }, [socialMeId, id]);
+
   function switchTab(t: TabKey) {
     if (t === tab) return;
     if (!loadedTabs.current.has(t)) {
@@ -600,6 +615,8 @@ export function ProfilePage() {
     // business. and add a tab in their personal profile page is where they add/edit their
     // business." One tab on every profile; the panel below decides which form to show.
     { key: "business" as TabKey, label: "Business" },
+    // Q&A (Steve, 2026-11-17): ask this member a question; they answer with a video.
+    { key: "qa" as TabKey, label: t("qa_tab"), count: qaCount ?? undefined },
     { key: "following", label: "Following", count: profile.total_followings },
     { key: "followers", label: "Followers", count: profile.total_followers },
     { key: "friends", label: "Friends", count: profile.friendsCount },
@@ -823,8 +840,11 @@ export function ProfilePage() {
       <div style={{ marginTop: 4 }}>
         {tabLoading ? (
           <div style={{ padding: "32px 0" }}><Loading /></div>
-        ) : tabError && tab !== "playlists" && tab !== "business" && tab !== "series" ? (
+        ) : tabError && tab !== "playlists" && tab !== "business" && tab !== "series" && tab !== "qa" ? (
           <p className="muted" style={{ padding: "24px 0", textAlign: "center" }}>{tabError}</p>
+        ) : tab === "qa" ? (
+          <QaPanel creatorId={profile.id} creatorName={profile.username ? `@${profile.username}` : displayName(profile)}
+            isMe={isMe} myId={socialMe?.id ?? null} onCount={setQaCount} />
         ) : tab === "playlists" ? (
           <PlaylistsPanel ownerId={profile.id} isMe={isMe} myId={me?.id} playlists={playlists}
             onChanged={() => void reloadPlaylists()} createRequest={playlistCreate} />
@@ -863,10 +883,17 @@ export function ProfilePage() {
             </div>
           )
         ) : (
-          tabVideos.length === 0 ? (
+          tabVideos.length === 0 && !(isMe && tab === "videos" && draftCount > 0) ? (
             <p className="muted" style={{ padding: "24px 0", textAlign: "center" }}>{t("no_videos_yet")}</p>
           ) : (
             <div className="profile-vid-grid">
+              {/* Drafts (Steve, 2026-11-17): first in your own videos, only when there are some. */}
+              {isMe && tab === "videos" && draftCount > 0 && (
+                <button type="button" className="drafts-tile" onClick={() => navigate("/drafts")}>
+                  <span style={{ fontSize: 26 }}>🗂️</span>
+                  <span>{t("dft_drafts_n", draftCount)}</span>
+                </button>
+              )}
               {tabVideos.map((p) => (
                 <ProfileThumb
                   key={p.id}

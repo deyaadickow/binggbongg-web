@@ -9,6 +9,7 @@
 // The mock is only ever imported under `import.meta.env.DEV`, so it is not in the production build.
 import { post, type ApiResponse, type Post, type UserSummary, type VideoComment } from "./api";
 import { createUploadUrls, putToSignedUrl, type UploadSlot } from "./upload";
+import type { QaQuestionRef } from "./qa";
 
 /** The endpoints this feature added on the server. In dev they are ALWAYS mocked. */
 const NEW_ENDPOINTS = new Set([
@@ -108,6 +109,8 @@ export interface SocialPost extends Post {
   poll?: Poll | null;
   add_yours?: AddYours | null;
   link_sticker?: LinkSticker | null;
+  /** Q&A (backend 1cc24bd): the profile question this video answers. */
+  qa_question?: QaQuestionRef | null;
 }
 
 export interface AddYoursPage {

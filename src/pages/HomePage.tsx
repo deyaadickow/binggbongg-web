@@ -1,7 +1,9 @@
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { post, type Post } from "../lib/api";
 import { fetchFeedBatch, findingUserId, type FeedTab } from "../lib/finding";
+import { socialUser } from "../lib/social";
+import type { NearbyArea } from "../lib/qa";
 import { openRandomLive } from "../lib/liveSwipe";
 import { useSession } from "../lib/session";
 import { PostCard } from "../components/PostCard";
@@ -43,12 +45,25 @@ export function HomePage() {
   const location = useLocation();
   // Friends | Following | For You (Steve, 2026-11-16), For You by default. Kept for the visit, so
   // coming back from a video lands on the same feed.
-  const [tab, setTabState] = useState<FeedTab>(() => getFeedSource());
+  // Nearby (Steve, 2026-11-17) is the fourth; the directory's Nearby tile opens it with ?feed=nearby.
+  const [tab, setTabState] = useState<FeedTab>(() => {
+    const want = new URLSearchParams(window.location.search).get("feed");
+    if (want === "nearby" || want === "friends" || want === "following" || want === "foryou") { setFeedSource(want); return want; }
+    return getFeedSource();
+  });
   const setTab = (next: FeedTab) => { setFeedSource(next); setTabState(next); };
-  const meId = findingUserId(user?.id);
+  useEffect(() => {
+    const want = new URLSearchParams(location.search).get("feed");
+    if ((want === "nearby" || want === "friends" || want === "following" || want === "foryou") && want !== tab) setTab(want);
+  }, [location.search]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Nearby: on the dev server the Social mock's pretend member counts as signed in too.
+  const meId = tab === "nearby" ? findingUserId(user?.id) ?? socialUser(user)?.id ?? null : findingUserId(user?.id);
+  const [area, setArea] = useState<NearbyArea | null>(null);
   const needsSignIn = tab !== "foryou" && !meId;
   const [noFriends, setNoFriends] = useState(false);
   const [posts, setPosts] = useState<Post[]>([]);
+  const countRef = useRef(0);
+  countRef.current = posts.length;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // Help campaigns to sprinkle through the feed, and the interval the SERVER chose. Loaded once;
@@ -62,8 +77,9 @@ export function HomePage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetchFeedBatch(tab, meId);
+      const res = await fetchFeedBatch(tab, meId, countRef.current);
       setNoFriends(res.noFriends);
+      setArea(res.area ?? null);
       setPosts((prev) => {
         const seen = new Set(prev.map((p) => p.id));
         const next = [...prev, ...res.posts.filter((p) => !seen.has(p.id))];
@@ -85,7 +101,9 @@ export function HomePage() {
 
   useEffect(() => {
     setPosts([]);
+    countRef.current = 0;
     setNoFriends(false);
+    setArea(null);
     loadMore();
   }, [loadMore]);
 
@@ -147,10 +165,10 @@ export function HomePage() {
         </button>
         {/* The three feeds side by side (Steve, 2026-11-16), gold underline on the active one. */}
         <div className="fnd-feed-tabs" role="tablist">
-          {(["friends", "following", "foryou"] as const).map((k) => (
+          {(["nearby", "friends", "following", "foryou"] as const).map((k) => (
             <button key={k} type="button" role="tab" aria-selected={tab === k} className={tab === k ? "active" : ""}
               onClick={() => { if (k !== tab) setTab(k); }}>
-              {t(k === "friends" ? "fnd_friends" : k === "following" ? "fnd_following" : "fnd_for_you")}
+              {t(k === "nearby" ? "nb_nearby" : k === "friends" ? "fnd_friends" : k === "following" ? "fnd_following" : "fnd_for_you")}
             </button>
           ))}
         </div>
@@ -164,7 +182,24 @@ export function HomePage() {
             style={{ background: "var(--gold-border)", color: "#000", borderColor: "var(--gold-border)" }}>{t("fnd_sign_in")}</Link>
         </div>
       )}
-      {!needsSignIn && !loading && posts.length === 0 && tab !== "foryou" && !error && (
+      {/* Nearby (Steve, 2026-11-17): from the location already on the profile — the browser is
+          never asked for its location. */}
+      {tab === "nearby" && !needsSignIn && area && area.level !== "none" && area.name && (
+        <div className="nearby-line">📍 {t("nb_near", area.name)}</div>
+      )}
+      {tab === "nearby" && !needsSignIn && !loading && !error && area?.level === "none" && (
+        <div className="card pad nearby-none">
+          <p style={{ color: "var(--gold)", fontSize: 16, marginTop: 0 }}>{t("nb_add_city")}</p>
+          <button type="button" className="btn gold" onClick={() => navigate("/settings/account#your-area")}>{t("nb_edit_profile")}</button>
+        </div>
+      )}
+      {tab === "nearby" && !needsSignIn && !loading && !error && area && area.level !== "none" && posts.length === 0 && (
+        <div className="card pad" style={{ textAlign: "center", marginBottom: 14 }}>
+          <p style={{ color: "var(--gold)", fontSize: 16, marginTop: 0 }}>{t("nb_empty")}</p>
+          <button type="button" className="btn gold" onClick={() => setTab("foryou")}>{t("fnd_for_you")}</button>
+        </div>
+      )}
+      {!needsSignIn && !loading && posts.length === 0 && tab !== "foryou" && tab !== "nearby" && !error && (
         <div className="card pad" style={{ textAlign: "center", marginBottom: 14 }}>
           <p style={{ color: "var(--gold)", fontSize: 16, marginTop: 0 }}>{t(tab === "friends" && noFriends ? "fnd_no_friends" : "fnd_no_following")}</p>
           <Link to="/search" className="btn" style={{ background: "var(--gold-border)", color: "#000", borderColor: "var(--gold-border)" }}>{t("fnd_find_people")}</Link>
@@ -202,7 +237,7 @@ export function HomePage() {
           );
         })}
       </div>
-      {loading ? <Loading /> : !needsSignIn && (posts.length > 0 || tab === "foryou") && (
+      {loading ? <Loading /> : !needsSignIn && (posts.length > 0 || tab === "foryou") && !(tab === "nearby" && area?.level === "none") && (
         <div className="center" style={{ marginTop: 20 }}>
           <button className="btn" onClick={loadMore}>{t("show_more")}</button>
         </div>

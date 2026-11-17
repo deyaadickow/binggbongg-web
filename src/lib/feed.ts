@@ -26,7 +26,7 @@ export function appendToFeed(posts: Post[]): Post[] {
  *  so the video page tops it up from the same one. */
 const SOURCE_KEY = "bb.feedSource";
 export function getFeedSource(): FeedTab {
-  try { const v = sessionStorage.getItem(SOURCE_KEY); return v === "friends" || v === "following" ? v : "foryou"; } catch { return "foryou"; }
+  try { const v = sessionStorage.getItem(SOURCE_KEY); return v === "friends" || v === "following" || v === "nearby" ? v : "foryou"; } catch { return "foryou"; }
 }
 export function setFeedSource(tab: FeedTab) {
   try { sessionStorage.setItem(SOURCE_KEY, tab); } catch { /* private mode etc. */ }
@@ -47,7 +47,7 @@ export function insertIntoFeed(p: Post, at: number): Post[] {
 export async function fetchMoreFeed(userId: number | null): Promise<Post[]> {
   const source = getFeedSource();
   try {
-    const { posts } = await fetchFeedBatch(userId || source === "foryou" ? source : "foryou", userId);
+    const { posts } = await fetchFeedBatch(userId || source === "foryou" ? source : "foryou", userId, getFeed().length);
     return appendToFeed(posts);
   } catch (e) {
     throw new Error((e as Error).message || tt("couldn_t_load_more_videos"));

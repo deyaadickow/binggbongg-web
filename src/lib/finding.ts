@@ -8,6 +8,7 @@
 // and in dev a "Not interested" or a keyword can never reach the live server.
 import { devCreatorDecorate } from "./creators";
 import { tt } from "./i18n";
+import { fetchNearbyPosts, type NearbyArea } from "./qa";
 import { post, type ApiResponse, type Post, type Sound, type UserSummary } from "./api";
 
 /** The endpoints this feature added on the server. In dev they are ALWAYS mocked. */
@@ -115,11 +116,17 @@ export async function fetchPostsByTopic(topicId: number, start: number, count: n
 
 // ---- The three feeds -----------------------------------------------------------------------------
 
-export type FeedTab = "friends" | "following" | "foryou";
-const FEED_ENDPOINT: Record<FeedTab, string> = { friends: "fetchFriendsPosts", following: "fetchFollowingPosts", foryou: "fetchPosts" };
+export type FeedTab = "nearby" | "friends" | "following" | "foryou";
+const FEED_ENDPOINT: Record<Exclude<FeedTab, "nearby">, string> = { friends: "fetchFriendsPosts", following: "fetchFollowingPosts", foryou: "fetchPosts" };
 
-/** One batch of a feed. `noFriends`: the member follows nobody who follows them back. */
-export async function fetchFeedBatch(tab: FeedTab, myUserId: number | null): Promise<{ posts: Post[]; noFriends: boolean }> {
+/** One batch of a feed. `noFriends`: the member follows nobody who follows them back. `area`: the
+ *  Nearby feed's area (lib/qa.ts — Steve, 2026-11-17); `start`: how many it already has. */
+export async function fetchFeedBatch(tab: FeedTab, myUserId: number | null, start = 0): Promise<{ posts: Post[]; noFriends: boolean; area?: NearbyArea }> {
+  if (tab === "nearby") {
+    if (!myUserId) return { posts: [], noFriends: false, area: { level: "none", name: "" } };
+    const r = await fetchNearbyPosts(myUserId, start);
+    return { posts: await devCreatorDecorate(r.posts), noFriends: false, area: r.area };
+  }
   const params = myUserId ? { my_user_id: myUserId } : {};
   const r = tab === "foryou" && !(import.meta.env.DEV && myUserId === MOCK_MEMBER_ID)
     ? await post<Post[]>(FEED_ENDPOINT[tab], params)

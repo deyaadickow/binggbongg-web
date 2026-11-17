@@ -21,6 +21,8 @@ export function VideoStickers({ post, hidden }: { post: SocialPost; hidden?: boo
   return (
     <>
       {post.reply_comment && <ReplyBubble reply={post.reply_comment} />}
+      {/* Q&A (Steve, 2026-11-17): the question this video answers, as the same white bubble. */}
+      {post.qa_question && !post.reply_comment && <QuestionBubble q={post.qa_question} />}
       {post.poll && <PollCard key={`poll-${post.id}`} postId={post.id} initial={post.poll} />}
       {post.link_sticker && <LinkPill link={post.link_sticker} />}
       {post.add_yours && <AddYoursCard ay={post.add_yours} />}
@@ -38,6 +40,22 @@ export function ReplyBubble({ reply, preview }: { reply: Pick<ReplyComment, "pos
       onClick={() => { if (!preview && reply.post_id) navigate(`/video/${reply.post_id}?comments=1`); }}>
       <span className="reply-bubble-head">{t("soc_reply_to_comment", name)}</span>
       <span className="reply-bubble-text">{reply.comment || "…"}</span>
+    </button>
+  );
+}
+
+/** The profile question a video answers ("@name asked" + the question). On the video it opens the
+ *  creator's Q&A; on the upload page and the camera it is a preview. */
+export function QuestionBubble({ q, preview }: { q: { question: string; user_name?: string; fullname?: string; creator_user_id?: number }; preview?: boolean }) {
+  const { t } = useT();
+  const navigate = useNavigate();
+  const name = q.user_name || q.fullname || "";
+  return (
+    <button type="button" className={`reply-bubble${preview ? " preview" : ""}`}
+      onPointerDown={(e) => e.stopPropagation()}
+      onClick={() => { if (!preview && q.creator_user_id) navigate(`/profile/${q.creator_user_id}?tab=qa`); }}>
+      <span className="reply-bubble-head">{t("qa_user_asked", name)}</span>
+      <span className="reply-bubble-text">{q.question || "…"}</span>
     </button>
   );
 }

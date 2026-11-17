@@ -84,6 +84,8 @@ interface MyUser extends UserSummary {
   show_following_list?: number | string | null;
   allow_virtual_games?: number | string | null;
   wants_to_battle?: number | string | null;
+  city?: string | null;
+  state?: string | null;
 }
 // label/hint are translation KEYS: module-level data, translated where it is rendered.
 const TOGGLES: { key: keyof MyUser; label: StringKey; hint: StringKey }[] = [
@@ -101,14 +103,33 @@ export function AccountSettingsPage() {
   const [me, setMe] = useState<MyUser | null>(null);
   const [fullname, setFullname] = useState("");
   const [bio, setBio] = useState("");
+  // Your area (Steve, 2026-11-17): what the Nearby feed uses — typed here, never the browser's location.
+  const [city, setCity] = useState("");
+  const [areaState, setAreaState] = useState("");
+  const [areaCountry, setAreaCountry] = useState("");
+  const [countryRows, setCountryRows] = useState<{ name?: string | null; states?: { name?: string | null }[] }[]>([]);
   const [busy, setBusy] = useState(false);
   const { setToast, el } = useToast();
   useEffect(() => {
     if (!user) return;
     post<MyUser>("fetchMyUserDetails", { my_user_id: user.id }).then((r) => {
-      if (r.status && r.data) { setMe(r.data); setFullname(r.data.fullname ?? ""); setBio(r.data.bio ?? ""); }
+      if (r.status && r.data) {
+        setMe(r.data); setFullname(r.data.fullname ?? ""); setBio(r.data.bio ?? "");
+        setCity(r.data.city ?? ""); setAreaState(r.data.state ?? ""); setAreaCountry(r.data.country ?? "");
+      }
     }).catch(() => undefined);
   }, [user]);
+  // The Nearby feed's "Edit Profile" lands on Your area.
+  useEffect(() => {
+    if (!me || window.location.hash !== "#your-area") return;
+    const timer = window.setTimeout(() => document.getElementById("your-area")?.scrollIntoView({ behavior: "smooth", block: "center" }), 200);
+    return () => window.clearTimeout(timer);
+  }, [me]);
+  useEffect(() => {
+    post<{ countryStates?: { data?: { name?: string | null; states?: { name?: string | null }[] }[] } }>("fetchSettings", { x: 1 })
+      .then((r) => setCountryRows(r.data?.countryStates?.data ?? []))
+      .catch(() => undefined);
+  }, []);
   if (!isLoggedIn || !user) return <NeedLogin />;
   async function save(fields: Record<string, unknown>) {
     if (!user) return;
@@ -148,6 +169,23 @@ export function AccountSettingsPage() {
             <label className="soft" style={{ fontSize: 13 }}>{t("bio")}</label>
             <textarea className="input" value={bio} onChange={(e) => setBio(e.target.value)} maxLength={200} rows={3} style={{ width: "100%", marginBottom: 10 }} />
             <button className="btn" disabled={busy} onClick={() => save({ fullname, bio })}>{t("save_profile")}</button>
+          </div>
+          {/* Your area (Steve, 2026-11-17): the Nearby feed shows videos from here. */}
+          <div className="card pad" id="your-area" style={{ marginTop: 12 }}>
+            <div style={{ fontWeight: 800, color: "var(--gold)" }}>📍 {t("nb_your_area")}</div>
+            <div className="muted" style={{ fontSize: 12, marginBottom: 10 }}>{t("nb_area_help")}</div>
+            <label className="soft" style={{ fontSize: 13 }}>{t("country")}</label>
+            <GoldSelect ariaLabel={t("country")} placeholder="—" searchable value={areaCountry}
+              options={[{ value: "", label: "—" }, ...countryRows.map((c) => ({ value: c.name ?? "", label: c.name ?? "" }))]}
+              onChange={(v) => { setAreaCountry(v); setAreaState(""); }} style={{ marginBottom: 10 }} />
+            <label className="soft" style={{ fontSize: 13 }}>{t("state")}</label>
+            <GoldSelect ariaLabel={t("state")} placeholder="—" searchable value={areaState}
+              disabled={!(countryRows.find((c) => c.name === areaCountry)?.states ?? []).length}
+              options={[{ value: "", label: "—" }, ...(countryRows.find((c) => c.name === areaCountry)?.states ?? []).map((x) => ({ value: x.name ?? "", label: x.name ?? "" }))]}
+              onChange={setAreaState} style={{ marginBottom: 10 }} />
+            <label className="soft" style={{ fontSize: 13 }}>{t("city")}</label>
+            <input className="input" value={city} onChange={(e) => setCity(e.target.value)} maxLength={100} style={{ width: "100%", marginBottom: 10 }} />
+            <button className="btn" disabled={busy} onClick={() => save({ city: city.trim(), state: areaState, country: areaCountry })}>{t("save")}</button>
           </div>
         </>
       )}

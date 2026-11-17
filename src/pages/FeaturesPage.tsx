@@ -172,6 +172,10 @@ export const FEATURES: Section[] = [
       { icon: "⭕", nameKey: "fname_stories", blurbKey: "fblurb_stories", to: "/stories" },
       { icon: "📊", nameKey: "fname_polls_stickers", blurbKey: "fblurb_polls_stickers", to: "/upload?stickers=1" },
       { icon: "📑", nameKey: "fname_playlists", blurbKey: "fblurb_playlists", myProfile: true, profileTab: "playlists", whereKey: "fwhere_your_profile" },
+      // Drafts, Q&A and Nearby (Steve, 2026-11-17: "All").
+      { icon: "🗂️", nameKey: "fname_drafts", blurbKey: "fblurb_drafts", to: "/drafts" },
+      { icon: "❓", nameKey: "fname_qa", blurbKey: "fblurb_qa", myProfile: true, profileTab: "qa", whereKey: "fwhere_your_profile" },
+      { icon: "📍", nameKey: "fname_nearby", blurbKey: "fblurb_nearby", to: "/?feed=nearby" },
       { icon: "🔮", nameKey: "fname_lucky_numbers_and_horoscope", blurbKey: "fblurb_lucky_numbers_and_horoscope", to: "/lucky" },
     ],
   },

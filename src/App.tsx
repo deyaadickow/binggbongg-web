@@ -28,6 +28,7 @@ import { ContestUploadPage } from "./pages/ContestUploadPage";
 import { ContestsPage, ContestBoardPage } from "./pages/ContestsPage";
 import { HelpListPage, HelpCampaignPage, StartHelpPage } from "./pages/HelpPages";
 import { AddYoursPage, StoriesPage } from "./pages/SocialPages";
+import { DraftsPage } from "./pages/DraftsPage";
 import { HomePage } from "./pages/HomePage";
 import { LanguagePage } from "./pages/LanguagePage";
 import { FeaturesPage } from "./pages/FeaturesPage";
@@ -175,6 +176,8 @@ export default function App() {
           {/* Social (Steve, 2026-11-17): Stories and the "Add Yours" chains. */}
           <Route path="/stories" element={<StoriesPage />} />
           <Route path="/add-yours/:id" element={<AddYoursPage />} />
+          {/* Drafts (Steve, 2026-11-17): videos saved on this browser to post later. */}
+          <Route path="/drafts" element={<DraftsPage />} />
           {/* Creators and money (Steve, 2026-11-17): subscriptions, paid series, scheduled posts. */}
           <Route path="/subscriptions" element={<SubscriptionsPage />} />
           <Route path="/series" element={<MySeriesPage />} />

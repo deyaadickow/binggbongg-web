@@ -302,13 +302,21 @@ export async function mockSocialCall<T>(endpoint: string, params: Record<string,
       const reply: ReplyComment | null = rc ? { id: rc.id, post_id: Number(rc.post_id), comment: rc.comment, user_id: rc.user_id, user_name: rc.user?.username ?? "", fullname: rc.user?.fullname, profile_image: rc.user?.profile_image ?? null, media_type: rc.media_type ?? null } : null;
       const linkSticker: LinkSticker | null = link ? { url: link, label: String(params.link_label ?? "").trim().slice(0, 40) || undefined, domain: (() => { try { return new URL(link).hostname.replace(/^www\./, ""); } catch { return link; } })(), x: Number(params.link_x ?? 0.5), y: Number(params.link_y ?? 0.6) } : null;
       const uidPost = Number(params.user_id);
+      // Q&A (1cc24bd): a video answering a question asked on the uploader's own profile.
+      let qaQuestion: SocialPost["qa_question"] = null;
+      if (params.answer_question_id) {
+        const qm = await import("./qaMock");
+        const res = qm.mockAnswerQuestion(Number(params.answer_question_id), uidPost, id, String(params.thumbnail));
+        if (typeof res === "string") return fail(res);
+        qaQuestion = res;
+      }
       const newPost: SocialPost = {
         id, user_id: uidPost, video: "mockfile:" + String(params.video), thumbnail: "mockfile:" + String(params.thumbnail),
         description: String(params.description ?? ""), likes: 0, views: 0, total_comments: 0, created_at: new Date().toISOString().slice(0, 19).replace("T", " "),
         user: uidPost === ME ? { id: ME, fullname: "Test Member", username: "testmember" } : { id: uidPost },
         allow_repost: Number(params.allow_repost ?? 1),
         poll: q ? { question: q, options: opts.map((text) => ({ text, votes: 0 })), total: 0, x: Number(params.poll_x ?? 0.5), y: Number(params.poll_y ?? 0.3) } : null,
-        add_yours: addYours, link_sticker: linkSticker, reply_comment: reply,
+        add_yours: addYours, link_sticker: linkSticker, reply_comment: reply, qa_question: qaQuestion,
       };
       s.posts.push(newPost); save(s);
       return ok(null as T, { message: "Post uploaded successfully (dev mock — nothing was sent)", post_id: id });

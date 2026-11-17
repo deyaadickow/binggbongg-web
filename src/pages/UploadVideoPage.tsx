@@ -11,7 +11,8 @@ import { videoDuration, videoThumbnail } from "../lib/upload";
 import { socialPut, socialUploadPost, socialUploadUrls, socialUser, type ReplyComment } from "../lib/social";
 import { EMPTY_STICKERS, StickerEditor, stickerParams, stickerProblem, type StickerState } from "../components/StickerEditor";
 import { CameraCapture, cameraSupported, type Capture } from "../components/CameraCapture";
-import { ReplyBubble } from "../components/SocialStickers";
+import { QuestionBubble, ReplyBubble } from "../components/SocialStickers";
+import { countDrafts, deleteDraft, draftsSupported, getDraft, onDraftsChanged, saveDraft, type DraftAnswer, type DraftFields } from "../lib/drafts";
 import { Notice } from "../components/Common";
 import { GoldSelect } from "../components/GoldSelect";
 import { tt, useT  } from "../lib/i18n";
@@ -84,6 +85,15 @@ export function UploadVideoPage() {
   const [camera, setCamera] = useState(false);
   const [newPostId, setNewPostId] = useState(0);
   const stickersWanted = new URLSearchParams(location.search).get("stickers") === "1";
+  // Q&A (Steve, 2026-11-17): the profile question this video answers.
+  const [answerQuestion, setAnswerQuestion] = useState<DraftAnswer | null>(null);
+  // Drafts (Steve, 2026-11-17): the draft this page was opened from (posting it deletes it), and
+  // how many the member has (the "Drafts" button before a video is chosen).
+  const draftParam = Number(new URLSearchParams(location.search).get("draft") ?? 0) || 0;
+  const [draftId, setDraftId] = useState(0);
+  const [draftCreated, setDraftCreated] = useState<number | undefined>(undefined);
+  const [draftCount, setDraftCount] = useState(0);
+  const [savingDraft, setSavingDraft] = useState(false);
 
   // Creators and money (Steve, 2026-11-17): subscribers only, add to a series, post later.
   const [planActive, setPlanActive] = useState<boolean | null>(null);
@@ -126,9 +136,11 @@ export function UploadVideoPage() {
 
   useEffect(() => {
     const st = location.state as { greenScreen?: { file: File; duration: number; thumb: Blob | null }; remix?: Remix; postKind?: "text" | "slideshow" | "song"; songId?: number;
-      replyComment?: Pick<ReplyComment, "id" | "post_id" | "comment" | "user_name" | "fullname">; addYours?: { id: number; prompt: string } } | null;
+      replyComment?: Pick<ReplyComment, "id" | "post_id" | "comment" | "user_name" | "fullname">; addYours?: { id: number; prompt: string };
+      answerQuestion?: DraftAnswer } | null;
     const gs = st?.greenScreen;
     if (st?.replyComment?.id) setReplyComment(st.replyComment);
+    if (st?.answerQuestion?.id) setAnswerQuestion(st.answerQuestion);
     if (st?.addYours?.id) setJoinAddYours(st.addYours);
     setRemix(st?.remix ?? null);
     setPostKind(st?.postKind === "text" || st?.postKind === "slideshow" || st?.postKind === "song" ? st.postKind : "video");
@@ -138,6 +150,61 @@ export function UploadVideoPage() {
     setDuration(gs.duration);
     recordedThumbRef.current = gs.thumb && gs.thumb.size ? gs.thumb : null;
   }, [location.state]);
+
+  // Drafts: how many this member has on this browser.
+  useEffect(() => {
+    if (!user?.id) return;
+    const uid = user.id;
+    const refresh = () => { void countDrafts(uid).then(setDraftCount); };
+    refresh();
+    return onDraftsChanged(refresh);
+  }, [user?.id]);
+
+  // Opened from Drafts (?draft=ID): the saved video and every field, exactly as they were saved.
+  useEffect(() => {
+    if (!user?.id || !draftParam) return;
+    let alive = true;
+    getDraft(user.id, draftParam).then((d) => {
+      if (!alive) return;
+      if (!d) { setError(t("dft_not_found")); return; }
+      const f = d.fields;
+      setFile(new File([d.video], d.video_name || "draft.mp4", { type: d.video_type || d.video.type || "video/mp4" }));
+      setDuration(Number.isFinite(d.duration) ? d.duration : null);
+      recordedThumbRef.current = d.thumb && d.thumb.size ? d.thumb : null;
+      setCatId(f.catId); setDescription(f.description); setLinkedUrl(f.linkedUrl); setCountry(f.country); setState(f.state);
+      setCanComment(f.canComment); setCanSave(f.canSave); setAllowRepost(f.allowRepost); setCanDuet(f.canDuet); setCanStitch(f.canStitch);
+      setAutoCaptions(f.autoCaptions); setPostKind(f.postKind); setSongId(f.songId); setRemix(f.remix);
+      setReplyComment(f.replyComment); setJoinAddYours(f.joinAddYours); setAnswerQuestion(f.answerQuestion);
+      setStickers(f.stickers ?? EMPTY_STICKERS); setSubsOnly(f.subsOnly); setSeriesId(f.seriesId); setLater(f.later);
+      if (f.laterAt) setLaterAt(f.laterAt);
+      setDraftId(d.id); setDraftCreated(d.created_at);
+    }).catch(() => { if (alive) setError(t("dft_not_found")); });
+    return () => { alive = false; };
+  }, [user?.id, draftParam]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /** Keep this video and everything typed here on this browser, to post later. */
+  async function saveAsDraft() {
+    if (!user || !file || savingDraft || busy) return;
+    setSavingDraft(true);
+    setError("");
+    try {
+      const thumb = recordedThumbRef.current ?? await videoThumbnail(file).catch(() => null);
+      const fields: DraftFields = {
+        catId, description, linkedUrl, country, state, canComment, canSave, allowRepost, canDuet, canStitch, autoCaptions,
+        postKind, songId, remix, replyComment, joinAddYours, answerQuestion, stickers, subsOnly, seriesId, later, laterAt,
+      };
+      const id = await saveDraft({
+        id: draftId || null, created_at: draftCreated, user_id: user.id,
+        video: file, video_name: file.name, video_type: file.type || "video/mp4", duration, thumb, fields,
+      });
+      setDraftId(id);
+      showGoldAlert(t("dft_saved"));
+    } catch {
+      showGoldAlert(t("dft_save_failed"));
+    } finally {
+      setSavingDraft(false);
+    }
+  }
 
   // Prefill the member's own country so most people never touch these two.
   useEffect(() => {
@@ -186,7 +253,12 @@ export function UploadVideoPage() {
     if (!catId) { setError(tt("pick_a_category")); return; }
     const problem = stickerProblem(stickers, t);
     if (problem) { setError(problem); return; }
-    const social = { ...stickerParams(stickers, joinAddYours?.id), ...(replyComment ? { reply_comment_id: replyComment.id } : {}) };
+    const social = {
+      ...stickerParams(stickers, joinAddYours?.id),
+      ...(replyComment ? { reply_comment_id: replyComment.id } : {}),
+      // Q&A (backend 1cc24bd): the answer is linked to the question and the asker is told.
+      ...(answerQuestion ? { answer_question_id: answerQuestion.id } : {}),
+    };
     // Creators and money: subscribers only, a series, a time to post it (unix seconds).
     let scheduledUnix = 0;
     if (later) {
@@ -260,6 +332,8 @@ export function UploadVideoPage() {
         } else showGoldAlert(msg);
         throw new Error(msg);
       }
+      // Posted (or scheduled) from a draft: the draft has done its job.
+      if (draftId) { await deleteDraft(user.id, draftId).catch(() => undefined); setDraftId(0); setDraftCreated(undefined); }
       // Post later: no post exists yet — the server posts it at that time.
       if ((res as { scheduled?: unknown }).scheduled) {
         const at = String((res as { publish_at?: unknown }).publish_at ?? "");
@@ -314,7 +388,7 @@ export function UploadVideoPage() {
           <div className="row">
             {newPostId > 0 && <button className="btn gold" onClick={() => navigate(`/video/${newPostId}`)}>{t("soc_open_video")}</button>}
             <button className="btn" onClick={() => navigate(`/profile/${user.id}`)}>{t("see_my_profile")}</button>
-            <button className="btn ghost" onClick={() => { setDone(false); setFile(null); setRemix(null); setPostKind("video"); setSongId(null); setDuration(null); setDescription(""); setLinkedUrl(""); setStickers(EMPTY_STICKERS); setReplyComment(null); setJoinAddYours(null); setNewPostId(0); }}>{t("upload_another")}</button>
+            <button className="btn ghost" onClick={() => { setDone(false); setFile(null); setRemix(null); setPostKind("video"); setSongId(null); setDuration(null); setDescription(""); setLinkedUrl(""); setStickers(EMPTY_STICKERS); setReplyComment(null); setJoinAddYours(null); setAnswerQuestion(null); setNewPostId(0); if (draftParam) navigate("/upload", { replace: true }); }}>{t("upload_another")}</button>
           </div>
         </div>
       </div>
@@ -332,10 +406,18 @@ export function UploadVideoPage() {
           <button className="btn small ghost" onClick={() => setReplyComment(null)}>{t("soc_dont_reply")}</button>
         </div>
       )}
+      {answerQuestion && (
+        <div className="card pad" style={{ marginBottom: 12, display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+          <div style={{ color: "var(--gold)", fontWeight: 800 }}>🎥 {t("qa_answering_with_video")}</div>
+          <QuestionBubble q={{ question: answerQuestion.question, user_name: answerQuestion.asker_name }} preview />
+          <button className="btn small ghost" onClick={() => setAnswerQuestion(null)}>{t("qa_dont_answer")}</button>
+        </div>
+      )}
       {camera && (
         <div className="card pad" style={{ marginBottom: 12 }}>
           <CameraCapture allowPhoto={false} maxSeconds={60} onDone={onCapture} onCancel={() => setCamera(false)}
-            overlay={replyComment ? <ReplyBubble reply={replyComment} preview /> : undefined} />
+            overlay={replyComment ? <ReplyBubble reply={replyComment} preview />
+              : answerQuestion ? <QuestionBubble q={{ question: answerQuestion.question, user_name: answerQuestion.asker_name }} preview /> : undefined} />
         </div>
       )}
       <div className="card pad" style={{ marginBottom: 12 }}>
@@ -355,6 +437,8 @@ export function UploadVideoPage() {
               <button className="btn" onClick={() => navigate("/text-post")}>🔤 {t("tp_title")}</button>
               <button className="btn" onClick={() => navigate("/slideshow")}>🖼️ {t("ss_title")}</button>
               <button className="btn" onClick={() => navigate("/bingg-bongg-song")}>♪ {t("song_title")}</button>
+              {/* Drafts (Steve, 2026-11-17): the videos saved on this browser to post later. */}
+              {draftsSupported() && <button className="btn" onClick={() => navigate("/drafts")}>🗂️ {t("dft_drafts_n", draftCount)}</button>}
             </div>
           </>
         ) : (
@@ -515,10 +599,19 @@ export function UploadVideoPage() {
         </div>
       )}
 
-      <button className="btn block" disabled={busy || !file} onClick={upload}
-        style={{ background: "var(--gold-border)", color: "#000", borderColor: "var(--gold-border)" }}>
-        {busy ? "Uploading…" : later ? t("cm_schedule") : "Upload video"}
-      </button>
+      {/* Drafts (Steve, 2026-11-17): "Save draft" next to Post. */}
+      <div className="row" style={{ gap: 10 }}>
+        {draftsSupported() && (
+          <button className="btn ghost" disabled={busy || savingDraft || !file} onClick={() => void saveAsDraft()}
+            style={{ flex: "0 0 auto", minWidth: 120 }}>
+            {savingDraft ? t("dft_saving") : t("dft_save_draft")}
+          </button>
+        )}
+        <button className="btn block" disabled={busy || !file} onClick={upload}
+          style={{ flex: 1, background: "var(--gold-border)", color: "#000", borderColor: "var(--gold-border)" }}>
+          {busy ? "Uploading…" : later ? t("cm_schedule") : "Upload video"}
+        </button>
+      </div>
     </div>
   );
 }

@@ -775,5 +775,6 @@ function pickSocial(p: SocialPost): Partial<SocialPost> {
   if (p.add_yours !== undefined) out.add_yours = p.add_yours;
   if (p.link_sticker !== undefined) out.link_sticker = p.link_sticker;
   if (p.reply_comment !== undefined) out.reply_comment = p.reply_comment;
+  if (p.qa_question !== undefined) out.qa_question = p.qa_question;
   return out;
 }
