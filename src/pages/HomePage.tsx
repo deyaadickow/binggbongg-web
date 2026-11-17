@@ -135,6 +135,11 @@ export function HomePage() {
       {/* Stories row removed (Steve, 2026-11-17): "we don't need this one on main feed please remove
           it." Stories stay on their own page from the directory and the ring on profiles. */}
       <div className="row" style={{ marginBottom: 14, flexWrap: "wrap" }}>
+        {/* Steve, 2026-11-17: "Set all the buttons together, make them uniform including the live" —
+            Live first, then the three feeds, all the same black and gold button. */}
+        <button type="button" className="feed-live-btn" onClick={openLive} disabled={liveBusy} aria-busy={liveBusy}>
+          {t("live")}
+        </button>
         {/* The three feeds side by side (Steve, 2026-11-16), gold underline on the active one. */}
         <div className="fnd-feed-tabs" role="tablist">
           {(["friends", "following", "foryou"] as const).map((k) => (
@@ -144,9 +149,6 @@ export function HomePage() {
             </button>
           ))}
         </div>
-        <button type="button" className="btn small feed-live-btn" onClick={openLive} disabled={liveBusy} aria-busy={liveBusy}>
-          {t("live")}
-        </button>
         <span className="spacer" />
         <StoreBadges compact />
       </div>
