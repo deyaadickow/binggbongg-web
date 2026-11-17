@@ -10,6 +10,7 @@ import { RemixRecorderPage } from "./pages/RemixRecorderPage";
 import { EditorPage } from "./pages/EditorPage";
 import { TextPostPage } from "./pages/TextPostPage";
 import { SlideshowPage } from "./pages/SlideshowPage";
+import { MySongsPage, SharedSongPage, SongPage, SongQuestionsPage, SongStartPage, SongVideoPage } from "./pages/SongPages";
 import { CreateVideoAdPage } from "./pages/CreateVideoAdPage";
 import { UploadPhotosPage } from "./pages/UploadPhotosPage";
 import { CartoonPage } from "./pages/CartoonPage";
@@ -232,6 +233,13 @@ export default function App() {
           <Route path="/editor" element={<EditorPage />} />
           <Route path="/text-post" element={<TextPostPage />} />
           <Route path="/slideshow" element={<SlideshowPage />} />
+          {/* Bingg Bongg Song (Steve, 2026-11-16): the member's songs, and the public share page. */}
+          <Route path="/bingg-bongg-song" element={<SongStartPage />} />
+          <Route path="/bingg-bongg-song/new" element={<SongQuestionsPage />} />
+          <Route path="/bingg-bongg-song/my" element={<MySongsPage />} />
+          <Route path="/bingg-bongg-song/:id" element={<SongPage />} />
+          <Route path="/bingg-bongg-song/:id/video" element={<SongVideoPage />} />
+          <Route path="/song/:code" element={<SharedSongPage />} />
           <Route path="/photos" element={<MyPhotosPage />} />
           <Route path="/photos-directory" element={<PhotosDirectoryPage />} />
 

@@ -14,6 +14,7 @@ import { tt, useT  } from "../lib/i18n";
 import { PageTitle } from "../components/PageTitle";
 import { requireVerified } from "../lib/verifyEmail";
 import { showGoldAlert } from "../components/GoldToast";
+import { songAttachPost } from "../lib/song";
 
 interface ContestCat { id: number; name?: string | null }
 interface CountryRow { name?: string | null; states?: { name?: string | null }[] }
@@ -60,7 +61,9 @@ export function UploadVideoPage() {
   // Automatic captions (Steve, 2026-11-16): on by default. Text posts and slideshows are rendered
   // on the device and have no speech, so they say what they are instead (post_kind).
   const [autoCaptions, setAutoCaptions] = useState(true);
-  const [postKind, setPostKind] = useState<"video" | "text" | "slideshow">("video");
+  const [postKind, setPostKind] = useState<"video" | "text" | "slideshow" | "song">("video");
+  // Bingg Bongg Song (2026-11-16): the song whose video this is, linked to the post once it is up.
+  const [songId, setSongId] = useState<number | null>(null);
 
   const [busy, setBusy] = useState(false);
   const [stage, setStage] = useState("");
@@ -78,10 +81,11 @@ export function UploadVideoPage() {
   }, []);
 
   useEffect(() => {
-    const st = location.state as { greenScreen?: { file: File; duration: number; thumb: Blob | null }; remix?: Remix; postKind?: "text" | "slideshow" } | null;
+    const st = location.state as { greenScreen?: { file: File; duration: number; thumb: Blob | null }; remix?: Remix; postKind?: "text" | "slideshow" | "song"; songId?: number } | null;
     const gs = st?.greenScreen;
     setRemix(st?.remix ?? null);
-    setPostKind(st?.postKind === "text" || st?.postKind === "slideshow" ? st.postKind : "video");
+    setPostKind(st?.postKind === "text" || st?.postKind === "slideshow" || st?.postKind === "song" ? st.postKind : "video");
+    setSongId(st?.postKind === "song" && st.songId ? Number(st.songId) : null);
     if (!gs?.file) return;
     setFile(gs.file);
     setDuration(gs.duration);
@@ -104,6 +108,7 @@ export function UploadVideoPage() {
     recordedThumbRef.current = null;
     setRemix(null); // a different file is no longer that duet / stitch / sound
     setPostKind("video");
+    setSongId(null);
     if (f.size > MAX_MB * 1024 * 1024) {
       setError(`That file is ${(f.size / 1024 / 1024).toFixed(0)}MB — the limit is ${MAX_MB}MB.`);
       return;
@@ -171,6 +176,12 @@ export function UploadVideoPage() {
         showGoldAlert(msg);
         throw new Error(msg);
       }
+      // A Bingg Bongg Song's video: link the new post to the song (top-level post_id).
+      const newPostId = Number((res as { post_id?: unknown }).post_id ?? 0);
+      if (songId && newPostId) {
+        setStage("Publishing…");
+        await songAttachPost(user.id, songId, newPostId).catch(() => undefined);
+      }
       setDone(true);
     } catch (e) {
       setError((e as Error).message);
@@ -193,7 +204,7 @@ export function UploadVideoPage() {
           <p className="soft" style={{ marginTop: 0 }}>{t("uploaded_it_will_appear_on_your_profile")}</p>
           <div className="row">
             <button className="btn" onClick={() => navigate(`/profile/${user.id}`)}>{t("see_my_profile")}</button>
-            <button className="btn ghost" onClick={() => { setDone(false); setFile(null); setRemix(null); setPostKind("video"); setDuration(null); setDescription(""); setLinkedUrl(""); }}>{t("upload_another")}</button>
+            <button className="btn ghost" onClick={() => { setDone(false); setFile(null); setRemix(null); setPostKind("video"); setSongId(null); setDuration(null); setDescription(""); setLinkedUrl(""); }}>{t("upload_another")}</button>
           </div>
         </div>
       </div>
@@ -219,6 +230,7 @@ export function UploadVideoPage() {
               <button className="btn" onClick={() => navigate("/editor")}>🎞️ {t("ed_title")}</button>
               <button className="btn" onClick={() => navigate("/text-post")}>🔤 {t("tp_title")}</button>
               <button className="btn" onClick={() => navigate("/slideshow")}>🖼️ {t("ss_title")}</button>
+              <button className="btn" onClick={() => navigate("/bingg-bongg-song")}>♪ {t("song_title")}</button>
             </div>
           </>
         ) : (
@@ -236,7 +248,7 @@ export function UploadVideoPage() {
 
       {postKind !== "video" && file && (
         <div className="card pad" style={{ marginBottom: 12, color: "var(--gold)", fontWeight: 700, textAlign: "center" }}>
-          {postKind === "text" ? t("tp_title") : t("ss_title")}
+          {postKind === "text" ? t("tp_title") : postKind === "song" ? `♪ ${t("song_title")}` : t("ss_title")}
         </div>
       )}
 

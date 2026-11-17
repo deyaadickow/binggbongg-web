@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useT } from "../lib/i18n";
 import { useSession } from "../lib/session";
 import { Avatar } from "../components/Common";
 import {
@@ -25,6 +26,8 @@ import {
  */
 export function BirthdayPage() {
   const { user: me } = useSession();
+  const { t } = useT();
+  const navigate = useNavigate();
   const [tab, setTab] = useState<"today" | "mine">("today");
   const [list, setList] = useState<BirthdayList | null>(null);
   const [wishes, setWishes] = useState<BirthdayWishes | null>(null);
@@ -145,7 +148,7 @@ export function BirthdayPage() {
                   // No wishing yourself a happy birthday.
                   <span style={{ color: "var(--gold)", opacity: 0.7, fontSize: 13 }}>That's you</span>
                 ) : (
-                  <div className="row" style={{ gap: 6 }}>
+                  <div className="row" style={{ gap: 6, flexWrap: "wrap", justifyContent: "flex-end" }}>
                     {m.already_wished ? (
                       // Free, once each. Once sent, say so rather than letting them be refused.
                       <span className="btn" style={{ opacity: 0.65, cursor: "default" }}>Wished ✓</span>
@@ -157,6 +160,10 @@ export function BirthdayPage() {
                     {/* Uncapped on purpose — as many as they want to pay for. */}
                     <button className="btn" disabled={busy} onClick={() => void send(m, "flowers")}>
                       💐 {flowerCoins}
+                    </button>
+                    {/* Bingg Bongg Song (2026-11-16): a song with their name in it, for their birthday. */}
+                    <button className="btn" onClick={() => navigate(`/bingg-bongg-song/new?occasion=birthday&name=${encodeURIComponent(m.fullname || m.username || "")}`)}>
+                      ♪ {t("song_make_birthday")}
                     </button>
                   </div>
                 )}

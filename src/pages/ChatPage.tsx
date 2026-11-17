@@ -11,7 +11,7 @@
 // Translation is the same feature too — a globe picks the language YOU read in, and each
 // message grows a dimmed second line. Per reader, nothing stored, the sender is never told.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { Avatar, Loading, Notice } from "../components/Common";
 import { post, type UserSummary } from "../lib/api";
 import {
@@ -43,7 +43,13 @@ export function ChatPage() {
 
   const [partner, setPartner] = useState<UserSummary | null>(null);
   const [messages, setMessages] = useState<DmMessage[] | null>(null);
-  const [draft, setDraft] = useState("");
+  // A link handed over by another page to send here — Bingg Bongg Song's "Send to someone"
+  // (2026-11-16) opens the chat with the song's link already typed; the member presses Send.
+  const location = useLocation();
+  const [draft, setDraft] = useState(() => {
+    const d = (location.state as { draft?: unknown } | null)?.draft;
+    return typeof d === "string" ? d : "";
+  });
   const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
 

@@ -12,7 +12,7 @@ import { SoundPicker } from "../components/SoundPicker";
 import { showGoldAlert } from "../components/GoldToast";
 import { loadTextBehindFonts } from "../lib/textBehind";
 import { drawTextBlock, POST_H, POST_W, TEXT_COLORS, TEXT_FONTS } from "../lib/textPost";
-import { drawCover, loadScaledImage, pickMime, renderToMp4, type RenderResult } from "../lib/videoKit";
+import { drawKenBurns, loadScaledImage, pickMime, renderToMp4, type RenderResult } from "../lib/videoKit";
 import { startMusic, useMusic } from "../lib/music";
 import { useSession } from "../lib/session";
 
@@ -28,14 +28,9 @@ const chip = (on: boolean): React.CSSProperties => ({
   border: "1.5px solid var(--gold-border)", background: on ? "var(--gold)" : "#000", color: on ? "#000" : "var(--gold)",
 });
 
-/** Photo i at time `local` seconds into its own slot of `per` seconds: zoom 1 -> 1.12, a slow
- *  drift that changes direction photo to photo. */
+/** Photo i, `local` seconds into its own slot of `per` seconds (lib/videoKit drawKenBurns). */
 function drawPhoto(ctx: CanvasRenderingContext2D, p: Photo, i: number, local: number, per: number) {
-  const k = Math.max(0, Math.min(1, local / (per + FADE)));
-  const inward = i % 2 === 0;
-  const zoom = inward ? 1 + 0.12 * k : 1.12 - 0.12 * k;
-  const dir = [[-1, 0], [1, 0], [0, -1], [0, 1]][i % 4];
-  drawCover(ctx, p.bmp, p.bmp.width, p.bmp.height, 0, 0, POST_W, POST_H, false, zoom, dir[0] * (k - 0.5) * 0.8, dir[1] * (k - 0.5) * 0.8);
+  drawKenBurns(ctx, p.bmp, i, local, per + FADE, POST_W, POST_H);
 }
 
 export function SlideshowPage() {

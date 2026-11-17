@@ -397,3 +397,14 @@ export async function loadScaledImage(src: Blob | string, maxW: number, maxH: nu
   full.close();
   return scaled;
 }
+
+/** The Photo slideshow's slow Ken-Burns move (also the Bingg Bongg Song video's): photo `i` at
+ *  `local` seconds into a slot `span` long zooms 1 -> 1.12 (or back), drifting in a direction that
+ *  changes photo to photo. */
+export function drawKenBurns(ctx: CanvasRenderingContext2D, bmp: ImageBitmap, i: number, local: number, span: number, w: number, h: number) {
+  const k = Math.max(0, Math.min(1, local / span));
+  const inward = i % 2 === 0;
+  const zoom = inward ? 1 + 0.12 * k : 1.12 - 0.12 * k;
+  const dir = [[-1, 0], [1, 0], [0, -1], [0, 1]][i % 4];
+  drawCover(ctx, bmp, bmp.width, bmp.height, 0, 0, w, h, false, zoom, dir[0] * (k - 0.5) * 0.8, dir[1] * (k - 0.5) * 0.8);
+}

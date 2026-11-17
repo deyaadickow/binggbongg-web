@@ -159,6 +159,8 @@ export const FEATURES: Section[] = [
       { icon: "🎞️", nameKey: "fname_video_editor", blurbKey: "fblurb_video_editor", to: "/editor" },
       { icon: "🔤", nameKey: "fname_text_post", blurbKey: "fblurb_text_post", to: "/text-post" },
       { icon: "🖼️", nameKey: "fname_photo_slideshow", blurbKey: "fblurb_photo_slideshow", to: "/slideshow" },
+      // Steve, 2026-11-16: "Build Bingg Bongg Song, 299 BBs, 3 free previews".
+      { icon: "♪", nameKey: "fname_bingg_bongg_song", blurbKey: "fblurb_bingg_bongg_song", to: "/bingg-bongg-song" },
       { icon: "🖼️", nameKey: "fname_photos", blurbKey: "fblurb_photos", to: "/photos" },
       { icon: "✨", nameKey: "fname_photo_styles", blurbKey: "fblurb_photo_styles", to: "/cartoon" },
       // Steve, 2026-11-02: big words behind the person in a photo, drawn on the device.
