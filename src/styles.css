@@ -1817,3 +1817,7 @@ body:has(.story-viewer) .get-app-bar { display: none; }
 
 /* Swipeable Information Center banner (Steve, 2026-11-17): vertical page scroll stays native. */
 .ic-banner { touch-action: pan-y; user-select: none; }
+
+/* Steve, 2026-11-17: "Please make the Information Center button and text larger in height" */
+.nav .links a.info-center-chip { font-size: 19px; padding: 12px 20px; line-height: 1.2; }
+@media (max-width: 480px) { .nav .links a.info-center-chip { font-size: 17px; padding: 11px 14px; } }
