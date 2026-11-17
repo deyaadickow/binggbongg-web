@@ -1701,3 +1701,55 @@ body:has(.story-viewer) .get-app-bar { display: none; }
 .cm-datetime { color-scheme: dark; background: #000; color: var(--gold); border: 1.5px solid var(--gold-border); }
 .cm-upload-link { width: 100%; padding: 12px 14px; border: none; border-bottom: 1px solid var(--line); background: transparent; color: var(--gold); cursor: pointer; font-size: inherit; }
 @media (max-width: 480px) { .cm-totals b { font-size: 15px; } }
+
+/* Safety and wellbeing (Steve, 2026-11-17): screen time, Family Pairing, Restricted Mode. */
+.wb-page .wb-section { margin-bottom: 12px; }
+.wb-help { font-size: 13px; margin-top: 10px; line-height: 1.4; }
+.wb-chips .cm-chip:disabled { opacity: .55; cursor: default; }
+.wb-today { text-align: center; margin-bottom: 12px; background: #000; }
+.wb-today-num { color: var(--gold-bright); font-size: 34px; font-weight: 900; line-height: 1.15; }
+.wb-today-left { color: var(--gold); font-weight: 800; margin-top: 4px; }
+.wb-banner { display: block; background: #000; color: var(--gold); border: 1.5px solid var(--gold); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; font-weight: 800; box-shadow: 0 0 10px rgba(240,196,32,.25); }
+.wb-banner-actions .wb-actions { margin-top: 10px; }
+.wb-row-btn { text-align: left; font-size: 15px; }
+.wb-row-btn:disabled { opacity: .55; }
+.wb-intro { margin: 0 0 10px; line-height: 1.45; }
+.wb-roles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+@media (max-width: 480px) { .wb-roles { grid-template-columns: 1fr; } }
+.wb-role { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 20px 14px; background: #000; border: 2px solid var(--gold-border); border-radius: 16px; color: var(--gold); cursor: pointer; text-align: center; box-shadow: 0 0 14px rgba(240,196,32,.18); }
+.wb-role:hover { border-color: var(--gold-bright); }
+.wb-role-icon { font-size: 40px; }
+.wb-role-title { font-size: 20px; font-weight: 900; color: var(--gold-bright); }
+.wb-role-text { font-size: 14px; color: var(--text-soft); line-height: 1.35; }
+.wb-code-card { text-align: center; background: #000; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.wb-code { color: var(--gold-bright); font-size: 38px; font-weight: 900; letter-spacing: .32em; padding-left: .32em; font-variant-numeric: tabular-nums; }
+@media (max-width: 400px) { .wb-code { font-size: 30px; letter-spacing: .24em; padding-left: .24em; } }
+.wb-qr { border: 1.5px solid var(--gold-border); border-radius: 12px; max-width: 70vw; height: auto; }
+.wb-countdown { color: var(--gold); font-weight: 800; font-variant-numeric: tabular-nums; }
+.wb-teen-row { cursor: pointer; }
+.wb-tag { display: inline-block; margin-top: 4px; color: #000; background: var(--gold-border); border-radius: 999px; padding: 1px 10px; font-size: 12px; font-weight: 800; }
+.wb-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 14px; }
+.wb-code-input { text-align: center; font-size: 24px; font-weight: 900; letter-spacing: .3em; color: var(--gold-bright); text-transform: uppercase; }
+.wb-linked { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; background: #000; }
+.wb-linked-title { color: var(--gold); font-weight: 900; font-size: 18px; word-break: break-word; }
+.wb-readonly { background: #000; }
+.wb-ro-row { display: flex; justify-content: space-between; gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--line); color: var(--text-soft); }
+.wb-ro-row:last-child { border-bottom: none; }
+.wb-ro-row b { color: var(--gold); text-align: right; }
+.wb-unlink { margin-top: 18px; border-color: #C9372C; color: #FF6B6B; }
+/* Passcode popup — the gold popup with a field. */
+.wb-popup-back { position: fixed; inset: 0; background: rgba(0,0,0,.6); display: flex; align-items: center; justify-content: center; padding: 24px; }
+.wb-popup { max-width: 420px; width: 100%; text-align: center; background: #000; border-color: var(--gold-border); }
+.wb-popup-text { margin: 4px 0 14px; color: var(--gold); font-size: 18px; line-height: 1.4; white-space: pre-wrap; word-break: break-word; }
+.wb-popup-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
+.wb-popup-btns .btn { min-width: 120px; }
+.wb-pin { text-align: center; font-size: 26px; letter-spacing: .5em; padding-left: calc(14px + .5em); max-width: 220px; margin: 0 auto; display: block; color: var(--gold-bright); }
+.wb-err { color: #FF6B6B; margin-top: 10px; font-weight: 700; }
+/* Time's up / Take a break: full screen over everything, not dismissable by back. */
+.wb-full { position: fixed; inset: 0; z-index: 99990; background: #000; display: flex; align-items: center; justify-content: center; padding: 24px 16px; overflow-y: auto; }
+.wb-full-body { width: min(380px, 100%); display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
+.wb-logo { border-radius: 50%; box-shadow: 0 0 22px rgba(240,196,32,.35); }
+.wb-full-title { color: var(--gold-bright); font-size: 28px; font-weight: 900; margin: 6px 0 0; }
+.wb-full-text { color: var(--text-soft); font-size: 17px; line-height: 1.45; margin: 0; }
+.wb-unlock { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 8px; }
+.wb-unlock .wb-chips { justify-content: center; }

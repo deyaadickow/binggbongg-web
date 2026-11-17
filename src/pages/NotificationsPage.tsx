@@ -38,6 +38,8 @@ interface NotificationRow {
 /** Where a Chat Battle alert row leads, or null for every other row. */
 function chatBattleLink(row: NotificationRow): string | null {
   const d = row.data && typeof row.data === "object" ? row.data : null;
+  // Family Pairing (2026-11-17): a parent's or teen's pairing notice opens the Family Pairing page.
+  if (row.notification_type === "family_pairing" || d?.type === "family_pairing") return "/settings/family-pairing";
   // Country Battle v2: the 7:55 PM reminder (a phone push; a row here, if the server ever lists
   // one, opens the battle as a viewer — "Join live" shows there while a join would work).
   if (row.notification_type === "country_battle_reminder" || d?.type === "country_battle_reminder") {

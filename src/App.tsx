@@ -66,6 +66,8 @@ import { VideoAdGigPage, MyVideoAdGigsPage } from "./pages/VideoAdGigPages";
 import { CvCPage, CvCBattlePage } from "./pages/CvCPages";
 import { LiveViewerRoute } from "./pages/LiveViewerPage";
 import { MySeriesPage, ScheduledPage, SeriesEditPage, SeriesPage, SubscriptionsPage } from "./pages/CreatorPages";
+import { FamilyPairingPage, FamilyTeenPage, RestrictedModePage, ScreenTimePage } from "./pages/WellbeingPages";
+import { WellbeingGate } from "./components/Wellbeing";
 import { WalletPage } from "./pages/WalletPage";
 import { GoLivePage } from "./pages/GoLivePage";
 import { StreamFromPcPage } from "./pages/StreamFromPcPage";
@@ -146,6 +148,9 @@ export default function App() {
         <PageTracking />
         {/* Inbox counts (2026-11-10): one loader for the tabs and the header's "Inbox (N)". */}
         <InboxCountsSync />
+        {/* Safety and wellbeing (Steve, 2026-11-17): the one screen-time tracker (visible tab only)
+            and its Time's up / Take a break pages, over every route. */}
+        <WellbeingGate />
         <LandingSwitch>
         <Nav />
         <div className="shell">
@@ -291,6 +296,11 @@ export default function App() {
           <Route path="/featured-contest" element={<FeaturedContestPage />} />
           <Route path="/contests/:id" element={<ContestBoardPage />} />
           <Route path="/settings" element={<SettingsHubPage />} />
+          {/* Safety and wellbeing (Steve, 2026-11-17). */}
+          <Route path="/settings/screen-time" element={<ScreenTimePage />} />
+          <Route path="/settings/restricted-mode" element={<RestrictedModePage />} />
+          <Route path="/settings/family-pairing" element={<FamilyPairingPage />} />
+          <Route path="/settings/family-pairing/teen/:id" element={<FamilyTeenPage />} />
           <Route path="/settings/account" element={<AccountSettingsPage />} />
           <Route path="/settings/share" element={<ShareProfilePage />} />
           <Route path="/settings/qr" element={<QrCodePage />} />

@@ -91,6 +91,8 @@ export function VideoPage() {
       try {
         const res = await fetchPostByIdSocial(id ?? "", user ? { my_user_id: user.id, user_id: user.id } : {});
         const raw0 = Array.isArray(res.data) ? res.data[0] : res.data;
+        // Restricted Mode (2026-11-17): the server says why in its own words — the gold popup.
+        if (!res.status && res.code === "restricted_mode") { showGoldAlert(String(res.message || tt("that_video_isn_t_available"))); }
         if (!res.status || !raw0) throw new Error(res.message ?? tt("that_video_isn_t_available"));
         const [raw] = await devCreatorDecorate([raw0]);
         const data = await decoratePost(raw);

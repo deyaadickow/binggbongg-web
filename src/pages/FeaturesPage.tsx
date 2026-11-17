@@ -231,6 +231,13 @@ export const FEATURES: Section[] = [
 
       { icon: "🚷", nameKey: "fname_filter_keywords", blurbKey: "fblurb_filter_keywords", to: "/settings/filter-keywords", whereKey: "fwhere_settings" },
 
+      // Safety and wellbeing (Steve, 2026-11-17).
+      { icon: "⏳", nameKey: "fname_screen_time", blurbKey: "fblurb_screen_time", to: "/settings/screen-time", whereKey: "fwhere_settings" },
+
+      { icon: "👨‍👧", nameKey: "fname_family_pairing", blurbKey: "fblurb_family_pairing", to: "/settings/family-pairing", whereKey: "fwhere_settings" },
+
+      { icon: "🛡️", nameKey: "fname_restricted_mode", blurbKey: "fblurb_restricted_mode", to: "/settings/restricted-mode", whereKey: "fwhere_settings" },
+
       { icon: "🎭", nameKey: "fname_virtual_look", blurbKey: "fblurb_virtual_look", to: "/settings/virtual-look" },
 
       { icon: "⭐", nameKey: "fname_vip_voter_badges", blurbKey: "fblurb_vip_voter_badges", to: "/browse/vip-badges" },

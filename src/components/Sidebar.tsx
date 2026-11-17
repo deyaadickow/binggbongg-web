@@ -94,6 +94,10 @@ export function sidebarSections(userId: number | null, contestOn = false, podcas
       { to: "/settings/blocked", label: "blocked_profiles", icon: "🚫", needsLogin: true },
       // Finding videos (Steve, 2026-11-16): words that keep videos out of your feeds.
       { to: "/settings/filter-keywords", label: "fnd_filter_keywords", icon: "🚷", needsLogin: true },
+      // Safety and wellbeing (Steve, 2026-11-17).
+      { to: "/settings/screen-time", label: "wb_screen_time", icon: "⏳", needsLogin: true },
+      { to: "/settings/family-pairing", label: "wb_family_pairing", icon: "👨‍👧", needsLogin: true },
+      { to: "/settings/restricted-mode", label: "wb_restricted_mode", icon: "🛡️", needsLogin: true },
       // Steve, 2026-11-09: the on/off switch for messages from members, plus who is stopped.
       { to: "/settings/messages", label: "dm_settings_title", icon: "✉️", needsLogin: true },
       { to: "/settings/moderators", label: "my_moderators", icon: "🛡️", needsLogin: true },
