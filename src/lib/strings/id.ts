@@ -2489,4 +2489,8 @@ export const id = {
   dr_bbs: "%1$s BBs",
   dr_gifted_by: "Hadiah dari:",
   dr_no_gifts: "Belum ada hadiah",
+  // Settings in five boxes (Steve, 2026-11-17)
+  set_box_switches: "Sakelar",
+  set_box_settings: "Pengaturan",
+  set_box_features: "Fitur",
 };

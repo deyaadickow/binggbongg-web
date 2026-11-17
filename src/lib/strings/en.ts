@@ -3435,4 +3435,8 @@ export const en = {
   ce_different: "Use a different email",
   ce_resend_wait: "We couldn't send it again yet. Wait a minute, then try again.",
   ce_no_session: "This browser lost your sign-in. Tap Use a different email, then log in again with the same email and password.",
+  // Settings in five boxes (Steve, 2026-11-17)
+  set_box_switches: "Switches",
+  set_box_settings: "Settings",
+  set_box_features: "Features",
 } as const;

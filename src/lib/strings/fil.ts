@@ -2652,4 +2652,8 @@ export const fil = {
   ce_different: "Gumamit ng ibang email",
   ce_resend_wait: "Hindi pa namin ito maipadala ulit. Maghintay ng isang minuto, tapos subukan ulit.",
   ce_no_session: "Nawala ang sign-in mo sa browser na ito. Pindutin ang Gumamit ng ibang email, tapos mag-log in ulit gamit ang parehong email at password.",
+  // Settings in five boxes (Steve, 2026-11-17)
+  set_box_switches: "Mga Switch",
+  set_box_settings: "Mga Setting",
+  set_box_features: "Mga Feature",
 };

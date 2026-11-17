@@ -10,7 +10,8 @@ import { API_BASE, currentAuthHeaders, displayName, mediaUrl, post, type UserSum
 import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice, UserRow } from "../components/Common";
 import { useToast, showGoldAlert } from "../components/GoldToast";
-import { SideLinkItem, SiteFooter, sidebarSections } from "../components/Sidebar";
+import { SideLinkItem, SiteFooter, sidebarSections, type SideLink } from "../components/Sidebar";
+import { FEATURES, featureHref } from "./FeaturesPage";
 import { fetchMyVirtualBattles, fetchVirtualGiftRecord, sendVirtualThankYou, type VirtualBattleData, type VirtualGiftRecord } from "../lib/battles";
 import { VirtualGiftRecordOverlay, personName } from "../components/BattleEngines";
 import { GoldSelect } from "../components/GoldSelect";
@@ -38,27 +39,129 @@ function NeedLogin() {
   return <div className="page"><Notice>{tn("sign_in_to_open_this_page", <Link to="/login">{t("sign_in")}</Link>)}</Notice></div>;
 }
 
+// Settings in five boxes (Steve, 2026-11-17): "First box will be all the Toggle switches. Second
+// box will be all the settings. Third box will be all the Features. 4Th box will be for General.
+// 5th box will be for Log Out and Delete Account. All these features will be in the Feature
+// Section. And every other feature we have and will create in the future." Every row still comes
+// from sidebarSections (so the desktop sidebar and this page never drift); the lists below only
+// say which box a route goes in. A link no list names lands in Features, so a new sidebar link is
+// never lost, and every Bingg Bongg Features tile follows it, read from FEATURES.
+const BOX_SETTINGS = ["/settings/account", "/settings/reminders", "/settings/screen-time", "/settings/family-pairing",
+  "/settings/restricted-mode", "/settings/messages", "/settings/blocked", "/settings/filter-keywords", "/settings/moderators",
+  "/settings/language", "/settings/vault", "/settings/verification", "/subscriptions", "/settings/simulcast", "/settings/virtual-look"];
+// The Bingg Bongg button's menu on the phones, first: Upload Videos, Upload Photos, Start a
+// Podcast, Text Post, Photo Slideshow, Bingg Bongg Song.
+const BOX_FEATURES_FIRST = ["/upload", "/upload-photos", "/podcasts/start", "/text-post", "/slideshow", "/bingg-bongg-song"];
+const BOX_GENERAL = ["/settings/support", "/settings/terms", "/settings/privacy", "/settings/contact", "/settings/about",
+  "/settings/safety", "/settings/app-features", "/settings/faq"];
+const BOX_LAST = ["#signout", "/settings/delete-account"];
+
+function SettingsBox({ title, children }: { title?: string; children: React.ReactNode }) {
+  return (
+    <div className="card" style={{ marginBottom: 12, overflow: "hidden" }}>
+      {title && <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)" }}><b style={{ color: "var(--gold)" }}>{title}</b></div>}
+      {children}
+    </div>
+  );
+}
+
 /** The whole Settings list as a page — what phones and narrow screens use instead of the sidebar. */
 export function SettingsHubPage() {
   const { t } = useT();
   const { user, isLoggedIn, signOut } = useSession();
   const contestOn = useContestOn();
   const podcastOn = usePodcastEnabled();
+  const all = sidebarSections(user?.id ?? null, contestOn, podcastOn).flatMap((sec) => sec.links)
+    .filter((l) => !l.needsLogin || isLoggedIn);
+  const byRoute = new Map(all.map((l) => [l.to, l]));
+  const pick = (routes: string[]) => routes.map((r) => byRoute.get(r)).filter((l): l is SideLink => !!l);
+  const placed = new Set([...BOX_SETTINGS, ...BOX_GENERAL, ...BOX_LAST]);
+  const first = pick(BOX_FEATURES_FIRST);
+  BOX_FEATURES_FIRST.forEach((r) => placed.add(r));
+  const store = all.filter((l) => l.external);
+  // The same page, or the same name, twice is one row (Daily Horoscope is in two sidebar lists).
+  const seen = new Set<string>([...BOX_SETTINGS, ...BOX_GENERAL, ...BOX_LAST]);
+  const names = new Set<string>();
+  const fresh = (to: string, label: string) => {
+    const key = to.split("?")[0];
+    if (seen.has(key) || names.has(t(label as StringKey))) return false;
+    seen.add(key); names.add(t(label as StringKey));
+    return true;
+  };
+  const features = [...first, ...all.filter((l) => !placed.has(l.to) && !l.external)].filter((l) => fresh(l.to, l.label));
+  const tiles: SideLink[] = [];
+  FEATURES.flatMap((sec) => sec.features)
+    .filter((f) => (!f.contestOnly || contestOn) && (!f.podcastOnly || podcastOn))
+    .forEach((f) => {
+      const href = featureHref(f, user?.id ?? null);
+      if (!href || !fresh(href, f.labelKey ?? f.nameKey)) return;
+      tiles.push({ to: href, label: f.labelKey ?? f.nameKey, icon: f.icon === "bingo_card" ? "🎱" : f.icon });
+    });
+  const row = (l: SideLink) => <SideLinkItem key={l.to + l.label} link={l} onSignOut={signOut} big />;
+  const box2 = pick(BOX_SETTINGS);
+  const box5 = pick(BOX_LAST);
   return (
     <Page title={t("settings")}>
-      {sidebarSections(user?.id ?? null, contestOn, podcastOn).map((sec, i) => (
-        <div key={i} className="card" style={{ marginBottom: 12, overflow: "hidden" }}>
-          {/* t(), not the bare key. The sidebar has always translated these; this page printed
-              them raw, so every language saw "account" / "general" / "get_the_app". The type
-              only checks that a key EXISTS, not that anybody translated it before rendering. */}
-          {sec.title && <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)" }}><b style={{ color: "var(--gold)" }}>{t(sec.title)}</b></div>}
-          {sec.links.filter((l) => !l.needsLogin || isLoggedIn).map((l) => <SideLinkItem key={l.label} link={l} onSignOut={signOut} big />)}
-        </div>
-      ))}
+      {isLoggedIn && <SettingsBox title={t("set_box_switches")}><SettingsSwitches /></SettingsBox>}
+      {box2.length > 0 && <SettingsBox title={t("set_box_settings")}>{box2.map(row)}</SettingsBox>}
+      <SettingsBox title={t("set_box_features")}>{features.map(row)}{tiles.map(row)}</SettingsBox>
+      <SettingsBox title={t("general")}>{pick(BOX_GENERAL).map(row)}{store.map(row)}</SettingsBox>
+      {box5.length > 0 && <SettingsBox>{box5.map(row)}</SettingsBox>}
       {/* The sidebar that normally carries this is hidden under 900px, and a phone is how most
           people see the site — so who operates it has to be reachable here too. */}
       <SiteFooter />
     </Page>
+  );
+}
+
+/** Box 1: every switch, saved the moment it is flipped (the same fields as Account settings). */
+function SettingsSwitches() {
+  const { t } = useT();
+  const { user, refresh } = useSession();
+  const [me, setMe] = useState<MyUser | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [dm, setDm] = useState<DmSettings | null>(null);
+  const { setToast, el } = useToast();
+  useEffect(() => {
+    if (!user) return;
+    post<MyUser>("fetchMyUserDetails", { my_user_id: user.id }).then((r) => { if (r.status && r.data) setMe(r.data); }).catch(() => undefined);
+    fetchDmSettings(user.id).then(setDm).catch(() => undefined);
+  }, [user]);
+  if (!me) return <Loading />;
+  async function save(fields: Record<string, unknown>) {
+    if (!user) return;
+    setBusy(true);
+    try {
+      const r = await post<MyUser>("updateUserDetails", { user_id: user.id, ...fields });
+      if (!r.status) throw new Error(r.message ?? tt("couldn_t_save"));
+      setMe((m) => ({ ...(m ?? {} as MyUser), ...(r.data ?? {}), ...fields } as MyUser));
+      refresh();
+    } catch (e) { setToast((e as Error).message); } finally { setBusy(false); }
+  }
+  return (
+    <>
+      {TOGGLES.map((tog) => (
+        <label key={tog.key} className="row" style={{ padding: "12px 14px", borderBottom: "1px solid var(--line)", cursor: "pointer" }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 700 }}>{t(tog.label)}</div>
+            <div className="muted" style={{ fontSize: 12 }}>{t(tog.hint)}</div>
+          </div>
+          <input type="checkbox" className="switch" disabled={busy} checked={on(me[tog.key])} onChange={(e) => save({ [tog.key]: e.target.checked ? 1 : 0 })} />
+        </label>
+      ))}
+      <CountryBattleReminderToggle row initial={me.country_battle_reminders == null ? null : on(me.country_battle_reminders)} />
+      {dm && (
+        <label className="row" style={{ padding: "12px 14px", borderTop: "1px solid var(--line)", cursor: "pointer" }}>
+          <div style={{ flex: 1 }}><div style={{ fontWeight: 700 }}>{t("dm_settings_title")}</div></div>
+          <input type="checkbox" className="switch" checked={!!dm.dm_open} onChange={(e) => {
+            const open = e.target.checked;
+            setDm({ ...dm, dm_open: open });
+            if (user) setDmOpen(user.id, open).then((r) => setDm(r ?? dm)).catch(() => setDm(dm));
+          }} />
+        </label>
+      )}
+      {el}
+    </>
   );
 }
 

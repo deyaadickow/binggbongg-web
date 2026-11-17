@@ -2453,4 +2453,8 @@ export const es = {
   dr_bbs: "%1$s BBs",
   dr_gifted_by: "Regalos de:",
   dr_no_gifts: "Sin regalos",
+  // Settings in five boxes (Steve, 2026-11-17)
+  set_box_switches: "Interruptores",
+  set_box_settings: "Ajustes",
+  set_box_features: "Funciones",
 };
