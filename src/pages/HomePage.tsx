@@ -134,7 +134,12 @@ export function HomePage() {
     <div className="page">
       {/* Stories row removed (Steve, 2026-11-17): "we don't need this one on main feed please remove
           it." Stories stay on their own page from the directory and the ring on profiles. */}
-      <div className="row" style={{ marginBottom: 14, flexWrap: "wrap" }}>
+      {/* Steve, 2026-11-17: "Please center the buttons from side to side of the screen and go up a
+          little bit more." Three columns: empty | the buttons | the store badges, so the buttons
+          sit in the middle of the page whatever the badges take. */}
+      <div className="feed-top-row">
+        <span />
+        <div className="feed-top-buttons">
         {/* Steve, 2026-11-17: "Set all the buttons together, make them uniform including the live" —
             Live first, then the three feeds, all the same black and gold button. */}
         <button type="button" className="feed-live-btn" onClick={openLive} disabled={liveBusy} aria-busy={liveBusy}>
@@ -149,8 +154,8 @@ export function HomePage() {
             </button>
           ))}
         </div>
-        <span className="spacer" />
-        <StoreBadges compact />
+        </div>
+        <div className="feed-top-badges"><StoreBadges compact /></div>
       </div>
       {needsSignIn && (
         <div className="card pad" style={{ textAlign: "center", marginBottom: 14 }}>
