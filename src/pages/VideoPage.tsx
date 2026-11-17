@@ -18,6 +18,9 @@ import { HEART_RED, HeartRatingPanel, ratingLine } from "../components/HeartRati
 import { parseCaptions, setPostAutoCaptions, shownCaptions, updatePostAutoCaptions, type CaptionLine } from "../lib/autoCaptions";
 import { decoratePost, fetchPostByIdSocial, repostPost, socialUser, type SocialPost } from "../lib/social";
 import { VideoStickers } from "../components/SocialStickers";
+import { EpisodeChip, LockedCard } from "../components/Creators";
+import { devCreatorDecorate } from "../lib/creators";
+import { setFeed as saveFeedQueue } from "../lib/feed";
 
 const AUTO_KEY = "bb.autoplayNext";
 
@@ -69,6 +72,8 @@ export function VideoPage() {
   const holdTimer = useRef(0);
   const holdFired = useRef(false);
 
+  // Creators and money (2026-11-17): bumped after a purchase / subscribe to reload this post unlocked.
+  const [reloadKey, setReloadKey] = useState(0);
   const index = feed.findIndex((p) => String(p.id) === String(id));
   const prev = index > 0 ? feed[index - 1] : null;
   const next = index >= 0 && index < feed.length - 1 ? feed[index + 1] : null;
@@ -85,19 +90,26 @@ export function VideoPage() {
     (async () => {
       try {
         const res = await fetchPostByIdSocial(id ?? "", user ? { my_user_id: user.id, user_id: user.id } : {});
-        const raw = Array.isArray(res.data) ? res.data[0] : res.data;
-        if (!res.status || !raw) throw new Error(res.message ?? tt("that_video_isn_t_available"));
+        const raw0 = Array.isArray(res.data) ? res.data[0] : res.data;
+        if (!res.status || !raw0) throw new Error(res.message ?? tt("that_video_isn_t_available"));
+        const [raw] = await devCreatorDecorate([raw0]);
         const data = await decoratePost(raw);
         setItem(data);
         setLiked(!!data.is_post_liked);
         if (!fromFeed) setFeedState(appendToFeed([data]));
+        else if (!!fromFeed.locked !== !!data.locked) {
+          // Unlocked (or locked) since the feed loaded it: the queue gets the fresh copy.
+          const next = feed.map((p) => (p.id === data.id ? data : p));
+          saveFeedQueue(next);
+          setFeedState(next);
+        }
       } catch (e) {
         if (!fromFeed) setError((e as Error).message);
       }
     })();
     // The member's ID, not the object: the session replaces the object on every balance
     // refresh, and reloading the post for that unmounted whatever was open over the video.
-  }, [id, user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [id, user?.id, reloadKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Page history: which video this was — its caption's start, else whose it is. The router already
   // recorded the visit; this only names it. Checked against the URL so the previous video, still
@@ -127,6 +139,9 @@ export function VideoPage() {
 
   const go = useCallback((p: Post | null) => { if (p) navigate(`/video/${p.id}`); }, [navigate]);
   const goNext = useCallback(() => go(next), [go, next]);
+  // Auto-advance skips past locked videos (subscriber-only / unbought series episodes).
+  const nextPlayable = index >= 0 ? feed.slice(index + 1).find((p) => !p.locked) ?? null : null;
+  const goNextPlayable = useCallback(() => go(nextPlayable ?? next), [go, nextPlayable, next]);
   const goPrev = useCallback(() => go(prev), [go, prev]);
 
   // Arrow keys + scroll wheel, like flicking on the phone.
@@ -535,6 +550,10 @@ export function VideoPage() {
         onPointerLeave={cancelHold}
         onPointerCancel={cancelHold}
         onContextMenu={(e) => { if (holdFired.current) e.preventDefault(); }}>
+        {/* A locked post arrives with video "" — never put that on a <video>; the locked card instead. */}
+        {item.locked || !item.video ? (
+          item.locked ? <LockedCard key={`lock-${item.id}`} post={item} onUnlocked={() => setReloadKey((k) => k + 1)} /> : <div className="player" />
+        ) : (
         <video key={item.id} ref={videoRef} className="player" src={mediaUrl(item.video)} poster={mediaUrl(item.thumbnail)} controls autoPlay playsInline
           loop={!auto}
           onPlay={() => { if (watchStartedAt.current === 0) watchStartedAt.current = Date.now(); }}
@@ -543,8 +562,9 @@ export function VideoPage() {
             completedPlays.current += 1; watchClockStop();
             if (!auto) return;
             if (sentGift || giftSheetOpen) { advanceAfterGift.current = true; return; }
-            goNext();
+            goNextPlayable();
           }} />
+        )}
         {sentGift && <GiftFlash gift={sentGift} onDone={clearSentGift} />}
         {/* Poll, Add Yours, link and comment-reply stickers (Steve, 2026-11-17). */}
         <VideoStickers post={item} hidden={chromeHidden} />
@@ -673,6 +693,8 @@ export function VideoPage() {
               {item.remix_of.type === "duet" ? "Duet with" : "Stitched from"} @{item.remix_of.user_name ?? ""}
             </Link>
           )}
+          {/* Creators and money (2026-11-17): "Ep N" on a series episode opens the series. */}
+          {item.series_info && !item.locked && <EpisodeChip post={item} style={{ marginTop: 6 }} />}
           {/* Steve, 2026-11-16 ("Show the sound line"): the sound, one line, opens its page. */}
           {item.sound?.id && item.sound.title?.trim() && (
             <Link to={`/sound/${item.sound.id}`} style={{ display: "block", color: "var(--gold)", fontSize: 13, marginTop: 4, maxWidth: "100%",

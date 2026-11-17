@@ -62,6 +62,7 @@ import { BinggBonusOverlay } from "../components/BinggBonusOverlay";
 import { makeBinggBonusWatcher } from "../lib/binggBonus";
 import { FishHostControls, LiveFishOverlay } from "../components/LiveFishOverlay";
 import { CountryTranslatePopup } from "../components/CountryTranslatePopup";
+import { LiveAccessGate, SubscribersOnlyLiveToggle } from "../components/Creators";
 
 interface Member { user_id: number; fullname?: string; username?: string; profile_image?: string; country?: string; local_timezone?: string }
 interface RoomMembers { host_user_id: number; host_fullname?: string; host_username?: string; host_profile_image?: string; host_country?: string; host_local_timezone?: string; live_seconds?: number; guests: Member[]; multi_live?: unknown;
@@ -80,7 +81,14 @@ const MEMBERS_POLL_MS = 5000;
  *  last room's members, chat and battle state into the next one. */
 export function LiveViewerRoute() {
   const { room } = useParams();
-  return <LiveViewerPage key={room ?? ""} />;
+  const [search] = useSearchParams();
+  // Creators and money (2026-11-17): a viewer checks checkLiveAccess first; a subscribers-only
+  // live shows the Subscribe sheet instead of joining. The host (?host=1) goes straight in.
+  return (
+    <LiveAccessGate key={room ?? ""} roomName={decodeURIComponent(room ?? "")} skip={search.get("host") === "1"}>
+      <LiveViewerPage key={room ?? ""} />
+    </LiveAccessGate>
+  );
 }
 
 export function LiveViewerPage() {
@@ -1884,6 +1892,8 @@ export function LiveViewerPage() {
               )}
               {/* Catch the Fish (Steve, 2026-11-07): the streamer's own switch and who caught it. */}
               {role === "host" && myId !== null && <FishHostControls myId={myId} roomName={roomName} messages={messages} />}
+              {/* Creators and money (2026-11-17): only the host's subscribers may join. */}
+              {role === "host" && myId !== null && <SubscribersOnlyLiveToggle myId={myId} roomName={roomName} />}
               <span className="spacer" />
               {role === "host"
                 ? <button className="btn small" style={{ borderColor: "var(--red)", color: "var(--red)" }} onClick={endLive}>{t("end_live")}</button>

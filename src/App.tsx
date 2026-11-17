@@ -65,6 +65,7 @@ import { MyShowPage, ShowsPage } from "./pages/ShowsPages";
 import { VideoAdGigPage, MyVideoAdGigsPage } from "./pages/VideoAdGigPages";
 import { CvCPage, CvCBattlePage } from "./pages/CvCPages";
 import { LiveViewerRoute } from "./pages/LiveViewerPage";
+import { MySeriesPage, ScheduledPage, SeriesEditPage, SeriesPage, SubscriptionsPage } from "./pages/CreatorPages";
 import { WalletPage } from "./pages/WalletPage";
 import { GoLivePage } from "./pages/GoLivePage";
 import { StreamFromPcPage } from "./pages/StreamFromPcPage";
@@ -169,6 +170,13 @@ export default function App() {
           {/* Social (Steve, 2026-11-17): Stories and the "Add Yours" chains. */}
           <Route path="/stories" element={<StoriesPage />} />
           <Route path="/add-yours/:id" element={<AddYoursPage />} />
+          {/* Creators and money (Steve, 2026-11-17): subscriptions, paid series, scheduled posts. */}
+          <Route path="/subscriptions" element={<SubscriptionsPage />} />
+          <Route path="/series" element={<MySeriesPage />} />
+          <Route path="/series/new" element={<SeriesEditPage />} />
+          <Route path="/series/:id/edit" element={<SeriesEditPage />} />
+          <Route path="/series/:id" element={<SeriesPage />} />
+          <Route path="/scheduled" element={<ScheduledPage />} />
           <Route path="/profile/:id" element={<ProfilePage />} />
           <Route path="/upcoming" element={<UpcomingPage />} />
           {/* Steve, 2026-10-11: direct messages — the same Firestore conversations the phones use. */}

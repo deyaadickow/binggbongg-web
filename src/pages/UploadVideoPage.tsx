@@ -19,6 +19,11 @@ import { PageTitle } from "../components/PageTitle";
 import { requireVerified } from "../lib/verifyEmail";
 import { showGoldAlert } from "../components/GoldToast";
 import { songAttachPost } from "../lib/song";
+import {
+  creatorUploadPost, fetchCreatorOptions, fetchCreatorPlan, fetchUserSeries, localDateTime, localInputToUnix, scheduleProblem,
+  toLocalInput, type CreatorOptions, type Series,
+} from "../lib/creators";
+import { showGoldConfirm } from "../components/GoldToast";
 
 interface ContestCat { id: number; name?: string | null }
 interface CountryRow { name?: string | null; states?: { name?: string | null }[] }
@@ -80,6 +85,16 @@ export function UploadVideoPage() {
   const [newPostId, setNewPostId] = useState(0);
   const stickersWanted = new URLSearchParams(location.search).get("stickers") === "1";
 
+  // Creators and money (Steve, 2026-11-17): subscribers only, add to a series, post later.
+  const [planActive, setPlanActive] = useState<boolean | null>(null);
+  const [mySeries, setMySeries] = useState<Series[]>([]);
+  const [creatorOpts, setCreatorOpts] = useState<CreatorOptions | null>(null);
+  const [subsOnly, setSubsOnly] = useState(false);
+  const [seriesId, setSeriesId] = useState("");
+  const [later, setLater] = useState(false);
+  const [laterAt, setLaterAt] = useState(() => toLocalInput(new Date(Date.now() + 3600_000)));
+  const [scheduledFor, setScheduledFor] = useState("");
+
   const [busy, setBusy] = useState(false);
   const [stage, setStage] = useState("");
   const [progress, setProgress] = useState(0);
@@ -94,6 +109,20 @@ export function UploadVideoPage() {
       })
       .catch(() => undefined);
   }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    let alive = true;
+    fetchCreatorOptions().then((o) => { if (alive) setCreatorOpts(o); });
+    fetchCreatorPlan(user.id).then((i) => { if (alive) setPlanActive(!!i.plan?.is_active); }).catch(() => { if (alive) setPlanActive(false); });
+    fetchUserSeries(user.id).then((r) => { if (alive) setMySeries(r); }).catch(() => undefined);
+    return () => { alive = false; };
+  }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    const sid = (location.state as { seriesId?: number } | null)?.seriesId;
+    if (sid) setSeriesId(String(sid));
+  }, [location.state]);
 
   useEffect(() => {
     const st = location.state as { greenScreen?: { file: File; duration: number; thumb: Blob | null }; remix?: Remix; postKind?: "text" | "slideshow" | "song"; songId?: number;
@@ -158,9 +187,23 @@ export function UploadVideoPage() {
     const problem = stickerProblem(stickers, t);
     if (problem) { setError(problem); return; }
     const social = { ...stickerParams(stickers, joinAddYours?.id), ...(replyComment ? { reply_comment_id: replyComment.id } : {}) };
-    // Until backend 610de8b is deployed, the dev server sends a post with stickers or a comment
-    // reply (and anything from the pretend member) to the mock, never to the live server.
-    const mocked = import.meta.env.DEV && (Object.keys(social).length > 0 || !realUser);
+    // Creators and money: subscribers only, a series, a time to post it (unix seconds).
+    let scheduledUnix = 0;
+    if (later) {
+      scheduledUnix = localInputToUnix(laterAt);
+      const why = creatorOpts ? scheduleProblem(scheduledUnix, creatorOpts) : scheduledUnix ? "" : "soon";
+      if (why) { showGoldAlert(why === "soon" ? t("cm_too_soon", creatorOpts?.schedule_min_minutes ?? 5) : t("cm_too_far", creatorOpts?.schedule_max_days ?? 60)); return; }
+    }
+    const creator: Record<string, unknown> = {
+      ...(subsOnly && planActive ? { subscribers_only: 1 } : {}),
+      ...(seriesId ? { series_id: Number(seriesId) } : {}),
+      ...(later ? { scheduled_at: scheduledUnix } : {}),
+    };
+    const hasCreator = Object.keys(creator).length > 0;
+    // Until backend 610de8b / 5c98576 are deployed, the dev server sends a post with stickers, a
+    // comment reply or a creator option (and anything from the pretend member) to the mocks, never
+    // to the live server.
+    const mocked = import.meta.env.DEV && (Object.keys(social).length > 0 || hasCreator || !realUser);
     setBusy(true);
     setError("");
     try {
@@ -183,7 +226,7 @@ export function UploadVideoPage() {
       await socialPut(thumbSlot, new File([thumb], "thumb.jpg", { type: "image/jpeg" }));
 
       setStage("Publishing…");
-      const res = await socialUploadPost({
+      const params = {
         user_id: user.id,
         video: videoSlot.key,
         thumbnail: thumbSlot.key,
@@ -206,11 +249,23 @@ export function UploadVideoPage() {
         ...(remix?.soundId ? { sound_id: remix.soundId } : {}),
         ...(remix?.type ? { remix_type: remix.type, remix_post_id: remix.postId } : {}),
         ...social,
-      }, mocked);
+        ...creator,
+      };
+      const res = hasCreator ? await creatorUploadPost(params) : await socialUploadPost(params, mocked);
       if (!res.status) {
         const msg = res.message || tt("couldn_t_publish_that_video");
-        showGoldAlert(msg);
+        if (res.code === "no_plan") {
+          void showGoldConfirm({ message: msg, confirmLabel: t("cm_my_subscription"), cancelLabel: t("cm_not_now") })
+            .then((yes) => { if (yes) navigate("/subscriptions"); });
+        } else showGoldAlert(msg);
         throw new Error(msg);
+      }
+      // Post later: no post exists yet — the server posts it at that time.
+      if ((res as { scheduled?: unknown }).scheduled) {
+        const at = String((res as { publish_at?: unknown }).publish_at ?? "");
+        setScheduledFor(localDateTime(at) || new Date(scheduledUnix * 1000).toLocaleString());
+        setDone(true);
+        return;
       }
       // A Bingg Bongg Song's video: link the new post to the song (top-level post_id).
       const newPostId = Number((res as { post_id?: unknown }).post_id ?? 0);
@@ -231,6 +286,23 @@ export function UploadVideoPage() {
 
   if (!user) {
     return <div className="page"><Notice>{t("sign_in_to_upload_a_video")}</Notice></div>;
+  }
+
+  if (done && scheduledFor) {
+    return (
+      <div className="page" style={{ maxWidth: 720 }}>
+        <PageTitle>{t("upload_video")}</PageTitle>
+        <div className="card pad center">
+          <div style={{ fontSize: 36 }}>🗓</div>
+          <p className="cm-gold" style={{ fontSize: 18, fontWeight: 800 }}>{t("cm_scheduled_for", scheduledFor)}</p>
+          <p className="soft" style={{ marginTop: 0 }}>{t("cm_scheduled_note")}</p>
+          <div className="row" style={{ justifyContent: "center", gap: 10, flexWrap: "wrap" }}>
+            <button className="btn gold" onClick={() => navigate("/scheduled")}>{t("cm_scheduled_posts")}</button>
+            <button className="btn ghost" onClick={() => { setDone(false); setScheduledFor(""); setFile(null); setDuration(null); setDescription(""); setLater(false); setSubsOnly(false); setSeriesId(""); }}>{t("upload_another")}</button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (done) {
@@ -382,6 +454,56 @@ export function UploadVideoPage() {
         ))}
       </div>
 
+      {/* Creators and money (Steve, 2026-11-17). */}
+      <div className="card" style={{ marginBottom: 12 }}>
+        {planActive ? (
+          <label className="row" style={{ padding: "12px 14px", borderBottom: "1px solid var(--line)", cursor: "pointer" }}>
+            <div style={{ flex: 1, fontWeight: 700 }}>🔒 {t("cm_subscribers_only")}</div>
+            <input type="checkbox" className="switch" checked={subsOnly} onChange={(e) => setSubsOnly(e.target.checked)} />
+          </label>
+        ) : (
+          <button type="button" className="row cm-upload-link" onClick={() => navigate("/subscriptions")}>
+            <div style={{ flex: 1, fontWeight: 700, textAlign: "left" }}>🔒 {t("cm_subscribers_only")}</div>
+            <span>{t("cm_set_up_subscriptions")} ›</span>
+          </button>
+        )}
+        <div className="row" style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)", gap: 10 }}>
+          <div style={{ fontWeight: 700, whiteSpace: "nowrap" }}>🎬 {t("cm_add_to_series")}</div>
+          <GoldSelect
+            ariaLabel={t("cm_add_to_series")}
+            value={seriesId}
+            options={[
+              { value: "", label: t("cm_no_series_option") },
+              ...mySeries.map((x) => ({ value: String(x.id), label: x.title })),
+              { value: "new", label: t("cm_new_series") },
+            ]}
+            onChange={(v) => {
+              if (v !== "new") { setSeriesId(v); return; }
+              const go = () => navigate("/series/new", { state: { back: "upload" } });
+              if (!file) { go(); return; }
+              void showGoldConfirm({ message: t("cm_leave_upload_q"), confirmLabel: t("cm_new_series"), cancelLabel: t("cancel") }).then((yes) => { if (yes) go(); });
+            }}
+            style={{ flex: 1, minWidth: 0 }}
+          />
+        </div>
+        <label className="row" style={{ padding: "12px 14px", borderBottom: later ? "1px solid var(--line)" : undefined, cursor: "pointer" }}>
+          <div style={{ flex: 1, fontWeight: 700 }}>🗓 {t("cm_post_later")}</div>
+          <input type="checkbox" className="switch" checked={later} onChange={(e) => setLater(e.target.checked)} />
+        </label>
+        {later && (
+          <div style={{ padding: "10px 14px" }}>
+            <input type="datetime-local" className="input cm-datetime" value={laterAt}
+              min={toLocalInput(new Date(Date.now() + ((creatorOpts?.schedule_min_minutes ?? 5) + 1) * 60_000))}
+              max={toLocalInput(new Date(Date.now() + (creatorOpts?.schedule_max_days ?? 60) * 86400_000))}
+              onChange={(e) => setLaterAt(e.target.value)} style={{ width: "100%" }} />
+            <div className="muted" style={{ fontSize: 12, marginTop: 6 }}>
+              {t("cm_post_later_hint", Intl.DateTimeFormat().resolvedOptions().timeZone || "")}
+            </div>
+            <button type="button" className="btn small ghost" style={{ marginTop: 8 }} onClick={() => navigate("/scheduled")}>{t("cm_scheduled_posts")} ›</button>
+          </div>
+        )}
+      </div>
+
       {error && <p style={{ color: "#f55", fontSize: 13 }}>{error}</p>}
 
       {busy && (
@@ -395,7 +517,7 @@ export function UploadVideoPage() {
 
       <button className="btn block" disabled={busy || !file} onClick={upload}
         style={{ background: "var(--gold-border)", color: "#000", borderColor: "var(--gold-border)" }}>
-        {busy ? "Uploading…" : "Upload video"}
+        {busy ? "Uploading…" : later ? t("cm_schedule") : "Upload video"}
       </button>
     </div>
   );

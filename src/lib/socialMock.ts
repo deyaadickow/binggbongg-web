@@ -60,6 +60,8 @@ const abs = (path?: string | null) => (!path ? "" : /^(https?:|blob:|data:)/i.te
 // ---- Uploaded files: a key -> object URL in this page's memory -----------------------------------
 const files: Record<string, string> = {};
 const fileUrl = (key: unknown) => files[String(key)] ?? "";
+/** The object URL of a file "uploaded" in the mock (lib/creatorsMock.ts shows scheduled thumbnails). */
+export const mockFileUrl = (key: unknown) => fileUrl(key);
 
 export async function mockPut(slot: UploadSlot, file: File, onProgress?: (f: number) => void): Promise<void> {
   for (let i = 1; i <= 5; i++) { await wait(120); onProgress?.(i / 5); }

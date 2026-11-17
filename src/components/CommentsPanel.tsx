@@ -28,6 +28,7 @@ import {
   type PendingMedia,
 } from "../lib/commentMedia";
 import { fetchCommentsSocial, isPinned, setCommentPinned, socialUser } from "../lib/social";
+import { SubscriberChip, useSubscriberBadges } from "./Creators";
 import { useT } from "../lib/i18n";
 
 const PAGE = 20;
@@ -117,6 +118,8 @@ export function CommentsPanel({ postId, totalComments, postOwnerId }: { postId: 
   const [sending, setSending] = useState(false);
   const [stickerPickerOpen, setStickerPickerOpen] = useState(false);
   const [count, setCount] = useState(totalComments ?? 0);
+  // Creators and money (2026-11-17): "★ Subscriber" beside the creator's paid-up subscribers.
+  const subscriberIds = useSubscriberBadges(postOwnerId, comments.map((c) => Number(c.user?.id ?? c.user_id ?? 0)));
 
   // The attachment row.
   const [pending, setPending] = useState<PendingMedia | null>(null);
@@ -627,6 +630,7 @@ export function CommentsPanel({ postId, totalComments, postOwnerId }: { postId: 
                 >
                   {c.user?.username ? `@${c.user.username}` : displayName(c.user)}
                 </Link>
+                {subscriberIds.has(Number(c.user?.id ?? c.user_id ?? 0)) && <SubscriberChip />}
 
                 {c.comment && (
                   <div className="soft" style={{ fontSize: 14, wordBreak: "break-word" }}>

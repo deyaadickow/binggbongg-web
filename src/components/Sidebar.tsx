@@ -81,6 +81,10 @@ export function sidebarSections(userId: number | null, contestOn = false, podcas
       // Steve, 2026-09-26: "Where is support on the web?" — the 💝 Support button lives on the
       // member's own profile page; this puts Who Supported Me one click away from anywhere too.
       { to: "/support", label: "who_supported_me", icon: "💝", needsLogin: true },
+      // Creators and money (Steve, 2026-11-17).
+      { to: "/subscriptions", label: "cm_subscriptions", icon: "💎", needsLogin: true },
+      { to: "/series", label: "cm_my_series", icon: "🎬", needsLogin: true },
+      { to: "/scheduled", label: "cm_scheduled_posts", icon: "🗓", needsLogin: true },
       { to: "/settings/account", label: "account_settings", icon: "⚙️", needsLogin: true },
       { to: "/settings/share", label: "share_profile", icon: "🔗", needsLogin: true },
       { to: "/settings/qr", label: "my_qr_code", icon: "▦", needsLogin: true },

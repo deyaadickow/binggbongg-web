@@ -178,6 +178,11 @@ export const FEATURES: Section[] = [
   {
     titleKey: "fsec_money",
     features: [
+      // Creators and money (Steve, 2026-11-17): "Paid subscriptions to a creator. Paid video series.
+      // Scheduling posts ahead of time."
+      { icon: "💎", nameKey: "fname_subscriptions", blurbKey: "fblurb_subscriptions", to: "/subscriptions" },
+      { icon: "🎬", nameKey: "fname_series", blurbKey: "fblurb_series", to: "/series" },
+      { icon: "🗓", nameKey: "fname_scheduled_posts", blurbKey: "fblurb_scheduled_posts", to: "/scheduled" },
       // Steve, 2026-11-10: "These are free coins to give away ... This is money you earn".
       { icon: "🪙", nameKey: "fname_free_coins", blurbKey: "fblurb_free_coins", to: "/free-coins", freeCoinsOnly: true },
       { icon: "🪙", nameKey: "fname_coins_and_gifts", blurbKey: "fblurb_coins_and_gifts", to: "/wallet" },

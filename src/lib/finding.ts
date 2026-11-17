@@ -6,6 +6,7 @@
 // Until that is deployed, the dev server answers the NEW endpoints from lib/findingMock.ts. The
 // mock is only ever imported under `import.meta.env.DEV`, so it is not in the production build,
 // and in dev a "Not interested" or a keyword can never reach the live server.
+import { devCreatorDecorate } from "./creators";
 import { tt } from "./i18n";
 import { post, type ApiResponse, type Post, type Sound, type UserSummary } from "./api";
 
@@ -124,7 +125,8 @@ export async function fetchFeedBatch(tab: FeedTab, myUserId: number | null): Pro
     ? await post<Post[]>(FEED_ENDPOINT[tab], params)
     : await findCall<Post[]>(FEED_ENDPOINT[tab], params);
   if (!r.status) throw new Error(r.message || "");
-  return { posts: arr<Post>(r.data), noFriends: tab === "friends" && r.message === "no_friends" };
+  // Creators and money (2026-11-17): on the dev server the mock's locks / series episodes.
+  return { posts: await devCreatorDecorate(arr<Post>(r.data)), noFriends: tab === "friends" && r.message === "no_friends" };
 }
 
 // ---- Not interested + keyword filters ------------------------------------------------------------

@@ -22,6 +22,12 @@ export function setAuthHeaders(token: string | null, userId: number | null) {
   authHeaders = token && userId ? { AUTHTOKEN: token, USERID: String(userId) } : {};
 }
 
+/** The signed-in member's id as the request headers carry it (null when signed out). */
+export function currentUserId(): number | null {
+  const id = Number(authHeaders.USERID ?? 0);
+  return id > 0 ? id : null;
+}
+
 /** The headers every authorised call sends, for the two uploads that must build their own
  *  request (multipart / progress) instead of going through post(). */
 export function currentAuthHeaders(): Record<string, string> {
@@ -262,7 +268,18 @@ export interface Post {
   my_rating?: number | string | null;
   /** 0 = the creator turned reposting off (the Repost row is hidden). */
   allow_repost?: number | null;
+  /** Creators and money (Steve, 2026-11-17): set when the viewer may not watch this post yet —
+   *  `video` is then "" and must never be played (show the locked card). */
+  locked?: PostLock | null;
+  /** Set on any episode of a paid video series. */
+  series_info?: { id: number; title: string; episode_no: number; episodes_count: number } | null;
 }
+
+export type PostLock =
+  | { reason: "subscribers"; creator_id: number; sub_price_bbs: number }
+  | { reason: "series"; creator_id: number; episode_no?: number; series: {
+      id: number; title: string; pricing: "series" | "episode" | "both" | "free"; series_price_bbs?: number | null;
+      episode_price_bbs?: number | null; first_episode_free?: number; free_for_subscribers?: number; episodes_count?: number } };
 
 /** The like's 1-10 rating (Steve, 2026-11-16). Sending again changes it; unliking (dislikePost)
  *  deletes it on the server. Returns the post's new average, or null on ANY failure — callers

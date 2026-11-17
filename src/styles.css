@@ -1644,3 +1644,60 @@ body.signup-black { background: radial-gradient(120% 55% at 50% 0%, #2a2108 0%, 
 /* The "Get the app" bar sits at z-index 90; a full-screen story hides it (the gold popups at 70 stay above the story). */
 body:has(.story-viewer) .get-app-bar { display: none; }
 .sticker-drag .link-pill { max-width: 200px; }
+
+/* ---- Creators and money (Steve, 2026-11-17): subscriptions, paid series, scheduled posts ---- */
+.cm-gold { color: var(--gold); }
+.cm-label { color: var(--gold); font-weight: 800; font-size: 13px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: .04em; }
+.cm-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.cm-chip { background: #000; color: var(--gold); border: 1.5px solid var(--gold-border); border-radius: 999px; padding: 8px 14px; font-weight: 800; font-size: 14px; cursor: pointer; }
+.cm-chip.active { background: var(--gold-border); color: #000; }
+.cm-switch-row { padding: 12px 14px; border-bottom: 1px solid var(--line); cursor: pointer; color: var(--gold); font-weight: 700; }
+.cm-switch-row:last-child { border-bottom: none; }
+.cm-row-btn { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 12px; color: var(--gold); font-weight: 800; cursor: pointer; background: #000; }
+.cm-tabs { display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; scrollbar-width: none; }
+.cm-tabs button { flex: 1 0 auto; background: #000; color: var(--gold); border: 1.5px solid var(--gold-border); border-radius: 999px; padding: 8px 14px; font-weight: 800; cursor: pointer; white-space: nowrap; }
+.cm-tabs button.active { background: var(--gold-border); color: #000; }
+.cm-sheet { background: #000; max-width: 440px; }
+.cm-sheet-title { color: var(--gold); font-size: 20px; font-weight: 800; text-align: center; margin-bottom: 4px; }
+.cm-price { color: var(--gold-bright); font-size: 26px; font-weight: 900; text-align: center; }
+.cm-perk-head { color: var(--gold); font-weight: 800; font-size: 13px; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+.cm-perks { list-style: none; margin: 0; padding: 12px 14px; border: 1.5px solid var(--gold-border); border-radius: 12px; color: var(--gold); display: grid; gap: 8px; }
+.cm-sub-btn { flex: 1; background: #000; color: var(--gold); border: 1.5px solid var(--gold-border); font-weight: 800; white-space: nowrap; }
+.cm-ep-chip { display: inline-block; background: #000; color: var(--gold); border: 1.5px solid var(--gold-border); border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 800; cursor: pointer; z-index: 2; }
+.cm-lock-badge { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,.75); border: 1.5px solid var(--gold-border); border-radius: 999px; width: 28px; height: 28px; display: grid; place-items: center; font-size: 14px; z-index: 2; }
+.cm-sub-chip { display: inline-block; margin-left: 6px; background: #000; color: var(--gold); border: 1px solid var(--gold-border); border-radius: 999px; padding: 0 8px; font-size: 11px; font-weight: 800; vertical-align: middle; }
+.cm-blur { filter: blur(10px) brightness(.45); transform: scale(1.08); }
+.cm-thumb-empty { display: block; width: 100%; height: 100%; background: #111; }
+.cm-card-lock { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: var(--gold); font-weight: 800; text-align: center; padding: 12px; font-size: 14px; }
+.cm-locked { position: relative; width: 100%; aspect-ratio: 9 / 16; max-height: 78vh; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; border-radius: inherit; }
+.cm-locked-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: blur(18px) brightness(.4); transform: scale(1.1); }
+.cm-locked-body { position: relative; display: flex; flex-direction: column; align-items: stretch; gap: 10px; padding: 20px; width: min(340px, 100%); text-align: center; }
+.cm-locked-icon { font-size: 44px; color: var(--gold); text-shadow: 0 0 12px rgba(240,196,32,.6); }
+.cm-locked-title { color: var(--gold); font-size: 19px; font-weight: 900; margin-bottom: 4px; text-shadow: 0 1px 4px #000; }
+.cm-list { display: grid; gap: 10px; }
+.cm-person, .cm-episode, .cm-sched { display: flex; align-items: center; gap: 12px; padding: 10px; background: #000; }
+.cm-episode { cursor: pointer; }
+.cm-episode.locked { cursor: default; }
+.cm-name { color: var(--gold); font-weight: 800; }
+.cm-sub-line { color: var(--gold); opacity: .8; font-size: 13px; }
+.cm-episode-thumb { position: relative; width: 64px; height: 88px; flex: none; border-radius: 8px; overflow: hidden; background: #111; border: 1px solid var(--gold-border); display: grid; place-items: center; }
+.cm-episode-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.cm-episode.locked .cm-episode-thumb img { filter: blur(4px) brightness(.5); }
+.cm-episode-play { position: absolute; inset: 0; display: grid; place-items: center; color: var(--gold); font-size: 22px; text-shadow: 0 1px 4px #000; }
+.cm-sched { align-items: flex-start; }
+.cm-failed { border-color: #f55; color: #f77; }
+.cm-error { color: #f77; font-size: 13px; margin-top: 4px; }
+.cm-totals { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+.cm-totals .card { background: #000; text-align: center; display: flex; flex-direction: column; gap: 4px; }
+.cm-totals b { color: var(--gold-bright); font-size: 18px; }
+.cm-totals span { color: var(--gold); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+.cm-series-head { background: #000; overflow: hidden; }
+.cm-series-head > img, .cm-series-cover-empty { width: 100%; max-height: 260px; object-fit: cover; display: block; }
+.cm-series-cover-empty { height: 140px; display: grid; place-items: center; font-size: 44px; background: #111; }
+.cm-series-title { color: var(--gold); font-size: 22px; margin: 0 0 8px; word-break: break-word; }
+.cm-series-price { position: absolute; left: 6px; bottom: 6px; background: rgba(0,0,0,.8); color: var(--gold); border: 1px solid var(--gold-border); border-radius: 999px; padding: 1px 8px; font-size: 11px; font-weight: 800; }
+.cm-cover-pick { width: 84px; height: 84px; border-radius: 10px; border: 1.5px dashed var(--gold-border); background: #000; color: var(--gold); font-size: 28px; padding: 0; overflow: hidden; cursor: pointer; }
+.cm-cover-pick img { width: 100%; height: 100%; object-fit: cover; }
+.cm-datetime { color-scheme: dark; background: #000; color: var(--gold); border: 1.5px solid var(--gold-border); }
+.cm-upload-link { width: 100%; padding: 12px 14px; border: none; border-bottom: 1px solid var(--line); background: transparent; color: var(--gold); cursor: pointer; font-size: inherit; }
+@media (max-width: 480px) { .cm-totals b { font-size: 15px; } }

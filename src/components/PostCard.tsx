@@ -5,8 +5,11 @@ import { Avatar } from "./Common";
 import { BattleBadge, BattleInfoPopup, BattleStreak, battleBadgeExplainer, battleStreakExplainer } from "./BattleBadge";
 import { GiftFlash, PostGiftButton } from "./GiftSheet";
 import { HashtagText } from "./HashtagText";
+import { EpisodeChip } from "./Creators";
+import { useT } from "../lib/i18n";
 
 export function PostCard({ post }: { post: Post }) {
+  const { t } = useT();
   const [sent, setSent] = useState<Gift | null>(null);
   // Steve, 2026-10-05: "Make all popup into our design black and gold" — the explainers for the
   // two circles open the app's own popup, not the browser's white alert box.
@@ -15,7 +18,16 @@ export function PostCard({ post }: { post: Post }) {
   return (
     <div className="card post-card">
       <Link to={`/video/${post.id}`} className="thumb" style={{ display: "block" }}>
-        {post.thumbnail ? <img src={mediaUrl(post.thumbnail)} alt="" loading="lazy" /> : <video src={mediaUrl(post.video)} muted preload="metadata" />}
+        {/* A locked post (Creators and money, 2026-11-17) has video "": never an empty <video> src. */}
+        {post.thumbnail ? <img src={mediaUrl(post.thumbnail)} alt="" loading="lazy" className={post.locked ? "cm-blur" : undefined} />
+          : post.video ? <video src={mediaUrl(post.video)} muted preload="metadata" /> : <span className="cm-thumb-empty" />}
+        {post.locked && (
+          <span className="cm-card-lock">
+            <span className="cm-locked-icon" style={{ fontSize: 30 }}>🔒</span>
+            <span>{post.locked.reason === "subscribers" ? t("cm_subscribers_only") : `${post.locked.series.title} · ${t("cm_episode_n", post.locked.episode_no ?? 0)}`}</span>
+          </span>
+        )}
+        {!post.locked && post.series_info && <EpisodeChip post={post} style={{ position: "absolute", top: 8, left: 8 }} />}
         <div className="meta">
           <span>♥ {post.likes ?? 0}</span>
           <span style={{ marginLeft: 10 }}>👁 {post.views ?? 0}</span>

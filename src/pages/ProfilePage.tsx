@@ -23,6 +23,9 @@ import { cbText } from "../lib/countryBattle";
 import { StoryRingAvatar } from "../components/Stories";
 import { PlaylistsPanel } from "../components/Playlists";
 import { playlistsFor, socialCall, socialUser, type PlaylistRow } from "../lib/social";
+import { LockBadge, SubscribeButton } from "../components/Creators";
+import { SeriesGrid } from "./CreatorPages";
+import { devCreatorDecorate, fetchUserSeries, type Series } from "../lib/creators";
 
 interface ProfileUser extends UserSummary {
   refer_code?: string;
@@ -70,8 +73,8 @@ interface BattleCareer {
   opponents?: BattleOpponent[];
 }
 
-type TabKey = "videos" | "photos" | "likes" | "reposted" | "playlists" | "saved" | "history" | "following" | "followers" | "friends" | "business";
-const TAB_KEYS: TabKey[] = ["videos", "photos", "likes", "reposted", "playlists", "saved", "history", "following", "followers", "friends", "business"];
+type TabKey = "videos" | "photos" | "likes" | "reposted" | "playlists" | "series" | "saved" | "history" | "following" | "followers" | "friends" | "business";
+const TAB_KEYS: TabKey[] = ["videos", "photos", "likes", "reposted", "playlists", "series", "saved", "history", "following", "followers", "friends", "business"];
 
 const USER_TABS: TabKey[] = ["following", "followers", "friends"];
 
@@ -114,6 +117,8 @@ function ProfileThumb({ p, isMe, onClick }: { p: ProfilePost; isMe: boolean; onC
         <div style={{ width: "100%", height: "100%", background: "#111", display: "flex", alignItems: "center", justifyContent: "center", color: "#333", fontSize: 28 }}>▶</div>
       )}
       {(p.views ?? 0) > 0 && <span className="p-views">{fmt(p.views)}</span>}
+      {/* Creators and money (2026-11-17): subscriber-only / unbought series episode. */}
+      <LockBadge lock={p.locked} />
       {(p.lifetime_votes ?? 0) > 0 && <span className="p-votes">★ {fmt(p.lifetime_votes)}</span>}
       {p.user_video_number != null && <span className="p-num">#{p.user_video_number}</span>}
       {/* Steve, 2026-10-05: "This is not working." It was a plain span with no click on it at
@@ -329,6 +334,7 @@ export function ProfilePage() {
   const [tabError, setTabError] = useState<string | null>(null);
   const [playlists, setPlaylists] = useState<PlaylistRow[]>([]);
   const [playlistCreate, setPlaylistCreate] = useState(0);
+  const [series, setSeries] = useState<Series[] | null>(null);
   const [showBattleBoard, setShowBattleBoard] = useState(false);
   /** Open by default: the point of the card is that people SEE what is scheduled. */
   const [showSchedule, setShowSchedule] = useState(true);
@@ -352,6 +358,7 @@ export function ProfilePage() {
     setTabUsers([]);
     setTabPhotos([]);
     setPhotoCount(null);
+    setSeries(null);
 
     (async () => {
       try {
@@ -387,6 +394,12 @@ export function ProfilePage() {
 
     // Steve, 2026-10-01: "Add a 'Business' tab in the personal profile page." The panel fetches
     // and renders its own data (fetchMyBusinesses), so there is nothing for this effect to load.
+    if (tab === "series") {
+      // Creators and money (2026-11-17): the member's paid video series.
+      setSeries(null);
+      fetchUserSeries(Number(id)).then(setSeries).catch(() => setSeries([])).finally(() => setTabLoading(false));
+      return;
+    }
     if (tab === "business" || tab === "playlists") {
       setTabLoading(false);
       return;
@@ -423,7 +436,7 @@ export function ProfilePage() {
     // own validator on 2026-09-26. Three of these used to name routes that DO NOT EXIST —
     // fetchRepostVideos, fetchFriendsList and fetchUserWatchHistory — so those tabs 404'd and
     // rendered empty forever. A guessed endpoint name fails exactly like a missing feature.
-    const endpointMap: Record<Exclude<TabKey, "photos" | "business" | "playlists">, [string, Record<string, unknown>]> = {
+    const endpointMap: Record<Exclude<TabKey, "photos" | "business" | "playlists" | "series">, [string, Record<string, unknown>]> = {
       videos: ["fetchUserPosts", { user_id: id, ...base }],
       // NOT fetchUserPostsWithLikes: that returns THIS member's own posts that have received
       // likes, whereas the "Likes" count beside the tab is likedVideosCounts — the videos they
@@ -472,7 +485,10 @@ export function ProfilePage() {
         } else {
           // Reposted and Likes are join rows carrying the post under `post`; Videos/Saved/History
           // are already posts. `?? row` keeps both shapes working through one path.
-          setTabVideos(items.map((row) => (row.post ?? row) as ProfilePost).filter(Boolean));
+          const vids = items.map((row) => (row.post ?? row) as ProfilePost).filter(Boolean);
+          setTabVideos(vids);
+          // Dev server: the Creators mock's locks over the real list.
+          if (import.meta.env.DEV) void devCreatorDecorate(vids).then(setTabVideos);
         }
       })
       .catch((e: unknown) => {
@@ -591,6 +607,8 @@ export function ProfilePage() {
     { key: "reposted", label: t("soc_reposts"), count: profile.repostedCounts },
     // Steve, 2026-11-17: "Playlists on a profile" — everyone's, with the owner's create/edit/delete.
     { key: "playlists", label: t("fname_playlists"), count: playlists.length },
+    // Creators and money (Steve, 2026-11-17): paid video series.
+    { key: "series", label: t("cm_series_tab"), count: series ? series.length : undefined },
     ...(isMe ? [
       { key: "saved" as TabKey, label: "Saved" },
       { key: "history" as TabKey, label: "History" },
@@ -741,6 +759,8 @@ export function ProfilePage() {
               {following ? "Following" : "Follow"}
             </button>
           )}
+          {/* Creators and money (2026-11-17): "Subscribe · 199 BBs/month" when they offer one. */}
+          {!isMe && <SubscribeButton creatorId={profile.id} creatorName={displayName(profile)} />}
           {/* Steve, 2026-11-09: "Please add send a message to members public profile page." This
               was the Chat button, shown only on a mutual follow; now every signed-in member gets
               it, and the one-message-until-they-reply limit is enforced in the thread itself. */}
@@ -769,6 +789,9 @@ export function ProfilePage() {
             <button className="btn ghost small" onClick={() => { switchTab("playlists"); setPlaylistCreate((n) => n + 1); }}>
               {t("playlist")}</button>
           )}
+          {/* Creators and money (2026-11-17). */}
+          {isMe && <button className="btn ghost small" onClick={() => navigate("/subscriptions")}>💎 {t("cm_my_subscription")}</button>}
+          {isMe && <button className="btn ghost small" onClick={() => navigate("/scheduled")}>🗓 {t("cm_scheduled_posts")}</button>}
         </div>
 
         {!isMe && isLoggedIn && me && <ChatBattleAlertToggle myId={me.id} host={profile} following={following} />}
@@ -800,11 +823,16 @@ export function ProfilePage() {
       <div style={{ marginTop: 4 }}>
         {tabLoading ? (
           <div style={{ padding: "32px 0" }}><Loading /></div>
-        ) : tabError && tab !== "playlists" && tab !== "business" ? (
+        ) : tabError && tab !== "playlists" && tab !== "business" && tab !== "series" ? (
           <p className="muted" style={{ padding: "24px 0", textAlign: "center" }}>{tabError}</p>
         ) : tab === "playlists" ? (
           <PlaylistsPanel ownerId={profile.id} isMe={isMe} myId={me?.id} playlists={playlists}
             onChanged={() => void reloadPlaylists()} createRequest={playlistCreate} />
+        ) : tab === "series" ? (
+          <div>
+            {isMe && <button className="btn gold" style={{ width: "100%", margin: "8px 0 12px" }} onClick={() => navigate("/series/new")}>{t("cm_new_series")}</button>}
+            {series === null ? <Loading /> : <SeriesGrid series={series} />}
+          </div>
         ) : tab === "business" ? (
           isMe ? <MyBusinessesPanel /> : <MemberBusinessesPanel userId={profile.id} />
         ) : tab === "photos" ? (
