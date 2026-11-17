@@ -33,6 +33,9 @@ const chip = (on: boolean): React.CSSProperties => ({
   border: "1.5px solid var(--gold-border)", background: on ? "var(--gold)" : "#000", color: on ? "#000" : "var(--gold)",
 });
 const qLabel: React.CSSProperties = { color: "var(--gold)", fontWeight: 800, fontSize: 16, margin: "0 0 8px", display: "flex", gap: 10, alignItems: "flex-start" };
+const PURPOSE_ICONS: Record<string, string> = { me: "🌟", business: "🏪" };
+/** The "What do you want to say" example, by what the ad is for (v2.1: Bingg Bongg or a business). */
+const SAY_PH: Record<string, StringKey> = { me: "vad_q_say_ph", business: "vad_q_say_ph_business" };
 const TONE_ICONS: Record<string, string> = { excited: "🔥", friendly: "😊", professional: "💼", funny: "😂" };
 
 function QNum({ n }: { n: number }) {
@@ -128,7 +131,7 @@ export function AdStartPage() {
       <div style={{ ...SONG_GOLD_CARD, textAlign: "center", padding: "26px 18px" }}>
         <div style={{ fontSize: 50, lineHeight: 1 }}>🎬</div>
         <h2 style={{ color: "var(--gold-bright)", fontSize: "clamp(22px, 6vw, 30px)", lineHeight: 1.2, margin: "12px 0 12px" }}>{t("vad_line_1", o.max_seconds)}</h2>
-        <p className="soft" style={{ fontSize: 16, margin: "0 0 6px" }}>{t("vad_line_2", o.price_bbs, o.free_edits)}</p>
+        <p className="soft" style={{ fontSize: 16, margin: "0 0 6px" }}>{o.extra_change_bbs != null ? t("vad_line_2_extra", o.price_bbs, o.included_changes, o.extra_change_bbs) : t(o.included_changes === 1 ? "vad_line_2_one" : "vad_line_2", o.price_bbs, o.included_changes)}</p>
         <p className="soft" style={{ fontSize: 16, margin: "0 0 20px" }}>{t("vad_line_3")}</p>
         <button className="btn gold block" style={{ fontSize: 20, minHeight: 58, fontWeight: 900 }}
           onClick={() => (me ? navigate(`${BASE}/new`) : navigate("/login", { state: { from: `${BASE}/new` } }))}>
@@ -185,6 +188,9 @@ export function AdQuestionsPage({ edit = false }: { edit?: boolean }) {
   const [loaded, setLoaded] = useState<AdMakerAd | null>(null);
   const [loadError, setLoadError] = useState("");
   const [change, setChange] = useState("");
+  const [purpose, setPurpose] = useState("me");
+  const [businessName, setBusinessName] = useState("");
+  const [contact, setContact] = useState("");
   const [mention, setMention] = useState("");
   const [media, setMedia] = useState<Pick[]>([]);
   const [parts, setParts] = useState<string[]>([]);
@@ -202,7 +208,7 @@ export function AdQuestionsPage({ edit = false }: { edit?: boolean }) {
     if (!me || !startId) return;
     fetchAdMakerAd(me, startId).then((a) => {
       setLoaded(a);
-      setMention(a.mention); setNotes(a.notes); setParts(a.parts); setTone(a.tone || "excited");
+      setPurpose(a.purpose || "me"); setBusinessName(a.business_name); setContact(a.contact); setMention(a.mention); setNotes(a.notes); setParts(a.parts); setTone(a.tone || "excited");
       setVoice(a.voice || "female"); setLanguage(a.language || "en"); setMedia(a.media);
     }).catch((e) => setLoadError((e as Error).message));
   }, [me, startId]);
@@ -239,7 +245,7 @@ export function AdQuestionsPage({ edit = false }: { edit?: boolean }) {
   }
 
   const answers = (): AdAnswers => ({
-    mention: mention.trim(), notes: notes.trim(), parts, media: media.filter((m) => m.key).map((m) => ({ type: m.type, key: m.key })),
+    purpose, business_name: purpose === "business" ? businessName.trim() : "", contact: purpose === "business" ? contact.trim() : "", mention: mention.trim(), notes: notes.trim(), parts, media: media.filter((m) => m.key).map((m) => ({ type: m.type, key: m.key })),
     tone, voice, language,
   });
 
@@ -247,6 +253,7 @@ export function AdQuestionsPage({ edit = false }: { edit?: boolean }) {
     if (!me || busy) return;
     if (uploading) { showGoldAlert(t("vad_wait_uploads")); return; }
     if (!mention.trim() && !parts.length) { showGoldAlert(t("vad_need_something")); return; }
+    if (purpose === "business" && !businessName.trim() && !contact.trim()) { showGoldAlert(t("vad_need_business")); return; }
     if (!(await showGoldConfirm({ message: t("vad_confirm", opts.price_bbs), confirmLabel: t("vad_go_ahead"), cancelLabel: t("cancel") }))) return;
     setBusy(true);
     try {
@@ -266,7 +273,18 @@ export function AdQuestionsPage({ edit = false }: { edit?: boolean }) {
     if (!change.trim()) { showGoldAlert(t("vad_need_change")); return; }
     setBusy(true);
     try {
-      const a = await adMakerEdit(me, loaded.id, change.trim(), answers());
+      let a: AdMakerAd;
+      try {
+        a = await adMakerEdit(me, loaded.id, change.trim(), answers());
+      } catch (e) {
+        // After the included change, another one costs BBs: ask with the server's sentence, then
+        // send the very same request again with confirm_pay=1.
+        if (!(e instanceof AdMakerError) || e.code !== "change_costs_bbs") throw e;
+        const price = Number(e.data?.coins_needed ?? loaded.extra_change_bbs ?? opts.extra_change_bbs ?? 0);
+        const yes = await showGoldConfirm({ message: e.message, confirmLabel: t("vad_pay_bbs", price), cancelLabel: t("cancel") });
+        if (!yes) { setBusy(false); return; }
+        a = await adMakerEdit(me, loaded.id, change.trim(), answers(), true);
+      }
       navigate(`${BASE}/${a.id}`, { replace: true });
     } catch (e) {
       setBusy(false);
@@ -278,11 +296,16 @@ export function AdQuestionsPage({ edit = false }: { edit?: boolean }) {
   if (!me) return <div className="page" style={{ maxWidth: 680 }}><PageTitle>{title}</PageTitle><SignInNotice /></div>;
   if (startId && loadError) return <div className="page" style={{ maxWidth: 680 }}><PageTitle>{title}</PageTitle><Notice error>{loadError}</Notice></div>;
   if (startId && !loaded) return <div className="page" style={{ maxWidth: 680 }}><PageTitle>{title}</PageTitle><Loading /></div>;
-  if (edit && loaded && loaded.edits_left <= 0) {
+  const extraBbs = loaded?.extra_change_bbs ?? opts.extra_change_bbs;
+  const paidChange = !!(edit && loaded && loaded.edits_left <= 0);
+  if (paidChange && extraBbs == null) {
     return (
       <div className="page" style={{ maxWidth: 680 }}>
-        <PageTitle backTo={`${BASE}/${loaded.id}`}>{title}</PageTitle>
-        <div style={{ ...SONG_GOLD_CARD, textAlign: "center" }}><p style={{ color: "var(--gold)", fontWeight: 800 }}>{t("vad_no_changes_left")}</p></div>
+        <PageTitle backTo={`${BASE}/${loaded!.id}`}>{title}</PageTitle>
+        <div style={{ ...SONG_GOLD_CARD, textAlign: "center" }}>
+          <p style={{ color: "var(--gold)", fontWeight: 800, marginBottom: 4 }}>{t("vad_no_changes_left")}</p>
+          <p className="muted" style={{ marginTop: 0 }}>{t("vad_more_changes_soon")}</p>
+        </div>
       </div>
     );
   }
@@ -294,7 +317,9 @@ export function AdQuestionsPage({ edit = false }: { edit?: boolean }) {
       <div style={SONG_GOLD_CARD}>
         {edit && loaded && (
           <>
-            <div style={{ color: "var(--gold)", fontWeight: 800, textAlign: "center", marginBottom: 12 }}>{t("vad_changes_left", loaded.edits_left, opts.free_edits)}</div>
+            <div style={{ color: "var(--gold)", fontWeight: 800, textAlign: "center", marginBottom: 12 }}>
+              {paidChange ? t("vad_change_costs", extraBbs ?? 0) : t("vad_changes_left", loaded.edits_left, loaded.included_changes)}
+            </div>
             <p style={qLabel}><QNum n={++n} /><span>{t("vad_q_change")}</span></p>
             <textarea className="input" value={change} maxLength={800} rows={3} autoFocus onChange={(e) => setChange(e.target.value)}
               placeholder={t("vad_q_change_ph")} aria-label={t("vad_q_change")} style={{ padding: 12, resize: "vertical", minHeight: 90, lineHeight: 1.4 }} />
@@ -302,9 +327,31 @@ export function AdQuestionsPage({ edit = false }: { edit?: boolean }) {
           </>
         )}
 
-        <p style={qLabel}><QNum n={++n} /><span>{t("vad_q_say")}</span></p>
+        <p style={qLabel}><QNum n={++n} /><span>{t("vad_q_purpose")}</span></p>
+        <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.min(opts.purposes.length, 2) || 1}, 1fr)`, gap: 10 }} role="radiogroup" aria-label={t("vad_q_purpose")}>
+          {opts.purposes.map((x) => (
+            <button key={x.key} type="button" role="radio" aria-checked={purpose === x.key}
+              style={{ ...chip(purpose === x.key), whiteSpace: "normal", padding: "16px 10px", fontSize: 17, borderRadius: 16, display: "flex", flexDirection: "column", alignItems: "center", gap: 6, lineHeight: 1.25 }}
+              onClick={() => { if (x.key !== purpose && x.key !== "me" && !loaded) setParts([]); setPurpose(x.key); }}>
+              <span style={{ fontSize: 34, lineHeight: 1 }}>{PURPOSE_ICONS[x.key] ?? "✦"}</span>
+              {x.label}
+            </button>
+          ))}
+        </div>
+        {purpose === "business" && (
+          <div data-testid="ad-business-fields">
+            <p style={{ ...qLabel, marginTop: 16 }}><span>{t("vad_q_business_name")}</span></p>
+            <input className="input" value={businessName} maxLength={80} onChange={(e) => setBusinessName(e.target.value)}
+              placeholder={t("vad_q_business_name_ph")} aria-label={t("vad_q_business_name")} />
+            <p style={{ ...qLabel, marginTop: 14 }}><span>{t("vad_q_contact")}</span></p>
+            <textarea className="input" value={contact} maxLength={300} rows={3} onChange={(e) => setContact(e.target.value)}
+              placeholder={t("vad_q_contact_ph")} aria-label={t("vad_q_contact")} style={{ padding: 12, resize: "vertical", minHeight: 84, lineHeight: 1.4 }} />
+          </div>
+        )}
+
+        <p style={{ ...qLabel, marginTop: 20 }}><QNum n={++n} /><span>{t("vad_q_say")}</span></p>
         <textarea className="input" value={mention} maxLength={1500} rows={4} onChange={(e) => setMention(e.target.value)}
-          placeholder={t("vad_q_say_ph")} aria-label={t("vad_q_say")} style={{ padding: 12, resize: "vertical", minHeight: 110, lineHeight: 1.4 }} />
+          placeholder={t(SAY_PH[purpose] ?? "vad_q_say_ph_business")} aria-label={t("vad_q_say")} style={{ padding: 12, resize: "vertical", minHeight: 110, lineHeight: 1.4 }} />
 
         <p style={{ ...qLabel, marginTop: 20 }}><QNum n={++n} /><span>{t("vad_q_media", maxMedia)}</span></p>
         <input ref={fileRef} type="file" accept="image/*,video/*" multiple style={{ display: "none" }}
@@ -339,7 +386,19 @@ export function AdQuestionsPage({ edit = false }: { edit?: boolean }) {
         </div>
         <style>{"@keyframes vaSpin { to { transform: rotate(360deg) } } .va-spin { width: 28px; height: 28px; border-radius: 50%; border: 3px solid rgba(240,196,32,.25); border-top-color: var(--gold); animation: vaSpin .8s linear infinite; display: inline-block }"}</style>
 
-        <p style={{ ...qLabel, marginTop: 20 }}><QNum n={++n} /><span>{t("vad_q_parts")}</span></p>
+        <p style={{ ...qLabel, marginTop: 20 }}><QNum n={++n} /><span>{t("vad_q_presenter")}</span></p>
+        <div style={{ display: "flex", gap: 10 }} role="radiogroup" aria-label={t("vad_q_presenter")}>
+          {(opts.voices.length ? opts.voices : ["female", "male"]).map((v) => (
+            <button key={v} type="button" role="radio" aria-checked={voice === v} onClick={() => setVoice(v)}
+              style={{ ...chip(voice === v), flex: 1, padding: "16px 10px", fontSize: 19, borderRadius: 16, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+              <span style={{ fontSize: 40, lineHeight: 1 }}>{v === "male" ? "👨" : "👩"}</span>
+              {v === "male" ? t("vad_voice_man") : t("vad_voice_woman")}
+            </button>
+          ))}
+        </div>
+        {!opts.presenter && <p className="muted" style={{ fontSize: 12, margin: "6px 0 0" }}>{t("vad_presenter_voice_note")}</p>}
+
+        <p style={{ ...qLabel, marginTop: 20 }}><QNum n={++n} /><span>{t("vad_q_parts_optional")}</span></p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
           {opts.parts.map((p) => {
             const on = parts.includes(p.key);
@@ -358,13 +417,6 @@ export function AdQuestionsPage({ edit = false }: { edit?: boolean }) {
             <button key={x.key} type="button" style={chip(tone === x.key)} onClick={() => setTone(x.key)}>{TONE_ICONS[x.key] ?? "🎙"} {x.label}</button>
           ))}
         </div>
-        <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
-          {opts.voices.map((v) => (
-            <button key={v} type="button" style={{ ...chip(voice === v), flex: 1, padding: "12px 14px", fontSize: 16 }} onClick={() => setVoice(v)}>
-              {v === "male" ? `👨 ${t("vad_voice_man")}` : v === "female" ? `👩 ${t("vad_voice_woman")}` : v}
-            </button>
-          ))}
-        </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 12 }}>
           {opts.languages.map((l) => (
             <button key={l.code} type="button" style={chip(language === l.code)} onClick={() => setLanguage(l.code)}>{l.name}</button>
@@ -376,19 +428,21 @@ export function AdQuestionsPage({ edit = false }: { edit?: boolean }) {
           placeholder={t("vad_q_notes_ph")} aria-label={t("vad_q_notes")} style={{ padding: 12, resize: "vertical", minHeight: 90, lineHeight: 1.4 }} />
 
         <div style={{ marginTop: 20, border: "1.5px solid var(--gold-border)", borderRadius: 12, padding: "12px 14px", color: "var(--gold)", lineHeight: 1.45 }}>
-          ⏱ {t("vad_note", opts.max_seconds, code || t("vad_your_username"))}
+          ⏱ {purpose === "business"
+            ? t(opts.included_changes === 1 ? "vad_note_business_one" : "vad_note_business", opts.max_seconds, opts.included_changes)
+            : t(opts.included_changes === 1 ? "vad_note_one" : "vad_note", opts.max_seconds, code || t("vad_your_username"), opts.included_changes)}
         </div>
 
         {edit ? (
           <button className="btn gold block" style={{ marginTop: 20, fontSize: 19, minHeight: 56, fontWeight: 900 }} disabled={busy || !change.trim()} onClick={() => void makeChanges()}>
-            {busy ? t("song_starting") : `✎ ${t("vad_send_changes")}`}
+            {busy ? t("song_starting") : paidChange ? `✎ ${t("vad_another_change", extraBbs ?? 0)}` : `✎ ${t("vad_send_changes")}`}
           </button>
         ) : (
           <button className="btn gold block" style={{ marginTop: 20, fontSize: 19, minHeight: 56, fontWeight: 900 }} disabled={busy} onClick={() => void make()}>
             {busy ? t("song_starting") : `🎬 ${t("vad_make_for", opts.price_bbs)}`}
           </button>
         )}
-        {edit && <p className="muted" style={{ textAlign: "center", fontSize: 12, marginBottom: 0 }}>{t("vad_changes_free")}</p>}
+        {edit && !paidChange && <p className="muted" style={{ textAlign: "center", fontSize: 12, marginBottom: 0 }}>{t("vad_changes_free")}</p>}
       </div>
     </div>
   );
@@ -480,7 +534,8 @@ function YourAdView({ ad }: { ad: AdMakerAd }) {
   const [posting, setPosting] = useState(false);
   const share = ad.share_url ?? "";
   const remaking = ad.status === "remaking";
-  const total = ad.edits_used + ad.edits_left || 3;
+  const total = ad.included_changes || 1;
+  const extra = ad.extra_change_bbs;
   const shareText = t("vad_share_text", ad.referral_code ?? "", share);
 
   async function doShare() {
@@ -533,12 +588,12 @@ function YourAdView({ ad }: { ad: AdMakerAd }) {
         <div style={{ ...SONG_GOLD_CARD, marginTop: 14 }}>
           <div style={{ color: "var(--gold-bright)", fontWeight: 900, fontSize: 17, marginBottom: 10 }}>{t("vad_script")}</div>
           {ad.script.map((l, i) => {
-            const isCode = i === ad.script.length - 1 || l.show === "code";
+            const isEnd = i === ad.script.length - 1;
             return (
               <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "8px 0", borderTop: i ? "1px solid #2a2a2a" : 0 }}>
                 <span style={{ flex: "0 0 24px", color: "var(--gold)", fontWeight: 800, fontVariantNumeric: "tabular-nums" }}>{i + 1}.</span>
-                <span style={{ flex: 1, color: isCode ? "var(--gold-bright)" : "var(--gold)", fontWeight: isCode ? 800 : 500, lineHeight: 1.4 }}>{l.say}</span>
-                {isCode && <span style={{ flex: "none", fontSize: 11, fontWeight: 800, color: "#000", background: "var(--gold)", borderRadius: 999, padding: "2px 8px", whiteSpace: "nowrap" }}>{t("vad_your_code")}</span>}
+                <span style={{ flex: 1, minWidth: 0, overflowWrap: "anywhere", color: isEnd ? "var(--gold-bright)" : "var(--gold)", fontWeight: isEnd ? 800 : 500, lineHeight: 1.4 }}>{l.say}</span>
+                {isEnd && <span style={{ flex: "none", fontSize: 11, fontWeight: 800, color: "#000", background: "var(--gold)", borderRadius: 999, padding: "2px 8px", whiteSpace: "nowrap" }}>{ad.ends_with_code ? t("vad_your_code") : t("vad_your_contact")}</span>}
               </div>
             );
           })}
@@ -546,10 +601,13 @@ function YourAdView({ ad }: { ad: AdMakerAd }) {
       )}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10, marginTop: 14 }}>
-        <button className="btn gold" style={{ ...btn, gridColumn: "1 / -1" }} disabled={remaking || ad.edits_left <= 0}
-          onClick={() => navigate(`${BASE}/${ad.id}/edit`)}>
-          {ad.edits_left <= 0 ? t("vad_no_changes_left") : `✎ ${t("vad_make_changes")}`}
-        </button>
+        <div style={{ gridColumn: "1 / -1" }}>
+          <button className="btn gold block" style={btn} disabled={remaking || (ad.edits_left <= 0 && extra == null)}
+            onClick={() => navigate(`${BASE}/${ad.id}/edit`)}>
+            {ad.edits_left > 0 ? `✎ ${t("vad_make_changes")}` : extra != null ? `✎ ${t("vad_another_change", extra)}` : t("vad_no_changes_left")}
+          </button>
+          {ad.edits_left <= 0 && extra == null && <p className="muted" style={{ textAlign: "center", fontSize: 12, margin: "6px 0 0" }}>{t("vad_more_changes_soon")}</p>}
+        </div>
         {ad.post_id
           ? <button className="btn" style={btn} onClick={() => navigate(`/video/${ad.post_id}`)}>▶ {t("song_see_video")}</button>
           : <button className="btn" style={btn} disabled={remaking || posting || !ad.video_url} onClick={() => void postIt()}>📤 {posting ? t("snd_loading") : t("vad_post")}</button>}

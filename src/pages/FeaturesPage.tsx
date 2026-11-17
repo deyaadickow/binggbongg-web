@@ -207,7 +207,8 @@ export const FEATURES: Section[] = [
       // Steve, 2026-10-31: "Can we add analytics for all members?" -> "In the app, for each member".
       { icon: "📈", nameKey: "fname_my_analytics", blurbKey: "fblurb_my_analytics", to: "/my-analytics" },
       { icon: "🏪", nameKey: "fname_bingg_bongg_shop", blurbKey: "fblurb_bingg_bongg_shop", to: "/shop" },
-      { icon: "🎥", nameKey: "fname_video_ad_gig", blurbKey: "fblurb_video_ad_gig", to: "/gigs" },
+      // Video Ad Gig retired 2026-11-17 (Steve: "we can eliminate our influencers ads jobs and we can just do ours"):
+      // { icon: "🎥", nameKey: "fname_video_ad_gig", blurbKey: "fblurb_video_ad_gig", to: "/gigs" },
       { icon: "🎤", nameKey: "fname_your_own_live_show", blurbKey: "fblurb_your_own_live_show", to: "/my-show" },
     ],
   },

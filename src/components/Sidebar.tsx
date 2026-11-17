@@ -26,8 +26,9 @@ export function sidebarSections(userId: number | null, contestOn = false, podcas
       { to: "/live", label: "live_now", icon: "🔴" },
       // Your own live Bingg Bongg show (Steve, 2026-10-17).
       { to: "/shows", label: "shows", icon: "📺" },
-      // Video Ad Gig (Steve, 2026-10-17).
-      { to: "/gigs", label: "video_ad_gig", icon: "🎥" },
+      // Video Ad Gig (Steve, 2026-10-17) RETIRED 2026-11-17 (Steve: "we can eliminate our influencers
+      // ads jobs and we can just do ours" — Bingg Bongg Video Ad replaces it). The pages stay, unlinked.
+      // { to: "/gigs", label: "video_ad_gig", icon: "🎥" },
       // Steve, 2026-10-18: "add a tab on main feed for 'Go live on 6 platforms' and when tapped
       // link them right to that page on their settings." The phones put a chip on the feed; the
       // web's feed-level navigation is this list, so it goes here — pointing at the same
@@ -65,7 +66,7 @@ export function sidebarSections(userId: number | null, contestOn = false, podcas
         { to: "/podcasts", label: "pod_title_short", icon: "🎧" } as SideLink,
       ] : []),
       { to: "/my-show", label: "my_show", icon: "🎙", needsLogin: true },
-      { to: "/my-gigs", label: "gig_my_gigs", icon: "🎬", needsLogin: true },
+      // Video Ad Gig retired 2026-11-17 (see above): { to: "/my-gigs", label: "gig_my_gigs", icon: "🎬", needsLogin: true },
       // Lucky numbers + daily horoscope (Steve, 2026-10-09) — the feed-level door, matching
       // the Home chip on the phones. There is a second one under Account, matching their
       // Settings row; Steve asked for both.

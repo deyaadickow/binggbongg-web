@@ -1,3 +1,12 @@
+// v2 (Steve, 2026-11-17, later): "This is one of the questions to the member, Do you want a man or
+// a woman," / "we don't have to do 3 reviews, we can do only one, if they want more it will cost them
+// more." / "we should do these ads for everyone for any reason or job". So: a purpose question, the
+// presenter's sex (= voice), ONE included change, and later changes paid (change_costs_bbs ->
+// confirm_pay=1) once the server prices them (extra_change_bbs; null = not for sale yet).
+// v2.1 (Steve: "Extra changes cost 100 BBs each" / "We don't have to put their referral code if they
+// are making an ad for their business."): two purposes, me = Bingg Bongg (ends with the referral
+// code) and business (business_name + contact, and the ad ends with those instead).
+//
 // Bingg Bongg Video Ad (Steve, 2026-11-17: "Just like Bingg Bongg Song I want to be able to create a
 // 60 seconds video ads for members for 500 BBs ... view it and edit up to 3 times, alway important
 // to mention their referral code at the end of the ad. Minus 500 BBs from their account before you
@@ -20,6 +29,11 @@ export interface AdScriptLine { say: string; show?: string }
 export interface AdMakerAd {
   id: number;
   status: AdStatus;
+  purpose: string;
+  business_name: string;
+  contact: string;
+  /** true = the last scene is the referral code (purpose me); false = the business name + contact. */
+  ends_with_code: boolean;
   mention: string;
   notes: string;
   parts: string[];
@@ -38,6 +52,9 @@ export interface AdMakerAd {
   coins_charged?: number;
   edits_used: number;
   edits_left: number;
+  included_changes: number;
+  /** BBs for one more change after the included one(s); null = not for sale yet. */
+  extra_change_bbs: number | null;
   refunded?: boolean;
   failure_reason?: string | null;
   share_url?: string | null;
@@ -49,6 +66,11 @@ export interface AdMakerAd {
 export interface AdMakerOptions {
   price_bbs: number;
   free_edits: number;
+  included_changes: number;
+  extra_change_bbs: number | null;
+  /** A presenter (talking person) is set up on the server; false = voice-over only. */
+  presenter: boolean;
+  purposes: { key: string; label: string }[];
   max_seconds: number;
   max_media: number;
   parts: { key: string; label: string; about?: string }[];
@@ -72,7 +94,13 @@ export interface SharedAd {
  *  before the server is deployed and if adMakerOptions ever fails. adMakerOptions replaces them. */
 export const DEFAULT_AD_OPTIONS: AdMakerOptions = {
   price_bbs: 500,
-  free_edits: 3,
+  free_edits: 1,
+  included_changes: 1,
+  extra_change_bbs: 100,
+  presenter: false,
+  purposes: [
+    { key: "me", label: "Bingg Bongg" }, { key: "business", label: "My business / something else" },
+  ],
   max_seconds: 60,
   max_media: 8,
   parts: [
@@ -122,6 +150,11 @@ async function call<T>(endpoint: string, params: Record<string, unknown>): Promi
     const mode = adMockMode();
     if (mode) {
       const m = await import("./adMakerMock");
+      // The options come from the real (live) server even with the mock on; the mock only adjusts them.
+      if (endpoint === "adMakerOptions") {
+        const real = await post<T>(endpoint, params).catch(() => null);
+        return m.mockAdOptions<T>(real, mode);
+      }
       return m.mockAdCall<T>(endpoint, params, mode);
     }
   }
@@ -141,6 +174,10 @@ export function normaliseAd(raw: Partial<AdMakerAd> & Record<string, unknown>): 
     ...(raw as AdMakerAd),
     id: Number(raw.id),
     status: (raw.status ?? "draft") as AdStatus,
+    purpose: String(raw.purpose ?? "me"),
+    business_name: String(raw.business_name ?? ""),
+    contact: String(raw.contact ?? ""),
+    ends_with_code: raw.ends_with_code == null ? String(raw.purpose ?? "me") !== "business" : [true, 1, "1"].includes(raw.ends_with_code as unknown as boolean | number | string),
     mention: String(raw.mention ?? ""),
     notes: String(raw.notes ?? ""),
     parts: arr<string>(raw.parts).map(String),
@@ -153,6 +190,8 @@ export function normaliseAd(raw: Partial<AdMakerAd> & Record<string, unknown>): 
     price_bbs: Number(raw.price_bbs ?? 500) || 500,
     edits_used: Number(raw.edits_used ?? 0) || 0,
     edits_left: Number(raw.edits_left ?? 0) || 0,
+    included_changes: Number(raw.included_changes ?? 1) || 1,
+    extra_change_bbs: raw.extra_change_bbs == null || (raw.extra_change_bbs as unknown) === "" ? null : Number(raw.extra_change_bbs) || null,
     duration: raw.duration == null ? null : Number(raw.duration),
     refunded: [true, 1, "1"].includes(raw.refunded as unknown as boolean | number | string),
   };
@@ -189,6 +228,10 @@ export async function fetchAdMakerOptions(): Promise<AdMakerOptions> {
     return {
       price_bbs: Number(d.price_bbs) || DEFAULT_AD_OPTIONS.price_bbs,
       free_edits: Number(d.free_edits) || DEFAULT_AD_OPTIONS.free_edits,
+      included_changes: Number(d.included_changes ?? d.free_edits) || DEFAULT_AD_OPTIONS.included_changes,
+      extra_change_bbs: d.extra_change_bbs == null ? null : Number(d.extra_change_bbs) || null,
+      presenter: !!d.presenter,
+      purposes: d.purposes?.length ? d.purposes : DEFAULT_AD_OPTIONS.purposes,
       max_seconds: Number(d.max_seconds) || DEFAULT_AD_OPTIONS.max_seconds,
       max_media: Number(d.max_media) || DEFAULT_AD_OPTIONS.max_media,
       parts: d.parts?.length ? d.parts : DEFAULT_AD_OPTIONS.parts,
@@ -203,6 +246,9 @@ export async function fetchAdMakerOptions(): Promise<AdMakerOptions> {
 }
 
 export interface AdAnswers {
+  purpose: string;
+  business_name: string;
+  contact: string;
   mention: string;
   notes: string;
   parts: string[];
@@ -226,9 +272,13 @@ export async function adMakerMake(myId: number, adId: number): Promise<AdMakerAd
   return adOrThrow(r, "Your ad couldn't be started. Please try again.");
 }
 
-/** One of the free changes. Throws AdMakerError("no_edits_left") when they are used up. */
-export async function adMakerEdit(myId: number, adId: number, change: string, a?: AdAnswers): Promise<AdMakerAd> {
-  const r = await call<Record<string, unknown>>("adMakerEdit", { my_user_id: myId, ad_id: adId, change_request: change, ...(a ? wire(a) : {}) });
+/** A change. The included one is free; after it the server answers AdMakerError("change_costs_bbs")
+ *  with the price sentence — ask, then send the same request again with confirmPay. When more
+ *  changes are not for sale: AdMakerError("no_edits_left"). Short of BBs: "not_enough_coins". */
+export async function adMakerEdit(myId: number, adId: number, change: string, a?: AdAnswers, confirmPay = false): Promise<AdMakerAd> {
+  const r = await call<Record<string, unknown>>("adMakerEdit", {
+    my_user_id: myId, ad_id: adId, change_request: change, ...(a ? wire(a) : {}), ...(confirmPay ? { confirm_pay: 1 } : {}),
+  });
   return adOrThrow(r, "Your changes couldn't be started. Please try again.");
 }
 
