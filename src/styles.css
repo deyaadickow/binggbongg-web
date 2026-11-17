@@ -1491,3 +1491,36 @@ body.signup-black { background: radial-gradient(120% 55% at 50% 0%, #2a2108 0%, 
 .dr-bbs.leader { border: 2px solid #FF1A1A; animation: dr-leader-blink 1s ease-in-out infinite; }
 @keyframes dr-leader-blink { 0%, 100% { border-color: #FF1A1A; } 50% { border-color: rgba(255, 26, 26, .15); } }
 @media (prefers-reduced-motion: reduce) { .dr-bbs.leader { animation: none; border-color: #FF1A1A; } }
+
+/* ---- Finding videos (Steve, 2026-11-16) ---------------------------------------------------- */
+.fnd-feed-tabs { display: flex; gap: 2px; min-width: 0; }
+.fnd-feed-tabs button { background: transparent; border: none; border-bottom: 3px solid transparent; color: var(--text-soft); font-weight: 700; font-size: 17px; padding: 6px 10px 5px; cursor: pointer; white-space: nowrap; }
+.fnd-feed-tabs button:hover { color: var(--gold); }
+.fnd-feed-tabs button.active { color: var(--gold); border-bottom-color: var(--gold); font-weight: 800; }
+@media (max-width: 420px) { .fnd-feed-tabs button { font-size: 15px; padding: 6px 6px 5px; } .fnd-feed-tabs + .feed-live-btn { margin-left: 4px; } }
+.fnd-gotit { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 65; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 8px; width: max-content; max-width: calc(100vw - 32px); padding: 10px 16px; border-radius: 12px; background: #000; border: 1.5px solid var(--gold-border); color: var(--gold); font-weight: 700; font-size: 14px; box-shadow: 0 6px 24px rgba(0,0,0,.6); }
+.fnd-gotit button { background: none; border: none; color: var(--gold-bright); font-weight: 800; font-size: 14px; cursor: pointer; text-decoration: underline; padding: 2px; }
+.fnd-searchbar { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 16px; margin-bottom: 18px; border-radius: 999px; border: 1.5px solid var(--gold-border); background: #0d0d0d; color: var(--text-soft); font-size: 15px; cursor: pointer; text-align: left; }
+.fnd-section-title { color: var(--gold); font-size: 18px; font-weight: 800; margin: 18px 0 10px; }
+.fnd-tag-row { display: block; padding: 12px; margin-bottom: 10px; color: inherit; }
+.fnd-tag-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; }
+.fnd-tag-head b { color: var(--gold); font-size: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.fnd-strip { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.fnd-strip::-webkit-scrollbar { display: none; }
+.fnd-strip img, .fnd-strip .ph { flex: 0 0 auto; width: 72px; height: 100px; object-fit: cover; border-radius: 8px; border: 1px solid var(--gold-border); background: #111; }
+.fnd-hscroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: thin; }
+.fnd-sound { flex: 0 0 150px; padding: 10px; color: inherit; min-width: 0; }
+.fnd-sound .cover { width: 100%; aspect-ratio: 1; border-radius: 10px; border: 1.5px solid var(--gold-border); background: #000; display: flex; align-items: center; justify-content: center; font-size: 40px; color: var(--gold); overflow: hidden; margin-bottom: 8px; }
+.fnd-sound .cover img { width: 100%; height: 100%; object-fit: cover; }
+.fnd-ellip { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fnd-creator { flex: 0 0 92px; display: flex; flex-direction: column; align-items: center; gap: 6px; color: inherit; text-align: center; min-width: 0; }
+.fnd-creator .fnd-ellip { width: 100%; font-size: 13px; font-weight: 700; color: var(--gold); }
+.fnd-topics { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+.fnd-topic { padding: 12px; color: var(--gold); font-weight: 800; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.tabs.fnd-search-tabs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.tabs.fnd-search-tabs > button { min-width: 0; padding: 6px 2px; font-size: clamp(11px, 3.2vw, 14px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fnd-chip { display: inline-flex; align-items: center; gap: 8px; padding: 6px 8px 6px 14px; border-radius: 999px; border: 1.5px solid var(--gold-border); background: #0d0d0d; color: var(--gold); font-weight: 700; max-width: 100%; }
+.fnd-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fnd-chip button { flex: none; width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--gold-border); background: #000; color: var(--gold); cursor: pointer; font-size: 14px; line-height: 1; padding: 0; }
+.fnd-list-row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; margin-bottom: 8px; color: inherit; min-width: 0; }
+.fnd-list-row .grow { flex: 1; min-width: 0; }

@@ -8,7 +8,9 @@ import { useSession } from "../lib/session";
 import { memberLabel, trackPage } from "../lib/pageTracker";
 import { Avatar, Loading, Notice } from "../components/Common";
 import { GiftFlash, PostGiftButton } from "../components/GiftSheet";
-import { appendToFeed, fetchMoreFeed, getFeed } from "../lib/feed";
+import { appendToFeed, fetchMoreFeed, getFeed, insertIntoFeed, removeFromFeed } from "../lib/feed";
+import { HashtagList, HashtagText } from "../components/HashtagText";
+import { findingUserId, notInterested, postHashtags, splitHashtags, undoNotInterested } from "../lib/finding";
 import { tt, useT  } from "../lib/i18n";
 import { showGoldAlert } from "../components/GoldToast";
 import { AutoCaptionOverlay, CcButton, EditCaptionsDialog } from "../components/AutoCaptions";
@@ -371,6 +373,55 @@ export function VideoPage() {
     setItem((cur) => (cur && cur.id === data.id ? { ...cur, ...data } : cur));
   }, []);
 
+  // ---- Not interested (Steve, 2026-11-16: Finding videos) ------------------------------------
+  // The video leaves the queue and the next one plays; a gold bar offers Undo for 4 seconds.
+  const meId = findingUserId(user?.id);
+  const [gotIt, setGotIt] = useState<{ post: Post; at: number } | null>(null);
+  const gotItTimer = useRef(0);
+  useEffect(() => () => window.clearTimeout(gotItTimer.current), []);
+
+  function markNotInterested() {
+    if (!item) return;
+    closeMenu(false);
+    if (!meId) { goSignIn(); return; }
+    const gone = item;
+    const at = Math.max(0, feed.findIndex((p) => p.id === gone.id));
+    const after = feed[at + 1] ?? null;
+    setFeedState(removeFromFeed(gone.id));
+    window.clearTimeout(gotItTimer.current);
+    setGotIt({ post: gone, at });
+    gotItTimer.current = window.setTimeout(() => setGotIt(null), 4000);
+    if (after) navigate(`/video/${after.id}`, { replace: true });
+    else navigate("/", { replace: true });
+    notInterested(meId, gone.id).catch((e) => {
+      // Not saved: put it back so the member is not told something that did not happen.
+      window.clearTimeout(gotItTimer.current);
+      setGotIt(null);
+      setFeedState(insertIntoFeed(gone, at));
+      showGoldAlert((e as Error).message || tt("something_went_wrong"));
+    });
+  }
+
+  function undoGotIt() {
+    if (!gotIt || !meId) return;
+    const { post: back, at } = gotIt;
+    window.clearTimeout(gotItTimer.current);
+    setGotIt(null);
+    setFeedState(insertIntoFeed(back, at));
+    navigate(`/video/${back.id}`, { replace: true });
+    undoNotInterested(meId, back.id).catch((e) => showGoldAlert((e as Error).message || tt("something_went_wrong")));
+  }
+
+  const gotItBar = gotIt ? (
+    <div className="fnd-gotit" role="status">
+      <span>{t("fnd_got_it")}</span>
+      <span aria-hidden>·</span>
+      <button type="button" onClick={undoGotIt}>{t("fnd_undo")}</button>
+      <span aria-hidden>·</span>
+      <button type="button" onClick={() => { window.clearTimeout(gotItTimer.current); setGotIt(null); navigate("/settings/filter-keywords"); }}>{t("fnd_filter_keywords")}</button>
+    </div>
+  ) : null;
+
   if (error) return <div className="page"><Notice error>{error}</Notice></div>;
   if (!item) return <div className="page"><Loading /></div>;
 
@@ -429,6 +480,8 @@ export function VideoPage() {
         },
       },
     ] : []),
+    // Not interested (Steve, 2026-11-16) — never on your own video.
+    ...(!meId || Number(item.user_id) !== Number(meId) ? [{ label: t("fnd_not_interested"), onPick: markNotInterested }] : []),
     { label: t("copy_this_video"), onPick: () => { void copyLink(); closeMenu(); } },
     // Steve, 2026-11-13: "please add a analytics button, when they click it they will see all
     // the analytics for this video."
@@ -592,7 +645,7 @@ export function VideoPage() {
         )}
         <div style={{ flex: 1, minWidth: 0 }}>
           <Link to={`/profile/${item.user_id}`} style={{ fontWeight: 800, color: "var(--text)" }}>{displayName(item.user)}</Link>
-          <div className="soft">{item.description}</div>
+          <div className="soft" style={{ wordBreak: "break-word" }}><HashtagText text={item.description} /></div>
           {/* Steve, 2026-11-16: "Duet with @name" / "Stitched from @name" opens the original. */}
           {item.remix_of && (
             <Link to={`/video/${item.remix_of.id}`} style={{ display: "block", color: "var(--gold)", fontWeight: 700, fontSize: 13, marginTop: 4,
@@ -607,7 +660,9 @@ export function VideoPage() {
               ♪ {item.sound.title.trim()}
             </Link>
           )}
-          {item.hashtags && <div className="muted" style={{ fontSize: 13 }}>{item.hashtags}</div>}
+          {/* Finding videos (2026-11-16): each hashtag opens its page. Tags already shown as
+              #words in the description are not repeated. */}
+          <HashtagList style={{ marginTop: 4 }} tags={postHashtags(item).filter((h) => !splitHashtags(item.description ?? "").some((x) => x.tag?.toLowerCase() === h.toLowerCase()))} />
           <div className="muted" style={{ fontSize: 12, marginTop: 6 }}>{index >= 0 ? `${t("n_of_m", index + 1, feed.length)}${loadingMore ? t("dot_loading_more") : ""}` : ""} · {auto ? t("auto_plays_the_next_video") : t("repeats_this_video")} · {t("arrow_keys_or_scroll_to_move")}</div>
         </div>
         <button ref={heartRef} className="btn small" title={isLoggedIn ? (liked ? t("hr_rate_this_video") : "") : "Sign in to like"}
@@ -654,6 +709,7 @@ export function VideoPage() {
           }}
         />
       )}
+      {gotItBar}
       {showReport && (
         <ReportDialog
           postId={item.id}

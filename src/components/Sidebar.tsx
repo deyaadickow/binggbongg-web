@@ -34,6 +34,8 @@ export function sidebarSections(userId: number | null, contestOn = false, podcas
       // Simulcast page that already sits under Account.
       { to: "/settings/simulcast", label: "go_live_on_6_platforms", icon: "📡", needsLogin: true },
       { to: "/search", label: "search", icon: "🔍" },
+      // Finding videos (Steve, 2026-11-16): trending hashtags, sounds, topics and creators.
+      { to: "/discover", label: "fnd_discover", icon: "🧭" },
       // Steve, 2026-10-11: "Yes please start the direct messages on the web."
       { to: "/messages", label: "messages", icon: "💬", needsLogin: true },
       // Steve, 2026-10-18: "Add the notification record so members can read it later."
@@ -86,6 +88,8 @@ export function sidebarSections(userId: number | null, contestOn = false, podcas
       { to: "/settings/referrals", label: "referrals", icon: "🤝", needsLogin: true },
       { to: "/settings/contest-requests", label: "contest_pending_requests", icon: "🏆", needsLogin: true },
       { to: "/settings/blocked", label: "blocked_profiles", icon: "🚫", needsLogin: true },
+      // Finding videos (Steve, 2026-11-16): words that keep videos out of your feeds.
+      { to: "/settings/filter-keywords", label: "fnd_filter_keywords", icon: "🚷", needsLogin: true },
       // Steve, 2026-11-09: the on/off switch for messages from members, plus who is stopped.
       { to: "/settings/messages", label: "dm_settings_title", icon: "✉️", needsLogin: true },
       { to: "/settings/moderators", label: "my_moderators", icon: "🛡️", needsLogin: true },

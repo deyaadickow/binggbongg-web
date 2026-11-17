@@ -1,11 +1,12 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { post, type Post } from "../lib/api";
+import { fetchFeedBatch, findingUserId, type FeedTab } from "../lib/finding";
 import { openRandomLive } from "../lib/liveSwipe";
 import { useSession } from "../lib/session";
 import { PostCard } from "../components/PostCard";
 import { Loading, Notice, StoreBadges } from "../components/Common";
-import { setFeed } from "../lib/feed";
+import { getFeedSource, setFeed, setFeedSource } from "../lib/feed";
 import { FeedPhotoCard } from "../components/FeedPhotoCard";
 import { CountryBattleDec1Banner } from "../components/CountryBattleDec1Banner";
 import { PrelaunchBanner } from "../components/PrelaunchBanner";
@@ -39,6 +40,14 @@ export function HomePage() {
     setLiveBusy(true);
     openRandomLive(navigate, user?.id ?? 0).catch(() => navigate("/live")).finally(() => setLiveBusy(false));
   };
+  const location = useLocation();
+  // Friends | Following | For You (Steve, 2026-11-16), For You by default. Kept for the visit, so
+  // coming back from a video lands on the same feed.
+  const [tab, setTabState] = useState<FeedTab>(() => getFeedSource());
+  const setTab = (next: FeedTab) => { setFeedSource(next); setTabState(next); };
+  const meId = findingUserId(user?.id);
+  const needsSignIn = tab !== "foryou" && !meId;
+  const [noFriends, setNoFriends] = useState(false);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,19 +58,20 @@ export function HomePage() {
   );
 
   const loadMore = useCallback(async () => {
+    if (tab !== "foryou" && !meId) return; // guests see the sign-in card instead
     setLoading(true);
     setError(null);
     try {
-      const res = await post<Post[]>("fetchPosts", user ? { my_user_id: user.id } : {});
-      if (!res.status) throw new Error(res.message ?? tt("couldn_t_load_the_feed"));
+      const res = await fetchFeedBatch(tab, meId);
+      setNoFriends(res.noFriends);
       setPosts((prev) => {
         const seen = new Set(prev.map((p) => p.id));
-        const next = [...prev, ...(res.data ?? []).filter((p) => !seen.has(p.id))];
+        const next = [...prev, ...res.posts.filter((p) => !seen.has(p.id))];
         setFeed(next); // the video page steps through this same order
         return next;
       });
     } catch (e) {
-      setError((e as Error).message);
+      setError((e as Error).message || tt("couldn_t_load_the_feed"));
     } finally {
       setLoading(false);
     }
@@ -71,10 +81,11 @@ export function HomePage() {
     // posts, so the card just gifted vanished with the gift still on it (Steve, 2026-10-15:
     // "I don't see the gift and the video switches to another video right away").
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+  }, [meId, tab]);
 
   useEffect(() => {
     setPosts([]);
+    setNoFriends(false);
     loadMore();
   }, [loadMore]);
 
@@ -122,13 +133,34 @@ export function HomePage() {
   return (
     <div className="page">
       <div className="row" style={{ marginBottom: 14, flexWrap: "wrap" }}>
-        <h1 className="page-title" style={{ margin: 0 }}>{t("for_you")}</h1>
+        {/* The three feeds side by side (Steve, 2026-11-16), gold underline on the active one. */}
+        <div className="fnd-feed-tabs" role="tablist">
+          {(["friends", "following", "foryou"] as const).map((k) => (
+            <button key={k} type="button" role="tab" aria-selected={tab === k} className={tab === k ? "active" : ""}
+              onClick={() => { if (k !== tab) setTab(k); }}>
+              {t(k === "friends" ? "fnd_friends" : k === "following" ? "fnd_following" : "fnd_for_you")}
+            </button>
+          ))}
+        </div>
         <button type="button" className="btn small feed-live-btn" onClick={openLive} disabled={liveBusy} aria-busy={liveBusy}>
           {t("live")}
         </button>
         <span className="spacer" />
         <StoreBadges compact />
       </div>
+      {needsSignIn && (
+        <div className="card pad" style={{ textAlign: "center", marginBottom: 14 }}>
+          <p style={{ color: "var(--gold)", fontSize: 16, marginTop: 0 }}>{t("fnd_sign_in_to_see")}</p>
+          <Link to="/login" state={{ from: location.pathname }} className="btn"
+            style={{ background: "var(--gold-border)", color: "#000", borderColor: "var(--gold-border)" }}>{t("fnd_sign_in")}</Link>
+        </div>
+      )}
+      {!needsSignIn && !loading && posts.length === 0 && tab !== "foryou" && !error && (
+        <div className="card pad" style={{ textAlign: "center", marginBottom: 14 }}>
+          <p style={{ color: "var(--gold)", fontSize: 16, marginTop: 0 }}>{t(tab === "friends" && noFriends ? "fnd_no_friends" : "fnd_no_following")}</p>
+          <Link to="/search" className="btn" style={{ background: "var(--gold-border)", color: "#000", borderColor: "var(--gold-border)" }}>{t("fnd_find_people")}</Link>
+        </div>
+      )}
       {error && <Notice error>{error}</Notice>}
       {/* Pre-Launch Special (Steve, 2026-11-10) — only while fetchPrelaunch says it is on. */}
       <PrelaunchBanner />
@@ -161,7 +193,7 @@ export function HomePage() {
           );
         })}
       </div>
-      {loading ? <Loading /> : (
+      {loading ? <Loading /> : !needsSignIn && (posts.length > 0 || tab === "foryou") && (
         <div className="center" style={{ marginTop: 20 }}>
           <button className="btn" onClick={loadMore}>{t("show_more")}</button>
         </div>

@@ -216,6 +216,11 @@ export const FEATURES: Section[] = [
 
       { icon: "🔎", nameKey: "fname_search", blurbKey: "fblurb_search", to: "/search" },
 
+      // Finding videos (Steve, 2026-11-16).
+      { icon: "🧭", nameKey: "fname_discover", blurbKey: "fblurb_discover", to: "/discover" },
+
+      { icon: "🚷", nameKey: "fname_filter_keywords", blurbKey: "fblurb_filter_keywords", to: "/settings/filter-keywords", whereKey: "fwhere_settings" },
+
       { icon: "🎭", nameKey: "fname_virtual_look", blurbKey: "fblurb_virtual_look", to: "/settings/virtual-look" },
 
       { icon: "⭐", nameKey: "fname_vip_voter_badges", blurbKey: "fblurb_vip_voter_badges", to: "/browse/vip-badges" },

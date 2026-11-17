@@ -57,6 +57,7 @@ import { LandingPage } from "./pages/LandingPage";
 import { useEffect, type ReactNode } from "react";
 import { post } from "./lib/api";
 import { pixelPageView } from "./lib/pixel";
+import { DiscoverPage, FilterKeywordsPage, HashtagPage, TopicPage } from "./pages/FindingPages";
 import { SearchPage } from "./pages/SearchPage";
 import { LiveNowPage, LiveVideoPage } from "./pages/LiveNowPage";
 import { MyShowPage, ShowsPage } from "./pages/ShowsPages";
@@ -183,6 +184,11 @@ export default function App() {
           {/* My Analytics (Steve, 2026-10-31: "Can we add analytics for all members?"). */}
           <Route path="/my-analytics" element={<MyAnalyticsPage />} />
           <Route path="/search" element={<SearchPage />} />
+          {/* Finding videos (Steve, 2026-11-16): Discover, a hashtag's videos, a topic's videos, Filter keywords. */}
+          <Route path="/discover" element={<DiscoverPage />} />
+          <Route path="/hashtag/:tag" element={<HashtagPage />} />
+          <Route path="/topic/:id" element={<TopicPage />} />
+          <Route path="/settings/filter-keywords" element={<FilterKeywordsPage />} />
           <Route path="/live" element={<LiveNowPage />} />
           {/* Steve, 2026-11-01: the directory's live-room tiles open their own pages, not an empty Live Now. */}
           <Route path="/battles" element={<BattlesPage />} />

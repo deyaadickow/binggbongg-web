@@ -4,6 +4,7 @@ import { displayName, mediaUrl, type Gift, type Post } from "../lib/api";
 import { Avatar } from "./Common";
 import { BattleBadge, BattleInfoPopup, BattleStreak, battleBadgeExplainer, battleStreakExplainer } from "./BattleBadge";
 import { GiftFlash, PostGiftButton } from "./GiftSheet";
+import { HashtagText } from "./HashtagText";
 
 export function PostCard({ post }: { post: Post }) {
   const [sent, setSent] = useState<Gift | null>(null);
@@ -59,7 +60,7 @@ export function PostCard({ post }: { post: Post }) {
                 }}
               />
             </div>
-            <div className="muted" style={{ fontSize: 12, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{post.description || post.hashtags || ""}</div>
+            <div className="muted" style={{ fontSize: 12, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}><HashtagText inLink text={post.description || (post.hashtags ? post.hashtags.split(",").filter(Boolean).map((h) => "#" + h.replace(/^#/, "")).join(" ") : "")} /></div>
           </div>
         </Link>
         {/* Steve, 2026-10-01: "add gift boxes on all video on for you page on the web." */}
