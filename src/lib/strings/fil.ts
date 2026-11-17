@@ -2633,4 +2633,11 @@ export const fil = {
   fblurb_qa: "Tinatanong ka ng mga miyembro sa profile mo; sagutin sila gamit ang video.",
   fname_nearby: "Malapit",
   fblurb_nearby: "Mga video mula sa mga miyembro sa lungsod, probinsya o bansa mo.",
+  information_center: "Information Center",
+  ic_million: "Hanggang Isang Milyong dolyar $1,000,000 na Referral Bonus Commission. Kahit sino ay pwedeng maging Milyonaryo sa Bingg Bongg",
+  ic_one_video: "Isang video na may 70+ features",
+  ic_algorithm: "Alamin kung paano gumagana ang algorithm ng Bingg Bongg",
+  ic_exciting_news: "Pindutin dito para makita ang pinakabagong exciting news namin",
+  ic_daily_email: "Isang email ang ipapadala araw-araw",
+  ic_banner_n: "Banner %1$s",
 };

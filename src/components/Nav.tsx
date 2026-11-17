@@ -39,20 +39,14 @@ export function Nav() {
         {/* Steve, 2026-11-17: "The for you on top and on bottom do the same thing? if yes, remove the
             bottom one." The phones dropped their For You chip; this is the web's copy of it. The
             feed's own For You tab and the logo both lead to the feed. */}
-        {/* Steve, 2026-11-16: "Next to for you page add 'All Country Battles'". */}
-        <NavLink to="/country-battles" className="acb-chip">
-          {t("acb_tab")}
+        {/* Steve, 2026-11-17: "remove all the buttons on the bottom of the page and we will have only
+            one button that says, 'Information Center'." All Country Battles, 70+ Features, 70+ Videos,
+            1 Video 70+ Features and Our Ads moved onto /information-center. The red live dot that
+            sat on All Country Battles (2026-11-16) rides on this button now. */}
+        <NavLink to="/information-center" className="acb-chip info-center-chip">
+          {t("information_center")}
           {battleLive && <span className="live-dot" aria-hidden />}
         </NavLink>
-        {/* Steve, 2026-11-14: "For You / 70+ Features / 70+ Videos / 1 Video 70+ Features / Our Ads". */}
-        <NavLink to="/features">{t("tab_70_features")}</NavLink>
-        {/* Steve, 2026-11-05: "Next to 'For You Page' and 'Bingg Bongg features' on main feed page
-            please add '70+ Featured Videos'" — the existing Features Videos page and its player
-            with the language buttons. */}
-        <NavLink to="/feature-videos">{t("tab_70_videos")}</NavLink>
-        <NavLink to="/one-video">{t("tab_1_video")}</NavLink>
-        {/* Steve, 2026-11-12: "Next to 70+ Featured Videos create 'Our Ads' button". */}
-        <NavLink to="/our-ads">{t("our_ads_tab")}</NavLink>
         <NavLink to="/settings" className="only-narrow">{t("settings")}</NavLink>
       </nav>
       <div className="me">

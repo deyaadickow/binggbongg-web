@@ -40,6 +40,7 @@ import { OneVideoPage } from "./pages/OneVideoPage";
 import { ReferralProgramPage } from "./pages/ReferralProgramPage";
 import { FeaturedContestPage } from "./pages/FeaturedContestPage";
 import { ExcitingNewsPage } from "./pages/ExcitingNewsPage";
+import { InformationCenterPage } from "./pages/InformationCenterPage";
 import { BusinessPage, BusinessTabPage, CreateBusinessPage, MyBusinessesPage } from "./pages/BusinessPages";
 import { LoginPage } from "./pages/LoginPage";
 import { VideoPage } from "./pages/VideoPage";
@@ -347,6 +348,8 @@ export default function App() {
           {/* Pre-Launch Special (Steve, 2026-11-10; 2026-11-11: 100 FBBs for every member, no refill). */}
           <Route path="/pre-launch" element={<PrelaunchPage />} />
           {/* Every feature's 60-second video under its own heading (Steve, 2026-10-29). */}
+          {/* Information Center (Steve, 2026-11-17): the one button on the feed leads here. */}
+          <Route path="/information-center" element={<InformationCenterPage />} />
           <Route path="/feature-videos" element={<FeatureVideosPage />} />
           <Route path="/our-ads" element={<FeatureVideosPage kind="ads" />} />
           <Route path="/one-video" element={<OneVideoPage />} />
