@@ -50,6 +50,8 @@ export interface Feature {
   whereKey?: StringKey;
   /** Your OWN profile, whose id is only known once somebody is signed in. */
   myProfile?: true;
+  /** With myProfile: the profile tab to open (e.g. "playlists"). */
+  profileTab?: string;
   /** Shown only while the admin has a contest switched on (Steve, 2026-11-01:
    *  "remove all singing contest from the app for now, we will start the contest in the
    *  future"). Switching one on in the admin panel brings the tile back, no deploy. */
@@ -166,7 +168,10 @@ export const FEATURES: Section[] = [
       // Steve, 2026-11-02: big words behind the person in a photo, drawn on the device.
       { icon: "🖼️", nameKey: "fname_text_behind_photo", blurbKey: "fblurb_text_behind_photo", to: "/text-behind-photo" },
       { icon: "🦖", nameKey: "fname_monster_videos", blurbKey: "fblurb_monster_videos", to: "/monster" },
-      { icon: "📑", nameKey: "fname_playlists", blurbKey: "fblurb_playlists", myProfile: true, whereKey: "fwhere_your_profile" },
+      // Social (Steve, 2026-11-17): Stories, Polls & stickers, and Playlists on your profile's Playlists tab.
+      { icon: "⭕", nameKey: "fname_stories", blurbKey: "fblurb_stories", to: "/stories" },
+      { icon: "📊", nameKey: "fname_polls_stickers", blurbKey: "fblurb_polls_stickers", to: "/upload?stickers=1" },
+      { icon: "📑", nameKey: "fname_playlists", blurbKey: "fblurb_playlists", myProfile: true, profileTab: "playlists", whereKey: "fwhere_your_profile" },
       { icon: "🔮", nameKey: "fname_lucky_numbers_and_horoscope", blurbKey: "fblurb_lucky_numbers_and_horoscope", to: "/lucky" },
     ],
   },
@@ -278,7 +283,7 @@ export const FEATURES: Section[] = [
 /** Where tapping a tile goes — also what the feed's feature promo card's TRY IT opens, so the two
  *  can never disagree. Undefined: the tile has no link. */
 export function featureHref(f: Feature, userId?: number | null): string | undefined {
-  return f.myProfile ? (userId ? `/profile/${userId}` : "/login") : f.to;
+  return f.myProfile ? (userId ? `/profile/${userId}${f.profileTab ? `?tab=${f.profileTab}` : ""}` : "/login") : f.to;
 }
 
 // Steve, 2026-10-25: "add a number on top right corner of each feature starting from #1". The

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { rememberCopiedLink, videoShareUrl } from "../lib/copiedLink";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { displayName, mediaUrl, post, type Post, type UserSummary } from "../lib/api";
 import { VipBadge, VipBadgePopup } from "../components/VipBadge";
 import { isVipReferrer } from "../lib/referral";
@@ -20,6 +20,9 @@ import { CountryBattleBadges } from "../components/CountryBattleBits";
 import { tt, useT  } from "../lib/i18n";
 import { fetchChatBattleAlertMute, setChatBattleAlertMute } from "../lib/chatBattle";
 import { cbText } from "../lib/countryBattle";
+import { StoryRingAvatar } from "../components/Stories";
+import { PlaylistsPanel } from "../components/Playlists";
+import { playlistsFor, socialCall, socialUser, type PlaylistRow } from "../lib/social";
 
 interface ProfileUser extends UserSummary {
   refer_code?: string;
@@ -42,19 +45,14 @@ interface ProfileUser extends UserSummary {
   watch_history?: string;
   is_following_each_other?: number;
   is_blocked?: number;
+  /** user_playlists rows (fetchUserDetails eager-loads them). */
+  playlists?: PlaylistRow[];
 }
 
 interface ProfilePost extends Post {
   user_video_number?: number;
   lifetime_votes?: number;
   this_month_votes?: number;
-}
-
-interface Playlist {
-  id: number;
-  name?: string;
-  thumbnail?: string;
-  video_count?: number;
 }
 
 interface BattleOpponent {
@@ -72,7 +70,8 @@ interface BattleCareer {
   opponents?: BattleOpponent[];
 }
 
-type TabKey = "videos" | "photos" | "likes" | "reposted" | "saved" | "history" | "following" | "followers" | "friends" | "business";
+type TabKey = "videos" | "photos" | "likes" | "reposted" | "playlists" | "saved" | "history" | "following" | "followers" | "friends" | "business";
+const TAB_KEYS: TabKey[] = ["videos", "photos", "likes", "reposted", "playlists", "saved", "history", "following", "followers", "friends", "business"];
 
 const USER_TABS: TabKey[] = ["following", "followers", "friends"];
 
@@ -303,56 +302,14 @@ function BattleBoardModal({ userId, onClose }: { userId: number; onClose: () => 
   );
 }
 
-function CreatePlaylistDialog({ userId, onClose, onCreated }: { userId: number; onClose: () => void; onCreated: (pl: Playlist) => void }) {
-  const { t } = useT();
-  const [name, setName] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [err, setErr] = useState("");
-
-  async function save() {
-    if (!name.trim()) { setErr("Enter a playlist name"); return; }
-    setSaving(true);
-    setErr("");
-    try {
-      const r = await post<Playlist>("createPlaylist", { user_id: userId, name: name.trim() });
-      if (!r.status) throw new Error(r.message ?? tt("failed_to_create"));
-      onCreated(r.data ?? { id: Date.now(), name: name.trim() });
-      onClose();
-    } catch (e) {
-      setErr((e as Error).message);
-      setSaving(false);
-    }
-  }
-
-  return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
-        <h3>{t("create_playlist")}</h3>
-        <input
-          style={{ width: "100%", background: "#0a0a0a", border: "1.5px solid var(--gold-border)", borderRadius: 8, padding: "10px 12px", color: "#fff", fontSize: 15, marginBottom: 8, outline: "none", boxSizing: "border-box" }}
-          placeholder={t("playlist_name")}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && save()}
-          autoFocus
-        />
-        {err && <div style={{ color: "#f84", fontSize: 12, marginBottom: 8 }}>{err}</div>}
-        <div style={{ display: "flex", gap: 8 }}>
-          <button className="btn" style={{ flex: 1 }} onClick={save} disabled={saving}>
-            {saving ? "Creating…" : "Create"}
-          </button>
-          <button className="btn ghost small" onClick={onClose}>{t("cancel")}</button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export function ProfilePage() {
   const { t } = useT();
   const { id } = useParams();
   const navigate = useNavigate();
   const { user: me, isLoggedIn } = useSession();
+  // Stories and playlists act for the member — on the dev server also the Social mock's pretend one.
+  const socialMe = socialUser(me);
+  const [searchParams] = useSearchParams();
   const [profile, setProfile] = useState<ProfileUser | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [following, setFollowing] = useState(false);
@@ -370,11 +327,11 @@ export function ProfilePage() {
   const [viewingPhoto, setViewingPhoto] = useState<Photo | null>(null);
   const [tabLoading, setTabLoading] = useState(false);
   const [tabError, setTabError] = useState<string | null>(null);
-  const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [playlists, setPlaylists] = useState<PlaylistRow[]>([]);
+  const [playlistCreate, setPlaylistCreate] = useState(0);
   const [showBattleBoard, setShowBattleBoard] = useState(false);
   /** Open by default: the point of the card is that people SEE what is scheduled. */
   const [showSchedule, setShowSchedule] = useState(true);
-  const [showCreatePlaylist, setShowCreatePlaylist] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
   const [showReport, setShowReport] = useState(false);
   /** Have I stopped messages from this member? Decides "Stop" vs "Allow" in the ⋮ menu. */
@@ -388,7 +345,9 @@ export function ProfilePage() {
     setProfile(null);
     setError(null);
     loadedTabs.current = new Set();
-    setTab("videos");
+    // ?tab=playlists (the directory's Playlists tile) opens that tab.
+    const wanted = searchParams.get("tab") as TabKey | null;
+    setTab(wanted && TAB_KEYS.includes(wanted) ? wanted : "videos");
     setTabVideos([]);
     setTabUsers([]);
     setTabPhotos([]);
@@ -396,13 +355,14 @@ export function ProfilePage() {
 
     (async () => {
       try {
-        const res = await post<ProfileUser>("fetchUserDetails", {
+        const res = await socialCall<ProfileUser>("fetchUserDetails", {
           user_id: id,
           ...(me ? { my_user_id: me.id } : {}),
         });
         if (!res.status || !res.data) throw new Error(res.message ?? tt("member_not_found"));
         setProfile(res.data);
         setFollowing(!!res.data.is_following);
+        setPlaylists(await playlistsFor(res.data.id, res.data.playlists));
       } catch (e) {
         setError((e as Error).message);
       }
@@ -427,7 +387,7 @@ export function ProfilePage() {
 
     // Steve, 2026-10-01: "Add a 'Business' tab in the personal profile page." The panel fetches
     // and renders its own data (fetchMyBusinesses), so there is nothing for this effect to load.
-    if (tab === "business") {
+    if (tab === "business" || tab === "playlists") {
       setTabLoading(false);
       return;
     }
@@ -463,7 +423,7 @@ export function ProfilePage() {
     // own validator on 2026-09-26. Three of these used to name routes that DO NOT EXIST —
     // fetchRepostVideos, fetchFriendsList and fetchUserWatchHistory — so those tabs 404'd and
     // rendered empty forever. A guessed endpoint name fails exactly like a missing feature.
-    const endpointMap: Record<Exclude<TabKey, "photos" | "business">, [string, Record<string, unknown>]> = {
+    const endpointMap: Record<Exclude<TabKey, "photos" | "business" | "playlists">, [string, Record<string, unknown>]> = {
       videos: ["fetchUserPosts", { user_id: id, ...base }],
       // NOT fetchUserPostsWithLikes: that returns THIS member's own posts that have received
       // likes, whereas the "Likes" count beside the tab is likedVideosCounts — the videos they
@@ -484,7 +444,7 @@ export function ProfilePage() {
     setTabUsers([]);
     setTabVideos([]);
     setTabError(null);
-    post(endpoint, params)
+    socialCall(endpoint, params)
       .then((r) => {
         const items = (r.data ?? r.list ?? []) as Record<string, unknown>[];
         if (USER_TABS.includes(tab)) {
@@ -524,12 +484,12 @@ export function ProfilePage() {
       .finally(() => setTabLoading(false));
   }, [tab, profile]);
 
-  useEffect(() => {
-    if (!profile || !id) return;
-    post<Playlist[]>("fetchUserPlaylists", { user_id: id })
-      .then((r) => setPlaylists(r.data ?? []))
-      .catch(() => {});
-  }, [profile?.id]);
+  /** After a playlist is made, edited or deleted: the profile's rows again. */
+  async function reloadPlaylists() {
+    if (!id) return;
+    const res = await socialCall<ProfileUser>("fetchUserDetails", { user_id: id, ...(me ? { my_user_id: me.id } : {}) }).catch(() => null);
+    setPlaylists(await playlistsFor(Number(id), res?.data?.playlists));
+  }
 
   async function toggleFollow() {
     if (!me || !profile) return;
@@ -613,7 +573,7 @@ export function ProfilePage() {
   if (error) return <div className="page"><Notice error>{error}</Notice></div>;
   if (!profile) return <div className="page"><Loading /></div>;
 
-  const isMe = me?.id === profile.id;
+  const isMe = !!socialMe && socialMe.id === profile.id;
 
   const tabs: { key: TabKey; label: string; count?: number }[] = [
     { key: "videos", label: "Videos", count: profile.postCounts },
@@ -628,7 +588,9 @@ export function ProfilePage() {
     { key: "followers", label: "Followers", count: profile.total_followers },
     { key: "friends", label: "Friends", count: profile.friendsCount },
     { key: "likes", label: "Likes", count: profile.likedVideosCounts },
-    { key: "reposted", label: "Reposted", count: profile.repostedCounts },
+    { key: "reposted", label: t("soc_reposts"), count: profile.repostedCounts },
+    // Steve, 2026-11-17: "Playlists on a profile" — everyone's, with the owner's create/edit/delete.
+    { key: "playlists", label: t("fname_playlists"), count: playlists.length },
     ...(isMe ? [
       { key: "saved" as TabKey, label: "Saved" },
       { key: "history" as TabKey, label: "History" },
@@ -640,7 +602,8 @@ export function ProfilePage() {
       {/* Header card */}
       <div style={{ padding: "16px 0 0" }}>
         <div style={{ display: "flex", gap: 14, alignItems: "flex-start", marginBottom: 12 }}>
-          <Avatar user={profile} size="lg" />
+          {/* Stories (2026-11-17): a gold ring while they have live stories; tap opens them. */}
+          <StoryRingAvatar profile={profile}><Avatar user={profile} size="lg" /></StoryRingAvatar>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
               <h1 style={{ fontSize: 20, color: "var(--gold)", fontWeight: 800, margin: 0 }}>
@@ -746,7 +709,7 @@ export function ProfilePage() {
             { label: "Followers", val: profile.total_followers, tab: "followers" as TabKey },
             { label: "Friends", val: profile.friendsCount, tab: "friends" as TabKey },
             { label: "Likes", val: profile.total_likes, tab: "likes" as TabKey },
-            { label: "Reposted", val: profile.repostedCounts, tab: "reposted" as TabKey },
+            { label: t("soc_reposts"), val: profile.repostedCounts, tab: "reposted" as TabKey },
           ].map(({ label, val, tab: t }) => (
             <button
               key={label}
@@ -803,7 +766,7 @@ export function ProfilePage() {
               {t("support_2")}</button>
           )}
           {isMe && (
-            <button className="btn ghost small" onClick={() => setShowCreatePlaylist(true)}>
+            <button className="btn ghost small" onClick={() => { switchTab("playlists"); setPlaylistCreate((n) => n + 1); }}>
               {t("playlist")}</button>
           )}
         </div>
@@ -816,26 +779,6 @@ export function ProfilePage() {
 
         {showSchedule && <ScheduleSection profileId={profileId} myId={me?.id} />}
 
-        {/* Playlists (own profile) */}
-        {isMe && playlists.length > 0 && (
-          <div style={{ marginTop: 14 }}>
-            <div style={{ fontSize: 12, fontWeight: 800, color: "var(--gold)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 6 }}>
-              {t("playlists")}</div>
-            <div className="playlist-scroll">
-              {playlists.map((pl) => (
-                <div key={pl.id} className="playlist-item">
-                  <div className="playlist-item-thumb">
-                    {pl.thumbnail ? <img src={mediaUrl(pl.thumbnail)} alt={pl.name} /> : "🎵"}
-                  </div>
-                  <div className="playlist-item-name">{pl.name || "Playlist"}</div>
-                  {pl.video_count != null && (
-                    <div style={{ fontSize: 10, color: "var(--text-dim)", textAlign: "center" }}>{t("n_videos", pl.video_count)}</div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Tab chips */}
@@ -857,8 +800,11 @@ export function ProfilePage() {
       <div style={{ marginTop: 4 }}>
         {tabLoading ? (
           <div style={{ padding: "32px 0" }}><Loading /></div>
-        ) : tabError ? (
+        ) : tabError && tab !== "playlists" && tab !== "business" ? (
           <p className="muted" style={{ padding: "24px 0", textAlign: "center" }}>{tabError}</p>
+        ) : tab === "playlists" ? (
+          <PlaylistsPanel ownerId={profile.id} isMe={isMe} myId={me?.id} playlists={playlists}
+            onChanged={() => void reloadPlaylists()} createRequest={playlistCreate} />
         ) : tab === "business" ? (
           isMe ? <MyBusinessesPanel /> : <MemberBusinessesPanel userId={profile.id} />
         ) : tab === "photos" ? (
@@ -918,13 +864,6 @@ export function ProfilePage() {
       {/* Modals */}
       {showBattleBoard && (
         <BattleBoardModal userId={profileId} onClose={() => setShowBattleBoard(false)} />
-      )}
-      {showCreatePlaylist && me && (
-        <CreatePlaylistDialog
-          userId={me.id}
-          onClose={() => setShowCreatePlaylist(false)}
-          onCreated={(pl) => setPlaylists((prev) => [pl, ...prev])}
-        />
       )}
       {vipInfo && (
         <VipBadgePopup viewerIsVip={isVipReferrer(isMe ? profile.is_vip_referrer : me?.is_vip_referrer)} onClose={() => setVipInfo(false)} />

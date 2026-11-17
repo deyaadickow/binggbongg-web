@@ -27,6 +27,7 @@ import { MemberAlbumPage } from "./pages/MemberAlbumPage";
 import { ContestUploadPage } from "./pages/ContestUploadPage";
 import { ContestsPage, ContestBoardPage } from "./pages/ContestsPage";
 import { HelpListPage, HelpCampaignPage, StartHelpPage } from "./pages/HelpPages";
+import { AddYoursPage, StoriesPage } from "./pages/SocialPages";
 import { HomePage } from "./pages/HomePage";
 import { LanguagePage } from "./pages/LanguagePage";
 import { FeaturesPage } from "./pages/FeaturesPage";
@@ -165,6 +166,9 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/video/:id" element={<VideoPage />} />
           <Route path="/video/:id/analytics" element={<PostAnalyticsPage />} />
+          {/* Social (Steve, 2026-11-17): Stories and the "Add Yours" chains. */}
+          <Route path="/stories" element={<StoriesPage />} />
+          <Route path="/add-yours/:id" element={<AddYoursPage />} />
           <Route path="/profile/:id" element={<ProfilePage />} />
           <Route path="/upcoming" element={<UpcomingPage />} />
           {/* Steve, 2026-10-11: direct messages — the same Firestore conversations the phones use. */}

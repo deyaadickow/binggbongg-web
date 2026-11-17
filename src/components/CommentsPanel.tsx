@@ -27,6 +27,8 @@ import {
   uploadPending,
   type PendingMedia,
 } from "../lib/commentMedia";
+import { fetchCommentsSocial, isPinned, setCommentPinned, socialUser } from "../lib/social";
+import { useT } from "../lib/i18n";
 
 const PAGE = 20;
 
@@ -96,8 +98,13 @@ const iconBtn: React.CSSProperties = {
   justifyContent: "center", background: "transparent", border: "1px solid rgba(212,175,55,.35)",
   color: GOLD, cursor: "pointer", padding: 0, touchAction: "none",
 };
-export function CommentsPanel({ postId, totalComments }: { postId: number; totalComments?: number }) {
+export function CommentsPanel({ postId, totalComments, postOwnerId }: { postId: number; totalComments?: number; postOwnerId?: number }) {
   const { user, isLoggedIn } = useSession();
+  const { t } = useT();
+  // Pins and video replies (Steve, 2026-11-17) act for the member — on the dev server also the
+  // mock's pretend member, whose actions only ever reach lib/socialMock.ts.
+  const socialMe = socialUser(user);
+  const isCreator = !!socialMe && postOwnerId !== undefined && Number(postOwnerId) === Number(socialMe.id);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -165,7 +172,7 @@ export function CommentsPanel({ postId, totalComments }: { postId: number; total
     if (more) setLoadingMore(true); else setLoading(true);
     try {
       const start = more ? comments.length : 0;
-      const rows = await fetchPostComments(postId, start, PAGE, user?.id);
+      const rows = await fetchCommentsSocial(postId, start, PAGE, user?.id, () => fetchPostComments(postId, start, PAGE, user?.id));
       setNoMore(rows.length < PAGE);
       setComments((prev) => (more ? [...prev, ...rows] : rows));
     } catch {
@@ -185,7 +192,7 @@ export function CommentsPanel({ postId, totalComments }: { postId: number; total
     inFlight.current = new Set();
     stopVoice();
     setLoading(true);
-    fetchPostComments(postId, 0, PAGE, user?.id)
+    fetchCommentsSocial(postId, 0, PAGE, user?.id, () => fetchPostComments(postId, 0, PAGE, user?.id))
       .then((rows) => { if (alive) { setComments(rows); setNoMore(rows.length < PAGE); } })
       .catch(() => { if (alive) setComments([]); })
       .finally(() => { if (alive) setLoading(false); });
@@ -368,6 +375,34 @@ export function CommentsPanel({ postId, totalComments }: { postId: number; total
       setCount((n) => n + 1);
       showGoldAlert("Couldn't delete that comment.");
     }
+  }
+
+  /** The creator pins one comment to the top (one per video); unpinning leaves it where it is. */
+  async function togglePin(c: VideoComment) {
+    if (!socialMe) return;
+    const pin = !isPinned(c);
+    try {
+      await setCommentPinned(socialMe.id, c.id, pin);
+      setComments((prev) => {
+        const rows = prev.map((x) => (x.id === c.id ? { ...x, is_pinned: pin ? 1 : 0 } : pin ? { ...x, is_pinned: 0 } : x) as VideoComment);
+        if (!pin) return rows;
+        const top = rows.find((x) => x.id === c.id)!;
+        return [top, ...rows.filter((x) => x.id !== c.id)];
+      });
+      showGoldAlert(t(pin ? "soc_pinned_done" : "soc_unpinned_done"));
+    } catch (e) {
+      showGoldAlert((e as Error).message || t("something_went_wrong"));
+    }
+  }
+
+  /** Reply to this comment with a video: the upload page, with the comment as a bubble. */
+  function replyWithVideo(c: VideoComment) {
+    if (!socialMe) { requireLogin(); return; }
+    document.querySelectorAll("video").forEach((v) => v.pause());
+    navigate("/upload", { state: { replyComment: {
+      id: c.id, post_id: c.post_id ?? postId, comment: c.comment ?? "",
+      user_name: c.user?.username ?? "", fullname: c.user?.fullname ?? "",
+    } } });
   }
 
   function toggleVoice(c: VideoComment) {
@@ -578,11 +613,14 @@ export function CommentsPanel({ postId, totalComments }: { postId: number; total
       <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 12 }}>
         {comments.map((c) => {
           const mine = !!user && c.user?.id === user.id;
+          const notMine = !socialMe || Number(c.user?.id ?? c.user_id) !== Number(socialMe.id);
+          const pinned = isPinned(c);
           const tr = c.id != null ? translations[c.id] : undefined;
           return (
             <div key={c.id} className="row" style={{ gap: 10, alignItems: "flex-start" }}>
               <Link to={`/profile/${c.user?.id ?? c.user_id}`}><Avatar user={c.user} /></Link>
               <div style={{ flex: 1, minWidth: 0 }}>
+                {pinned && <div className="pinned-label">📌 {t("soc_pinned_by_creator")}</div>}
                 <Link
                   to={`/profile/${c.user?.id ?? c.user_id}`}
                   style={{ fontWeight: 700, color: "var(--text)", fontSize: 13 }}
@@ -691,6 +729,13 @@ export function CommentsPanel({ postId, totalComments }: { postId: number; total
                   )}
                   {mine && (
                     <button className="btn small ghost" onClick={() => void remove(c)}>Delete</button>
+                  )}
+                  {isCreator && (
+                    <button className="btn small ghost" onClick={() => void togglePin(c)}>📌 {t(pinned ? "soc_unpin" : "soc_pin")}</button>
+                  )}
+                  {notMine && (
+                    <button className="btn small ghost" title={t("soc_reply_with_video")} aria-label={t("soc_reply_with_video")}
+                      onClick={() => replyWithVideo(c)}>🎥 {t("soc_reply_with_video")}</button>
                   )}
                 </div>
               </div>

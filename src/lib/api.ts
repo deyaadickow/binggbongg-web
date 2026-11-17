@@ -13,7 +13,7 @@ export type ApiResponse<T> = { status: boolean; message?: string; data?: T } & R
 
 export function mediaUrl(path?: string | null): string {
   if (!path) return "";
-  if (/^https?:\/\//i.test(path)) return path;
+  if (/^(https?:|blob:|data:)/i.test(path)) return path;
   return UPLOAD_BASE + path.replace(/^\/+/, "");
 }
 
@@ -260,6 +260,8 @@ export interface Post {
   rating_avg?: number | string | null;
   rating_count?: number | string | null;
   my_rating?: number | string | null;
+  /** 0 = the creator turned reposting off (the Repost row is hidden). */
+  allow_repost?: number | null;
 }
 
 /** The like's 1-10 rating (Steve, 2026-11-16). Sending again changes it; unliking (dislikePost)
@@ -787,6 +789,8 @@ export interface VideoComment {
   /** Steve, 2026-11-16: a photo, video or recorded voice message attached to the comment.
    *  media_url / media_thumbnail_url are already absolute. A voice message ALSO fills voice_url
    *  (voice_type "recorded") for older phones; show it once, as the voice-message player. */
+  /** Steve, 2026-11-17: the creator's one pinned comment (0/1). fetchPostComments sends it first. */
+  is_pinned?: number | null;
   media_type?: "photo" | "video" | "voice" | null;
   media_url?: string | null;
   media_thumbnail_url?: string | null;

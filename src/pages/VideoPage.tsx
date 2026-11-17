@@ -16,6 +16,8 @@ import { showGoldAlert } from "../components/GoldToast";
 import { AutoCaptionOverlay, CcButton, EditCaptionsDialog } from "../components/AutoCaptions";
 import { HEART_RED, HeartRatingPanel, ratingLine } from "../components/HeartRating";
 import { parseCaptions, setPostAutoCaptions, shownCaptions, updatePostAutoCaptions, type CaptionLine } from "../lib/autoCaptions";
+import { decoratePost, fetchPostByIdSocial, repostPost, socialUser, type SocialPost } from "../lib/social";
+import { VideoStickers } from "../components/SocialStickers";
 
 const AUTO_KEY = "bb.autoplayNext";
 
@@ -27,7 +29,7 @@ export function VideoPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, isLoggedIn } = useSession();
-  const [item, setItem] = useState<Post | null>(null);
+  const [item, setItem] = useState<SocialPost | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [liked, setLiked] = useState(false);
   const [feed, setFeedState] = useState<Post[]>(() => getFeed());
@@ -75,12 +77,17 @@ export function VideoPage() {
   // refresh like state; a deep link fetches it and puts it at the head of a fresh queue.
   useEffect(() => {
     const fromFeed = feed.find((p) => String(p.id) === String(id));
-    if (fromFeed) { setItem(fromFeed); setLiked(!!fromFeed.is_post_liked); }
+    if (fromFeed) {
+      setItem(fromFeed); setLiked(!!fromFeed.is_post_liked);
+      // Polls / Add Yours / links / comment replies (on the dev server, the mock's).
+      void decoratePost(fromFeed).then((d) => setItem((cur) => (cur && cur.id === d.id ? { ...d, ...cur, ...pickSocial(d) } : cur)));
+    }
     (async () => {
       try {
-        const res = await post<Post | Post[]>("fetchPostById", { post_id: id, ...(user ? { my_user_id: user.id, user_id: user.id } : {}) });
-        const data = Array.isArray(res.data) ? res.data[0] : res.data;
-        if (!res.status || !data) throw new Error(res.message ?? tt("that_video_isn_t_available"));
+        const res = await fetchPostByIdSocial(id ?? "", user ? { my_user_id: user.id, user_id: user.id } : {});
+        const raw = Array.isArray(res.data) ? res.data[0] : res.data;
+        if (!res.status || !raw) throw new Error(res.message ?? tt("that_video_isn_t_available"));
+        const data = await decoratePost(raw);
         setItem(data);
         setLiked(!!data.is_post_liked);
         if (!fromFeed) setFeedState(appendToFeed([data]));
@@ -109,6 +116,14 @@ export function VideoPage() {
     fetchMoreFeed(user?.id ?? null).then(setFeedState).catch(() => undefined).finally(() => setLoadingMore(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [index, feed.length, loadingMore, user?.id]);
+
+  // A comment reply's bubble opens the original video at its comments (Steve, 2026-11-17).
+  const openComments = new URLSearchParams(location.search).get("comments") === "1";
+  useEffect(() => {
+    if (!openComments || !item || String(item.id) !== String(id)) return;
+    const timer = window.setTimeout(() => document.getElementById("video-comments")?.scrollIntoView({ behavior: "smooth", block: "start" }), 300);
+    return () => window.clearTimeout(timer);
+  }, [openComments, item?.id, id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const go = useCallback((p: Post | null) => { if (p) navigate(`/video/${p.id}`); }, [navigate]);
   const goNext = useCallback(() => go(next), [go, next]);
@@ -376,6 +391,7 @@ export function VideoPage() {
   // ---- Not interested (Steve, 2026-11-16: Finding videos) ------------------------------------
   // The video leaves the queue and the next one plays; a gold bar offers Undo for 4 seconds.
   const meId = findingUserId(user?.id);
+  const socialMe = socialUser(user);
   const [gotIt, setGotIt] = useState<{ post: Post; at: number } | null>(null);
   const gotItTimer = useRef(0);
   useEffect(() => () => window.clearTimeout(gotItTimer.current), []);
@@ -486,16 +502,18 @@ export function VideoPage() {
     // Steve, 2026-11-13: "please add a analytics button, when they click it they will see all
     // the analytics for this video."
     { label: t("va_menu_row"), onPick: () => { closeMenu(false); navigate(`/video/${item.id}/analytics`); } },
-    {
+    // Repost (Steve, 2026-11-17): hidden when the creator turned reposting off, and on your own
+    // video (the server refuses both). On the dev server it goes to the mock, never the live server.
+    ...(Number(item.allow_repost ?? 1) !== 0 && (!socialMe || Number(item.user_id) !== Number(socialMe.id)) ? [{
       label: t("repost"),
       onPick: () => {
         closeMenu(false);
-        if (!isLoggedIn || !user) { navigate("/login", { state: { from: location.pathname } }); return; }
-        void post("repostUserPost", { user_id: user.id, post_id: item.id })
-          .then((r) => showGoldAlert(r.message ?? tt("done")))
-          .catch(() => showGoldAlert(tt("something_went_wrong")));
+        if (!socialMe) { navigate("/login", { state: { from: location.pathname } }); return; }
+        void repostPost(socialMe.id, item.id)
+          .then((m) => showGoldAlert(m || tt("done")))
+          .catch((e) => showGoldAlert((e as Error).message || tt("something_went_wrong")));
       },
-    },
+    }] : []),
     {
       label: t("report"),
       onPick: () => {
@@ -528,6 +546,8 @@ export function VideoPage() {
             goNext();
           }} />
         {sentGift && <GiftFlash gift={sentGift} onDone={clearSentGift} />}
+        {/* Poll, Add Yours, link and comment-reply stickers (Steve, 2026-11-17). */}
+        <VideoStickers post={item} hidden={chromeHidden} />
         {captionLines.length > 0 && <AutoCaptionOverlay key={item.id} lines={captionLines} videoRef={videoRef} />}
         {captionLines.length > 0 && !chromeHidden && <CcButton style={{ position: "absolute", top: 12, right: 12, zIndex: 3 }} />}
 
@@ -696,7 +716,9 @@ export function VideoPage() {
       {/* Steve, 2026-10-21: "Yes add the web too." The web had no comments at all until now —
           see CommentsPanel. Keyed on the post so moving down the feed resets the list rather
           than showing the previous video's comments under the new one. */}
-      <CommentsPanel key={item.id} postId={item.id} totalComments={item.total_comments} />
+      <div id="video-comments" style={{ scrollMarginTop: 70 }}>
+        <CommentsPanel key={item.id} postId={item.id} totalComments={item.total_comments} postOwnerId={item.user_id} />
+      </div>
       {editCaptions && user && (
         <EditCaptionsDialog
           lines={editCaptions}
@@ -720,4 +742,14 @@ export function VideoPage() {
       )}
     </div>
   );
+}
+
+/** The sticker fields of a decorated post, laid over a feed copy that has none. */
+function pickSocial(p: SocialPost): Partial<SocialPost> {
+  const out: Partial<SocialPost> = {};
+  if (p.poll !== undefined) out.poll = p.poll;
+  if (p.add_yours !== undefined) out.add_yours = p.add_yours;
+  if (p.link_sticker !== undefined) out.link_sticker = p.link_sticker;
+  if (p.reply_comment !== undefined) out.reply_comment = p.reply_comment;
+  return out;
 }
