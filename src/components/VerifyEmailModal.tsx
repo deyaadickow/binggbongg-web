@@ -9,10 +9,10 @@
 // Mounted once, inside SessionProvider. It also confirms SILENTLY when the member comes back to
 // the tab after tapping the link in their email (focus / visibilitychange).
 import { useCallback, useEffect, useRef, useState } from "react";
-import { post } from "../lib/api";
 import { useSession } from "../lib/session";
 import { tt, useT } from "../lib/i18n";
-import { freshVerifiedToken, resendVerification } from "../lib/emailAuth";
+import { resendVerification } from "../lib/emailAuth";
+import { confirmEmailNow } from "./SignupWall";
 import { registerVerifyModal } from "../lib/verifyEmail";
 import { showGoldAlert } from "./GoldToast";
 
@@ -43,16 +43,9 @@ export function VerifyEmailModal() {
   const confirm = useCallback(async (): Promise<ConfirmResult> => {
     const me = userRef.current;
     if (!me) return "no_session";
-    const state = await freshVerifiedToken();
-    if (!state) return "no_session";
-    if (!state.verified || !state.idToken) return "not_yet";
-    const res = await post<unknown>("confirmEmailVerified", { user_id: me.id, provider_token: state.idToken });
-    if (res.status) {
-      patchUser({ needs_email_verification: false });
-      return "verified";
-    }
-    if (res.reason === "not_verified_yet") return "not_yet";
-    return { message: typeof res.message === "string" && res.message ? res.message : tt("ve_not_yet") };
+    const r = await confirmEmailNow(me.id);
+    if (r === "verified") patchUser({ needs_email_verification: false });
+    return r;
   }, [patchUser]);
 
   // Back from the email app: if the link was tapped, finish quietly. No popup when it wasn't.

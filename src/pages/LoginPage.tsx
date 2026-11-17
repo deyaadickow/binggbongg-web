@@ -1,6 +1,6 @@
 import type React from "react";
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { post, setAuthHeaders, type UserSummary } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Notice, StoreBadges } from "../components/Common";
@@ -29,6 +29,9 @@ declare global {
 }
 
 let gsiInitialised = false;
+/** Google's callback is set up once per page load; it calls whichever sign-up screen is showing now
+ *  (the wall and /login are separate mounts, and a stale one would send the member to the wrong page). */
+let gsiHandler: ((credential: string) => void) | null = null;
 
 function decodeJwt(token: string): Record<string, string> {
   const payload = token.split(".")[1] ?? "";
@@ -101,7 +104,9 @@ const ICON_EYE_OFF = svg(<><path d="M3 3l18 18M10.6 5.1A10 10 0 0 1 12 5c6.5 0 1
 const looksLikeEmail = (s: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.trim());
 
 
-export function LoginPage() {
+/** `wall`: shown by SignupWall in front of a page the visitor may not open signed out; `from` is that
+ *  page, opened as soon as they are in. */
+export function LoginPage({ wall = false, from: wallFrom }: { wall?: boolean; from?: string } = {}) {
   const { t } = useT();
   const { signIn, isLoggedIn } = useSession();
   const navigate = useNavigate();
@@ -112,7 +117,7 @@ export function LoginPage() {
   // Where to go after signing in. A signed-out tap on Gift or the heart sends the member here
   // with the video they were on; anything else lands on the feed as before.
   const routerLocation = useLocation();
-  const from = (routerLocation.state as { from?: string } | null)?.from ?? "/";
+  const from = wallFrom ?? (routerLocation.state as { from?: string } | null)?.from ?? "/";
   const devMode = new URLSearchParams(location.search).get("dev") === "1";
   const [devUserId, setDevUserId] = useState("");
   const [devToken, setDevToken] = useState("");
@@ -278,6 +283,7 @@ export function LoginPage() {
     }
   }
 
+  gsiHandler = register;
   useEffect(() => {
     if (!GOOGLE_CLIENT_ID || inApp) return;
     const script = document.createElement("script");
@@ -287,7 +293,7 @@ export function LoginPage() {
       if (!window.google || !buttonRef.current) return;
       // GIS warns if initialize() runs twice (React StrictMode mounts twice in dev) — once is enough.
       if (!gsiInitialised) {
-        window.google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: (r) => register(r.credential) });
+        window.google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: (r) => gsiHandler?.(r.credential) });
         gsiInitialised = true;
       }
       const width = Math.min(320, Math.max(200, (buttonRef.current.parentElement?.clientWidth ?? 320)));
@@ -317,11 +323,12 @@ export function LoginPage() {
     }
   }
 
-  const title = mode === "create" ? t("su_title_create") : mode === "signin" ? t("su_title_signin") : t("su_title_reset");
+  // Steve, 2026-11-17: "Sign up free and get 100 free BBs to explore Bingg Bongg".
+  const title = mode === "create" ? t("su_wall_headline") : mode === "signin" ? t("su_title_signin") : t("su_title_reset");
   const subtitle = mode === "create" ? t("su_sub_create") : mode === "signin" ? t("su_sub_signin") : t("su_sub_reset");
   const cta = busy
     ? (mode === "reset" ? t("su_sending") : t("signing_you_in"))
-    : mode === "create" ? t("su_create_account") : mode === "signin" ? t("sign_in") : t("su_send_reset");
+    : mode === "create" ? t("su_sign_up") : mode === "signin" ? t("su_log_in") : t("su_send_reset");
 
   return (
     <div className="page signup-page">
@@ -340,11 +347,11 @@ export function LoginPage() {
       <form className="signup-card" onSubmit={submit} noValidate>
         {mode !== "reset" && (
           <div className="signup-tabs" role="tablist">
-            <button type="button" role="tab" aria-selected={mode === "create"} className={mode === "create" ? "on" : ""} onClick={() => switchMode("create")}>{t("su_create_account")}</button>
-            <button type="button" role="tab" aria-selected={mode === "signin"} className={mode === "signin" ? "on" : ""} onClick={() => switchMode("signin")}>{t("sign_in")}</button>
+            <button type="button" role="tab" aria-selected={mode === "create"} className={mode === "create" ? "on" : ""} onClick={() => switchMode("create")}>{t("su_sign_up")}</button>
+            <button type="button" role="tab" aria-selected={mode === "signin"} className={mode === "signin" ? "on" : ""} onClick={() => switchMode("signin")}>{t("su_log_in")}</button>
           </div>
         )}
-        <h1 className="signup-title">{title}</h1>
+        <h1 className={mode === "create" ? "signup-headline" : "signup-title"}>{title}</h1>
         <p className="signup-sub">{subtitle}</p>
 
         <label className="signup-label" htmlFor="su-email">{t("su_email")}</label>
@@ -431,6 +438,14 @@ export function LoginPage() {
 
         <button type="submit" className="signup-cta" disabled={busy}>{cta}{!busy && <span className="signup-cta-arrow" aria-hidden="true">→</span>}</button>
         {mode === "create" && <p className="signup-free">{t("su_free_fast")}</p>}
+        {mode !== "reset" && (
+          <div className="signup-wall-toggle">
+            {mode === "create" ? t("su_have_account") : t("su_new_here")}{" "}
+            <button type="button" className="signup-inline-link" onClick={() => switchMode(mode === "create" ? "signin" : "create")}>
+              {mode === "create" ? t("su_log_in") : t("su_sign_up")}
+            </button>
+          </div>
+        )}
 
         {error && <div className="signup-form-err" role="alert">{error}</div>}
         {info && <div className="signup-info" role="status">{info}</div>}
@@ -468,6 +483,13 @@ export function LoginPage() {
         )}
       </form>
       {!inApp && <div className="signup-badges"><StoreBadges /></div>}
+      {/* Readable without an account (lib/publicRoutes.ts). */}
+      <nav className="signup-legal" aria-label={t("su_legal_links")}>
+        <Link to="/settings/terms">{t("terms_of_use")}</Link>
+        <Link to="/settings/privacy">{t("privacy_policy")}</Link>
+        <Link to="/settings/contact">{t("contact_us")}</Link>
+        {wall && <Link to="/features">{t("su_see_features")}</Link>}
+      </nav>
     </div>
   );
 }

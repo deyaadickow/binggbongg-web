@@ -104,6 +104,7 @@ import { PodcastEpisodePage, PodcastsPage, StartPodcastPage } from "./pages/Podc
 import { PodcastPlayerProvider } from "./lib/podcastPlayer";
 import { PodcastMiniBar } from "./components/PodcastBits";
 import SplashIntro from "./components/SplashIntro";
+import { SignupWall } from "./components/SignupWall";
 
 /** The ads' landing page (/ph) stands alone — no menu, no sidebar, nothing but the contest and the
  *  download button (Steve, 2026-10-31). Everything else gets the normal site. */
@@ -154,6 +155,10 @@ export default function App() {
         {/* Safety and wellbeing (Steve, 2026-11-17): the one screen-time tracker (visible tab only)
             and its Time's up / Take a break pages, over every route. */}
         <WellbeingGate />
+        {/* The sign-up wall (Steve, 2026-11-17: "If they install and don't signup they are not
+            allowed to go in the app."). Signed out, only lib/publicRoutes.ts's pages open;
+            every other address shows the sign-up screen alone. Unverified email: "Check your email". */}
+        <SignupWall>
         <LandingSwitch>
         <Nav />
         <div className="shell">
@@ -164,7 +169,7 @@ export default function App() {
         <main className="content cosmic-page">
         <FallbackBack />
         {/* Easy sign-up (Steve, 2026-11-03): the later, dismissible "verify your email" and
-            "add your name & photo" reminders. Never a wall. */}
+            "add your name & photo" reminders. The wall itself is SignupWall above. */}
         <SignupNudges />
         <VerifyEmailModal />
         <Routes>
@@ -387,6 +392,7 @@ export default function App() {
         </main>
         </div>
         </LandingSwitch>
+        </SignupWall>
         <PodcastMiniBar />
         <GetAppBar />
       </BrowserRouter>

@@ -2,6 +2,7 @@ import { useLocation } from "react-router-dom";
 import { useSession } from "../lib/session";
 import { useT } from "../lib/i18n";
 import { phoneOs, storeUrl } from "../lib/getApp";
+import { isPublicPath } from "../lib/publicRoutes";
 
 /** A gold "Install" bar along the bottom of the screen for a signed-out visitor on a phone
  *  (Steve, 2026-11-01: installs, not website visits). The sign-in page has its own. */
@@ -11,7 +12,8 @@ export function GetAppBar() {
   const { pathname } = useLocation();
   const os = phoneOs();
   // The invite page has its own store button, with the inviter's code in the link.
-  if (isLoggedIn || !os || pathname === "/login" || pathname.startsWith("/invite/")) return null;
+  // The sign-up wall has its own store badges; the bar is only for the public pages.
+  if (isLoggedIn || !os || !isPublicPath(pathname) || pathname.startsWith("/invite/")) return null;
   return (
     <>
       <div className="get-app-spacer" aria-hidden="true" />

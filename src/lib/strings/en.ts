@@ -3423,4 +3423,16 @@ export const en = {
   ic_exciting_news: "Click here to see our latest exciting news",
   ic_daily_email: "One email will be sent out every day",
   ic_banner_n: "Banner %1$s",
+  // The sign-up wall (Steve, 2026-11-17).
+  su_wall_headline: "Sign up free and get 100 free BBs to explore Bingg Bongg",
+  su_sign_up: "Sign Up",
+  su_log_in: "Log in",
+  su_legal_links: "Terms and policies",
+  su_see_features: "See every feature",
+  ce_title: "Check your email",
+  ce_body: "We sent a link to verify your email. Tap it, then come back here and press I've verified.",
+  ce_spam: "Can't find it? Check your spam folder.",
+  ce_different: "Use a different email",
+  ce_resend_wait: "We couldn't send it again yet. Wait a minute, then try again.",
+  ce_no_session: "This browser lost your sign-in. Tap Use a different email, then log in again with the same email and password.",
 } as const;

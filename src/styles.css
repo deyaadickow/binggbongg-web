@@ -1821,3 +1821,21 @@ body:has(.story-viewer) .get-app-bar { display: none; }
 /* Steve, 2026-11-17: "Please make the Information Center button and text larger in height" */
 .nav .links a.info-center-chip { font-size: 19px; padding: 12px 20px; line-height: 1.2; }
 @media (max-width: 480px) { .nav .links a.info-center-chip { font-size: 17px; padding: 11px 14px; } }
+
+/* The sign-up wall (Steve, 2026-11-17: "If they install and don't signup they are not allowed to
+   go in the app."). The sign-up screen alone fills the window: no menu, no sidebar, no feed. */
+.signup-wall { min-height: 100vh; min-height: 100dvh; box-sizing: border-box; }
+.signup-wall .signup-page { padding-left: 16px; padding-right: 16px; }
+.signup-headline { margin: 0; text-align: center; color: var(--gold-bright); font-size: 24px; line-height: 1.2; font-weight: 800; }
+.signup-wall-toggle { margin-top: 14px; text-align: center; color: var(--gold-bright); font-size: 16px; }
+.signup-legal { margin: 18px 0 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 14px; font-size: 13px; }
+.signup-legal a { color: var(--gold-bright); text-decoration: underline; font-weight: 600; }
+/* "Check your email" — until the link in it is tapped, this is all a new member sees. */
+.ce-card { display: flex; flex-direction: column; align-items: stretch; text-align: center; margin-top: 18px; padding: 22px 18px 18px; border: 2px solid var(--gold); border-radius: 20px; background: #000; color: var(--gold-bright); }
+.ce-ico { align-self: center; color: var(--gold-bright); margin-bottom: 8px; }
+.ce-body { margin: 12px 0 6px; font-size: 16px; line-height: 1.45; }
+.ce-email { margin: 0 0 6px; font-size: 18px; font-weight: 800; color: var(--gold-bright); overflow-wrap: anywhere; }
+.ce-spam { margin: 0; font-size: 14px; opacity: .9; }
+.ce-btn { margin-top: 12px; min-height: 52px; border-radius: 999px; border: 2px solid var(--gold); background: #000; color: var(--gold-bright); font-size: 17px; font-weight: 800; font-family: inherit; cursor: pointer; }
+.ce-btn:disabled { opacity: .7; cursor: default; }
+.ce-different { margin-top: 14px; font-size: 16px; align-self: center; }

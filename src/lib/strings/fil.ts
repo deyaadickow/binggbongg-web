@@ -2640,4 +2640,16 @@ export const fil = {
   ic_exciting_news: "Pindutin dito para makita ang pinakabagong exciting news namin",
   ic_daily_email: "Isang email ang ipapadala araw-araw",
   ic_banner_n: "Banner %1$s",
+  // The sign-up wall (Steve, 2026-11-17).
+  su_wall_headline: "Mag-sign up nang libre at kumuha ng 100 libreng BBs para ma-explore ang Bingg Bongg",
+  su_sign_up: "Mag-sign up",
+  su_log_in: "Mag-log in",
+  su_legal_links: "Mga tuntunin at patakaran",
+  su_see_features: "Tingnan ang lahat ng feature",
+  ce_title: "Tingnan ang email mo",
+  ce_body: "Nagpadala kami ng link para i-verify ang email mo. I-tap ito, tapos bumalik ka rito at pindutin ang Na-verify ko na.",
+  ce_spam: "Hindi mo makita? Tingnan ang spam folder mo.",
+  ce_different: "Gumamit ng ibang email",
+  ce_resend_wait: "Hindi pa namin ito maipadala ulit. Maghintay ng isang minuto, tapos subukan ulit.",
+  ce_no_session: "Nawala ang sign-in mo sa browser na ito. Pindutin ang Gumamit ng ibang email, tapos mag-log in ulit gamit ang parehong email at password.",
 };
