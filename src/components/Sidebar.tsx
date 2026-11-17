@@ -49,6 +49,8 @@ export function sidebarSections(userId: number | null, contestOn = false, podcas
       { to: "/slideshow", label: "ss_title", icon: "🖼️", needsLogin: true },
       // Bingg Bongg Song (Steve, 2026-11-16).
       { to: "/bingg-bongg-song", label: "song_title", icon: "🎵" },
+      // Bingg Bongg Video Ad (Steve, 2026-11-17).
+      { to: "/bingg-bongg-video-ad", label: "vad_title", icon: "🎬" },
       { to: "/photos-directory", label: "photos", icon: "📷", needsLogin: true },
       { to: "/photos", label: "my_photos", icon: "🖼️", needsLogin: true },
       // Steve, 2026-10-18: "Add photo style tab on main feed". Next to Photos, because every

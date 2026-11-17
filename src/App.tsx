@@ -11,6 +11,7 @@ import { EditorPage } from "./pages/EditorPage";
 import { TextPostPage } from "./pages/TextPostPage";
 import { SlideshowPage } from "./pages/SlideshowPage";
 import { MySongsPage, SharedSongPage, SongPage, SongQuestionsPage, SongStartPage, SongVideoPage } from "./pages/SongPages";
+import { AdPage, AdQuestionsPage, AdStartPage, MyAdsPage, SharedAdPage } from "./pages/AdMakerPages";
 import { CreateVideoAdPage } from "./pages/CreateVideoAdPage";
 import { UploadPhotosPage } from "./pages/UploadPhotosPage";
 import { CartoonPage } from "./pages/CartoonPage";
@@ -267,6 +268,13 @@ export default function App() {
           <Route path="/bingg-bongg-song/:id" element={<SongPage />} />
           <Route path="/bingg-bongg-song/:id/video" element={<SongVideoPage />} />
           <Route path="/song/:code" element={<SharedSongPage />} />
+          {/* Bingg Bongg Video Ad (Steve, 2026-11-17): the member's 60-second ads, and the public ad page. */}
+          <Route path="/bingg-bongg-video-ad" element={<AdStartPage />} />
+          <Route path="/bingg-bongg-video-ad/new" element={<AdQuestionsPage />} />
+          <Route path="/bingg-bongg-video-ad/my" element={<MyAdsPage />} />
+          <Route path="/bingg-bongg-video-ad/:id" element={<AdPage />} />
+          <Route path="/bingg-bongg-video-ad/:id/edit" element={<AdQuestionsPage edit />} />
+          <Route path="/ad/:code" element={<SharedAdPage />} />
           <Route path="/photos" element={<MyPhotosPage />} />
           <Route path="/photos-directory" element={<PhotosDirectoryPage />} />
 

@@ -20,6 +20,7 @@ import { PageTitle } from "../components/PageTitle";
 import { requireVerified } from "../lib/verifyEmail";
 import { showGoldAlert } from "../components/GoldToast";
 import { songAttachPost } from "../lib/song";
+import { adMakerAttachPost } from "../lib/adMaker";
 import {
   creatorUploadPost, fetchCreatorOptions, fetchCreatorPlan, fetchUserSeries, localDateTime, localInputToUnix, scheduleProblem,
   toLocalInput, type CreatorOptions, type Series,
@@ -76,6 +77,8 @@ export function UploadVideoPage() {
   const [postKind, setPostKind] = useState<"video" | "text" | "slideshow" | "song">("video");
   // Bingg Bongg Song (2026-11-16): the song whose video this is, linked to the post once it is up.
   const [songId, setSongId] = useState<number | null>(null);
+  // Bingg Bongg Video Ad (2026-11-17): the ad being posted, linked to the post once it is up.
+  const [adMakerId, setAdMakerId] = useState<number | null>(null);
 
   // Social (Steve, 2026-11-17): the comment this video answers, the Add Yours it joins, and the
   // poll / Add Yours / link stickers.
@@ -135,7 +138,7 @@ export function UploadVideoPage() {
   }, [location.state]);
 
   useEffect(() => {
-    const st = location.state as { greenScreen?: { file: File; duration: number; thumb: Blob | null }; remix?: Remix; postKind?: "text" | "slideshow" | "song"; songId?: number;
+    const st = location.state as { greenScreen?: { file: File; duration: number; thumb: Blob | null }; remix?: Remix; postKind?: "text" | "slideshow" | "song"; songId?: number; adMakerId?: number;
       replyComment?: Pick<ReplyComment, "id" | "post_id" | "comment" | "user_name" | "fullname">; addYours?: { id: number; prompt: string };
       answerQuestion?: DraftAnswer } | null;
     const gs = st?.greenScreen;
@@ -145,6 +148,7 @@ export function UploadVideoPage() {
     setRemix(st?.remix ?? null);
     setPostKind(st?.postKind === "text" || st?.postKind === "slideshow" || st?.postKind === "song" ? st.postKind : "video");
     setSongId(st?.postKind === "song" && st.songId ? Number(st.songId) : null);
+    setAdMakerId(st?.adMakerId ? Number(st.adMakerId) : null);
     if (!gs?.file) return;
     setFile(gs.file);
     setDuration(gs.duration);
@@ -222,7 +226,7 @@ export function UploadVideoPage() {
     recordedThumbRef.current = null;
     setRemix(null); // a different file is no longer that duet / stitch / sound
     setPostKind("video");
-    setSongId(null);
+    setSongId(null); setAdMakerId(null);
     if (f.size > MAX_MB * 1024 * 1024) {
       setError(`That file is ${(f.size / 1024 / 1024).toFixed(0)}MB — the limit is ${MAX_MB}MB.`);
       return;
@@ -241,7 +245,7 @@ export function UploadVideoPage() {
     setError("");
     setRemix(null);
     setPostKind("video");
-    setSongId(null);
+    setSongId(null); setAdMakerId(null);
     setFile(new File([c.blob], `recording.${c.ext}`, { type: c.contentType }));
     setDuration(c.duration ?? null);
     recordedThumbRef.current = c.thumb ?? null;
@@ -348,6 +352,7 @@ export function UploadVideoPage() {
         setStage("Publishing…");
         await songAttachPost(user.id, songId, newPostId).catch(() => undefined);
       }
+      if (adMakerId && newPostId) await adMakerAttachPost(user.id, adMakerId, newPostId).catch(() => undefined);
       setDone(true);
     } catch (e) {
       setError((e as Error).message);
@@ -388,7 +393,7 @@ export function UploadVideoPage() {
           <div className="row">
             {newPostId > 0 && <button className="btn gold" onClick={() => navigate(`/video/${newPostId}`)}>{t("soc_open_video")}</button>}
             <button className="btn" onClick={() => navigate(`/profile/${user.id}`)}>{t("see_my_profile")}</button>
-            <button className="btn ghost" onClick={() => { setDone(false); setFile(null); setRemix(null); setPostKind("video"); setSongId(null); setDuration(null); setDescription(""); setLinkedUrl(""); setStickers(EMPTY_STICKERS); setReplyComment(null); setJoinAddYours(null); setAnswerQuestion(null); setNewPostId(0); if (draftParam) navigate("/upload", { replace: true }); }}>{t("upload_another")}</button>
+            <button className="btn ghost" onClick={() => { setDone(false); setFile(null); setRemix(null); setPostKind("video"); setSongId(null); setAdMakerId(null); setDuration(null); setDescription(""); setLinkedUrl(""); setStickers(EMPTY_STICKERS); setReplyComment(null); setJoinAddYours(null); setAnswerQuestion(null); setNewPostId(0); if (draftParam) navigate("/upload", { replace: true }); }}>{t("upload_another")}</button>
           </div>
         </div>
       </div>

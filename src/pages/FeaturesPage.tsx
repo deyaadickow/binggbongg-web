@@ -163,6 +163,8 @@ export const FEATURES: Section[] = [
       { icon: "🖼️", nameKey: "fname_photo_slideshow", blurbKey: "fblurb_photo_slideshow", to: "/slideshow" },
       // Steve, 2026-11-16: "Build Bingg Bongg Song, 299 BBs, 3 free previews".
       { icon: "♪", nameKey: "fname_bingg_bongg_song", blurbKey: "fblurb_bingg_bongg_song", to: "/bingg-bongg-song" },
+      // Steve, 2026-11-17: "Just like Bingg Bongg Song ... 60 seconds video ads for members for 500 BBs".
+      { icon: "🎬", nameKey: "fname_bingg_bongg_video_ad", blurbKey: "fblurb_bingg_bongg_video_ad", to: "/bingg-bongg-video-ad" },
       { icon: "🖼️", nameKey: "fname_photos", blurbKey: "fblurb_photos", to: "/photos" },
       { icon: "✨", nameKey: "fname_photo_styles", blurbKey: "fblurb_photo_styles", to: "/cartoon" },
       // Steve, 2026-11-02: big words behind the person in a photo, drawn on the device.
