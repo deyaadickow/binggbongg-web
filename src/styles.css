@@ -116,6 +116,10 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 /* The Settings hub reuses these as full-width rows rather than pills. */
 .side-link.big { padding: 12px 14px; margin-bottom: 0; border-radius: 0; border: 0; border-bottom: 1px solid var(--line); font-size: 15px; background: none; }
 .side-link.big:last-child { border-bottom: 0; }
+/* Settings boxes (Steve, 2026-11-17): "add gold lines across side to side between every line of
+   text/feature in all boxes" — one gold line under every row, heading included, none under the last. */
+.settings-box > * { border-bottom: 1px solid var(--gold-border) !important; }
+.settings-box > *:last-child { border-bottom: 0 !important; }
 .side-link.big.active { background: rgba(212,175,55,.12); color: var(--gold); box-shadow: inset 3px 0 0 var(--gold-border); }
 .wallet-link { display: flex; align-items: center; gap: 12px; color: inherit; }
 .wallet-link:hover { border-color: var(--gold-bright); }

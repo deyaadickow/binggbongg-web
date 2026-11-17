@@ -58,8 +58,8 @@ const BOX_LAST = ["#signout", "/settings/delete-account"];
 
 function SettingsBox({ title, children }: { title?: string; children: React.ReactNode }) {
   return (
-    <div className="card" style={{ marginBottom: 12, overflow: "hidden" }}>
-      {title && <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)" }}><b style={{ color: "var(--gold)" }}>{title}</b></div>}
+    <div className="card settings-box" style={{ marginBottom: 12, overflow: "hidden" }}>
+      {title && <div style={{ padding: "10px 14px" }}><b style={{ color: "var(--gold)" }}>{title}</b></div>}
       {children}
     </div>
   );
@@ -151,7 +151,7 @@ function SettingsSwitches() {
       ))}
       <CountryBattleReminderToggle row initial={me.country_battle_reminders == null ? null : on(me.country_battle_reminders)} />
       {dm && (
-        <label className="row" style={{ padding: "12px 14px", borderTop: "1px solid var(--line)", cursor: "pointer" }}>
+        <label className="row" style={{ padding: "12px 14px", cursor: "pointer" }}>
           <div style={{ flex: 1 }}><div style={{ fontWeight: 700 }}>{t("dm_settings_title")}</div></div>
           <input type="checkbox" className="switch" checked={!!dm.dm_open} onChange={(e) => {
             const open = e.target.checked;
