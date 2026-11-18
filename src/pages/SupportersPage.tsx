@@ -37,6 +37,12 @@ function GiftCount({ count }: { count: number | undefined }) {
 // latest date on top." Grouped by the day of each member's LATEST gift (last_gift_at, server
 // time), newest day first; within a day the bigger total comes first.
 interface DayGroup { key: string; label: string; supporters: Supporter[] }
+function filterSupporters(list: Supporter[], query: string): Supporter[] {
+  const q = query.trim().replace(/^@/, "").toLowerCase();
+  if (!q) return list;
+  return list.filter((s) => (s.user?.fullname ?? "").toLowerCase().includes(q) || (s.user?.username ?? "").toLowerCase().includes(q));
+}
+
 function groupByLastGift(list: Supporter[]): DayGroup[] {
   const sorted = [...list].sort((a, b) =>
     (b.last_gift_at ?? "").localeCompare(a.last_gift_at ?? "") || b.total_coins - a.total_coins);
@@ -76,6 +82,8 @@ export function SupportersPage() {
   const [data, setData] = useState<SupportersData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  // Steve, 2026-11-18: "Please add search on top of this page." Filters by name or @username.
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     if (!user) return;
@@ -96,6 +104,10 @@ export function SupportersPage() {
       </div>
       {loading ? <Loading /> : error ? <Notice>{error}</Notice> : data && (
         <>
+          {data.supporters.length > 0 && (
+            <input type="search" className="wsm-search" value={query} onChange={(e) => setQuery(e.target.value)}
+              placeholder={`🔍  ${t("search_by_name")}`} aria-label={t("search_by_name")} autoComplete="off" />
+          )}
           <div className="card row" style={{ padding: 14, marginBottom: 12, justifyContent: "space-between" }}>
             <div><div className="muted" style={{ fontSize: 12 }}>{t("supporters")}</div><div style={{ fontWeight: 800, fontSize: 20 }}>{n(data.supporter_count)}</div></div>
             <div><div className="muted" style={{ fontSize: 12 }}>{t("gifts")}</div><div style={{ fontWeight: 800, fontSize: 20 }}>{n(data.gift_count)}</div></div>
@@ -105,7 +117,7 @@ export function SupportersPage() {
             <p className="muted" style={{ padding: "24px 0", textAlign: "center" }}>{t("no_one_has_sent_you_a_gift_yet")}</p>
           ) : (
             <div style={{ display: "grid", gap: 8 }}>
-              {groupByLastGift(data.supporters).map((g) => [
+              {groupByLastGift(filterSupporters(data.supporters, query)).map((g) => [
                 <DateDivider key={`d-${g.key}`} label={g.label} />,
                 ...g.supporters.map((s) => (
                 <Link key={s.user.id} to={`/support/${s.user.id}`} className="card row" style={{ padding: 10, color: "inherit" }}>
