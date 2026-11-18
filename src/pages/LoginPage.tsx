@@ -432,7 +432,7 @@ export function LoginPage({ wall = false, from: wallFrom }: { wall?: boolean; fr
                 onChange={(e) => setReferral(e.target.value)}
               />
             </div>
-            <div style={{ fontSize: 13, color: "#F0C420", marginTop: 4 }}>{t("su_referral_hint")}</div>
+            <div style={{ fontSize: 13, color: "#F0C420", marginTop: 4, textAlign: "center" }}>{t("su_referral_hint")}</div>
           </>
         )}
 

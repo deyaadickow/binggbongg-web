@@ -2641,7 +2641,7 @@ export const fil = {
   ic_daily_email: "Isang email ang ipapadala araw-araw",
   ic_banner_n: "Banner %1$s",
   // The sign-up wall (Steve, 2026-11-17).
-  su_wall_headline: "Mag-sign up nang libre at kumuha ng 100 libreng BBs para ma-explore ang Bingg Bongg",
+  su_wall_headline: "Mag-sign up nang LIBRE\nKumuha ng 100 BBs\nPara maglaro nang LIBRE\nI-explore ang Bingg Bongg nang LIBRE",
   su_sign_up: "Mag-sign up",
   su_log_in: "Mag-log in",
   su_legal_links: "Mga tuntunin at patakaran",

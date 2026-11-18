@@ -3424,7 +3424,7 @@ export const en = {
   ic_daily_email: "One email will be sent out every day",
   ic_banner_n: "Banner %1$s",
   // The sign-up wall (Steve, 2026-11-17).
-  su_wall_headline: "Sign up free and get 100 free BBs to explore Bingg Bongg",
+  su_wall_headline: "Sign up FREE\nGet 100 BBs\nTo play with FREE\nExplore Bingg Bongg FREE",
   su_sign_up: "Sign Up",
   su_log_in: "Log in",
   su_legal_links: "Terms and policies",

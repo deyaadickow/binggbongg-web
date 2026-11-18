@@ -1877,3 +1877,14 @@ body:has(.story-viewer) .get-app-bar { display: none; }
 .profile-info-btn:hover { color: var(--gold-bright); border-color: var(--gold-bright); }
 @media (max-width: 480px) { .profile-info-btn { font-size: 17px; padding: 11px 14px; } }
 .profile-info-page { padding: 8px 0 24px; }
+/* Sign-up screen: every line of text centred (Steve, 2026-11-18: "Please make all the text center"),
+   and the headline keeps its four lines (Sign up FREE / Get 100 BBs / To play with FREE / Explore Bingg Bongg FREE). */
+.signup-page .signup-headline { white-space: pre-line; }
+.signup-page .signup-label,
+.signup-page .signup-input,
+.signup-page .signup-field-err,
+.signup-page .signup-sub,
+.signup-page .signup-free { text-align: center; }
+.signup-page .signup-forgot { align-self: center; }
+.signup-page .store-badges { justify-content: center; text-align: center; }
+.signup-page .store-badges > .muted { flex-basis: 100%; }
