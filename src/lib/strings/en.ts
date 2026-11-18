@@ -2147,7 +2147,7 @@ export const en = {
   featured_videos_tab: "100+ Featured Videos",
   tab_70_features: "100+ Features",
   tab_70_videos: "100+ Videos",
-  tab_1_video: "1 Video 70+ Features",
+  tab_1_video: "1 Video 100+ Features",
   our_ads_tab: "Our Ads",
   fv_language: "Language",
   // Multi-live 24 (2026-11-05) — same keys and words as Android's strings_multi_live.xml.

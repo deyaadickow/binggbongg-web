@@ -1947,7 +1947,7 @@ export const id = {
   featured_videos_tab: "100+ Video Unggulan",
   tab_70_features: "100+ Fitur",
   tab_70_videos: "100+ Video",
-  tab_1_video: "1 Video 70+ Fitur",
+  tab_1_video: "1 Video 100+ Fitur",
   our_ads_tab: "Iklan Kami",
   fv_language: "Bahasa",
   // Multi-live 24 (2026-11-05) — same keys and words as Android's strings_multi_live.xml.

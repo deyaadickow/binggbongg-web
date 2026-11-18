@@ -1952,7 +1952,7 @@ export const fil = {
   featured_videos_tab: "100+ Itinatampok na Video",
   tab_70_features: "100+ Features",
   tab_70_videos: "100+ Video",
-  tab_1_video: "1 Video, 70+ Features",
+  tab_1_video: "1 Video, 100+ Features",
   our_ads_tab: "Aming mga Ad",
   fv_language: "Wika",
   // Multi-live 24 (2026-11-05) — same keys and words as Android's strings_multi_live.xml.

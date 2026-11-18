@@ -1920,7 +1920,7 @@ export const es = {
   featured_videos_tab: "100+ videos destacados",
   tab_70_features: "100+ funciones",
   tab_70_videos: "100+ videos",
-  tab_1_video: "1 video, 70+ funciones",
+  tab_1_video: "1 video, 100+ funciones",
   our_ads_tab: "Nuestros anuncios",
   fv_language: "Idioma",
   // Multi-live 24 (2026-11-05) — same keys and words as Android's strings_multi_live.xml.
