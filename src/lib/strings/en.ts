@@ -2145,7 +2145,7 @@ export const en = {
   ve_no_session: "Please sign out, then sign in again with your email and password.",
   ve_checking: "Checking…",
   featured_videos_tab: "100+ Featured Videos",
-  tab_70_features: "70+ Features",
+  tab_70_features: "100+ Features",
   tab_70_videos: "100+ Videos",
   tab_1_video: "1 Video 70+ Features",
   our_ads_tab: "Our Ads",

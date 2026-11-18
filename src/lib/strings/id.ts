@@ -1945,7 +1945,7 @@ export const id = {
   ve_no_session: "Silakan keluar, lalu masuk lagi dengan email dan kata sandi kamu.",
   ve_checking: "Memeriksa…",
   featured_videos_tab: "100+ Video Unggulan",
-  tab_70_features: "70+ Fitur",
+  tab_70_features: "100+ Fitur",
   tab_70_videos: "100+ Video",
   tab_1_video: "1 Video 70+ Fitur",
   our_ads_tab: "Iklan Kami",

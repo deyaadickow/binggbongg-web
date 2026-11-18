@@ -1950,7 +1950,7 @@ export const fil = {
   ve_no_session: "Mag-sign out muna, tapos mag-sign in ulit gamit ang email at password mo.",
   ve_checking: "Tinitingnan…",
   featured_videos_tab: "100+ Itinatampok na Video",
-  tab_70_features: "70+ Features",
+  tab_70_features: "100+ Features",
   tab_70_videos: "100+ Video",
   tab_1_video: "1 Video, 70+ Features",
   our_ads_tab: "Aming mga Ad",

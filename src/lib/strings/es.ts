@@ -1918,7 +1918,7 @@ export const es = {
   ve_no_session: "Cierra sesión y vuelve a entrar con tu correo y contraseña.",
   ve_checking: "Comprobando…",
   featured_videos_tab: "100+ videos destacados",
-  tab_70_features: "70+ funciones",
+  tab_70_features: "100+ funciones",
   tab_70_videos: "100+ videos",
   tab_1_video: "1 video, 70+ funciones",
   our_ads_tab: "Nuestros anuncios",
