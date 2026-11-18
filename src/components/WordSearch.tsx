@@ -9,7 +9,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Confetti, MuteButton, Podium, firstName } from "./GameShow";
 import { Celebration, type CelebrationShow } from "./Celebration";
-import { sfx, haptic } from "../lib/gameSounds";
+import { sfx, haptic, useStopGameSoundsOnUnmount } from "../lib/gameSounds";
 import { useT } from "../lib/i18n";
 import {
   WS_COLORS, WS_DEFAULT_PRICE, WS_PRICES, fetchWordFinders, fetchWordSearchThemes, lettersOf, lineCells, matchSwipe,
@@ -144,6 +144,7 @@ export function WordSearchPanel({ game, myUserId, onFind, onEnd, onClose, onNoti
   onFind: (from: WSCell, to: WSCell) => Promise<WSFindResult | null>;
   onEnd: () => void; onClose: () => void; onNotice: (msg: string) => void;
 }) {
+  useStopGameSoundsOnUnmount(); // 2026-11-18: no game sound outlives the game
   const { t } = useT();
   const title = useWordSearchTitle()(game);
   const [collapsed, setCollapsed] = useState(false);

@@ -16,9 +16,10 @@ import {
 import { tt, useT  } from "../lib/i18n";
 import { Confetti, MuteButton, SceneBanner } from "./GameShow";
 import { SCENES } from "../lib/gameSceneData";
-import { haptic, sfx } from "../lib/gameSounds";
+import { haptic, sfx, useStopGameSoundsOnUnmount } from "../lib/gameSounds";
 
 export function BlockEscapeOverlay({ onClose }: { onClose: () => void }) {
+  useStopGameSoundsOnUnmount(); // 2026-11-18: no game sound outlives the game
   const { t } = useT();
   const [levels, setLevels] = useState<BlockEscapeLevel[] | null>(null);
   const [error, setError] = useState("");

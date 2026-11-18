@@ -1,8 +1,38 @@
 // Game Show sounds (Steve, 2026-10-27: "make these games more exciting"). Synthesized with Web Audio
 // — no audio files, no licences — the same idea as the phones' TapGameSoundPlayer. One mute switch,
 // remembered in this browser, shared by Guessing Games and Trivia Night.
+import { useEffect } from "react";
+
 const MUTE_KEY = "bb_game_show_muted";
 let ctx: AudioContext | null = null;
+
+// Steve, 2026-11-18: "When i'm live playing a game, every game has a sound, when the game is over the
+// sound doesn't stop please fix it." Every scheduled tone/noise is remembered here until it ends, so
+// stopGameSounds() can cut whatever is still ringing or queued (a drumroll, a 2 s bell, a fanfare)
+// the moment a game closes, the member leaves the live, or the next game opens.
+const live = new Set<AudioScheduledSourceNode>();
+function track(n: AudioScheduledSourceNode) {
+  live.add(n);
+  n.onended = () => { live.delete(n); try { n.disconnect(); } catch { /* already gone */ } };
+}
+
+/** Stop every game sound that is still playing or scheduled to play. Safe to call any time. */
+export function stopGameSounds() {
+  for (const n of live) {
+    try { n.stop(); } catch { /* not started yet or already stopped */ }
+    try { n.disconnect(); } catch { /* already disconnected */ }
+  }
+  live.clear();
+}
+
+/** For each in-live game overlay: silence the last game's tail when this one opens, and silence this
+ *  one when it closes (game over / closed / left the live). */
+export function useStopGameSoundsOnUnmount() {
+  useEffect(() => {
+    stopGameSounds();
+    return stopGameSounds;
+  }, []);
+}
 
 export function isMuted(): boolean {
   try { return localStorage.getItem(MUTE_KEY) === "1"; } catch { return false; }
@@ -28,7 +58,7 @@ function tone(f0: number, f1: number, ms: number, at = 0, type: OscillatorType =
   const o = a.createOscillator(); const g = a.createGain();
   o.type = type; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(Math.max(1, f1), t + ms / 1000);
   g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(gain, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + ms / 1000);
-  o.connect(g).connect(a.destination); o.start(t); o.stop(t + ms / 1000 + 0.02);
+  o.connect(g).connect(a.destination); o.start(t); o.stop(t + ms / 1000 + 0.02); track(o);
 }
 
 function noise(ms: number, at = 0, gain = 0.12) {
@@ -37,7 +67,7 @@ function noise(ms: number, at = 0, gain = 0.12) {
   const buf = a.createBuffer(1, len, a.sampleRate); const d = buf.getChannelData(0);
   for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-6 * i / len);
   const s = a.createBufferSource(); const g = a.createGain(); g.gain.value = gain;
-  s.buffer = buf; s.connect(g).connect(a.destination); s.start(a.currentTime + at / 1000);
+  s.buffer = buf; s.connect(g).connect(a.destination); s.start(a.currentTime + at / 1000); track(s);
 }
 
 export const sfx = {
@@ -89,7 +119,7 @@ function swish(ms: number, at: number, f0: number, f1: number, gain = 0.2) {
   const f = a.createBiquadFilter(); f.type = "bandpass"; f.Q.value = 6;
   f.frequency.setValueAtTime(f0, t); f.frequency.exponentialRampToValueAtTime(f1, t + ms / 1000);
   const g = a.createGain(); g.gain.value = gain;
-  s.connect(f).connect(g).connect(a.destination); s.start(t);
+  s.connect(f).connect(g).connect(a.destination); s.start(t); track(s);
 }
 
 function clack(at: number, loud = 1) {

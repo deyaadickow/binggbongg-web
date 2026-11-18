@@ -25,7 +25,7 @@ import { CbHeader, CountryBattleGrid, StarredYouBar, heardIds, useRotation, useS
 import { useCountryBattleRoom } from "../lib/countryBattleRoom";
 import { cbText, countShape, gridShape, serverNow, useTick } from "../lib/countryBattle";
 import { chatChannel, ensureFirebaseSignIn, observeChat, sendChat, type ChatMessage } from "../lib/firebase";
-import { haptic, sfx } from "../lib/gameSounds";
+import { haptic, sfx, stopGameSounds } from "../lib/gameSounds";
 import {
   battleScreenPath, bonusText, chatBattleStage, checkUserLiveRoom, parseGiftMsg, roomHostId,
   type ChbBattler, type ChbGiftInfo, type ChbGiftMsg, type ChbLiveRoom, type ChbPerson, type ChbResult, type ChbState,
@@ -323,6 +323,8 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
   /** The explainer-video demo only: whose screen this is (a fake battler), signed in or not. */
   demoUserId?: number;
 }) {
+  // Leaving the live (or this battle screen) silences every game sound still ringing (Steve, 2026-11-18).
+  useEffect(() => stopGameSounds, []);
   const { t } = useT();
   const { user, isLoggedIn } = useSession();
   const navigate = useNavigate();

@@ -25,7 +25,7 @@ import { Overlay } from "./BattleEngines";
 import { useT } from "../lib/i18n";
 import { Confetti, MuteButton, Podium, SceneBanner } from "./GameShow";
 import { SCENES } from "../lib/gameSceneData";
-import { haptic, sfx } from "../lib/gameSounds";
+import { haptic, sfx, useStopGameSoundsOnUnmount } from "../lib/gameSounds";
 
 /** The Bingo podium rule, one everywhere (the room, the game's winners page, Android, iOS): the
  *  whole-card winner first, then whoever took the most patterns. Under each name: "Whole card"
@@ -109,6 +109,7 @@ export function BingoOverlay({ game, myUserId, isHost, strip, onBuy, onEndGame, 
   onEndGame: () => void;
   onClose: () => void;
 }) {
+  useStopGameSoundsOnUnmount(); // 2026-11-18: no game sound outlives the game
   const { t } = useT();
   // "Mine if I have one, else the first" — resolved on every render rather than stored, so it
   // stays right if the game's player list is not what this browser last saw.

@@ -18,7 +18,7 @@ import { fetchOneStrokeLevels, type OneStrokeLevel } from "../lib/onestroke";
 import { tt, useT  } from "../lib/i18n";
 import { Confetti, MuteButton, SceneBanner } from "./GameShow";
 import { SCENES } from "../lib/gameSceneData";
-import { haptic, sfx } from "../lib/gameSounds";
+import { haptic, sfx, useStopGameSoundsOnUnmount } from "../lib/gameSounds";
 
 // The board's viewBox is inset beyond 0..1 so a thick stroke on an edge node is not clipped in
 // half. These two constants exist because that inset ALSO has to be undone when a pointer
@@ -33,6 +33,7 @@ const IQ_PER_EDGE = 3;
 const IQ_PER_LEVEL = 11;
 
 export function OneStrokeOverlay({ onClose }: { onClose: () => void }) {
+  useStopGameSoundsOnUnmount(); // 2026-11-18: no game sound outlives the game
   const { t } = useT();
   const [levels, setLevels] = useState<OneStrokeLevel[] | null>(null);
   const [failed, setFailed] = useState(false);

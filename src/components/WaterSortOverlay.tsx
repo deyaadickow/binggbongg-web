@@ -18,7 +18,7 @@ import { useSession } from "../lib/session";
 import { useT } from "../lib/i18n";
 import { MuteButton } from "./GameShow";
 import { Celebration, type CelebrationShow } from "./Celebration";
-import { haptic, sfx } from "../lib/gameSounds";
+import { haptic, sfx, useStopGameSoundsOnUnmount } from "../lib/gameSounds";
 
 const LEVEL_KEY = "bb_water_sort_level";
 const gold = "var(--gold, #F0C420)";
@@ -35,6 +35,7 @@ type Phase = "starting" | "attention" | "playing" | "finishing" | "done" | "erro
 /** The game over the live room, with the coins around it: start (and the first-timer's Attention
  *  popup), play, then Finish -> endColourBallSession -> the result. */
 export function WaterSortOverlay({ roomName, hostName, isHost, onClose }: { roomName: string; hostName: string; isHost: boolean; onClose: () => void }) {
+  useStopGameSoundsOnUnmount(); // 2026-11-18: no game sound outlives the game
   const { t } = useT();
   const { user, refresh } = useSession();
   const [phase, setPhase] = useState<Phase>("starting");

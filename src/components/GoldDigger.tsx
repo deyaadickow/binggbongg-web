@@ -201,11 +201,11 @@ export function GoldDiggerManager() {
 
   useEffect(() => () => window.clearTimeout(hideTimer.current), []);
 
-  const toastTimer = useRef(0);
+  // Steve, 2026-11-18: "the banner appears and disappears before i can read what it says. please
+  // add a small 'OK' on it for a member to click for it to disappear." — no auto-hide any more; the
+  // banner stays until the member taps OK (a new catch replaces it).
   const say = useCallback((text: string, ok: boolean) => {
-    window.clearTimeout(toastTimer.current);
     setToast({ text, ok, key: Date.now() });
-    toastTimer.current = window.setTimeout(() => setToast(null), ok ? 4200 : 3000);
   }, []);
 
   async function tap(n: Shown) {
@@ -306,24 +306,38 @@ export function GoldDiggerManager() {
       )}
 
       {toast && (
-        <button
+        <div
           key={toast.key}
-          type="button"
+          role="status"
           className="gd-anim"
-          onClick={() => { setToast(null); if (toast.ok) navigate("/gold-digger"); }}
           style={{
             position: "fixed", left: "50%", bottom: 96, zIndex: 9002, transform: "translateX(-50%)",
             maxWidth: "calc(100vw - 32px)", width: "max-content",
             background: "#000", color: toast.ok ? "#FFDD55" : "#fff", border: `2px solid ${toast.ok ? "#F0C420" : "#D4AF37"}`,
-            borderRadius: 14, padding: "10px 16px", fontWeight: 800, fontSize: 15, lineHeight: 1.3,
-            boxShadow: "0 6px 24px rgba(0,0,0,.6), 0 0 14px rgba(240,196,32,.35)", cursor: "pointer",
+            borderRadius: 14, padding: "10px 12px 10px 16px", fontWeight: 800, fontSize: 15, lineHeight: 1.3,
+            boxShadow: "0 6px 24px rgba(0,0,0,.6), 0 0 14px rgba(240,196,32,.35)",
             display: "flex", alignItems: "center", gap: 10, textAlign: "left",
             animation: "gd-toast .25s ease-out both",
           }}
         >
-          {toast.ok && <GoldNugget size={28} twinkle={false} />}
-          <span>{toast.text}</span>
-        </button>
+          {/* The message still opens the Gold Digger board on a catch; OK just closes the banner. */}
+          <span
+            onClick={toast.ok ? () => { setToast(null); navigate("/gold-digger"); } : undefined}
+            style={{ display: "flex", alignItems: "center", gap: 10, cursor: toast.ok ? "pointer" : "default", minWidth: 0 }}
+          >
+            {toast.ok && <GoldNugget size={28} twinkle={false} />}
+            <span>{toast.text}</span>
+          </span>
+          <button
+            type="button"
+            onClick={() => setToast(null)}
+            style={{
+              flex: "none", background: "linear-gradient(180deg,#FFE066,#F0C420 55%,#C9971A)", color: "#000",
+              border: "1px solid #FFDD55", borderRadius: 8, padding: "4px 12px", fontWeight: 900, fontSize: 13,
+              lineHeight: 1.2, cursor: "pointer", boxShadow: "0 0 8px rgba(240,196,32,.45)",
+            }}
+          >{t("ok")}</button>
+        </div>
       )}
     </>
   );

@@ -5,7 +5,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { LiveTile } from "../lib/live";
 import type { TriviaGame, TriviaMode, TriviaPlayer, TriviaStart } from "../lib/trivia";
 import { Confetti, CountdownRing, MuteButton, Podium, SceneBanner, SceneChips, firstName, sceneForTrivia } from "./GameShow";
-import { haptic, sfx } from "../lib/gameSounds";
+import { haptic, sfx, useStopGameSoundsOnUnmount } from "../lib/gameSounds";
 import { tt } from "../lib/i18n";
 
 const gold = "var(--gold, #F0C420)";
@@ -28,6 +28,7 @@ export function TriviaOverlay({ game, myUserId, tileFor, onAnswer, onBuy, onEnd,
   onBuy: (recipientId: number, powerup: "5050" | "time" | "vote", choice?: number) => void;
   onEnd: () => void; onClose: () => void;
 }) {
+  useStopGameSoundsOnUnmount(); // 2026-11-18: no game sound outlives the game
   const [collapsed, setCollapsed] = useState(false);
   const [polledAt, setPolledAt] = useState(() => Date.now());
   const [, setTick] = useState(0);

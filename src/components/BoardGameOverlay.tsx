@@ -7,7 +7,7 @@ import type { LiveTile } from "../lib/live";
 import type { AiLevel, BoardGame, BoardKind, BoardMove, BoardPlayer, BoardPowerup, BoardStart, Sq } from "../lib/boardgame";
 import { Confetti, MuteButton, Podium, SceneBanner, SceneChips, firstName, sideColor } from "./GameShow";
 import { SCENES } from "../lib/gameSceneData";
-import { haptic, sfx } from "../lib/gameSounds";
+import { haptic, sfx, useStopGameSoundsOnUnmount } from "../lib/gameSounds";
 
 const gold = "var(--gold, #F0C420)";
 const LIGHT = "#E9D8A6", DARK = "#7A5230", CHECKERS_LIGHT = "#D9C29A", CHECKERS_DARK = "#4F7F4F";
@@ -98,6 +98,7 @@ export function BoardGameOverlay({ game, myUserId, onMove, onBuy, onResign, onEn
   onBuy: (recipientId: number, powerup: BoardPowerup, move?: string) => void;
   onResign: () => void; onEnd: () => void; onClose: () => void;
 }) {
+  useStopGameSoundsOnUnmount(); // 2026-11-18: no game sound outlives the game
   const [collapsed, setCollapsed] = useState(false);
   const [picked, setPicked] = useState<Sq | null>(null);
   const [tick, setTick] = useState(0);

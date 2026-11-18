@@ -6,7 +6,7 @@ import type { LiveTile } from "../lib/live";
 import type { PyramidGame, PyramidPlayer, PyramidTiers } from "../lib/pyramid";
 import { Confetti, CountdownRing, MuteButton, Podium, SceneBanner, SceneChips, firstName } from "./GameShow";
 import { SCENES } from "../lib/gameSceneData";
-import { haptic, sfx } from "../lib/gameSounds";
+import { haptic, sfx, useStopGameSoundsOnUnmount } from "../lib/gameSounds";
 
 const gold = "var(--gold, #F0C420)";
 /** Bottom to top — the order a gift climbs. */
@@ -39,6 +39,7 @@ export function PyramidOverlay({ game, myUserId, onSend, onEnd, onClose, tileFor
   tileFor?: (userId: number) => LiveTile | undefined;
   onSend: (playerId: number, flowers: number) => void; onEnd: () => void; onClose: () => void;
 }) {
+  useStopGameSoundsOnUnmount(); // 2026-11-18: no game sound outlives the game
   const [left, setLeft] = useState(game.seconds_left);
   const [collapsed, setCollapsed] = useState(false);
   useEffect(() => { setLeft(game.seconds_left); }, [game.seconds_left, game.pyramid_game_id]);

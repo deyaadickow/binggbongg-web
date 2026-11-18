@@ -4,7 +4,7 @@ import { agreeToEntryFee, endTapGame, gameTitle, gameTitleWithRate, giftTapGameS
 import { useSession } from "../lib/session";
 import { useT } from "../lib/i18n";
 import { Confetti, MuteButton } from "./GameShow";
-import { haptic, isMuted, sfx } from "../lib/gameSounds";
+import { haptic, isMuted, sfx, useStopGameSoundsOnUnmount } from "../lib/gameSounds";
 import { AddPicturePopup, HitMeField, hasProfilePicture } from "./HitMe";
 import { useLoadedImage } from "../lib/gameArt";
 
@@ -51,6 +51,8 @@ export function TapGameOverlay({ game, roomName, onClose, onToast, hostAvatar, i
   const [balloons, setBalloons] = useState<Balloon[]>([]);
   const laneLastSpawn = useRef<number[]>(new Array(LANES).fill(0));
   const [phase, setPhase] = useState<Phase>("intro");
+  const phaseRef = useRef<Phase>(phase);
+  phaseRef.current = phase;
   const [start, setStart] = useState<TapGameStart | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [caught, setCaught] = useState(0);
@@ -68,10 +70,36 @@ export function TapGameOverlay({ game, roomName, onClose, onToast, hostAvatar, i
   const audio = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    if (game.sound_file_url) audio.current = new Audio(mediaUrl(game.sound_file_url));
+    if (!game.sound_file_url) return;
+    const a = new Audio(mediaUrl(game.sound_file_url));
+    audio.current = a;
+    // Steve, 2026-11-18: "when the game is over the sound doesn't stop" — the admin tap sound can be
+    // a long clip; it is cut when the overlay goes away (closed, left the live, next game).
+    return () => { a.pause(); a.removeAttribute("src"); a.load(); if (audio.current === a) audio.current = null; };
   }, [game.sound_file_url]);
 
   const ctxRef = useRef<AudioContext | null>(null);
+  const bgVideo = useRef<HTMLVideoElement | null>(null);
+  useStopGameSoundsOnUnmount();
+  // The synthesized pop's own AudioContext is closed with the overlay.
+  useEffect(() => () => { void ctxRef.current?.close().catch(() => undefined); ctxRef.current = null; }, []);
+  // The game's sound plays only while the round is being played: the moment it ends (adding up,
+  // result, error) the admin tap clip is stopped and rewound, and the looping background video —
+  // which carries the game's music/sound effects — is muted and paused.
+  useEffect(() => {
+    const v = bgVideo.current;
+    if (phase === "playing") {
+      if (v) { v.muted = false; v.play().catch(() => { v.muted = true; v.play().catch(() => undefined); }); }
+      return;
+    }
+    const a = audio.current;
+    if (a) { a.pause(); a.currentTime = 0; }
+    if (v) {
+      v.muted = true;
+      if (phase === "intro" || phase === "starting" || phase === "attention") v.play().catch(() => undefined); // silent scenery
+      else v.pause();
+    }
+  }, [phase]);
   const playTap = useCallback(() => {
     // The Game Show mute button (shared by every room game) silences the taps too.
     if (isMuted()) return;
@@ -284,14 +312,18 @@ export function TapGameOverlay({ game, roomName, onClose, onToast, hostAvatar, i
         {bgIsVideo && bgUrl && (
           <video
             ref={(el) => {
+              bgVideo.current = el;
               if (!el) return;
               // Steve, 2026-09-09, about the phones: "also please make the sound effect of the
-              // video work as well" — so this is deliberately NOT muted. The game only ever
-              // starts from the player's own tap, which satisfies autoplay policy; if a browser
-              // still refuses, drop to muted rather than showing a frozen frame.
+              // video work as well" — so while the round is PLAYING it is NOT muted (the phase
+              // effect above unmutes it; the game only starts from the player's own tap, which
+              // satisfies autoplay policy). Before and after the round it stays silent (2026-11-18).
+              const ph = phaseRef.current;
+              el.muted = ph !== "playing";
+              if (ph === "finishing" || ph === "done" || ph === "error") { el.pause(); return; }
               el.play().catch(() => { el.muted = true; el.play().catch(() => undefined); });
             }}
-            src={bgUrl} autoPlay loop playsInline
+            src={bgUrl} autoPlay loop playsInline muted
             style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", pointerEvents: "none" }}
           />
         )}

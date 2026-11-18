@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { stopGameSounds } from "../lib/gameSounds";
 import { HostBonusIntro } from "../components/HostBonus";
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { LiveSwipeNav } from "../components/LiveSwipe";
@@ -92,6 +93,8 @@ export function LiveViewerRoute() {
 }
 
 export function LiveViewerPage() {
+  // Leaving the live (or this battle screen) silences every game sound still ringing (Steve, 2026-11-18).
+  useEffect(() => stopGameSounds, []);
   const { t, tn } = useT();
   const { room: roomParam } = useParams();
   const [search] = useSearchParams();

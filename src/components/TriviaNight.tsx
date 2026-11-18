@@ -9,7 +9,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Confetti, CountdownRing, MuteButton, Podium } from "./GameShow";
 import { Celebration, WrongAnswerNotice, type CelebrationShow } from "./Celebration";
-import { sfx } from "../lib/gameSounds";
+import { sfx, useStopGameSoundsOnUnmount } from "../lib/gameSounds";
 import { useT } from "../lib/i18n";
 import { fetchTriviaCategories, type TriviaCategory, type TriviaNight, type TriviaNightAnswer } from "../lib/trivianight";
 
@@ -66,6 +66,7 @@ export function TriviaNightPanel({ game, myUserId, onAnswer, onEnd, onClose }: {
   onAnswer: (i: number) => Promise<TriviaNightAnswer | null>;
   onEnd: () => void; onClose: () => void;
 }) {
+  useStopGameSoundsOnUnmount(); // 2026-11-18: no game sound outlives the game
   const { t } = useT();
   const title = useQuizTitle()(game);
   const [collapsed, setCollapsed] = useState(false);

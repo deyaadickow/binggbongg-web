@@ -10,7 +10,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Confetti, CountdownRing, MuteButton, Podium, SceneBanner, SceneChips } from "./GameShow";
 import { Celebration, WrongAnswerNotice, type CelebrationShow } from "./Celebration";
-import { sfx } from "../lib/gameSounds";
+import { sfx, useStopGameSoundsOnUnmount } from "../lib/gameSounds";
 import { SCENES, type Scene } from "../lib/gameSceneData";
 import { useT, type StringKey } from "../lib/i18n";
 import { NOT_ENOUGH_COINS, type BehindAnswer, type BehindGame } from "../lib/behind";
@@ -67,6 +67,7 @@ export function BehindGamePanel({ game, myUserId, iAmOnScreen, onAnswer, onRemov
   onRemoveWrong: () => Promise<{ removed: number | null; message: string | null } | null>;
   onEnd: () => void; onClose: () => void;
 }) {
+  useStopGameSoundsOnUnmount(); // 2026-11-18: no game sound outlives the game
   const { t } = useT();
   const [collapsed, setCollapsed] = useState(false);
   const [polledAt, setPolledAt] = useState(() => Date.now());

@@ -13,7 +13,7 @@
 // /chat-battle/0?demo=24|12|6          the screen with fake battlers and no LiveKit or server, for
 //                                      the explainer video. &own=0 = a viewer's screen (home tile
 //                                      instead of own); &end=1 = the podium; &img=/path/ photos.
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useT } from "../lib/i18n";
 import { showGoldAlert } from "../components/GoldToast";
@@ -22,7 +22,7 @@ import { CbHeader, CountryBattleGrid, StarredYouBar, heardIds } from "../compone
 import { CHAT_RESERVE, ChatStrip, GridBattleEnd, GridBattleLive, SPOTLIGHT_MS, nameOf, useGridBattleTiles, type GridBattleSource } from "../components/GridBattleScreen";
 import { cbText, clock, useTick } from "../lib/countryBattle";
 import { type ChatMessage } from "../lib/firebase";
-import { sfx } from "../lib/gameSounds";
+import { sfx, stopGameSounds } from "../lib/gameSounds";
 import {
   chatBattleHeartbeat, chatReasonText, joinChatBattle, leaveChatBattle, sendChatBattleGift,
   type ChbBattler, type ChbGiftInfo, type ChbState,
@@ -31,6 +31,8 @@ import {
 // ---- the page --------------------------------------------------------------------------------
 
 export function ChatBattleLivePage() {
+  // Leaving the live (or this battle screen) silences every game sound still ringing (Steve, 2026-11-18).
+  useEffect(() => stopGameSounds, []);
   const { contestId } = useParams();
   const [sp] = useSearchParams();
   const demo = sp.get("demo");

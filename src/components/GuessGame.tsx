@@ -3,7 +3,7 @@
 // guessing locks; the host enters the answer and the closest guesses win — bragging rights only.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Confetti, CountdownRing, MuteButton, Podium, SceneBanner, optionColor, sceneForGuess, textOn, type Lane } from "./GameShow";
-import { haptic, sfx } from "../lib/gameSounds";
+import { haptic, sfx, useStopGameSoundsOnUnmount } from "../lib/gameSounds";
 import {
   fetchGuessLeaderboard, fetchGuessTemplates, GUESS_PRICE_MAX, GUESS_PRICE_MIN,
   type GuessGame, type GuessKind, type GuessStart, type GuessTemplate, type GuessValue, type GuesserRow,
@@ -51,6 +51,7 @@ export function GuessCard({ game, myUserId, onGuess, onLock, onResolve, onCancel
   /** A finished game can be closed straight away (Steve, 2026-10-27) instead of waiting out its 90s. */
   onClose: () => void;
 }) {
+  useStopGameSoundsOnUnmount(); // 2026-11-18: no game sound outlives the game
   const [collapsed, setCollapsed] = useState(false);
   const [board, setBoard] = useState<GuesserRow[] | null>(null);
   const [answering, setAnswering] = useState<number | null>(null);   // host: the pick they are about to confirm
