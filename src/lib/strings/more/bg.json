@@ -1844,5 +1844,7 @@
  "dr_winner": "%1$s печели с %2$s BBs!",
  "dr_bbs": "%1$s BBs",
  "dr_gifted_by": "Подаръци от:",
- "dr_no_gifts": "Няма подаръци"
+ "dr_no_gifts": "Няма подаръци",
+ "pi_my_information": "Моята информация",
+ "pi_information": "Информация"
 }

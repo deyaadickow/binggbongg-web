@@ -1841,5 +1841,7 @@
  "dr_winner": "%1$s laimi su %2$s BBs!",
  "dr_bbs": "%1$s BBs",
  "dr_gifted_by": "Dovanojo:",
- "dr_no_gifts": "Dovanų nėra"
+ "dr_no_gifts": "Dovanų nėra",
+ "pi_my_information": "Mano informacija",
+ "pi_information": "Informacija"
 }

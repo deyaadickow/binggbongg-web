@@ -1842,5 +1842,7 @@
  "dr_winner": "%1$s ชนะด้วย %2$s BBs!",
  "dr_bbs": "%1$s BBs",
  "dr_gifted_by": "ผู้ให้ของขวัญ:",
- "dr_no_gifts": "ไม่มีของขวัญ"
+ "dr_no_gifts": "ไม่มีของขวัญ",
+ "pi_my_information": "ข้อมูลของฉัน",
+ "pi_information": "ข้อมูล"
 }

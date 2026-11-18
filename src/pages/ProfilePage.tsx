@@ -321,7 +321,11 @@ export function ProfilePage() {
   const { user: me, isLoggedIn } = useSession();
   // Stories and playlists act for the member — on the dev server also the Social mock's pretend one.
   const socialMe = socialUser(me);
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  // My Information (Steve, 2026-11-18): "?info=1" shows the My Information view, so the
+  // browser's Back closes it like the phones' back arrow does.
+  const showInfo = searchParams.get("info") === "1";
+  const infoOpenedHere = useRef(false);
   const [profile, setProfile] = useState<ProfileUser | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [following, setFollowing] = useState(false);
@@ -611,6 +615,22 @@ export function ProfilePage() {
 
   const isMe = !!socialMe && socialMe.id === profile.id;
 
+  function openInfo() {
+    infoOpenedHere.current = true;
+    const next = new URLSearchParams(searchParams);
+    next.set("info", "1");
+    setSearchParams(next);
+    window.scrollTo(0, 0);
+  }
+  function closeInfo() {
+    if (!showInfo) return;
+    // Opened with the button: Back is the same as the browser's. Opened from a link: drop the flag.
+    if (infoOpenedHere.current) { infoOpenedHere.current = false; navigate(-1); return; }
+    const next = new URLSearchParams(searchParams);
+    next.delete("info");
+    setSearchParams(next, { replace: true });
+  }
+
   const tabs: { key: TabKey; label: string; count?: number }[] = [
     { key: "videos", label: "Videos", count: profile.postCounts },
     // Steve, 2026-09-26: "next to videos we need to add photos". Count is only known once the
@@ -639,110 +659,93 @@ export function ProfilePage() {
 
   return (
     <div className="page" style={{ maxWidth: 600, margin: "0 auto" }}>
-      {/* Header card */}
-      <div style={{ padding: "16px 0 0" }}>
-        <div style={{ display: "flex", gap: 14, alignItems: "flex-start", marginBottom: 12 }}>
-          {/* Stories (2026-11-17): a gold ring while they have live stories; tap opens them. */}
-          <StoryRingAvatar profile={profile}><Avatar user={profile} size="lg" /></StoryRingAvatar>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-              <h1 style={{ fontSize: 20, color: "var(--gold)", fontWeight: 800, margin: 0 }}>
-                {displayName(profile)}
-              </h1>
-              {/* Steve, 2026-10-05: the Bingg Bongg Battle Badge beside their name. */}
-              <BattleBadge
-                badge={profile.battle_badge}
-                onClick={() => setBattleInfo({
-                  title: "Bingg Bongg Battle Badge",
-                  body: battleBadgeExplainer(displayName(profile), profile.battle_badge ?? 0),
-                })}
-              />
-              {/* Steve, 2026-10-05: the streak beside it — one flame per 30 days kept, and a
-                  flame is one free day. */}
-              <BattleStreak
-                streak={profile.battle_streak}
-                flames={profile.battle_flames}
-                onClick={() => setBattleInfo({
-                  title: "Battle Streak",
-                  body: battleStreakExplainer(displayName(profile), profile.battle_streak ?? 0, profile.battle_flames ?? 0),
-                  flames: profile.battle_flames ?? 0,
-                })}
-              />
-              {/* Steve, 2026-10-29: a VIP Referral Member's gold pill; tapping it says what it is. */}
-              {isVipReferrer(profile.is_vip_referrer) && <VipBadge onClick={() => setVipInfo(true)} />}
-              {/* Build Your Houses (Steve, 2026-11-05): "🏠 N houses" opens their house page. */}
-              <HousesPill userId={profile.id} />
-              {/* Gold Digger (2026-11-17): "⛏️ Gold Digger 🥇 October 2026" — opens the board. */}
-              <GoldDiggerBadge badges={profile.gold_digger_badges} />
-              {profile.is_verified === 2 && (
-                <span title={t("verified")} style={{ color: "#4af", fontSize: 16 }}>✓</span>
-              )}
-              {profile.profile_category?.name && (
-                <span className="pill" style={{ fontSize: 11 }}>{profile.profile_category.name}</span>
-              )}
-            </div>
-            {/* Steve, 2026-10-11: "For this entire page put black borders around all the text
-                and make all the text in gold colour." The handle and bio were grey text
-                straight on the page. */}
-            <div className="gold-plate" style={{ fontSize: 12, marginTop: 4 }}>
-              @{profile.username}{profile.country ? ` · ${profile.country}` : ""}
-            </div>
-            {/* Country Battle v2 daily badges — 1st gold, 2nd silver, 3rd bronze, newest first, each
-                opening that day's top 100; the lifetime counts beside them. */}
-            <CountryBattleBadges badges={profile.country_battle_badges} counts={profile.country_battle_badge_counts} />
-            {profile.bio && (
-              <p className="gold-plate" style={{ marginTop: 6, fontSize: 13, lineHeight: 1.4 }}>{profile.bio}</p>
-            )}
-            {/* Social links */}
-            {(isValidUrl(profile.fb_url) || isValidUrl(profile.insta_url) || isValidUrl(profile.youtube_url)) && (
-              <div className="social-links">
-                {isValidUrl(profile.fb_url) && (
-                  <a href={profile.fb_url!} target="_blank" rel="noopener noreferrer" className="social-link">
-                    {/* i18n-exempt: brand names. */}
-                    <span>f</span> Facebook
-                  </a>
+      {/* Header card. My Information (Steve, 2026-11-18: "Right under the image, Please add a
+          \"My Information\" button ... Click on \"My Information\" button and add all the
+          information on this page to that page. Video, Photos, Business, Following, etc this line
+          will stay on this page."): the profile keeps the avatar, the button and the tab row; the
+          name, badges, bio, counts and every button are on the My Information view. "Information"
+          on someone else's profile — it is theirs, not mine. */}
+      {showInfo ? (
+        <div className="profile-info-page">
+          <div className="cosmic-head">
+            <button className="back-circle" onClick={closeInfo} aria-label={t("back")}>‹</button>
+            <h1 className="page-title" style={{ margin: 0 }}>{t(isMe ? "pi_my_information" : "pi_information")}</h1>
+          </div>
+          <div style={{ display: "flex", gap: 14, alignItems: "flex-start", marginBottom: 12 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                <h1 style={{ fontSize: 20, color: "var(--gold)", fontWeight: 800, margin: 0 }}>
+                  {displayName(profile)}
+                </h1>
+                {/* Steve, 2026-10-05: the Bingg Bongg Battle Badge beside their name. */}
+                <BattleBadge
+                  badge={profile.battle_badge}
+                  onClick={() => setBattleInfo({
+                    title: "Bingg Bongg Battle Badge",
+                    body: battleBadgeExplainer(displayName(profile), profile.battle_badge ?? 0),
+                  })}
+                />
+                {/* Steve, 2026-10-05: the streak beside it — one flame per 30 days kept, and a
+                    flame is one free day. */}
+                <BattleStreak
+                  streak={profile.battle_streak}
+                  flames={profile.battle_flames}
+                  onClick={() => setBattleInfo({
+                    title: "Battle Streak",
+                    body: battleStreakExplainer(displayName(profile), profile.battle_streak ?? 0, profile.battle_flames ?? 0),
+                    flames: profile.battle_flames ?? 0,
+                  })}
+                />
+                {/* Steve, 2026-10-29: a VIP Referral Member's gold pill; tapping it says what it is. */}
+                {isVipReferrer(profile.is_vip_referrer) && <VipBadge onClick={() => setVipInfo(true)} />}
+                {/* Build Your Houses (Steve, 2026-11-05): "🏠 N houses" opens their house page. */}
+                <HousesPill userId={profile.id} />
+                {/* Gold Digger (2026-11-17): "⛏️ Gold Digger 🥇 October 2026" — opens the board. */}
+                <GoldDiggerBadge badges={profile.gold_digger_badges} />
+                {profile.is_verified === 2 && (
+                  <span title={t("verified")} style={{ color: "#4af", fontSize: 16 }}>✓</span>
                 )}
-                {isValidUrl(profile.insta_url) && (
-                  <a href={profile.insta_url!} target="_blank" rel="noopener noreferrer" className="social-link">
-                    {/* i18n-exempt: brand names. */}
-                    <span>◉</span> Instagram
-                  </a>
-                )}
-                {isValidUrl(profile.youtube_url) && (
-                  <a href={profile.youtube_url!} target="_blank" rel="noopener noreferrer" className="social-link">
-                    {/* i18n-exempt: brand names. */}
-                    <span>▶</span> YouTube
-                  </a>
+                {profile.profile_category?.name && (
+                  <span className="pill" style={{ fontSize: 11 }}>{profile.profile_category.name}</span>
                 )}
               </div>
-            )}
-          </div>
-          {/* Options menu for other profiles */}
-          {!isMe && isLoggedIn && (
-            <div style={{ position: "relative", flexShrink: 0 }}>
-              <button
-                className="btn ghost small"
-                onClick={() => setShowOptions((v) => !v)}
-                style={{ padding: "4px 8px", fontSize: 18 }}
-                title={t("options")}
-              >⋮</button>
-              {showOptions && (
-                <div style={{ position: "absolute", right: 0, top: "100%", background: "var(--panel)", border: "1.5px solid var(--gold-border)", borderRadius: 10, minWidth: 140, zIndex: 20, padding: 4 }}>
-                  <button className="btn ghost small" style={{ width: "100%", textAlign: "left", borderRadius: 6 }}
-                    onClick={() => { navigator.share?.({ url: `${window.location.origin}/profile/${profile.id}`, title: displayName(profile) }).catch(() => {}); setShowOptions(false); }}>
-                    {t("share_profile_2")}</button>
-                  <button className="btn ghost small" style={{ width: "100%", textAlign: "left", borderRadius: 6 }} onClick={() => void toggleStopMessages()}>
-                    {t(iStoppedThem ? "dm_allow_from" : "dm_stop_from", profile.username || displayName(profile))}</button>
-                  <button className="btn ghost small" style={{ width: "100%", textAlign: "left", borderRadius: 6 }} onClick={handleReport}>
-                    {t("report")}</button>
-                  <button className="btn ghost small" style={{ width: "100%", textAlign: "left", borderRadius: 6, color: "#f84" }} onClick={handleBlock}>
-                    {t("block")}</button>
+              {/* Steve, 2026-10-11: "For this entire page put black borders around all the text
+                  and make all the text in gold colour." The handle and bio were grey text
+                  straight on the page. */}
+              <div className="gold-plate" style={{ fontSize: 12, marginTop: 4 }}>
+                @{profile.username}{profile.country ? ` · ${profile.country}` : ""}
+              </div>
+              {/* Country Battle v2 daily badges — 1st gold, 2nd silver, 3rd bronze, newest first, each
+                  opening that day's top 100; the lifetime counts beside them. */}
+              <CountryBattleBadges badges={profile.country_battle_badges} counts={profile.country_battle_badge_counts} />
+              {profile.bio && (
+                <p className="gold-plate" style={{ marginTop: 6, fontSize: 13, lineHeight: 1.4 }}>{profile.bio}</p>
+              )}
+              {/* Social links */}
+              {(isValidUrl(profile.fb_url) || isValidUrl(profile.insta_url) || isValidUrl(profile.youtube_url)) && (
+                <div className="social-links">
+                  {isValidUrl(profile.fb_url) && (
+                    <a href={profile.fb_url!} target="_blank" rel="noopener noreferrer" className="social-link">
+                      {/* i18n-exempt: brand names. */}
+                      <span>f</span> Facebook
+                    </a>
+                  )}
+                  {isValidUrl(profile.insta_url) && (
+                    <a href={profile.insta_url!} target="_blank" rel="noopener noreferrer" className="social-link">
+                      {/* i18n-exempt: brand names. */}
+                      <span>◉</span> Instagram
+                    </a>
+                  )}
+                  {isValidUrl(profile.youtube_url) && (
+                    <a href={profile.youtube_url!} target="_blank" rel="noopener noreferrer" className="social-link">
+                      {/* i18n-exempt: brand names. */}
+                      <span>▶</span> YouTube
+                    </a>
+                  )}
                 </div>
               )}
             </div>
-          )}
-        </div>
-
+          </div>
         {/* Stat bullets */}
         <div style={{ display: "flex", overflowX: "auto", scrollbarWidth: "none", gap: 0, borderBottom: "1px solid var(--line)", borderTop: "1px solid var(--line)", margin: "0 -16px", padding: "0 4px" }}>
           {[
@@ -757,7 +760,7 @@ export function ProfilePage() {
               key={label}
               className="stat-bullet"
               style={{ background: "none", border: "none", cursor: "pointer", padding: "10px 8px", minWidth: 60, flex: 1 }}
-              onClick={() => switchTab(t)}
+              onClick={() => { switchTab(t); closeInfo(); }}
             >
               <b style={{ fontSize: 16, color: "var(--gold)", fontWeight: 800 }}>{fmt(val)}</b>
               <span style={{ fontSize: 10, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.04em", marginTop: 2 }}>{label}</span>
@@ -810,7 +813,7 @@ export function ProfilePage() {
               {t("support_2")}</button>
           )}
           {isMe && (
-            <button className="btn ghost small" onClick={() => { switchTab("playlists"); setPlaylistCreate((n) => n + 1); }}>
+            <button className="btn ghost small" onClick={() => { switchTab("playlists"); setPlaylistCreate((n) => n + 1); closeInfo(); }}>
               {t("playlist")}</button>
           )}
           {/* Creators and money (2026-11-17). */}
@@ -826,8 +829,42 @@ export function ProfilePage() {
 
         {showSchedule && <ScheduleSection profileId={profileId} myId={me?.id} />}
 
+        </div>
+      ) : (
+      <div style={{ padding: "16px 0 0" }}>
+        <div className="profile-avatar-row">
+          {/* Stories (2026-11-17): a gold ring while they have live stories; tap opens them. */}
+          <StoryRingAvatar profile={profile}><Avatar user={profile} size="lg" /></StoryRingAvatar>
+          {/* Options menu for other profiles */}
+          {!isMe && isLoggedIn && (
+            <div style={{ position: "relative", flexShrink: 0 }}>
+              <button
+                className="btn ghost small"
+                onClick={() => setShowOptions((v) => !v)}
+                style={{ padding: "4px 8px", fontSize: 18 }}
+                title={t("options")}
+              >⋮</button>
+              {showOptions && (
+                <div style={{ position: "absolute", right: 0, top: "100%", background: "var(--panel)", border: "1.5px solid var(--gold-border)", borderRadius: 10, minWidth: 140, zIndex: 20, padding: 4 }}>
+                  <button className="btn ghost small" style={{ width: "100%", textAlign: "left", borderRadius: 6 }}
+                    onClick={() => { navigator.share?.({ url: `${window.location.origin}/profile/${profile.id}`, title: displayName(profile) }).catch(() => {}); setShowOptions(false); }}>
+                    {t("share_profile_2")}</button>
+                  <button className="btn ghost small" style={{ width: "100%", textAlign: "left", borderRadius: 6 }} onClick={() => void toggleStopMessages()}>
+                    {t(iStoppedThem ? "dm_allow_from" : "dm_stop_from", profile.username || displayName(profile))}</button>
+                  <button className="btn ghost small" style={{ width: "100%", textAlign: "left", borderRadius: 6 }} onClick={handleReport}>
+                    {t("report")}</button>
+                  <button className="btn ghost small" style={{ width: "100%", textAlign: "left", borderRadius: 6, color: "#f84" }} onClick={handleBlock}>
+                    {t("block")}</button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+        <button className="profile-info-btn" onClick={openInfo}>{t(isMe ? "pi_my_information" : "pi_information")}</button>
       </div>
+      )}
 
+      {!showInfo && (<>
       {/* Tab chips */}
       <div className="profile-tabs-wrap" style={{ margin: "0 -16px", padding: "0 12px" }}>
         <div className="profile-tabs">
@@ -913,6 +950,7 @@ export function ProfilePage() {
           )
         )}
       </div>
+      </>)}
 
       {viewingPhoto && (
         <div onClick={() => setViewingPhoto(null)}

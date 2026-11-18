@@ -1840,5 +1840,7 @@
  "dr_winner": "%1$s מנצח עם %2$s BBs!",
  "dr_bbs": "%1$s BBs",
  "dr_gifted_by": "מתנות מאת:",
- "dr_no_gifts": "אין מתנות"
+ "dr_no_gifts": "אין מתנות",
+ "pi_my_information": "המידע שלי",
+ "pi_information": "מידע"
 }

@@ -1841,5 +1841,7 @@
  "dr_winner": "%1$s vinnur með %2$s BBs!",
  "dr_bbs": "%1$s BBs",
  "dr_gifted_by": "Gjafir frá:",
- "dr_no_gifts": "Engar gjafir"
+ "dr_no_gifts": "Engar gjafir",
+ "pi_my_information": "Mínar upplýsingar",
+ "pi_information": "Upplýsingar"
 }

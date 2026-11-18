@@ -1849,3 +1849,12 @@ body:has(.story-viewer) .get-app-bar { display: none; }
   background: #000; color: var(--gold); border: 1px solid var(--gold-border, var(--gold)); border-radius: 10px; outline: none; }
 .wsm-search::placeholder { color: var(--gold); opacity: .7; }
 .wsm-search:focus { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(212,175,55,.25); }
+
+/* My Information on the profile (Steve, 2026-11-18): the avatar alone, then the same wide gold pill
+   as the home page's Information Center button. */
+.profile-avatar-row { position: relative; display: flex; justify-content: center; align-items: center; margin-bottom: 14px; }
+.profile-avatar-row > div:last-child:not(:first-child) { position: absolute; right: 0; top: 0; }
+.profile-info-btn { display: block; width: 100%; box-sizing: border-box; margin: 0 0 14px; padding: 12px 20px; background: #000; border: 2px solid var(--gold-border); border-radius: 999px; color: var(--gold); font-weight: 800; font-size: 19px; line-height: 1.2; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+.profile-info-btn:hover { color: var(--gold-bright); border-color: var(--gold-bright); }
+@media (max-width: 480px) { .profile-info-btn { font-size: 17px; padding: 11px 14px; } }
+.profile-info-page { padding: 8px 0 24px; }

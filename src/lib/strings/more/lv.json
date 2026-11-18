@@ -1840,5 +1840,7 @@
  "dr_winner": "%1$s uzvar ar %2$s BBs!",
  "dr_bbs": "%1$s BBs",
  "dr_gifted_by": "Dāvināja:",
- "dr_no_gifts": "Nav dāvanu"
+ "dr_no_gifts": "Nav dāvanu",
+ "pi_my_information": "Mana informācija",
+ "pi_information": "Informācija"
 }

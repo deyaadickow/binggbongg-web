@@ -2494,4 +2494,7 @@ export const es = {
   gd_badge_more: "×%1$s",
   gd_refresh: "Actualizar",
   gd_load_failed: "No se pudo cargar la tabla de Buscador de Oro. Inténtalo de nuevo.",
+  // My Information on the profile (Steve, 2026-11-18)
+  pi_my_information: "Mi información",
+  pi_information: "Información",
 };

@@ -1843,5 +1843,7 @@
  "dr_winner": "Ο/Η %1$s κερδίζει με %2$s BBs!",
  "dr_bbs": "%1$s BBs",
  "dr_gifted_by": "Δώρα από:",
- "dr_no_gifts": "Κανένα δώρο"
+ "dr_no_gifts": "Κανένα δώρο",
+ "pi_my_information": "Οι πληροφορίες μου",
+ "pi_information": "Πληροφορίες"
 }

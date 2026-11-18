@@ -1844,5 +1844,7 @@
  "dr_winner": "%1$s thắng với %2$s BBs!",
  "dr_bbs": "%1$s BBs",
  "dr_gifted_by": "Người tặng:",
- "dr_no_gifts": "Không có quà"
+ "dr_no_gifts": "Không có quà",
+ "pi_my_information": "Thông tin của tôi",
+ "pi_information": "Thông tin"
 }

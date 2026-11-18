@@ -1835,5 +1835,7 @@
  "dr_winner": "%1$s voittaa %2$s BBs:llä!",
  "dr_bbs": "%1$s BBs",
  "dr_gifted_by": "Lahjoittajat:",
- "dr_no_gifts": "Ei lahjoja"
+ "dr_no_gifts": "Ei lahjoja",
+ "pi_my_information": "Omat tiedot",
+ "pi_information": "Tiedot"
 }

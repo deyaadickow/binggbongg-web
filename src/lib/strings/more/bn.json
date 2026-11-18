@@ -1843,5 +1843,7 @@
  "dr_winner": "%1$s %2$s BBs নিয়ে জিতেছেন!",
  "dr_bbs": "%1$s BBs",
  "dr_gifted_by": "উপহার দিয়েছেন:",
- "dr_no_gifts": "কোনো উপহার নেই"
+ "dr_no_gifts": "কোনো উপহার নেই",
+ "pi_my_information": "আমার তথ্য",
+ "pi_information": "তথ্য"
 }

@@ -1844,5 +1844,7 @@
  "dr_winner": "%1$s vyhráva s %2$s BBs!",
  "dr_bbs": "%1$s BBs",
  "dr_gifted_by": "Darovali:",
- "dr_no_gifts": "Žiadne darčeky"
+ "dr_no_gifts": "Žiadne darčeky",
+ "pi_my_information": "Moje informácie",
+ "pi_information": "Informácie"
 }

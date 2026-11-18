@@ -2693,4 +2693,7 @@ export const fil = {
   gd_badge_more: "×%1$s",
   gd_refresh: "I-refresh",
   gd_load_failed: "Hindi ma-load ang Gold Digger board. Subukan ulit.",
+  // My Information on the profile (Steve, 2026-11-18)
+  pi_my_information: "Aking Impormasyon",
+  pi_information: "Impormasyon",
 };

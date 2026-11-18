@@ -1843,5 +1843,7 @@
  "dr_winner": "%1$s перемагає з %2$s BBs!",
  "dr_bbs": "%1$s BBs",
  "dr_gifted_by": "Подарували:",
- "dr_no_gifts": "Немає подарунків"
+ "dr_no_gifts": "Немає подарунків",
+ "pi_my_information": "Моя інформація",
+ "pi_information": "Інформація"
 }

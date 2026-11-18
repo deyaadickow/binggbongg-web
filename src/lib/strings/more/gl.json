@@ -1840,5 +1840,7 @@
  "dr_winner": "%1$s gaña con %2$s BBs!",
  "dr_bbs": "%1$s BBs",
  "dr_gifted_by": "Agasallos de:",
- "dr_no_gifts": "Sen agasallos"
+ "dr_no_gifts": "Sen agasallos",
+ "pi_my_information": "A miña información",
+ "pi_information": "Información"
 }

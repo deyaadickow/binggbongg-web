@@ -1844,5 +1844,7 @@
  "dr_winner": "%1$s님이 %2$s BBs로 우승!",
  "dr_bbs": "%1$s BBs",
  "dr_gifted_by": "선물한 사람:",
- "dr_no_gifts": "선물 없음"
+ "dr_no_gifts": "선물 없음",
+ "pi_my_information": "내 정보",
+ "pi_information": "정보"
 }

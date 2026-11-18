@@ -2530,4 +2530,7 @@ export const id = {
   gd_badge_more: "×%1$s",
   gd_refresh: "Muat ulang",
   gd_load_failed: "Tidak bisa memuat papan Pemburu Emas. Coba lagi.",
+  // My Information on the profile (Steve, 2026-11-18)
+  pi_my_information: "Informasi Saya",
+  pi_information: "Informasi",
 };

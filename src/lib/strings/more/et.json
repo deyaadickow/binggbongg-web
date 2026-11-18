@@ -1841,5 +1841,7 @@
  "dr_winner": "%1$s võidab %2$s BBs-iga!",
  "dr_bbs": "%1$s BBs",
  "dr_gifted_by": "Kinkijad:",
- "dr_no_gifts": "Kingitusi pole"
+ "dr_no_gifts": "Kingitusi pole",
+ "pi_my_information": "Minu andmed",
+ "pi_information": "Andmed"
 }

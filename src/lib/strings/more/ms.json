@@ -1844,5 +1844,7 @@
  "dr_winner": "%1$s menang dengan %2$s BBs!",
  "dr_bbs": "%1$s BBs",
  "dr_gifted_by": "Hadiah daripada:",
- "dr_no_gifts": "Tiada hadiah"
+ "dr_no_gifts": "Tiada hadiah",
+ "pi_my_information": "Maklumat Saya",
+ "pi_information": "Maklumat"
 }

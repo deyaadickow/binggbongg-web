@@ -1843,5 +1843,7 @@
  "dr_winner": "%1$sさんが%2$s BBsで優勝！",
  "dr_bbs": "%1$s BBs",
  "dr_gifted_by": "ギフトを贈った人：",
- "dr_no_gifts": "ギフトなし"
+ "dr_no_gifts": "ギフトなし",
+ "pi_my_information": "マイ情報",
+ "pi_information": "情報"
 }

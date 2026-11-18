@@ -2142,5 +2142,7 @@
  "dr_winner": "%1$s يفوز بـ %2$s BBs!",
  "dr_bbs": "%1$s BBs",
  "dr_gifted_by": "أهداه:",
- "dr_no_gifts": "لا هدايا"
+ "dr_no_gifts": "لا هدايا",
+ "pi_my_information": "معلوماتي",
+ "pi_information": "معلومات"
 }

@@ -1844,5 +1844,7 @@
  "dr_winner": "%1$s %2$s BBs உடன் வென்றார்!",
  "dr_bbs": "%1$s BBs",
  "dr_gifted_by": "பரிசளித்தவர்கள்:",
- "dr_no_gifts": "பரிசுகள் இல்லை"
+ "dr_no_gifts": "பரிசுகள் இல்லை",
+ "pi_my_information": "எனது தகவல்",
+ "pi_information": "தகவல்"
 }

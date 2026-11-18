@@ -3476,4 +3476,7 @@ export const en = {
   gd_badge_more: "×%1$s",
   gd_refresh: "Refresh",
   gd_load_failed: "Couldn't load the Gold Digger board. Try again.",
+  // My Information on the profile (Steve, 2026-11-18)
+  pi_my_information: "My Information",
+  pi_information: "Information",
 } as const;

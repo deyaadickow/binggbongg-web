@@ -1837,5 +1837,7 @@
  "dr_winner": "%1$s nyert %2$s BBs-szel!",
  "dr_bbs": "%1$s BBs",
  "dr_gifted_by": "Ajándékozók:",
- "dr_no_gifts": "Nincs ajándék"
+ "dr_no_gifts": "Nincs ajándék",
+ "pi_my_information": "Saját adataim",
+ "pi_information": "Adatok"
 }

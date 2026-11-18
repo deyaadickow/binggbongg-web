@@ -1844,5 +1844,7 @@
  "dr_winner": "%1$s %2$s BBs ਨਾਲ ਜਿੱਤੇ!",
  "dr_bbs": "%1$s BBs",
  "dr_gifted_by": "ਤੋਹਫ਼ਾ ਦੇਣ ਵਾਲੇ:",
- "dr_no_gifts": "ਕੋਈ ਤੋਹਫ਼ਾ ਨਹੀਂ"
+ "dr_no_gifts": "ਕੋਈ ਤੋਹਫ਼ਾ ਨਹੀਂ",
+ "pi_my_information": "ਮੇਰੀ ਜਾਣਕਾਰੀ",
+ "pi_information": "ਜਾਣਕਾਰੀ"
 }

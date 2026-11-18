@@ -1842,5 +1842,7 @@
  "dr_winner": "%1$s vinner med %2$s BBs!",
  "dr_bbs": "%1$s BBs",
  "dr_gifted_by": "Gåvor från:",
- "dr_no_gifts": "Inga gåvor"
+ "dr_no_gifts": "Inga gåvor",
+ "pi_my_information": "Min information",
+ "pi_information": "Information"
 }

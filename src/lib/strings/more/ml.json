@@ -1839,5 +1839,7 @@
  "dr_winner": "%1$s %2$s BBs നേടി ജയിച്ചു!",
  "dr_bbs": "%1$s BBs",
  "dr_gifted_by": "സമ്മാനം നൽകിയവർ:",
- "dr_no_gifts": "സമ്മാനങ്ങളില്ല"
+ "dr_no_gifts": "സമ്മാനങ്ങളില്ല",
+ "pi_my_information": "എന്റെ വിവരങ്ങൾ",
+ "pi_information": "വിവരങ്ങൾ"
 }

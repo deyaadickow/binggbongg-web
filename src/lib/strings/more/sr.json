@@ -1844,5 +1844,7 @@
  "dr_winner": "%1$s побеђује са %2$s BBs!",
  "dr_bbs": "%1$s BBs",
  "dr_gifted_by": "Поклонили:",
- "dr_no_gifts": "Нема поклона"
+ "dr_no_gifts": "Нема поклона",
+ "pi_my_information": "Моје информације",
+ "pi_information": "Информације"
 }

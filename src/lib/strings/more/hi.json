@@ -1844,5 +1844,7 @@
  "dr_winner": "%1$s %2$s BBs के साथ जीते!",
  "dr_bbs": "%1$s BBs",
  "dr_gifted_by": "गिफ़्ट देने वाले:",
- "dr_no_gifts": "कोई गिफ़्ट नहीं"
+ "dr_no_gifts": "कोई गिफ़्ट नहीं",
+ "pi_my_information": "मेरी जानकारी",
+ "pi_information": "जानकारी"
 }

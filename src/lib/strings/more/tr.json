@@ -1844,5 +1844,7 @@
  "dr_winner": "%1$s %2$s BBs ile kazandı!",
  "dr_bbs": "%1$s BBs",
  "dr_gifted_by": "Hediye edenler:",
- "dr_no_gifts": "Hediye yok"
+ "dr_no_gifts": "Hediye yok",
+ "pi_my_information": "Bilgilerim",
+ "pi_information": "Bilgiler"
 }

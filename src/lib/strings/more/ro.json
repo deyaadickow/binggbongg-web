@@ -1839,5 +1839,7 @@
  "dr_winner": "%1$s câștigă cu %2$s BBs!",
  "dr_bbs": "%1$s BBs",
  "dr_gifted_by": "Cadouri de la:",
- "dr_no_gifts": "Niciun cadou"
+ "dr_no_gifts": "Niciun cadou",
+ "pi_my_information": "Informațiile mele",
+ "pi_information": "Informații"
 }

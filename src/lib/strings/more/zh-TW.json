@@ -1844,5 +1844,7 @@
  "dr_winner": "%1$s以%2$s BBs獲勝！",
  "dr_bbs": "%1$s BBs",
  "dr_gifted_by": "送禮者：",
- "dr_no_gifts": "尚無禮物"
+ "dr_no_gifts": "尚無禮物",
+ "pi_my_information": "我的資訊",
+ "pi_information": "資訊"
 }

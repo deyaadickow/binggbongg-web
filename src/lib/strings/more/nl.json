@@ -1844,5 +1844,7 @@
  "dr_winner": "%1$s wint met %2$s BBs!",
  "dr_bbs": "%1$s BBs",
  "dr_gifted_by": "Cadeaus van:",
- "dr_no_gifts": "Geen cadeaus"
+ "dr_no_gifts": "Geen cadeaus",
+ "pi_my_information": "Mijn informatie",
+ "pi_information": "Informatie"
 }
