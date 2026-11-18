@@ -1853,5 +1853,11 @@
  "vm_play": "Sesli mesajı oynat",
  "vm_pause": "Duraklat",
  "vm_mic_unavailable": "Mikrofon kullanılamıyor, bu yüzden burada sesli mesaj kaydedilemez.",
- "vm_too_large": "Bu sesli mesaj gönderilemeyecek kadar büyük."
+ "vm_too_large": "Bu sesli mesaj gönderilemeyecek kadar büyük.",
+ "fa_title": "Bingg Bongg Yapay Zeka Asistanı",
+ "fa_yes": "EVET",
+ "fa_more": "Bana daha fazla soru göster",
+ "fa_error": "Bingg ve Bongg şu anda cevap veremiyorlar. Lütfen bir süre sonra tekrar deneyin.",
+ "fblurb_ai_assistant": "Ana sayfada Bingg veya Bongg'a dokunun. Size birkaç soru soracaklar ve Bingg Bongg'un neler yapabileceğini gösterecekler.",
+ "fname_ai_assistant": "Bingg Bongg Yapay Zeka Asistanı"
 }

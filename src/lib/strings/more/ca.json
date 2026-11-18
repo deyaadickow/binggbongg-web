@@ -1852,5 +1852,11 @@
  "vm_play": "Reprodueix el missatge de veu",
  "vm_pause": "Pausa",
  "vm_mic_unavailable": "El micròfon no està disponible, així que aquí no es pot gravar un missatge de veu.",
- "vm_too_large": "Aquest missatge de veu és massa gran per enviar-lo."
+ "vm_too_large": "Aquest missatge de veu és massa gran per enviar-lo.",
+ "fa_title": "Assistent d'IA de Bingg Bongg",
+ "fa_yes": "SÍ",
+ "fa_more": "Mostra'm més preguntes",
+ "fa_error": "En Bingg i en Bongg no poden respondre ara mateix. Torna-ho a intentar d'aquí a un moment.",
+ "fblurb_ai_assistant": "Toca Bingg o Bongg al canal d'inici. Et faran algunes preguntes i et mostraran tot el que pot fer Bingg Bongg.",
+ "fname_ai_assistant": "Assistent d'IA de Bingg Bongg"
 }

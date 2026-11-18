@@ -2505,4 +2505,11 @@ export const es = {
   vm_pause: "Pausa",
   vm_mic_unavailable: "El micrófono no está disponible, así que aquí no se puede grabar un mensaje de voz.",
   vm_too_large: "Ese mensaje de voz es demasiado grande para enviarlo.",
+  // Bingg Bongg AI Assistant (Steve, 2026-11-18)
+  fa_title: "Asistente de IA Bingg Bongg",
+  fa_yes: "SÍ",
+  fa_more: "Muéstrame más preguntas",
+  fa_error: "Bingg y Bongg no pueden responder ahora mismo. Inténtalo de nuevo en un momento.",
+  fblurb_ai_assistant: "Pulsa Bingg o Bongg en la página de inicio. Te harán algunas preguntas y te mostrarán todo lo que Bingg Bongg puede hacer.",
+  fname_ai_assistant: "Asistente de IA Bingg Bongg",
 };

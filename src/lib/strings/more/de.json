@@ -1853,5 +1853,11 @@
  "vm_play": "Sprachnachricht abspielen",
  "vm_pause": "Pause",
  "vm_mic_unavailable": "Das Mikrofon ist nicht verfügbar, daher kann hier keine Sprachnachricht aufgenommen werden.",
- "vm_too_large": "Diese Sprachnachricht ist zu groß zum Senden."
+ "vm_too_large": "Diese Sprachnachricht ist zu groß zum Senden.",
+ "fa_title": "Bingg Bongg KI-Assistent",
+ "fa_yes": "JA",
+ "fa_more": "Zeige mir weitere Fragen",
+ "fa_error": "Bingg und Bongg können momentan nicht antworten. Bitte versuchen Sie es in einem Moment noch einmal.",
+ "fblurb_ai_assistant": "Tippe auf Bingg oder Bongg im Home-Feed. Sie stellen dir ein paar Fragen und zeigen dir alle Funktionen von Bingg Bongg.",
+ "fname_ai_assistant": "Bingg Bongg KI-Assistent"
 }

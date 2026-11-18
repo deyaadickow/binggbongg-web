@@ -1848,5 +1848,11 @@
  "vm_play": "Redă mesajul vocal",
  "vm_pause": "Pauză",
  "vm_mic_unavailable": "Microfonul nu este disponibil, așa că aici nu se poate înregistra un mesaj vocal.",
- "vm_too_large": "Acest mesaj vocal este prea mare pentru a fi trimis."
+ "vm_too_large": "Acest mesaj vocal este prea mare pentru a fi trimis.",
+ "fa_title": "Asistentul AI Bingg Bongg",
+ "fa_yes": "DA",
+ "fa_more": "Arată-mi mai multe întrebări",
+ "fa_error": "Bingg și Bongg nu pot răspunde acum. Vă rugăm să încercați din nou imediat.",
+ "fblurb_ai_assistant": "Atingeți Bingg sau Bongg în fluxul principal. Aceștia vă pun câteva întrebări și vă arată tot ce poate face Bingg Bongg.",
+ "fname_ai_assistant": "Asistentul AI Bingg Bongg"
 }

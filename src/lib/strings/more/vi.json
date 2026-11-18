@@ -1853,5 +1853,11 @@
  "vm_play": "Phát tin nhắn thoại",
  "vm_pause": "Tạm dừng",
  "vm_mic_unavailable": "Micrô không khả dụng nên không thể ghi âm tin nhắn thoại tại đây.",
- "vm_too_large": "Tin nhắn thoại đó quá lớn để gửi."
+ "vm_too_large": "Tin nhắn thoại đó quá lớn để gửi.",
+ "fa_title": "Trợ lý AI Bingg Bongg",
+ "fa_yes": "ĐÚNG",
+ "fa_more": "Hiển thị thêm câu hỏi",
+ "fa_error": "Bingg và Bongg hiện không thể trả lời. Vui lòng thử lại sau một lát.",
+ "fblurb_ai_assistant": "Hãy nhấn vào Bingg hoặc Bongg trên trang chủ. Họ sẽ hỏi bạn một vài câu hỏi và cho bạn thấy tất cả những gì Bingg Bongg có thể làm.",
+ "fname_ai_assistant": "Trợ lý AI Bingg Bongg"
 }

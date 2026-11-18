@@ -1853,5 +1853,11 @@
  "vm_play": "Main mesej suara",
  "vm_pause": "Jeda",
  "vm_mic_unavailable": "Mikrofon tidak tersedia, jadi mesej suara tidak boleh dirakam di sini.",
- "vm_too_large": "Mesej suara itu terlalu besar untuk dihantar."
+ "vm_too_large": "Mesej suara itu terlalu besar untuk dihantar.",
+ "fa_title": "Pembantu AI Bingg Bongg",
+ "fa_yes": "YA",
+ "fa_more": "Tunjukkan saya lebih banyak soalan",
+ "fa_error": "Bingg dan Bongg tidak dapat menjawab sekarang. Sila cuba lagi sebentar lagi.",
+ "fblurb_ai_assistant": "Ketik Bingg atau Bongg pada suapan Laman Utama. Mereka akan menanyakan beberapa soalan kepada anda dan menunjukkan kepada anda semua yang Bingg Bongg boleh lakukan.",
+ "fname_ai_assistant": "Pembantu AI Bingg Bongg"
 }

@@ -1849,5 +1849,11 @@
  "vm_play": "Atskaņot balss ziņu",
  "vm_pause": "Pauze",
  "vm_mic_unavailable": "Mikrofons nav pieejams, tāpēc šeit nevar ierakstīt balss ziņu.",
- "vm_too_large": "Šī balss ziņa ir pārāk liela, lai to nosūtītu."
+ "vm_too_large": "Šī balss ziņa ir pārāk liela, lai to nosūtītu.",
+ "fa_title": "Bingg Bongg mākslīgā intelekta palīgs",
+ "fa_yes": "JĀ",
+ "fa_more": "Rādīt man vairāk jautājumu",
+ "fa_error": "Bingg un Bongg šobrīd nevar atbildēt. Lūdzu, mēģiniet vēlreiz pēc brīža.",
+ "fblurb_ai_assistant": "Sākumlapas plūsmā pieskarieties Bingg vai Bongg. Viņi uzdos jums dažus jautājumus un parādīs visu, ko Bingg Bongg spēj.",
+ "fname_ai_assistant": "Bingg Bongg mākslīgā intelekta palīgs"
 }

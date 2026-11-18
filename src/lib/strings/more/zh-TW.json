@@ -1853,5 +1853,11 @@
  "vm_play": "播放語音訊息",
  "vm_pause": "暫停",
  "vm_mic_unavailable": "麥克風無法使用，因此無法在此錄製語音訊息。",
- "vm_too_large": "這則語音訊息太大，無法傳送。"
+ "vm_too_large": "這則語音訊息太大，無法傳送。",
+ "fa_title": "Bingg Bongg人工智慧助手",
+ "fa_yes": "是的",
+ "fa_more": "顯示更多問題",
+ "fa_error": "Bingg 和 Bongg 現在無法接聽電話，請稍後再試。",
+ "fblurb_ai_assistant": "點擊主頁上的 Bingg 或 Bongg。他們會問你幾個問題，並向你展示 Bingg Bongg 的所有功能。",
+ "fname_ai_assistant": "Bingg Bongg人工智慧助手"
 }

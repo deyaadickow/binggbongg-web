@@ -1852,5 +1852,11 @@
  "vm_play": "Přehrát hlasovou zprávu",
  "vm_pause": "Pozastavit",
  "vm_mic_unavailable": "Mikrofon není k dispozici, takže zde nelze nahrát hlasovou zprávu.",
- "vm_too_large": "Tato hlasová zpráva je příliš velká na odeslání."
+ "vm_too_large": "Tato hlasová zpráva je příliš velká na odeslání.",
+ "fa_title": "Bingg Bongg AI asistent",
+ "fa_yes": "ANO",
+ "fa_more": "Zobrazit další otázky",
+ "fa_error": "Bingg a Bongg momentálně nemohou odpovědět. Zkuste to prosím znovu za chvíli.",
+ "fblurb_ai_assistant": "Klepněte na Bingg nebo Bongg na domovské stránce. Položí vám pár otázek a ukáže vám všechno, co Bingg Bongg umí.",
+ "fname_ai_assistant": "Bingg Bongg AI asistent"
 }

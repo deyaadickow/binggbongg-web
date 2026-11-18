@@ -3487,4 +3487,11 @@ export const en = {
   vm_pause: "Pause",
   vm_mic_unavailable: "The microphone isn't available, so a voice message can't be recorded here.",
   vm_too_large: "That voice message is too large to send.",
+  // Bingg Bongg AI Assistant (Steve, 2026-11-18)
+  fa_title: "Bingg Bongg AI Assistant",
+  fa_yes: "YES",
+  fa_more: "Show me more questions",
+  fa_error: "Bingg and Bongg can't answer right now. Please try again in a moment.",
+  fblurb_ai_assistant: "Tap Bingg or Bongg on the Home feed. They ask you a few questions and show you everything Bingg Bongg can do.",
+  fname_ai_assistant: "Bingg Bongg AI Assistant",
 } as const;

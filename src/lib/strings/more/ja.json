@@ -1852,5 +1852,11 @@
  "vm_play": "ボイスメッセージを再生",
  "vm_pause": "一時停止",
  "vm_mic_unavailable": "マイクが使用できないため、ここではボイスメッセージを録音できません。",
- "vm_too_large": "このボイスメッセージは大きすぎて送信できません。"
+ "vm_too_large": "このボイスメッセージは大きすぎて送信できません。",
+ "fa_title": "Bingg Bongg AIアシスタント",
+ "fa_yes": "はい",
+ "fa_more": "もっと質問を表示",
+ "fa_error": "BinggとBongg現在応答できません。しばらくしてからもう一度お試しください。",
+ "fblurb_ai_assistant": "ホーム画面でBinggまたはBonggをタップしてください。いくつか質問をされた後、Bingg Bonggでできることがすべて表示されます。",
+ "fname_ai_assistant": "Bingg Bongg AIアシスタント"
 }

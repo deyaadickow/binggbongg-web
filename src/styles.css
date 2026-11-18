@@ -1888,3 +1888,36 @@ body:has(.story-viewer) .get-app-bar { display: none; }
 .signup-page .signup-forgot { align-self: center; }
 .signup-page .store-badges { justify-content: center; text-align: center; }
 .signup-page .store-badges > .muted { flex-basis: 100%; }
+
+/* Bingg Bongg AI Assistant (Steve, 2026-11-18): the round Bingg / Bongg face on the Home feed and its
+   popup. Left edge, low enough to clear the top buttons, above the get-app bar. */
+.fa-icon { position: fixed; left: 12px; bottom: calc(96px + env(safe-area-inset-bottom)); z-index: 80; width: 58px; height: 58px;
+  padding: 0; border-radius: 50%; border: 2.5px solid var(--gold); background: #000; cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,.7), 0 0 14px rgba(240,196,32,.45); animation: fa-bob 3.2s ease-in-out infinite; }
+.fa-icon img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block; }
+.fa-icon-ai { position: absolute; left: 50%; bottom: -8px; transform: translateX(-50%); background: var(--gold); color: #000;
+  font-size: 11px; font-weight: 900; line-height: 1; padding: 3px 7px; border-radius: 9px; border: 1.5px solid #000; letter-spacing: .04em; }
+.fa-icon:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+@keyframes fa-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+@media (prefers-reduced-motion: reduce) { .fa-icon { animation: none; } }
+@media (min-width: 900px) { .fa-icon { left: 24px; bottom: 32px; width: 68px; height: 68px; } }
+.fa-backdrop { z-index: 120; }
+.fa-card { position: relative; width: 100%; max-width: 480px; max-height: 86vh; overflow-y: auto; background: #000;
+  border: 2px solid var(--gold); border-radius: 20px; padding: 22px 18px 18px; box-shadow: 0 0 40px rgba(240,196,32,.25); }
+.fa-x { position: absolute; top: 8px; right: 10px; width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--gold);
+  background: #000; color: var(--gold); font-size: 22px; line-height: 1; cursor: pointer; }
+.fa-title { color: var(--gold); font-size: 19px; font-weight: 900; text-align: center; margin: 0 36px 14px; }
+.fa-who { display: flex; flex-direction: column; align-items: center; gap: 6px; margin-bottom: 10px; }
+.fa-who img { width: 84px; height: 84px; border-radius: 50%; border: 2.5px solid var(--gold); object-fit: cover; }
+.fa-name { color: var(--gold); font-weight: 800; font-size: 17px; }
+.fa-greeting { color: #fff; font-size: 16px; line-height: 1.45; text-align: center; margin: 0 0 14px; }
+.fa-questions { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.fa-questions li { display: flex; align-items: center; gap: 12px; border: 1.5px solid var(--gold-border); border-radius: 14px;
+  padding: 10px 10px 10px 14px; background: linear-gradient(180deg, #17130a, #050403); }
+.fa-q { flex: 1; color: #fff; font-size: 15px; line-height: 1.4; }
+.fa-yes { flex-shrink: 0; min-width: 72px; padding: 10px 16px; border-radius: 999px; border: 0; cursor: pointer;
+  background: linear-gradient(180deg, var(--gold-bright), var(--gold)); color: #000; font-weight: 900; font-size: 15px; }
+.fa-actions { display: flex; gap: 10px; margin-top: 16px; }
+.fa-more, .fa-close { flex: 1; padding: 11px 12px; border-radius: 999px; border: 1.5px solid var(--gold); background: #000;
+  color: var(--gold); font-weight: 800; font-size: 14px; cursor: pointer; }
+.fa-more:disabled { opacity: .6; cursor: default; }

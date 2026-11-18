@@ -1850,5 +1850,11 @@
  "vm_play": "Afspil talebesked",
  "vm_pause": "Pause",
  "vm_mic_unavailable": "Mikrofonen er ikke tilgængelig, så der kan ikke optages en talebesked her.",
- "vm_too_large": "Den talebesked er for stor til at blive sendt."
+ "vm_too_large": "Den talebesked er for stor til at blive sendt.",
+ "fa_title": "Bingg Bongg AI-assistent",
+ "fa_yes": "JA",
+ "fa_more": "Vis mig flere spørgsmål",
+ "fa_error": "Bingg og Bongg kan ikke svare lige nu. Prøv igen om et øjeblik.",
+ "fblurb_ai_assistant": "Tryk på Bingg eller Bongg i startfeedet. De stiller dig et par spørgsmål og viser dig alt, hvad Bingg Bongg kan.",
+ "fname_ai_assistant": "Bingg Bongg AI-assistent"
 }

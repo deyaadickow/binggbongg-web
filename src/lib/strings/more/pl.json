@@ -1853,5 +1853,11 @@
  "vm_play": "Odtwórz wiadomość głosową",
  "vm_pause": "Pauza",
  "vm_mic_unavailable": "Mikrofon jest niedostępny, więc nie można tu nagrać wiadomości głosowej.",
- "vm_too_large": "Ta wiadomość głosowa jest za duża, aby ją wysłać."
+ "vm_too_large": "Ta wiadomość głosowa jest za duża, aby ją wysłać.",
+ "fa_title": "Asystent AI Bingg Bongg",
+ "fa_yes": "TAK",
+ "fa_more": "Pokaż mi więcej pytań",
+ "fa_error": "Bingg i Bongg nie mogą teraz odpowiedzieć. Spróbuj ponownie za chwilę.",
+ "fblurb_ai_assistant": "Kliknij Bingg lub Bongg na stronie głównej. Zadadzą Ci kilka pytań i pokażą Ci, co potrafi Bingg Bongg.",
+ "fname_ai_assistant": "Asystent AI Bingg Bongg"
 }

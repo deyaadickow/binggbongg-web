@@ -1853,5 +1853,11 @@
  "vm_play": "Écouter le message vocal",
  "vm_pause": "Pause",
  "vm_mic_unavailable": "Le micro n'est pas disponible, un message vocal ne peut donc pas être enregistré ici.",
- "vm_too_large": "Ce message vocal est trop volumineux pour être envoyé."
+ "vm_too_large": "Ce message vocal est trop volumineux pour être envoyé.",
+ "fa_title": "Assistant IA Bingg Bongg",
+ "fa_yes": "OUI",
+ "fa_more": "Afficher plus de questions",
+ "fa_error": "Bingg et Bongg ne peuvent pas répondre pour le moment. Veuillez réessayer dans un instant.",
+ "fblurb_ai_assistant": "Appuyez sur Bingg ou Bongg dans le flux d'accueil. Ils vous poseront quelques questions et vous montreront tout ce que Bingg Bongg peut faire.",
+ "fname_ai_assistant": "Assistant IA Bingg Bongg"
 }

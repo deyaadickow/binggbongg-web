@@ -79,6 +79,8 @@ export const FEATURES: Section[] = [
     features: [
       // Steve, 2026-11-16: "add the referral program the first one on the list above exciting news."
       { icon: "💸", nameKey: "fname_referral_program", blurbKey: "fblurb_referral_program", to: "/referral-program" },
+      // Steve, 2026-11-18: the Bingg Bongg AI Assistant — the same popup as the Bingg / Bongg icon on the feed.
+      { icon: "🐼", nameKey: "fname_ai_assistant", blurbKey: "fblurb_ai_assistant", to: "/?assistant=1" },
       // Pre-Launch Special (Steve, 2026-11-10; changed 2026-11-11 to 100 FBBs each: "1000 free BBs is too much, make it 100 Free BBs" — "We will give everyone 1000 FBBs
       // from day one, and every new member" — no refill, no wipe).
       { icon: "🎉", nameKey: "fname_prelaunch", blurbKey: "fblurb_prelaunch", to: "/pre-launch" },

@@ -1850,5 +1850,11 @@
  "vm_play": "Esita häälsõnum",
  "vm_pause": "Paus",
  "vm_mic_unavailable": "Mikrofon pole saadaval, seega ei saa siin häälsõnumit salvestada.",
- "vm_too_large": "See häälsõnum on saatmiseks liiga suur."
+ "vm_too_large": "See häälsõnum on saatmiseks liiga suur.",
+ "fa_title": "Bingg Bonggi tehisintellekti assistent",
+ "fa_yes": "JAH",
+ "fa_more": "Näita mulle rohkem küsimusi",
+ "fa_error": "Bingg ja Bongg ei saa praegu vastata. Palun proovige uuesti hetke pärast.",
+ "fblurb_ai_assistant": "Puuduta avalehe voos Binggi või Bonggi. Nad küsivad sinult paar küsimust ja näitavad sulle kõike, mida Bingg Bongg teha oskab.",
+ "fname_ai_assistant": "Bingg Bonggi tehisintellekti assistent"
 }

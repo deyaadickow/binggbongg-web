@@ -2704,4 +2704,11 @@ export const fil = {
   vm_pause: "I-pause",
   vm_mic_unavailable: "Hindi available ang mikropono, kaya hindi makakapag-record ng voice message dito.",
   vm_too_large: "Masyadong malaki ang voice message na iyan para maipadala.",
+  // Bingg Bongg AI Assistant (Steve, 2026-11-18)
+  fa_title: "Bingg Bongg AI Assistant",
+  fa_yes: "OO",
+  fa_more: "Magpakita sa akin ng higit pang mga tanong",
+  fa_error: "Hindi makasagot sina Bingg at Bongg sa ngayon. Pakisubukang muli maya-maya.",
+  fblurb_ai_assistant: "I-tap ang Bingg o Bongg sa Home feed. Magtatanong sila sa iyo ng ilang bagay at ipapakita sa iyo ang lahat ng kayang gawin ni Bingg Bongg.",
+  fname_ai_assistant: "Bingg Bongg AI Assistant",
 };

@@ -1850,5 +1850,11 @@
  "vm_play": "Spila talskilaboð",
  "vm_pause": "Hlé",
  "vm_mic_unavailable": "Hljóðneminn er ekki tiltækur, svo ekki er hægt að taka upp talskilaboð hér.",
- "vm_too_large": "Þessi talskilaboð eru of stór til að senda."
+ "vm_too_large": "Þessi talskilaboð eru of stór til að senda.",
+ "fa_title": "Bingg Bongg AI aðstoðarmaður",
+ "fa_yes": "JÁ",
+ "fa_more": "Sýndu mér fleiri spurningar",
+ "fa_error": "Bingg og Bongg geta ekki svarað núna. Vinsamlegast reynið aftur eftir smástund.",
+ "fblurb_ai_assistant": "Ýttu á Bingg eða Bongg í aðalstraumnum. Þeir spyrja þig nokkurra spurninga og sýna þér allt sem Bingg Bongg getur gert.",
+ "fname_ai_assistant": "Bingg Bongg AI aðstoðarmaður"
 }

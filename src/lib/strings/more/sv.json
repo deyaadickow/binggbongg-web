@@ -1851,5 +1851,11 @@
  "vm_play": "Spela upp röstmeddelande",
  "vm_pause": "Paus",
  "vm_mic_unavailable": "Mikrofonen är inte tillgänglig, så ett röstmeddelande kan inte spelas in här.",
- "vm_too_large": "Det röstmeddelandet är för stort för att skickas."
+ "vm_too_large": "Det röstmeddelandet är för stort för att skickas.",
+ "fa_title": "Bingg Bongg AI-assistent",
+ "fa_yes": "JA",
+ "fa_more": "Visa mig fler frågor",
+ "fa_error": "Bingg och Bongg kan inte svara just nu. Försök igen om en stund.",
+ "fblurb_ai_assistant": "Tryck på Bingg eller Bongg i startflödet. De ställer några frågor och visar dig allt Bingg Bongg kan göra.",
+ "fname_ai_assistant": "Bingg Bongg AI-assistent"
 }

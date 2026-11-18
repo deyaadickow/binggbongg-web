@@ -1853,5 +1853,11 @@
  "vm_play": "የድምፅ መልዕክት አጫውት",
  "vm_pause": "ለአፍታ አቁም",
  "vm_mic_unavailable": "ማይክሮፎኑ አይገኝም፣ ስለዚህ እዚህ የድምፅ መልዕክት መቅዳት አይቻልም።",
- "vm_too_large": "ያ የድምፅ መልዕክት ለመላክ በጣም ትልቅ ነው።"
+ "vm_too_large": "ያ የድምፅ መልዕክት ለመላክ በጣም ትልቅ ነው።",
+ "fa_title": "Bingg Bongg የአይአይ ረዳት",
+ "fa_yes": "አዎ",
+ "fa_more": "ተጨማሪ ጥያቄዎችን አሳየኝ",
+ "fa_error": "Bingg እና Bongg አሁን መልስ መስጠት አይችሉም። እባክዎ ከአፍታ በኋላ እንደገና ይሞክሩ።",
+ "fblurb_ai_assistant": "በመነሻ መጋቢው ላይ Bingg ወይም Bongg መታ ያድርጉ። ጥቂት ጥያቄዎችን ይጠይቁዎታል እና Bingg Bongg ማድረግ የሚችለውን ሁሉ ያሳዩዎታል።",
+ "fname_ai_assistant": "Bingg Bongg የአይአይ ረዳት"
 }

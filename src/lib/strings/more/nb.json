@@ -1850,5 +1850,11 @@
  "vm_play": "Spill av talemelding",
  "vm_pause": "Pause",
  "vm_mic_unavailable": "Mikrofonen er ikke tilgjengelig, så en talemelding kan ikke tas opp her.",
- "vm_too_large": "Den talemeldingen er for stor til å sendes."
+ "vm_too_large": "Den talemeldingen er for stor til å sendes.",
+ "fa_title": "Bingg Bongg AI-assistent",
+ "fa_yes": "JA",
+ "fa_more": "Vis meg flere spørsmål",
+ "fa_error": "Bingg og Bongg kan ikke svare akkurat nå. Prøv igjen om et øyeblikk.",
+ "fblurb_ai_assistant": "Trykk på Bingg eller Bongg i startfeeden. De stiller deg noen spørsmål og viser deg alt Bingg Bongg kan gjøre.",
+ "fname_ai_assistant": "Bingg Bongg AI-assistent"
 }

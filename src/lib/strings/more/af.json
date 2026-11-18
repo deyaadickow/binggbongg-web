@@ -1851,5 +1851,11 @@
  "vm_play": "Speel stemboodskap",
  "vm_pause": "Pouse",
  "vm_mic_unavailable": "Die mikrofoon is nie beskikbaar nie, dus kan 'n stemboodskap nie hier opgeneem word nie.",
- "vm_too_large": "Daardie stemboodskap is te groot om te stuur."
+ "vm_too_large": "Daardie stemboodskap is te groot om te stuur.",
+ "fa_title": "Bingg Bongg KI-assistent",
+ "fa_yes": "JA",
+ "fa_more": "Wys my meer vrae",
+ "fa_error": "Bingg en Bongg kan nie nou antwoord nie. Probeer asseblief weer oor 'n oomblik.",
+ "fblurb_ai_assistant": "Tik Bingg of Bongg op die tuisblad. Hulle vra jou 'n paar vrae en wys jou alles wat Bingg Bongg kan doen.",
+ "fname_ai_assistant": "Bingg Bongg KI-assistent"
 }

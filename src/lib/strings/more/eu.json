@@ -1853,5 +1853,11 @@
  "vm_play": "Erreproduzitu ahots-mezua",
  "vm_pause": "Pausatu",
  "vm_mic_unavailable": "Mikrofonoa ez dago erabilgarri, beraz, ezin da ahots-mezurik grabatu hemen.",
- "vm_too_large": "Ahots-mezu hori handiegia da bidaltzeko."
+ "vm_too_large": "Ahots-mezu hori handiegia da bidaltzeko.",
+ "fa_title": "Bingg Bongg AI laguntzailea",
+ "fa_yes": "BAI",
+ "fa_more": "Erakutsi galdera gehiago",
+ "fa_error": "Binggek eta Bonggek ezin dute erantzun une honetan. Saiatu berriro une batean, mesedez.",
+ "fblurb_ai_assistant": "Sakatu Bingg edo Bongg hasierako jarioan. Galdera batzuk egingo dizkizute eta Bingg Bonggek egin dezakeen guztia erakutsiko dizute.",
+ "fname_ai_assistant": "Bingg Bongg AI laguntzailea"
 }

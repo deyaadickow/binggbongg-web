@@ -1853,5 +1853,11 @@
  "vm_play": "播放语音消息",
  "vm_pause": "暂停",
  "vm_mic_unavailable": "麦克风不可用，因此无法在此录制语音消息。",
- "vm_too_large": "该语音消息太大，无法发送。"
+ "vm_too_large": "该语音消息太大，无法发送。",
+ "fa_title": "Bingg Bongg人工智能助手",
+ "fa_yes": "是的",
+ "fa_more": "显示更多问题",
+ "fa_error": "Bingg 和 Bongg 现在无法接听电话，请稍后再试。",
+ "fblurb_ai_assistant": "点击主页上的 Bingg 或 Bongg。他们会问你几个问题，并向你展示 Bingg Bongg 的所有功能。",
+ "fname_ai_assistant": "Bingg Bongg人工智能助手"
 }

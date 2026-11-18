@@ -106,6 +106,7 @@ import { PodcastMiniBar } from "./components/PodcastBits";
 import SplashIntro from "./components/SplashIntro";
 import { SignupWall } from "./components/SignupWall";
 import { GoldDiggerManager } from "./components/GoldDigger";
+import { FeedAssistantHost } from "./components/FeedAssistant";
 import { GoldDiggerPage } from "./pages/GoldDiggerPage";
 
 /** The ads' landing page (/ph) stands alone — no menu, no sidebar, nothing but the contest and the
@@ -160,6 +161,9 @@ export default function App() {
         {/* Gold Digger (Steve, 2026-11-17: "Find gold where ever you are on the app. On any page on any
             live stream, on any battle, at any time."): one manager, the nugget over every route. */}
         <GoldDiggerManager />
+        {/* Bingg Bongg AI Assistant (Steve, 2026-11-18): the Bingg / Bongg icon on the Home feed + its
+            popup of questions whose YES opens that feature. */}
+        <FeedAssistantHost />
         {/* The sign-up wall (Steve, 2026-11-17: "If they install and don't signup they are not
             allowed to go in the app."). Signed out, only lib/publicRoutes.ts's pages open;
             every other address shows the sign-up screen alone. Unverified email: "Check your email". */}

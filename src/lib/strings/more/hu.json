@@ -1846,5 +1846,11 @@
  "vm_play": "Hangüzenet lejátszása",
  "vm_pause": "Szünet",
  "vm_mic_unavailable": "A mikrofon nem érhető el, ezért itt nem lehet hangüzenetet felvenni.",
- "vm_too_large": "Ez a hangüzenet túl nagy a küldéshez."
+ "vm_too_large": "Ez a hangüzenet túl nagy a küldéshez.",
+ "fa_title": "Bingg Bongg mesterséges intelligencia asszisztens",
+ "fa_yes": "IGEN",
+ "fa_more": "Mutass több kérdést",
+ "fa_error": "Bingg és Bongg jelenleg nem tudnak válaszolni. Kérjük, próbáld újra később.",
+ "fblurb_ai_assistant": "Koppints a Bingg vagy a Bongg elemre a kezdőlapon. Feltesznek neked néhány kérdést, és megmutatják, mit tud a Bingg Bongg.",
+ "fname_ai_assistant": "Bingg Bongg mesterséges intelligencia asszisztens"
 }

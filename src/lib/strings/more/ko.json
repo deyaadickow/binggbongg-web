@@ -1853,5 +1853,11 @@
  "vm_play": "음성 메시지 재생",
  "vm_pause": "일시정지",
  "vm_mic_unavailable": "마이크를 사용할 수 없어 여기서는 음성 메시지를 녹음할 수 없습니다.",
- "vm_too_large": "음성 메시지가 너무 커서 보낼 수 없습니다."
+ "vm_too_large": "음성 메시지가 너무 커서 보낼 수 없습니다.",
+ "fa_title": "Bingg Bongg AI 어시스턴트",
+ "fa_yes": "예",
+ "fa_more": "더 많은 질문을 보여주세요",
+ "fa_error": "Bingg Bongg 지금 응답할 수 없습니다. 잠시 후 다시 시도해 주세요.",
+ "fblurb_ai_assistant": "홈 화면에서 Bingg 또는 Bongg 탭하세요. 몇 가지 질문을 하고 Bingg Bongg 할 수 있는 모든 것을 보여줍니다.",
+ "fname_ai_assistant": "Bingg Bongg AI 어시스턴트"
 }

@@ -2541,4 +2541,11 @@ export const id = {
   vm_pause: "Jeda",
   vm_mic_unavailable: "Mikrofon tidak tersedia, jadi pesan suara tidak bisa direkam di sini.",
   vm_too_large: "Pesan suara itu terlalu besar untuk dikirim.",
+  // Bingg Bongg AI Assistant (Steve, 2026-11-18)
+  fa_title: "Asisten AI Bingg Bongg",
+  fa_yes: "YA",
+  fa_more: "Tampilkan pertanyaan lainnya",
+  fa_error: "Bingg dan Bongg tidak dapat menjawab saat ini. Silakan coba lagi sebentar lagi.",
+  fblurb_ai_assistant: "Ketuk Bingg atau Bongg di beranda. Mereka akan mengajukan beberapa pertanyaan dan menunjukkan semua yang dapat dilakukan Bingg Bongg.",
+  fname_ai_assistant: "Asisten AI Bingg Bongg",
 };
