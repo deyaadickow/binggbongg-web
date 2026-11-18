@@ -21,6 +21,7 @@ import { VideoStickers } from "../components/SocialStickers";
 import { EpisodeChip, LockedCard } from "../components/Creators";
 import { devCreatorDecorate } from "../lib/creators";
 import { setFeed as saveFeedQueue } from "../lib/feed";
+import { rollGoldNow } from "../lib/goldDigger";
 
 const AUTO_KEY = "bb.autoplayNext";
 
@@ -49,6 +50,16 @@ export function VideoPage() {
   const watchStartedAt = useRef(0);
   const watchAccumulatedMs = useRef(0);
   const completedPlays = useRef(0);
+  // Gold Digger (2026-11-17): "Watch a video to the end you might find a couple of grams of gold."
+  // Once per video shown: the player loops unless auto-next is on, so "ended" alone never fires.
+  const goldRolledFor = useRef<number | null>(null);
+  const rollGoldAtEnd = useCallback((postId: number, v: HTMLVideoElement | null, ended = false) => {
+    if (!v || goldRolledFor.current === postId) return;
+    const d = v.duration;
+    if (!ended && !(Number.isFinite(d) && d > 0 && v.currentTime >= d - 0.35)) return;
+    goldRolledFor.current = postId;
+    rollGoldNow("video_end", postId);
+  }, []);
   const watchReported = useRef(false);
   const wheelLock = useRef(0);
   // Steve, 2026-10-19: "Hold the screen for 2 seconds and a popup will appear, Pause that video
@@ -560,7 +571,9 @@ export function VideoPage() {
           loop={!auto}
           onPlay={() => { if (watchStartedAt.current === 0) watchStartedAt.current = Date.now(); }}
           onPause={watchClockStop}
-          onEnded={() => {
+          onTimeUpdate={(e) => rollGoldAtEnd(item.id, e.currentTarget)}
+          onEnded={(e) => {
+            rollGoldAtEnd(item.id, e.currentTarget, true);
             completedPlays.current += 1; watchClockStop();
             if (!auto) return;
             if (sentGift || giftSheetOpen) { advanceAfterGift.current = true; return; }

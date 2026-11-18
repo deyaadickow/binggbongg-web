@@ -24,6 +24,7 @@
 // both phones: the same 109 key names exist in strings.xml, Localizable.strings and the web
 // dictionary, so a feature's wording is written once and lands on all three.
 import { BingoCardIcon } from "../components/BingoCardIcon";
+import { GoldNugget } from "../components/GoldDigger";
 import { FeatureIcon } from "../components/ArtIcon";
 import { Link } from "react-router-dom";
 import { translate, useT, type StringKey } from "../lib/i18n";
@@ -138,6 +139,8 @@ export const FEATURES: Section[] = [
   {
     titleKey: "fsec_games",
     features: [
+      // Gold Digger (Steve, 2026-11-17): "World wide Gold diggers. When you see gold click it and it's yours."
+      { icon: "gold_nugget", nameKey: "fname_gold_digger", blurbKey: "fblurb_gold_digger", to: "/gold-digger" },
       { icon: "🎮", nameKey: "fname_n99_tap_games", blurbKey: "fblurb_n99_tap_games", to: "/feature/tap-games", whereKey: "fwhere_the_live_room" },
       { icon: "bingo_card", nameKey: "fname_bingg_bongg_bingo", blurbKey: "fblurb_bingg_bongg_bingo", to: "/feature/bingo", whereKey: "fwhere_the_live_room" },
       // Guessing Games is hidden (Steve, 2026-10-27) — its tile comes back with it:
@@ -345,7 +348,7 @@ function Tile({ f, number, video, onWatch, extras = [], onWatchExtra }: { f: Fea
       {/* Top-left corner, opposite the #number (Steve, 2026-10-30). The empty line keeps the name
           below the corners. */}
       <span style={{ position: "absolute", top: 14, left: 16, fontSize: 24, lineHeight: 1 }} aria-hidden>
-        <FeatureIcon artKey={featureArtKey(f)} size={32}>{f.icon === "bingo_card" ? <BingoCardIcon size={32} /> : f.icon}</FeatureIcon>
+        <FeatureIcon artKey={featureArtKey(f)} size={32}>{f.icon === "bingo_card" ? <BingoCardIcon size={32} /> : f.icon === "gold_nugget" ? <GoldNugget size={32} /> : f.icon}</FeatureIcon>
       </span>
       <span style={{ display: "block", height: 22 }} aria-hidden />
       <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, maxWidth: "100%" }}>

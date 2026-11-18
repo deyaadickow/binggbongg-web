@@ -95,7 +95,7 @@ export function SettingsHubPage() {
     .forEach((f) => {
       const href = featureHref(f, user?.id ?? null);
       if (!href || !fresh(href, f.labelKey ?? f.nameKey)) return;
-      tiles.push({ to: href, label: f.labelKey ?? f.nameKey, icon: f.icon === "bingo_card" ? "🎱" : f.icon });
+      tiles.push({ to: href, label: f.labelKey ?? f.nameKey, icon: f.icon === "bingo_card" ? "🎱" : f.icon === "gold_nugget" ? "⛏️" : f.icon });
     });
   const row = (l: SideLink) => <SideLinkItem key={l.to + l.label} link={l} onSignOut={signOut} big />;
   const box2 = pick(BOX_SETTINGS);

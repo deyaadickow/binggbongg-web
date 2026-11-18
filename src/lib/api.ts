@@ -87,6 +87,12 @@ export async function post<T = unknown>(endpoint: string, params: Record<string,
     const bonus = json.bingg_bonus;
     void import("./binggBonus").then((m) => m.publishBinggBonus(bonus, params)).catch(() => undefined);
   }
+  // Gold Digger (2026-11-17): "when you give gifts you might see gold." Every gift path — live
+  // rooms, battles, games, the feed — sends through one of these two, so the extra chance is
+  // asked for once, here. The server throttles rolls; a no-op when signed out.
+  if ((endpoint === "sendCoinsToUser" || endpoint === "sendCoinsToPost") && json && json.status) {
+    void import("./goldDigger").then((m) => m.rollGoldNow("gift")).catch(() => undefined);
+  }
   return json;
 }
 

@@ -4,6 +4,8 @@ import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom"
 import { displayName, mediaUrl, post, type Post, type UserSummary } from "../lib/api";
 import { VipBadge, VipBadgePopup } from "../components/VipBadge";
 import { isVipReferrer } from "../lib/referral";
+import { GoldDiggerBadge } from "../components/GoldDigger";
+import type { GdBadge } from "../lib/goldDigger";
 import { BattleBadge, BattleInfoPopup, BattleStreak, battleBadgeExplainer, battleStreakExplainer } from "../components/BattleBadge";
 import { HousesPill } from "./HousesPage";
 import { useSession } from "../lib/session";
@@ -30,6 +32,9 @@ import { SeriesGrid } from "./CreatorPages";
 import { devCreatorDecorate, fetchUserSeries, type Series } from "../lib/creators";
 
 interface ProfileUser extends UserSummary {
+  /** Gold Digger (2026-11-17): every month this member finished in the top 3, newest first.
+   *  Absent on older servers — read as none. */
+  gold_digger_badges?: GdBadge[];
   refer_code?: string;
   is_verified?: number;
   profile_category?: { id?: number; name?: string } | null;
@@ -667,6 +672,8 @@ export function ProfilePage() {
               {isVipReferrer(profile.is_vip_referrer) && <VipBadge onClick={() => setVipInfo(true)} />}
               {/* Build Your Houses (Steve, 2026-11-05): "🏠 N houses" opens their house page. */}
               <HousesPill userId={profile.id} />
+              {/* Gold Digger (2026-11-17): "⛏️ Gold Digger 🥇 October 2026" — opens the board. */}
+              <GoldDiggerBadge badges={profile.gold_digger_badges} />
               {profile.is_verified === 2 && (
                 <span title={t("verified")} style={{ color: "#4af", fontSize: 16 }}>✓</span>
               )}

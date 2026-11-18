@@ -14,6 +14,9 @@ const EXACT = new Set<string>([
   "/features",
   "/feature-videos",
   "/settings/app-features",
+  // Gold Digger's board (2026-11-17): the leaders and Hall of Fame are for everyone to see; finding
+  // gold needs an account, and the page says so.
+  "/gold-digger",
   "/settings/about",
   "/settings/faq",
   // Legal and store-required pages.

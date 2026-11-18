@@ -105,6 +105,8 @@ import { PodcastPlayerProvider } from "./lib/podcastPlayer";
 import { PodcastMiniBar } from "./components/PodcastBits";
 import SplashIntro from "./components/SplashIntro";
 import { SignupWall } from "./components/SignupWall";
+import { GoldDiggerManager } from "./components/GoldDigger";
+import { GoldDiggerPage } from "./pages/GoldDiggerPage";
 
 /** The ads' landing page (/ph) stands alone — no menu, no sidebar, nothing but the contest and the
  *  download button (Steve, 2026-10-31). Everything else gets the normal site. */
@@ -155,6 +157,9 @@ export default function App() {
         {/* Safety and wellbeing (Steve, 2026-11-17): the one screen-time tracker (visible tab only)
             and its Time's up / Take a break pages, over every route. */}
         <WellbeingGate />
+        {/* Gold Digger (Steve, 2026-11-17: "Find gold where ever you are on the app. On any page on any
+            live stream, on any battle, at any time."): one manager, the nugget over every route. */}
+        <GoldDiggerManager />
         {/* The sign-up wall (Steve, 2026-11-17: "If they install and don't signup they are not
             allowed to go in the app."). Signed out, only lib/publicRoutes.ts's pages open;
             every other address shows the sign-up screen alone. Unverified email: "Check your email". */}
@@ -357,6 +362,8 @@ export default function App() {
           <Route path="/houses" element={<HousesPage />} />
           <Route path="/houses/:userId" element={<HousesPage />} />
           <Route path="/features" element={<FeaturesPage />} />
+          {/* Gold Digger (Steve, 2026-11-17): the monthly board + Hall of Fame. Open signed out too. */}
+          <Route path="/gold-digger" element={<GoldDiggerPage />} />
           <Route path="/free-coins" element={<FreeCoinsPage />} />
           {/* Pre-Launch Special (Steve, 2026-11-10; 2026-11-11: 100 FBBs for every member, no refill). */}
           <Route path="/pre-launch" element={<PrelaunchPage />} />
