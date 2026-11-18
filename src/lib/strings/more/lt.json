@@ -1843,5 +1843,12 @@
  "dr_gifted_by": "Dovanojo:",
  "dr_no_gifts": "Dovanų nėra",
  "pi_my_information": "Mano informacija",
- "pi_information": "Informacija"
+ "pi_information": "Informacija",
+ "vm_record": "Įrašyti balso žinutę",
+ "vm_send": "Siųsti balso žinutę",
+ "vm_discard": "Ištrinti įrašą",
+ "vm_play": "Leisti balso žinutę",
+ "vm_pause": "Pristabdyti",
+ "vm_mic_unavailable": "Mikrofonas nepasiekiamas, todėl čia negalima įrašyti balso žinutės.",
+ "vm_too_large": "Ši balso žinutė per didelė, kad būtų išsiųsta."
 }

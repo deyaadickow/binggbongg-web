@@ -1846,5 +1846,12 @@
  "dr_gifted_by": "Darovali:",
  "dr_no_gifts": "Žiadne darčeky",
  "pi_my_information": "Moje informácie",
- "pi_information": "Informácie"
+ "pi_information": "Informácie",
+ "vm_record": "Nahrať hlasovú správu",
+ "vm_send": "Odoslať hlasovú správu",
+ "vm_discard": "Vymazať nahrávku",
+ "vm_play": "Prehrať hlasovú správu",
+ "vm_pause": "Pozastaviť",
+ "vm_mic_unavailable": "Mikrofón nie je k dispozícii, takže tu nemožno nahrať hlasovú správu.",
+ "vm_too_large": "Táto hlasová správa je príliš veľká na odoslanie."
 }

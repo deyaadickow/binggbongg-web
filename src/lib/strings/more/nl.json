@@ -1846,5 +1846,12 @@
  "dr_gifted_by": "Cadeaus van:",
  "dr_no_gifts": "Geen cadeaus",
  "pi_my_information": "Mijn informatie",
- "pi_information": "Informatie"
+ "pi_information": "Informatie",
+ "vm_record": "Spraakbericht opnemen",
+ "vm_send": "Spraakbericht versturen",
+ "vm_discard": "Opname verwijderen",
+ "vm_play": "Spraakbericht afspelen",
+ "vm_pause": "Pauze",
+ "vm_mic_unavailable": "De microfoon is niet beschikbaar, dus hier kan geen spraakbericht worden opgenomen.",
+ "vm_too_large": "Dat spraakbericht is te groot om te versturen."
 }

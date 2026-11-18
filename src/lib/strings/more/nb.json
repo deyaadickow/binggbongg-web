@@ -1843,5 +1843,12 @@
  "dr_gifted_by": "Gaver fra:",
  "dr_no_gifts": "Ingen gaver",
  "pi_my_information": "Min informasjon",
- "pi_information": "Informasjon"
+ "pi_information": "Informasjon",
+ "vm_record": "Ta opp en talemelding",
+ "vm_send": "Send talemelding",
+ "vm_discard": "Slett opptak",
+ "vm_play": "Spill av talemelding",
+ "vm_pause": "Pause",
+ "vm_mic_unavailable": "Mikrofonen er ikke tilgjengelig, så en talemelding kan ikke tas opp her.",
+ "vm_too_large": "Den talemeldingen er for stor til å sendes."
 }

@@ -1846,5 +1846,12 @@
  "dr_gifted_by": "Opariak:",
  "dr_no_gifts": "Oparirik ez",
  "pi_my_information": "Nire informazioa",
- "pi_information": "Informazioa"
+ "pi_information": "Informazioa",
+ "vm_record": "Grabatu ahots-mezu bat",
+ "vm_send": "Bidali ahots-mezua",
+ "vm_discard": "Ezabatu grabazioa",
+ "vm_play": "Erreproduzitu ahots-mezua",
+ "vm_pause": "Pausatu",
+ "vm_mic_unavailable": "Mikrofonoa ez dago erabilgarri, beraz, ezin da ahots-mezurik grabatu hemen.",
+ "vm_too_large": "Ahots-mezu hori handiegia da bidaltzeko."
 }

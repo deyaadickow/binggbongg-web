@@ -1846,5 +1846,12 @@
  "dr_gifted_by": "Người tặng:",
  "dr_no_gifts": "Không có quà",
  "pi_my_information": "Thông tin của tôi",
- "pi_information": "Thông tin"
+ "pi_information": "Thông tin",
+ "vm_record": "Ghi âm tin nhắn thoại",
+ "vm_send": "Gửi tin nhắn thoại",
+ "vm_discard": "Xóa bản ghi âm",
+ "vm_play": "Phát tin nhắn thoại",
+ "vm_pause": "Tạm dừng",
+ "vm_mic_unavailable": "Micrô không khả dụng nên không thể ghi âm tin nhắn thoại tại đây.",
+ "vm_too_large": "Tin nhắn thoại đó quá lớn để gửi."
 }

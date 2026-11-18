@@ -2497,4 +2497,12 @@ export const es = {
   // My Information on the profile (Steve, 2026-11-18)
   pi_my_information: "Mi información",
   pi_information: "Información",
+  // Voice messages in chats (Steve, 2026-11-18)
+  vm_record: "Grabar un mensaje de voz",
+  vm_send: "Enviar mensaje de voz",
+  vm_discard: "Borrar grabación",
+  vm_play: "Reproducir mensaje de voz",
+  vm_pause: "Pausa",
+  vm_mic_unavailable: "El micrófono no está disponible, así que aquí no se puede grabar un mensaje de voz.",
+  vm_too_large: "Ese mensaje de voz es demasiado grande para enviarlo.",
 };

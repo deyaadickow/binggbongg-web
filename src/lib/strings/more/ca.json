@@ -1845,5 +1845,12 @@
  "dr_gifted_by": "Regals de:",
  "dr_no_gifts": "Cap regal",
  "pi_my_information": "La meva informació",
- "pi_information": "Informació"
+ "pi_information": "Informació",
+ "vm_record": "Grava un missatge de veu",
+ "vm_send": "Envia el missatge de veu",
+ "vm_discard": "Esborra la gravació",
+ "vm_play": "Reprodueix el missatge de veu",
+ "vm_pause": "Pausa",
+ "vm_mic_unavailable": "El micròfon no està disponible, així que aquí no es pot gravar un missatge de veu.",
+ "vm_too_large": "Aquest missatge de veu és massa gran per enviar-lo."
 }

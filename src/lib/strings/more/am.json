@@ -1846,5 +1846,12 @@
  "dr_gifted_by": "ስጦታ የሰጡ፡",
  "dr_no_gifts": "ስጦታ የለም",
  "pi_my_information": "የእኔ መረጃ",
- "pi_information": "መረጃ"
+ "pi_information": "መረጃ",
+ "vm_record": "የድምፅ መልዕክት ይቅዱ",
+ "vm_send": "የድምፅ መልዕክት ላክ",
+ "vm_discard": "ቅጂውን ሰርዝ",
+ "vm_play": "የድምፅ መልዕክት አጫውት",
+ "vm_pause": "ለአፍታ አቁም",
+ "vm_mic_unavailable": "ማይክሮፎኑ አይገኝም፣ ስለዚህ እዚህ የድምፅ መልዕክት መቅዳት አይቻልም።",
+ "vm_too_large": "ያ የድምፅ መልዕክት ለመላክ በጣም ትልቅ ነው።"
 }

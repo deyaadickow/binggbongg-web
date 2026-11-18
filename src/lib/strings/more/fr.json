@@ -1846,5 +1846,12 @@
  "dr_gifted_by": "Offert par :",
  "dr_no_gifts": "Aucun cadeau",
  "pi_my_information": "Mes informations",
- "pi_information": "Informations"
+ "pi_information": "Informations",
+ "vm_record": "Enregistrer un message vocal",
+ "vm_send": "Envoyer le message vocal",
+ "vm_discard": "Supprimer l'enregistrement",
+ "vm_play": "Écouter le message vocal",
+ "vm_pause": "Pause",
+ "vm_mic_unavailable": "Le micro n'est pas disponible, un message vocal ne peut donc pas être enregistré ici.",
+ "vm_too_large": "Ce message vocal est trop volumineux pour être envoyé."
 }

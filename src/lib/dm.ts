@@ -43,7 +43,12 @@ export function senderUser(u: UserSummary & { identity?: string }, isNew: boolea
 
 /** What the phones put in the pointer doc's `lastMsg` for a media message — the inbox shows
  *  this instead of an empty line. Taken from Android's strings: ic_text_image / ic_text_video. */
-const MEDIA_LAST_MSG: Record<string, string> = { image: "\u{1F4F7} image", video: "\u{1F3A5} video" };
+const MEDIA_LAST_MSG: Record<string, string> = {
+  image: "\u{1F4F7} image",
+  video: "\u{1F3A5} video",
+  // Voice messages (Steve, 2026-11-18): the same label iOS and Android write.
+  audio: "\u{1F3A4} voice message",
+};
 
 export interface DmMessage {
   id: string;
@@ -52,6 +57,8 @@ export interface DmMessage {
   image: string;
   time: number;
   senderIdentity: string;
+  /** A voice message's length in whole seconds; undefined when the row has none. */
+  duration?: number;
 }
 
 export interface DmConversation {
@@ -136,6 +143,7 @@ export async function observeMessages(
           // Written as a double by both apps; a string has been seen in older rows.
           time: Number(v.time ?? 0),
           senderIdentity: String(v.senderUser?.user_identity ?? ""),
+          duration: v.duration != null && Number.isFinite(Number(v.duration)) ? Number(v.duration) : undefined,
         } as DmMessage;
       });
       // Queried newest-first because that is the shape the index and the rules expect;
@@ -153,7 +161,7 @@ export async function observeMessages(
 async function write(
   me: UserSummary & { identity?: string },
   partner: UserSummary & { identity?: string },
-  opts: { msg: string; msgType: "text" | "image" | "video"; image: string },
+  opts: { msg: string; msgType: "text" | "image" | "video" | "audio"; image: string; duration?: number },
 ): Promise<void> {
   const myIdentity = me.identity ?? "";
   const theirIdentity = partner.identity ?? "";
@@ -173,6 +181,7 @@ async function write(
     time,
     senderUser: senderUser(me, true),
     not_deleted_identities: [myIdentity, theirIdentity],
+    ...(opts.duration !== undefined ? { duration: opts.duration } : {}),
   });
 
   // The phones put a label in lastMsg for media, not the caption, so a photo with no words
@@ -212,6 +221,18 @@ export async function sendMediaMessage(
 ): Promise<void> {
   if (!key) throw new Error(tt("nothing_uploaded"));
   await write(me, partner, { msg: caption.trim(), msgType: kind, image: key });
+}
+
+/** A voice message, already uploaded (uploadVoiceMessage). [seconds] is stored as a whole
+ *  number in `duration`, exactly as the phones write it; `msg` is always "". */
+export async function sendVoiceMessage(
+  me: UserSummary & { identity?: string },
+  partner: UserSummary & { identity?: string },
+  key: string,
+  seconds: number,
+): Promise<void> {
+  if (!key) throw new Error(tt("nothing_uploaded"));
+  await write(me, partner, { msg: "", msgType: "audio", image: key, duration: Math.max(1, Math.round(seconds)) });
 }
 
 /** Clears the unread flag on the reader's own pointer — what the phones do on opening a thread. */
@@ -319,6 +340,38 @@ export async function uploadChatMedia(
   await assertAllowed(userId, slot.key, kind, thumbKey);
 
   return { key: slot.key, kind };
+}
+
+// ---------------------------------------------------------------------------------------
+// Voice messages — Steve, 2026-11-18: "Add a voice message to send to all chats."
+//
+// Same three upload steps as a photo, but NO moderateChatMedia: that endpoint treats anything
+// that is not a video as an image and would hand an audio file to Hive's image scan. The shared
+// format (all three apps): msgType "audio", image = the S3 key, msg "", duration = whole seconds.
+
+export const DM_MAX_VOICE_BYTES = 10 * 1024 * 1024;
+export const DM_MAX_VOICE_SECONDS = 60;
+
+/** The recorder formats to try, best first. Safari gives AAC in MP4 (.m4a, what the phones
+ *  record); Chrome and Firefox give Opus in WebM. */
+export function pickVoiceMime(): string {
+  const options = ["audio/mp4;codecs=mp4a.40.2", "audio/mp4", "audio/webm;codecs=opus", "audio/webm"];
+  if (typeof MediaRecorder === "undefined") return "";
+  for (const m of options) if (MediaRecorder.isTypeSupported?.(m)) return m;
+  return "";
+}
+
+/** Uploads a finished recording and returns its S3 key. The extension and content type are the
+ *  ones the browser actually recorded in, not a guess. */
+export async function uploadVoiceMessage(userId: number, blob: Blob, onProgress?: (fraction: number) => void): Promise<string> {
+  if (blob.size > DM_MAX_VOICE_BYTES) throw new Error(tt("vm_too_large"));
+  const contentType = (blob.type || "audio/webm").split(";")[0];
+  const ext = contentType === "audio/mp4" ? "m4a" : contentType === "audio/ogg" ? "ogg" : "webm";
+  const fileName = `voice-${Date.now()}.${ext}`;
+  const [slot] = await createUploadUrls(userId, [{ file_name: fileName, content_type: contentType }]);
+  if (!slot) throw new Error(tt("couldn_t_prepare_the_upload"));
+  await putToSignedUrl(slot, new File([blob], fileName, { type: contentType }), onProgress);
+  return slot.key;
 }
 
 // ---------------------------------------------------------------------------------------

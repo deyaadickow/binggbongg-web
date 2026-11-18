@@ -2696,4 +2696,12 @@ export const fil = {
   // My Information on the profile (Steve, 2026-11-18)
   pi_my_information: "Aking Impormasyon",
   pi_information: "Impormasyon",
+  // Voice messages in chats (Steve, 2026-11-18)
+  vm_record: "Mag-record ng voice message",
+  vm_send: "Ipadala ang voice message",
+  vm_discard: "Burahin ang recording",
+  vm_play: "I-play ang voice message",
+  vm_pause: "I-pause",
+  vm_mic_unavailable: "Hindi available ang mikropono, kaya hindi makakapag-record ng voice message dito.",
+  vm_too_large: "Masyadong malaki ang voice message na iyan para maipadala.",
 };

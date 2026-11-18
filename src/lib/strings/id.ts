@@ -2533,4 +2533,12 @@ export const id = {
   // My Information on the profile (Steve, 2026-11-18)
   pi_my_information: "Informasi Saya",
   pi_information: "Informasi",
+  // Voice messages in chats (Steve, 2026-11-18)
+  vm_record: "Rekam pesan suara",
+  vm_send: "Kirim pesan suara",
+  vm_discard: "Hapus rekaman",
+  vm_play: "Putar pesan suara",
+  vm_pause: "Jeda",
+  vm_mic_unavailable: "Mikrofon tidak tersedia, jadi pesan suara tidak bisa direkam di sini.",
+  vm_too_large: "Pesan suara itu terlalu besar untuk dikirim.",
 };

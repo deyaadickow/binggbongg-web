@@ -1843,5 +1843,12 @@
  "dr_gifted_by": "Gjafir frá:",
  "dr_no_gifts": "Engar gjafir",
  "pi_my_information": "Mínar upplýsingar",
- "pi_information": "Upplýsingar"
+ "pi_information": "Upplýsingar",
+ "vm_record": "Taka upp talskilaboð",
+ "vm_send": "Senda talskilaboð",
+ "vm_discard": "Eyða upptöku",
+ "vm_play": "Spila talskilaboð",
+ "vm_pause": "Hlé",
+ "vm_mic_unavailable": "Hljóðneminn er ekki tiltækur, svo ekki er hægt að taka upp talskilaboð hér.",
+ "vm_too_large": "Þessi talskilaboð eru of stór til að senda."
 }

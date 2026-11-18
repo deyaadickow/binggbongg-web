@@ -1844,5 +1844,12 @@
  "dr_gifted_by": "Geskenke van:",
  "dr_no_gifts": "Geen geskenke nie",
  "pi_my_information": "My Inligting",
- "pi_information": "Inligting"
+ "pi_information": "Inligting",
+ "vm_record": "Neem 'n stemboodskap op",
+ "vm_send": "Stuur stemboodskap",
+ "vm_discard": "Vee opname uit",
+ "vm_play": "Speel stemboodskap",
+ "vm_pause": "Pouse",
+ "vm_mic_unavailable": "Die mikrofoon is nie beskikbaar nie, dus kan 'n stemboodskap nie hier opgeneem word nie.",
+ "vm_too_large": "Daardie stemboodskap is te groot om te stuur."
 }

@@ -1846,5 +1846,12 @@
  "dr_gifted_by": "Hadiah daripada:",
  "dr_no_gifts": "Tiada hadiah",
  "pi_my_information": "Maklumat Saya",
- "pi_information": "Maklumat"
+ "pi_information": "Maklumat",
+ "vm_record": "Rakam mesej suara",
+ "vm_send": "Hantar mesej suara",
+ "vm_discard": "Padam rakaman",
+ "vm_play": "Main mesej suara",
+ "vm_pause": "Jeda",
+ "vm_mic_unavailable": "Mikrofon tidak tersedia, jadi mesej suara tidak boleh dirakam di sini.",
+ "vm_too_large": "Mesej suara itu terlalu besar untuk dihantar."
 }

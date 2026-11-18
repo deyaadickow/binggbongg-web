@@ -1845,5 +1845,12 @@
  "dr_gifted_by": "ギフトを贈った人：",
  "dr_no_gifts": "ギフトなし",
  "pi_my_information": "マイ情報",
- "pi_information": "情報"
+ "pi_information": "情報",
+ "vm_record": "ボイスメッセージを録音",
+ "vm_send": "ボイスメッセージを送信",
+ "vm_discard": "録音を削除",
+ "vm_play": "ボイスメッセージを再生",
+ "vm_pause": "一時停止",
+ "vm_mic_unavailable": "マイクが使用できないため、ここではボイスメッセージを録音できません。",
+ "vm_too_large": "このボイスメッセージは大きすぎて送信できません。"
 }

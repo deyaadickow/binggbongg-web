@@ -580,6 +580,25 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .dm-pending-hint { color: var(--gold); opacity: .7; font-size: 12px; }
 
+/* Voice messages (Steve, 2026-11-18): gold mic in place of Send when the box is empty, a red
+   pulsing dot + clock while recording, and a gold play circle + bar + length in the bubble. */
+.dm-round { flex: 0 0 44px; width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid var(--gold-border); background: var(--gold-border); color: #101010; display: grid; place-items: center; cursor: pointer; padding: 0; }
+.dm-round:hover { background: var(--gold-bright); border-color: var(--gold-bright); }
+.dm-round:disabled { opacity: .5; cursor: default; }
+.dm-round.ghost { background: #000; color: var(--gold); }
+.dm-round.ghost:hover { background: #1a1a1a; color: var(--gold-bright); }
+.dm-rec { flex: 1; min-width: 0; min-height: 44px; display: flex; align-items: center; gap: 10px; padding: 0 14px; border-radius: 12px; border: 1.5px solid var(--gold-border); background: #000; }
+.dm-rec-dot { width: 12px; height: 12px; border-radius: 50%; background: #e53935; flex: none; animation: dm-rec-pulse 1s ease-in-out infinite; }
+.dm-rec-dot.still { animation: none; opacity: .6; }
+@keyframes dm-rec-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.8); } }
+.dm-rec-time { color: var(--gold); font-weight: 800; font-variant-numeric: tabular-nums; }
+.dm-voice { display: flex; align-items: center; gap: 10px; min-width: 190px; }
+.dm-voice-play { flex: 0 0 36px; width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--gold-border); background: var(--gold-border); color: #101010; display: grid; place-items: center; cursor: pointer; padding: 0; }
+.dm-voice-play:hover { background: var(--gold-bright); }
+.dm-voice-track { flex: 1; height: 4px; border-radius: 2px; background: rgba(212,175,55,.3); overflow: hidden; }
+.dm-voice-fill { height: 100%; background: var(--gold); }
+.dm-voice-len { color: var(--gold); font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
 /* Bingg Bongg Bingo Battle (Steve, 2026-10-11) — battle engine #11.
    The card is Steve's own artwork with the numbers laid into his empty boxes as PERCENTAGES
    of the image, which is why the cells are absolutely positioned inside a position:relative

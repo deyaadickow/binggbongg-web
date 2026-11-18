@@ -1842,5 +1842,12 @@
  "dr_gifted_by": "Agasallos de:",
  "dr_no_gifts": "Sen agasallos",
  "pi_my_information": "A miña información",
- "pi_information": "Información"
+ "pi_information": "Información",
+ "vm_record": "Gravar unha mensaxe de voz",
+ "vm_send": "Enviar a mensaxe de voz",
+ "vm_discard": "Borrar a gravación",
+ "vm_play": "Reproducir a mensaxe de voz",
+ "vm_pause": "Pausa",
+ "vm_mic_unavailable": "O micrófono non está dispoñible, así que aquí non se pode gravar unha mensaxe de voz.",
+ "vm_too_large": "Esa mensaxe de voz é demasiado grande para enviala."
 }

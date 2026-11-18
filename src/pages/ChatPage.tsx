@@ -15,8 +15,8 @@ import { Link, useLocation, useParams } from "react-router-dom";
 import { Avatar, Loading, Notice } from "../components/Common";
 import { post, type UserSummary } from "../lib/api";
 import {
-  conversationId, fetchDmStatus, markConversationRead, noteDmSent, observeMessages, sendMediaMessage, sendMessage,
-  uploadChatMedia, type DmMessage, type DmStatus,
+  conversationId, DM_MAX_VOICE_SECONDS, fetchDmStatus, markConversationRead, noteDmSent, observeMessages, pickVoiceMime,
+  sendMediaMessage, sendMessage, sendVoiceMessage, uploadChatMedia, uploadVoiceMessage, type DmMessage, type DmStatus,
 } from "../lib/dm";
 import { displayName } from "../lib/api";
 import { mediaUrl } from "../lib/api";
@@ -33,6 +33,89 @@ function dayLabel(ms: number): string {
   const yesterday = new Date(today.getTime() - 86400000);
   if (d.toDateString() === yesterday.toDateString()) return "Yesterday";
   return d.toLocaleDateString([], { month: "short", day: "numeric", year: "numeric" });
+}
+
+/** 0:07 — minutes and zero-padded seconds, the way the phones show a voice message's length. */
+function clock(seconds: number): string {
+  const s = Math.max(0, Math.floor(seconds));
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+}
+
+// Only one voice message plays at a time, across every bubble on the page.
+let playingVoice: HTMLAudioElement | null = null;
+
+/** A voice message: gold play/pause circle, a thin gold progress bar and the length. */
+function VoiceBubble({ src, duration }: { src: string; duration?: number }) {
+  const { t } = useT();
+  const audio = useRef<HTMLAudioElement | null>(null);
+  const [playing, setPlaying] = useState(false);
+  const [at, setAt] = useState(0);
+  // A browser recording (WebM) often reports its length as Infinity, so the stored duration
+  // wins; the element's own figure is only a fallback for rows written without one.
+  const [known, setKnown] = useState<number | undefined>(duration);
+  const total = duration ?? known ?? 0;
+
+  useEffect(() => () => {
+    if (playingVoice === audio.current) playingVoice = null;
+    audio.current?.pause();
+  }, []);
+
+  function toggle() {
+    const el = audio.current;
+    if (!el) return;
+    if (!el.paused) { el.pause(); return; }
+    if (playingVoice && playingVoice !== el) playingVoice.pause();
+    playingVoice = el;
+    void el.play().catch(() => setPlaying(false));
+  }
+
+  const fraction = total > 0 ? Math.min(1, at / total) : 0;
+  return (
+    <div className="dm-voice">
+      <audio
+        ref={audio}
+        src={src}
+        preload="metadata"
+        onPlay={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
+        onEnded={() => { setPlaying(false); setAt(0); if (audio.current) audio.current.currentTime = 0; }}
+        onTimeUpdate={(e) => setAt(e.currentTarget.currentTime)}
+        onLoadedMetadata={(e) => { const d = e.currentTarget.duration; if (Number.isFinite(d) && d > 0) setKnown(d); }}
+      />
+      <button type="button" className="dm-voice-play" onClick={toggle} aria-label={playing ? t("vm_pause") : t("vm_play")}>
+        {playing ? (
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden><rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor" /><rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor" /></svg>
+        ) : (
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden><path d="M8 5v14l11-7z" fill="currentColor" /></svg>
+        )}
+      </button>
+      <div className="dm-voice-track"><div className="dm-voice-fill" style={{ width: `${fraction * 100}%` }} /></div>
+      <span className="dm-voice-len">{clock(playing || at > 0 ? at : total)}</span>
+    </div>
+  );
+}
+
+function MicIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden>
+      <rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" />
+      <path d="M6 11a6 6 0 0 0 12 0M12 17v4M9 21h6" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function SendArrow() {
+  return (
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden><path d="M3 20l18-8L3 4v6l12 2-12 2z" fill="currentColor" /></svg>
+  );
+}
+
+function TrashIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden>
+      <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
 }
 
 export function ChatPage() {
@@ -71,6 +154,122 @@ export function ChatPage() {
   // Message limits (Steve, 2026-11-09): one message until they reply, and nothing at all when
   // they've switched messages off or stopped you. The server decides; null = not asked yet.
   const [dmStatus, setDmStatus] = useState<DmStatus | null>(null);
+
+  // Voice messages (Steve, 2026-11-18: "Add a voice message to send to all chats."). Tap the
+  // mic to start, tap the gold arrow to send, the trash to throw it away. Stops itself at 60 s.
+  const [rec, setRec] = useState<{ started: number; elapsed: number; stopped: boolean } | null>(null);
+  const [micNote, setMicNote] = useState<string | null>(null);
+  const recorder = useRef<MediaRecorder | null>(null);
+  const recStream = useRef<MediaStream | null>(null);
+  const recBlob = useRef<Promise<Blob> | null>(null);
+  const recStoppedAt = useRef<number | null>(null);
+
+  function releaseMic() {
+    recStream.current?.getTracks().forEach((tr) => tr.stop());
+    recStream.current = null;
+  }
+
+  function stopRecorder() {
+    const r = recorder.current;
+    if (r && r.state !== "inactive") r.stop();
+    if (recStoppedAt.current === null) recStoppedAt.current = Date.now();
+    releaseMic();
+  }
+
+  // Leaving the page (or the conversation) never leaves the microphone on.
+  useEffect(() => () => { stopRecorder(); recorder.current = null; }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { setRec(null); setMicNote(null); }, [id]);
+
+  // The running clock, and the 60-second stop.
+  useEffect(() => {
+    if (!rec || rec.stopped) return;
+    const tick = window.setInterval(() => {
+      setRec((cur) => {
+        if (!cur || cur.stopped) return cur;
+        const elapsed = (Date.now() - cur.started) / 1000;
+        if (elapsed >= DM_MAX_VOICE_SECONDS) {
+          stopRecorder();
+          return { ...cur, elapsed: DM_MAX_VOICE_SECONDS, stopped: true };
+        }
+        return { ...cur, elapsed };
+      });
+    }, 200);
+    return () => window.clearInterval(tick);
+  }, [rec?.started, rec?.stopped]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function startRecording() {
+    if (sending || rec) return;
+    setError(null);
+    setMicNote(null);
+    // A refusal gets a plain note and nothing more — never a "please allow" or "are you sure"
+    // after the member has said no.
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
+      setMicNote(t("vm_mic_unavailable"));
+      return;
+    }
+    let stream: MediaStream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch {
+      setMicNote(t("vm_mic_unavailable"));
+      return;
+    }
+    const mime = pickVoiceMime();
+    let r: MediaRecorder;
+    try {
+      r = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
+    } catch {
+      stream.getTracks().forEach((tr) => tr.stop());
+      setMicNote(t("vm_mic_unavailable"));
+      return;
+    }
+    const chunks: Blob[] = [];
+    r.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+    recBlob.current = new Promise<Blob>((resolve) => {
+      r.onstop = () => resolve(new Blob(chunks, { type: (r.mimeType || mime || "audio/webm").split(";")[0] }));
+    });
+    recorder.current = r;
+    recStream.current = stream;
+    recStoppedAt.current = null;
+    r.start(250);
+    setRec({ started: Date.now(), elapsed: 0, stopped: false });
+  }
+
+  function cancelRecording() {
+    stopRecorder();
+    recorder.current = null;
+    recBlob.current = null;
+    setRec(null);
+  }
+
+  async function sendRecording() {
+    if (!rec || !user || !partner || sending) return;
+    const started = rec.started;
+    stopRecorder();
+    const seconds = Math.min(DM_MAX_VOICE_SECONDS, ((recStoppedAt.current ?? Date.now()) - started) / 1000);
+    const pendingBlob = recBlob.current;
+    recorder.current = null;
+    recBlob.current = null;
+    // Under a second is a slip of the finger, not a message.
+    if (!pendingBlob || seconds < 1) { setRec(null); return; }
+    if (dmStatus && !dmStatus.can_send) { setRec(null); return; }
+    if (!requireVerified()) { setRec(null); return; }
+    setRec({ ...rec, elapsed: seconds, stopped: true });
+    setSending(true);
+    setError(null);
+    try {
+      const blob = await pendingBlob;
+      const key = await uploadVoiceMessage(user.id, blob, setProgress);
+      await sendVoiceMessage(user, partner, key, seconds);
+      void noteDmSent(user.id, partner.id).then(setDmStatus);
+    } catch (e) {
+      setError((e as Error).message || "Couldn't send that.");
+    } finally {
+      setSending(false);
+      setProgress(0);
+      setRec(null);
+    }
+  }
 
   useEffect(() => {
     if (!id) return;
@@ -258,6 +457,7 @@ export function ChatPage() {
                   {m.msgType === "video" && m.image && (
                     <video className="dm-media" src={mediaUrl(m.image)} controls preload="metadata" />
                   )}
+                  {m.msgType === "audio" && m.image && <VoiceBubble src={mediaUrl(m.image)} duration={m.duration} />}
                   {m.msg && <div className={m.msgType === "text" ? undefined : "dm-caption"}>{m.msg}</div>}
                   {second && <><div className="dm-bubble-rule" /><div className="dm-translated">{second}</div></>}
                 </div>
@@ -290,6 +490,7 @@ export function ChatPage() {
       )}
 
       {notice && <div className={`dm-limit${locked ? " locked" : ""}`} role="status">{notice}</div>}
+      {micNote && <div className="dm-limit" role="status">{micNote}</div>}
 
       <div className="dm-composer">
         <input
@@ -302,9 +503,25 @@ export function ChatPage() {
         <button
           className="btn ghost dm-attach"
           title={t("send_a_photo_or_a_video")}
-          disabled={sending || locked}
+          disabled={sending || locked || !!rec}
           onClick={() => filePicker.current?.click()}
         >+</button>
+        {rec ? (
+          <>
+            <div className="dm-rec" role="status" aria-live="polite">
+              <span className={`dm-rec-dot${rec.stopped ? " still" : ""}`} aria-hidden />
+              <span className="dm-rec-time">
+                {sending ? `${clock(rec.elapsed)} · ${Math.round(progress * 100)}%` : `${clock(rec.elapsed)} / ${clock(DM_MAX_VOICE_SECONDS)}`}
+              </span>
+            </div>
+            <button type="button" className="dm-round ghost" onClick={cancelRecording} disabled={sending} aria-label={t("vm_discard")} title={t("vm_discard")}>
+              <TrashIcon />
+            </button>
+            <button type="button" className="dm-round" onClick={() => void sendRecording()} disabled={sending} aria-label={t("vm_send")} title={t("vm_send")}>
+              <SendArrow />
+            </button>
+          </>
+        ) : (<>
         <input
           className="input"
           placeholder={pending ? "Caption (optional)" : "Write Something"}
@@ -314,7 +531,14 @@ export function ChatPage() {
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter") void send(); }}
         />
-        <button className="btn" disabled={(!draft.trim() && !pending) || sending || locked} onClick={() => void send()}>{t("send")}</button>
+        {!draft.trim() && !pending ? (
+          <button type="button" className="dm-round" disabled={sending || locked} onClick={() => void startRecording()} aria-label={t("vm_record")} title={t("vm_record")}>
+            <MicIcon />
+          </button>
+        ) : (
+          <button className="btn" disabled={(!draft.trim() && !pending) || sending || locked} onClick={() => void send()}>{t("send")}</button>
+        )}
+        </>)}
       </div>
     </div>
   );

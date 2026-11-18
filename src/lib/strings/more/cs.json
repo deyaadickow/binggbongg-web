@@ -1845,5 +1845,12 @@
  "dr_gifted_by": "Darovali:",
  "dr_no_gifts": "Žádné dárky",
  "pi_my_information": "Moje informace",
- "pi_information": "Informace"
+ "pi_information": "Informace",
+ "vm_record": "Nahrát hlasovou zprávu",
+ "vm_send": "Odeslat hlasovou zprávu",
+ "vm_discard": "Smazat nahrávku",
+ "vm_play": "Přehrát hlasovou zprávu",
+ "vm_pause": "Pozastavit",
+ "vm_mic_unavailable": "Mikrofon není k dispozici, takže zde nelze nahrát hlasovou zprávu.",
+ "vm_too_large": "Tato hlasová zpráva je příliš velká na odeslání."
 }

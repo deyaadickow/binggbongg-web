@@ -3479,4 +3479,12 @@ export const en = {
   // My Information on the profile (Steve, 2026-11-18)
   pi_my_information: "My Information",
   pi_information: "Information",
+  // Voice messages in chats (Steve, 2026-11-18)
+  vm_record: "Record a voice message",
+  vm_send: "Send voice message",
+  vm_discard: "Delete recording",
+  vm_play: "Play voice message",
+  vm_pause: "Pause",
+  vm_mic_unavailable: "The microphone isn't available, so a voice message can't be recorded here.",
+  vm_too_large: "That voice message is too large to send.",
 } as const;

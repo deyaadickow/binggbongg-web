@@ -1846,5 +1846,12 @@
  "dr_gifted_by": "Prezenty od:",
  "dr_no_gifts": "Brak prezentów",
  "pi_my_information": "Moje informacje",
- "pi_information": "Informacje"
+ "pi_information": "Informacje",
+ "vm_record": "Nagraj wiadomość głosową",
+ "vm_send": "Wyślij wiadomość głosową",
+ "vm_discard": "Usuń nagranie",
+ "vm_play": "Odtwórz wiadomość głosową",
+ "vm_pause": "Pauza",
+ "vm_mic_unavailable": "Mikrofon jest niedostępny, więc nie można tu nagrać wiadomości głosowej.",
+ "vm_too_large": "Ta wiadomość głosowa jest za duża, aby ją wysłać."
 }

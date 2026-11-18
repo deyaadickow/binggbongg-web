@@ -1842,5 +1842,12 @@
  "dr_gifted_by": "Dāvināja:",
  "dr_no_gifts": "Nav dāvanu",
  "pi_my_information": "Mana informācija",
- "pi_information": "Informācija"
+ "pi_information": "Informācija",
+ "vm_record": "Ierakstīt balss ziņu",
+ "vm_send": "Sūtīt balss ziņu",
+ "vm_discard": "Dzēst ierakstu",
+ "vm_play": "Atskaņot balss ziņu",
+ "vm_pause": "Pauze",
+ "vm_mic_unavailable": "Mikrofons nav pieejams, tāpēc šeit nevar ierakstīt balss ziņu.",
+ "vm_too_large": "Šī balss ziņa ir pārāk liela, lai to nosūtītu."
 }

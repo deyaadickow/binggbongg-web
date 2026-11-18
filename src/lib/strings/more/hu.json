@@ -1839,5 +1839,12 @@
  "dr_gifted_by": "Ajándékozók:",
  "dr_no_gifts": "Nincs ajándék",
  "pi_my_information": "Saját adataim",
- "pi_information": "Adatok"
+ "pi_information": "Adatok",
+ "vm_record": "Hangüzenet felvétele",
+ "vm_send": "Hangüzenet küldése",
+ "vm_discard": "Felvétel törlése",
+ "vm_play": "Hangüzenet lejátszása",
+ "vm_pause": "Szünet",
+ "vm_mic_unavailable": "A mikrofon nem érhető el, ezért itt nem lehet hangüzenetet felvenni.",
+ "vm_too_large": "Ez a hangüzenet túl nagy a küldéshez."
 }

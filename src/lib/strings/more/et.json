@@ -1843,5 +1843,12 @@
  "dr_gifted_by": "Kinkijad:",
  "dr_no_gifts": "Kingitusi pole",
  "pi_my_information": "Minu andmed",
- "pi_information": "Andmed"
+ "pi_information": "Andmed",
+ "vm_record": "Salvesta häälsõnum",
+ "vm_send": "Saada häälsõnum",
+ "vm_discard": "Kustuta salvestis",
+ "vm_play": "Esita häälsõnum",
+ "vm_pause": "Paus",
+ "vm_mic_unavailable": "Mikrofon pole saadaval, seega ei saa siin häälsõnumit salvestada.",
+ "vm_too_large": "See häälsõnum on saatmiseks liiga suur."
 }

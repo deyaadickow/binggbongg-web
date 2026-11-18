@@ -1846,5 +1846,12 @@
  "dr_gifted_by": "Presentes de:",
  "dr_no_gifts": "Nenhum presente",
  "pi_my_information": "Minhas informações",
- "pi_information": "Informações"
+ "pi_information": "Informações",
+ "vm_record": "Gravar uma mensagem de voz",
+ "vm_send": "Enviar mensagem de voz",
+ "vm_discard": "Apagar gravação",
+ "vm_play": "Reproduzir mensagem de voz",
+ "vm_pause": "Pausar",
+ "vm_mic_unavailable": "O microfone não está disponível, então não é possível gravar uma mensagem de voz aqui.",
+ "vm_too_large": "Essa mensagem de voz é grande demais para ser enviada."
 }

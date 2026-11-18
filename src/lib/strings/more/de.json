@@ -1846,5 +1846,12 @@
  "dr_gifted_by": "Geschenkt von:",
  "dr_no_gifts": "Keine Geschenke",
  "pi_my_information": "Meine Informationen",
- "pi_information": "Informationen"
+ "pi_information": "Informationen",
+ "vm_record": "Sprachnachricht aufnehmen",
+ "vm_send": "Sprachnachricht senden",
+ "vm_discard": "Aufnahme löschen",
+ "vm_play": "Sprachnachricht abspielen",
+ "vm_pause": "Pause",
+ "vm_mic_unavailable": "Das Mikrofon ist nicht verfügbar, daher kann hier keine Sprachnachricht aufgenommen werden.",
+ "vm_too_large": "Diese Sprachnachricht ist zu groß zum Senden."
 }

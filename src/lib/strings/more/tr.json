@@ -1846,5 +1846,12 @@
  "dr_gifted_by": "Hediye edenler:",
  "dr_no_gifts": "Hediye yok",
  "pi_my_information": "Bilgilerim",
- "pi_information": "Bilgiler"
+ "pi_information": "Bilgiler",
+ "vm_record": "Sesli mesaj kaydet",
+ "vm_send": "Sesli mesajı gönder",
+ "vm_discard": "Kaydı sil",
+ "vm_play": "Sesli mesajı oynat",
+ "vm_pause": "Duraklat",
+ "vm_mic_unavailable": "Mikrofon kullanılamıyor, bu yüzden burada sesli mesaj kaydedilemez.",
+ "vm_too_large": "Bu sesli mesaj gönderilemeyecek kadar büyük."
 }

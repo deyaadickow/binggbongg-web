@@ -1844,5 +1844,12 @@
  "dr_gifted_by": "Gåvor från:",
  "dr_no_gifts": "Inga gåvor",
  "pi_my_information": "Min information",
- "pi_information": "Information"
+ "pi_information": "Information",
+ "vm_record": "Spela in ett röstmeddelande",
+ "vm_send": "Skicka röstmeddelande",
+ "vm_discard": "Radera inspelningen",
+ "vm_play": "Spela upp röstmeddelande",
+ "vm_pause": "Paus",
+ "vm_mic_unavailable": "Mikrofonen är inte tillgänglig, så ett röstmeddelande kan inte spelas in här.",
+ "vm_too_large": "Det röstmeddelandet är för stort för att skickas."
 }

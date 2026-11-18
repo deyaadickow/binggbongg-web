@@ -1843,5 +1843,12 @@
  "dr_gifted_by": "Gaver fra:",
  "dr_no_gifts": "Ingen gaver",
  "pi_my_information": "Mine oplysninger",
- "pi_information": "Oplysninger"
+ "pi_information": "Oplysninger",
+ "vm_record": "Optag en talebesked",
+ "vm_send": "Send talebesked",
+ "vm_discard": "Slet optagelse",
+ "vm_play": "Afspil talebesked",
+ "vm_pause": "Pause",
+ "vm_mic_unavailable": "Mikrofonen er ikke tilgængelig, så der kan ikke optages en talebesked her.",
+ "vm_too_large": "Den talebesked er for stor til at blive sendt."
 }

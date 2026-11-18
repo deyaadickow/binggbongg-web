@@ -1846,5 +1846,12 @@
  "dr_gifted_by": "送礼者：",
  "dr_no_gifts": "暂无礼物",
  "pi_my_information": "我的信息",
- "pi_information": "信息"
+ "pi_information": "信息",
+ "vm_record": "录制语音消息",
+ "vm_send": "发送语音消息",
+ "vm_discard": "删除录音",
+ "vm_play": "播放语音消息",
+ "vm_pause": "暂停",
+ "vm_mic_unavailable": "麦克风不可用，因此无法在此录制语音消息。",
+ "vm_too_large": "该语音消息太大，无法发送。"
 }

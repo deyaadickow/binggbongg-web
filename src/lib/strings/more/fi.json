@@ -1837,5 +1837,12 @@
  "dr_gifted_by": "Lahjoittajat:",
  "dr_no_gifts": "Ei lahjoja",
  "pi_my_information": "Omat tiedot",
- "pi_information": "Tiedot"
+ "pi_information": "Tiedot",
+ "vm_record": "Nauhoita ääniviesti",
+ "vm_send": "Lähetä ääniviesti",
+ "vm_discard": "Poista nauhoitus",
+ "vm_play": "Toista ääniviesti",
+ "vm_pause": "Tauko",
+ "vm_mic_unavailable": "Mikrofoni ei ole käytettävissä, joten ääniviestiä ei voi nauhoittaa täällä.",
+ "vm_too_large": "Ääniviesti on liian suuri lähetettäväksi."
 }
