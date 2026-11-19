@@ -101,12 +101,12 @@ export function GoldNugget({ size = 56, twinkle = true }: { size?: number; twink
 
 type Shown = GdDrop & { x: number; y: number; px: number; key: number };
 type Burst = { x: number; y: number; grams: number; size: GdSize; key: number };
-type Toast = { text: string; ok: boolean; key: number };
+type Toast = { text: string; ok: boolean; key: number; quip?: string };
 
 /** Mounted ONCE (App.tsx). Runs only while a signed-in, verified member has the tab visible. */
 export function GoldDiggerManager() {
   useGdKeyframes();
-  const { t } = useT();
+  const { t, lang } = useT();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { user, isLoggedIn } = useSession();
@@ -204,14 +204,14 @@ export function GoldDiggerManager() {
   // Steve, 2026-11-18: "the banner appears and disappears before i can read what it says. please
   // add a small 'OK' on it for a member to click for it to disappear." — no auto-hide any more; the
   // banner stays until the member taps OK (a new catch replaces it).
-  const say = useCallback((text: string, ok: boolean) => {
-    setToast({ text, ok, key: Date.now() });
+  const say = useCallback((text: string, ok: boolean, quip?: string) => {
+    setToast({ text, ok, key: Date.now(), quip: quip || undefined });
   }, []);
 
   async function tap(n: Shown) {
     hide();
     haptic(25);
-    const res = await goldDiggerClaim(userId, n.token);
+    const res = await goldDiggerClaim(userId, n.token, lang);
     if (res.ok) {
       const g = res.data.grams;
       if (n.size === "giant") { sfx.fanfare(); setConfetti((c) => c + 1); }
@@ -219,9 +219,11 @@ export function GoldDiggerManager() {
       else sfx.sparkle();
       setBurst({ x: n.x + n.px / 2, y: n.y + n.px / 2, grams: g, size: n.size, key: n.key });
       window.setTimeout(() => setBurst((b) => (b && b.key === n.key ? null : b)), 1600);
-      say(res.data.rank > 0
+      // Steve, 2026-11-18: bigger text + "make this game more fun with different words" — the
+      // server's headline and cheeky line (older servers send neither: the old text is kept).
+      say(res.data.headline || (res.data.rank > 0
         ? t("gd_toast_found", g, res.data.month_grams, res.data.rank)
-        : t("gd_toast_found_norank", g, res.data.month_grams), true);
+        : t("gd_toast_found_norank", g, res.data.month_grams)), true, res.data.quip);
     } else {
       sfx.nope();
       say(res.message || (res.reason === "capped" ? t("gd_capped", 100) : t("gd_too_slow")), false);
@@ -312,9 +314,9 @@ export function GoldDiggerManager() {
           className="gd-anim"
           style={{
             position: "fixed", left: "50%", bottom: 96, zIndex: 9002, transform: "translateX(-50%)",
-            maxWidth: "calc(100vw - 32px)", width: "max-content",
+            maxWidth: "min(560px, calc(100vw - 32px))", width: "max-content",
             background: "#000", color: toast.ok ? "#FFDD55" : "#fff", border: `2px solid ${toast.ok ? "#F0C420" : "#D4AF37"}`,
-            borderRadius: 14, padding: "10px 12px 10px 16px", fontWeight: 800, fontSize: 15, lineHeight: 1.3,
+            borderRadius: 16, padding: "14px 14px 14px 18px", fontWeight: 900, fontSize: 20, lineHeight: 1.3,
             boxShadow: "0 6px 24px rgba(0,0,0,.6), 0 0 14px rgba(240,196,32,.35)",
             display: "flex", alignItems: "center", gap: 10, textAlign: "left",
             animation: "gd-toast .25s ease-out both",
@@ -325,15 +327,18 @@ export function GoldDiggerManager() {
             onClick={toast.ok ? () => { setToast(null); navigate("/gold-digger"); } : undefined}
             style={{ display: "flex", alignItems: "center", gap: 10, cursor: toast.ok ? "pointer" : "default", minWidth: 0 }}
           >
-            {toast.ok && <GoldNugget size={28} twinkle={false} />}
-            <span>{toast.text}</span>
+            {toast.ok && <GoldNugget size={40} twinkle={false} />}
+            <span style={{ display: "flex", flexDirection: "column", gap: 6, minWidth: 0 }}>
+              <span style={{ textShadow: "0 1px 4px #000", fontSize: "clamp(17px, 4.9vw, 20px)" }}>{toast.text}</span>
+              {toast.quip && <span style={{ color: "#fff", fontSize: 17, fontWeight: 800, lineHeight: 1.35 }}>{toast.quip}</span>}
+            </span>
           </span>
           <button
             type="button"
             onClick={() => setToast(null)}
             style={{
               flex: "none", background: "linear-gradient(180deg,#FFE066,#F0C420 55%,#C9971A)", color: "#000",
-              border: "1px solid #FFDD55", borderRadius: 8, padding: "4px 12px", fontWeight: 900, fontSize: 13,
+              border: "1px solid #FFDD55", borderRadius: 10, padding: "8px 16px", fontWeight: 900, fontSize: 16,
               lineHeight: 1.2, cursor: "pointer", boxShadow: "0 0 8px rgba(240,196,32,.45)",
             }}
           >{t("ok")}</button>

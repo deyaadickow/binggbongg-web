@@ -65,7 +65,11 @@ export interface GdBoard {
 
 export interface GdDrop { token: string; size: GdSize; seconds: number }
 export interface GdRoll { enabled: boolean; next_in: number; drop: GdDrop | null; capped?: boolean }
-export interface GdClaim { grams: number; size: GdSize; month_grams: number; rank: number; today_grams: number; daily_cap_grams: number }
+export interface GdClaim {
+  grams: number; size: GdSize; month_grams: number; rank: number; today_grams: number; daily_cap_grams: number;
+  /** Newer servers (2026-11-18): "+3 g · 57 g this month · #12" and the cheeky line, both in the member's language. */
+  headline?: string; quip?: string;
+}
 
 
 export async function fetchGoldDigger(userId?: number | null): Promise<GdBoard | null> {
@@ -82,9 +86,9 @@ export type ClaimResult =
   | { ok: true; data: GdClaim }
   | { ok: false; message: string; reason: string };
 
-export async function goldDiggerClaim(userId: number, token: string): Promise<ClaimResult> {
+export async function goldDiggerClaim(userId: number, token: string, language = "en"): Promise<ClaimResult> {
   try {
-    const res = await post<GdClaim & { reason?: string }>("goldDiggerClaim", { user_id: userId, token });
+    const res = await post<GdClaim & { reason?: string }>("goldDiggerClaim", { user_id: userId, token, language });
     if (res.status && res.data) return { ok: true, data: res.data };
     const reason = String((res.data as { reason?: string } | undefined)?.reason ?? "");
     return { ok: false, message: typeof res.message === "string" ? res.message : "", reason };
@@ -116,3 +120,4 @@ export function countdownParts(seconds: number): { d: number; h: number; m: numb
 }
 
 export const MEDALS = ["🥇", "🥈", "🥉"];
+
