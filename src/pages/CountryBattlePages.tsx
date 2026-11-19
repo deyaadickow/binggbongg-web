@@ -2,6 +2,8 @@
 // minutes country battle once a day every day seven days a week, in Philippines it will be 8 pm.
 // We will have a lifetime Bragging rights battle board, for every day, and we will show the top 100
 // with the most score daily."
+// Hourly since Sun Nov 22 2026 (Steve, 2026-11-19): a 5-minute battle at the top of every local
+// hour, 24 a day — each "day" below is one of those battles.
 //
 // /country-battle               today's battle (or the next) for the member's country
 // /country-battle/board         every finished day, newest first
@@ -132,7 +134,7 @@ export function CountryBattlePage() {
             <div style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0 }}>
               <b style={{ color: "var(--gold)", fontSize: 18 }}>{battle.date_label}</b>
               <span style={{ fontSize: 13, color: "#fff" }}>🕗 {whenText(t, battle.starts_at, now)}</span>
-              <span style={{ fontSize: 12, color: "var(--text-soft)" }}>{cbText(t("cb2_minutes"), { n: battle.duration_minutes ?? 10 })}</span>
+              <span style={{ fontSize: 12, color: "var(--text-soft)" }}>{cbText(t("cb2_minutes"), { n: battle.duration_minutes ?? 5 })}</span>
             </div>
             <span className="spacer" />
             {battle.room_open && battle.phase !== "ended" && (
@@ -229,10 +231,8 @@ function CountryBattleExplainer({ note, demo }: { note: string; demo: DemoKind |
     fetchFeatureVideos(lang).then((v) => { if (live) setVideo(v.country_battle ?? null); });
     return () => { live = false; };
   }, [lang]);
-  // 8 PM in the Philippines (Asia/Manila is UTC+8 all year, no daylight saving) = 12:00 UTC, shown in
-  // the member's own clock too. The server sends the real schedule once the switch is on.
-  const d = new Date();
-  const phUtc = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 12, 0)).toISOString();
+  // Every hour, on the hour (2026-11-19) — no single start time to convert any more. The server
+  // sends the real schedule once the switch is on.
   return (
     <div className="page cb-page" style={{ maxWidth: 760 }}>
       <PageTitle>{t("cb_title")}</PageTitle>
@@ -251,7 +251,7 @@ function CountryBattleExplainer({ note, demo }: { note: string; demo: DemoKind |
 
       <div className="card pad row" style={{ marginBottom: 12, gap: 10 }}>
         <span style={{ fontSize: 22 }} aria-hidden>🕗</span>
-        <span style={{ color: "#fff", fontSize: 14 }}>{cbText(t("cb2_daily_ph"), { time: localTime(phUtc) })}</span>
+        <span style={{ color: "#fff", fontSize: 14 }}>{t("cb2_daily_ph")}</span>
       </div>
 
       <Rules t={t} />
@@ -335,7 +335,7 @@ const DEMO_UID = 4551;
 function demoDayTop(dayId: number): CbDayTop {
   const names = ["maria santos", "juan dela cruz", "angel reyes", "mark bautista", "joy villanueva", "paolo garcia", "Mae", "carlo aquino", "bea castillo", "miguel torres"];
   return {
-    day: { day_id: dayId || 12, country: "Philippines", date: "2026-12-01", date_label: "Tue, Dec 1", starts_at: "2026-12-01T12:00:00Z", ends_at: "2026-12-01T12:10:00Z", finished: true, participants: 52, is_test: false },
+    day: { day_id: dayId || 12, country: "Philippines", date: "2026-12-01", date_label: "Tue, Dec 1 · 8 PM", starts_at: "2026-12-01T12:00:00Z", ends_at: "2026-12-01T12:05:00Z", finished: true, participants: 52, is_test: false },
     rows: names.map((name, i) => ({
       user_id: i === 6 ? DEMO_UID : 1001 + i, name, username: name.replace(/[^a-z]/gi, "").toLowerCase(), profile_image: null,
       rank: i + 1, score: [9000, 7350, 6100, 5600, 5100, 4700, 4200, 3900, 3100, 2800][i], badge: i < 3 ? i + 1 : null,

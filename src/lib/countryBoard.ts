@@ -208,12 +208,12 @@ export async function demoRecap(dayId: number, reason?: string | null): Promise<
       day_id: dayId || 12, date: "2026-12-01", country: "Philippines", flag: "🇵🇭", rank: 7, of: 52, points: 4200, top,
       user: { user_id: 4551, name: "Mae", username: "mae", profile_image: null },
       card_url: await demoCard([
-        { t: "TONIGHT'S COUNTRY BATTLE", s: 46 }, { t: "🇵🇭", s: 180 }, { t: "Philippines · Dec 1, 2026", s: 52 },
+        { t: "COUNTRY BATTLE · 8 PM", s: 46 }, { t: "🇵🇭", s: 180 }, { t: "Philippines · Dec 1, 2026", s: 52 },
         { t: "Mae", s: 72 }, { t: "#7 of 52", s: 130 }, { t: "4,200 points", s: 60 },
-        { t: top.map((p) => `#${p.rank} ${p.name}`).join("   "), s: 34 }, { t: "Battle me tomorrow 8 PM", s: 50 },
+        { t: top.map((p) => `#${p.rank} ${p.name}`).join("   "), s: 34 }, { t: "Battle me next hour!", s: 50 },
       ]),
       page_url: "https://admin.binggbongg.com/battle/country/12/4551?ref=mae",
-      share_text: "I finished #7 of 52 in tonight's 🇵🇭 Philippines Country Battle on Bingg Bongg! Battle me tomorrow at 8 PM — join with my code mae",
+      share_text: "I finished #7 of 52 in the 8 PM 🇵🇭 Philippines Country Battle on Bingg Bongg! Battle me next hour — join with my code mae",
     },
   };
 }

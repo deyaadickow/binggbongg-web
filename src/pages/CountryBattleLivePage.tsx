@@ -1,4 +1,4 @@
-// The Country Battle screen, v2 (Steve, 2026-11-03): "one 10 minutes country battle once a day
+// The Country Battle screen, v2 (Steve, 2026-11-03; hourly 5-minute battles since 2026-11-22): "one 10 minutes country battle once a day
 // every day seven days a week, in Philippines it will be 8 pm ... Everything else will be the same
 // as chat battle." So it IS the Chat Battle screen (components/GridBattleScreen): one shared room,
 // own tile top-left, up to 23 others rotating, stars with sound, cb_gift with "say thanks!", the

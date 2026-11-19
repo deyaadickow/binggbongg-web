@@ -10,7 +10,6 @@ import { PostCard } from "../components/PostCard";
 import { Loading, Notice, StoreBadges } from "../components/Common";
 import { getFeedSource, setFeed, setFeedSource } from "../lib/feed";
 import { FeedPhotoCard } from "../components/FeedPhotoCard";
-import { CountryBattleDec1Banner } from "../components/CountryBattleDec1Banner";
 import { PrelaunchBanner } from "../components/PrelaunchBanner";
 import { ReferralOfferPopup } from "../components/ReferralOffer";
 import { HelpFeedCard } from "../components/HelpFeedCard";
@@ -208,7 +207,6 @@ export function HomePage() {
       {error && <Notice error>{error}</Notice>}
       {/* Pre-Launch Special (Steve, 2026-11-10) — only while fetchPrelaunch says it is on. */}
       <PrelaunchBanner />
-      <CountryBattleDec1Banner />
       {/* The $100 referral offer video, once per member (2026-11-11). For You only: never over a live room. */}
       <ReferralOfferPopup />
       {/* One member photo in the feed, the phones' fetchRandomFeedPhoto. Only members past the

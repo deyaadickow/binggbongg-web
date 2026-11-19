@@ -4,6 +4,11 @@
 // every day, and we will show the top 100 with the most score daily. Everything else will be the
 // same as chat battle."
 //
+// Hourly (Steve, 2026-11-19): from Sun Nov 22 2026 00:00 Philippine time the once-a-day 8 PM,
+// 10-minute battle is replaced by a 5-minute battle at the top of EVERY local hour, 24 a day; one
+// push a day at 7:55 PM local. Same shapes, plus `every_hour: true` on the battle and each country.
+// A "day" (day_id) is now one country's one HOURLY battle.
+//
 // The wire contract (scratchpad country_battle_v2_api.md) and nothing more. The server is the
 // authority for every rule and every time — the schedule, who may join, the cap, the score, the
 // badges. One id per battle: `day_id` (a "day" IS one country's one battle). The v1 weekly calls
@@ -141,6 +146,8 @@ export interface CbDayState {
   timezone?: string;
   start_time?: string;
   duration_minutes?: number;
+  /** true once battles run every hour, on the hour (2026-11-19). */
+  every_hour?: boolean;
   room_name: string | null;
   room_open: boolean;
   /** null = NO LIMIT (Steve 2026-11-03/04). The server may quietly cap a battle, but it never says so here: only a join answers reason "full". */
@@ -159,7 +166,7 @@ export interface CbDayState {
   me: CbDayMe;
 }
 
-export interface CbCountry { country: string; timezone: string; start_time: string; duration_minutes: number }
+export interface CbCountry { country: string; timezone: string; start_time: string; duration_minutes: number; every_hour?: boolean }
 
 export interface CbLastDay {
   day_id: number;
