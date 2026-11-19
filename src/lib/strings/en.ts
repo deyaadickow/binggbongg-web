@@ -2045,7 +2045,7 @@ export const en = {
   chb_alerts_off_done: "You won't get Chat Battle alerts from @{name}.",
   chb_alerts_on_done: "You'll get Chat Battle alerts from @{name} again.",
   cb2_tagline: "The whole country battles live — 5 minutes, every hour.",
-  cb2_explain: "Every hour, on the hour, members in your country go live in one giant 5-minute battle — 24 battles a day, every day. Everyone in your country can join any time during the 5 minutes — there is no limit on how many battlers can be live at once. Every tile has a gift box. The top 3 of every battle get a Country Battle badge, and every battle goes on the Bragging Rights Board forever.",
+  cb2_explain: "Every hour, on the hour, members in your country go live in one giant 5-minute battle — 24 battles a day, every day. Everyone in your country can join any time during the 5 minutes — there is no limit on how many battlers can be live at once. Every tile has a gift box. The top 3 of every battle get a Country Battle badge and an extra 10%, 5% or 3% on what they earned from gifts in that battle, and every battle goes on the Bragging Rights Board forever.",
   cb2_how_score: "Your score is the gift BBs you receive during the battle. On equal scores, whoever reached it first ranks higher.",
   cb2_when_your_time: "{day} at {time} your time",
   cb2_minutes: "{n}-minute battle",

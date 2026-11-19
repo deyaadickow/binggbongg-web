@@ -1818,7 +1818,7 @@ export const es = {
   chb_alerts_off_done: "Ya no recibirás alertas de Chat Battle de @{name}.",
   chb_alerts_on_done: "Volverás a recibir alertas de Chat Battle de @{name}.",
   cb2_tagline: "Todo el país compite en vivo: 5 minutos, cada hora.",
-  cb2_explain: "Cada hora, en punto, los miembros de tu país se conectan en vivo en una gran batalla de 5 minutos: 24 batallas al día, todos los días. Todos en tu país pueden unirse cuando quieran durante esos 5 minutos: no hay límite de participantes en vivo. Cada mosaico tiene una caja de regalo. Los 3 primeros de cada batalla reciben una insignia de Batalla de Países y cada batalla queda para siempre en la Tabla de Honor.",
+  cb2_explain: "Cada hora, en punto, los miembros de tu país se conectan en vivo en una gran batalla de 5 minutos: 24 batallas al día, todos los días. Todos en tu país pueden unirse cuando quieran durante esos 5 minutos: no hay límite de participantes en vivo. Cada mosaico tiene una caja de regalo. Los 3 primeros de cada batalla reciben una insignia de Batalla de Países y un 10 %, 5 % o 3 % extra sobre lo que ganaron con regalos en esa batalla, y cada batalla queda para siempre en la Tabla de Honor.",
   cb2_how_score: "Tu puntuación son los BBs de regalo que recibes durante la batalla. Si hay empate, queda por delante quien llegó primero a esa puntuación.",
   cb2_when_your_time: "{day} a las {time}, tu hora",
   cb2_minutes: "Batalla de {n} minutos",
