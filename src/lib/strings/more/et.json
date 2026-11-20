@@ -1923,5 +1923,9 @@
  "mb_month": "Sel kuul",
  "mb_year": "Sel aastal",
  "mb_all": "Esimesest päevast",
- "mb_open": "Vaata märke"
+ "mb_open": "Vaata märke",
+ "fname_gold_digger": "Kullatükid",
+ "gd_title": "Kullatükid",
+ "gd_starts_soon": "Kullatükid algab peagi",
+ "gd_badge": "⛏️ Kullatükid %1$s %2$s"
 }

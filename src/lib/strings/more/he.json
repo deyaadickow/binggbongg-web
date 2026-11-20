@@ -1922,5 +1922,9 @@
  "mb_month": "החודש",
  "mb_year": "השנה",
  "mb_all": "מהיום הראשון",
- "mb_open": "הצג תגים"
+ "mb_open": "הצג תגים",
+ "fname_gold_digger": "גושי זהב",
+ "gd_title": "גושי זהב",
+ "gd_starts_soon": "גושי זהב מתחיל בקרוב",
+ "gd_badge": "⛏️ גושי זהב %1$s %2$s"
 }

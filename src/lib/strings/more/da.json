@@ -1923,5 +1923,9 @@
  "mb_month": "Denne måned",
  "mb_year": "I år",
  "mb_all": "Fra dag ét",
- "mb_open": "Se mærker"
+ "mb_open": "Se mærker",
+ "fname_gold_digger": "Guldklumper",
+ "gd_title": "Guldklumper",
+ "gd_starts_soon": "Guldklumper starter snart",
+ "gd_badge": "⛏️ Guldklumper %1$s %2$s"
 }

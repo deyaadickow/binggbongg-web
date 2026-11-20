@@ -1926,5 +1926,9 @@
  "mb_month": "Tento mesiac",
  "mb_year": "Tento rok",
  "mb_all": "Od prvého dňa",
- "mb_open": "Zobraziť odznaky"
+ "mb_open": "Zobraziť odznaky",
+ "fname_gold_digger": "Zlaté nugety",
+ "gd_title": "Zlaté nugety",
+ "gd_starts_soon": "Zlaté nugety čoskoro začnú",
+ "gd_badge": "⛏️ Zlaté nugety %1$s %2$s"
 }

@@ -1926,5 +1926,9 @@
  "mb_month": "Bu ay",
  "mb_year": "Bu yıl",
  "mb_all": "İlk günden beri",
- "mb_open": "Rozetleri gör"
+ "mb_open": "Rozetleri gör",
+ "fname_gold_digger": "Altın Külçeler",
+ "gd_title": "Altın Külçeler",
+ "gd_starts_soon": "Altın Külçeler yakında başlıyor",
+ "gd_badge": "⛏️ Altın Külçeler %1$s %2$s"
 }

@@ -1925,5 +1925,9 @@
  "mb_month": "今月",
  "mb_year": "今年",
  "mb_all": "初日から",
- "mb_open": "バッジを見る"
+ "mb_open": "バッジを見る",
+ "fname_gold_digger": "ゴールデンナゲット",
+ "gd_title": "ゴールデンナゲット",
+ "gd_starts_soon": "ゴールデンナゲットはまもなく開始",
+ "gd_badge": "⛏️ ゴールデンナゲット %1$s %2$s"
 }

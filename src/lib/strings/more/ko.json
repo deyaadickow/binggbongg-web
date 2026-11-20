@@ -1926,5 +1926,9 @@
  "mb_month": "이번 달",
  "mb_year": "올해",
  "mb_all": "첫날부터",
- "mb_open": "배지 보기"
+ "mb_open": "배지 보기",
+ "fname_gold_digger": "골든 너겟",
+ "gd_title": "골든 너겟",
+ "gd_starts_soon": "골든 너겟 곧 시작",
+ "gd_badge": "⛏️ 골든 너겟 %1$s %2$s"
 }

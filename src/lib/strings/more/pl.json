@@ -1926,5 +1926,9 @@
  "mb_month": "W tym miesiącu",
  "mb_year": "W tym roku",
  "mb_all": "Od pierwszego dnia",
- "mb_open": "Zobacz odznaki"
+ "mb_open": "Zobacz odznaki",
+ "fname_gold_digger": "Złote Samorodki",
+ "gd_title": "Złote Samorodki",
+ "gd_starts_soon": "Złote Samorodki wkrótce",
+ "gd_badge": "⛏️ Złote Samorodki %1$s %2$s"
 }

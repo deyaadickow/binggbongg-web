@@ -1926,5 +1926,9 @@
  "mb_month": "本月",
  "mb_year": "今年",
  "mb_all": "從第一天起",
- "mb_open": "查看徽章"
+ "mb_open": "查看徽章",
+ "fname_gold_digger": "金塊",
+ "gd_title": "金塊",
+ "gd_starts_soon": "金塊即將開始",
+ "gd_badge": "⛏️ 金塊 %1$s %2$s"
 }

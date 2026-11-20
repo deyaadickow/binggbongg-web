@@ -1926,5 +1926,9 @@
  "mb_month": "Diesen Monat",
  "mb_year": "Dieses Jahr",
  "mb_all": "Seit dem ersten Tag",
- "mb_open": "Abzeichen ansehen"
+ "mb_open": "Abzeichen ansehen",
+ "fname_gold_digger": "Goldnuggets",
+ "gd_title": "Goldnuggets",
+ "gd_starts_soon": "Goldnuggets startet bald",
+ "gd_badge": "⛏️ Goldnuggets %1$s %2$s"
 }

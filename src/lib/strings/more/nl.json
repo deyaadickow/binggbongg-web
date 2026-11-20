@@ -1926,5 +1926,9 @@
  "mb_month": "Deze maand",
  "mb_year": "Dit jaar",
  "mb_all": "Sinds dag één",
- "mb_open": "Bekijk badges"
+ "mb_open": "Bekijk badges",
+ "fname_gold_digger": "Goudklompjes",
+ "gd_title": "Goudklompjes",
+ "gd_starts_soon": "Goudklompjes begint binnenkort",
+ "gd_badge": "⛏️ Goudklompjes %1$s %2$s"
 }

@@ -1924,5 +1924,9 @@
  "mb_month": "Den här månaden",
  "mb_year": "I år",
  "mb_all": "Sedan dag ett",
- "mb_open": "Visa märken"
+ "mb_open": "Visa märken",
+ "fname_gold_digger": "Guldklimpar",
+ "gd_title": "Guldklimpar",
+ "gd_starts_soon": "Guldklimpar startar snart",
+ "gd_badge": "⛏️ Guldklimpar %1$s %2$s"
 }

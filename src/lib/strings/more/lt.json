@@ -1923,5 +1923,9 @@
  "mb_month": "Šį mėnesį",
  "mb_year": "Šiais metais",
  "mb_all": "Nuo pirmos dienos",
- "mb_open": "Žiūrėti ženklelius"
+ "mb_open": "Žiūrėti ženklelius",
+ "fname_gold_digger": "Aukso grynuoliai",
+ "gd_title": "Aukso grynuoliai",
+ "gd_starts_soon": "Aukso grynuoliai netrukus prasidės",
+ "gd_badge": "⛏️ Aukso grynuoliai %1$s %2$s"
 }

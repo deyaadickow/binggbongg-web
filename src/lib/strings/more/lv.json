@@ -1922,5 +1922,9 @@
  "mb_month": "Šomēnes",
  "mb_year": "Šogad",
  "mb_all": "No pirmās dienas",
- "mb_open": "Skatīt nozīmītes"
+ "mb_open": "Skatīt nozīmītes",
+ "fname_gold_digger": "Zelta tīrradņi",
+ "gd_title": "Zelta tīrradņi",
+ "gd_starts_soon": "Zelta tīrradņi drīz sāksies",
+ "gd_badge": "⛏️ Zelta tīrradņi %1$s %2$s"
 }

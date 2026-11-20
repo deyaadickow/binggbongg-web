@@ -1926,5 +1926,9 @@
  "mb_month": "Ce mois-ci",
  "mb_year": "Cette année",
  "mb_all": "Depuis le premier jour",
- "mb_open": "Voir les badges"
+ "mb_open": "Voir les badges",
+ "fname_gold_digger": "Pépites d'Or",
+ "gd_title": "Pépites d'Or",
+ "gd_starts_soon": "Pépites d'Or commence bientôt",
+ "gd_badge": "⛏️ Pépites d'Or %1$s %2$s"
 }

@@ -1926,5 +1926,9 @@
  "mb_month": "Hilabete honetan",
  "mb_year": "Aurten",
  "mb_all": "Lehen egunetik",
- "mb_open": "Ikusi txapak"
+ "mb_open": "Ikusi txapak",
+ "fname_gold_digger": "Urrezko Pepitak",
+ "gd_title": "Urrezko Pepitak",
+ "gd_starts_soon": "Urrezko Pepitak laster hasiko da",
+ "gd_badge": "⛏️ Urrezko Pepitak %1$s %2$s"
 }

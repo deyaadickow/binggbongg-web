@@ -1926,5 +1926,9 @@
  "mb_month": "Este mês",
  "mb_year": "Este ano",
  "mb_all": "Desde o primeiro dia",
- "mb_open": "Ver emblemas"
+ "mb_open": "Ver emblemas",
+ "fname_gold_digger": "Pepitas de Ouro",
+ "gd_title": "Pepitas de Ouro",
+ "gd_starts_soon": "Pepitas de Ouro começa em breve",
+ "gd_badge": "⛏️ Pepitas de Ouro %1$s %2$s"
 }

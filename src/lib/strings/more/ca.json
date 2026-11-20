@@ -1925,5 +1925,9 @@
  "mb_month": "Aquest mes",
  "mb_year": "Aquest any",
  "mb_all": "Des del primer dia",
- "mb_open": "Mostra les insígnies"
+ "mb_open": "Mostra les insígnies",
+ "fname_gold_digger": "Pepites d'Or",
+ "gd_title": "Pepites d'Or",
+ "gd_starts_soon": "Pepites d'Or comença aviat",
+ "gd_badge": "⛏️ Pepites d'Or %1$s %2$s"
 }

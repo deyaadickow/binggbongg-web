@@ -1919,5 +1919,9 @@
  "mb_month": "Ebben a hónapban",
  "mb_year": "Idén",
  "mb_all": "Az első naptól",
- "mb_open": "Jelvények megtekintése"
+ "mb_open": "Jelvények megtekintése",
+ "fname_gold_digger": "Aranyrögök",
+ "gd_title": "Aranyrögök",
+ "gd_starts_soon": "Hamarosan indul az Aranyrögök",
+ "gd_badge": "⛏️ Aranyrögök %1$s %2$s"
 }

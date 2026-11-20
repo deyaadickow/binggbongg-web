@@ -1921,5 +1921,9 @@
  "mb_month": "Luna aceasta",
  "mb_year": "Anul acesta",
  "mb_all": "Din prima zi",
- "mb_open": "Vezi insignele"
+ "mb_open": "Vezi insignele",
+ "fname_gold_digger": "Pepite de Aur",
+ "gd_title": "Pepite de Aur",
+ "gd_starts_soon": "Pepite de Aur începe în curând",
+ "gd_badge": "⛏️ Pepite de Aur %1$s %2$s"
 }

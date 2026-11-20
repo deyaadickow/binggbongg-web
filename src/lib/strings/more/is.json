@@ -1923,5 +1923,9 @@
  "mb_month": "Í þessum mánuði",
  "mb_year": "Í ár",
  "mb_all": "Frá fyrsta degi",
- "mb_open": "Sjá merki"
+ "mb_open": "Sjá merki",
+ "fname_gold_digger": "Gullmolar",
+ "gd_title": "Gullmolar",
+ "gd_starts_soon": "Gullmolar byrjar bráðum",
+ "gd_badge": "⛏️ Gullmolar %1$s %2$s"
 }

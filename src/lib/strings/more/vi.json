@@ -1926,5 +1926,9 @@
  "mb_month": "Tháng này",
  "mb_year": "Năm nay",
  "mb_all": "Từ ngày đầu tiên",
- "mb_open": "Xem huy hiệu"
+ "mb_open": "Xem huy hiệu",
+ "fname_gold_digger": "Cục Vàng",
+ "gd_title": "Cục Vàng",
+ "gd_starts_soon": "Cục Vàng sắp bắt đầu",
+ "gd_badge": "⛏️ Cục Vàng %1$s %2$s"
 }
