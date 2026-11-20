@@ -395,7 +395,7 @@ export function ProfilePage() {
   const [tabLoading, setTabLoading] = useState(false);
   const [tabError, setTabError] = useState<string | null>(null);
   const [playlists, setPlaylists] = useState<PlaylistRow[]>([]);
-  const [playlistCreate, setPlaylistCreate] = useState(0);
+  const [playlistCreate] = useState(0); // Create Playlist is gone (2026-11-20); kept so the panel prop stays put
   const [seriesCreate, setSeriesCreate] = useState(false);
   const [series, setSeries] = useState<Series[] | null>(null);
   // Q&A (2026-11-17): how many questions, once the tab has loaded them.
@@ -877,10 +877,8 @@ export function ProfilePage() {
             <button className="btn ghost small" onClick={() => navigate("/support")}>
               {t("support_2")}</button>
           )}
-          {isMe && (
-            <button className="btn ghost small" onClick={() => { switchTab("playlists"); setPlaylistCreate((n) => n + 1); closeInfo(); }}>
-              {t("playlist")}</button>
-          )}
+          {/* Create Playlist removed (Steve, 2026-11-20: "now we don't need the playlist anymore. please delete
+              the playlist and just keep the Create Series"). Existing playlists still play from their tab. */}
           {/* Create Series, the Create Playlist way (Steve, 2026-11-20). */}
           {isMe && me?.id && (
             <button className="btn ghost small" onClick={() => { setSeriesCreate(true); closeInfo(); }}>📁 {t("fld_create_series")}</button>

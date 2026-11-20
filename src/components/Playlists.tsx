@@ -62,9 +62,8 @@ export function PlaylistsPanel({ ownerId, isMe, myId, playlists, onChanged, crea
 
   return (
     <div>
-      {isMe && (
-        <button className="btn gold" style={{ width: "100%", margin: "8px 0 12px" }} onClick={() => setEditing("new")}>＋ {t("soc_new_playlist")}</button>
-      )}
+      {/* No new or edited playlists (Steve, 2026-11-20: "just keep the Create Series"); the old ones still play
+          and their owner can still delete them. */}
       {playlists.length === 0 ? (
         <p className="muted" style={{ padding: "24px 0", textAlign: "center" }}>{t("soc_no_playlists")}</p>
       ) : (
@@ -81,7 +80,6 @@ export function PlaylistsPanel({ ownerId, isMe, myId, playlists, onChanged, crea
                 <div className="muted" style={{ fontSize: 12, textAlign: "center" }}>{t("n_videos", c?.count ?? playlistPostIds(pl).length)}</div>
                 {isMe && (
                   <div className="row" style={{ gap: 6, justifyContent: "center", marginTop: 4 }}>
-                    <button className="btn small ghost" onClick={() => setEditing(pl)}>✎ {t("soc_edit")}</button>
                     <button className="btn small ghost" onClick={() => void remove(pl)}>🗑</button>
                   </div>
                 )}
