@@ -25,6 +25,78 @@ interface Analytics {
 }
 type ChartKey = "views" | "followers" | "gift_coins" | "earned";
 
+// "Since day one" (Steve, 2026-11-20: "add all the information on that page what ever activities he
+// ever did from day one ... how many times live streaming, how many time battling with time").
+// Backend: MyLifetimeAnalyticsController::fetchMyLifetimeAnalytics — sections of lifetime totals
+// with a this-month figure; labels and titles come translated for `lang`.
+type LifeKind = "count" | "duration" | "date" | "bbs";
+interface LifeItem { id: string; kind: LifeKind; label: string; total: number | string; month: number | null }
+interface LifeSection { id: string; title: string; items: LifeItem[] }
+interface Lifetime { sections: LifeSection[]; labels: { all_time: string; this_month: string } }
+
+/** 219186 -> "60:53:06" (hours keep counting past 24, as Steve wrote "10:45"). */
+export function hms(sec: number): string {
+  const s = Math.max(0, Math.round(sec));
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), r = s % 60;
+  return `${h}:${String(m).padStart(2, "0")}:${String(r).padStart(2, "0")}`;
+}
+
+function lifeValue(v: number | string | null, kind: LifeKind, lang: string): string {
+  if (v === null || v === undefined) return "—";
+  if (kind === "date") return longDate(String(v), lang);
+  if (kind === "duration") return hms(Number(v));
+  return Number(v).toLocaleString(lang);
+}
+
+function LifetimeView({ userId, lang }: { userId: number; lang: string }) {
+  const { t } = useT();
+  const [data, setData] = useState<Lifetime | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [reload, setReload] = useState(0);
+  useEffect(() => {
+    let live = true;
+    setError(null);
+    post<Lifetime>("fetchMyLifetimeAnalytics", { user_id: userId, my_user_id: userId, lang })
+      .then((r) => {
+        if (!live) return;
+        if (r.status && r.data) setData(r.data);
+        else setError(r.message || t("ma_load_error"));
+      })
+      .catch(() => { if (live) setError(t("ma_load_error")); });
+    return () => { live = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId, lang, reload]);
+
+  if (error) return (
+    <div style={{ textAlign: "center" }}>
+      <Notice error>{error}</Notice>
+      <button type="button" className="btn small" style={{ marginTop: 10 }} onClick={() => setReload((n) => n + 1)}>{t("ma_retry")}</button>
+    </div>
+  );
+  if (!data) return <Loading />;
+  return (
+    <div style={{ display: "grid", gap: 14 }}>
+      {data.sections.map((sec) => (
+        <section key={sec.id} className="card" style={{ padding: "12px 14px", background: "#000", border: "1.5px solid var(--gold-border)" }}>
+          <h2 className="ma-h2" style={{ marginTop: 0 }}>{sec.title}</h2>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr auto auto", columnGap: 14, rowGap: 8, alignItems: "baseline" }}>
+            <div />
+            <div style={{ fontSize: 12, color: "var(--gold)", opacity: 0.75, textAlign: "right" }}>{data.labels.all_time}</div>
+            <div style={{ fontSize: 12, color: "var(--gold)", opacity: 0.75, textAlign: "right" }}>{data.labels.this_month}</div>
+            {sec.items.map((it) => (
+              <div key={it.id} style={{ display: "contents" }}>
+                <div style={{ color: "var(--gold)", minWidth: 0 }}>{it.label}</div>
+                <div style={{ color: "var(--gold)", fontWeight: 800, textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{lifeValue(it.total, it.kind, lang)}</div>
+                <div style={{ color: "var(--gold)", opacity: 0.8, textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{it.month === null ? "—" : lifeValue(it.month, it.kind, lang)}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  );
+}
+
 const num = (v: unknown) => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
 
 /** The server sends some numbers as strings (raw rows); coerce everything once, here. */
@@ -162,11 +234,13 @@ export function MyAnalyticsPage() {
   const [loading, setLoading] = useState(true);
   const [reload, setReload] = useState(0);
   const [chart, setChart] = useState<ChartKey>("views");
+  // Opens on "Since day one" (the page Steve asked for from My Information); the period tabs follow.
+  const [lifetime, setLifetime] = useState(true);
 
   const paramsKey = JSON.stringify(params);
   // Keyed on the id, never the user object: the session replaces the object on every refresh.
   useEffect(() => {
-    if (!userId) return;
+    if (!userId || lifetime) return;
     let live = true;
     setLoading(true);
     setError(null);
@@ -182,7 +256,7 @@ export function MyAnalyticsPage() {
       .finally(() => { if (live) setLoading(false); });
     return () => { live = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId, paramsKey, lang, reload]);
+  }, [userId, paramsKey, lang, reload, lifetime]);
 
   if (!isLoggedIn || !user) {
     return <div className="page"><Notice>{tn("ma_sign_in", <Link to="/login">{t("sign_in")}</Link>)}</Notice></div>;
@@ -198,13 +272,19 @@ export function MyAnalyticsPage() {
       <h1 className="page-title">{t("ma_title")}</h1>
 
       <div className="row" style={{ gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+        <button type="button" className="btn small" onClick={() => setLifetime(true)}
+          style={lifetime ? { background: "var(--gold)", color: "#000" } : { background: "transparent", color: "var(--gold)" }}>
+          {t("ma_since_day_one")}
+        </button>
         {tabs.map((tab) => (
-          <button key={tab.range} type="button" className="btn small" onClick={() => setParams({ range: tab.range })}
-            style={params.range === tab.range ? { background: "var(--gold)", color: "#000" } : { background: "transparent", color: "var(--gold)" }}>
+          <button key={tab.range} type="button" className="btn small" onClick={() => { setLifetime(false); setParams({ range: tab.range }); }}
+            style={!lifetime && params.range === tab.range ? { background: "var(--gold)", color: "#000" } : { background: "transparent", color: "var(--gold)" }}>
             {t(tab.label)}
           </button>
         ))}
       </div>
+
+      {lifetime ? <LifetimeView userId={user.id} lang={lang} /> : <>
 
       <div className="row" style={{ justifyContent: "center", gap: 12, marginBottom: 12 }}>
         <button type="button" className="btn small ma-arrow" aria-label={t("ma_previous")}
@@ -290,6 +370,7 @@ export function MyAnalyticsPage() {
           </p>
         </div>
       )}
+      </>}
     </div>
   );
 }

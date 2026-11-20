@@ -879,6 +879,8 @@ export function ProfilePage() {
           {/* Creators and money (2026-11-17). */}
           {isMe && <button className="btn ghost small" onClick={() => navigate("/subscriptions")}>💎 {t("cm_my_subscription")}</button>}
           {isMe && <button className="btn ghost small" onClick={() => navigate("/scheduled")}>🗓 {t("cm_scheduled_posts")}</button>}
+          {/* My Analytics (Steve, 2026-11-20): everything the member did since day one. */}
+          {isMe && <button className="btn ghost small" onClick={() => navigate("/my-analytics")}>📊 {t("ma_title")}</button>}
         </div>
 
         {!isMe && isLoggedIn && me && <ChatBattleAlertToggle myId={me.id} host={profile} following={following} />}

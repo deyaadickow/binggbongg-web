@@ -1899,5 +1899,6 @@
  "fblurb_video_series": "Gör vilken mapp som helst till en numrerad serie, #1 till #100, och lägg videorna i din egen ordning.",
  "fav_create": "Skapa",
  "fav_live": "LIVE",
- "fav_follow": "Följ"
+ "fav_follow": "Följ",
+ "ma_since_day_one": "Sedan dag ett"
 }

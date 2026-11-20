@@ -1901,5 +1901,6 @@
  "fblurb_video_series": "把任何文件夹变成 #1 到 #100 的编号系列，并按你的顺序排列视频。",
  "fav_create": "创建",
  "fav_live": "直播",
- "fav_follow": "关注"
+ "fav_follow": "关注",
+ "ma_since_day_one": "从第一天起"
 }

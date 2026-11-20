@@ -2595,4 +2595,6 @@ export const id = {
   fav_create: "Buat",
   fav_live: "LIVE",
   fav_follow: "Ikuti",
+  // My Analytics "Since day one" (2026-11-20)
+  ma_since_day_one: "Sejak hari pertama",
 };

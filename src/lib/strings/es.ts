@@ -2559,4 +2559,6 @@ export const es = {
   fav_create: "Crear",
   fav_live: "EN VIVO",
   fav_follow: "Seguir",
+  // My Analytics "Since day one" (2026-11-20)
+  ma_since_day_one: "Desde el primer día",
 };

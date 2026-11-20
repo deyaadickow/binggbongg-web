@@ -3541,4 +3541,6 @@ export const en = {
   fav_create: "Create",
   fav_live: "LIVE",
   fav_follow: "Follow",
+  // My Analytics "Since day one" (2026-11-20)
+  ma_since_day_one: "Since day one",
 } as const;

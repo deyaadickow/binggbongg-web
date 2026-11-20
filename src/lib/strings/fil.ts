@@ -2758,4 +2758,6 @@ export const fil = {
   fav_create: "Gumawa",
   fav_live: "LIVE",
   fav_follow: "I-follow",
+  // My Analytics "Since day one" (2026-11-20)
+  ma_since_day_one: "Mula unang araw",
 };

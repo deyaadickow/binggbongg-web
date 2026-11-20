@@ -1894,5 +1894,6 @@
  "fblurb_video_series": "Bármelyik mappából csinálhatsz számozott sorozatot #1-től #100-ig, a videókat a saját sorrendedbe téve.",
  "fav_create": "Létrehozás",
  "fav_live": "ÉLŐ",
- "fav_follow": "Követés"
+ "fav_follow": "Követés",
+ "ma_since_day_one": "Az első naptól"
 }
