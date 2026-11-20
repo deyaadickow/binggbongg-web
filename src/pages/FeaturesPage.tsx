@@ -178,6 +178,8 @@ export const FEATURES: Section[] = [
       // Social (Steve, 2026-11-17): Stories, Polls & stickers, and Playlists on your profile's Playlists tab.
       { icon: "⭕", nameKey: "fname_stories", blurbKey: "fblurb_stories", to: "/stories" },
       { icon: "📊", nameKey: "fname_polls_stickers", blurbKey: "fblurb_polls_stickers", to: "/upload?stickers=1" },
+      // Steve, 2026-11-20: video folders on your profile (Dancing, Singing, My Wedding...).
+      { icon: "📁", nameKey: "fname_profile_folders", blurbKey: "fblurb_profile_folders", myProfile: true, profileTab: "videos", whereKey: "fwhere_your_profile" },
       { icon: "📑", nameKey: "fname_playlists", blurbKey: "fblurb_playlists", myProfile: true, profileTab: "playlists", whereKey: "fwhere_your_profile" },
       // Drafts, Q&A and Nearby (Steve, 2026-11-17: "All").
       { icon: "🗂️", nameKey: "fname_drafts", blurbKey: "fblurb_drafts", to: "/drafts" },

@@ -13,6 +13,8 @@ import { memberLabel, trackPage } from "../lib/pageTracker";
 import { ReportDialog } from "../components/ReportDialog";
 import { Avatar, Loading, Notice } from "../components/Common";
 import { fetchUserPhotos, type Photo } from "../lib/photos";
+import { ProfileFolders, pickFolder } from "../components/ProfileFolders";
+import { setPostFolder, announceFoldersChanged } from "../lib/folders";
 import { MemberBusinessesPanel, MyBusinessesPanel } from "./BusinessPages";
 import { ScheduleSection } from "../components/ScheduleSection";
 import { PodcastProfileSection } from "../components/PodcastBits";
@@ -62,6 +64,8 @@ interface ProfileUser extends UserSummary {
 interface ProfilePost extends Post {
   /** Set while the owner has it pinned on top of their profile (max 3, 2026-11-20). */
   pinned_at?: string | null;
+  /** Profile video folders (2026-11-20): the folder this video is in, if any. */
+  folder_id?: number | null;
   user_video_number?: number;
   lifetime_votes?: number;
   this_month_votes?: number;
@@ -371,6 +375,8 @@ export function ProfilePage() {
   const [tabVideos, setTabVideos] = useState<ProfilePost[]>([]);
   /** The own-video gold hold menu (Pin / Unpin, Delete — Steve, 2026-11-20). */
   const [menuFor, setMenuFor] = useState<ProfilePost | null>(null);
+  /** Profile video folders (2026-11-20): the open folder on the Videos tab, 0 = All videos. */
+  const [folderSel, setFolderSel] = useState(0);
   const [tabUsers, setTabUsers] = useState<UserSummary[]>([]);
   // Photos are neither posts nor members, so they get their own bucket rather than being
   // squeezed through tabVideos (different fields, different click target).
@@ -408,6 +414,7 @@ export function ProfilePage() {
     setTabVideos([]);
     setTabUsers([]);
     setTabPhotos([]);
+    setFolderSel(0);
     setPhotoCount(null);
     setSeries(null);
     setQaCount(null);
@@ -435,6 +442,13 @@ export function ProfilePage() {
     if (!profile || !id || String(profile.id) !== String(id) || String(profile.id) === String(me?.id)) return;
     trackPage("profile", "member", id, memberLabel(profile));
   }, [profile?.id, id, me?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // A different folder is a different list: let the Videos tab load again.
+  const lastFolder = useRef(0);
+  if (lastFolder.current !== folderSel) {
+    lastFolder.current = folderSel;
+    loadedTabs.current.delete("videos");
+  }
 
   useEffect(() => {
     if (!profile || !id) return;
@@ -489,7 +503,7 @@ export function ProfilePage() {
     // fetchRepostVideos, fetchFriendsList and fetchUserWatchHistory — so those tabs 404'd and
     // rendered empty forever. A guessed endpoint name fails exactly like a missing feature.
     const endpointMap: Record<Exclude<TabKey, "photos" | "business" | "playlists" | "series" | "qa">, [string, Record<string, unknown>]> = {
-      videos: ["fetchUserPosts", { user_id: id, ...base }],
+      videos: ["fetchUserPosts", { user_id: id, ...base, ...(folderSel > 0 ? { folder_id: folderSel } : {}) }],
       // NOT fetchUserPostsWithLikes: that returns THIS member's own posts that have received
       // likes, whereas the "Likes" count beside the tab is likedVideosCounts — the videos they
       // liked. fetchUserLikedPosts is the one that matches the number.
@@ -550,7 +564,7 @@ export function ProfilePage() {
         setTabError(status === 401 && !me ? "Sign in to see this." : "Couldn't load this tab.");
       })
       .finally(() => setTabLoading(false));
-  }, [tab, profile]);
+  }, [tab, profile, folderSel]);
 
   /** After a playlist is made, edited or deleted: the profile's rows again. */
   async function reloadPlaylists() {
@@ -962,13 +976,17 @@ export function ProfilePage() {
               ))}
             </div>
           )
-        ) : (
-          tabVideos.length === 0 && !(isMe && tab === "videos" && draftCount > 0) ? (
-            <p className="muted" style={{ padding: "24px 0", textAlign: "center" }}>{t("no_videos_yet")}</p>
+        ) : (<>
+          {/* Profile video folders (Steve, 2026-11-20): All videos + each folder, gold chips. */}
+          {tab === "videos" && (
+            <ProfileFolders profileId={profile.id} isMe={isMe} myId={socialMe?.id ?? me?.id} selected={folderSel} onSelect={setFolderSel} />
+          )}
+          {tabVideos.length === 0 && !(isMe && tab === "videos" && draftCount > 0 && folderSel === 0) ? (
+            <p className="muted" style={{ padding: "24px 0", textAlign: "center" }}>{t(tab === "videos" && folderSel > 0 ? "fld_empty" : "no_videos_yet")}</p>
           ) : (
             <div className="profile-vid-grid">
               {/* Drafts (Steve, 2026-11-17): first in your own videos, only when there are some. */}
-              {isMe && tab === "videos" && draftCount > 0 && (
+              {isMe && tab === "videos" && draftCount > 0 && folderSel === 0 && (
                 <button type="button" className="drafts-tile" onClick={() => navigate("/drafts")}>
                   <span style={{ fontSize: 26 }}>🗂️</span>
                   <span>{t("dft_drafts_n", draftCount)}</span>
@@ -984,8 +1002,8 @@ export function ProfilePage() {
                 />
               ))}
             </div>
-          )
-        )}
+          )}
+        </>)}
       </div>
       </>)}
 
@@ -993,6 +1011,22 @@ export function ProfilePage() {
         <OwnVideoMenu
           post={menuFor}
           onClose={() => setMenuFor(null)}
+          onMove={async () => {
+            const target = menuFor;
+            setMenuFor(null);
+            const to = await pickFolder(socialMe.id, target.folder_id ?? 0);
+            if (to === null || to === (target.folder_id ?? 0)) return;
+            try {
+              const r = await setPostFolder(socialMe.id, target.id, to);
+              if (!r.status) { showGoldAlert(r.message || "Something went wrong. Please try again."); return; }
+              setTabVideos((list) => folderSel > 0 && to !== folderSel
+                ? list.filter((x) => x.id !== target.id)
+                : list.map((x) => (x.id === target.id ? { ...x, folder_id: to || null } : x)));
+              announceFoldersChanged();
+            } catch {
+              showGoldAlert("Something went wrong. Please try again.");
+            }
+          }}
           onPin={async () => {
             const target = menuFor;
             setMenuFor(null);
@@ -1065,7 +1099,7 @@ export function ProfilePage() {
 
 /** The gold hold menu on your own video tile (Steve, 2026-11-20: "redesign it to our design ...
  *  add Pin") — black card, gold border, gold title, one gold-outlined row per action. */
-function OwnVideoMenu({ post: p, onPin, onDelete, onClose }: { post: ProfilePost; onPin: () => void; onDelete: () => void; onClose: () => void }) {
+function OwnVideoMenu({ post: p, onPin, onMove, onDelete, onClose }: { post: ProfilePost; onPin: () => void; onMove: () => void; onDelete: () => void; onClose: () => void }) {
   const { t } = useT();
   const row: React.CSSProperties = { display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%", padding: "12px 14px", background: "transparent", color: "#fff", border: "1px solid var(--gold-border)", borderRadius: 10, fontSize: 15, fontWeight: 600, cursor: "pointer" };
   return (
@@ -1076,6 +1110,8 @@ function OwnVideoMenu({ post: p, onPin, onDelete, onClose }: { post: ProfilePost
         <div style={{ height: 2, margin: "10px -8px 12px", background: "linear-gradient(90deg, transparent, var(--gold-border), transparent)" }} />
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           <button style={row} onClick={onPin}><span style={{ color: "var(--gold)", display: "inline-flex" }}><PinGlyph size={14} /></span>{t(p.pinned_at ? "pin_unpin" : "pin_to_top")}</button>
+          {/* Profile video folders (2026-11-20). */}
+          <button style={row} onClick={onMove}><span style={{ color: "var(--gold)" }}>📁</span>{t("fld_move")}</button>
           <button style={row} onClick={onDelete}>{t("delete")}</button>
         </div>
         <button onClick={onClose} style={{ marginTop: 14, padding: "8px 28px", background: "#000", color: "var(--gold)", border: "1px solid var(--gold-border)", borderRadius: 999, fontWeight: 800, fontSize: 13, letterSpacing: ".05em", cursor: "pointer" }}>

@@ -26,6 +26,8 @@ import {
   toLocalInput, type CreatorOptions, type Series,
 } from "../lib/creators";
 import { showGoldConfirm } from "../components/GoldToast";
+import { fetchPostFolders, type PostFolder } from "../lib/folders";
+import { createFolderFlow } from "../components/ProfileFolders";
 
 interface ContestCat { id: number; name?: string | null }
 interface CountryRow { name?: string | null; states?: { name?: string | null }[] }
@@ -57,6 +59,12 @@ export function UploadVideoPage() {
   const [countries, setCountries] = useState<CountryRow[]>([]);
 
   const [catId, setCatId] = useState<string>("");
+  // Profile video folders (2026-11-20): optional folder for this video ("" = no folder).
+  const [folderId, setFolderId] = useState<string>("");
+  const [folders, setFolders] = useState<PostFolder[]>([]);
+  useEffect(() => {
+    if (realUser?.id) void fetchPostFolders(realUser.id).then(setFolders);
+  }, [realUser?.id]);
   const [country, setCountry] = useState("");
   const [state, setState] = useState("");
   const [description, setDescription] = useState("");
@@ -310,6 +318,7 @@ export function UploadVideoPage() {
         can_save: canSave ? 1 : 0,
         allow_repost: allowRepost ? 1 : 0,
         contest_cat_id: catId,
+        ...(folderId ? { folder_id: Number(folderId) } : {}),
         // This was posted as `link` while the box was labelled Description — tbl_post.link is
         // the external-URL column, so web captions were being written there and never shown.
         ...(description.trim() ? { description: description.trim() } : {}),
@@ -485,6 +494,29 @@ export function UploadVideoPage() {
           onChange={setCatId}
           style={{ marginBottom: 10 }}
         />
+
+        {/* Profile video folders (Steve, 2026-11-20): which folder on my profile this video goes in. */}
+        {realUser?.id && (
+          <>
+            <label className="soft" style={{ fontSize: 13 }}>📁 {t("fld_folder")}</label>
+            <GoldSelect
+              ariaLabel={t("fld_folder")}
+              placeholder={t("fld_none")}
+              value={folderId}
+              options={[
+                { value: "", label: t("fld_none") },
+                ...folders.map((f) => ({ value: String(f.id), label: f.name })),
+                { value: "__new", label: `+ ${t("fld_new_folder")}` },
+              ]}
+              onChange={async (v) => {
+                if (v !== "__new") { setFolderId(v); return; }
+                const made = realUser?.id ? await createFolderFlow(realUser.id) : null;
+                if (made) { setFolders((fs) => [...fs, made]); setFolderId(String(made.id)); }
+              }}
+              style={{ marginBottom: 10 }}
+            />
+          </>
+        )}
 
         <label className="soft" style={{ fontSize: 13 }}>{t("_description")}</label>
         <textarea className="input" rows={3} value={description} onChange={(e) => setDescription(e.target.value)}
