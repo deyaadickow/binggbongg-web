@@ -12,7 +12,7 @@ import { Link } from "react-router-dom";
 import { showGoldAlert, showGoldConfirm } from "./GoldToast";
 import {
   FOLDER_NAME_MAX, FOLDERS_CHANGED, announceFoldersChanged, createPostFolder, deletePostFolder,
-  fetchFolderVideos, fetchPostFolders, fetchPostSeriesInfo, renamePostFolder, setFolderOrder, setFolderSeries,
+  fetchFolderVideos, fetchPostFolders, renamePostFolder, setFolderOrder, setFolderSeries,
   type FolderVideo, type PostFolder, type SeriesInfo,
 } from "../lib/folders";
 
@@ -340,36 +340,6 @@ export function askNumber(current: number, max: number): Promise<number | null> 
       return <Dialog />;
     });
   });
-}
-
-/**
- * Under a video in a numbered-series folder (2026-11-20): "Dancing · Part 3 of 12" with ‹ › for
- * the previous / next part. Renders nothing for any other video (and asks the server only when
- * the video is in a folder at all).
- */
-export function FolderPartChip({ postId, folderId, style }: { postId: number; folderId?: number | null; style?: React.CSSProperties }) {
-  const { t } = useT();
-  const [info, setInfo] = useState<SeriesInfo | null>(null);
-  useEffect(() => {
-    setInfo(null);
-    if (!folderId) return;
-    let live = true;
-    void fetchPostSeriesInfo(postId).then((i) => { if (live) setInfo(i); });
-    return () => { live = false; };
-  }, [postId, folderId]);
-  if (!info?.is_series || !info.position || !info.count) return null;
-  const nav = (id?: number | null, label?: string) => id
-    ? <Link to={`/video/${id}`} aria-label={label} style={{ color: "#000", background: "var(--gold-border)", borderRadius: 10, padding: "0 8px", fontWeight: 900 }}>{label === "prev" ? "‹" : "›"}</Link>
-    : null;
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6, color: "var(--gold)", fontWeight: 800, fontSize: 13, ...style }}>
-      {nav(info.prev_id, "prev")}
-      <span style={{ border: "1px solid var(--gold-border)", borderRadius: 10, padding: "1px 8px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-        📁 {info.folder_name} · {t("fld_part_of", info.position, info.count)}
-      </span>
-      {nav(info.next_id, "next")}
-    </div>
-  );
 }
 
 /**

@@ -23,7 +23,7 @@ import { EpisodeChip, LockedCard } from "../components/Creators";
 import { devCreatorDecorate } from "../lib/creators";
 import { setFeed as saveFeedQueue } from "../lib/feed";
 import { rollGoldNow } from "../lib/goldDigger";
-import { FolderPartChip } from "../components/ProfileFolders";
+import { PostPlaylistBar } from "../components/PostPlaylistBar";
 import { MemberBullseye } from "../components/MemberBullseye";
 
 const AUTO_KEY = "bb.autoplayNext";
@@ -719,8 +719,8 @@ export function VideoPage() {
           )}
           {/* Creators and money (2026-11-17): "Ep N" on a series episode opens the series. */}
           {item.series_info && !item.locked && <EpisodeChip post={item} style={{ marginTop: 6 }} />}
-          {/* Numbered series in a profile folder (2026-11-20): Part N of M with previous / next. */}
-          <FolderPartChip postId={item.id} folderId={(item as { folder_id?: number | null }).folder_id} />
+          {/* Playlists + numbered-series folders (2026-11-20): the phones' playlist bar. */}
+          <PostPlaylistBar post={item} />
           {/* Steve, 2026-11-16 ("Show the sound line"): the sound, one line, opens its page. */}
           {item.sound?.id && item.sound.title?.trim() && (
             <Link to={`/sound/${item.sound.id}`} style={{ display: "block", color: "var(--gold)", fontSize: 13, marginTop: 4, maxWidth: "100%",
