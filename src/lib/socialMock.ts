@@ -333,7 +333,25 @@ export async function mockSocialCall<T>(endpoint: string, params: Record<string,
     }
     case "fetchUserPosts": {
       if (Number(params.user_id) !== ME) return fail("not mocked");
-      return ok(s.posts.filter((x) => x.user_id === ME).reverse().map(resolvePost) as T);
+      // Pin (2026-11-20): pinned first, most recently pinned first, like the server.
+      const pinned = mockPins();
+      const mine = s.posts.filter((x) => x.user_id === ME).reverse().map(resolvePost)
+        .map((x) => ({ ...x, pinned_at: pinned.includes(x.id) ? "pinned" : null }));
+      // ?mockPins=1: five pretend videos so the hold menu can be tried with nothing uploaded.
+      if (!mine.length && location.search.includes("mockPins")) {
+        for (let i = 5; i >= 1; i--) mine.push({ id: 990000100 + i, user_id: ME, views: i * 10, user_video_number: i, pinned_at: pinned.includes(990000100 + i) ? "pinned" : null } as unknown as (typeof mine)[number]);
+      }
+      return ok([...pinned.map((id) => mine.find((x) => x.id === id)).filter(Boolean), ...mine.filter((x) => !pinned.includes(x.id))] as T);
+    }
+    case "pinPost": {
+      const pid = Number(params.post_id);
+      let pins = mockPins().filter((id) => id !== pid);
+      if (Number(params.pin) === 1) {
+        if (!mockPins().includes(pid) && mockPins().length >= 3) return { status: false, limit_reached: true, pinned_ids: mockPins(), message: "You can pin only 3 videos. Unpin one first." } as ApiResponse<T>;
+        pins = [pid, ...pins];
+      }
+      try { localStorage.setItem("bb_mock_pins", JSON.stringify(pins)); } catch { /* dev only */ }
+      return { status: true, pinned_ids: pins, message: "Pinned (dev mock)" } as ApiResponse<T>;
     }
 
     case "repostUserPost": {
@@ -384,4 +402,9 @@ export function mockPlaylists(userId: number, rows: PlaylistRow[]): PlaylistRow[
   const s = load();
   const real = rows.filter((r) => !s.playlistDeleted.includes(r.id)).map((r) => ({ ...r, ...(s.playlistEdits[String(r.id)] ?? {}) }));
   return [...s.playlists.filter((p) => p.user_id === userId), ...real];
+}
+
+/** Dev mock: pinned post ids, most recently pinned first (2026-11-20). */
+function mockPins(): number[] {
+  try { return JSON.parse(localStorage.getItem("bb_mock_pins") || "[]") as number[]; } catch { return []; }
 }
