@@ -6,7 +6,6 @@ import { VipBadge, VipBadgePopup } from "../components/VipBadge";
 import { isVipReferrer } from "../lib/referral";
 import { GoldDiggerBadge } from "../components/GoldDigger";
 import type { GdBadge } from "../lib/goldDigger";
-import { BattleBadge, BattleInfoPopup, BattleStreak, battleBadgeExplainer, battleStreakExplainer } from "../components/BattleBadge";
 import { HousesPill } from "./HousesPage";
 import { useSession } from "../lib/session";
 import { memberLabel, trackPage } from "../lib/pageTracker";
@@ -376,7 +375,6 @@ export function ProfilePage() {
   const [tab, setTab] = useState<TabKey>("videos");
   // Steve, 2026-10-05: "Make all popup into our design black and gold" — the badge and streak
   // explainers open the app's own popup instead of the browser's white alert box.
-  const [battleInfo, setBattleInfo] = useState<{ title: string; body: string; flames?: number } | null>(null);
   const [vipInfo, setVipInfo] = useState(false);
   const [tabVideos, setTabVideos] = useState<ProfilePost[]>([]);
   /** The own-video gold hold menu (Pin / Unpin, Delete — Steve, 2026-11-20). */
@@ -742,25 +740,12 @@ export function ProfilePage() {
                 <h1 style={{ fontSize: 20, color: "var(--gold)", fontWeight: 800, margin: 0 }}>
                   {displayName(profile)}
                 </h1>
-                {/* Steve, 2026-10-05: the Bingg Bongg Battle Badge beside their name. */}
-                <BattleBadge
-                  badge={profile.battle_badge}
-                  onClick={() => setBattleInfo({
-                    title: "Bingg Bongg Battle Badge",
-                    body: battleBadgeExplainer(displayName(profile), profile.battle_badge ?? 0),
-                  })}
-                />
-                {/* Steve, 2026-10-05: the streak beside it — one flame per 30 days kept, and a
-                    flame is one free day. */}
-                <BattleStreak
-                  streak={profile.battle_streak}
-                  flames={profile.battle_flames}
-                  onClick={() => setBattleInfo({
-                    title: "Battle Streak",
-                    body: battleStreakExplainer(displayName(profile), profile.battle_streak ?? 0, profile.battle_flames ?? 0),
-                    flames: profile.battle_flames ?? 0,
-                  })}
-                />
+                {/* Steve, 2026-11-20: "These i-cons are not needed anymore that we have them in a page
+                    nice and organized. Please put the name and username side by side." The Battle Badge
+                    and streak pill live on the Badges page (the feed bullseye); @username sits here. */}
+                <span className="gold-plate" style={{ fontSize: 13 }}>
+                  @{profile.username}{profile.country ? ` · ${profile.country}` : ""}
+                </span>
                 {/* Steve, 2026-10-29: a VIP Referral Member's gold pill; tapping it says what it is. */}
                 {isVipReferrer(profile.is_vip_referrer) && <VipBadge onClick={() => setVipInfo(true)} />}
                 {/* Build Your Houses (Steve, 2026-11-05): "🏠 N houses" opens their house page. */}
@@ -777,9 +762,6 @@ export function ProfilePage() {
               {/* Steve, 2026-10-11: "For this entire page put black borders around all the text
                   and make all the text in gold colour." The handle and bio were grey text
                   straight on the page. */}
-              <div className="gold-plate" style={{ fontSize: 12, marginTop: 4 }}>
-                @{profile.username}{profile.country ? ` · ${profile.country}` : ""}
-              </div>
               {/* Country Battle v2 daily badges — 1st gold, 2nd silver, 3rd bronze, newest first, each
                   opening that day's top 100; the lifetime counts beside them. */}
               <CountryBattleBadges badges={profile.country_battle_badges} counts={profile.country_battle_badge_counts} />
@@ -1118,9 +1100,6 @@ export function ProfilePage() {
       )}
       {vipInfo && (
         <VipBadgePopup viewerIsVip={isVipReferrer(isMe ? profile.is_vip_referrer : me?.is_vip_referrer)} onClose={() => setVipInfo(false)} />
-      )}
-      {battleInfo && (
-        <BattleInfoPopup title={battleInfo.title} body={battleInfo.body} flames={battleInfo.flames} onClose={() => setBattleInfo(null)} />
       )}
       {showReport && profile && (
         <ReportDialog
