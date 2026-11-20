@@ -228,14 +228,15 @@ export function MyAnalyticsPage() {
   const { t, tn, lang } = useT();
   const { user, isLoggedIn } = useSession();
   const userId = user?.id ?? null;
-  const [params, setParams] = useState<PeriodParams>({ range: "month" });
+  const [params, setParams] = useState<PeriodParams>({ range: "today" });
   const [data, setData] = useState<Analytics | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [reload, setReload] = useState(0);
   const [chart, setChart] = useState<ChartKey>("views");
-  // Opens on "Since day one" (the page Steve asked for from My Information); the period tabs follow.
-  const [lifetime, setLifetime] = useState(true);
+  // Steve, 2026-11-20: "Please put since day one all the way at the end on the right side, and
+  // Today should be clicked by default." Today | This Month | This Year | Since day one.
+  const [lifetime, setLifetime] = useState(false);
 
   const paramsKey = JSON.stringify(params);
   // Keyed on the id, never the user object: the session replaces the object on every refresh.
@@ -272,16 +273,16 @@ export function MyAnalyticsPage() {
       <h1 className="page-title">{t("ma_title")}</h1>
 
       <div className="row" style={{ gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
-        <button type="button" className="btn small" onClick={() => setLifetime(true)}
-          style={lifetime ? { background: "var(--gold)", color: "#000" } : { background: "transparent", color: "var(--gold)" }}>
-          {t("ma_since_day_one")}
-        </button>
         {tabs.map((tab) => (
           <button key={tab.range} type="button" className="btn small" onClick={() => { setLifetime(false); setParams({ range: tab.range }); }}
             style={!lifetime && params.range === tab.range ? { background: "var(--gold)", color: "#000" } : { background: "transparent", color: "var(--gold)" }}>
             {t(tab.label)}
           </button>
         ))}
+        <button type="button" className="btn small" onClick={() => setLifetime(true)}
+          style={lifetime ? { background: "var(--gold)", color: "#000" } : { background: "transparent", color: "var(--gold)" }}>
+          {t("ma_since_day_one")}
+        </button>
       </div>
 
       {lifetime ? <LifetimeView userId={user.id} lang={lang} /> : <>
