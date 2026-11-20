@@ -63,6 +63,20 @@ export async function setPostPosition(myId: number, postId: number, position: nu
   return { ok: !!r.status, order: Array.isArray(r.order) ? r.order.map(Number) : [], count: r.count, message: r.message };
 }
 
+/** The folder editor (2026-11-20): the whole order, top = #1. Saving makes the folder a series. */
+export async function setFolderOrder(myId: number, folderId: number, postIds: number[]): Promise<{ ok: boolean; message?: string }> {
+  const r = (await post("setFolderOrder", { user_id: myId, folder_id: folderId, post_ids: postIds.join(",") })) as unknown as { status?: boolean; message?: string };
+  return { ok: !!r.status, message: r.message };
+}
+
+export interface FolderVideo { id: number; thumbnail?: string | null; description?: string | null; folder_pos?: number | null }
+
+/** A folder's videos in its current order, for the editor. */
+export async function fetchFolderVideos(profileId: number, folderId: number): Promise<FolderVideo[]> {
+  const r = (await post("fetchUserPosts", { user_id: profileId, folder_id: folderId, start: 0, count: 300 })) as unknown as { data?: FolderVideo[] };
+  return Array.isArray(r.data) ? r.data : [];
+}
+
 export interface SeriesInfo { is_series: boolean; position?: number; count?: number; folder_name?: string; prev_id?: number | null; next_id?: number | null }
 
 export async function fetchPostSeriesInfo(postId: number): Promise<SeriesInfo> {

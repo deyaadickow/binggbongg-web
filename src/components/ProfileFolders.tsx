@@ -12,7 +12,8 @@ import { Link } from "react-router-dom";
 import { showGoldAlert, showGoldConfirm } from "./GoldToast";
 import {
   FOLDER_NAME_MAX, FOLDERS_CHANGED, announceFoldersChanged, createPostFolder, deletePostFolder,
-  fetchPostFolders, fetchPostSeriesInfo, renamePostFolder, setFolderSeries, type PostFolder, type SeriesInfo,
+  fetchFolderVideos, fetchPostFolders, fetchPostSeriesInfo, renamePostFolder, setFolderOrder, setFolderSeries,
+  type FolderVideo, type PostFolder, type SeriesInfo,
 } from "../lib/folders";
 
 const chip = (active: boolean): React.CSSProperties => ({
@@ -154,6 +155,7 @@ export function ProfileFolders({ profileId, isMe, myId, selected, onSelect }: {
   const { t } = useT();
   const [folders, setFolders] = useState<PostFolder[]>([]);
   const [menuFor, setMenuFor] = useState<number | null>(null);
+  const [editFor, setEditFor] = useState<PostFolder | null>(null);
 
   useEffect(() => {
     let live = true;
@@ -207,11 +209,22 @@ export function ProfileFolders({ profileId, isMe, myId, selected, onSelect }: {
       {folders.map((f) => (
         <FolderTile key={f.id} label={f.name} count={f.post_count} cover={f.cover} active={selected === f.id} series={!!f.is_series}
           onClick={() => onSelect(f.id)}
-          onMenu={isMe ? () => setMenuFor(f.id) : undefined} />
+          onMenu={isMe ? () => setMenuFor(f.id) : undefined}
+          onEdit={isMe ? () => setEditFor(f) : undefined} />
       ))}
       {isMe && myId && (
         <FolderTile label={t("fld_new_folder")} icon="+" dashed
           onClick={async () => { const f = await createFolderFlow(myId); if (f) onSelect(f.id); }} />
+      )}
+      {editFor && myId && (
+        <FolderOrderSheet folder={editFor} profileId={profileId} myId={myId} onClose={() => setEditFor(null)}
+          onSaved={() => {
+            const id = editFor.id;
+            setEditFor(null);
+            announceFoldersChanged();
+            // Open the folder (again) so its grid shows the new #1, #2 …
+            onSelect(0); window.setTimeout(() => onSelect(id), 0);
+          }} />
       )}
       {menuFolder && (
         <div style={overlay} onClick={() => setMenuFor(null)}>
@@ -236,9 +249,9 @@ export function ProfileFolders({ profileId, isMe, myId, selected, onSelect }: {
  * Gold tab on top, gold-outlined front showing the first video's thumbnail (dark with an icon when
  * empty), and the name + count on a dark strip along the bottom. Owner: hold / right-click / ⋮.
  */
-function FolderTile({ label, count, cover, icon, active, dashed, series, onClick, onMenu }: {
+function FolderTile({ label, count, cover, icon, active, dashed, series, onClick, onMenu, onEdit }: {
   label: string; count?: number; cover?: string | null; icon?: string; active?: boolean; dashed?: boolean; series?: boolean;
-  onClick: () => void; onMenu?: () => void;
+  onClick: () => void; onMenu?: () => void; onEdit?: () => void;
 }) {
   const hold = useRef<number | null>(null);
   const held = useRef(false);
@@ -266,6 +279,12 @@ function FolderTile({ label, count, cover, icon, active, dashed, series, onClick
         {series && (
           <span style={{ position: "absolute", top: 3, left: 3, padding: "1px 6px", borderRadius: 8, background: "var(--gold-border)",
             color: "#000", fontWeight: 900, fontSize: 10.5 }}>#1…{count}</span>
+        )}
+        {onEdit && (
+          <span role="button" aria-label="✎" title={tt("fld_edit")} onPointerDown={(e) => e.stopPropagation()}
+            onClick={(e) => { e.stopPropagation(); onEdit(); }}
+            style={{ position: "absolute", top: 3, right: 28, width: 22, height: 22, borderRadius: 11, background: "var(--gold-border)",
+              color: "#000", fontWeight: 900, lineHeight: "22px", fontSize: 13 }}>✎</span>
         )}
         {onMenu && (
           <span role="button" aria-label="⋮" onPointerDown={(e) => e.stopPropagation()}
@@ -349,6 +368,111 @@ export function FolderPartChip({ postId, folderId, style }: { postId: number; fo
         📁 {info.folder_name} · {t("fld_part_of", info.position, info.count)}
       </span>
       {nav(info.next_id, "next")}
+    </div>
+  );
+}
+
+/**
+ * The folder editor, like Edit Playlist (Steve, 2026-11-20: "move the videos and organize them the
+ * way i want top video would be #1 video, next would be #2 video. this is the way i want to be able
+ * to create a sereis with the video folders"). Drag a row by its ≡ handle (mouse or finger); the top
+ * row is #1. Update saves the whole order and makes the folder a numbered series.
+ */
+function FolderOrderSheet({ folder, profileId, myId, onClose, onSaved }: {
+  folder: PostFolder; profileId: number; myId: number; onClose: () => void; onSaved: () => void;
+}) {
+  const { t } = useT();
+  const [rows, setRows] = useState<FolderVideo[] | null>(null);
+  const [dragAt, setDragAt] = useState<number | null>(null);
+  const [saving, setSaving] = useState(false);
+  const listRef = useRef<HTMLDivElement>(null);
+  const ROW = 76;
+
+  useEffect(() => {
+    let live = true;
+    void fetchFolderVideos(profileId, folder.id).then((v) => {
+      if (!live) return;
+      // Series folders already come in their order; otherwise by any saved number, then as listed.
+      const sorted = folder.is_series ? v : [...v].sort((a, b) => (a.folder_pos ?? 1e9) - (b.folder_pos ?? 1e9));
+      setRows(sorted);
+    }).catch(() => { if (live) setRows([]); });
+    return () => { live = false; };
+  }, [profileId, folder.id, folder.is_series]);
+
+  function startDrag(e: React.PointerEvent, from: number) {
+    e.preventDefault();
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    setDragAt(from);
+    let at = from;
+    const top = listRef.current?.getBoundingClientRect().top ?? 0;
+    const move = (ev: PointerEvent) => {
+      if (!rows) return;
+      const to = Math.max(0, Math.min(rows.length - 1, Math.floor((ev.clientY - top + (listRef.current?.scrollTop ?? 0)) / ROW)));
+      if (to !== at) {
+        setRows((list) => {
+          if (!list) return list;
+          const next = [...list]; const [it] = next.splice(at, 1); next.splice(to, 0, it); return next;
+        });
+        at = to; setDragAt(to);
+      }
+    };
+    const up = () => {
+      setDragAt(null);
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      window.removeEventListener("pointercancel", up);
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+    window.addEventListener("pointercancel", up);
+  }
+
+  async function update() {
+    if (!rows) return;
+    setSaving(true);
+    try {
+      const r = await setFolderOrder(myId, folder.id, rows.map((v) => v.id));
+      if (!r.ok) { showGoldAlert(r.message || tt("something_went_wrong")); setSaving(false); return; }
+      onSaved();
+    } catch {
+      showGoldAlert(tt("something_went_wrong")); setSaving(false);
+    }
+  }
+
+  return (
+    <div style={{ ...overlay, padding: 12 }} onClick={onClose}>
+      <div className="card pad" style={{ ...card, maxWidth: 460, boxSizing: "border-box", maxHeight: "88vh", display: "flex", flexDirection: "column" }}
+        onClick={(e) => e.stopPropagation()}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <h2 style={{ margin: 0, color: "var(--gold)", flex: 1, fontWeight: 900 }}>{t("fld_edit")}</h2>
+          <button className="btn small ghost" aria-label={t("fld_cancel")} onClick={onClose}>✕</button>
+        </div>
+        <div style={{ color: "var(--gold)", opacity: .85, fontWeight: 700, margin: "2px 0 4px" }}>📁 {folder.name}</div>
+        <div className="muted" style={{ fontSize: 14, marginBottom: 10 }}>{t("fld_edit_sub")}</div>
+        <div ref={listRef} style={{ overflowY: "auto", flex: 1, touchAction: dragAt === null ? "auto" : "none" }}>
+          {rows === null ? <div className="muted center" style={{ padding: 24 }}>…</div>
+            : rows.length === 0 ? <p className="muted center">{t("fld_empty")}</p>
+            : rows.map((v, i) => (
+              <div key={v.id} style={{ height: ROW - 8, marginBottom: 8, display: "flex", alignItems: "center", gap: 12, padding: "0 10px 0 4px",
+                borderRadius: 10, border: `1.5px solid ${dragAt === i ? "var(--gold-bright)" : "var(--gold-border)"}`,
+                background: dragAt === i ? "rgba(240,196,32,.12)" : "#000" }}>
+                <div style={{ width: 50, height: 60, borderRadius: 6, flex: "0 0 auto", background: v.thumbnail ? `#111 url("${mediaUrl(v.thumbnail)}") center/cover` : "#111" }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ color: "var(--gold)", fontWeight: 900, fontSize: 18 }}>#{i + 1}</div>
+                  {(v.description ?? "").trim() && (
+                    <div className="muted" style={{ fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{v.description}</div>
+                  )}
+                </div>
+                <span role="button" aria-label="≡" onPointerDown={(e) => startDrag(e, i)}
+                  style={{ color: "var(--gold)", fontSize: 28, lineHeight: 1, padding: "8px 6px", cursor: "grab", touchAction: "none", userSelect: "none" }}>≡</span>
+              </div>
+            ))}
+        </div>
+        <button className="btn" disabled={saving || !rows?.length} onClick={() => void update()}
+          style={{ marginTop: 12, height: 46, color: "var(--gold-bright)", background: "#000", border: "1.5px solid var(--gold-border)", fontWeight: 800 }}>
+          {saving ? "…" : t("fld_update")}
+        </button>
+      </div>
     </div>
   );
 }
