@@ -85,6 +85,8 @@ function LifetimeView({ userId, lang }: { userId: number; lang: string }) {
             <div style={{ fontSize: 12, color: "var(--gold)", opacity: 0.75, textAlign: "right" }}>{data.labels.this_month}</div>
             {sec.items.map((it) => (
               <div key={it.id} style={{ display: "contents" }}>
+                {/* thin gold line across the card between rows (Steve, 2026-11-20) */}
+                <div style={{ gridColumn: "1 / -1", height: 1, background: "var(--gold)", opacity: 0.35 }} />
                 <div style={{ color: "var(--gold)", minWidth: 0 }}>{it.label}</div>
                 <div style={{ color: "var(--gold)", fontWeight: 800, textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{lifeValue(it.total, it.kind, lang)}</div>
                 <div style={{ color: "var(--gold)", opacity: 0.8, textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{it.month === null ? "—" : lifeValue(it.month, it.kind, lang)}</div>
