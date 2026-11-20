@@ -2743,4 +2743,15 @@ export const fil = {
   fblurb_profile_folders: "Gumawa ng kahit ilang folder sa profile mo, tulad ng Sayaw, Kanta o Kasal Ko, at ilagay ang bawat video sa isa.",
   // "Search · <topic>" bar under every video (2026-11-20).
   stb_search: "Maghanap",
+  // Numbered series in folders (2026-11-20)
+  fld_series_on: "Gawing serye na may numero",
+  fld_series_off: "Itigil ang pagnunumero",
+  fld_set_number: "Lagyan ng numero",
+  fld_move_up: "Itaas",
+  fld_move_down: "Ibaba",
+  fld_number_hint: "Numero mula 1 hanggang %1$s",
+  fld_part_of: "Bahagi %1$s ng %2$s",
+  fld_series: "Serye",
+  fname_video_series: "Mga Seryeng May Numero",
+  fblurb_video_series: "Gawing seryeng may numero ang kahit anong folder, #1 hanggang #100, at ayusin ang mga video ayon sa gusto mo.",
 };

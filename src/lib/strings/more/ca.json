@@ -1887,5 +1887,15 @@
  "fld_moved": "Mogut a %1$s",
  "fname_profile_folders": "Carpetes de vídeos",
  "fblurb_profile_folders": "Crea totes les carpetes que vulguis al teu perfil, com Ball, Cant o El meu casament, i posa cada vídeo en una.",
- "stb_search": "Cerca"
+ "stb_search": "Cerca",
+ "fld_series_on": "Numera com a sèrie",
+ "fld_series_off": "Deixa de numerar",
+ "fld_set_number": "Posa el número",
+ "fld_move_up": "Puja",
+ "fld_move_down": "Baixa",
+ "fld_number_hint": "Número de l'1 al %1$s",
+ "fld_part_of": "Part %1$s de %2$s",
+ "fld_series": "Sèrie",
+ "fname_video_series": "Sèries numerades",
+ "fblurb_video_series": "Converteix qualsevol carpeta en una sèrie numerada, del #1 al #100, i ordena els vídeos al teu gust."
 }

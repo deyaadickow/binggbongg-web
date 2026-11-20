@@ -1886,5 +1886,15 @@
  "fld_moved": "Geskuif na %1$s",
  "fname_profile_folders": "Videovouers",
  "fblurb_profile_folders": "Maak soveel vouers as wat jy wil op jou profiel, soos Dans, Sing of My Troue, en sit elke video in een.",
- "stb_search": "Soek"
+ "stb_search": "Soek",
+ "fld_series_on": "Nommer as 'n reeks",
+ "fld_series_off": "Hou op nommer",
+ "fld_set_number": "Stel nommer",
+ "fld_move_up": "Skuif op",
+ "fld_move_down": "Skuif af",
+ "fld_number_hint": "Nommer van 1 tot %1$s",
+ "fld_part_of": "Deel %1$s van %2$s",
+ "fld_series": "Reeks",
+ "fname_video_series": "Genommerde reekse",
+ "fblurb_video_series": "Maak enige vouer 'n genommerde reeks, #1 tot #100, en sit die video's in jou eie volgorde."
 }

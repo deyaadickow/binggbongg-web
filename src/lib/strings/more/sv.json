@@ -1886,5 +1886,15 @@
  "fld_moved": "Flyttad till %1$s",
  "fname_profile_folders": "Videomappar",
  "fblurb_profile_folders": "Skapa så många mappar du vill på din profil, som Dans, Sång eller Mitt bröllop, och lägg varje video i en.",
- "stb_search": "Sök"
+ "stb_search": "Sök",
+ "fld_series_on": "Numrera som serie",
+ "fld_series_off": "Sluta numrera",
+ "fld_set_number": "Ange nummer",
+ "fld_move_up": "Flytta upp",
+ "fld_move_down": "Flytta ned",
+ "fld_number_hint": "Nummer från 1 till %1$s",
+ "fld_part_of": "Del %1$s av %2$s",
+ "fld_series": "Serie",
+ "fname_video_series": "Numrerade serier",
+ "fblurb_video_series": "Gör vilken mapp som helst till en numrerad serie, #1 till #100, och lägg videorna i din egen ordning."
 }

@@ -1888,5 +1888,15 @@
  "fld_moved": "Đã chuyển vào %1$s",
  "fname_profile_folders": "Thư mục video",
  "fblurb_profile_folders": "Tạo bao nhiêu thư mục tùy thích trên hồ sơ, như Nhảy, Hát hay Đám cưới của tôi, và đặt mỗi video vào một thư mục.",
- "stb_search": "Tìm kiếm"
+ "stb_search": "Tìm kiếm",
+ "fld_series_on": "Đánh số thành loạt",
+ "fld_series_off": "Ngừng đánh số",
+ "fld_set_number": "Đặt số",
+ "fld_move_up": "Lên trên",
+ "fld_move_down": "Xuống dưới",
+ "fld_number_hint": "Số từ 1 đến %1$s",
+ "fld_part_of": "Phần %1$s / %2$s",
+ "fld_series": "Loạt",
+ "fname_video_series": "Loạt video đánh số",
+ "fblurb_video_series": "Biến bất kỳ thư mục nào thành loạt video đánh số từ #1 đến #100 và sắp xếp video theo thứ tự của bạn."
 }

@@ -2186,5 +2186,15 @@
  "fld_moved": "تم النقل إلى %1$s",
  "fname_profile_folders": "مجلدات الفيديو",
  "fblurb_profile_folders": "أنشئ ما تشاء من المجلدات في ملفك الشخصي، مثل رقص أو غناء أو حفل زفافي، وضع كل فيديو في أحدها.",
- "stb_search": "بحث"
+ "stb_search": "بحث",
+ "fld_series_on": "ترقيم كسلسلة",
+ "fld_series_off": "إيقاف الترقيم",
+ "fld_set_number": "تعيين الرقم",
+ "fld_move_up": "تحريك لأعلى",
+ "fld_move_down": "تحريك لأسفل",
+ "fld_number_hint": "رقم من 1 إلى %1$s",
+ "fld_part_of": "الجزء %1$s من %2$s",
+ "fld_series": "سلسلة",
+ "fname_video_series": "سلاسل مرقّمة",
+ "fblurb_video_series": "حوّل أي مجلد إلى سلسلة مرقّمة من #1 إلى #100 ورتّب الفيديوهات كما تريد."
 }

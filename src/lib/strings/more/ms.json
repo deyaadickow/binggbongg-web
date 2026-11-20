@@ -1888,5 +1888,15 @@
  "fld_moved": "Dialihkan ke %1$s",
  "fname_profile_folders": "Folder Video",
  "fblurb_profile_folders": "Buat seberapa banyak folder yang anda mahu di profil anda, seperti Menari, Menyanyi atau Perkahwinan Saya, dan letakkan setiap video dalam satu.",
- "stb_search": "Cari"
+ "stb_search": "Cari",
+ "fld_series_on": "Nomborkan sebagai siri",
+ "fld_series_off": "Berhenti menomborkan",
+ "fld_set_number": "Tetapkan nombor",
+ "fld_move_up": "Alih ke atas",
+ "fld_move_down": "Alih ke bawah",
+ "fld_number_hint": "Nombor 1 hingga %1$s",
+ "fld_part_of": "Bahagian %1$s daripada %2$s",
+ "fld_series": "Siri",
+ "fname_video_series": "Siri Bernombor",
+ "fblurb_video_series": "Jadikan mana-mana folder siri bernombor, #1 hingga #100, dan susun video mengikut urutan anda sendiri."
 }

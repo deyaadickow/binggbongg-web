@@ -2580,4 +2580,15 @@ export const id = {
   fblurb_profile_folders: "Buat folder sebanyak yang kamu mau di profilmu, seperti Menari, Menyanyi atau Pernikahanku, lalu masukkan setiap video ke salah satunya.",
   // "Search · <topic>" bar under every video (2026-11-20).
   stb_search: "Cari",
+  // Numbered series in folders (2026-11-20)
+  fld_series_on: "Nomori sebagai seri",
+  fld_series_off: "Berhenti menomori",
+  fld_set_number: "Atur nomor",
+  fld_move_up: "Naikkan",
+  fld_move_down: "Turunkan",
+  fld_number_hint: "Nomor 1 sampai %1$s",
+  fld_part_of: "Bagian %1$s dari %2$s",
+  fld_series: "Seri",
+  fname_video_series: "Seri Bernomor",
+  fblurb_video_series: "Jadikan folder mana pun seri bernomor, #1 sampai #100, dan atur urutan videonya sesukamu.",
 };

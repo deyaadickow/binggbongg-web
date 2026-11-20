@@ -1888,5 +1888,15 @@
  "fld_moved": "已移到 %1$s",
  "fname_profile_folders": "视频文件夹",
  "fblurb_profile_folders": "在个人主页创建任意数量的文件夹，例如舞蹈、唱歌或我的婚礼，把每个视频放进其中一个。",
- "stb_search": "搜索"
+ "stb_search": "搜索",
+ "fld_series_on": "编号成系列",
+ "fld_series_off": "停止编号",
+ "fld_set_number": "设置编号",
+ "fld_move_up": "上移",
+ "fld_move_down": "下移",
+ "fld_number_hint": "编号 1 到 %1$s",
+ "fld_part_of": "第 %1$s 集，共 %2$s 集",
+ "fld_series": "系列",
+ "fname_video_series": "编号系列",
+ "fblurb_video_series": "把任何文件夹变成 #1 到 #100 的编号系列，并按你的顺序排列视频。"
 }

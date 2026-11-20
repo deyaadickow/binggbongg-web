@@ -1888,5 +1888,15 @@
  "fld_moved": "%1$s میں منتقل ہو گیا",
  "fname_profile_folders": "ویڈیو فولڈرز",
  "fblurb_profile_folders": "اپنے پروفائل پر جتنے چاہیں فولڈر بنائیں، جیسے ڈانس، گانا یا میری شادی، اور ہر ویڈیو کو ایک میں رکھیں۔",
- "stb_search": "تلاش"
+ "stb_search": "تلاش",
+ "fld_series_on": "سیریز کے طور پر نمبر دیں",
+ "fld_series_off": "نمبر دینا بند کریں",
+ "fld_set_number": "نمبر مقرر کریں",
+ "fld_move_up": "اوپر کریں",
+ "fld_move_down": "نیچے کریں",
+ "fld_number_hint": "1 سے %1$s تک نمبر",
+ "fld_part_of": "حصہ %1$s از %2$s",
+ "fld_series": "سیریز",
+ "fname_video_series": "نمبر والی سیریز",
+ "fblurb_video_series": "کسی بھی فولڈر کو #1 سے #100 تک نمبر والی سیریز بنائیں اور ویڈیوز اپنی ترتیب میں رکھیں۔"
 }

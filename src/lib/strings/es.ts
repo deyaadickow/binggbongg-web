@@ -2544,4 +2544,15 @@ export const es = {
   fblurb_profile_folders: "Crea todas las carpetas que quieras en tu perfil, como Baile, Canto o Mi boda, y pon cada video en una.",
   // "Search · <topic>" bar under every video (2026-11-20).
   stb_search: "Buscar",
+  // Numbered series in folders (2026-11-20)
+  fld_series_on: "Numerar como serie",
+  fld_series_off: "Dejar de numerar",
+  fld_set_number: "Poner número",
+  fld_move_up: "Subir",
+  fld_move_down: "Bajar",
+  fld_number_hint: "Número del 1 al %1$s",
+  fld_part_of: "Parte %1$s de %2$s",
+  fld_series: "Serie",
+  fname_video_series: "Series numeradas",
+  fblurb_video_series: "Convierte cualquier carpeta en una serie numerada, del #1 al #100, y ordena los videos a tu manera.",
 };

@@ -8,10 +8,11 @@ import { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { tt, useT } from "../lib/i18n";
 import { mediaUrl } from "../lib/api";
+import { Link } from "react-router-dom";
 import { showGoldAlert, showGoldConfirm } from "./GoldToast";
 import {
   FOLDER_NAME_MAX, FOLDERS_CHANGED, announceFoldersChanged, createPostFolder, deletePostFolder,
-  fetchPostFolders, renamePostFolder, type PostFolder,
+  fetchPostFolders, fetchPostSeriesInfo, renamePostFolder, setFolderSeries, type PostFolder, type SeriesInfo,
 } from "../lib/folders";
 
 const chip = (active: boolean): React.CSSProperties => ({
@@ -189,12 +190,22 @@ export function ProfileFolders({ profileId, isMe, myId, selected, onSelect }: {
     announceFoldersChanged();
   }
 
+  async function toggleSeries(f: PostFolder) {
+    setMenuFor(null);
+    if (!myId) return;
+    const r = await setFolderSeries(myId, f.id, !f.is_series);
+    if (!r.status) { showGoldAlert(r.message || "Error"); return; }
+    announceFoldersChanged();
+    // The open folder's order changed: open it again.
+    if (selected === f.id) { onSelect(0); window.setTimeout(() => onSelect(f.id), 0); }
+  }
+
   const menuFolder = folders.find((f) => f.id === menuFor) ?? null;
   return (
     <div className="profile-folders" style={{ display: "flex", gap: 10, overflowX: "auto", padding: "10px 2px 12px", alignItems: "flex-end" }}>
       <FolderTile label={t("fld_all_videos")} active={selected === 0} icon="▦" onClick={() => onSelect(0)} />
       {folders.map((f) => (
-        <FolderTile key={f.id} label={f.name} count={f.post_count} cover={f.cover} active={selected === f.id}
+        <FolderTile key={f.id} label={f.name} count={f.post_count} cover={f.cover} active={selected === f.id} series={!!f.is_series}
           onClick={() => onSelect(f.id)}
           onMenu={isMe ? () => setMenuFor(f.id) : undefined} />
       ))}
@@ -208,6 +219,7 @@ export function ProfileFolders({ profileId, isMe, myId, selected, onSelect }: {
             <h3 style={{ margin: "0 0 14px", color: "var(--gold)" }}>📁 {menuFolder.name}</h3>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               <button className="btn" style={{ color: "var(--gold)", background: "#000", borderColor: "var(--gold-border)" }} onClick={() => void rename(menuFolder)}>✏️ {t("fld_rename")}</button>
+              <button className="btn" style={{ color: "var(--gold)", background: "#000", borderColor: "var(--gold-border)" }} onClick={() => void toggleSeries(menuFolder)}>#️⃣ {t(menuFolder.is_series ? "fld_series_off" : "fld_series_on")}</button>
               <button className="btn" style={{ color: "#ff6b6b", background: "#000", borderColor: "var(--gold-border)" }} onClick={() => void remove(menuFolder)}>🗑️ {t("fld_delete")}</button>
               <button className="btn" onClick={() => setMenuFor(null)}>{t("fld_cancel")}</button>
             </div>
@@ -224,8 +236,8 @@ export function ProfileFolders({ profileId, isMe, myId, selected, onSelect }: {
  * Gold tab on top, gold-outlined front showing the first video's thumbnail (dark with an icon when
  * empty), and the name + count on a dark strip along the bottom. Owner: hold / right-click / ⋮.
  */
-function FolderTile({ label, count, cover, icon, active, dashed, onClick, onMenu }: {
-  label: string; count?: number; cover?: string | null; icon?: string; active?: boolean; dashed?: boolean;
+function FolderTile({ label, count, cover, icon, active, dashed, series, onClick, onMenu }: {
+  label: string; count?: number; cover?: string | null; icon?: string; active?: boolean; dashed?: boolean; series?: boolean;
   onClick: () => void; onMenu?: () => void;
 }) {
   const hold = useRef<number | null>(null);
@@ -251,6 +263,10 @@ function FolderTile({ label, count, cover, icon, active, dashed, onClick, onMenu
           <span style={{ position: "absolute", inset: "0 0 28px 0", display: "flex", alignItems: "center", justifyContent: "center",
             color: "var(--gold)", fontSize: icon === "+" ? 34 : 28, fontWeight: 800 }}>{icon ?? <GoldFolderIcon />}</span>
         )}
+        {series && (
+          <span style={{ position: "absolute", top: 3, left: 3, padding: "1px 6px", borderRadius: 8, background: "var(--gold-border)",
+            color: "#000", fontWeight: 900, fontSize: 10.5 }}>#1…{count}</span>
+        )}
         {onMenu && (
           <span role="button" aria-label="⋮" onPointerDown={(e) => e.stopPropagation()}
             onClick={(e) => { e.stopPropagation(); onMenu(); }}
@@ -274,5 +290,65 @@ function GoldFolderIcon() {
     <svg width="34" height="28" viewBox="0 0 34 28" aria-hidden="true">
       <path d="M2 5a3 3 0 0 1 3-3h8l3 3h13a3 3 0 0 1 3 3v15a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3z" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinejoin="round" />
     </svg>
+  );
+}
+
+/** Gold "Set number" box for a numbered series: resolves 1..max, or null. */
+export function askNumber(current: number, max: number): Promise<number | null> {
+  return new Promise((resolve) => {
+    mount((close) => {
+      function Dialog() {
+        const [v, setV] = useState(String(current));
+        const done = (n: number | null) => { close(); resolve(n); };
+        const n = Number(v);
+        const ok = Number.isInteger(n) && n >= 1 && n <= max;
+        return (
+          <div style={overlay} onClick={() => done(null)}>
+            <div className="card pad" style={{ ...card, textAlign: "center" }} onClick={(e) => e.stopPropagation()}>
+              <h3 style={{ margin: "0 0 12px", color: "var(--gold)" }}>{tt("fld_set_number")}</h3>
+              <input className="input" autoFocus inputMode="numeric" value={v} onChange={(e) => setV(e.target.value.replace(/\D/g, ""))}
+                onKeyDown={(e) => { if (e.key === "Enter" && ok) done(n); }}
+                style={{ width: 120, textAlign: "center", fontSize: 22, fontWeight: 800, color: "var(--gold)", borderColor: "var(--gold-border)", background: "#000" }} />
+              <p style={{ margin: "8px 0 0", opacity: .8 }}>{tt("fld_number_hint", max)}</p>
+              <div style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 14 }}>
+                <button className="btn" onClick={() => done(null)} style={{ minWidth: 110 }}>{tt("fld_cancel")}</button>
+                <button className="btn" disabled={!ok} onClick={() => done(n)} style={goldBtn}>{tt("fld_save")}</button>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      return <Dialog />;
+    });
+  });
+}
+
+/**
+ * Under a video in a numbered-series folder (2026-11-20): "Dancing · Part 3 of 12" with ‹ › for
+ * the previous / next part. Renders nothing for any other video (and asks the server only when
+ * the video is in a folder at all).
+ */
+export function FolderPartChip({ postId, folderId, style }: { postId: number; folderId?: number | null; style?: React.CSSProperties }) {
+  const { t } = useT();
+  const [info, setInfo] = useState<SeriesInfo | null>(null);
+  useEffect(() => {
+    setInfo(null);
+    if (!folderId) return;
+    let live = true;
+    void fetchPostSeriesInfo(postId).then((i) => { if (live) setInfo(i); });
+    return () => { live = false; };
+  }, [postId, folderId]);
+  if (!info?.is_series || !info.position || !info.count) return null;
+  const nav = (id?: number | null, label?: string) => id
+    ? <Link to={`/video/${id}`} aria-label={label} style={{ color: "#000", background: "var(--gold-border)", borderRadius: 10, padding: "0 8px", fontWeight: 900 }}>{label === "prev" ? "‹" : "›"}</Link>
+    : null;
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6, color: "var(--gold)", fontWeight: 800, fontSize: 13, ...style }}>
+      {nav(info.prev_id, "prev")}
+      <span style={{ border: "1px solid var(--gold-border)", borderRadius: 10, padding: "1px 8px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+        📁 {info.folder_name} · {t("fld_part_of", info.position, info.count)}
+      </span>
+      {nav(info.next_id, "next")}
+    </div>
   );
 }

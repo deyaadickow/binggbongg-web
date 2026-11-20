@@ -16,6 +16,8 @@ export interface PostFolder {
   sort: number;
   post_count: number;
   cover?: string | null;
+  /** A numbered series: the owner's order, #1 first (2026-11-20). */
+  is_series?: boolean;
 }
 
 export const FOLDER_NAME_MAX = 30;
@@ -48,4 +50,25 @@ export const setPostFolder = (myId: number, postId: number, folderId: number) =>
 export const FOLDERS_CHANGED = "bb:post-folders-changed";
 export function announceFoldersChanged() {
   window.dispatchEvent(new Event(FOLDERS_CHANGED));
+}
+
+// ---- Numbered series (Steve, 2026-11-20: "organize and number their videos ... from video #1
+// through Video #100"). A series folder lists in the owner's order, #1 first.
+export const setFolderSeries = (myId: number, folderId: number, on: boolean) =>
+  write("setFolderSeries", { user_id: myId, folder_id: folderId, on: on ? 1 : 0 });
+
+/** Give a video number `position` in its folder; the rest shift. Answers the new order (ids). */
+export async function setPostPosition(myId: number, postId: number, position: number): Promise<{ ok: boolean; order: number[]; count?: number; message?: string }> {
+  const r = (await post("setPostPosition", { user_id: myId, post_id: postId, position })) as unknown as { status?: boolean; order?: number[]; count?: number; message?: string };
+  return { ok: !!r.status, order: Array.isArray(r.order) ? r.order.map(Number) : [], count: r.count, message: r.message };
+}
+
+export interface SeriesInfo { is_series: boolean; position?: number; count?: number; folder_name?: string; prev_id?: number | null; next_id?: number | null }
+
+export async function fetchPostSeriesInfo(postId: number): Promise<SeriesInfo> {
+  try {
+    return (await post("fetchPostSeriesInfo", { post_id: postId })) as unknown as SeriesInfo;
+  } catch {
+    return { is_series: false };
+  }
 }

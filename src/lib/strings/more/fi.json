@@ -1879,5 +1879,15 @@
  "fld_moved": "Siirretty kansioon %1$s",
  "fname_profile_folders": "Videokansiot",
  "fblurb_profile_folders": "Tee profiiliisi niin monta kansiota kuin haluat, kuten Tanssi, Laulu tai Häämme, ja laita jokainen video yhteen.",
- "stb_search": "Hae"
+ "stb_search": "Hae",
+ "fld_series_on": "Numeroi sarjaksi",
+ "fld_series_off": "Lopeta numerointi",
+ "fld_set_number": "Aseta numero",
+ "fld_move_up": "Siirrä ylös",
+ "fld_move_down": "Siirrä alas",
+ "fld_number_hint": "Numero 1–%1$s",
+ "fld_part_of": "Osa %1$s/%2$s",
+ "fld_series": "Sarja",
+ "fname_video_series": "Numeroidut sarjat",
+ "fblurb_video_series": "Tee mistä tahansa kansiosta numeroitu sarja #1–#100 ja järjestä videot omaan järjestykseesi."
 }

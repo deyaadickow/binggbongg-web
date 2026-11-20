@@ -1888,5 +1888,15 @@
  "fld_moved": "已移到 %1$s",
  "fname_profile_folders": "影片資料夾",
  "fblurb_profile_folders": "在個人檔案建立任意數量的資料夾，例如舞蹈、唱歌或我的婚禮，把每部影片放進其中一個。",
- "stb_search": "搜尋"
+ "stb_search": "搜尋",
+ "fld_series_on": "編號成系列",
+ "fld_series_off": "停止編號",
+ "fld_set_number": "設定編號",
+ "fld_move_up": "上移",
+ "fld_move_down": "下移",
+ "fld_number_hint": "編號 1 到 %1$s",
+ "fld_part_of": "第 %1$s 集，共 %2$s 集",
+ "fld_series": "系列",
+ "fname_video_series": "編號系列",
+ "fblurb_video_series": "把任何資料夾變成 #1 到 #100 的編號系列，並依你的順序排列影片。"
 }

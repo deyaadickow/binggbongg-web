@@ -1881,5 +1881,15 @@
  "fld_moved": "Áthelyezve ide: %1$s",
  "fname_profile_folders": "Videómappák",
  "fblurb_profile_folders": "Hozz létre annyi mappát a profilodon, amennyit szeretnél, például Tánc, Ének vagy Az esküvőm, és tegyél minden videót egybe.",
- "stb_search": "Keresés"
+ "stb_search": "Keresés",
+ "fld_series_on": "Számozás sorozatként",
+ "fld_series_off": "Számozás leállítása",
+ "fld_set_number": "Szám beállítása",
+ "fld_move_up": "Feljebb",
+ "fld_move_down": "Lejjebb",
+ "fld_number_hint": "Szám 1 és %1$s között",
+ "fld_part_of": "%1$s. rész / %2$s",
+ "fld_series": "Sorozat",
+ "fname_video_series": "Számozott sorozatok",
+ "fblurb_video_series": "Bármelyik mappából csinálhatsz számozott sorozatot #1-től #100-ig, a videókat a saját sorrendedbe téve."
 }

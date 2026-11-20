@@ -1887,5 +1887,15 @@
  "fld_moved": "Spostato in %1$s",
  "fname_profile_folders": "Cartelle video",
  "fblurb_profile_folders": "Crea tutte le cartelle che vuoi sul tuo profilo, come Ballo, Canto o Il mio matrimonio, e metti ogni video in una.",
- "stb_search": "Cerca"
+ "stb_search": "Cerca",
+ "fld_series_on": "Numera come serie",
+ "fld_series_off": "Smetti di numerare",
+ "fld_set_number": "Imposta numero",
+ "fld_move_up": "Sposta su",
+ "fld_move_down": "Sposta giù",
+ "fld_number_hint": "Numero da 1 a %1$s",
+ "fld_part_of": "Parte %1$s di %2$s",
+ "fld_series": "Serie",
+ "fname_video_series": "Serie numerate",
+ "fblurb_video_series": "Trasforma qualsiasi cartella in una serie numerata, dal #1 al #100, e metti i video nel tuo ordine."
 }

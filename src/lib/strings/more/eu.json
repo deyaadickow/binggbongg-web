@@ -1888,5 +1888,15 @@
  "fld_moved": "%1$s karpetara eramana",
  "fname_profile_folders": "Bideo-karpetak",
  "fblurb_profile_folders": "Sortu nahi beste karpeta zure profilean, adibidez Dantza, Kantua edo Nire ezkontza, eta jarri bideo bakoitza batean.",
- "stb_search": "Bilatu"
+ "stb_search": "Bilatu",
+ "fld_series_on": "Zenbakitu serie gisa",
+ "fld_series_off": "Utzi zenbakitzeari",
+ "fld_set_number": "Ezarri zenbakia",
+ "fld_move_up": "Gora",
+ "fld_move_down": "Behera",
+ "fld_number_hint": "1etik %1$s-ra arteko zenbakia",
+ "fld_part_of": "%2$s-tik %1$s. zatia",
+ "fld_series": "Seriea",
+ "fname_video_series": "Serie zenbakituak",
+ "fblurb_video_series": "Bihurtu edozein karpeta serie zenbakitu, #1etik #100era, eta jarri bideoak zure ordenan."
 }

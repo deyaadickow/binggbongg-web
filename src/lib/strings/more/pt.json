@@ -1888,5 +1888,15 @@
  "fld_moved": "Movido para %1$s",
  "fname_profile_folders": "Pastas de vídeos",
  "fblurb_profile_folders": "Crie quantas pastas quiser no seu perfil, como Dança, Canto ou Meu casamento, e coloque cada vídeo em uma.",
- "stb_search": "Pesquisar"
+ "stb_search": "Pesquisar",
+ "fld_series_on": "Numerar como série",
+ "fld_series_off": "Parar de numerar",
+ "fld_set_number": "Definir número",
+ "fld_move_up": "Mover para cima",
+ "fld_move_down": "Mover para baixo",
+ "fld_number_hint": "Número de 1 a %1$s",
+ "fld_part_of": "Parte %1$s de %2$s",
+ "fld_series": "Série",
+ "fname_video_series": "Séries numeradas",
+ "fblurb_video_series": "Transforme qualquer pasta em uma série numerada, do #1 ao #100, e coloque os vídeos na sua ordem."
 }

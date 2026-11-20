@@ -1884,5 +1884,15 @@
  "fld_moved": "Movido a %1$s",
  "fname_profile_folders": "Cartafoles de vídeos",
  "fblurb_profile_folders": "Crea tantos cartafoles como queiras no teu perfil, como Baile, Canto ou A miña voda, e pon cada vídeo nun.",
- "stb_search": "Buscar"
+ "stb_search": "Buscar",
+ "fld_series_on": "Numerar como serie",
+ "fld_series_off": "Deixar de numerar",
+ "fld_set_number": "Poñer número",
+ "fld_move_up": "Subir",
+ "fld_move_down": "Baixar",
+ "fld_number_hint": "Número do 1 ao %1$s",
+ "fld_part_of": "Parte %1$s de %2$s",
+ "fld_series": "Serie",
+ "fname_video_series": "Series numeradas",
+ "fblurb_video_series": "Converte calquera cartafol nunha serie numerada, do #1 ao #100, e ordena os vídeos ao teu xeito."
 }

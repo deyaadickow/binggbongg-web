@@ -1887,5 +1887,15 @@
  "fld_moved": "%1$s に移動しました",
  "fname_profile_folders": "動画フォルダ",
  "fblurb_profile_folders": "プロフィールにフォルダをいくつでも作れます。ダンス、歌、私の結婚式など、動画をそれぞれのフォルダに入れましょう。",
- "stb_search": "検索"
+ "stb_search": "検索",
+ "fld_series_on": "シリーズとして番号を付ける",
+ "fld_series_off": "番号付けをやめる",
+ "fld_set_number": "番号を設定",
+ "fld_move_up": "上へ移動",
+ "fld_move_down": "下へ移動",
+ "fld_number_hint": "1〜%1$s の番号",
+ "fld_part_of": "パート %1$s / %2$s",
+ "fld_series": "シリーズ",
+ "fname_video_series": "番号付きシリーズ",
+ "fblurb_video_series": "どのフォルダも #1〜#100 の番号付きシリーズにして、動画を好きな順に並べられます。"
 }

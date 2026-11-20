@@ -1885,5 +1885,15 @@
  "fld_moved": "Fært í %1$s",
  "fname_profile_folders": "Myndbandamöppur",
  "fblurb_profile_folders": "Búðu til eins margar möppur og þú vilt á prófílnum þínum, eins og Dans, Söngur eða Brúðkaupið mitt, og settu hvert myndband í eina.",
- "stb_search": "Leita"
+ "stb_search": "Leita",
+ "fld_series_on": "Númera sem röð",
+ "fld_series_off": "Hætta að númera",
+ "fld_set_number": "Setja númer",
+ "fld_move_up": "Færa upp",
+ "fld_move_down": "Færa niður",
+ "fld_number_hint": "Númer frá 1 til %1$s",
+ "fld_part_of": "Hluti %1$s af %2$s",
+ "fld_series": "Röð",
+ "fname_video_series": "Númeraðar raðir",
+ "fblurb_video_series": "Gerðu hvaða möppu sem er að númeraðri röð, #1 til #100, og raðaðu myndböndunum eins og þú vilt."
 }

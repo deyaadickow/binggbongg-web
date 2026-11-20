@@ -13,8 +13,8 @@ import { memberLabel, trackPage } from "../lib/pageTracker";
 import { ReportDialog } from "../components/ReportDialog";
 import { Avatar, Loading, Notice } from "../components/Common";
 import { fetchUserPhotos, type Photo } from "../lib/photos";
-import { ProfileFolders, pickFolder } from "../components/ProfileFolders";
-import { setPostFolder, announceFoldersChanged } from "../lib/folders";
+import { ProfileFolders, askNumber, pickFolder } from "../components/ProfileFolders";
+import { setPostFolder, setPostPosition, announceFoldersChanged } from "../lib/folders";
 import { MemberBusinessesPanel, MyBusinessesPanel } from "./BusinessPages";
 import { ScheduleSection } from "../components/ScheduleSection";
 import { PodcastProfileSection } from "../components/PodcastBits";
@@ -66,6 +66,8 @@ interface ProfilePost extends Post {
   pinned_at?: string | null;
   /** Profile video folders (2026-11-20): the folder this video is in, if any. */
   folder_id?: number | null;
+  /** Its number inside a numbered-series folder (2026-11-20). */
+  folder_pos?: number | null;
   user_video_number?: number;
   lifetime_votes?: number;
   this_month_votes?: number;
@@ -111,7 +113,7 @@ function PinGlyph({ size = 12 }: { size?: number }) {
   );
 }
 
-function ProfileThumb({ p, isMe, onClick, onMenu }: { p: ProfilePost; isMe: boolean; onClick: () => void; onMenu?: () => void }) {
+function ProfileThumb({ p, isMe, onClick, onMenu, seriesNo }: { p: ProfilePost; isMe: boolean; onClick: () => void; onMenu?: () => void; seriesNo?: number }) {
   const { t } = useT();
   const thumb = mediaUrl(p.thumbnail);
   const navigate = useNavigate();
@@ -157,7 +159,11 @@ function ProfileThumb({ p, isMe, onClick, onMenu }: { p: ProfilePost; isMe: bool
         <div style={{ width: "100%", height: "100%", background: "#111", display: "flex", alignItems: "center", justifyContent: "center", color: "#333", fontSize: 28 }}>▶</div>
       )}
       {(p.views ?? 0) > 0 && <span className="p-views">{fmt(p.views)}</span>}
-      {p.pinned_at && <span className="p-pin" title={t("pin_badge")}><PinGlyph /></span>}
+      {p.pinned_at && !seriesNo && <span className="p-pin" title={t("pin_badge")}><PinGlyph /></span>}
+      {/* Numbered series (2026-11-20): the video's number in the folder, gold. */}
+      {seriesNo != null && (
+        <span style={{ position: "absolute", top: 6, left: 6, padding: "2px 8px", borderRadius: 10, background: "var(--gold-border)", color: "#000", fontWeight: 900, fontSize: 13, zIndex: 2 }}>#{seriesNo}</span>
+      )}
       {/* Creators and money (2026-11-17): subscriber-only / unbought series episode. */}
       <LockBadge lock={p.locked} />
       {(p.lifetime_votes ?? 0) > 0 && <span className="p-votes">★ {fmt(p.lifetime_votes)}</span>}
@@ -377,6 +383,9 @@ export function ProfilePage() {
   const [menuFor, setMenuFor] = useState<ProfilePost | null>(null);
   /** Profile video folders (2026-11-20): the open folder on the Videos tab, 0 = All videos. */
   const [folderSel, setFolderSel] = useState(0);
+  /** The open folder is a numbered series: #N badges + Set number in the menu. */
+  const [folderSeries, setFolderSeries] = useState(false);
+  const [folderCount, setFolderCount] = useState(0);
   const [tabUsers, setTabUsers] = useState<UserSummary[]>([]);
   // Photos are neither posts nor members, so they get their own bucket rather than being
   // squeezed through tabVideos (different fields, different click target).
@@ -552,6 +561,7 @@ export function ProfilePage() {
           // Reposted and Likes are join rows carrying the post under `post`; Videos/Saved/History
           // are already posts. `?? row` keeps both shapes working through one path.
           const vids = items.map((row) => (row.post ?? row) as ProfilePost).filter(Boolean);
+          if (tab === "videos") { setFolderSeries(folderSel > 0 && r.folder_series === true); setFolderCount(Number(r.count ?? vids.length)); }
           setTabVideos(vids);
           // Dev server: the Creators mock's locks over the real list.
           if (import.meta.env.DEV) void devCreatorDecorate(vids).then(setTabVideos);
@@ -999,6 +1009,7 @@ export function ProfilePage() {
                   isMe={isMe}
                   onClick={() => navigate(`/video/${p.id}`)}
                   onMenu={isMe && tab === "videos" ? () => setMenuFor(p) : undefined}
+                  seriesNo={tab === "videos" && folderSeries ? (p.folder_pos ?? undefined) : undefined}
                 />
               ))}
             </div>
@@ -1011,6 +1022,23 @@ export function ProfilePage() {
         <OwnVideoMenu
           post={menuFor}
           onClose={() => setMenuFor(null)}
+          series={folderSeries ? { pos: menuFor.folder_pos ?? 1, count: Math.max(folderCount, tabVideos.length) } : undefined}
+          onNumber={async (how) => {
+            const target = menuFor;
+            setMenuFor(null);
+            const cur = target.folder_pos ?? 1;
+            const max = Math.max(folderCount, tabVideos.length);
+            const to = how === "up" ? cur - 1 : how === "down" ? cur + 1 : await askNumber(cur, max);
+            if (to == null || to === cur || to < 1 || to > max) return;
+            const r = await setPostPosition(socialMe.id, target.id, to);
+            if (!r.ok) { showGoldAlert(r.message || "Something went wrong. Please try again."); return; }
+            // The server's whole order; keep the videos this page has loaded, numbered as the server has them.
+            setTabVideos((list) => r.order.flatMap((id, i): ProfilePost[] => {
+              const v = list.find((x) => x.id === id);
+              return v ? [{ ...v, folder_pos: i + 1 }] : [];
+            }));
+            announceFoldersChanged();
+          }}
           onMove={async () => {
             const target = menuFor;
             setMenuFor(null);
@@ -1099,7 +1127,10 @@ export function ProfilePage() {
 
 /** The gold hold menu on your own video tile (Steve, 2026-11-20: "redesign it to our design ...
  *  add Pin") — black card, gold border, gold title, one gold-outlined row per action. */
-function OwnVideoMenu({ post: p, onPin, onMove, onDelete, onClose }: { post: ProfilePost; onPin: () => void; onMove: () => void; onDelete: () => void; onClose: () => void }) {
+function OwnVideoMenu({ post: p, onPin, onMove, onDelete, onClose, series, onNumber }: {
+  post: ProfilePost; onPin: () => void; onMove: () => void; onDelete: () => void; onClose: () => void;
+  series?: { pos: number; count: number }; onNumber: (how: "set" | "up" | "down") => void;
+}) {
   const { t } = useT();
   const row: React.CSSProperties = { display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%", padding: "12px 14px", background: "transparent", color: "#fff", border: "1px solid var(--gold-border)", borderRadius: 10, fontSize: 15, fontWeight: 600, cursor: "pointer" };
   return (
@@ -1110,6 +1141,12 @@ function OwnVideoMenu({ post: p, onPin, onMove, onDelete, onClose }: { post: Pro
         <div style={{ height: 2, margin: "10px -8px 12px", background: "linear-gradient(90deg, transparent, var(--gold-border), transparent)" }} />
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           <button style={row} onClick={onPin}><span style={{ color: "var(--gold)", display: "inline-flex" }}><PinGlyph size={14} /></span>{t(p.pinned_at ? "pin_unpin" : "pin_to_top")}</button>
+          {/* Numbered series (2026-11-20): #N inside the open folder. */}
+          {series && (<>
+            <button style={row} onClick={() => onNumber("set")}><span style={{ color: "var(--gold)" }}>#{series.pos}</span>{t("fld_set_number")}</button>
+            {series.pos > 1 && <button style={row} onClick={() => onNumber("up")}><span style={{ color: "var(--gold)" }}>▲</span>{t("fld_move_up")}</button>}
+            {series.pos < series.count && <button style={row} onClick={() => onNumber("down")}><span style={{ color: "var(--gold)" }}>▼</span>{t("fld_move_down")}</button>}
+          </>)}
           {/* Profile video folders (2026-11-20). */}
           <button style={row} onClick={onMove}><span style={{ color: "var(--gold)" }}>📁</span>{t("fld_move")}</button>
           <button style={row} onClick={onDelete}>{t("delete")}</button>

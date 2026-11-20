@@ -1888,5 +1888,15 @@
  "fld_moved": "%1$s klasörüne taşındı",
  "fname_profile_folders": "Video Klasörleri",
  "fblurb_profile_folders": "Profilinde istediğin kadar klasör oluştur, Dans, Şarkı ya da Düğünüm gibi, ve her videoyu birine koy.",
- "stb_search": "Ara"
+ "stb_search": "Ara",
+ "fld_series_on": "Seri olarak numarala",
+ "fld_series_off": "Numaralamayı bırak",
+ "fld_set_number": "Numara ver",
+ "fld_move_up": "Yukarı taşı",
+ "fld_move_down": "Aşağı taşı",
+ "fld_number_hint": "1 ile %1$s arasında numara",
+ "fld_part_of": "Bölüm %1$s / %2$s",
+ "fld_series": "Seri",
+ "fname_video_series": "Numaralı Seriler",
+ "fblurb_video_series": "Herhangi bir klasörü #1'den #100'e numaralı bir seriye çevir ve videoları kendi sıranla diz."
 }

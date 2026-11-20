@@ -1883,5 +1883,15 @@
  "fld_moved": "Mutat în %1$s",
  "fname_profile_folders": "Dosare video",
  "fblurb_profile_folders": "Creează câte dosare vrei pe profilul tău, cum ar fi Dans, Cântat sau Nunta mea, și pune fiecare videoclip într-unul.",
- "stb_search": "Caută"
+ "stb_search": "Caută",
+ "fld_series_on": "Numerotează ca serie",
+ "fld_series_off": "Oprește numerotarea",
+ "fld_set_number": "Setează numărul",
+ "fld_move_up": "Mută în sus",
+ "fld_move_down": "Mută în jos",
+ "fld_number_hint": "Număr de la 1 la %1$s",
+ "fld_part_of": "Partea %1$s din %2$s",
+ "fld_series": "Serie",
+ "fname_video_series": "Serii numerotate",
+ "fblurb_video_series": "Transformă orice dosar într-o serie numerotată, de la #1 la #100, și pune videoclipurile în ordinea ta."
 }

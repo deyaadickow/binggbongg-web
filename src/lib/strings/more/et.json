@@ -1885,5 +1885,15 @@
  "fld_moved": "Teisaldatud kausta %1$s",
  "fname_profile_folders": "Videokaustad",
  "fblurb_profile_folders": "Tee oma profiilile nii palju kaustu kui soovid, näiteks Tants, Laul või Minu pulm, ja pane iga video ühte neist.",
- "stb_search": "Otsi"
+ "stb_search": "Otsi",
+ "fld_series_on": "Nummerda sarjana",
+ "fld_series_off": "Lõpeta nummerdamine",
+ "fld_set_number": "Määra number",
+ "fld_move_up": "Liiguta üles",
+ "fld_move_down": "Liiguta alla",
+ "fld_number_hint": "Number 1 kuni %1$s",
+ "fld_part_of": "Osa %1$s / %2$s",
+ "fld_series": "Sari",
+ "fname_video_series": "Nummerdatud sarjad",
+ "fblurb_video_series": "Tee mis tahes kaustast nummerdatud sari #1 kuni #100 ja pane videod oma järjekorda."
 }

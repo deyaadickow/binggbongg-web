@@ -1885,5 +1885,15 @@
  "fld_moved": "Perkelta į %1$s",
  "fname_profile_folders": "Vaizdo įrašų aplankai",
  "fblurb_profile_folders": "Susikurk profilyje kiek nori aplankų, pvz., Šokiai, Dainos ar Mano vestuvės, ir kiekvieną vaizdo įrašą įdėk į vieną.",
- "stb_search": "Ieškoti"
+ "stb_search": "Ieškoti",
+ "fld_series_on": "Numeruoti kaip seriją",
+ "fld_series_off": "Nebenumeruoti",
+ "fld_set_number": "Nustatyti numerį",
+ "fld_move_up": "Perkelti aukštyn",
+ "fld_move_down": "Perkelti žemyn",
+ "fld_number_hint": "Numeris nuo 1 iki %1$s",
+ "fld_part_of": "%1$s dalis iš %2$s",
+ "fld_series": "Serija",
+ "fname_video_series": "Numeruotos serijos",
+ "fblurb_video_series": "Paversk bet kurį aplanką numeruota serija nuo #1 iki #100 ir sudėliok vaizdo įrašus savo tvarka."
 }

@@ -1888,5 +1888,15 @@
  "fld_moved": "Déplacé vers %1$s",
  "fname_profile_folders": "Dossiers vidéo",
  "fblurb_profile_folders": "Crée autant de dossiers que tu veux sur ton profil, comme Danse, Chant ou Mon mariage, et range chaque vidéo dans l'un d'eux.",
- "stb_search": "Rechercher"
+ "stb_search": "Rechercher",
+ "fld_series_on": "Numéroter en série",
+ "fld_series_off": "Arrêter la numérotation",
+ "fld_set_number": "Définir le numéro",
+ "fld_move_up": "Monter",
+ "fld_move_down": "Descendre",
+ "fld_number_hint": "Numéro de 1 à %1$s",
+ "fld_part_of": "Partie %1$s sur %2$s",
+ "fld_series": "Série",
+ "fname_video_series": "Séries numérotées",
+ "fblurb_video_series": "Transforme n'importe quel dossier en série numérotée, du #1 au #100, et range les vidéos dans ton ordre."
 }

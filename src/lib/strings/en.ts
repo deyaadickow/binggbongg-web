@@ -3526,4 +3526,15 @@ export const en = {
   fblurb_profile_folders: "Make as many folders as you want on your profile, like Dancing, Singing or My Wedding, and put each video in one.",
   // "Search · <topic>" bar under every video (2026-11-20).
   stb_search: "Search",
+  // Numbered series in folders (2026-11-20)
+  fld_series_on: "Number as a series",
+  fld_series_off: "Stop numbering",
+  fld_set_number: "Set number",
+  fld_move_up: "Move up",
+  fld_move_down: "Move down",
+  fld_number_hint: "Number from 1 to %1$s",
+  fld_part_of: "Part %1$s of %2$s",
+  fld_series: "Series",
+  fname_video_series: "Numbered Series",
+  fblurb_video_series: "Turn any folder into a numbered series, #1 to #100, and put the videos in your own order.",
 } as const;

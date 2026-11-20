@@ -1888,5 +1888,15 @@
  "fld_moved": "Verplaatst naar %1$s",
  "fname_profile_folders": "Videomappen",
  "fblurb_profile_folders": "Maak zoveel mappen als je wilt op je profiel, zoals Dansen, Zingen of Mijn bruiloft, en zet elke video in één map.",
- "stb_search": "Zoeken"
+ "stb_search": "Zoeken",
+ "fld_series_on": "Nummeren als serie",
+ "fld_series_off": "Stoppen met nummeren",
+ "fld_set_number": "Nummer instellen",
+ "fld_move_up": "Omhoog",
+ "fld_move_down": "Omlaag",
+ "fld_number_hint": "Nummer van 1 tot %1$s",
+ "fld_part_of": "Deel %1$s van %2$s",
+ "fld_series": "Serie",
+ "fname_video_series": "Genummerde series",
+ "fblurb_video_series": "Maak van elke map een genummerde serie, #1 tot #100, en zet de video's in je eigen volgorde."
 }

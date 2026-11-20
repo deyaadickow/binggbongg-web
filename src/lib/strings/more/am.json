@@ -1888,5 +1888,15 @@
  "fld_moved": "ወደ %1$s ተዛውሯል",
  "fname_profile_folders": "የቪዲዮ አቃፊዎች",
  "fblurb_profile_folders": "በመገለጫዎ ላይ የፈለጉትን ያህል አቃፊዎች ይፍጠሩ፣ እንደ ዳንስ፣ ዘፈን ወይም ሰርጌ፣ እና እያንዳንዱን ቪዲዮ በአንዱ ውስጥ ያስቀምጡ።",
- "stb_search": "ፈልግ"
+ "stb_search": "ፈልግ",
+ "fld_series_on": "እንደ ተከታታይ ቁጥር ስጥ",
+ "fld_series_off": "ቁጥር መስጠት አቁም",
+ "fld_set_number": "ቁጥር አዘጋጅ",
+ "fld_move_up": "ወደ ላይ",
+ "fld_move_down": "ወደ ታች",
+ "fld_number_hint": "ቁጥር ከ1 እስከ %1$s",
+ "fld_part_of": "ክፍል %1$s ከ%2$s",
+ "fld_series": "ተከታታይ",
+ "fname_video_series": "ቁጥር ያላቸው ተከታታዮች",
+ "fblurb_video_series": "ማንኛውንም አቃፊ ከ#1 እስከ #100 ቁጥር ያለው ተከታታይ ያድርጉ፣ ቪዲዮዎቹንም በራስዎ ቅደም ተከተል ያስቀምጡ።"
 }
