@@ -1898,5 +1898,8 @@
  "fld_part_of": "Teil %1$s von %2$s",
  "fld_series": "Serie",
  "fname_video_series": "Nummerierte Serien",
- "fblurb_video_series": "Mach aus jedem Ordner eine nummerierte Serie von #1 bis #100 und bring die Videos in deine Reihenfolge."
+ "fblurb_video_series": "Mach aus jedem Ordner eine nummerierte Serie von #1 bis #100 und bring die Videos in deine Reihenfolge.",
+ "fav_create": "Erstellen",
+ "fav_live": "LIVE",
+ "fav_follow": "Folgen"
 }

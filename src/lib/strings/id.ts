@@ -2591,4 +2591,8 @@ export const id = {
   fld_series: "Seri",
   fname_video_series: "Seri Bernomor",
   fblurb_video_series: "Jadikan folder mana pun seri bernomor, #1 sampai #100, dan atur urutan videonya sesukamu.",
+  // Avatar row over the main feed (2026-11-20)
+  fav_create: "Buat",
+  fav_live: "LIVE",
+  fav_follow: "Ikuti",
 };

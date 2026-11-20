@@ -2555,4 +2555,8 @@ export const es = {
   fld_series: "Serie",
   fname_video_series: "Series numeradas",
   fblurb_video_series: "Convierte cualquier carpeta en una serie numerada, del #1 al #100, y ordena los videos a tu manera.",
+  // Avatar row over the main feed (2026-11-20)
+  fav_create: "Crear",
+  fav_live: "EN VIVO",
+  fav_follow: "Seguir",
 };

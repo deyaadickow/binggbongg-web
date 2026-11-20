@@ -1895,5 +1895,8 @@
  "fld_part_of": "%1$s dalis iš %2$s",
  "fld_series": "Serija",
  "fname_video_series": "Numeruotos serijos",
- "fblurb_video_series": "Paversk bet kurį aplanką numeruota serija nuo #1 iki #100 ir sudėliok vaizdo įrašus savo tvarka."
+ "fblurb_video_series": "Paversk bet kurį aplanką numeruota serija nuo #1 iki #100 ir sudėliok vaizdo įrašus savo tvarka.",
+ "fav_create": "Kurti",
+ "fav_live": "TIESIOGIAI",
+ "fav_follow": "Sekti"
 }

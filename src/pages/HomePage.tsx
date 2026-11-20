@@ -7,6 +7,7 @@ import type { NearbyArea } from "../lib/qa";
 import { openRandomLive } from "../lib/liveSwipe";
 import { useSession } from "../lib/session";
 import { PostCard } from "../components/PostCard";
+import { FeedAvatarRow } from "../components/FeedAvatarRow";
 import { Loading, Notice, StoreBadges } from "../components/Common";
 import { getFeedSource, setFeed, setFeedSource } from "../lib/feed";
 import { FeedPhotoCard } from "../components/FeedPhotoCard";
@@ -51,6 +52,8 @@ export function HomePage() {
     return getFeedSource();
   });
   const setTab = (next: FeedTab) => { setFeedSource(next); setTabState(next); };
+  // The avatar row (Steve, 2026-11-20): every chip tap (the active one too) brings it back.
+  const [avatarKey, setAvatarKey] = useState(0);
   useEffect(() => {
     const want = new URLSearchParams(location.search).get("feed");
     if ((want === "nearby" || want === "friends" || want === "following" || want === "foryou") && want !== tab) setTab(want);
@@ -166,7 +169,7 @@ export function HomePage() {
         <div className="fnd-feed-tabs" role="tablist">
           {(["nearby", "friends", "following", "foryou"] as const).map((k) => (
             <button key={k} type="button" role="tab" aria-selected={tab === k} className={tab === k ? "active" : ""}
-              onClick={() => { if (k !== tab) setTab(k); }}>
+              onClick={() => { setAvatarKey((n) => n + 1); if (k !== tab) setTab(k); }}>
               {t(k === "nearby" ? "nb_nearby" : k === "friends" ? "fnd_friends" : k === "following" ? "fnd_following" : "fnd_for_you")}
             </button>
           ))}
@@ -174,6 +177,7 @@ export function HomePage() {
         </div>
         <div className="feed-top-badges"><StoreBadges compact /></div>
       </div>
+      <FeedAvatarRow tab={tab} meId={findingUserId(user?.id) ?? socialUser(user)?.id ?? null} showKey={avatarKey} />
       {needsSignIn && (
         <div className="card pad" style={{ textAlign: "center", marginBottom: 14 }}>
           <p style={{ color: "var(--gold)", fontSize: 16, marginTop: 0 }}>{t("fnd_sign_in_to_see")}</p>

@@ -1895,5 +1895,8 @@
  "fld_part_of": "Osa %1$s / %2$s",
  "fld_series": "Sari",
  "fname_video_series": "Nummerdatud sarjad",
- "fblurb_video_series": "Tee mis tahes kaustast nummerdatud sari #1 kuni #100 ja pane videod oma järjekorda."
+ "fblurb_video_series": "Tee mis tahes kaustast nummerdatud sari #1 kuni #100 ja pane videod oma järjekorda.",
+ "fav_create": "Loo",
+ "fav_live": "OTSE",
+ "fav_follow": "Jälgi"
 }

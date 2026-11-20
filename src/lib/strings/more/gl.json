@@ -1894,5 +1894,8 @@
  "fld_part_of": "Parte %1$s de %2$s",
  "fld_series": "Serie",
  "fname_video_series": "Series numeradas",
- "fblurb_video_series": "Converte calquera cartafol nunha serie numerada, do #1 ao #100, e ordena os vídeos ao teu xeito."
+ "fblurb_video_series": "Converte calquera cartafol nunha serie numerada, do #1 ao #100, e ordena os vídeos ao teu xeito.",
+ "fav_create": "Crear",
+ "fav_live": "EN DIRECTO",
+ "fav_follow": "Seguir"
 }

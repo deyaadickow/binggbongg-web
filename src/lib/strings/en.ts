@@ -3537,4 +3537,8 @@ export const en = {
   fld_series: "Series",
   fname_video_series: "Numbered Series",
   fblurb_video_series: "Turn any folder into a numbered series, #1 to #100, and put the videos in your own order.",
+  // Avatar row over the main feed (2026-11-20)
+  fav_create: "Create",
+  fav_live: "LIVE",
+  fav_follow: "Follow",
 } as const;

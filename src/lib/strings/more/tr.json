@@ -1898,5 +1898,8 @@
  "fld_part_of": "Bölüm %1$s / %2$s",
  "fld_series": "Seri",
  "fname_video_series": "Numaralı Seriler",
- "fblurb_video_series": "Herhangi bir klasörü #1'den #100'e numaralı bir seriye çevir ve videoları kendi sıranla diz."
+ "fblurb_video_series": "Herhangi bir klasörü #1'den #100'e numaralı bir seriye çevir ve videoları kendi sıranla diz.",
+ "fav_create": "Oluştur",
+ "fav_live": "CANLI",
+ "fav_follow": "Takip et"
 }

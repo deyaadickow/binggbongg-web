@@ -1897,5 +1897,8 @@
  "fld_part_of": "Díl %1$s z %2$s",
  "fld_series": "Série",
  "fname_video_series": "Číslované série",
- "fblurb_video_series": "Udělej z jakékoli složky číslovanou sérii od #1 do #100 a seřaď videa po svém."
+ "fblurb_video_series": "Udělej z jakékoli složky číslovanou sérii od #1 do #100 a seřaď videa po svém.",
+ "fav_create": "Vytvořit",
+ "fav_live": "ŽIVĚ",
+ "fav_follow": "Sledovat"
 }

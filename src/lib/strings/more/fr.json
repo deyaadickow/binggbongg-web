@@ -1898,5 +1898,8 @@
  "fld_part_of": "Partie %1$s sur %2$s",
  "fld_series": "Série",
  "fname_video_series": "Séries numérotées",
- "fblurb_video_series": "Transforme n'importe quel dossier en série numérotée, du #1 au #100, et range les vidéos dans ton ordre."
+ "fblurb_video_series": "Transforme n'importe quel dossier en série numérotée, du #1 au #100, et range les vidéos dans ton ordre.",
+ "fav_create": "Créer",
+ "fav_live": "EN DIRECT",
+ "fav_follow": "Suivre"
 }

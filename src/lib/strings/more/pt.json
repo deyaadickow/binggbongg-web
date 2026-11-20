@@ -1898,5 +1898,8 @@
  "fld_part_of": "Parte %1$s de %2$s",
  "fld_series": "Série",
  "fname_video_series": "Séries numeradas",
- "fblurb_video_series": "Transforme qualquer pasta em uma série numerada, do #1 ao #100, e coloque os vídeos na sua ordem."
+ "fblurb_video_series": "Transforme qualquer pasta em uma série numerada, do #1 ao #100, e coloque os vídeos na sua ordem.",
+ "fav_create": "Criar",
+ "fav_live": "AO VIVO",
+ "fav_follow": "Seguir"
 }

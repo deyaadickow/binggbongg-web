@@ -2754,4 +2754,8 @@ export const fil = {
   fld_series: "Serye",
   fname_video_series: "Mga Seryeng May Numero",
   fblurb_video_series: "Gawing seryeng may numero ang kahit anong folder, #1 hanggang #100, at ayusin ang mga video ayon sa gusto mo.",
+  // Avatar row over the main feed (2026-11-20)
+  fav_create: "Gumawa",
+  fav_live: "LIVE",
+  fav_follow: "I-follow",
 };

@@ -1891,5 +1891,8 @@
  "fld_part_of": "%1$s. rész / %2$s",
  "fld_series": "Sorozat",
  "fname_video_series": "Számozott sorozatok",
- "fblurb_video_series": "Bármelyik mappából csinálhatsz számozott sorozatot #1-től #100-ig, a videókat a saját sorrendedbe téve."
+ "fblurb_video_series": "Bármelyik mappából csinálhatsz számozott sorozatot #1-től #100-ig, a videókat a saját sorrendedbe téve.",
+ "fav_create": "Létrehozás",
+ "fav_live": "ÉLŐ",
+ "fav_follow": "Követés"
 }

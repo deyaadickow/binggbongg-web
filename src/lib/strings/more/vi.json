@@ -1898,5 +1898,8 @@
  "fld_part_of": "Phần %1$s / %2$s",
  "fld_series": "Loạt",
  "fname_video_series": "Loạt video đánh số",
- "fblurb_video_series": "Biến bất kỳ thư mục nào thành loạt video đánh số từ #1 đến #100 và sắp xếp video theo thứ tự của bạn."
+ "fblurb_video_series": "Biến bất kỳ thư mục nào thành loạt video đánh số từ #1 đến #100 và sắp xếp video theo thứ tự của bạn.",
+ "fav_create": "Tạo",
+ "fav_live": "TRỰC TIẾP",
+ "fav_follow": "Theo dõi"
 }

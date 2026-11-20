@@ -1897,5 +1897,8 @@
  "fld_part_of": "パート %1$s / %2$s",
  "fld_series": "シリーズ",
  "fname_video_series": "番号付きシリーズ",
- "fblurb_video_series": "どのフォルダも #1〜#100 の番号付きシリーズにして、動画を好きな順に並べられます。"
+ "fblurb_video_series": "どのフォルダも #1〜#100 の番号付きシリーズにして、動画を好きな順に並べられます。",
+ "fav_create": "作成",
+ "fav_live": "ライブ",
+ "fav_follow": "フォロー"
 }

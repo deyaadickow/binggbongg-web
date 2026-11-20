@@ -1898,5 +1898,8 @@
  "fld_part_of": "第 %1$s 集，共 %2$s 集",
  "fld_series": "系列",
  "fname_video_series": "編號系列",
- "fblurb_video_series": "把任何資料夾變成 #1 到 #100 的編號系列，並依你的順序排列影片。"
+ "fblurb_video_series": "把任何資料夾變成 #1 到 #100 的編號系列，並依你的順序排列影片。",
+ "fav_create": "建立",
+ "fav_live": "直播",
+ "fav_follow": "追蹤"
 }

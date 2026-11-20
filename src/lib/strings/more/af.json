@@ -1896,5 +1896,8 @@
  "fld_part_of": "Deel %1$s van %2$s",
  "fld_series": "Reeks",
  "fname_video_series": "Genommerde reekse",
- "fblurb_video_series": "Maak enige vouer 'n genommerde reeks, #1 tot #100, en sit die video's in jou eie volgorde."
+ "fblurb_video_series": "Maak enige vouer 'n genommerde reeks, #1 tot #100, en sit die video's in jou eie volgorde.",
+ "fav_create": "Skep",
+ "fav_live": "REGSTREEKS",
+ "fav_follow": "Volg"
 }

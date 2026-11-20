@@ -1895,5 +1895,8 @@
  "fld_part_of": "Del %1$s av %2$s",
  "fld_series": "Serie",
  "fname_video_series": "Nummererte serier",
- "fblurb_video_series": "Gjør hvilken som helst mappe til en nummerert serie, #1 til #100, og legg videoene i din egen rekkefølge."
+ "fblurb_video_series": "Gjør hvilken som helst mappe til en nummerert serie, #1 til #100, og legg videoene i din egen rekkefølge.",
+ "fav_create": "Opprett",
+ "fav_live": "DIREKTE",
+ "fav_follow": "Følg"
 }

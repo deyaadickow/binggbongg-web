@@ -1898,5 +1898,8 @@
  "fld_part_of": "%2$s-tik %1$s. zatia",
  "fld_series": "Seriea",
  "fname_video_series": "Serie zenbakituak",
- "fblurb_video_series": "Bihurtu edozein karpeta serie zenbakitu, #1etik #100era, eta jarri bideoak zure ordenan."
+ "fblurb_video_series": "Bihurtu edozein karpeta serie zenbakitu, #1etik #100era, eta jarri bideoak zure ordenan.",
+ "fav_create": "Sortu",
+ "fav_live": "ZUZENEAN",
+ "fav_follow": "Jarraitu"
 }
