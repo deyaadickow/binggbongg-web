@@ -74,12 +74,11 @@ export function MemberBadgesPage() {
       {!data && !error && <Loading />}
       {data && (
         <div style={{ display: "grid", gap: 14 }}>
-          <Link to={`/profile/${data.user.id}`} style={{ display: "flex", alignItems: "center", gap: 12, color: gold, textDecoration: "none" }}>
-            <Avatar user={data.user} />
-            <div style={{ minWidth: 0 }}>
-              <div style={{ fontWeight: 800, fontSize: 17 }}>{displayName(data.user)}</div>
-              {data.user.username && <div style={{ opacity: 0.75 }}>@{data.user.username}</div>}
-            </div>
+          {/* Steve, 2026-11-20: "Enlarge the header and center it on top." */}
+          <Link to={`/profile/${data.user.id}`} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, color: gold, textDecoration: "none", textAlign: "center", padding: "4px 0 8px" }}>
+            <Avatar user={data.user} size="lg" />
+            <div style={{ fontWeight: 800, fontSize: 26, lineHeight: 1.15 }}>{displayName(data.user)}</div>
+            {data.user.username && <div style={{ opacity: 0.75, fontSize: 17 }}>@{data.user.username}</div>}
           </Link>
 
           <Card icon={<BattleBadge badge={data.battle_badge} size={40} />} title={t("mb_battle_badge")} body={t("mb_battle_badge_body")} />
