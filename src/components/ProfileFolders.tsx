@@ -8,12 +8,11 @@ import { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { tt, useT } from "../lib/i18n";
 import { mediaUrl } from "../lib/api";
-import { Link } from "react-router-dom";
 import { showGoldAlert, showGoldConfirm } from "./GoldToast";
 import {
   FOLDER_NAME_MAX, FOLDERS_CHANGED, announceFoldersChanged, createPostFolder, deletePostFolder,
   fetchFolderVideos, fetchPostFolders, renamePostFolder, setFolderOrder, setFolderSeries,
-  type FolderVideo, type PostFolder, type SeriesInfo,
+  type FolderVideo, type PostFolder,
 } from "../lib/folders";
 
 const chip = (active: boolean): React.CSSProperties => ({
