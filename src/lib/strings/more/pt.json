@@ -1887,5 +1887,6 @@
  "fld_bad_name": "O nome da pasta deve ter de 1 a 30 caracteres.",
  "fld_moved": "Movido para %1$s",
  "fname_profile_folders": "Pastas de vídeos",
- "fblurb_profile_folders": "Crie quantas pastas quiser no seu perfil, como Dança, Canto ou Meu casamento, e coloque cada vídeo em uma."
+ "fblurb_profile_folders": "Crie quantas pastas quiser no seu perfil, como Dança, Canto ou Meu casamento, e coloque cada vídeo em uma.",
+ "stb_search": "Pesquisar"
 }

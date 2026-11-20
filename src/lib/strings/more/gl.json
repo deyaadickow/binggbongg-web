@@ -1883,5 +1883,6 @@
  "fld_bad_name": "O nome debe ter de 1 a 30 caracteres.",
  "fld_moved": "Movido a %1$s",
  "fname_profile_folders": "Cartafoles de vídeos",
- "fblurb_profile_folders": "Crea tantos cartafoles como queiras no teu perfil, como Baile, Canto ou A miña voda, e pon cada vídeo nun."
+ "fblurb_profile_folders": "Crea tantos cartafoles como queiras no teu perfil, como Baile, Canto ou A miña voda, e pon cada vídeo nun.",
+ "stb_search": "Buscar"
 }

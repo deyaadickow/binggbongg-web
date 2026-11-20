@@ -10,6 +10,7 @@ import { Avatar, Loading, Notice } from "../components/Common";
 import { GiftFlash, PostGiftButton } from "../components/GiftSheet";
 import { appendToFeed, fetchMoreFeed, getFeed, insertIntoFeed, removeFromFeed } from "../lib/feed";
 import { HashtagList, HashtagText } from "../components/HashtagText";
+import { SearchTopicBar } from "../components/SearchTopicBar";
 import { findingUserId, notInterested, postHashtags, splitHashtags, undoNotInterested } from "../lib/finding";
 import { tt, useT  } from "../lib/i18n";
 import { showGoldAlert } from "../components/GoldToast";
@@ -687,6 +688,8 @@ export function VideoPage() {
           <button className={`arrow auto${auto ? " on" : ""}`} onClick={toggleAuto} title={auto ? "Auto-play next: on" : "Auto-play next: off"}>{auto ? "⏭" : "⟳"}</button>
         </div>
       </div>
+      {/* Steve, 2026-11-20: "Search · <what they are talking about>" right under the video, one click to search it. */}
+      <SearchTopicBar post={item} style={{ marginTop: 8 }} />
       <div className="row" style={{ marginTop: 14, alignItems: "flex-start" }}>
         {authorLive ? (
           // Steve, 2026-10-25: a creator who is live or battling gets a LIVE tag above their

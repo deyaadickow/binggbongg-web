@@ -1884,5 +1884,6 @@
  "fld_bad_name": "Heiti möppu verður að vera 1 til 30 stafir.",
  "fld_moved": "Fært í %1$s",
  "fname_profile_folders": "Myndbandamöppur",
- "fblurb_profile_folders": "Búðu til eins margar möppur og þú vilt á prófílnum þínum, eins og Dans, Söngur eða Brúðkaupið mitt, og settu hvert myndband í eina."
+ "fblurb_profile_folders": "Búðu til eins margar möppur og þú vilt á prófílnum þínum, eins og Dans, Söngur eða Brúðkaupið mitt, og settu hvert myndband í eina.",
+ "stb_search": "Leita"
 }

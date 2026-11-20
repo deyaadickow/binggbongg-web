@@ -2578,4 +2578,6 @@ export const id = {
   fld_moved: "Dipindahkan ke %1$s",
   fname_profile_folders: "Folder Video",
   fblurb_profile_folders: "Buat folder sebanyak yang kamu mau di profilmu, seperti Menari, Menyanyi atau Pernikahanku, lalu masukkan setiap video ke salah satunya.",
+  // "Search · <topic>" bar under every video (2026-11-20).
+  stb_search: "Cari",
 };

@@ -1884,5 +1884,6 @@
  "fld_bad_name": "Kausta nimi peab olema 1 kuni 30 märki.",
  "fld_moved": "Teisaldatud kausta %1$s",
  "fname_profile_folders": "Videokaustad",
- "fblurb_profile_folders": "Tee oma profiilile nii palju kaustu kui soovid, näiteks Tants, Laul või Minu pulm, ja pane iga video ühte neist."
+ "fblurb_profile_folders": "Tee oma profiilile nii palju kaustu kui soovid, näiteks Tants, Laul või Minu pulm, ja pane iga video ühte neist.",
+ "stb_search": "Otsi"
 }

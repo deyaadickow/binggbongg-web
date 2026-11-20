@@ -1887,5 +1887,6 @@
  "fld_bad_name": "Der Ordnername muss 1 bis 30 Zeichen lang sein.",
  "fld_moved": "Verschoben nach %1$s",
  "fname_profile_folders": "Video-Ordner",
- "fblurb_profile_folders": "Erstelle so viele Ordner wie du willst in deinem Profil, z. B. Tanzen, Singen oder Meine Hochzeit, und lege jedes Video in einen."
+ "fblurb_profile_folders": "Erstelle so viele Ordner wie du willst in deinem Profil, z. B. Tanzen, Singen oder Meine Hochzeit, und lege jedes Video in einen.",
+ "stb_search": "Suchen"
 }

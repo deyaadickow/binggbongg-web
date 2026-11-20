@@ -1886,5 +1886,6 @@
  "fld_bad_name": "Il nome deve avere da 1 a 30 caratteri.",
  "fld_moved": "Spostato in %1$s",
  "fname_profile_folders": "Cartelle video",
- "fblurb_profile_folders": "Crea tutte le cartelle che vuoi sul tuo profilo, come Ballo, Canto o Il mio matrimonio, e metti ogni video in una."
+ "fblurb_profile_folders": "Crea tutte le cartelle che vuoi sul tuo profilo, come Ballo, Canto o Il mio matrimonio, e metti ogni video in una.",
+ "stb_search": "Cerca"
 }

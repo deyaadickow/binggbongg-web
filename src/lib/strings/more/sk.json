@@ -1887,5 +1887,6 @@
  "fld_bad_name": "Názov musí mať 1 až 30 znakov.",
  "fld_moved": "Presunuté do %1$s",
  "fname_profile_folders": "Priečinky videí",
- "fblurb_profile_folders": "Vytvor si na profile toľko priečinkov, koľko chceš, napr. Tanec, Spev alebo Moja svadba, a daj každé video do jedného."
+ "fblurb_profile_folders": "Vytvor si na profile toľko priečinkov, koľko chceš, napr. Tanec, Spev alebo Moja svadba, a daj každé video do jedného.",
+ "stb_search": "Hľadať"
 }

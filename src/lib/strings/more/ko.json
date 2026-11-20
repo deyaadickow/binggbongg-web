@@ -1887,5 +1887,6 @@
  "fld_bad_name": "폴더 이름은 1~30자여야 해요.",
  "fld_moved": "%1$s(으)로 이동했어요",
  "fname_profile_folders": "동영상 폴더",
- "fblurb_profile_folders": "프로필에 폴더를 원하는 만큼 만들어 댄스, 노래, 나의 결혼식처럼 동영상을 하나씩 넣어 보세요."
+ "fblurb_profile_folders": "프로필에 폴더를 원하는 만큼 만들어 댄스, 노래, 나의 결혼식처럼 동영상을 하나씩 넣어 보세요.",
+ "stb_search": "검색"
 }

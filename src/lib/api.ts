@@ -261,6 +261,8 @@ export interface Post {
    *  [{"s":1.02,"e":3.25,"t":"words"}] in seconds; missing fields mean no captions. Not the same
    *  thing as the creator's own typed coloured `captions`. */
   auto_captions?: string | null;
+  /** "Search · <topic>" under the video (2026-11-20): a 2-5 word search phrase the server writes once per video; null = no bar. */
+  search_topic?: string | null;
   auto_captions_status?: "queued" | "working" | "done" | "none" | "failed" | "off" | null;
   auto_captions_lang?: string | null;
   auto_captions_on?: number | null;

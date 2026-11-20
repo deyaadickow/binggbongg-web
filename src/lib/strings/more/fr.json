@@ -1887,5 +1887,6 @@
  "fld_bad_name": "Le nom du dossier doit faire de 1 à 30 caractères.",
  "fld_moved": "Déplacé vers %1$s",
  "fname_profile_folders": "Dossiers vidéo",
- "fblurb_profile_folders": "Crée autant de dossiers que tu veux sur ton profil, comme Danse, Chant ou Mon mariage, et range chaque vidéo dans l'un d'eux."
+ "fblurb_profile_folders": "Crée autant de dossiers que tu veux sur ton profil, comme Danse, Chant ou Mon mariage, et range chaque vidéo dans l'un d'eux.",
+ "stb_search": "Rechercher"
 }

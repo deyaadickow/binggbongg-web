@@ -2542,4 +2542,6 @@ export const es = {
   fld_moved: "Movido a %1$s",
   fname_profile_folders: "Carpetas de videos",
   fblurb_profile_folders: "Crea todas las carpetas que quieras en tu perfil, como Baile, Canto o Mi boda, y pon cada video en una.",
+  // "Search · <topic>" bar under every video (2026-11-20).
+  stb_search: "Buscar",
 };

@@ -1886,5 +1886,6 @@
  "fld_bad_name": "Název složky musí mít 1 až 30 znaků.",
  "fld_moved": "Přesunuto do %1$s",
  "fname_profile_folders": "Složky videí",
- "fblurb_profile_folders": "Vytvoř si na profilu kolik složek chceš, třeba Tanec, Zpěv nebo Moje svatba, a dej každé video do jedné."
+ "fblurb_profile_folders": "Vytvoř si na profilu kolik složek chceš, třeba Tanec, Zpěv nebo Moje svatba, a dej každé video do jedné.",
+ "stb_search": "Hledat"
 }

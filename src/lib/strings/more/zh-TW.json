@@ -1887,5 +1887,6 @@
  "fld_bad_name": "資料夾名稱須為 1 到 30 個字元。",
  "fld_moved": "已移到 %1$s",
  "fname_profile_folders": "影片資料夾",
- "fblurb_profile_folders": "在個人檔案建立任意數量的資料夾，例如舞蹈、唱歌或我的婚禮，把每部影片放進其中一個。"
+ "fblurb_profile_folders": "在個人檔案建立任意數量的資料夾，例如舞蹈、唱歌或我的婚禮，把每部影片放進其中一個。",
+ "stb_search": "搜尋"
 }

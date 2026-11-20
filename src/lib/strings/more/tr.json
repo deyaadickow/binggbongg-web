@@ -1887,5 +1887,6 @@
  "fld_bad_name": "Klasör adı 1 ile 30 karakter olmalı.",
  "fld_moved": "%1$s klasörüne taşındı",
  "fname_profile_folders": "Video Klasörleri",
- "fblurb_profile_folders": "Profilinde istediğin kadar klasör oluştur, Dans, Şarkı ya da Düğünüm gibi, ve her videoyu birine koy."
+ "fblurb_profile_folders": "Profilinde istediğin kadar klasör oluştur, Dans, Şarkı ya da Düğünüm gibi, ve her videoyu birine koy.",
+ "stb_search": "Ara"
 }

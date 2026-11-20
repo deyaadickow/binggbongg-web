@@ -1884,5 +1884,6 @@
  "fld_bad_name": "Pavadinimas turi būti nuo 1 iki 30 simbolių.",
  "fld_moved": "Perkelta į %1$s",
  "fname_profile_folders": "Vaizdo įrašų aplankai",
- "fblurb_profile_folders": "Susikurk profilyje kiek nori aplankų, pvz., Šokiai, Dainos ar Mano vestuvės, ir kiekvieną vaizdo įrašą įdėk į vieną."
+ "fblurb_profile_folders": "Susikurk profilyje kiek nori aplankų, pvz., Šokiai, Dainos ar Mano vestuvės, ir kiekvieną vaizdo įrašą įdėk į vieną.",
+ "stb_search": "Ieškoti"
 }

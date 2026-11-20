@@ -1878,5 +1878,6 @@
  "fld_bad_name": "Kansion nimen on oltava 1–30 merkkiä.",
  "fld_moved": "Siirretty kansioon %1$s",
  "fname_profile_folders": "Videokansiot",
- "fblurb_profile_folders": "Tee profiiliisi niin monta kansiota kuin haluat, kuten Tanssi, Laulu tai Häämme, ja laita jokainen video yhteen."
+ "fblurb_profile_folders": "Tee profiiliisi niin monta kansiota kuin haluat, kuten Tanssi, Laulu tai Häämme, ja laita jokainen video yhteen.",
+ "stb_search": "Hae"
 }

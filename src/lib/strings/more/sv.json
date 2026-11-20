@@ -1885,5 +1885,6 @@
  "fld_bad_name": "Mappnamnet måste vara 1 till 30 tecken.",
  "fld_moved": "Flyttad till %1$s",
  "fname_profile_folders": "Videomappar",
- "fblurb_profile_folders": "Skapa så många mappar du vill på din profil, som Dans, Sång eller Mitt bröllop, och lägg varje video i en."
+ "fblurb_profile_folders": "Skapa så många mappar du vill på din profil, som Dans, Sång eller Mitt bröllop, och lägg varje video i en.",
+ "stb_search": "Sök"
 }

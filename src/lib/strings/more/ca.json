@@ -1886,5 +1886,6 @@
  "fld_bad_name": "El nom ha de tenir d'1 a 30 caràcters.",
  "fld_moved": "Mogut a %1$s",
  "fname_profile_folders": "Carpetes de vídeos",
- "fblurb_profile_folders": "Crea totes les carpetes que vulguis al teu perfil, com Ball, Cant o El meu casament, i posa cada vídeo en una."
+ "fblurb_profile_folders": "Crea totes les carpetes que vulguis al teu perfil, com Ball, Cant o El meu casament, i posa cada vídeo en una.",
+ "stb_search": "Cerca"
 }

@@ -1887,5 +1887,6 @@
  "fld_bad_name": "Tên thư mục phải từ 1 đến 30 ký tự.",
  "fld_moved": "Đã chuyển vào %1$s",
  "fname_profile_folders": "Thư mục video",
- "fblurb_profile_folders": "Tạo bao nhiêu thư mục tùy thích trên hồ sơ, như Nhảy, Hát hay Đám cưới của tôi, và đặt mỗi video vào một thư mục."
+ "fblurb_profile_folders": "Tạo bao nhiêu thư mục tùy thích trên hồ sơ, như Nhảy, Hát hay Đám cưới của tôi, và đặt mỗi video vào một thư mục.",
+ "stb_search": "Tìm kiếm"
 }

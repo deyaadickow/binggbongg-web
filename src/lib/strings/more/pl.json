@@ -1887,5 +1887,6 @@
  "fld_bad_name": "Nazwa folderu musi mieć od 1 do 30 znaków.",
  "fld_moved": "Przeniesiono do %1$s",
  "fname_profile_folders": "Foldery z filmami",
- "fblurb_profile_folders": "Twórz na profilu tyle folderów, ile chcesz, np. Taniec, Śpiew czy Mój ślub, i wkładaj każdy film do jednego z nich."
+ "fblurb_profile_folders": "Twórz na profilu tyle folderów, ile chcesz, np. Taniec, Śpiew czy Mój ślub, i wkładaj każdy film do jednego z nich.",
+ "stb_search": "Szukaj"
 }

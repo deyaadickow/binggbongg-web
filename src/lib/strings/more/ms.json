@@ -1887,5 +1887,6 @@
  "fld_bad_name": "Nama folder mesti 1 hingga 30 aksara.",
  "fld_moved": "Dialihkan ke %1$s",
  "fname_profile_folders": "Folder Video",
- "fblurb_profile_folders": "Buat seberapa banyak folder yang anda mahu di profil anda, seperti Menari, Menyanyi atau Perkahwinan Saya, dan letakkan setiap video dalam satu."
+ "fblurb_profile_folders": "Buat seberapa banyak folder yang anda mahu di profil anda, seperti Menari, Menyanyi atau Perkahwinan Saya, dan letakkan setiap video dalam satu.",
+ "stb_search": "Cari"
 }

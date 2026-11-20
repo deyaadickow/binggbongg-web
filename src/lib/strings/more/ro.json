@@ -1882,5 +1882,6 @@
  "fld_bad_name": "Numele trebuie să aibă între 1 și 30 de caractere.",
  "fld_moved": "Mutat în %1$s",
  "fname_profile_folders": "Dosare video",
- "fblurb_profile_folders": "Creează câte dosare vrei pe profilul tău, cum ar fi Dans, Cântat sau Nunta mea, și pune fiecare videoclip într-unul."
+ "fblurb_profile_folders": "Creează câte dosare vrei pe profilul tău, cum ar fi Dans, Cântat sau Nunta mea, și pune fiecare videoclip într-unul.",
+ "stb_search": "Caută"
 }

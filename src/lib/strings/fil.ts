@@ -2741,4 +2741,6 @@ export const fil = {
   fld_moved: "Nailipat sa %1$s",
   fname_profile_folders: "Mga Video Folder",
   fblurb_profile_folders: "Gumawa ng kahit ilang folder sa profile mo, tulad ng Sayaw, Kanta o Kasal Ko, at ilagay ang bawat video sa isa.",
+  // "Search · <topic>" bar under every video (2026-11-20).
+  stb_search: "Maghanap",
 };

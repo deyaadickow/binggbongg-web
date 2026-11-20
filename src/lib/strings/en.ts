@@ -3524,4 +3524,6 @@ export const en = {
   fld_moved: "Moved to %1$s",
   fname_profile_folders: "Video Folders",
   fblurb_profile_folders: "Make as many folders as you want on your profile, like Dancing, Singing or My Wedding, and put each video in one.",
+  // "Search · <topic>" bar under every video (2026-11-20).
+  stb_search: "Search",
 } as const;

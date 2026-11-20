@@ -1926,3 +1926,15 @@ body:has(.story-viewer) .get-app-bar { display: none; }
 .fa-more, .fa-close { flex: 1; padding: 11px 12px; border-radius: 999px; border: 1.5px solid var(--gold); background: #000;
   color: var(--gold); font-weight: 800; font-size: 14px; cursor: pointer; }
 .fa-more:disabled { opacity: .6; cursor: default; }
+
+/* "Search · <topic>" bar under every video (Steve, 2026-11-20). Black + gold, one slim line. */
+.stb-bar { display: flex; align-items: center; gap: 8px; width: 100%; padding: 9px 12px; margin: 0;
+  background: #0b0b0b; border: 1px solid rgba(240, 196, 32, 0.45); border-radius: 10px; color: #fff;
+  font: inherit; font-size: 14px; text-align: left; cursor: pointer; min-width: 0; }
+.stb-bar:hover { border-color: var(--gold); background: #141005; }
+.stb-bar .stb-icon { color: var(--gold); flex: 0 0 auto; }
+.stb-bar .stb-text { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stb-bar .stb-text b { color: var(--gold); font-weight: 800; }
+.stb-bar .stb-chev { color: var(--gold); font-size: 22px; line-height: 1; flex: 0 0 auto; }
+.stb-bar.compact { border-radius: 0; border-width: 1px 0 0 0; padding: 7px 10px; font-size: 12.5px; gap: 6px; background: #050505; }
+.stb-bar.compact .stb-chev { font-size: 18px; }

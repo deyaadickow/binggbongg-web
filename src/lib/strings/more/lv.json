@@ -1883,5 +1883,6 @@
  "fld_bad_name": "Nosaukumam jābūt no 1 līdz 30 rakstzīmēm.",
  "fld_moved": "Pārvietots uz %1$s",
  "fname_profile_folders": "Video mapes",
- "fblurb_profile_folders": "Izveido savā profilā tik mapju, cik vēlies, piemēram, Dejas, Dziesmas vai Mani kāzas, un ieliec katru video vienā."
+ "fblurb_profile_folders": "Izveido savā profilā tik mapju, cik vēlies, piemēram, Dejas, Dziesmas vai Mani kāzas, un ieliec katru video vienā.",
+ "stb_search": "Meklēt"
 }

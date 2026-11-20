@@ -5,6 +5,7 @@ import { Avatar } from "./Common";
 import { BattleBadge, BattleInfoPopup, BattleStreak, battleBadgeExplainer, battleStreakExplainer } from "./BattleBadge";
 import { GiftFlash, PostGiftButton } from "./GiftSheet";
 import { HashtagText } from "./HashtagText";
+import { SearchTopicBar } from "./SearchTopicBar";
 import { EpisodeChip } from "./Creators";
 import { useT } from "../lib/i18n";
 
@@ -78,6 +79,8 @@ export function PostCard({ post }: { post: Post }) {
         {/* Steve, 2026-10-01: "add gift boxes on all video on for you page on the web." */}
         <PostGiftButton post={post} onSent={setSent} />
       </div>
+      {/* Steve, 2026-11-20: "Search · <topic>" under every video, one click to search what they are talking about. */}
+      <SearchTopicBar post={post} compact />
       {info && <BattleInfoPopup title={info.title} body={info.body} flames={info.flames} onClose={() => setInfo(null)} />}
     </div>
   );

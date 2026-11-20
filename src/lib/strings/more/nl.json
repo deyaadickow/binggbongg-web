@@ -1887,5 +1887,6 @@
  "fld_bad_name": "De mapnaam moet 1 tot 30 tekens zijn.",
  "fld_moved": "Verplaatst naar %1$s",
  "fname_profile_folders": "Videomappen",
- "fblurb_profile_folders": "Maak zoveel mappen als je wilt op je profiel, zoals Dansen, Zingen of Mijn bruiloft, en zet elke video in één map."
+ "fblurb_profile_folders": "Maak zoveel mappen als je wilt op je profiel, zoals Dansen, Zingen of Mijn bruiloft, en zet elke video in één map.",
+ "stb_search": "Zoeken"
 }

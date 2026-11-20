@@ -1887,5 +1887,6 @@
  "fld_bad_name": "Izenak 1 eta 30 karaktere artean izan behar ditu.",
  "fld_moved": "%1$s karpetara eramana",
  "fname_profile_folders": "Bideo-karpetak",
- "fblurb_profile_folders": "Sortu nahi beste karpeta zure profilean, adibidez Dantza, Kantua edo Nire ezkontza, eta jarri bideo bakoitza batean."
+ "fblurb_profile_folders": "Sortu nahi beste karpeta zure profilean, adibidez Dantza, Kantua edo Nire ezkontza, eta jarri bideo bakoitza batean.",
+ "stb_search": "Bilatu"
 }

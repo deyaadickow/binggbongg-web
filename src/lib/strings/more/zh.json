@@ -1887,5 +1887,6 @@
  "fld_bad_name": "文件夹名称须为 1 到 30 个字符。",
  "fld_moved": "已移到 %1$s",
  "fname_profile_folders": "视频文件夹",
- "fblurb_profile_folders": "在个人主页创建任意数量的文件夹，例如舞蹈、唱歌或我的婚礼，把每个视频放进其中一个。"
+ "fblurb_profile_folders": "在个人主页创建任意数量的文件夹，例如舞蹈、唱歌或我的婚礼，把每个视频放进其中一个。",
+ "stb_search": "搜索"
 }

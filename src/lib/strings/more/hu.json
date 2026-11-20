@@ -1880,5 +1880,6 @@
  "fld_bad_name": "A mappa neve 1–30 karakter lehet.",
  "fld_moved": "Áthelyezve ide: %1$s",
  "fname_profile_folders": "Videómappák",
- "fblurb_profile_folders": "Hozz létre annyi mappát a profilodon, amennyit szeretnél, például Tánc, Ének vagy Az esküvőm, és tegyél minden videót egybe."
+ "fblurb_profile_folders": "Hozz létre annyi mappát a profilodon, amennyit szeretnél, például Tánc, Ének vagy Az esküvőm, és tegyél minden videót egybe.",
+ "stb_search": "Keresés"
 }
