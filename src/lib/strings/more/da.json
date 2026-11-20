@@ -1856,5 +1856,12 @@
  "fa_more": "Vis mig flere spørgsmål",
  "fa_error": "Bingg og Bongg kan ikke svare lige nu. Prøv igen om et øjeblik.",
  "fblurb_ai_assistant": "Tryk på Bingg eller Bongg i startfeedet. De stiller dig et par spørgsmål og viser dig alt, hvad Bingg Bongg kan.",
- "fname_ai_assistant": "Bingg Bongg AI-assistent"
+ "fname_ai_assistant": "Bingg Bongg AI-assistent",
+ "pin_to_top": "Fastgør øverst",
+ "pin_unpin": "Frigør",
+ "pin_limit": "Du kan kun fastgøre 3 videoer. Frigør en først.",
+ "pin_done": "Fastgjort øverst på din profil",
+ "pin_undone": "Frigjort",
+ "pin_badge": "Fastgjort",
+ "pin_delete_ask": "Vil du virkelig gerne slette dette opslag?"
 }

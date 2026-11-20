@@ -1854,5 +1854,12 @@
  "fa_more": "Arată-mi mai multe întrebări",
  "fa_error": "Bingg și Bongg nu pot răspunde acum. Vă rugăm să încercați din nou imediat.",
  "fblurb_ai_assistant": "Atingeți Bingg sau Bongg în fluxul principal. Aceștia vă pun câteva întrebări și vă arată tot ce poate face Bingg Bongg.",
- "fname_ai_assistant": "Asistentul AI Bingg Bongg"
+ "fname_ai_assistant": "Asistentul AI Bingg Bongg",
+ "pin_to_top": "Fixează sus",
+ "pin_unpin": "Anulează fixarea",
+ "pin_limit": "Poți fixa doar 3 videoclipuri. Anulează mai întâi fixarea unuia.",
+ "pin_done": "Fixat în partea de sus a profilului tău",
+ "pin_undone": "Fixare anulată",
+ "pin_badge": "Fixat",
+ "pin_delete_ask": "Chiar vrei să ștergi această postare?"
 }

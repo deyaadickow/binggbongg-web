@@ -1859,5 +1859,12 @@
  "fa_more": "Bana daha fazla soru göster",
  "fa_error": "Bingg ve Bongg şu anda cevap veremiyorlar. Lütfen bir süre sonra tekrar deneyin.",
  "fblurb_ai_assistant": "Ana sayfada Bingg veya Bongg'a dokunun. Size birkaç soru soracaklar ve Bingg Bongg'un neler yapabileceğini gösterecekler.",
- "fname_ai_assistant": "Bingg Bongg Yapay Zeka Asistanı"
+ "fname_ai_assistant": "Bingg Bongg Yapay Zeka Asistanı",
+ "pin_to_top": "En üste sabitle",
+ "pin_unpin": "Sabitlemeyi kaldır",
+ "pin_limit": "Yalnızca 3 video sabitleyebilirsin. Önce birinin sabitlemesini kaldır.",
+ "pin_done": "Profilinin en üstüne sabitlendi",
+ "pin_undone": "Sabitleme kaldırıldı",
+ "pin_badge": "Sabitlendi",
+ "pin_delete_ask": "Bu gönderiyi gerçekten silmek istiyor musunuz?"
 }

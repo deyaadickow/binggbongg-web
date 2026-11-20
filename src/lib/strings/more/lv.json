@@ -1855,5 +1855,12 @@
  "fa_more": "Rādīt man vairāk jautājumu",
  "fa_error": "Bingg un Bongg šobrīd nevar atbildēt. Lūdzu, mēģiniet vēlreiz pēc brīža.",
  "fblurb_ai_assistant": "Sākumlapas plūsmā pieskarieties Bingg vai Bongg. Viņi uzdos jums dažus jautājumus un parādīs visu, ko Bingg Bongg spēj.",
- "fname_ai_assistant": "Bingg Bongg mākslīgā intelekta palīgs"
+ "fname_ai_assistant": "Bingg Bongg mākslīgā intelekta palīgs",
+ "pin_to_top": "Piespraust augšā",
+ "pin_unpin": "Atspraust",
+ "pin_limit": "Var piespraust tikai 3 video. Vispirms atspraudiet vienu.",
+ "pin_done": "Piesprausts jūsu profila augšā",
+ "pin_undone": "Atsprausts",
+ "pin_badge": "Piesprausts",
+ "pin_delete_ask": "Vai tiešām vēlaties dzēst šo ierakstu?"
 }

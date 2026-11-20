@@ -1855,5 +1855,12 @@
  "fa_more": "הראה לי עוד שאלות",
  "fa_error": "Bingg Bongg לא יכולים לענות כרגע. אנא נסה שוב עוד רגע.",
  "fblurb_ai_assistant": "הקישו על Bingg או Bongg בפיד הבית. הם ישאלו אתכם כמה שאלות ויראו לכם את כל מה Bingg Bongg יכול לעשות.",
- "fname_ai_assistant": "עוזר בינה מלאכותית Bingg Bongg"
+ "fname_ai_assistant": "עוזר בינה מלאכותית Bingg Bongg",
+ "pin_to_top": "הצמד למעלה",
+ "pin_unpin": "בטל הצמדה",
+ "pin_limit": "אפשר להצמיד רק 3 סרטונים. בטל הצמדה של אחד קודם.",
+ "pin_done": "הוצמד לראש הפרופיל שלך",
+ "pin_undone": "ההצמדה בוטלה",
+ "pin_badge": "מוצמד",
+ "pin_delete_ask": "האם אתה בטוח שברצונך למחוק את הפוסט הזה?"
 }

@@ -1856,5 +1856,12 @@
  "fa_more": "Näita mulle rohkem küsimusi",
  "fa_error": "Bingg ja Bongg ei saa praegu vastata. Palun proovige uuesti hetke pärast.",
  "fblurb_ai_assistant": "Puuduta avalehe voos Binggi või Bonggi. Nad küsivad sinult paar küsimust ja näitavad sulle kõike, mida Bingg Bongg teha oskab.",
- "fname_ai_assistant": "Bingg Bonggi tehisintellekti assistent"
+ "fname_ai_assistant": "Bingg Bonggi tehisintellekti assistent",
+ "pin_to_top": "Kinnita üles",
+ "pin_unpin": "Vabasta",
+ "pin_limit": "Saad kinnitada ainult 3 videot. Vabasta enne üks.",
+ "pin_done": "Kinnitatud su profiili ülaossa",
+ "pin_undone": "Vabastatud",
+ "pin_badge": "Kinnitatud",
+ "pin_delete_ask": "Kas soovid selle postituse tõesti kustutada?"
 }

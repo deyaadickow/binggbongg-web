@@ -1858,5 +1858,12 @@
  "fa_more": "もっと質問を表示",
  "fa_error": "BinggとBongg現在応答できません。しばらくしてからもう一度お試しください。",
  "fblurb_ai_assistant": "ホーム画面でBinggまたはBonggをタップしてください。いくつか質問をされた後、Bingg Bonggでできることがすべて表示されます。",
- "fname_ai_assistant": "Bingg Bongg AIアシスタント"
+ "fname_ai_assistant": "Bingg Bongg AIアシスタント",
+ "pin_to_top": "トップに固定",
+ "pin_unpin": "固定を解除",
+ "pin_limit": "固定できる動画は3本までです。先に1本の固定を解除してください。",
+ "pin_done": "プロフィールのトップに固定しました",
+ "pin_undone": "固定を解除しました",
+ "pin_badge": "固定中",
+ "pin_delete_ask": "この投稿を本当に削除しますか？"
 }

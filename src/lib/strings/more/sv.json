@@ -1857,5 +1857,12 @@
  "fa_more": "Visa mig fler frågor",
  "fa_error": "Bingg och Bongg kan inte svara just nu. Försök igen om en stund.",
  "fblurb_ai_assistant": "Tryck på Bingg eller Bongg i startflödet. De ställer några frågor och visar dig allt Bingg Bongg kan göra.",
- "fname_ai_assistant": "Bingg Bongg AI-assistent"
+ "fname_ai_assistant": "Bingg Bongg AI-assistent",
+ "pin_to_top": "Fäst överst",
+ "pin_unpin": "Lossa",
+ "pin_limit": "Du kan bara fästa 3 videor. Lossa en först.",
+ "pin_done": "Fäst överst på din profil",
+ "pin_undone": "Lossad",
+ "pin_badge": "Fäst",
+ "pin_delete_ask": "Vill du verkligen radera detta inlägg?"
 }

@@ -1859,5 +1859,12 @@
  "fa_more": "顯示更多問題",
  "fa_error": "Bingg 和 Bongg 現在無法接聽電話，請稍後再試。",
  "fblurb_ai_assistant": "點擊主頁上的 Bingg 或 Bongg。他們會問你幾個問題，並向你展示 Bingg Bongg 的所有功能。",
- "fname_ai_assistant": "Bingg Bongg人工智慧助手"
+ "fname_ai_assistant": "Bingg Bongg人工智慧助手",
+ "pin_to_top": "置頂",
+ "pin_unpin": "取消置頂",
+ "pin_limit": "最多只能置頂 3 部影片。請先取消置頂一部。",
+ "pin_done": "已置頂到你的個人檔案",
+ "pin_undone": "已取消置頂",
+ "pin_badge": "置頂",
+ "pin_delete_ask": "您確定要刪除此貼文嗎？"
 }

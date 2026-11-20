@@ -3494,4 +3494,12 @@ export const en = {
   fa_error: "Bingg and Bongg can't answer right now. Please try again in a moment.",
   fblurb_ai_assistant: "Tap Bingg or Bongg on the Home feed. They ask you a few questions and show you everything Bingg Bongg can do.",
   fname_ai_assistant: "Bingg Bongg AI Assistant",
+  // Pin up to 3 videos on your profile (2026-11-20)
+  pin_to_top: "Pin to top",
+  pin_unpin: "Unpin",
+  pin_limit: "You can pin only 3 videos. Unpin one first.",
+  pin_done: "Pinned to the top of your profile",
+  pin_undone: "Unpinned",
+  pin_badge: "Pinned",
+  pin_delete_ask: "Do you really want to delete this post?",
 } as const;

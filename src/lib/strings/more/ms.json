@@ -1859,5 +1859,12 @@
  "fa_more": "Tunjukkan saya lebih banyak soalan",
  "fa_error": "Bingg dan Bongg tidak dapat menjawab sekarang. Sila cuba lagi sebentar lagi.",
  "fblurb_ai_assistant": "Ketik Bingg atau Bongg pada suapan Laman Utama. Mereka akan menanyakan beberapa soalan kepada anda dan menunjukkan kepada anda semua yang Bingg Bongg boleh lakukan.",
- "fname_ai_assistant": "Pembantu AI Bingg Bongg"
+ "fname_ai_assistant": "Pembantu AI Bingg Bongg",
+ "pin_to_top": "Semat di atas",
+ "pin_unpin": "Nyahsemat",
+ "pin_limit": "Anda hanya boleh menyemat 3 video. Nyahsemat satu dahulu.",
+ "pin_done": "Disemat di atas profil anda",
+ "pin_undone": "Dinyahsemat",
+ "pin_badge": "Disemat",
+ "pin_delete_ask": "Adakah anda benar-benar mahu memadam siaran ini?"
 }

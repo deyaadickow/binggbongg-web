@@ -1850,5 +1850,12 @@
  "fa_more": "Näytä minulle lisää kysymyksiä",
  "fa_error": "Bingg ja Bongg eivät pysty vastaamaan juuri nyt. Yritä uudelleen hetken kuluttua.",
  "fblurb_ai_assistant": "Napauta Bingg- tai Bongg-kuvaketta kotisivulla. He kysyvät sinulta muutaman kysymyksen ja näyttävät kaiken, mitä Bingg Bongg osaa.",
- "fname_ai_assistant": "Bingg Bongg tekoälyavustaja"
+ "fname_ai_assistant": "Bingg Bongg tekoälyavustaja",
+ "pin_to_top": "Kiinnitä ylös",
+ "pin_unpin": "Irrota",
+ "pin_limit": "Voit kiinnittää vain 3 videota. Irrota ensin yksi.",
+ "pin_done": "Kiinnitetty profiilisi yläosaan",
+ "pin_undone": "Irrotettu",
+ "pin_badge": "Kiinnitetty",
+ "pin_delete_ask": "Haluatko varmasti poistaa tämän julkaisun?"
 }

@@ -1855,5 +1855,12 @@
  "fa_more": "Móstrame máis preguntas",
  "fa_error": "Bingg e Bongg non poden responder agora mesmo. Téntao de novo nun momento.",
  "fblurb_ai_assistant": "Toca Bingg ou Bongg no feed de inicio. Faranche unhas cantas preguntas e mostraranche todo o que Bingg Bongg pode facer.",
- "fname_ai_assistant": "Asistente de IA de Bingg Bongg"
+ "fname_ai_assistant": "Asistente de IA de Bingg Bongg",
+ "pin_to_top": "Fixar arriba",
+ "pin_unpin": "Desfixar",
+ "pin_limit": "Só podes fixar 3 vídeos. Desfixa un primeiro.",
+ "pin_done": "Fixado arriba no teu perfil",
+ "pin_undone": "Desfixado",
+ "pin_badge": "Fixado",
+ "pin_delete_ask": "Seguro que queres eliminar esta publicación?"
 }

@@ -1858,5 +1858,12 @@
  "fa_more": "Покажите мне ещё вопросы",
  "fa_error": "Bingg и Bongg сейчас не могут ответить. Пожалуйста, попробуйте позже.",
  "fblurb_ai_assistant": "Нажмите на Bingg или Bongg в ленте новостей. Они зададут вам несколько вопросов и покажут все возможности Bingg Bongg.",
- "fname_ai_assistant": "Bingg Bongg AI Assistant"
+ "fname_ai_assistant": "Bingg Bongg AI Assistant",
+ "pin_to_top": "Закрепить наверху",
+ "pin_unpin": "Открепить",
+ "pin_limit": "Можно закрепить только 3 видео. Сначала открепите одно.",
+ "pin_done": "Закреплено вверху вашего профиля",
+ "pin_undone": "Откреплено",
+ "pin_badge": "Закреплено",
+ "pin_delete_ask": "Вы действительно хотите удалить эту публикацию?"
 }

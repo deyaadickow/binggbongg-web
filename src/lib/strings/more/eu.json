@@ -1859,5 +1859,12 @@
  "fa_more": "Erakutsi galdera gehiago",
  "fa_error": "Binggek eta Bonggek ezin dute erantzun une honetan. Saiatu berriro une batean, mesedez.",
  "fblurb_ai_assistant": "Sakatu Bingg edo Bongg hasierako jarioan. Galdera batzuk egingo dizkizute eta Bingg Bonggek egin dezakeen guztia erakutsiko dizute.",
- "fname_ai_assistant": "Bingg Bongg AI laguntzailea"
+ "fname_ai_assistant": "Bingg Bongg AI laguntzailea",
+ "pin_to_top": "Ainguratu goian",
+ "pin_unpin": "Kendu aingura",
+ "pin_limit": "3 bideo bakarrik ainguratu ditzakezu. Kendu bati aingura lehenik.",
+ "pin_done": "Zure profilaren goian ainguratuta",
+ "pin_undone": "Aingura kenduta",
+ "pin_badge": "Ainguratuta",
+ "pin_delete_ask": "Ziur zaude argitalpen hau ezabatu nahi duzula?"
 }

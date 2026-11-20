@@ -1858,5 +1858,12 @@
  "fa_more": "Mostra'm més preguntes",
  "fa_error": "En Bingg i en Bongg no poden respondre ara mateix. Torna-ho a intentar d'aquí a un moment.",
  "fblurb_ai_assistant": "Toca Bingg o Bongg al canal d'inici. Et faran algunes preguntes i et mostraran tot el que pot fer Bingg Bongg.",
- "fname_ai_assistant": "Assistent d'IA de Bingg Bongg"
+ "fname_ai_assistant": "Assistent d'IA de Bingg Bongg",
+ "pin_to_top": "Fixa a dalt",
+ "pin_unpin": "Deixa de fixar",
+ "pin_limit": "Només pots fixar 3 vídeos. Primer deixa'n de fixar un.",
+ "pin_done": "Fixat a dalt del teu perfil",
+ "pin_undone": "Ja no està fixat",
+ "pin_badge": "Fixat",
+ "pin_delete_ask": "Segur que vols eliminar aquesta publicació?"
 }

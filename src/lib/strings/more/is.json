@@ -1856,5 +1856,12 @@
  "fa_more": "Sýndu mér fleiri spurningar",
  "fa_error": "Bingg og Bongg geta ekki svarað núna. Vinsamlegast reynið aftur eftir smástund.",
  "fblurb_ai_assistant": "Ýttu á Bingg eða Bongg í aðalstraumnum. Þeir spyrja þig nokkurra spurninga og sýna þér allt sem Bingg Bongg getur gert.",
- "fname_ai_assistant": "Bingg Bongg AI aðstoðarmaður"
+ "fname_ai_assistant": "Bingg Bongg AI aðstoðarmaður",
+ "pin_to_top": "Festa efst",
+ "pin_unpin": "Losa",
+ "pin_limit": "Þú getur aðeins fest 3 myndbönd. Losaðu eitt fyrst.",
+ "pin_done": "Fest efst á prófílinn þinn",
+ "pin_undone": "Losað",
+ "pin_badge": "Fest",
+ "pin_delete_ask": "Viltu örugglega eyða þessari færslu?"
 }

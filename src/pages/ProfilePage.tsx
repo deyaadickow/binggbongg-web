@@ -60,6 +60,8 @@ interface ProfileUser extends UserSummary {
 }
 
 interface ProfilePost extends Post {
+  /** Set while the owner has it pinned on top of their profile (max 3, 2026-11-20). */
+  pinned_at?: string | null;
   user_video_number?: number;
   lifetime_votes?: number;
   this_month_votes?: number;
@@ -96,11 +98,37 @@ function isValidUrl(url?: string | null): boolean {
   return !!url && /^https?:\/\/.+/.test(url);
 }
 
-function ProfileThumb({ p, isMe, onClick }: { p: ProfilePost; isMe: boolean; onClick: () => void }) {
+/** Pinned on top of the profile (2026-11-20): a small gold pin in a black disc. */
+function PinGlyph({ size = 12 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" style={{ transform: "rotate(45deg)" }}>
+      <path fill="currentColor" d="M16 9V4h1c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1h1v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z" />
+    </svg>
+  );
+}
+
+function ProfileThumb({ p, isMe, onClick, onMenu }: { p: ProfilePost; isMe: boolean; onClick: () => void; onMenu?: () => void }) {
   const { t } = useT();
   const thumb = mediaUrl(p.thumbnail);
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
+  // Hold (Steve, 2026-11-20): on your own grid, holding a tile ~0.7 s — or right-clicking it —
+  // opens the gold menu with Pin / Unpin and Delete. The click that ends a hold does not open
+  // the video.
+  const holdTimer = useRef<number | null>(null);
+  const held = useRef(false);
+  const cancelHold = () => { if (holdTimer.current) { window.clearTimeout(holdTimer.current); holdTimer.current = null; } };
+  const holdHandlers = onMenu ? {
+    onPointerDown: () => {
+      held.current = false;
+      cancelHold();
+      holdTimer.current = window.setTimeout(() => { held.current = true; holdTimer.current = null; onMenu(); }, 700);
+    },
+    onPointerUp: cancelHold,
+    onPointerLeave: cancelHold,
+    onPointerCancel: cancelHold,
+    onContextMenu: (e: MouseEvent) => { e.preventDefault(); cancelHold(); onMenu(); },
+  } : {};
 
   // Steve, 2026-10-13: "Add it on the tiles too." Same (C) as the video page, so a member can
   // copy a link straight off a grid without opening the video first.
@@ -119,11 +147,13 @@ function ProfileThumb({ p, isMe, onClick }: { p: ProfilePost; isMe: boolean; onC
   }
 
   return (
-    <div className="p-thumb" onClick={onClick}>
+    <div className="p-thumb" {...holdHandlers}
+      onClick={() => { if (held.current) { held.current = false; return; } onClick(); }}>
       {thumb ? <img src={thumb} alt="" loading="lazy" /> : (
         <div style={{ width: "100%", height: "100%", background: "#111", display: "flex", alignItems: "center", justifyContent: "center", color: "#333", fontSize: 28 }}>▶</div>
       )}
       {(p.views ?? 0) > 0 && <span className="p-views">{fmt(p.views)}</span>}
+      {p.pinned_at && <span className="p-pin" title={t("pin_badge")}><PinGlyph /></span>}
       {/* Creators and money (2026-11-17): subscriber-only / unbought series episode. */}
       <LockBadge lock={p.locked} />
       {(p.lifetime_votes ?? 0) > 0 && <span className="p-votes">★ {fmt(p.lifetime_votes)}</span>}
@@ -134,7 +164,11 @@ function ProfileThumb({ p, isMe, onClick }: { p: ProfilePost; isMe: boolean; onC
       {/* Both bottom-right actions share one row — every other corner of the tile already
           carries a badge (views, votes, video number), and two absolutely-positioned buttons
           at the same corner would sit on top of each other. */}
-      <div className="p-actions" onClick={(e) => e.stopPropagation()}>
+      <div className="p-actions" onClick={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()}>
+        {isMe && onMenu && (
+          <button className="p-copy" title={t("pin_to_top")} aria-label={t("pin_to_top")}
+            onClick={(e) => { e.stopPropagation(); onMenu(); }}>⋯</button>
+        )}
         {isMe && (
           <button
             className="p-ad"
@@ -335,6 +369,8 @@ export function ProfilePage() {
   const [battleInfo, setBattleInfo] = useState<{ title: string; body: string; flames?: number } | null>(null);
   const [vipInfo, setVipInfo] = useState(false);
   const [tabVideos, setTabVideos] = useState<ProfilePost[]>([]);
+  /** The own-video gold hold menu (Pin / Unpin, Delete — Steve, 2026-11-20). */
+  const [menuFor, setMenuFor] = useState<ProfilePost | null>(null);
   const [tabUsers, setTabUsers] = useState<UserSummary[]>([]);
   // Photos are neither posts nor members, so they get their own bucket rather than being
   // squeezed through tabVideos (different fields, different click target).
@@ -944,6 +980,7 @@ export function ProfilePage() {
                   p={p}
                   isMe={isMe}
                   onClick={() => navigate(`/video/${p.id}`)}
+                  onMenu={isMe && tab === "videos" ? () => setMenuFor(p) : undefined}
                 />
               ))}
             </div>
@@ -951,6 +988,49 @@ export function ProfilePage() {
         )}
       </div>
       </>)}
+
+      {menuFor && socialMe && (
+        <OwnVideoMenu
+          post={menuFor}
+          onClose={() => setMenuFor(null)}
+          onPin={async () => {
+            const target = menuFor;
+            setMenuFor(null);
+            const pin = !target.pinned_at;
+            try {
+              const r = await socialCall<unknown>("pinPost", { user_id: socialMe.id, post_id: target.id, pin: pin ? 1 : 0 });
+              const ids = Array.isArray(r.pinned_ids) ? (r.pinned_ids as unknown[]).map(Number) : null;
+              if (ids) {
+                // Same order the server lists them: pinned (most recently pinned first), then newest.
+                setTabVideos((list) => {
+                  const marked: ProfilePost[] = list.map((x) => ({ ...x, pinned_at: ids.includes(x.id) ? (x.pinned_at || "pinned") : null }));
+                  const pinned = ids.map((id) => marked.find((x) => x.id === id)).filter((x): x is ProfilePost => !!x);
+                  const rest = marked.filter((x) => !ids.includes(x.id)).sort((a, b) => b.id - a.id);
+                  return [...pinned, ...rest];
+                });
+              }
+              if (r.status) showGoldAlert(t(pin ? "pin_done" : "pin_undone"));
+              else if (r.limit_reached) showGoldAlert(t("pin_limit"));
+              else showGoldAlert(r.message || "Something went wrong. Please try again.");
+            } catch {
+              showGoldAlert("Something went wrong. Please try again.");
+            }
+          }}
+          onDelete={async () => {
+            const target = menuFor;
+            setMenuFor(null);
+            const yes = await showGoldConfirm({ message: t("pin_delete_ask"), confirmLabel: t("delete"), cancelLabel: t("cancel"), danger: true });
+            if (!yes) return;
+            try {
+              const r = await socialCall<unknown>("deletePost", { user_id: socialMe.id, post_id: target.id });
+              if (r.status) setTabVideos((list) => list.filter((x) => x.id !== target.id));
+              else showGoldAlert(r.message || "Something went wrong. Please try again.");
+            } catch {
+              showGoldAlert("Something went wrong. Please try again.");
+            }
+          }}
+        />
+      )}
 
       {viewingPhoto && (
         <div onClick={() => setViewingPhoto(null)}
@@ -979,6 +1059,29 @@ export function ProfilePage() {
           onDone={(message) => showGoldAlert(message)}
         />
       )}
+    </div>
+  );
+}
+
+/** The gold hold menu on your own video tile (Steve, 2026-11-20: "redesign it to our design ...
+ *  add Pin") — black card, gold border, gold title, one gold-outlined row per action. */
+function OwnVideoMenu({ post: p, onPin, onDelete, onClose }: { post: ProfilePost; onPin: () => void; onDelete: () => void; onClose: () => void }) {
+  const { t } = useT();
+  const row: React.CSSProperties = { display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%", padding: "12px 14px", background: "transparent", color: "#fff", border: "1px solid var(--gold-border)", borderRadius: 10, fontSize: 15, fontWeight: 600, cursor: "pointer" };
+  return (
+    <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 70, background: "rgba(0,0,0,.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+      <div onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true"
+        style={{ width: 300, maxWidth: "100%", background: "#000", border: "2px solid var(--gold-border)", borderRadius: 10, padding: "16px 16px 14px", textAlign: "center" }}>
+        <div style={{ color: "var(--gold)", fontWeight: 800, fontSize: 18, letterSpacing: ".04em" }}>✦ #{p.user_video_number ?? p.id} ✦</div>
+        <div style={{ height: 2, margin: "10px -8px 12px", background: "linear-gradient(90deg, transparent, var(--gold-border), transparent)" }} />
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <button style={row} onClick={onPin}><span style={{ color: "var(--gold)", display: "inline-flex" }}><PinGlyph size={14} /></span>{t(p.pinned_at ? "pin_unpin" : "pin_to_top")}</button>
+          <button style={row} onClick={onDelete}>{t("delete")}</button>
+        </div>
+        <button onClick={onClose} style={{ marginTop: 14, padding: "8px 28px", background: "#000", color: "var(--gold)", border: "1px solid var(--gold-border)", borderRadius: 999, fontWeight: 800, fontSize: 13, letterSpacing: ".05em", cursor: "pointer" }}>
+          {t("close").toUpperCase()}
+        </button>
+      </div>
     </div>
   );
 }

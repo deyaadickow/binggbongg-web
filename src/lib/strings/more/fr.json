@@ -1859,5 +1859,12 @@
  "fa_more": "Afficher plus de questions",
  "fa_error": "Bingg et Bongg ne peuvent pas répondre pour le moment. Veuillez réessayer dans un instant.",
  "fblurb_ai_assistant": "Appuyez sur Bingg ou Bongg dans le flux d'accueil. Ils vous poseront quelques questions et vous montreront tout ce que Bingg Bongg peut faire.",
- "fname_ai_assistant": "Assistant IA Bingg Bongg"
+ "fname_ai_assistant": "Assistant IA Bingg Bongg",
+ "pin_to_top": "Épingler en haut",
+ "pin_unpin": "Désépingler",
+ "pin_limit": "Vous ne pouvez épingler que 3 vidéos. Désépinglez-en une d'abord.",
+ "pin_done": "Épinglée en haut de votre profil",
+ "pin_undone": "Désépinglée",
+ "pin_badge": "Épinglée",
+ "pin_delete_ask": "Voulez-vous vraiment supprimer cette publication ?"
 }

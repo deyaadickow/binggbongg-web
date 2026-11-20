@@ -1859,5 +1859,12 @@
  "fa_more": "Zobraziť viac otázok",
  "fa_error": "Bingg a Bongg momentálne nemôžu odpovedať. Skúste to znova o chvíľu.",
  "fblurb_ai_assistant": "Klepnite na Bingg alebo Bongg na domovskej stránke. Položia vám niekoľko otázok a ukážu vám všetko, čo Bingg Bongg dokáže.",
- "fname_ai_assistant": "Bingg Bongg AI asistent"
+ "fname_ai_assistant": "Bingg Bongg AI asistent",
+ "pin_to_top": "Pripnúť navrch",
+ "pin_unpin": "Odopnúť",
+ "pin_limit": "Môžete pripnúť iba 3 videá. Najprv jedno odopnite.",
+ "pin_done": "Pripnuté navrch vášho profilu",
+ "pin_undone": "Odopnuté",
+ "pin_badge": "Pripnuté",
+ "pin_delete_ask": "Naozaj chcete odstrániť tento príspevok?"
 }

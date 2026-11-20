@@ -1856,5 +1856,12 @@
  "fa_more": "Rodyti daugiau klausimų",
  "fa_error": "Bingg ir Bongg šiuo metu negali atsakyti. Bandykite dar kartą po akimirkos.",
  "fblurb_ai_assistant": "Pagrindiniame sraute palieskite „Bingg“ arba „Bongg“. Jie užduos jums keletą klausimų ir parodys viską, ką gali „Bingg Bongg“.",
- "fname_ai_assistant": "Bingg Bongg dirbtinio intelekto asistentas"
+ "fname_ai_assistant": "Bingg Bongg dirbtinio intelekto asistentas",
+ "pin_to_top": "Prisegti viršuje",
+ "pin_unpin": "Atsegti",
+ "pin_limit": "Galite prisegti tik 3 vaizdo įrašus. Pirmiau atsekite vieną.",
+ "pin_done": "Prisegta jūsų profilio viršuje",
+ "pin_undone": "Atsegta",
+ "pin_badge": "Prisegta",
+ "pin_delete_ask": "Ar tikrai norite ištrinti šį įrašą?"
 }

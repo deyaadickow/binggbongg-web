@@ -2548,4 +2548,12 @@ export const id = {
   fa_error: "Bingg dan Bongg tidak dapat menjawab saat ini. Silakan coba lagi sebentar lagi.",
   fblurb_ai_assistant: "Ketuk Bingg atau Bongg di beranda. Mereka akan mengajukan beberapa pertanyaan dan menunjukkan semua yang dapat dilakukan Bingg Bongg.",
   fname_ai_assistant: "Asisten AI Bingg Bongg",
+  // Pin up to 3 videos on your profile (2026-11-20)
+  pin_to_top: "Sematkan di atas",
+  pin_unpin: "Lepas sematan",
+  pin_limit: "Kamu hanya bisa menyematkan 3 video. Lepas sematan satu dulu.",
+  pin_done: "Disematkan di atas profilmu",
+  pin_undone: "Sematan dilepas",
+  pin_badge: "Disematkan",
+  pin_delete_ask: "Apakah Anda benar-benar ingin menghapus postingan ini?",
 };

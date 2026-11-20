@@ -1857,5 +1857,12 @@
  "fa_more": "Wys my meer vrae",
  "fa_error": "Bingg en Bongg kan nie nou antwoord nie. Probeer asseblief weer oor 'n oomblik.",
  "fblurb_ai_assistant": "Tik Bingg of Bongg op die tuisblad. Hulle vra jou 'n paar vrae en wys jou alles wat Bingg Bongg kan doen.",
- "fname_ai_assistant": "Bingg Bongg KI-assistent"
+ "fname_ai_assistant": "Bingg Bongg KI-assistent",
+ "pin_to_top": "Speld bo-aan vas",
+ "pin_unpin": "Maak los",
+ "pin_limit": "Jy kan net 3 video's vasspeld. Maak eers een los.",
+ "pin_done": "Bo-aan jou profiel vasgespeld",
+ "pin_undone": "Losgemaak",
+ "pin_badge": "Vasgespeld",
+ "pin_delete_ask": "Wil jy regtig hierdie plasing verwyder?"
 }

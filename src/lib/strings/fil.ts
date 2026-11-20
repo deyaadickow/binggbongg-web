@@ -2711,4 +2711,12 @@ export const fil = {
   fa_error: "Hindi makasagot sina Bingg at Bongg sa ngayon. Pakisubukang muli maya-maya.",
   fblurb_ai_assistant: "I-tap ang Bingg o Bongg sa Home feed. Magtatanong sila sa iyo ng ilang bagay at ipapakita sa iyo ang lahat ng kayang gawin ni Bingg Bongg.",
   fname_ai_assistant: "Bingg Bongg AI Assistant",
+  // Pin up to 3 videos on your profile (2026-11-20)
+  pin_to_top: "I-pin sa itaas",
+  pin_unpin: "I-unpin",
+  pin_limit: "3 video lang ang puwede mong i-pin. Mag-unpin muna ng isa.",
+  pin_done: "Naka-pin na sa itaas ng profile mo",
+  pin_undone: "Na-unpin na",
+  pin_badge: "Naka-pin",
+  pin_delete_ask: "Gusto mo ba talagang burahin ang post na ito?",
 };

@@ -1859,5 +1859,12 @@
  "fa_more": "Hiển thị thêm câu hỏi",
  "fa_error": "Bingg và Bongg hiện không thể trả lời. Vui lòng thử lại sau một lát.",
  "fblurb_ai_assistant": "Hãy nhấn vào Bingg hoặc Bongg trên trang chủ. Họ sẽ hỏi bạn một vài câu hỏi và cho bạn thấy tất cả những gì Bingg Bongg có thể làm.",
- "fname_ai_assistant": "Trợ lý AI Bingg Bongg"
+ "fname_ai_assistant": "Trợ lý AI Bingg Bongg",
+ "pin_to_top": "Ghim lên đầu",
+ "pin_unpin": "Bỏ ghim",
+ "pin_limit": "Bạn chỉ có thể ghim 3 video. Hãy bỏ ghim một video trước.",
+ "pin_done": "Đã ghim lên đầu hồ sơ của bạn",
+ "pin_undone": "Đã bỏ ghim",
+ "pin_badge": "Đã ghim",
+ "pin_delete_ask": "Bạn có thực sự muốn xóa bài viết này không?"
 }

@@ -2512,4 +2512,12 @@ export const es = {
   fa_error: "Bingg y Bongg no pueden responder ahora mismo. Inténtalo de nuevo en un momento.",
   fblurb_ai_assistant: "Pulsa Bingg o Bongg en la página de inicio. Te harán algunas preguntas y te mostrarán todo lo que Bingg Bongg puede hacer.",
   fname_ai_assistant: "Asistente de IA Bingg Bongg",
+  // Pin up to 3 videos on your profile (2026-11-20)
+  pin_to_top: "Fijar arriba",
+  pin_unpin: "Desfijar",
+  pin_limit: "Solo puedes fijar 3 videos. Desfija uno primero.",
+  pin_done: "Fijado arriba en tu perfil",
+  pin_undone: "Desfijado",
+  pin_badge: "Fijado",
+  pin_delete_ask: "¿Realmente quieres eliminar esta publicación?",
 };

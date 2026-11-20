@@ -1859,5 +1859,12 @@
  "fa_more": "Laat me meer vragen zien",
  "fa_error": "Bingg en Bongg kunnen nu niet antwoorden. Probeer het over een moment nog eens.",
  "fblurb_ai_assistant": "Tik op Bingg of Bongg in het startscherm. Ze stellen je een paar vragen en laten je alles zien wat Bingg Bongg kan.",
- "fname_ai_assistant": "Bingg Bongg AI-assistent"
+ "fname_ai_assistant": "Bingg Bongg AI-assistent",
+ "pin_to_top": "Bovenaan vastzetten",
+ "pin_unpin": "Losmaken",
+ "pin_limit": "Je kunt maar 3 video's vastzetten. Maak er eerst een los.",
+ "pin_done": "Bovenaan je profiel vastgezet",
+ "pin_undone": "Losgemaakt",
+ "pin_badge": "Vastgezet",
+ "pin_delete_ask": "Wilt u dit bericht echt verwijderen?"
 }

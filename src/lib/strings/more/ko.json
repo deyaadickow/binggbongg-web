@@ -1859,5 +1859,12 @@
  "fa_more": "더 많은 질문을 보여주세요",
  "fa_error": "Bingg Bongg 지금 응답할 수 없습니다. 잠시 후 다시 시도해 주세요.",
  "fblurb_ai_assistant": "홈 화면에서 Bingg 또는 Bongg 탭하세요. 몇 가지 질문을 하고 Bingg Bongg 할 수 있는 모든 것을 보여줍니다.",
- "fname_ai_assistant": "Bingg Bongg AI 어시스턴트"
+ "fname_ai_assistant": "Bingg Bongg AI 어시스턴트",
+ "pin_to_top": "맨 위에 고정",
+ "pin_unpin": "고정 해제",
+ "pin_limit": "동영상은 3개까지만 고정할 수 있어요. 먼저 하나를 고정 해제하세요.",
+ "pin_done": "프로필 맨 위에 고정했어요",
+ "pin_undone": "고정 해제됨",
+ "pin_badge": "고정됨",
+ "pin_delete_ask": "이 게시물을 정말 삭제하시겠습니까?"
 }

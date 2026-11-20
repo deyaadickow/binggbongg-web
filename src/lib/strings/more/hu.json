@@ -1852,5 +1852,12 @@
  "fa_more": "Mutass több kérdést",
  "fa_error": "Bingg és Bongg jelenleg nem tudnak válaszolni. Kérjük, próbáld újra később.",
  "fblurb_ai_assistant": "Koppints a Bingg vagy a Bongg elemre a kezdőlapon. Feltesznek neked néhány kérdést, és megmutatják, mit tud a Bingg Bongg.",
- "fname_ai_assistant": "Bingg Bongg mesterséges intelligencia asszisztens"
+ "fname_ai_assistant": "Bingg Bongg mesterséges intelligencia asszisztens",
+ "pin_to_top": "Kitűzés felülre",
+ "pin_unpin": "Kitűzés megszüntetése",
+ "pin_limit": "Csak 3 videót tűzhetsz ki. Előbb szüntesd meg egy kitűzését.",
+ "pin_done": "Kitűzve a profilod tetejére",
+ "pin_undone": "Kitűzés megszüntetve",
+ "pin_badge": "Kitűzve",
+ "pin_delete_ask": "Biztosan törölni szeretnéd ezt a bejegyzést?"
 }

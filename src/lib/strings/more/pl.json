@@ -1859,5 +1859,12 @@
  "fa_more": "Pokaż mi więcej pytań",
  "fa_error": "Bingg i Bongg nie mogą teraz odpowiedzieć. Spróbuj ponownie za chwilę.",
  "fblurb_ai_assistant": "Kliknij Bingg lub Bongg na stronie głównej. Zadadzą Ci kilka pytań i pokażą Ci, co potrafi Bingg Bongg.",
- "fname_ai_assistant": "Asystent AI Bingg Bongg"
+ "fname_ai_assistant": "Asystent AI Bingg Bongg",
+ "pin_to_top": "Przypnij na górze",
+ "pin_unpin": "Odepnij",
+ "pin_limit": "Możesz przypiąć tylko 3 filmy. Najpierw odepnij jeden.",
+ "pin_done": "Przypięto na górze Twojego profilu",
+ "pin_undone": "Odpięto",
+ "pin_badge": "Przypięte",
+ "pin_delete_ask": "Czy na pewno chcesz usunąć ten post?"
 }

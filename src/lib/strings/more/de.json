@@ -1859,5 +1859,12 @@
  "fa_more": "Zeige mir weitere Fragen",
  "fa_error": "Bingg und Bongg können momentan nicht antworten. Bitte versuchen Sie es in einem Moment noch einmal.",
  "fblurb_ai_assistant": "Tippe auf Bingg oder Bongg im Home-Feed. Sie stellen dir ein paar Fragen und zeigen dir alle Funktionen von Bingg Bongg.",
- "fname_ai_assistant": "Bingg Bongg KI-Assistent"
+ "fname_ai_assistant": "Bingg Bongg KI-Assistent",
+ "pin_to_top": "Oben anheften",
+ "pin_unpin": "Lösen",
+ "pin_limit": "Du kannst nur 3 Videos anheften. Löse zuerst eines.",
+ "pin_done": "Oben in deinem Profil angeheftet",
+ "pin_undone": "Gelöst",
+ "pin_badge": "Angeheftet",
+ "pin_delete_ask": "Möchten Sie diesen Beitrag wirklich löschen?"
 }
