@@ -55,6 +55,7 @@ import { DailyFortunePage } from "./pages/DailyFortunePage";
 import { BirthdayPage } from "./pages/BirthdayPage";
 import { SupporterBreakdownPage, SupportersPage } from "./pages/SupportersPage";
 import { MyAnalyticsPage } from "./pages/MyAnalyticsPage";
+import { MemberBadgesPage } from "./pages/MemberBadgesPage";
 import { PostAnalyticsPage } from "./pages/PostAnalyticsPage";
 import { AdAnalyticsPage } from "./pages/AdAnalyticsPage";
 import { LandingPage } from "./pages/LandingPage";
@@ -219,6 +220,7 @@ export default function App() {
           <Route path="/support/:id" element={<SupporterBreakdownPage />} />
           {/* My Analytics (Steve, 2026-10-31: "Can we add analytics for all members?"). */}
           <Route path="/my-analytics" element={<MyAnalyticsPage />} />
+          <Route path="/badges/:id" element={<MemberBadgesPage />} />
           <Route path="/search" element={<SearchPage />} />
           {/* Finding videos (Steve, 2026-11-16): Discover, a hashtag's videos, a topic's videos, Filter keywords. */}
           <Route path="/discover" element={<DiscoverPage />} />

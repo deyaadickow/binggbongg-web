@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 import { Link } from "react-router-dom";
 import { displayName, mediaUrl, type Gift, type Post } from "../lib/api";
 import { Avatar } from "./Common";
-import { BattleBadge, BattleInfoPopup, BattleStreak, battleBadgeExplainer, battleStreakExplainer } from "./BattleBadge";
+import { MemberBullseye } from "./MemberBullseye";
 import { GiftFlash, PostGiftButton } from "./GiftSheet";
 import { HashtagText } from "./HashtagText";
 import { SearchTopicBar } from "./SearchTopicBar";
@@ -12,9 +12,6 @@ import { useT } from "../lib/i18n";
 export function PostCard({ post }: { post: Post }) {
   const { t } = useT();
   const [sent, setSent] = useState<Gift | null>(null);
-  // Steve, 2026-10-05: "Make all popup into our design black and gold" — the explainers for the
-  // two circles open the app's own popup, not the browser's white alert box.
-  const [info, setInfo] = useState<{ title: string; body: string; flames?: number } | null>(null);
   const clearSent = useCallback(() => setSent(null), []);
   return (
     <div className="card post-card">
@@ -39,39 +36,11 @@ export function PostCard({ post }: { post: Post }) {
         <Link to={`/profile/${post.user_id}`} className="row" style={{ color: "inherit", minWidth: 0, flex: 1 }}>
           <Avatar user={post.user} />
           <div style={{ minWidth: 0 }}>
-            {/* Steve, 2026-10-05: the Bingg Bongg Battle Badge beside their name, and clicking
-                it explains what the number is. */}
+            {/* Steve, 2026-11-20: "I wanna clean the screen" — the Battle Badge circle and the
+                streak pill left the name; the gold bullseye opens all of them on /badges/<id>. */}
             <div className="row" style={{ gap: 6, minWidth: 0 }}>
               <span style={{ fontWeight: 800, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{displayName(post.user)}</span>
-              <BattleBadge
-                badge={post.user?.battle_badge}
-                size={26}
-                onClick={(e) => {
-                  // The whole card is a <Link> to the profile — explaining the circle must not
-                  // also navigate away from the feed.
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setInfo({
-                    title: "Bingg Bongg Battle Badge",
-                    body: battleBadgeExplainer(displayName(post.user), post.user?.battle_badge ?? 0),
-                  });
-                }}
-              />
-              {/* Steve, 2026-10-05: the streak beside it — the flames are the free days banked. */}
-              <BattleStreak
-                streak={post.user?.battle_streak}
-                flames={post.user?.battle_flames}
-                size={26}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setInfo({
-                    title: "Battle Streak",
-                    body: battleStreakExplainer(displayName(post.user), post.user?.battle_streak ?? 0, post.user?.battle_flames ?? 0),
-                    flames: post.user?.battle_flames ?? 0,
-                  });
-                }}
-              />
+              <MemberBullseye userId={post.user_id ?? post.user?.id} />
             </div>
             <div className="muted" style={{ fontSize: 12, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}><HashtagText inLink text={post.description || (post.hashtags ? post.hashtags.split(",").filter(Boolean).map((h) => "#" + h.replace(/^#/, "")).join(" ") : "")} /></div>
           </div>
@@ -81,7 +50,6 @@ export function PostCard({ post }: { post: Post }) {
       </div>
       {/* Steve, 2026-11-20: "Search · <topic>" under every video, one click to search what they are talking about. */}
       <SearchTopicBar post={post} compact />
-      {info && <BattleInfoPopup title={info.title} body={info.body} flames={info.flames} onClose={() => setInfo(null)} />}
     </div>
   );
 }

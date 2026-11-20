@@ -24,6 +24,7 @@ import { devCreatorDecorate } from "../lib/creators";
 import { setFeed as saveFeedQueue } from "../lib/feed";
 import { rollGoldNow } from "../lib/goldDigger";
 import { FolderPartChip } from "../components/ProfileFolders";
+import { MemberBullseye } from "../components/MemberBullseye";
 
 const AUTO_KEY = "bb.autoplayNext";
 
@@ -703,7 +704,11 @@ export function VideoPage() {
           <Link to={`/profile/${item.user_id}`}><Avatar user={item.user} /></Link>
         )}
         <div style={{ flex: 1, minWidth: 0 }}>
-          <Link to={`/profile/${item.user_id}`} style={{ fontWeight: 800, color: "var(--text)" }}>{displayName(item.user)}</Link>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0 }}>
+            <Link to={`/profile/${item.user_id}`} style={{ fontWeight: 800, color: "var(--text)", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayName(item.user)}</Link>
+            {/* Steve, 2026-11-20: the gold bullseye beside the name opens their badges page. */}
+            <MemberBullseye userId={item.user_id ?? item.user?.id} />
+          </div>
           <div className="soft" style={{ wordBreak: "break-word" }}><HashtagText text={item.description} /></div>
           {/* Steve, 2026-11-16: "Duet with @name" / "Stitched from @name" opens the original. */}
           {item.remix_of && (
