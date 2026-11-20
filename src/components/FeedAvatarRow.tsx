@@ -69,7 +69,7 @@ export function FeedAvatarRow({ tab, meId, showKey }: { tab: FeedTab; meId: numb
         <span className="fav-name">{t("fav_create")}</span>
       </button>
       {rows.map((a) => {
-        const name = a.fullname?.trim() || a.username || displayName(a);
+        const name = a.fullname?.trim() || a.username || displayName({ username: a.username });
         const src = mediaUrl(a.profile_image);
         return (
           <div key={a.id} className="fav-item" role="listitem">
