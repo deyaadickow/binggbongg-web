@@ -4,9 +4,10 @@
  * folder's ⋮ (rename / delete). Also the imperative folder picker used by Upload and by the
  * video hold menu's "Move to folder" (pickFolder), and the name dialog (askFolderName).
  */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { tt, useT } from "../lib/i18n";
+import { mediaUrl } from "../lib/api";
 import { showGoldAlert, showGoldConfirm } from "./GoldToast";
 import {
   FOLDER_NAME_MAX, FOLDERS_CHANGED, announceFoldersChanged, createPostFolder, deletePostFolder,
@@ -188,33 +189,90 @@ export function ProfileFolders({ profileId, isMe, myId, selected, onSelect }: {
     announceFoldersChanged();
   }
 
+  const menuFolder = folders.find((f) => f.id === menuFor) ?? null;
   return (
-    <div className="profile-folders" style={{ display: "flex", gap: 8, overflowX: "auto", padding: "10px 2px 12px", alignItems: "center" }}>
-      <button style={chip(selected === 0)} onClick={() => onSelect(0)}>{t("fld_all_videos")}</button>
+    <div className="profile-folders" style={{ display: "flex", gap: 10, overflowX: "auto", padding: "10px 2px 12px", alignItems: "flex-end" }}>
+      <FolderTile label={t("fld_all_videos")} active={selected === 0} icon="▦" onClick={() => onSelect(0)} />
       {folders.map((f) => (
-        <span key={f.id} style={{ position: "relative", display: "inline-flex" }}>
-          <button style={chip(selected === f.id)} onClick={() => onSelect(f.id)}
-            onContextMenu={(e) => { if (isMe) { e.preventDefault(); setMenuFor(f.id); } }}>
-            📁 {f.name} <span style={{ opacity: .8, fontWeight: 600 }}>{f.post_count}</span>
-            {isMe && (
-              <span role="button" aria-label="⋮" onClick={(e) => { e.stopPropagation(); setMenuFor(menuFor === f.id ? null : f.id); }}
-                style={{ marginLeft: 2, padding: "0 2px", fontWeight: 900 }}>⋮</span>
-            )}
-          </button>
-          {menuFor === f.id && (
-            <span style={{ position: "absolute", top: "110%", left: 0, zIndex: 30, background: "#000", border: "1.5px solid var(--gold-border)", borderRadius: 12, padding: 6, display: "flex", flexDirection: "column", gap: 4, minWidth: 170 }}>
-              <button className="btn" style={{ color: "var(--gold)", background: "#000", borderColor: "var(--gold-border)" }} onClick={() => void rename(f)}>✏️ {t("fld_rename")}</button>
-              <button className="btn" style={{ color: "#ff6b6b", background: "#000", borderColor: "var(--gold-border)" }} onClick={() => void remove(f)}>🗑️ {t("fld_delete")}</button>
-            </span>
-          )}
-        </span>
+        <FolderTile key={f.id} label={f.name} count={f.post_count} cover={f.cover} active={selected === f.id}
+          onClick={() => onSelect(f.id)}
+          onMenu={isMe ? () => setMenuFor(f.id) : undefined} />
       ))}
       {isMe && myId && (
-        <button style={{ ...chip(false), borderStyle: "dashed" }}
-          onClick={async () => { const f = await createFolderFlow(myId); if (f) onSelect(f.id); }}>
-          + {t("fld_new_folder")}
-        </button>
+        <FolderTile label={t("fld_new_folder")} icon="+" dashed
+          onClick={async () => { const f = await createFolderFlow(myId); if (f) onSelect(f.id); }} />
+      )}
+      {menuFolder && (
+        <div style={overlay} onClick={() => setMenuFor(null)}>
+          <div className="card pad" style={{ ...card, textAlign: "center" }} onClick={(e) => e.stopPropagation()}>
+            <h3 style={{ margin: "0 0 14px", color: "var(--gold)" }}>📁 {menuFolder.name}</h3>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <button className="btn" style={{ color: "var(--gold)", background: "#000", borderColor: "var(--gold-border)" }} onClick={() => void rename(menuFolder)}>✏️ {t("fld_rename")}</button>
+              <button className="btn" style={{ color: "#ff6b6b", background: "#000", borderColor: "var(--gold-border)" }} onClick={() => void remove(menuFolder)}>🗑️ {t("fld_delete")}</button>
+              <button className="btn" onClick={() => setMenuFor(null)}>{t("fld_cancel")}</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
+  );
+}
+
+/**
+ * One folder, drawn as a folder (Steve, 2026-11-20: "make it look like a folder but also the front
+ * of it will look like their first video with a name of the folder on the bottom of the folder").
+ * Gold tab on top, gold-outlined front showing the first video's thumbnail (dark with an icon when
+ * empty), and the name + count on a dark strip along the bottom. Owner: hold / right-click / ⋮.
+ */
+function FolderTile({ label, count, cover, icon, active, dashed, onClick, onMenu }: {
+  label: string; count?: number; cover?: string | null; icon?: string; active?: boolean; dashed?: boolean;
+  onClick: () => void; onMenu?: () => void;
+}) {
+  const hold = useRef<number | null>(null);
+  const held = useRef(false);
+  const stop = () => { if (hold.current) { window.clearTimeout(hold.current); hold.current = null; } };
+  const border = `${active ? 3 : 2}px ${dashed ? "dashed" : "solid"} ${active ? "var(--gold-bright)" : "var(--gold-border)"}`;
+  const img = cover ? mediaUrl(cover) : "";
+  return (
+    <button type="button" title={label}
+      onClick={() => { if (held.current) { held.current = false; return; } onClick(); }}
+      onContextMenu={(e) => { if (onMenu) { e.preventDefault(); onMenu(); } }}
+      onPointerDown={() => { held.current = false; stop(); if (onMenu) hold.current = window.setTimeout(() => { held.current = true; onMenu(); }, 650); }}
+      onPointerUp={stop} onPointerLeave={stop} onPointerCancel={stop}
+      style={{ flex: "0 0 auto", width: 112, padding: 0, background: "transparent", border: "none", cursor: "pointer", position: "relative",
+        filter: active ? "drop-shadow(0 0 6px rgba(240,196,32,.55))" : undefined }}>
+      {/* the folder's tab */}
+      <div style={{ width: 46, height: 12, marginLeft: 8, borderTop: border, borderLeft: border, borderRight: border,
+        borderRadius: "7px 7px 0 0", background: active ? "var(--gold-border)" : "#000" }} />
+      {/* the front */}
+      <div style={{ position: "relative", height: 92, marginTop: -2, border, borderRadius: "0 10px 10px 10px", overflow: "hidden",
+        background: img ? `#000 url("${img}") center/cover no-repeat` : "linear-gradient(160deg,#1a1a1a,#050505)" }}>
+        {!img && (
+          <span style={{ position: "absolute", inset: "0 0 28px 0", display: "flex", alignItems: "center", justifyContent: "center",
+            color: "var(--gold)", fontSize: icon === "+" ? 34 : 28, fontWeight: 800 }}>{icon ?? <GoldFolderIcon />}</span>
+        )}
+        {onMenu && (
+          <span role="button" aria-label="⋮" onPointerDown={(e) => e.stopPropagation()}
+            onClick={(e) => { e.stopPropagation(); onMenu(); }}
+            style={{ position: "absolute", top: 3, right: 3, width: 22, height: 22, borderRadius: 11, background: "rgba(0,0,0,.7)",
+              color: "var(--gold)", fontWeight: 900, lineHeight: "22px", fontSize: 14 }}>⋮</span>
+        )}
+        <span style={{ position: "absolute", left: 0, right: 0, bottom: 0, padding: "5px 6px", background: "rgba(0,0,0,.82)",
+          borderTop: "1px solid var(--gold-border)", color: "var(--gold)", fontWeight: 800, fontSize: 12.5,
+          display: "flex", gap: 4, justifyContent: "center", alignItems: "baseline" }}>
+          <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{label}</span>
+          {count != null && <span style={{ opacity: .8, fontWeight: 700, flex: "0 0 auto" }}>{count}</span>}
+        </span>
+      </div>
+    </button>
+  );
+}
+
+/** A small gold-outlined folder for an empty folder's front. */
+function GoldFolderIcon() {
+  return (
+    <svg width="34" height="28" viewBox="0 0 34 28" aria-hidden="true">
+      <path d="M2 5a3 3 0 0 1 3-3h8l3 3h13a3 3 0 0 1 3 3v15a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3z" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinejoin="round" />
+    </svg>
   );
 }
