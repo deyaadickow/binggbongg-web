@@ -512,7 +512,7 @@ export function ProfilePage() {
     // fetchRepostVideos, fetchFriendsList and fetchUserWatchHistory — so those tabs 404'd and
     // rendered empty forever. A guessed endpoint name fails exactly like a missing feature.
     const endpointMap: Record<Exclude<TabKey, "photos" | "business" | "playlists" | "series" | "qa">, [string, Record<string, unknown>]> = {
-      videos: ["fetchUserPosts", { user_id: id, ...base, ...(folderSel > 0 ? { folder_id: folderSel } : {}) }],
+      videos: ["fetchUserPosts", { user_id: id, ...base, ...(folderSel > 0 ? { folder_id: folderSel } : { no_folder: 1 }) }],
       // NOT fetchUserPostsWithLikes: that returns THIS member's own posts that have received
       // likes, whereas the "Likes" count beside the tab is likedVideosCounts — the videos they
       // liked. fetchUserLikedPosts is the one that matches the number.
@@ -1049,7 +1049,7 @@ export function ProfilePage() {
             try {
               const r = await setPostFolder(socialMe.id, target.id, to);
               if (!r.status) { showGoldAlert(r.message || "Something went wrong. Please try again."); return; }
-              setTabVideos((list) => folderSel > 0 && to !== folderSel
+              setTabVideos((list) => to !== folderSel
                 ? list.filter((x) => x.id !== target.id)
                 : list.map((x) => (x.id === target.id ? { ...x, folder_id: to || null } : x)));
               announceFoldersChanged();
