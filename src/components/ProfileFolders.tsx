@@ -11,7 +11,7 @@ import { mediaUrl } from "../lib/api";
 import { showGoldAlert, showGoldConfirm } from "./GoldToast";
 import {
   FOLDER_NAME_MAX, FOLDERS_CHANGED, announceFoldersChanged, createPostFolder, deletePostFolder,
-  fetchFolderVideos, fetchPostFolders, renamePostFolder, setFolderOrder, setFolderSeries,
+  createFolderSeries, fetchAllMyVideos, fetchFolderVideos, fetchPostFolders, renamePostFolder, setFolderOrder, setFolderSeries,
   type FolderVideo, type PostFolder,
 } from "../lib/folders";
 
@@ -370,7 +370,7 @@ function FolderOrderSheet({ folder, profileId, myId, onClose, onSaved }: {
 
   function startDrag(e: React.PointerEvent, from: number) {
     e.preventDefault();
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    try { (e.target as HTMLElement).setPointerCapture(e.pointerId); } catch { /* not an active pointer */ }
     setDragAt(from);
     let at = from;
     const top = listRef.current?.getBoundingClientRect().top ?? 0;
@@ -378,9 +378,10 @@ function FolderOrderSheet({ folder, profileId, myId, onClose, onSaved }: {
       if (!rows) return;
       const to = Math.max(0, Math.min(rows.length - 1, Math.floor((ev.clientY - top + (listRef.current?.scrollTop ?? 0)) / ROW)));
       if (to !== at) {
+        const from = at; // read now: the updater runs later, after `at` has moved on
         setRows((list) => {
           if (!list) return list;
-          const next = [...list]; const [it] = next.splice(at, 1); next.splice(to, 0, it); return next;
+          const next = [...list]; const [it] = next.splice(from, 1); next.splice(to, 0, it); return next;
         });
         at = to; setDragAt(to);
       }
@@ -427,7 +428,7 @@ function FolderOrderSheet({ folder, profileId, myId, onClose, onSaved }: {
                 background: dragAt === i ? "rgba(240,196,32,.12)" : "#000" }}>
                 <div style={{ width: 50, height: 60, borderRadius: 6, flex: "0 0 auto", background: v.thumbnail ? `#111 url("${mediaUrl(v.thumbnail)}") center/cover` : "#111" }} />
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ color: "var(--gold)", fontWeight: 900, fontSize: 18 }}>#{i + 1}</div>
+                  <div style={{ color: "var(--gold)", fontWeight: 900, fontSize: 18 }}>{t("fld_video_n", i + 1)}</div>
                   {(v.description ?? "").trim() && (
                     <div className="muted" style={{ fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{v.description}</div>
                   )}
@@ -440,6 +441,140 @@ function FolderOrderSheet({ folder, profileId, myId, onClose, onSaved }: {
         <button className="btn" disabled={saving || !rows?.length} onClick={() => void update()}
           style={{ marginTop: 12, height: 46, color: "var(--gold-bright)", background: "#000", border: "1.5px solid var(--gold-border)", fontWeight: 800 }}>
           {saving ? "…" : t("fld_update")}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Create Series, the Create Playlist way (Steve, 2026-11-20: "this is how i want to create a
+ * playlist/Series. with the folder videos"): 1) a name, 2) tap your videos, 3) drag them into
+ * order (top = #1) and Add. The server makes a numbered folder and moves those videos into it.
+ */
+export function CreateSeriesSheet({ myId, onClose, onSaved }: { myId: number; onClose: () => void; onSaved: (folderId: number) => void }) {
+  const { t } = useT();
+  const [step, setStep] = useState(0);
+  const [name, setName] = useState("");
+  const [videos, setVideos] = useState<FolderVideo[] | null>(null);
+  const [picked, setPicked] = useState<FolderVideo[]>([]);
+  const [dragAt, setDragAt] = useState<number | null>(null);
+  const [saving, setSaving] = useState(false);
+  const listRef = useRef<HTMLDivElement>(null);
+  const ROW = 76;
+  const clean = name.trim().replace(/\s+/g, " ");
+
+  useEffect(() => {
+    let live = true;
+    void fetchAllMyVideos(myId).then((v) => { if (live) setVideos(v); }).catch(() => { if (live) setVideos([]); });
+    return () => { live = false; };
+  }, [myId]);
+
+  const toggle = (v: FolderVideo) => setPicked((p) => (p.some((x) => x.id === v.id) ? p.filter((x) => x.id !== v.id) : [...p, v]));
+
+  function startDrag(e: React.PointerEvent, from: number) {
+    e.preventDefault();
+    try { (e.target as HTMLElement).setPointerCapture(e.pointerId); } catch { /* not an active pointer */ }
+    setDragAt(from);
+    let at = from;
+    const top = listRef.current?.getBoundingClientRect().top ?? 0;
+    const move = (ev: PointerEvent) => {
+      const to = Math.max(0, Math.min(picked.length - 1, Math.floor((ev.clientY - top + (listRef.current?.scrollTop ?? 0)) / ROW)));
+      if (to !== at) {
+        const from = at; // read now: the updater runs later, after `at` has moved on
+        setPicked((list) => { const next = [...list]; const [it] = next.splice(from, 1); next.splice(to, 0, it); return next; });
+        at = to; setDragAt(to);
+      }
+    };
+    const up = () => {
+      setDragAt(null);
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      window.removeEventListener("pointercancel", up);
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+    window.addEventListener("pointercancel", up);
+  }
+
+  async function next() {
+    if (step === 0) { if (!clean || clean.length > FOLDER_NAME_MAX) { showGoldAlert(t("fld_bad_name")); return; } setStep(1); return; }
+    if (step === 1) { if (!picked.length) return; setStep(2); return; }
+    setSaving(true);
+    try {
+      const r = await createFolderSeries(myId, clean, picked.map((v) => v.id));
+      const e = errFrom(r);
+      if (e) { showGoldAlert(e); setSaving(false); if (r.code === "duplicate" || r.code === "bad_name") setStep(0); return; }
+      announceFoldersChanged();
+      onSaved(Number(r.folder?.id ?? 0));
+    } catch {
+      showGoldAlert(tt("something_went_wrong")); setSaving(false);
+    }
+  }
+
+  const ready = step === 0 ? !!clean : step === 1 ? picked.length > 0 : !saving;
+  return (
+    <div style={{ ...overlay, padding: 12 }} onClick={onClose}>
+      <div className="card pad" style={{ ...card, maxWidth: 460, boxSizing: "border-box", maxHeight: "88vh", display: "flex", flexDirection: "column" }}
+        onClick={(e) => e.stopPropagation()}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {step > 0 && <button className="btn small ghost" aria-label="‹" onClick={() => setStep(step - 1)}>‹</button>}
+          <h2 style={{ margin: 0, color: "var(--gold)", flex: 1, fontWeight: 900 }}>{t("fld_create_series")}</h2>
+          <button className="btn small ghost" aria-label={t("fld_cancel")} onClick={onClose}>✕</button>
+        </div>
+        {step > 0 && <div style={{ color: "var(--gold)", opacity: .85, fontWeight: 700, margin: "2px 0 4px" }}>📁 {clean}</div>}
+        <div className="muted" style={{ fontSize: 14, margin: "4px 0 10px" }}>
+          {step === 0 ? t("fld_series_name_sub") : step === 1 ? t("soc_playlist_pick_hint") : t("fld_edit_sub")}
+        </div>
+        {step === 0 && (
+          <input className="input" autoFocus maxLength={FOLDER_NAME_MAX} placeholder={t("fld_series_name_hint")} value={name}
+            onChange={(e) => setName(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") void next(); }} />
+        )}
+        {step === 1 && (
+          <div style={{ overflowY: "auto", flex: 1 }}>
+            {videos === null ? <div className="muted center" style={{ padding: 24 }}>…</div>
+              : videos.length === 0 ? <p className="muted center">{t("fld_empty")}</p>
+              : (
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6 }}>
+                  {videos.map((v) => {
+                    const n = picked.findIndex((x) => x.id === v.id);
+                    return (
+                      <button key={v.id} type="button" onClick={() => toggle(v)}
+                        style={{ position: "relative", aspectRatio: "3 / 4", borderRadius: 8, padding: 0, cursor: "pointer",
+                          border: `1.5px solid ${n >= 0 ? "var(--gold-bright)" : "var(--gold-border)"}`,
+                          background: v.thumbnail ? `#111 url("${mediaUrl(v.thumbnail)}") center/cover` : "#111" }}>
+                        <span style={{ position: "absolute", top: 5, right: 5, width: 22, height: 22, borderRadius: 11, display: "flex", alignItems: "center", justifyContent: "center",
+                          border: "2px solid " + (n >= 0 ? "var(--gold-bright)" : "#fff"), background: n >= 0 ? "var(--gold-bright)" : "rgba(0,0,0,.35)",
+                          color: "#000", fontWeight: 900, fontSize: 12 }}>{n >= 0 ? n + 1 : ""}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+          </div>
+        )}
+        {step === 2 && (
+          <div ref={listRef} style={{ overflowY: "auto", flex: 1, touchAction: dragAt === null ? "auto" : "none" }}>
+            {picked.map((v, i) => (
+              <div key={v.id} style={{ height: ROW - 8, marginBottom: 8, display: "flex", alignItems: "center", gap: 12, padding: "0 10px 0 4px",
+                borderRadius: 10, border: `1.5px solid ${dragAt === i ? "var(--gold-bright)" : "var(--gold-border)"}`,
+                background: dragAt === i ? "rgba(240,196,32,.12)" : "#000" }}>
+                <div style={{ width: 50, height: 60, borderRadius: 6, flex: "0 0 auto", background: v.thumbnail ? `#111 url("${mediaUrl(v.thumbnail)}") center/cover` : "#111" }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ color: "var(--gold)", fontWeight: 900, fontSize: 18 }}>{t("fld_video_n", i + 1)}</div>
+                  {(v.description ?? "").trim() && (
+                    <div className="muted" style={{ fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{v.description}</div>
+                  )}
+                </div>
+                <span role="button" aria-label="≡" onPointerDown={(e) => startDrag(e, i)}
+                  style={{ color: "var(--gold)", fontSize: 28, lineHeight: 1, padding: "8px 6px", cursor: "grab", touchAction: "none", userSelect: "none" }}>≡</span>
+              </div>
+            ))}
+          </div>
+        )}
+        <button className="btn" disabled={!ready} onClick={() => void next()}
+          style={{ marginTop: 12, height: 46, color: "var(--gold-bright)", background: "#000", border: "1.5px solid var(--gold-border)", fontWeight: 800, opacity: ready ? 1 : .5 }}>
+          {saving ? "…" : step === 2 ? t("add") : t("fld_next")}
         </button>
       </div>
     </div>

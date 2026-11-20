@@ -13,7 +13,7 @@ import { memberLabel, trackPage } from "../lib/pageTracker";
 import { ReportDialog } from "../components/ReportDialog";
 import { Avatar, Loading, Notice } from "../components/Common";
 import { fetchUserPhotos, type Photo } from "../lib/photos";
-import { ProfileFolders, askNumber, pickFolder } from "../components/ProfileFolders";
+import { CreateSeriesSheet, ProfileFolders, askNumber, pickFolder } from "../components/ProfileFolders";
 import { setPostFolder, setPostPosition, announceFoldersChanged } from "../lib/folders";
 import { MemberBusinessesPanel, MyBusinessesPanel } from "./BusinessPages";
 import { ScheduleSection } from "../components/ScheduleSection";
@@ -396,6 +396,7 @@ export function ProfilePage() {
   const [tabError, setTabError] = useState<string | null>(null);
   const [playlists, setPlaylists] = useState<PlaylistRow[]>([]);
   const [playlistCreate, setPlaylistCreate] = useState(0);
+  const [seriesCreate, setSeriesCreate] = useState(false);
   const [series, setSeries] = useState<Series[] | null>(null);
   // Q&A (2026-11-17): how many questions, once the tab has loaded them.
   const [qaCount, setQaCount] = useState<number | null>(null);
@@ -719,6 +720,10 @@ export function ProfilePage() {
 
   return (
     <div className="page" style={{ maxWidth: 600, margin: "0 auto" }}>
+      {seriesCreate && me?.id && (
+        <CreateSeriesSheet myId={Number(socialMe?.id ?? me.id)} onClose={() => setSeriesCreate(false)}
+          onSaved={(fid) => { setSeriesCreate(false); switchTab("videos"); setFolderSel(fid); }} />
+      )}
       {/* Header card. My Information (Steve, 2026-11-18: "Right under the image, Please add a
           \"My Information\" button ... Click on \"My Information\" button and add all the
           information on this page to that page. Video, Photos, Business, Following, etc this line
@@ -875,6 +880,10 @@ export function ProfilePage() {
           {isMe && (
             <button className="btn ghost small" onClick={() => { switchTab("playlists"); setPlaylistCreate((n) => n + 1); closeInfo(); }}>
               {t("playlist")}</button>
+          )}
+          {/* Create Series, the Create Playlist way (Steve, 2026-11-20). */}
+          {isMe && me?.id && (
+            <button className="btn ghost small" onClick={() => { setSeriesCreate(true); closeInfo(); }}>📁 {t("fld_create_series")}</button>
           )}
           {/* Creators and money (2026-11-17). */}
           {isMe && <button className="btn ghost small" onClick={() => navigate("/subscriptions")}>💎 {t("cm_my_subscription")}</button>}

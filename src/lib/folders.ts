@@ -38,6 +38,14 @@ async function write(endpoint: string, params: Record<string, unknown>): Promise
 }
 
 export const createPostFolder = (myId: number, name: string) => write("createPostFolder", { user_id: myId, name });
+/** Create Series the Create Playlist way (2026-11-20): a numbered folder with these videos, #1 first. */
+export const createFolderSeries = (myId: number, name: string, postIds: number[]) =>
+  write("createFolderSeries", { user_id: myId, name, post_ids: postIds.join(",") });
+/** Every video of a member (folders included) for the Create Series picker. */
+export async function fetchAllMyVideos(profileId: number): Promise<FolderVideo[]> {
+  const r = (await post("fetchUserPosts", { user_id: profileId, start: 0, count: 300 })) as unknown as { data?: FolderVideo[] };
+  return Array.isArray(r.data) ? r.data : [];
+}
 export const renamePostFolder = (myId: number, folderId: number, name: string) =>
   write("renamePostFolder", { user_id: myId, folder_id: folderId, name });
 export const deletePostFolder = (myId: number, folderId: number) =>
