@@ -29,9 +29,10 @@ const gold = "var(--gold)";
 function Card({ icon, title, value, body, extra }: { icon: React.ReactNode; title: string; value?: React.ReactNode; body: string; extra?: React.ReactNode }) {
   return (
     <section className="card" style={{ padding: "14px 16px", background: "#000", border: "1.5px solid var(--gold-border, #F0C420)", display: "grid", gap: 8 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <div style={{ width: 56, display: "flex", justifyContent: "center", flex: "0 0 auto" }}>{icon}</div>
-        <div style={{ flex: 1, minWidth: 0, color: gold, fontWeight: 800, fontSize: 17 }}>{title}</div>
+      {/* Steve, 2026-11-20: the heading of every box bigger and centred. */}
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, textAlign: "center" }}>
+        <div style={{ minHeight: 52, display: "flex", alignItems: "center", justifyContent: "center" }}>{icon}</div>
+        <div style={{ color: gold, fontWeight: 800, fontSize: 24, lineHeight: 1.15 }}>{title}</div>
         {value !== undefined && <div style={{ color: gold, fontWeight: 800, fontSize: 22, fontVariantNumeric: "tabular-nums" }}>{value}</div>}
       </div>
       <div style={{ height: 1, background: gold, opacity: 0.35 }} />
@@ -74,11 +75,12 @@ export function MemberBadgesPage() {
       {!data && !error && <Loading />}
       {data && (
         <div style={{ display: "grid", gap: 14 }}>
-          {/* Steve, 2026-11-20: "Enlarge the header and center it on top." */}
-          <Link to={`/profile/${data.user.id}`} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, color: gold, textDecoration: "none", textAlign: "center", padding: "4px 0 8px" }}>
-            <Avatar user={data.user} size="lg" />
-            <div style={{ fontWeight: 800, fontSize: 26, lineHeight: 1.15 }}>{displayName(data.user)}</div>
-            {data.user.username && <div style={{ opacity: 0.75, fontSize: 17 }}>@{data.user.username}</div>}
+          <Link to={`/profile/${data.user.id}`} style={{ display: "flex", alignItems: "center", gap: 12, color: gold, textDecoration: "none" }}>
+            <Avatar user={data.user} />
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontWeight: 800, fontSize: 17 }}>{displayName(data.user)}</div>
+              {data.user.username && <div style={{ opacity: 0.75 }}>@{data.user.username}</div>}
+            </div>
           </Link>
 
           <Card icon={<BattleBadge badge={data.battle_badge} size={40} />} title={t("mb_battle_badge")} body={t("mb_battle_badge_body")} />
