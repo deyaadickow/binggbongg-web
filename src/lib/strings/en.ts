@@ -3544,8 +3544,8 @@ export const en = {
   fld_edit_sub: "Drag the videos into order. The top video is #1, the next is #2.",
   fld_update: "Update",
   fld_series: "Series",
-  fname_video_series: "Numbered Series",
-  fblurb_video_series: "Turn any folder into a numbered series, #1 to #100, and put the videos in your own order.",
+  fname_video_series: "Create Playlist",
+  fblurb_video_series: "Name a playlist, tap your videos in the order they should play, drag to change it, and they play #1, #2, #3…",
   // Avatar row over the main feed (2026-11-20)
   fav_create: "Create",
   fav_live: "LIVE",

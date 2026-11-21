@@ -2562,8 +2562,8 @@ export const es = {
   fld_edit_sub: "Arrastra los videos para ordenarlos. El de arriba es el #1, el siguiente el #2.",
   fld_update: "Actualizar",
   fld_series: "Serie",
-  fname_video_series: "Series numeradas",
-  fblurb_video_series: "Convierte cualquier carpeta en una serie numerada, del #1 al #100, y ordena los videos a tu manera.",
+  fname_video_series: "Crear lista de reproducción",
+  fblurb_video_series: "Nombra tu lista, toca los videos en el orden que quieras, arrastra para cambiarlos y se reproducirán #1, #2, #3…",
   // Avatar row over the main feed (2026-11-20)
   fav_create: "Crear",
   fav_live: "EN VIVO",

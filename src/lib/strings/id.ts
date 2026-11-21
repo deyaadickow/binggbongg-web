@@ -2598,8 +2598,8 @@ export const id = {
   fld_edit_sub: "Seret video untuk mengurutkan. Video teratas #1, berikutnya #2.",
   fld_update: "Perbarui",
   fld_series: "Seri",
-  fname_video_series: "Seri Bernomor",
-  fblurb_video_series: "Jadikan folder mana pun seri bernomor, #1 sampai #100, dan atur urutan videonya sesukamu.",
+  fname_video_series: "Buat Daftar Putar",
+  fblurb_video_series: "Beri nama playlist, ketuk video sesuai urutan putar, geser untuk atur ulang, lalu video akan diputar #1, #2, #3…",
   // Avatar row over the main feed (2026-11-20)
   fav_create: "Buat",
   fav_live: "LIVE",

@@ -2761,8 +2761,8 @@ export const fil = {
   fld_edit_sub: "I-drag ang mga video para ayusin. Ang nasa itaas ang #1, ang kasunod ang #2.",
   fld_update: "I-update",
   fld_series: "Serye",
-  fname_video_series: "Mga Seryeng May Numero",
-  fblurb_video_series: "Gawing seryeng may numero ang kahit anong folder, #1 hanggang #100, at ayusin ang mga video ayon sa gusto mo.",
+  fname_video_series: "Gumawa ng Playlist",
+  fblurb_video_series: "Pangalanan ang playlist, i-tap ang mga video ayon sa pagkakasunod, i-drag para baguhin, at magpe-play sila #1, #2, #3…",
   // Avatar row over the main feed (2026-11-20)
   fav_create: "Gumawa",
   fav_live: "LIVE",
