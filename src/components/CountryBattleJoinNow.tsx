@@ -144,12 +144,14 @@ function CountryBattlePicker({ d, now }: { d: CbJoinNow; now: number }) {
             )}
             <div className="cbp-list">
               {shown.map((c) => {
+                const rank = list.indexOf(c) + 1;
                 const live = !!c.live && (!c.ends_at || Date.parse(c.ends_at) > now);
                 const at = Date.parse(c.starts_at ?? "");
                 const left = Number.isNaN(at) ? NaN : at - now;
                 return (
                   <button type="button" key={c.country} className={`cbp-row${c.country === d.country ? " on" : ""}`}
                     onClick={() => { setCountryBattlePick(c.country); setOpen(false); }}>
+                    <span className="cbp-rank">#{rank}</span>
                     <span className="cbp-flag" aria-hidden>{countryFlag(c.country)}</span>
                     <span className="cbp-name">{c.country}</span>
                     <span className="cbp-dots" aria-hidden />

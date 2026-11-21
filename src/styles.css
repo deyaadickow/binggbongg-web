@@ -1987,6 +1987,7 @@ body:has(.story-viewer) .get-app-bar { display: none; }
 .cbp-list { overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 2px; }
 .cbp-row { display: flex; align-items: center; gap: 10px; width: 100%; background: #000; border: 1.5px solid var(--gold-border); border-radius: 16px; padding: 10px 14px; color: #fff; font: inherit; cursor: pointer; text-align: left; }
 .cbp-row:hover, .cbp-row.on { border-color: var(--gold-bright); background: #120e02; }
+.cbp-rank { min-width: 36px; color: #fff; font-weight: 800; font-variant-numeric: tabular-nums; }
 .cbp-flag { font-size: 24px; }
 .cbp-name { font-weight: 800; color: var(--gold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .cbp-dots { flex: 1; min-width: 12px; border-bottom: 2px dotted rgba(212,175,55,.45); margin: 0 4px; transform: translateY(4px); }
