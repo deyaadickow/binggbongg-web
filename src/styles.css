@@ -2012,3 +2012,4 @@ body:has(.story-viewer) .get-app-bar { display: none; }
 .chb-chat-log .chb-line .chb-tr { color: #4FC3F7; margin-left: 6px; }
 
 .cb-head-battling { text-align: center; color: var(--gold); font-weight: 900; font-size: 18px; margin: 6px 0 2px; letter-spacing: .2px; }
+.live-bar { margin: 12px 0 0; max-width: none; }

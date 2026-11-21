@@ -2,7 +2,7 @@
 // The browser signs in with a Firebase custom token minted by the LiveKit token server for this session.
 import { initializeApp, getApps } from "firebase/app";
 import { getAuth, signInWithCustomToken } from "firebase/auth";
-import { addDoc, collection, getFirestore, limitToLast, onSnapshot, orderBy, query } from "firebase/firestore";
+import { addDoc, collection, getFirestore, limit, limitToLast, onSnapshot, orderBy, query } from "firebase/firestore";
 import { tokenServer } from "./api";
 
 const config = {
@@ -92,4 +92,16 @@ export async function sendChat(channel: string, senderUserId: number, senderName
     sentAt: Date.now(),
     senderProfileImage,
   });
+}
+
+/** Live captions (the phones' LiveCaptionsManager): a host whose "Captions" switch is on writes each
+ *  utterance to liveCaptions/{room}__{hostId}/segments, updated in place while it is spoken. The
+ *  newest one is the line to show. Returns the unsubscribe. */
+export function observeLiveCaption(roomName: string, speakerUserId: number, onLine: (text: string, isFinal: boolean, updatedAt: number) => void): () => void {
+  const db = getFirestore(app());
+  const q = query(collection(db, "liveCaptions", `${roomName}__${speakerUserId}`, "segments"), orderBy("updatedAt", "desc"), limit(1));
+  return onSnapshot(q, (snap) => {
+    const d = snap.docs[0]?.data();
+    if (d && typeof d.text === "string") onLine(d.text, d.isFinal !== false, Number(d.updatedAt) || 0);
+  }, () => undefined);
 }

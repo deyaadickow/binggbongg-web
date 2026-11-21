@@ -8,7 +8,8 @@ import { displayName, giftPrice, mediaUrl, post, type Gift, type UserSummary } f
 import { TapTapBurst, isTapTapGift, tapTapBurstDuration } from "../components/TapTapBurst";
 import { useSession } from "../lib/session";
 import { memberLabel, trackPage } from "../lib/pageTracker";
-import { chatChannel, ensureFirebaseSignIn, observeChat, sendChat, type ChatMessage } from "../lib/firebase";
+import { chatChannel, ensureFirebaseSignIn, observeChat, observeLiveCaption, sendChat, type ChatMessage } from "../lib/firebase";
+import { BattleActionBar } from "../components/BattleActionBar";
 import { useLiveRoom, type LiveRole, type LiveTile } from "../lib/live";
 import { activeBoxingWindow, useBattle, type BattleData } from "../lib/battle";
 import { VIRTUAL, fetchVirtualGiftRecord, sendVirtualThankYou, startVirtualBattle, type VirtualBattleData, type VirtualGiftRecord, type VirtualParticipant, FIVE_FIVE_FIVE, MARATHON, SERIES, TWO_V_TWO, cancel555, createSeries, finalize2v2, finalizeSeriesRound, invite2v2, invite555, inviteMarathon, secondsUntil, useEngine, voteMarathonCancel, type B555Data, type Battle2v2Data, type MarathonData, type SeriesData } from "../lib/battles";
@@ -639,6 +640,44 @@ export function LiveViewerPage() {
     }
     return () => { alive = false; };
   }, [messages, mtLang, isLoggedIn]);
+
+  // ---- the phones' bottom icons (Steve, 2026-11-21: "Adding all the icons on the bottom of every
+  // live is very important. Please add them."): Battles · Messages · MT · CC · Flip ----
+  const composeRef = useRef<HTMLInputElement>(null);
+  // CC: the host's live captions (written by the phone's "Captions" switch), in my language.
+  const [ccOn, setCcOn] = useState<boolean>(() => { try { return localStorage.getItem("bb.liveCc") === "1"; } catch { return false; } });
+  const [caption, setCaption] = useState("");
+  useEffect(() => {
+    setCaption("");
+    if (!ccOn || !hostUserId || !isLoggedIn) return;
+    let alive = true;
+    let unsub: (() => void) | null = null;
+    let hideTimer = 0;
+    const target = mtLang ?? defaultTargetLanguage();
+    ensureFirebaseSignIn().then(() => {
+      if (!alive) return;
+      unsub = observeLiveCaption(roomName, hostUserId, (text, isFinal, updatedAt) => {
+        if (Date.now() - updatedAt > 15000) return; // an old line from before I came in
+        window.clearTimeout(hideTimer);
+        setCaption(text);
+        hideTimer = window.setTimeout(() => { if (alive) setCaption(""); }, 6000);
+        if (isFinal && target) {
+          translateChatMessage(text, target).then((r) => {
+            if (alive && r?.translated) setCaption((cur) => (cur === text ? r.translated : cur));
+          });
+        }
+      });
+    }).catch(() => undefined);
+    return () => { alive = false; unsub?.(); window.clearTimeout(hideTimer); };
+  }, [ccOn, hostUserId, roomName, isLoggedIn, mtLang]);
+  const toggleCc = useCallback(() => {
+    setCcOn((on) => {
+      const next = !on;
+      try { localStorage.setItem("bb.liveCc", next ? "1" : "0"); } catch { /* ignore */ }
+      return next;
+    });
+  }, []);
+
   useEffect(() => {
     if (!isLoggedIn || roomClosed) return;
     let alive = true;
@@ -1598,6 +1637,11 @@ export function LiveViewerPage() {
                   }}>❤️</span>
               ))}
             </div>
+            {caption && (
+              <div aria-live="polite" style={{ position: "absolute", left: 0, right: 0, bottom: 70, display: "flex", justifyContent: "center", pointerEvents: "none", zIndex: 4, padding: "0 16px" }}>
+                <span style={{ background: "rgba(0,0,0,.7)", color: "#fff", fontWeight: 800, fontSize: 17, lineHeight: 1.3, padding: "6px 12px", borderRadius: 10, textAlign: "center", maxWidth: "100%" }}>{caption}</span>
+              </div>
+            )}
             {/* The gift playing right now — an effect gift bursts, a plain one shows the card. */}
             {giftEffect && (giftEffect.gift && isTapTapGift(giftEffect.gift) ? (
               <TapTapBurst key={giftEffect.key} gift={giftEffect.gift} />
@@ -1844,6 +1888,19 @@ export function LiveViewerPage() {
             </div>
           )}
 
+          <BattleActionBar className="live-bar"
+            onBattles={() => {
+              if (isPublisher && !anyBattleOpen) setMenuOpen(true);
+              else setRoomMenuOpen(true);
+            }}
+            onMessages={() => {
+              if (!isLoggedIn) { navigate("/login", { state: { from: window.location.pathname + window.location.search } }); return; }
+              composeRef.current?.focus();
+              composeRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+            }}
+            onMt={() => setMtOpen(true)} mtOn={!!mtLang}
+            onCc={toggleCc} ccOn={ccOn}
+            onFlip={isPublisher && !podcastAudio ? () => { void live.flipCamera(); } : null} />
           {isPublisher && (
             <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
               {/* An audio podcast has no camera at all — only the microphone. */}
@@ -1981,7 +2038,7 @@ export function LiveViewerPage() {
             {messages.length === 0 && <p className="muted">{t("say_hello")}</p>}
           </div>
           <form className="compose" onSubmit={submitChat}>
-            <input className="input" placeholder={t("say_something")} value={draft} onChange={(e) => setDraft(e.target.value)} maxLength={300} />
+            <input ref={composeRef} className="input" placeholder={t("say_something")} value={draft} onChange={(e) => setDraft(e.target.value)} maxLength={300} />
             <button className="btn small" type="submit" disabled={!draft.trim()}>{t("send")}</button>
           </form>
         </div>

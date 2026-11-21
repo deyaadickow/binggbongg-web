@@ -4,9 +4,10 @@
 // the website." The phones' live room bar: Battles · Messages · MT · CC · Flip — the same order and
 // colours here (icon over a small label, black bar, gold line on top).
 //
-// CC is left out on purpose: live captions only exist when the speaker's own phone runs
-// speech-to-text (the host's "Captions" switch), and nobody in a battle runs it — a CC button
-// would show nothing.
+// The normal live room (LiveViewerPage) uses it too, with CC: Steve, 2026-11-21: "Adding all the
+// icons on the bottom of every live is very important." CC stays off the grid battles: live
+// captions only exist when the speaker's own phone runs speech-to-text (the host's "Captions"
+// switch), and nobody in a battle runs it — a CC button there would show nothing.
 import { useT } from "../lib/i18n";
 
 /** The bar's height, kept free under the grid with the chat strip. */
@@ -29,6 +30,14 @@ function BubbleIcon({ color }: { color: string }) {
     </svg>
   );
 }
+function CcIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden>
+      <rect x="2" y="4.5" width="20" height="15" rx="3" fill="#FFD54F" />
+      <text x="12" y="15.6" textAnchor="middle" fontSize="8.5" fontWeight="900" fontFamily="Arial, sans-serif" fill="#000">CC</text>
+    </svg>
+  );
+}
 function FlipIcon() {
   return (
     <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden>
@@ -48,21 +57,26 @@ function BarButton({ icon, label, onClick, active }: { icon: React.ReactNode; la
   );
 }
 
-export function BattleActionBar({ onBattles, onMessages, onMt, mtOn, onFlip }: {
+export function BattleActionBar({ onBattles, onMessages, onMt, mtOn, onCc, ccOn, onFlip, className }: {
   onBattles: () => void;
   onMessages: () => void;
   onMt: () => void;
   /** Chat is being translated: MT shows lit. */
   mtOn: boolean;
+  /** The live room's CC (live captions). Absent where nobody publishes captions (the battles). */
+  onCc?: () => void;
+  ccOn?: boolean;
   /** Battlers only (a viewer has no camera to flip), as in the live room. */
   onFlip: (() => void) | null;
+  className?: string;
 }) {
   const { t } = useT();
   return (
-    <nav className="cb-bar" aria-label={t("fsec_battles")}>
+    <nav className={`cb-bar${className ? ` ${className}` : ""}`} aria-label={t("fsec_battles")}>
       <BarButton icon={<BullseyeIcon />} label={t("fsec_battles")} onClick={onBattles} />
       <BarButton icon={<BubbleIcon color="#fff" />} label={t("messages")} onClick={onMessages} />
       <BarButton icon={<BubbleIcon color="#4FC3F7" />} label="MT" onClick={onMt} active={mtOn} />
+      {onCc && <BarButton icon={<CcIcon />} label="CC" onClick={onCc} active={ccOn} />}
       {onFlip && <BarButton icon={<FlipIcon />} label={noEmoji(t("flip"))} onClick={onFlip} />}
     </nav>
   );
