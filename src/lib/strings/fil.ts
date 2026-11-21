@@ -2797,5 +2797,6 @@ export const fil = {
   cb_join_now_ms: "{m} min {s} segundo",
   cb_join_now_hms: "{h} oras {m} min {s} segundo",
   cbp_title: "Magsisimula ang mga battle sa",
+  cbp_battle_underway: "Nagaganap na ang battle",
   cbp_under_way: "Nagaganap na",
 };

@@ -71,7 +71,10 @@ export function CountryBattleJoinNow({ variant }: { variant: "button" | "banner"
   const startsAt = Date.parse(d.starts_at ?? d.opens_at ?? "");
   const toStart = Number.isNaN(startsAt) ? NaN : startsAt - now;
   let sub: string;
-  if (join && d.phase === "joining" && toStart > 0) sub = cbText(t("cb_join_now_open"), { time: waitText(t, toStart) });
+  // "Battle Is Underway" while it runs (Steve, 2026-11-21).
+  const battling = d.phase === "battle";
+  if (battling) sub = t("cbp_battle_underway");
+  else if (join && d.phase === "joining" && toStart > 0) sub = cbText(t("cb_join_now_open"), { time: waitText(t, toStart) });
   else if (join) sub = t("cb_join_now_live");
   else sub = Number.isNaN(toStart) || toStart <= 0 ? "" : cbText(t("cb_join_now_next"), { time: waitText(t, toStart) });
 
@@ -82,9 +85,12 @@ export function CountryBattleJoinNow({ variant }: { variant: "button" | "banner"
 
   const btn = (
     <button type="button" className={`cb-join-now ${variant}${join ? " live" : ""}`} onClick={open}>
+      {/* A blinking dot on each side: neon green while the battle is on, red otherwise (Steve, 2026-11-21:
+          "add two blinking neon green dots on each side of the banner. when the battle is over turn the green
+          blinking dots into red blinking dots"). */}
+      <span className={`cb-join-now-side l${battling ? " green" : ""}`} aria-hidden />
+      <span className={`cb-join-now-side r${battling ? " green" : ""}`} aria-hidden />
       <span className="cb-join-now-title">
-        {/* Always blinking, so members notice it (Steve, 2026-11-21: "Please make the red dot blink"). */}
-        <span className="cb-join-now-dot" aria-hidden />
         {cbText(t("cb_join_now_title"), { country: countryWord(d, lang) })}
       </span>
       {sub && <span className="cb-join-now-sub">{sub}</span>}

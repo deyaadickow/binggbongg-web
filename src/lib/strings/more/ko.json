@@ -1943,5 +1943,6 @@
  "cb_join_now_ms": "{m}분 {s}초",
  "cb_join_now_hms": "{h}시간 {m}분 {s}초",
  "cbp_title": "배틀 시작까지",
- "cbp_under_way": "진행 중"
+ "cbp_under_way": "진행 중",
+ "cbp_battle_underway": "배틀 진행 중"
 }

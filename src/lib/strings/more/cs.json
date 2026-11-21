@@ -1942,5 +1942,6 @@
  "cb_join_now_ms": "{m} min {s} sekund",
  "cb_join_now_hms": "{h} h {m} min {s} sekund",
  "cbp_title": "Bitvy začínají za",
- "cbp_under_way": "Probíhá"
+ "cbp_under_way": "Probíhá",
+ "cbp_battle_underway": "Bitva právě probíhá"
 }

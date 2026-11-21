@@ -1943,5 +1943,6 @@
  "cb_join_now_ms": "{m} நிமிடம் {s} விநாடி",
  "cb_join_now_hms": "{h} மணி {m} நிமிடம் {s} விநாடி",
  "cbp_title": "போர்கள் தொடங்கும் நேரம்",
- "cbp_under_way": "நடைபெறுகிறது"
+ "cbp_under_way": "நடைபெறுகிறது",
+ "cbp_battle_underway": "போர் நடைபெறுகிறது"
 }

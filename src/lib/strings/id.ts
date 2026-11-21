@@ -2634,5 +2634,6 @@ export const id = {
   cb_join_now_ms: "{m} mnt {s} detik",
   cb_join_now_hms: "{h} j {m} mnt {s} detik",
   cbp_title: "Battle dimulai dalam",
+  cbp_battle_underway: "Battle sedang berlangsung",
   cbp_under_way: "Sedang berlangsung",
 };

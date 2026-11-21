@@ -1939,5 +1939,6 @@
  "cb_join_now_ms": "{m} min {s} sekundes",
  "cb_join_now_hms": "{h} st. {m} min {s} sekundes",
  "cbp_title": "Cīņas sākas pēc",
- "cbp_under_way": "Notiek"
+ "cbp_under_way": "Notiek",
+ "cbp_battle_underway": "Cīņa notiek"
 }

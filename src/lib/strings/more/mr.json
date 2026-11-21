@@ -1937,5 +1937,6 @@
  "cb_join_now_ms": "{m} मिनिटे {s} सेकंद",
  "cb_join_now_hms": "{h} तास {m} मिनिटे {s} सेकंद",
  "cbp_title": "बॅटल सुरू होतील",
- "cbp_under_way": "सुरू आहे"
+ "cbp_under_way": "सुरू आहे",
+ "cbp_battle_underway": "बॅटल सुरू आहे"
 }

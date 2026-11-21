@@ -1942,5 +1942,6 @@
  "cb_join_now_ms": "{m} мин {s} сек.",
  "cb_join_now_hms": "{h} ч {m} мин {s} сек.",
  "cbp_title": "Битвы начнутся через",
- "cbp_under_way": "Идёт сейчас"
+ "cbp_under_way": "Идёт сейчас",
+ "cbp_battle_underway": "Битва идёт"
 }

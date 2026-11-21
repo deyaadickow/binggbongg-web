@@ -1942,5 +1942,6 @@
  "cb_join_now_ms": "{m} মিনিট {s} সেকেন্ড",
  "cb_join_now_hms": "{h} ঘণ্টা {m} মিনিট {s} সেকেন্ড",
  "cbp_title": "যুদ্ধ শুরু হবে",
- "cbp_under_way": "চলছে"
+ "cbp_under_way": "চলছে",
+ "cbp_battle_underway": "যুদ্ধ চলছে"
 }

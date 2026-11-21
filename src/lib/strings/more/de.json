@@ -1943,5 +1943,6 @@
  "cb_join_now_ms": "{m} Min. {s} Sekunden",
  "cb_join_now_hms": "{h} Std. {m} Min. {s} Sekunden",
  "cbp_title": "Battles starten in",
- "cbp_under_way": "Läuft"
+ "cbp_under_way": "Läuft",
+ "cbp_battle_underway": "Das Battle läuft"
 }

@@ -1942,5 +1942,6 @@
  "cb_join_now_ms": "{m}分{s}秒",
  "cb_join_now_hms": "{h}時間{m}分{s}秒",
  "cbp_title": "バトル開始まで",
- "cbp_under_way": "開催中"
+ "cbp_under_way": "開催中",
+ "cbp_battle_underway": "バトル開催中"
 }

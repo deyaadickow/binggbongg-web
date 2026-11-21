@@ -1943,5 +1943,6 @@
  "cb_join_now_ms": "{m} phút {s} giây",
  "cb_join_now_hms": "{h} giờ {m} phút {s} giây",
  "cbp_title": "Trận đấu bắt đầu sau",
- "cbp_under_way": "Đang diễn ra"
+ "cbp_under_way": "Đang diễn ra",
+ "cbp_battle_underway": "Trận đấu đang diễn ra"
 }

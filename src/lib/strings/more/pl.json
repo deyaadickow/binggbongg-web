@@ -1943,5 +1943,6 @@
  "cb_join_now_ms": "{m} min {s} sekund",
  "cb_join_now_hms": "{h} godz. {m} min {s} sekund",
  "cbp_title": "Bitwy zaczynają się za",
- "cbp_under_way": "Trwa"
+ "cbp_under_way": "Trwa",
+ "cbp_battle_underway": "Bitwa trwa"
 }

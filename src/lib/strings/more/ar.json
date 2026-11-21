@@ -2241,5 +2241,6 @@
  "cb_join_now_ms": "{m} دقيقة {s} ثانية",
  "cb_join_now_hms": "{h} س {m} دقيقة {s} ثانية",
  "cbp_title": "تبدأ المعارك بعد",
- "cbp_under_way": "جارية الآن"
+ "cbp_under_way": "جارية الآن",
+ "cbp_battle_underway": "المعركة جارية الآن"
 }

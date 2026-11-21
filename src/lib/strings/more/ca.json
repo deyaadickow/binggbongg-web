@@ -1942,5 +1942,6 @@
  "cb_join_now_ms": "{m} min {s} segons",
  "cb_join_now_hms": "{h} h {m} min {s} segons",
  "cbp_title": "Les batalles comencen en",
- "cbp_under_way": "En curs"
+ "cbp_under_way": "En curs",
+ "cbp_battle_underway": "La batalla és en curs"
 }

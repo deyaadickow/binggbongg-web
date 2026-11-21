@@ -1943,5 +1943,6 @@
  "cb_join_now_ms": "{m} ደቂቃ {s} ሰከንድ",
  "cb_join_now_hms": "{h} ሰዓት {m} ደቂቃ {s} ሰከንድ",
  "cbp_title": "ውጊያዎች የሚጀምሩት በ",
- "cbp_under_way": "እየተካሄደ ነው"
+ "cbp_under_way": "እየተካሄደ ነው",
+ "cbp_battle_underway": "ውጊያው እየተካሄደ ነው"
 }

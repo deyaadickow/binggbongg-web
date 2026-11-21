@@ -1941,5 +1941,6 @@
  "cb_join_now_ms": "{m} ನಿಮಿಷ {s} ಸೆಕೆಂಡು",
  "cb_join_now_hms": "{h} ಗಂಟೆ {m} ನಿಮಿಷ {s} ಸೆಕೆಂಡು",
  "cbp_title": "ಬ್ಯಾಟಲ್‌ಗಳು ಆರಂಭವಾಗುವುದು",
- "cbp_under_way": "ನಡೆಯುತ್ತಿದೆ"
+ "cbp_under_way": "ನಡೆಯುತ್ತಿದೆ",
+ "cbp_battle_underway": "ಬ್ಯಾಟಲ್ ನಡೆಯುತ್ತಿದೆ"
 }

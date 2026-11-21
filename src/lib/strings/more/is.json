@@ -1940,5 +1940,6 @@
  "cb_join_now_ms": "{m} mín {s} sekúndur",
  "cb_join_now_hms": "{h} klst {m} mín {s} sekúndur",
  "cbp_title": "Bardagar hefjast eftir",
- "cbp_under_way": "Í gangi"
+ "cbp_under_way": "Í gangi",
+ "cbp_battle_underway": "Bardaginn er í gangi"
 }

@@ -1943,5 +1943,6 @@
  "cb_join_now_ms": "{m} मिनट {s} सेकंड",
  "cb_join_now_hms": "{h} घंटे {m} मिनट {s} सेकंड",
  "cbp_title": "बैटल शुरू होंगी",
- "cbp_under_way": "चल रही है"
+ "cbp_under_way": "चल रही है",
+ "cbp_battle_underway": "बैटल चल रही है"
 }

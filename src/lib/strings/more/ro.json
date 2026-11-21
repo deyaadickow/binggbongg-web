@@ -1938,5 +1938,6 @@
  "cb_join_now_ms": "{m} min {s} secunde",
  "cb_join_now_hms": "{h} h {m} min {s} secunde",
  "cbp_title": "Luptele încep în",
- "cbp_under_way": "În desfășurare"
+ "cbp_under_way": "În desfășurare",
+ "cbp_battle_underway": "Lupta este în desfășurare"
 }

@@ -1942,5 +1942,6 @@
  "cb_join_now_ms": "{m} λεπ. {s} δευτερόλεπτα",
  "cb_join_now_hms": "{h} ώ. {m} λεπ. {s} δευτερόλεπτα",
  "cbp_title": "Οι μάχες ξεκινούν σε",
- "cbp_under_way": "Σε εξέλιξη"
+ "cbp_under_way": "Σε εξέλιξη",
+ "cbp_battle_underway": "Η μάχη βρίσκεται σε εξέλιξη"
 }
