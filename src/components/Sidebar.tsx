@@ -26,6 +26,9 @@ export function sidebarSections(userId: number | null, contestOn = false, podcas
       { to: "/upcoming", label: "l_and_b", icon: "🗓" },
       { to: "/business", label: "business", icon: "🏪" },
       { to: "/live", label: "live_now", icon: "🔴" },
+      // Steve, 2026-11-21: "Where can i find Country Battle on the website?" → "Yes, add it".
+      // For everyone; the page opens the member's own country's battle, else the Philippines.
+      { to: "/country-battle", label: "cb_title", icon: "🌏" },
       // Your own live Bingg Bongg show (Steve, 2026-10-17).
       { to: "/shows", label: "shows", icon: "📺" },
       // Video Ad Gig (Steve, 2026-10-17) RETIRED 2026-11-17 (Steve: "we can eliminate our influencers
