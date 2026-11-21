@@ -84,11 +84,18 @@ function CbTile({ tile, listening, onTap, onGift, attach, hasVideo, version, spa
 }) {
   const { t } = useT();
   const videoRef = useRef<HTMLVideoElement>(null);
+  // The attach arrives as a NEW function on every render (the screen re-renders each second for
+  // its countdown). Keyed on it, the camera was detached and re-attached every second — the
+  // video blinking in and out (Steve, 2026-11-21). Now it re-attaches only when the member, their
+  // video, or the room's tracks change, and the room hook skips a re-attach of the same track.
+  const attachRef = useRef(attach);
+  attachRef.current = attach;
+  const canAttach = !!attach;
   useEffect(() => {
     const el = videoRef.current;
-    if (!el || !attach || !hasVideo) return;
-    return attach(el);
-  }, [attach, hasVideo, version]);
+    if (!el || !attachRef.current || !hasVideo) return;
+    return attachRef.current(el);
+  }, [tile.userId, canAttach, hasVideo, version]);
   const photo = tile.photo ? mediaUrl(tile.photo) : "";
   const realPhoto = photo && !/\/$/.test(photo);
   return (

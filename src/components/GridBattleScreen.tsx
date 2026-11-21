@@ -34,6 +34,9 @@ import { requireVerified } from "../lib/verifyEmail";
 import { makeBinggBonusWatcher } from "../lib/binggBonus";
 import { BinggBonusOverlay } from "./BinggBonusOverlay";
 import { FishHostControls, LiveFishOverlay } from "./LiveFishOverlay";
+import { ACTION_BAR_RESERVE, BattleActionBar, BattlesMenu } from "./BattleActionBar";
+import { PickerSheet } from "./PickerSheet";
+import { TRANSLATION_LANGUAGES, defaultTargetLanguage, translateChatMessage, type TranslationResult } from "../lib/translate";
 
 const HEARTBEAT_MS = 5000;
 export const SPOTLIGHT_MS = 30000;
@@ -249,7 +252,13 @@ function useRoomChat(room: string | null, enabled: boolean, myId: number | null)
 
 /** The small strip under the tiles: the home battler's own viewers' chat (Steve: "each battler
  *  keeps their OWN viewers' chat in a small strip under the tiles"). */
-export function ChatStrip({ messages, onSend, note }: { messages: ChatMessage[]; onSend: ((text: string) => void) | null; note?: ReactNode }) {
+export function ChatStrip({ messages, onSend, note, inputRef, translations }: {
+  messages: ChatMessage[]; onSend: ((text: string) => void) | null; note?: ReactNode;
+  /** The bar's Messages icon focuses this input. */
+  inputRef?: React.RefObject<HTMLInputElement | null>;
+  /** MT: each line's translation, shown after the original when it differs. */
+  translations?: Record<string, TranslationResult>;
+}) {
   const { t } = useT();
   const [draft, setDraft] = useState("");
   const logRef = useRef<HTMLDivElement>(null);
@@ -264,18 +273,58 @@ export function ChatStrip({ messages, onSend, note }: { messages: ChatMessage[];
           : recent.map((m) => (
             // A gift line carries its gift as a NEGATIVE sender id (postGiftMessage on the phones).
             <div key={m.id} className={`chb-line${m.senderUserId < 0 ? " gift" : ""}`}>
-              {m.senderUserId < 0 ? <>🎁 {m.message}</> : <><b>{m.senderName}</b>{m.stickerUrl ? "🖼️" : m.message}</>}
+              {m.senderUserId < 0 ? <>🎁 {m.message}</> : <><b>{m.senderName}</b>{m.stickerUrl ? "🖼️" : m.message}{trOf(translations?.[m.id], m.message)}</>}
             </div>
           ))}
       </div>
       {onSend && (
         <form onSubmit={(e) => { e.preventDefault(); const v = draft.trim(); if (v) { onSend(v); setDraft(""); } }}>
-          <input value={draft} onChange={(e) => setDraft(e.target.value)} placeholder={t("say_something")} maxLength={300} aria-label={t("say_something")} />
+          <input ref={inputRef} value={draft} onChange={(e) => setDraft(e.target.value)} placeholder={t("say_something")} maxLength={300} aria-label={t("say_something")} />
           <button className="btn small" type="submit" disabled={!draft.trim()}>{t("send")}</button>
         </form>
       )}
     </div>
   );
+}
+
+/** " → the translation", only when it says something different. */
+function trOf(tr: TranslationResult | undefined, original: string): ReactNode {
+  const text = tr?.translated;
+  if (!text || text.trim().toLowerCase() === original.trim().toLowerCase()) return null;
+  return <span className="chb-tr">→ {text}</span>;
+}
+
+/** MT on the battle's chat strip — the live room's Message Translation, same picker, same saved
+ *  choice on this browser (bb.mtLang), same server call. */
+function useStripTranslation(messages: ChatMessage[], enabled: boolean) {
+  const [mtLang, setMtLang] = useState<string | null>(() => {
+    try {
+      const saved = localStorage.getItem("bb.mtLang");
+      if (saved !== null) return saved || null;
+    } catch { /* private window */ }
+    return defaultTargetLanguage();
+  });
+  const [translations, setTranslations] = useState<Record<string, TranslationResult>>({});
+  const asked = useRef<Set<string>>(new Set());
+  const pick = useCallback((code: string) => {
+    setMtLang(code || null);
+    try { localStorage.setItem("bb.mtLang", code); } catch { /* ignore */ }
+    asked.current = new Set();
+    setTranslations({});
+  }, []);
+  useEffect(() => {
+    if (!mtLang || !enabled) return;
+    let alive = true;
+    for (const m of messages.slice(-30)) {
+      if (m.senderUserId < 0 || m.stickerUrl || !m.message.trim() || asked.current.has(m.id)) continue;
+      asked.current.add(m.id);
+      translateChatMessage(m.message, mtLang).then((r) => {
+        if (alive && r) setTranslations((prev) => (prev[m.id] ? prev : { ...prev, [m.id]: r }));
+      });
+    }
+    return () => { alive = false; };
+  }, [messages, mtLang, enabled]);
+  return { mtLang, translations, pick };
 }
 
 /** The end: confetti, the podium (Country Battle: the server's top 3), the winner (or "Tie!"),
@@ -576,6 +625,13 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
     leave();
     goBack();
   };
+  /** The Battles menu's other pages: a battler leaves the battle first, as with the back arrow. */
+  const leaveTo = (path: string) => {
+    if (isBattler && !ended && !window.confirm(source.leaveConfirm)) return;
+    leave();
+    roomHook.disconnect();
+    navigate(path);
+  };
 
   // ---- the end: podium ~20 s, then battlers back to a live of their own, viewers follow home ----
   const sawRunning = useRef(false);
@@ -652,6 +708,11 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
   const chatRoom = (isBattler ? meRow?.chat_room_name : homeRow?.chat_room_name) || st?.room_name || null;
   const threadMessages = useRoomChat(chatRoom, isLoggedIn, myId || null);
   const messages = useMemo(() => mergeLines(threadMessages, localLines), [threadMessages, localLines]);
+  // ---- the bottom bar (the live room's icons): Battles · Messages · MT · Flip ----
+  const [battlesOpen, setBattlesOpen] = useState(false);
+  const [mtOpen, setMtOpen] = useState(false);
+  const chatInputRef = useRef<HTMLInputElement>(null);
+  const mt = useStripTranslation(messages, isLoggedIn);
   const onSend = isLoggedIn && user && chatRoom
     ? (text: string) => { if (!requireVerified()) return; sendChat(chatChannel(chatRoom, roomHostId(chatRoom)), user.id, displayName(user), text, user.profile_image ?? "").catch(() => undefined); }
     : null;
@@ -715,7 +776,7 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
       {tiles.length === 0
         ? <div className="card cb-empty">{ended ? t("chb_ended") : source.emptyText(st, now)}</div>
         : (
-          <CountryBattleGrid stage={grid.stage} shape={source.kind === "country" ? grid.shape : undefined} tiles={giftShow.withGift(tiles)} listen={heardNow} reserve={CHAT_RESERVE} phoneFullWidth
+          <CountryBattleGrid stage={grid.stage} shape={source.kind === "country" ? grid.shape : undefined} tiles={giftShow.withGift(tiles)} listen={heardNow} reserve={CHAT_RESERVE + ACTION_BAR_RESERVE} phoneFullWidth
             onTap={(id) => {
               // A battler's tap stars the tile — they hear only who they starred; a viewer's tap listens.
               if (isBattler) grid.star.toggle(id);
@@ -728,8 +789,29 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
             attach={roomHook.attachVideo} hasVideo={roomHook.hasVideo} version={roomHook.version}
             flash={flash} onFlashDone={() => setFlash(null)} />
         )}
-      <ChatStrip messages={messages} onSend={onSend}
+      <ChatStrip messages={messages} onSend={onSend} inputRef={chatInputRef} translations={mt.mtLang ? mt.translations : undefined}
         note={giftShow.note && <GiftNote key={giftShow.note.key} note={giftShow.note} onThank={onThank} onClose={giftShow.closeNote} />} />
+      <BattleActionBar
+        onBattles={() => setBattlesOpen(true)}
+        onMessages={() => {
+          if (!isLoggedIn) { navigate("/login", { state: { from: location.pathname + location.search } }); return; }
+          chatInputRef.current?.focus();
+          chatInputRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+        }}
+        onMt={() => setMtOpen(true)} mtOn={!!mt.mtLang}
+        onFlip={isBattler && !demoUserId ? () => { roomHook.flipCamera().then((ok) => { if (!ok) showGoldAlert(t("cb_camera_needed")); }); } : null} />
+      {battlesOpen && (
+        <BattlesMenu showLeaderboard={st.phase !== "upcoming"} onClose={() => setBattlesOpen(false)}
+          onLeaderboard={() => { setBattlesOpen(false); setBoardOpen(true); }}
+          onAllCountries={() => { setBattlesOpen(false); leaveTo("/country-battles"); }}
+          onAllBattles={() => { setBattlesOpen(false); leaveTo("/battles"); }} />
+      )}
+      {mtOpen && (
+        <PickerSheet title={t("message_translation")} noun="language" selected={mt.mtLang ?? ""}
+          items={[{ code: "", name: "None — show messages exactly as sent" },
+            ...TRANSLATION_LANGUAGES.map((l) => ({ code: l.code, name: `${l.name} · ${l.native}` }))]}
+          onPick={(code) => { mt.pick(code); setMtOpen(false); }} onClose={() => setMtOpen(false)} />
+      )}
       <BinggBonusOverlay />
       {/* Catch the Fish (Steve, 2026-11-07): a viewer's fish is a gift to the battler whose room
           they came in through (their home battler's own live room), never a battle gift. */}

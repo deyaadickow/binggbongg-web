@@ -31,6 +31,10 @@ export function battlerIdOf(identity: string | undefined | null): number | null 
 
 export interface CbPublisher { userId: number; name: string }
 
+/** Which track each tile's <video> shows, and its held-back detach (attachVideo). */
+const attachedTrack = new WeakMap<HTMLVideoElement, RemoteTrack | LocalVideoTrack>();
+const pendingDetach = new WeakMap<HTMLVideoElement, number>();
+
 export function useCountryBattleRoom(opts: {
   roomName: string | null;
   role: "guest" | "viewer";
@@ -172,10 +176,27 @@ export function useCountryBattleRoom(opts: {
         if (userIdOf(p) === userId) track = p.getTrackPublication(Track.Source.Camera)?.track as RemoteTrack | undefined;
       });
     }
-    if (!track) return () => undefined;
+    // A tile re-attaching the SAME track (a track event elsewhere in the room bumped `version`)
+    // keeps playing: the detach is held back a moment and cancelled by the re-attach, so the
+    // <video> never loses its stream — no blink. A different track swaps in cleanly.
+    const pending = pendingDetach.get(el);
+    if (pending) { window.clearTimeout(pending); pendingDetach.delete(el); }
+    const prev = attachedTrack.get(el);
+    if (!track) {
+      if (prev) { prev.detach(el); attachedTrack.delete(el); }
+      return () => undefined;
+    }
     const tr = track;
-    tr.attach(el);
-    return () => { tr.detach(el); };
+    if (prev && prev !== tr) prev.detach(el);
+    if (prev !== tr || !tr.attachedElements.includes(el)) tr.attach(el);
+    attachedTrack.set(el, tr);
+    return () => {
+      pendingDetach.set(el, window.setTimeout(() => {
+        pendingDetach.delete(el);
+        if (attachedTrack.get(el) === tr) attachedTrack.delete(el);
+        tr.detach(el);
+      }, 0));
+    };
   }, []);
 
   /** True when this member's camera is attached-ready (subscribed / published and not muted). */
@@ -197,6 +218,17 @@ export function useCountryBattleRoom(opts: {
 
   const disconnect = useCallback(() => { roomRef.current?.disconnect(); }, []);
 
+  /** The bar's Flip: front ↔ back camera, the live room's flipCamera (lib/live.ts). A computer
+   *  with one camera keeps it. */
+  const flipCamera = useCallback(async (): Promise<boolean> => {
+    const track = roomRef.current?.localParticipant.getTrackPublication(Track.Source.Camera)?.track as LocalVideoTrack | undefined;
+    if (!track) return false;
+    const facing = track.mediaStreamTrack.getSettings().facingMode === "environment" ? "user" : "environment";
+    try { await track.restartTrack({ facingMode: facing }); } catch { return false; }
+    setVersion((v) => v + 1);
+    return true;
+  }, []);
+
   /** A reliable data message on the room: to one battler (`toUserId`), or to everyone. */
   const sendData = useCallback((topic: string, payload: unknown, toUserId?: number | null): boolean => {
     const room = roomRef.current;
@@ -210,5 +242,5 @@ export function useCountryBattleRoom(opts: {
   /** This browser's LiveKit identity (`user_{id}` for a battler), once connected. */
   const identity = useCallback(() => roomRef.current?.localParticipant.identity ?? "", []);
 
-  return { status, error, version, publishers, attachVideo, hasVideo, disconnect, sendData, identity };
+  return { status, error, version, publishers, attachVideo, hasVideo, disconnect, flipCamera, sendData, identity };
 }
