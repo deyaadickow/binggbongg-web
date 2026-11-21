@@ -1943,5 +1943,6 @@
  "cb_join_now_hms": "{h} год {m} хв {s} сек.",
  "cbp_title": "Битви почнуться через",
  "cbp_under_way": "Триває",
- "cbp_battle_underway": "Битва триває"
+ "cbp_battle_underway": "Битва триває",
+ "cb_members_battling": "Учасники в битві: {n}"
 }

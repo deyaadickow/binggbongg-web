@@ -1940,5 +1940,6 @@
  "cb_join_now_hms": "{h} שע׳ {m} דק׳ {s} שניות",
  "cbp_title": "הקרבות מתחילים בעוד",
  "cbp_under_way": "מתקיים עכשיו",
- "cbp_battle_underway": "הקרב מתקיים עכשיו"
+ "cbp_battle_underway": "הקרב מתקיים עכשיו",
+ "cb_members_battling": "חברים בקרב: {n}"
 }

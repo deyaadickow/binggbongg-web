@@ -1941,5 +1941,6 @@
  "cb_join_now_hms": "{h} h {m} min {s} sekundit",
  "cbp_title": "Lahingud algavad",
  "cbp_under_way": "Käimas",
- "cbp_battle_underway": "Lahing on käimas"
+ "cbp_battle_underway": "Lahing on käimas",
+ "cb_members_battling": "Lahingus liikmeid: {n}"
 }

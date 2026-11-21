@@ -1944,5 +1944,6 @@
  "cb_join_now_hms": "{h} గం {m} నిమి {s} సెకన్లు",
  "cbp_title": "బ్యాటిల్స్ మొదలయ్యేది",
  "cbp_under_way": "జరుగుతోంది",
- "cbp_battle_underway": "బ్యాటిల్ జరుగుతోంది"
+ "cbp_battle_underway": "బ్యాటిల్ జరుగుతోంది",
+ "cb_members_battling": "పోటీలో ఉన్న సభ్యులు: {n}"
 }

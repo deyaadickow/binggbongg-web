@@ -1944,5 +1944,6 @@
  "cb_join_now_hms": "{h} h {m} min {s} segundo",
  "cbp_title": "Borrokak hasiko dira",
  "cbp_under_way": "Martxan",
- "cbp_battle_underway": "Borroka martxan dago"
+ "cbp_battle_underway": "Borroka martxan dago",
+ "cb_members_battling": "Borrokan dauden kideak: {n}"
 }

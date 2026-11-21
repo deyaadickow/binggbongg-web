@@ -1942,5 +1942,6 @@
  "cb_join_now_hms": "{h} ชม. {m} นาที {s} วินาที",
  "cbp_title": "แบทเทิลเริ่มใน",
  "cbp_under_way": "กำลังแข่ง",
- "cbp_battle_underway": "กำลังแข่งแบทเทิล"
+ "cbp_battle_underway": "กำลังแข่งแบทเทิล",
+ "cb_members_battling": "สมาชิกที่กำลังแข่ง: {n}"
 }

@@ -198,6 +198,8 @@ export interface ChbGiftMsg {
   gift_name?: string | null;
   icon_url?: string | null;
   coins?: number;
+  /** On this screen only: a Bongg Burst gift's icon count (one per BB), for "Rose ×100". */
+  count?: number;
 }
 
 /** Round 2: what a confirmed tile gift answers (`chat_battle_gift`, absent before the deploy). */

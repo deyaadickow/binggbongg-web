@@ -1944,5 +1944,6 @@
  "cb_join_now_hms": "{h} ਘੰਟੇ {m} ਮਿੰਟ {s} ਸਕਿੰਟ",
  "cbp_title": "ਬੈਟਲ ਸ਼ੁਰੂ ਹੋਣਗੀਆਂ",
  "cbp_under_way": "ਚੱਲ ਰਹੀ ਹੈ",
- "cbp_battle_underway": "ਬੈਟਲ ਚੱਲ ਰਹੀ ਹੈ"
+ "cbp_battle_underway": "ਬੈਟਲ ਚੱਲ ਰਹੀ ਹੈ",
+ "cb_members_battling": "ਮੁਕਾਬਲੇ ਵਿੱਚ ਮੈਂਬਰ: {n}"
 }

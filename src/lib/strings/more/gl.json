@@ -1940,5 +1940,6 @@
  "cb_join_now_hms": "{h} h {m} min {s} segundos",
  "cbp_title": "As batallas comezan en",
  "cbp_under_way": "En curso",
- "cbp_battle_underway": "A batalla está en curso"
+ "cbp_battle_underway": "A batalla está en curso",
+ "cb_members_battling": "Membros en batalla: {n}"
 }

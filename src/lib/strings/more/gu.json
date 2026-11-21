@@ -1944,5 +1944,6 @@
  "cb_join_now_hms": "{h} કલાક {m} મિનિટ {s} સેકન્ડ",
  "cbp_title": "બેટલ શરૂ થશે",
  "cbp_under_way": "ચાલુ છે",
- "cbp_battle_underway": "બેટલ ચાલુ છે"
+ "cbp_battle_underway": "બેટલ ચાલુ છે",
+ "cb_members_battling": "લડતા સભ્યો: {n}"
 }

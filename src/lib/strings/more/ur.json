@@ -1944,5 +1944,6 @@
  "cb_join_now_hms": "{h} گھنٹے {m} منٹ {s} سیکنڈ",
  "cbp_title": "بیٹل شروع ہوں گی",
  "cbp_under_way": "جاری ہے",
- "cbp_battle_underway": "بیٹل جاری ہے"
+ "cbp_battle_underway": "بیٹل جاری ہے",
+ "cb_members_battling": "مقابلے میں شریک اراکین: {n}"
 }

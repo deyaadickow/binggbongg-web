@@ -1944,5 +1944,6 @@
  "cb_join_now_hms": "{h} ч {m} мин {s} секунди",
  "cbp_title": "Битке почињу за",
  "cbp_under_way": "У току",
- "cbp_battle_underway": "Битка је у току"
+ "cbp_battle_underway": "Битка је у току",
+ "cb_members_battling": "Чланови у борби: {n}"
 }

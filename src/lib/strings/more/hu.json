@@ -1937,5 +1937,6 @@
  "cb_join_now_hms": "{h} óra {m} perc {s} másodperc",
  "cbp_title": "A csaták kezdete",
  "cbp_under_way": "Folyamatban",
- "cbp_battle_underway": "A csata folyamatban van"
+ "cbp_battle_underway": "A csata folyamatban van",
+ "cb_members_battling": "Harcoló tagok: {n}"
 }

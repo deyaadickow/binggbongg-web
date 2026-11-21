@@ -1944,5 +1944,6 @@
  "cb_join_now_hms": "{h} godz. {m} min {s} sekund",
  "cbp_title": "Bitwy zaczynają się za",
  "cbp_under_way": "Trwa",
- "cbp_battle_underway": "Bitwa trwa"
+ "cbp_battle_underway": "Bitwa trwa",
+ "cb_members_battling": "Członkowie w bitwie: {n}"
 }

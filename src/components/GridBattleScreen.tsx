@@ -13,7 +13,7 @@
 // back to a normal live.
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { displayName, mediaUrl, post, type ApiResponse, type Gift } from "../lib/api";
+import { displayName, giftPrice, mediaUrl, post, type ApiResponse, type Gift } from "../lib/api";
 import { useSession } from "../lib/session";
 import { useT } from "../lib/i18n";
 import { GiftSheet } from "./GiftSheet";
@@ -34,6 +34,8 @@ import { requireVerified } from "../lib/verifyEmail";
 import { makeBinggBonusWatcher } from "../lib/binggBonus";
 import { BinggBonusOverlay } from "./BinggBonusOverlay";
 import { FishHostControls, LiveFishOverlay } from "./LiveFishOverlay";
+import { TapTapBurst, isTapTapGift, tapTapBurstDuration } from "./TapTapBurst";
+import { loadGifts } from "../lib/gifts";
 import { ACTION_BAR_RESERVE, BattleActionBar, BattlesMenu } from "./BattleActionBar";
 import { PickerSheet } from "./PickerSheet";
 import { TRANSLATION_LANGUAGES, defaultTargetLanguage, translateChatMessage, type TranslationResult } from "../lib/translate";
@@ -100,7 +102,9 @@ export interface GridBattleSource {
 /** One gift line on screen: the sender's "You sent 🌹 to @jimmy", or the receiver's "@sam sent
  *  you 🌹 — say thanks!" with a Thank you button. */
 interface GiftNoteData {
-  kind: "sent" | "got";
+  /** "thanks": the receiver's Thank you, back on the GIFTER's screen (Steve, 2026-11-21: "the
+   *  Thank you is not reaching the gifter") — `who` thanked me, `giftName` is their whole line. */
+  kind: "sent" | "got" | "thanks";
   /** The other member: the receiver for "sent", the sender for "got". */
   who: string;
   giftName: string;
@@ -115,9 +119,10 @@ function GiftNote({ note, onThank, onClose }: { note: GiftNoteData; onThank: (()
     ? <img className="chb-gn-icon" src={mediaUrl(note.icon)} alt={note.giftName} title={note.giftName} onError={() => setBroken(true)} />
     : <b>{note.giftName || "🎁"}</b>;
   return (
-    <div className={`chb-gift-note ${note.kind}`} role="status">
+    <div className={`chb-gift-note ${note.kind === "thanks" ? "got" : note.kind}`} role="status">
       <span className="chb-gn-text">
-        {note.kind === "sent" ? tn("chb_gift_you_sent", gift, note.who) : tn("chb_gift_sent_you", note.who, gift)}
+        {note.kind === "thanks" ? <>💛 <b>{note.who}</b>: {note.giftName}</>
+          : note.kind === "sent" ? tn("chb_gift_you_sent", gift, note.who) : tn("chb_gift_sent_you", note.who, gift)}
       </span>
       {note.kind === "got" && onThank && <button type="button" className="btn small" onClick={onThank}>💛 {t("chb_thank_you")}</button>}
       <button type="button" className="chb-gn-x" onClick={onClose} aria-label={t("close")}>×</button>
@@ -142,7 +147,7 @@ function useGiftShow() {
     window.clearTimeout(noteTimer.current);
     const key = Date.now();
     setNote({ ...n, key });
-    noteTimer.current = window.setTimeout(() => setNote((cur) => (cur?.key === key ? null : cur)), n.kind === "got" ? GOT_NOTE_MS : SENT_NOTE_MS);
+    noteTimer.current = window.setTimeout(() => setNote((cur) => (cur?.key === key ? null : cur)), n.kind === "sent" ? SENT_NOTE_MS : GOT_NOTE_MS);
   }, []);
   const closeNote = useCallback(() => { window.clearTimeout(noteTimer.current); setNote(null); }, []);
   /** The tiles with the popped-up gift on the one it landed on. */
@@ -159,9 +164,16 @@ function giftLine(t: T, msg: ChbGiftMsg): ChatMessage {
     id: `cbg-${msg.from_user_id}-${msg.to_user_id}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
     senderUserId: -Math.max(1, msg.gift_id || 1),
     senderName: msg.from_name ?? "",
-    message: t("chb_gift_line", msg.from_name || "?", msg.to_name || "?", msg.gift_name || "🎁"),
+    message: t("chb_gift_line", msg.from_name || "?", msg.to_name || "?", giftLabel(msg.gift_name, msg.count)),
     sentAt: Date.now(),
   };
+}
+
+/** "Rose ×100" for a Bongg Burst gift (one icon per BB it costs), else just the name. Steve,
+ *  2026-11-21: "When i give 100 roses it's only showing one rose". */
+function giftLabel(name: string | null | undefined, count?: number): string {
+  const n = name || "🎁";
+  return count && count > 1 ? `${n} ×${count.toLocaleString()}` : n;
 }
 
 /** Thread + local lines, in time order. */
@@ -484,17 +496,40 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
   const stripOwnerRef = useRef(stripOwner);
   stripOwnerRef.current = stripOwner;
   useEffect(() => { setLocalLines([]); }, [stripOwner]);
+  // A Bongg Burst gift (100 roses for a 100-BB rose) bursts over the battle screen as in the live
+  // room, for the sender, the receiver and the receiver's own viewers — no longer one rose.
+  const [burst, setBurst] = useState<{ gift: Gift; key: number } | null>(null);
+  const burstTimer = useRef(0);
+  useEffect(() => () => window.clearTimeout(burstTimer.current), []);
+  const playBurst = useCallback((gift: Gift) => {
+    window.clearTimeout(burstTimer.current);
+    const key = Date.now();
+    setBurst({ gift, key });
+    burstTimer.current = window.setTimeout(() => setBurst((cur) => (cur?.key === key ? null : cur)), tapTapBurstDuration(gift));
+  }, []);
+  const giftsRef = useRef<Promise<Gift[]> | null>(null);
+  /** The full gift (its effect flags) for a cb_gift, which carries only the id. */
+  const giftById = useCallback(async (id: number): Promise<Gift | null> => {
+    giftsRef.current ??= loadGifts().catch(() => { giftsRef.current = null; return []; });
+    return (await giftsRef.current).find((g) => g.id === id) ?? null;
+  }, []);
   /** The gift the receiver's Thank you is for. */
   const thankRef = useRef<ChbGiftMsg | null>(null);
   const addLine = useCallback((msg: ChbGiftMsg) => setLocalLines((cur) => [...cur.slice(-19), giftLine(t, msg)]), [t]);
   /** A cb_gift from the room: the receiver gets "say thanks!", the receiver's own viewers get the
    *  line in their strip, everyone else ignores it. */
-  const onGiftData = (payload: unknown) => {
-    const msg = parseGiftMsg(payload);
-    if (!msg || msg.from_user_id === myIdRef.current) return;
+  const onGiftData = async (payload: unknown) => {
+    const parsed = parseGiftMsg(payload);
+    if (!parsed || parsed.from_user_id === myIdRef.current) return;
+    const mine = roleRef.current === "guest" && parsed.to_user_id === myIdRef.current;
+    if (!mine && !(stripOwnerRef.current && parsed.to_user_id === stripOwnerRef.current)) return;
+    const full = parsed.gift_id ? await giftById(parsed.gift_id) : null;
+    const isBurst = !!full && isTapTapGift(full);
+    const msg = isBurst ? { ...parsed, count: parsed.coins ?? giftPrice(full) } : parsed;
+    if (isBurst) playBurst(full);
     if (roleRef.current === "guest" && msg.to_user_id === myIdRef.current) {
       giftShow.popTile(msg.to_user_id, msg.icon_url ?? null);
-      giftShow.showNote({ kind: "got", who: msg.from_name || "?", giftName: msg.gift_name || "", icon: msg.icon_url ?? null });
+      giftShow.showNote({ kind: "got", who: msg.from_name || "?", giftName: giftLabel(msg.gift_name, msg.count), icon: msg.icon_url ?? null });
       addLine(msg);
       sfx.reveal();
       haptic([30, 40, 30]);
@@ -505,8 +540,17 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
     }
   };
   onDataRef.current = (topic, payload, from) => {
-    if (topic === "cb_gift") onGiftData(payload);
+    if (topic === "cb_gift") void onGiftData(payload);
+    else if (topic === "cb_thanks") onThanksData(payload);
     else signals.onData(topic, payload, from);
+  };
+  /** A receiver's Thank you, sent to the whole room; only the gifter it names shows it. */
+  const onThanksData = (payload: unknown) => {
+    const p = (payload ?? {}) as Record<string, unknown>;
+    if (Number(p.to_user_id) !== myIdRef.current || !myIdRef.current) return;
+    giftShow.showNote({ kind: "thanks", who: String(p.from_name || "?"), giftName: String(p.line || "💛"), icon: null });
+    sfx.reveal();
+    haptic([30, 40, 30]);
   };
   /** What the last confirmed tile gift answered (chat_battle_gift / country_battle_gift), for onSent. */
   const lastGiftRef = useRef<ChbGiftInfo | null>(null);
@@ -515,12 +559,14 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
     lastGiftRef.current = null;
     const icon = info?.icon_url ?? (gift.image ? gift.image : null);
     const receiver = info?.receiver ?? grid.byId.get(toUserId) ?? null;
+    const count = isTapTapGift(gift) ? info?.cb_gift?.coins ?? giftPrice(gift) : undefined;
+    if (count) playBurst(gift);
     giftShow.popTile(toUserId, icon);
-    giftShow.showNote({ kind: "sent", who: handleOf(receiver), giftName: info?.gift_name ?? gift.name ?? "", icon });
+    giftShow.showNote({ kind: "sent", who: handleOf(receiver), giftName: giftLabel(info?.gift_name ?? gift.name, count), icon });
     // Published only once the server confirmed the gift (GiftSheet calls onSent on status:true).
     if (info?.cb_gift) {
       roomHook.sendData("cb_gift", info.cb_gift);
-      if (toUserId === stripOwnerRef.current) addLine({ ...info.cb_gift, from_name: info.cb_gift.from_name ?? displayName(user ?? undefined) });
+      if (toUserId === stripOwnerRef.current) addLine({ ...info.cb_gift, count, from_name: info.cb_gift.from_name ?? displayName(user ?? undefined) });
     }
   };
   const homeStarsKey = signals.homeStars.join(",");
@@ -720,7 +766,13 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
   const onThank = onSend
     ? () => {
       const g = thankRef.current;
-      if (g) onSend(t("chb_thanks_line", g.from_name || "", g.gift_name || "🎁"));
+      if (g) {
+        const line = t("chb_thanks_line", g.from_name || "", giftLabel(g.gift_name, g.count));
+        onSend(line);
+        // ...and to the gifter, who watches a different chat (Steve, 2026-11-21: "the Thank you is
+        // not reaching the gifter"). Everyone gets it; only to_user_id shows it.
+        roomHook.sendData("cb_thanks", { from_user_id: myId, from_name: displayName(user ?? undefined), to_user_id: g.from_user_id, gift_id: g.gift_id, line });
+      }
       giftShow.closeNote();
     }
     : null;
@@ -815,6 +867,7 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
           onPick={(code) => { mt.pick(code); setMtOpen(false); }} onClose={() => setMtOpen(false)} />
       )}
       <BinggBonusOverlay />
+      {burst && <TapTapBurst key={burst.key} gift={burst.gift} />}
       {/* Catch the Fish (Steve, 2026-11-07): a viewer's fish is a gift to the battler whose room
           they came in through (their home battler's own live room), never a battle gift. */}
       <LiveFishOverlay streamerId={fishStreamer} roomName={homeRow?.chat_room_name ?? ""}
@@ -822,7 +875,7 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
       {giftTarget != null && (
         <GiftSheet
           onClose={() => setGiftTarget(null)}
-          onSent={(gift) => { setFlash({ userId: giftTarget, gift }); onGiftSent(giftTarget, gift); beat(); }}
+          onSent={(gift) => { if (!isTapTapGift(gift)) setFlash({ userId: giftTarget, gift }); onGiftSent(giftTarget, gift); beat(); }}
           sendOverride={async (_coins, gift) => {
             const res = await source.sendGift({ myId, toUserId: giftTarget, giftId: gift.id, roomName: giftRoom });
             lastGiftRef.current = source.giftInfo(res);

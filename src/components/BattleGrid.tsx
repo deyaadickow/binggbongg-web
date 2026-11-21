@@ -432,6 +432,10 @@ export function CbHeader({ stage, sub, line, liveCount, myScore, onBack, isTest,
             <b>{line}</b>
           </div>
         </div>
+        {/* Steve, 2026-11-21: "On top of the page should be how many members are battling". */}
+        {liveCount != null && (
+          <div className="cb-head-battling" aria-live="polite">⚔️ {cbText(t("cb_members_battling"), { n: liveCount.toLocaleString() })}</div>
+        )}
         {(liveCount != null || score != null || actions) && (
           <div className="cb-head-sub">
             {liveCount != null && <span className="pill live">● {cbText(t("cb_live_count"), { n: liveCount })}</span>}

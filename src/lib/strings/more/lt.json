@@ -1941,5 +1941,6 @@
  "cb_join_now_hms": "{h} val. {m} min. {s} sek.",
  "cbp_title": "Kovos prasideda po",
  "cbp_under_way": "Vyksta",
- "cbp_battle_underway": "Kova vyksta"
+ "cbp_battle_underway": "Kova vyksta",
+ "cb_members_battling": "Kovojantys nariai: {n}"
 }

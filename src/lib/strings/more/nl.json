@@ -1944,5 +1944,6 @@
  "cb_join_now_hms": "{h} u {m} min {s} seconden",
  "cbp_title": "Battles beginnen over",
  "cbp_under_way": "Bezig",
- "cbp_battle_underway": "De battle is bezig"
+ "cbp_battle_underway": "De battle is bezig",
+ "cb_members_battling": "Leden in de strijd: {n}"
 }

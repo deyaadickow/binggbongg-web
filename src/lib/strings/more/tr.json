@@ -1944,5 +1944,6 @@
  "cb_join_now_hms": "{h} sa {m} dk {s} saniye",
  "cbp_title": "Savaşlar başlıyor",
  "cbp_under_way": "Devam ediyor",
- "cbp_battle_underway": "Savaş devam ediyor"
+ "cbp_battle_underway": "Savaş devam ediyor",
+ "cb_members_battling": "Savaşan üyeler: {n}"
 }

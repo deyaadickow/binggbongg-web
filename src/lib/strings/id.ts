@@ -1707,6 +1707,7 @@ export const id = {
   cb_board_empty: "Belum ada battle yang selesai.",
   cb_participants_count: "{n} peserta",
   cb_live_count: "{n} live",
+  cb_members_battling: "Anggota yang bertanding: {n}",
   cb_waiting: "Menunggu anggota untuk live…",
   cb_test: "Battle uji coba — hanya penguji yang dapat melihat ini",
   cb_off: "Country Battle sedang tidak aktif saat ini.",

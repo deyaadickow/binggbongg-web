@@ -1943,5 +1943,6 @@
  "cb_join_now_hms": "{h} h {m} min {s} secondi",
  "cbp_title": "Le sfide iniziano tra",
  "cbp_under_way": "In corso",
- "cbp_battle_underway": "La sfida è in corso"
+ "cbp_battle_underway": "La sfida è in corso",
+ "cb_members_battling": "Membri in battaglia: {n}"
 }

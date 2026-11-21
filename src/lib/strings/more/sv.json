@@ -1942,5 +1942,6 @@
  "cb_join_now_hms": "{h} tim {m} min {s} sekunder",
  "cbp_title": "Battles börjar om",
  "cbp_under_way": "Pågår",
- "cbp_battle_underway": "Battlet pågår"
+ "cbp_battle_underway": "Battlet pågår",
+ "cb_members_battling": "Medlemmar i strid: {n}"
 }

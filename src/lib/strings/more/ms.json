@@ -1944,5 +1944,6 @@
  "cb_join_now_hms": "{h} j {m} min {s} saat",
  "cbp_title": "Pertarungan bermula dalam",
  "cbp_under_way": "Sedang berlangsung",
- "cbp_battle_underway": "Pertarungan sedang berlangsung"
+ "cbp_battle_underway": "Pertarungan sedang berlangsung",
+ "cb_members_battling": "Ahli yang bertanding: {n}"
 }

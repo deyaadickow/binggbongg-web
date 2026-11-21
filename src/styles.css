@@ -2010,3 +2010,5 @@ body:has(.story-viewer) .get-app-bar { display: none; }
 .cb-menu-row { display: flex; align-items: center; gap: 10px; width: 100%; cursor: pointer; padding: 13px 14px; margin-bottom: 8px; border-radius: 10px; background: #101010; color: var(--gold); border: 1.5px solid var(--gold-border); font-size: 15px; }
 .cb-menu-row span { flex: 1; text-align: center; }
 .chb-chat-log .chb-line .chb-tr { color: #4FC3F7; margin-left: 6px; }
+
+.cb-head-battling { text-align: center; color: var(--gold); font-weight: 900; font-size: 18px; margin: 6px 0 2px; letter-spacing: .2px; }

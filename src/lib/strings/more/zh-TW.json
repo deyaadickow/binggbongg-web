@@ -1944,5 +1944,6 @@
  "cb_join_now_hms": "{h}小時{m}分{s}秒",
  "cbp_title": "對戰開始倒數",
  "cbp_under_way": "進行中",
- "cbp_battle_underway": "對戰進行中"
+ "cbp_battle_underway": "對戰進行中",
+ "cb_members_battling": "正在對戰的成員：{n}"
 }

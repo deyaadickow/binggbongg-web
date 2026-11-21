@@ -1944,5 +1944,6 @@
  "cb_join_now_hms": "{h} ч {m} мин {s} секунди",
  "cbp_title": "Битките започват след",
  "cbp_under_way": "В ход",
- "cbp_battle_underway": "Битката е в ход"
+ "cbp_battle_underway": "Битката е в ход",
+ "cb_members_battling": "Членове в битка: {n}"
 }

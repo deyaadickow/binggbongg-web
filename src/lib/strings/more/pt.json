@@ -1944,5 +1944,6 @@
  "cb_join_now_hms": "{h} h {m} min {s} segundos",
  "cbp_title": "As batalhas começam em",
  "cbp_under_way": "Em andamento",
- "cbp_battle_underway": "A batalha está em andamento"
+ "cbp_battle_underway": "A batalha está em andamento",
+ "cb_members_battling": "Membros na batalha: {n}"
 }

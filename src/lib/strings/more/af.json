@@ -1942,5 +1942,6 @@
  "cb_join_now_hms": "{h} h {m} min {s} sekondes",
  "cbp_title": "Gevegte begin oor",
  "cbp_under_way": "Aan die gang",
- "cbp_battle_underway": "Die geveg is aan die gang"
+ "cbp_battle_underway": "Die geveg is aan die gang",
+ "cb_members_battling": "Lede wat veg: {n}"
 }

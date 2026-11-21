@@ -1712,6 +1712,7 @@ export const fil = {
   cb_board_empty: "Wala pang tapos na laban.",
   cb_participants_count: "{n} kalahok",
   cb_live_count: "{n} ang live",
+  cb_members_battling: "Mga miyembrong naglalaban: {n}",
   cb_waiting: "Naghihintay sa mga miyembrong mag-live…",
   cb_test: "Test battle — mga tester lang ang makakakita nito",
   cb_off: "Walang Country Battle ngayon.",
