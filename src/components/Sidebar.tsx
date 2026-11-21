@@ -1,8 +1,8 @@
 // Steve, 2026-09-24: "add all the settings links on the left side of the screen on chrome…
 // even if all the links are not working now we should add them anyway and work it out one at
 // a time." Every row of the phones' Settings screen, in the same order, plus the main tabs.
-import { Fragment } from "react";
-import { NavLink } from "react-router-dom";
+import { Fragment, useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useSession } from "../lib/session";
 import { APP_STORE_URL, PLAY_STORE_URL } from "./Common";
 import { useT, type StringKey } from "../lib/i18n";
@@ -36,7 +36,6 @@ export function sidebarSections(userId: number | null, contestOn = false, podcas
       // web's feed-level navigation is this list, so it goes here — pointing at the same
       // Simulcast page that already sits under Account.
       { to: "/settings/simulcast", label: "go_live_on_6_platforms", icon: "📡", needsLogin: true },
-      { to: "/search", label: "search", icon: "🔍" },
       // Finding videos (Steve, 2026-11-16): trending hashtags, sounds, topics and creators.
       { to: "/discover", label: "fnd_discover", icon: "🧭" },
       // Steve, 2026-10-11: "Yes please start the direct messages on the web."
@@ -154,6 +153,7 @@ export function Sidebar() {
   const podcastOn = usePodcastEnabled();
   return (
     <aside className="sidebar">
+      <SidebarSearch />
       {sidebarSections(user?.id ?? null, contestOn, podcastOn).map((sec, i) => {
         const links = sec.links.filter((l) => !l.needsLogin || isLoggedIn);
         // Signed out, every ACCOUNT link is filtered away and the heading was left stranded
@@ -171,6 +171,24 @@ export function Sidebar() {
       })}
       <SiteFooter />
     </aside>
+  );
+}
+
+/** Search box on top of the sidebar (Steve, 2026-11-21: "On the website sidebar please add search
+ *  on top."). Enter opens the Search page with what was typed; empty opens it as it is. */
+function SidebarSearch() {
+  const { t } = useT();
+  const navigate = useNavigate();
+  const [q, setQ] = useState("");
+  return (
+    <form className="side-search" role="search" onSubmit={(e) => {
+      e.preventDefault();
+      const k = q.trim();
+      navigate(k ? `/search?q=${encodeURIComponent(k)}` : "/search");
+    }}>
+      <span className="ico" aria-hidden>🔍</span>
+      <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("search")} aria-label={t("search")} />
+    </form>
   );
 }
 

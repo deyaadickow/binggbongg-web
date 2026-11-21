@@ -21,6 +21,13 @@ export function SearchPage() {
   // Finding videos (Steve, 2026-11-16): one search with Top | Videos | People | Sounds | Hashtags.
   type Tab = "online" | "top" | "videos" | "people" | "sounds" | "hashtags";
   const [tab, setTab] = useState<Tab>(() => (params.get("q") ? "top" : "online"));
+  // The sidebar's search box (Steve, 2026-11-21) opens /search?q=… — also while this page is open.
+  const qParam = params.get("q") ?? "";
+  useEffect(() => {
+    if (!qParam) return;
+    setKeyword(qParam);
+    setTab("top");
+  }, [qParam]);
   const [online, setOnline] = useState<UserSummary[] | null>(null);
   // Steve, 2026-11-08 redesign: "Online Now" + All Members / Friends / Following / Followers.
   const [scope, setScope] = useState<"all" | "friends" | "following" | "followers">("all");
