@@ -536,10 +536,10 @@ export function CreateSeriesSheet({ myId, folderId = 0, onClose, onSaved }: { my
         </div>
         {step > 0 && <div style={{ color: "var(--gold)", opacity: .85, fontWeight: 700, margin: "2px 0 4px" }}>📁 {clean}</div>}
         <div className="muted" style={{ fontSize: 14, margin: "4px 0 10px" }}>
-          {step === 0 ? t("fld_series_name_sub") : step === 1 ? t("soc_playlist_pick_hint") : t("fld_edit_sub")}
+          {step === 0 ? t("soc_playlist_name_needed") : step === 1 ? t("soc_playlist_pick_hint") : t("fld_edit_sub")}
         </div>
         {step === 0 && (
-          <input className="input" autoFocus maxLength={FOLDER_NAME_MAX} placeholder={t("fld_series_name_hint")} value={name}
+          <input className="input" autoFocus maxLength={FOLDER_NAME_MAX} placeholder={t("playlist_name")} value={name}
             onChange={(e) => setName(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") void next(); }} />
         )}
         {step === 1 && (
