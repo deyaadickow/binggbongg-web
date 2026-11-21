@@ -24,7 +24,7 @@ import { SoloBattleStandingsSheet } from "./SoloBattle";
 import { CbHeader, CountryBattleGrid, StarredYouBar, heardIds, useRotation, useStarPins, useStarSignals, type CbTileData } from "./BattleGrid";
 import { useCountryBattleRoom } from "../lib/countryBattleRoom";
 import { cbText, countShape, gridShape, serverNow, useTick } from "../lib/countryBattle";
-import { chatChannel, ensureFirebaseSignIn, observeChat, sendChat, type ChatMessage } from "../lib/firebase";
+import { chatChannel, ensureFirebaseSignIn, observeChat, observeLiveCaption, sendChat, type ChatMessage } from "../lib/firebase";
 import { haptic, sfx, stopGameSounds } from "../lib/gameSounds";
 import {
   battleScreenPath, bonusText, chatBattleStage, checkUserLiveRoom, parseGiftMsg, roomHostId,
@@ -759,6 +759,49 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
   const [mtOpen, setMtOpen] = useState(false);
   const chatInputRef = useRef<HTMLInputElement>(null);
   const mt = useStripTranslation(messages, isLoggedIn);
+  // ---- the rest of the live room's bar (Steve, 2026-11-21: "I want them to see and use all the
+  // icons we have available to use. Please add the rest of the icons to the country battle.") ----
+  const [camOn, setCamOn] = useState(true);
+  const [micOn, setMicOn] = useState(true);
+  const [giftsOpen, setGiftsOpen] = useState(false);
+  // CC: the captions of whoever this screen hears (their phone's "Captions" switch), in my language.
+  const [ccOn, setCcOn] = useState(false);
+  const [caption, setCaption] = useState("");
+  const ccSpeaker = isBattler ? (grid.star.pins[0] ?? null) : (listen ?? home ?? null);
+  const ccRoom = ccSpeaker ? (st?.battlers.find((b) => b.user_id === ccSpeaker)?.chat_room_name ?? st?.room_name ?? null) : null;
+  const ccLang = mt.mtLang;
+  useEffect(() => {
+    setCaption("");
+    if (!ccOn || !ccSpeaker || !ccRoom || !isLoggedIn || ccSpeaker === myId) return;
+    let alive = true;
+    let unsub: (() => void) | null = null;
+    let hideTimer = 0;
+    const target = ccLang ?? defaultTargetLanguage();
+    ensureFirebaseSignIn().then(() => {
+      if (!alive) return;
+      unsub = observeLiveCaption(ccRoom, ccSpeaker, (text, isFinal, updatedAt) => {
+        if (Date.now() - updatedAt > 15000) return;
+        window.clearTimeout(hideTimer);
+        setCaption(text);
+        hideTimer = window.setTimeout(() => { if (alive) setCaption(""); }, 6000);
+        if (isFinal && target) {
+          translateChatMessage(text, target).then((r) => {
+            if (alive && r?.translated) setCaption((cur) => (cur === text ? r.translated : cur));
+          });
+        }
+      });
+    }).catch(() => undefined);
+    return () => { alive = false; unsub?.(); window.clearTimeout(hideTimer); };
+  }, [ccOn, ccSpeaker, ccRoom, isLoggedIn, myId, ccLang]);
+  /** Share & Earn 10%: my own invite link (the referral program), with the battle. */
+  const shareBattle = () => {
+    const code = (user?.username ?? "").trim();
+    const url = code ? `https://binggbongg.com/invite/${encodeURIComponent(code)}` : "https://binggbongg.com/country-battles";
+    const text = `${source.title} · Bingg Bongg`;
+    const nav = navigator as Navigator & { share?: (d: ShareData) => Promise<void> };
+    if (nav.share) { nav.share({ title: text, text, url }).catch(() => undefined); return; }
+    navigator.clipboard?.writeText(`${text}\n${url}`).then(() => showGoldAlert(t("link_copied")), () => undefined);
+  };
   const onSend = isLoggedIn && user && chatRoom
     ? (text: string) => { if (!requireVerified()) return; sendChat(chatChannel(chatRoom, roomHostId(chatRoom)), user.id, displayName(user), text, user.profile_image ?? "").catch(() => undefined); }
     : null;
@@ -853,7 +896,34 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
           chatInputRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
         }}
         onMt={() => setMtOpen(true)} mtOn={!!mt.mtLang}
-        onFlip={isBattler && !demoUserId ? () => { roomHook.flipCamera().then((ok) => { if (!ok) showGoldAlert(t("cb_camera_needed")); }); } : null} />
+        onFlip={isBattler && !demoUserId ? () => { roomHook.flipCamera().then((ok) => { if (!ok) showGoldAlert(t("cb_camera_needed")); }); } : null}
+        onCc={() => setCcOn((on) => !on)} ccOn={ccOn}
+        onCamera={isBattler && !demoUserId ? () => { const next = !camOn; roomHook.setCamera(next).then((ok) => { if (ok) setCamOn(next); }); } : null} cameraOn={camOn}
+        onMic={isBattler && !demoUserId ? () => { const next = !micOn; roomHook.setMic(next).then((ok) => { if (ok) setMicOn(next); }); } : null} micOn={micOn}
+        joinLabel={showJoin ? joinLabel : null} onJoin={join}
+        onGifts={() => {
+          if (isBattler) { setGiftsOpen(true); return; }
+          if (!isLoggedIn) { navigate("/login", { state: { from: location.pathname + location.search } }); return; }
+          // The battler this screen hears, the one followed in, else the first one on screen.
+          const who = [listen, home, ...shown].find((id): id is number => typeof id === "number" && id > 0 && id !== myId);
+          if (who) setGiftTarget(who);
+        }}
+        onShare={shareBattle} />
+      {caption && <div className="cb-caption" role="status">{caption}</div>}
+      {giftsOpen && (
+        <div className="cb-menu-backdrop" onClick={() => setGiftsOpen(false)} role="dialog" aria-modal="true">
+          <div className="cb-menu" onClick={(e) => e.stopPropagation()}>
+            <div className="cb-menu-title">🎁 {t("gifts")}</div>
+            <div style={{ maxHeight: 320, overflowY: "auto" }}>
+              {messages.filter((m) => m.senderUserId < 0 || m.senderName === "🎁").slice().reverse().map((m) => (
+                <div key={m.id} className="cb-menu-row" style={{ cursor: "default" }}><span>{m.message}</span></div>
+              ))}
+              {!messages.some((m) => m.senderUserId < 0 || m.senderName === "🎁") && <div style={{ textAlign: "center", color: "#aaa", padding: 12 }}>—</div>}
+            </div>
+            <button type="button" className="btn ghost" style={{ width: "100%", marginTop: 4 }} onClick={() => setGiftsOpen(false)}>{t("close")}</button>
+          </div>
+        </div>
+      )}
       {battlesOpen && (
         <BattlesMenu showLeaderboard={st.phase !== "upcoming"} onClose={() => setBattlesOpen(false)}
           onLeaderboard={() => { setBattlesOpen(false); setBoardOpen(true); }}

@@ -229,6 +229,21 @@ export function useCountryBattleRoom(opts: {
     return true;
   }, []);
 
+  /** The bar's Camera / Mic (the live room's toggles): on or off for everyone. */
+  const setCamera = useCallback(async (on: boolean): Promise<boolean> => {
+    const room = roomRef.current;
+    if (!room) return false;
+    try { await room.localParticipant.setCameraEnabled(on); } catch { return false; }
+    setVersion((v) => v + 1);
+    return true;
+  }, []);
+  const setMic = useCallback(async (on: boolean): Promise<boolean> => {
+    const room = roomRef.current;
+    if (!room) return false;
+    try { await room.localParticipant.setMicrophoneEnabled(on); } catch { return false; }
+    return true;
+  }, []);
+
   /** A reliable data message on the room: to one battler (`toUserId`), or to everyone. */
   const sendData = useCallback((topic: string, payload: unknown, toUserId?: number | null): boolean => {
     const room = roomRef.current;
@@ -242,5 +257,5 @@ export function useCountryBattleRoom(opts: {
   /** This browser's LiveKit identity (`user_{id}` for a battler), once connected. */
   const identity = useCallback(() => roomRef.current?.localParticipant.identity ?? "", []);
 
-  return { status, error, version, publishers, attachVideo, hasVideo, disconnect, flipCamera, sendData, identity };
+  return { status, error, version, publishers, attachVideo, hasVideo, disconnect, flipCamera, setCamera, setMic, sendData, identity };
 }

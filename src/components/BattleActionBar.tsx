@@ -48,6 +48,48 @@ function FlipIcon() {
   );
 }
 
+function CameraIcon({ on }: { on: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden>
+      <path fill={on ? "#B388FF" : "#888"} d="M3 6.5A2.5 2.5 0 0 1 5.5 4h8A2.5 2.5 0 0 1 16 6.5v1.8l4.2-2.6A1.2 1.2 0 0 1 22 6.7v10.6a1.2 1.2 0 0 1-1.8 1L16 15.7v1.8a2.5 2.5 0 0 1-2.5 2.5h-8A2.5 2.5 0 0 1 3 17.5z" />
+      {!on && <path d="M3 3l18 18" stroke="#fff" strokeWidth="2" strokeLinecap="round" />}
+    </svg>
+  );
+}
+function MicIcon({ on }: { on: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden>
+      <rect x="8.5" y="2.5" width="7" height="12" rx="3.5" fill={on ? "#FF6E6E" : "#888"} />
+      <path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" fill="none" stroke={on ? "#FF6E6E" : "#888"} strokeWidth="2" strokeLinecap="round" />
+      {!on && <path d="M3 3l18 18" stroke="#fff" strokeWidth="2" strokeLinecap="round" />}
+    </svg>
+  );
+}
+function PersonIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden>
+      <circle cx="10" cy="8" r="4" fill="#69F0AE" /><path fill="#69F0AE" d="M2 20c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5z" />
+      <path d="M19 7v6M16 10h6" stroke="#69F0AE" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+function GiftIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden>
+      <path fill="#FF80AB" d="M3 8h18v4H3zM4.5 12h15v9h-15z" /><path d="M12 8v13" stroke="#000" strokeWidth="1.6" />
+      <path d="M12 8C10 4 6.5 4.5 7.3 6.8 7.8 8 12 8 12 8zm0 0c2-4 5.5-3.5 4.7-1.2C16.2 8 12 8 12 8z" fill="none" stroke="#FF80AB" strokeWidth="1.8" />
+    </svg>
+  );
+}
+function ShareIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden>
+      <path d="M12 15V3M7.5 7.5 12 3l4.5 4.5" fill="none" stroke="#4DD0E1" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M5 11v8.5A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5V11" fill="none" stroke="#4DD0E1" strokeWidth="2.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 function BarButton({ icon, label, onClick, active }: { icon: React.ReactNode; label: string; onClick: () => void; active?: boolean }) {
   return (
     <button type="button" className={`cb-bar-btn${active ? " active" : ""}`} onClick={onClick} aria-label={label} title={label}>
@@ -57,7 +99,8 @@ function BarButton({ icon, label, onClick, active }: { icon: React.ReactNode; la
   );
 }
 
-export function BattleActionBar({ onBattles, onMessages, onMt, mtOn, onCc, ccOn, onFlip, className }: {
+export function BattleActionBar({ onBattles, onMessages, onMt, mtOn, onCc, ccOn, onFlip, className,
+  onCamera, cameraOn, onMic, micOn, joinLabel, onJoin, onGifts, onShare }: {
   onBattles: () => void;
   onMessages: () => void;
   onMt: () => void;
@@ -69,6 +112,17 @@ export function BattleActionBar({ onBattles, onMessages, onMt, mtOn, onCc, ccOn,
   /** Battlers only (a viewer has no camera to flip), as in the live room. */
   onFlip: (() => void) | null;
   className?: string;
+  /** The rest of the live room's bar (Steve, 2026-11-21: "I want them to see and use all the
+   *  icons we have available to use"), in the phones' order: Camera · Mic (whoever is on camera),
+   *  Join (a viewer who may join), Gifts, Share & Earn 10%. The row scrolls sideways like theirs. */
+  onCamera?: (() => void) | null;
+  cameraOn?: boolean;
+  onMic?: (() => void) | null;
+  micOn?: boolean;
+  joinLabel?: string | null;
+  onJoin?: () => void;
+  onGifts?: (() => void) | null;
+  onShare?: () => void;
 }) {
   const { t } = useT();
   return (
@@ -78,6 +132,11 @@ export function BattleActionBar({ onBattles, onMessages, onMt, mtOn, onCc, ccOn,
       <BarButton icon={<BubbleIcon color="#4FC3F7" />} label="MT" onClick={onMt} active={mtOn} />
       {onCc && <BarButton icon={<CcIcon />} label="CC" onClick={onCc} active={ccOn} />}
       {onFlip && <BarButton icon={<FlipIcon />} label={noEmoji(t("flip"))} onClick={onFlip} />}
+      {onCamera && <BarButton icon={<CameraIcon on={cameraOn !== false} />} label="Camera" onClick={onCamera} />}
+      {onMic && <BarButton icon={<MicIcon on={micOn !== false} />} label={micOn === false ? "Mic Off" : "Mic"} onClick={onMic} />}
+      {joinLabel && onJoin && <BarButton icon={<PersonIcon />} label={joinLabel} onClick={onJoin} />}
+      {onGifts && <BarButton icon={<GiftIcon />} label="Gifts" onClick={onGifts} />}
+      {onShare && <BarButton icon={<ShareIcon />} label="Share & Earn 10%" onClick={onShare} />}
     </nav>
   );
 }

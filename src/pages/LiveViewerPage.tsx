@@ -1900,7 +1900,17 @@ export function LiveViewerPage() {
             }}
             onMt={() => setMtOpen(true)} mtOn={!!mtLang}
             onCc={toggleCc} ccOn={ccOn}
-            onFlip={isPublisher && !podcastAudio ? () => { void live.flipCamera(); } : null} />
+            onFlip={isPublisher && !podcastAudio ? () => { void live.flipCamera(); } : null}
+            onCamera={isPublisher && !podcastAudio ? () => { void live.toggleCamera(); } : null} cameraOn={live.cameraOn}
+            onMic={isPublisher ? () => { void live.toggleMic(); } : null} micOn={live.micOn}
+            joinLabel={role === "viewer" && live.status === "live" ? (joinState === "requested" ? t("waiting_for_the_host_to_accept") : t("ask_to_join")) : null}
+            onJoin={() => { if (joinState !== "requested") void requestToJoin(); }}
+            onGifts={() => {
+              if (!isLoggedIn) { navigate("/login", { state: { from: window.location.pathname + window.location.search } }); return; }
+              const to = broadcasters.find((b) => b.user_id !== user?.id);
+              if (to) setGiftTarget(to.user_id);
+            }}
+            onShare={() => { void shareLive(); }} />
           {isPublisher && (
             <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
               {/* An audio podcast has no camera at all — only the microphone. */}
