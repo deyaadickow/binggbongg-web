@@ -394,7 +394,7 @@ export function ProfilePage() {
   const [tabError, setTabError] = useState<string | null>(null);
   const [playlists, setPlaylists] = useState<PlaylistRow[]>([]);
   const [playlistCreate] = useState(0); // Create Playlist is gone (2026-11-20); kept so the panel prop stays put
-  const [seriesCreate, setSeriesCreate] = useState(false);
+  const [seriesCreate, setSeriesCreate] = useState(0); // folder id whose "Create Playlist" sheet is open
   const [series, setSeries] = useState<Series[] | null>(null);
   // Q&A (2026-11-17): how many questions, once the tab has loaded them.
   const [qaCount, setQaCount] = useState<number | null>(null);
@@ -719,8 +719,8 @@ export function ProfilePage() {
   return (
     <div className="page" style={{ maxWidth: 600, margin: "0 auto" }}>
       {seriesCreate && me?.id && (
-        <CreateSeriesSheet myId={Number(socialMe?.id ?? me.id)} onClose={() => setSeriesCreate(false)}
-          onSaved={(fid) => { setSeriesCreate(false); switchTab("videos"); setFolderSel(fid); }} />
+        <CreateSeriesSheet myId={Number(socialMe?.id ?? me.id)} folderId={seriesCreate} onClose={() => setSeriesCreate(0)}
+          onSaved={(fid) => { setSeriesCreate(0); switchTab("videos"); setFolderSel(0); window.setTimeout(() => setFolderSel(fid), 0); }} />
       )}
       {/* Header card. My Information (Steve, 2026-11-18: "Right under the image, Please add a
           \"My Information\" button ... Click on \"My Information\" button and add all the
@@ -861,10 +861,8 @@ export function ProfilePage() {
           )}
           {/* Create Playlist removed (Steve, 2026-11-20: "now we don't need the playlist anymore. please delete
               the playlist and just keep the Create Series"). Existing playlists still play from their tab. */}
-          {/* Create Series, the Create Playlist way (Steve, 2026-11-20). */}
-          {isMe && me?.id && (
-            <button className="btn ghost small" onClick={() => { setSeriesCreate(true); closeInfo(); }}>📁 {t("fld_create_series")}</button>
-          )}
+          {/* Create Series moved into every folder as "Create Playlist" (Steve, 2026-11-21: "On every new
+              folder Please add \"Create Playlist\" and remove Create series from My Information page"). */}
           {/* Creators and money (2026-11-17). */}
           {isMe && <button className="btn ghost small" onClick={() => navigate("/subscriptions")}>💎 {t("cm_my_subscription")}</button>}
           {isMe && <button className="btn ghost small" onClick={() => navigate("/scheduled")}>🗓 {t("cm_scheduled_posts")}</button>}
@@ -982,10 +980,17 @@ export function ProfilePage() {
           {tab === "videos" && (
             <ProfileFolders profileId={profile.id} isMe={isMe} myId={socialMe?.id ?? me?.id} selected={folderSel} onSelect={setFolderSel} />
           )}
-          {tabVideos.length === 0 && !(isMe && tab === "videos" && draftCount > 0 && folderSel === 0) ? (
+          {tabVideos.length === 0 && !(isMe && tab === "videos" && (folderSel > 0 || (draftCount > 0 && folderSel === 0))) ? (
             <p className="muted" style={{ padding: "24px 0", textAlign: "center" }}>{t(tab === "videos" && folderSel > 0 ? "fld_empty" : "no_videos_yet")}</p>
           ) : (
             <div className="profile-vid-grid">
+              {/* Create Playlist, first in each of your folders (Steve, 2026-11-21). */}
+              {isMe && tab === "videos" && folderSel > 0 && (
+                <button type="button" className="drafts-tile" style={{ border: "2px dashed var(--gold-border)" }} onClick={() => setSeriesCreate(folderSel)}>
+                  <span style={{ width: 34, height: 34, borderRadius: 17, background: "var(--gold-bright)", color: "#000", fontSize: 26, fontWeight: 900, lineHeight: "34px", textAlign: "center" }}>+</span>
+                  <span>{t("create_playlist")}</span>
+                </button>
+              )}
               {/* Drafts (Steve, 2026-11-17): first in your own videos, only when there are some. */}
               {isMe && tab === "videos" && draftCount > 0 && folderSel === 0 && (
                 <button type="button" className="drafts-tile" onClick={() => navigate("/drafts")}>

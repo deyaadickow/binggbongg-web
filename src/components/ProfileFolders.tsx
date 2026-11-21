@@ -452,9 +452,12 @@ function FolderOrderSheet({ folder, profileId, myId, onClose, onSaved }: {
  * playlist/Series. with the folder videos"): 1) a name, 2) tap your videos, 3) drag them into
  * order (top = #1) and Add. The server makes a numbered folder and moves those videos into it.
  */
-export function CreateSeriesSheet({ myId, onClose, onSaved }: { myId: number; onClose: () => void; onSaved: (folderId: number) => void }) {
+/** folderId > 0 = "Create Playlist" inside that folder (2026-11-21): no name step, the folder's own videos
+ *  start picked in their order, and Add makes them the folder's whole numbered list. */
+export function CreateSeriesSheet({ myId, folderId = 0, onClose, onSaved }: { myId: number; folderId?: number; onClose: () => void; onSaved: (folderId: number) => void }) {
   const { t } = useT();
-  const [step, setStep] = useState(0);
+  const first = folderId > 0 ? 1 : 0;
+  const [step, setStep] = useState(first);
   const [name, setName] = useState("");
   const [videos, setVideos] = useState<FolderVideo[] | null>(null);
   const [picked, setPicked] = useState<FolderVideo[]>([]);
@@ -467,8 +470,12 @@ export function CreateSeriesSheet({ myId, onClose, onSaved }: { myId: number; on
   useEffect(() => {
     let live = true;
     void fetchAllMyVideos(myId).then((v) => { if (live) setVideos(v); }).catch(() => { if (live) setVideos([]); });
+    if (folderId > 0) {
+      void fetchPostFolders(myId).then((f) => { const it = f.find((x) => x.id === folderId); if (live && it) setName(it.name); });
+      void fetchFolderVideos(myId, folderId).then((v) => { if (live) setPicked(v); }).catch(() => {});
+    }
     return () => { live = false; };
-  }, [myId]);
+  }, [myId, folderId]);
 
   const toggle = (v: FolderVideo) => setPicked((p) => (p.some((x) => x.id === v.id) ? p.filter((x) => x.id !== v.id) : [...p, v]));
 
@@ -502,7 +509,7 @@ export function CreateSeriesSheet({ myId, onClose, onSaved }: { myId: number; on
     if (step === 1) { if (!picked.length) return; setStep(2); return; }
     setSaving(true);
     try {
-      const r = await createFolderSeries(myId, clean, picked.map((v) => v.id));
+      const r = await createFolderSeries(myId, clean, picked.map((v) => v.id), folderId);
       const e = errFrom(r);
       if (e) { showGoldAlert(e); setSaving(false); if (r.code === "duplicate" || r.code === "bad_name") setStep(0); return; }
       announceFoldersChanged();
@@ -518,8 +525,8 @@ export function CreateSeriesSheet({ myId, onClose, onSaved }: { myId: number; on
       <div className="card pad" style={{ ...card, maxWidth: 460, boxSizing: "border-box", maxHeight: "88vh", display: "flex", flexDirection: "column" }}
         onClick={(e) => e.stopPropagation()}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          {step > 0 && <button className="btn small ghost" aria-label="‹" onClick={() => setStep(step - 1)}>‹</button>}
-          <h2 style={{ margin: 0, color: "var(--gold)", flex: 1, fontWeight: 900 }}>{t("fld_create_series")}</h2>
+          {step > first && <button className="btn small ghost" aria-label="‹" onClick={() => setStep(step - 1)}>‹</button>}
+          <h2 style={{ margin: 0, color: "var(--gold)", flex: 1, fontWeight: 900 }}>{t(folderId > 0 ? "create_playlist" : "fld_create_series")}</h2>
           <button className="btn small ghost" aria-label={t("fld_cancel")} onClick={onClose}>✕</button>
         </div>
         {step > 0 && <div style={{ color: "var(--gold)", opacity: .85, fontWeight: 700, margin: "2px 0 4px" }}>📁 {clean}</div>}
