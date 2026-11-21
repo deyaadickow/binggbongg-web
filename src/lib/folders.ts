@@ -41,7 +41,7 @@ export const createPostFolder = (myId: number, name: string) => write("createPos
 /** Create Series the Create Playlist way (2026-11-20): a numbered folder with these videos, #1 first. */
 /** folderId > 0: those videos become that folder's whole numbered list (Create Playlist in a folder). */
 export const createFolderSeries = (myId: number, name: string, postIds: number[], folderId = 0) =>
-  write("createFolderSeries", folderId > 0 ? { user_id: myId, folder_id: folderId, post_ids: postIds.join(",") } : { user_id: myId, name, post_ids: postIds.join(",") });
+  write("createFolderSeries", folderId > 0 ? { user_id: myId, folder_id: folderId, name, post_ids: postIds.join(",") } : { user_id: myId, name, post_ids: postIds.join(",") });
 /** Every video of a member (folders included) for the Create Series picker. */
 export async function fetchAllMyVideos(profileId: number): Promise<FolderVideo[]> {
   const r = (await post("fetchUserPosts", { user_id: profileId, start: 0, count: 300 })) as unknown as { data?: FolderVideo[] };

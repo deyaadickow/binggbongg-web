@@ -456,7 +456,9 @@ function FolderOrderSheet({ folder, profileId, myId, onClose, onSaved }: {
  *  start picked in their order, and Add makes them the folder's whole numbered list. */
 export function CreateSeriesSheet({ myId, folderId = 0, onClose, onSaved }: { myId: number; folderId?: number; onClose: () => void; onSaved: (folderId: number) => void }) {
   const { t } = useT();
-  const first = folderId > 0 ? 1 : 0;
+  // Name page first, also inside a folder (Steve, 2026-11-21: "Name the new playlist and right away add
+  // all the videos you want starting from #1"); the name renames the folder. Tap order = #1, #2…
+  const first = 0;
   const [step, setStep] = useState(first);
   const [name, setName] = useState("");
   const [videos, setVideos] = useState<FolderVideo[] | null>(null);
