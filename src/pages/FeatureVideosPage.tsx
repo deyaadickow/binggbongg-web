@@ -75,7 +75,10 @@ export function FeatureVideosPage({ kind = "features" }: { kind?: "features" | "
         <Notice>{t("no_videos_yet")}</Notice>
       ) : (
         <div style={{
-          display: "grid", gap: 16, marginTop: 14,
+          // Each title centred right on top of its own video, and more room between rows so a title never
+          // reads as the video above's (Steve, 2026-11-21: "Please put the name of each video on top in the
+          // center and closer to the video").
+          display: "grid", columnGap: 16, rowGap: 30, marginTop: 14,
           gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
         }}>
           {videos.map((v, vi) => (
@@ -83,7 +86,7 @@ export function FeatureVideosPage({ kind = "features" }: { kind?: "features" | "
             // however many lines its title wraps to.
             <div key={v.id} style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
               <h2 style={{
-                flex: 1, display: "flex", alignItems: "flex-end", margin: "0 0 8px",
+                flex: 1, display: "flex", alignItems: "flex-end", justifyContent: "center", textAlign: "center", margin: "0 0 5px",
                 color: "var(--gold)", fontSize: 15, fontWeight: 800, lineHeight: 1.25,
                 overflowWrap: "anywhere",
               }}>
