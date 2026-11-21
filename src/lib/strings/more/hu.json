@@ -1928,5 +1928,11 @@
  "fname_gold_digger": "Aranyrögök",
  "gd_title": "Aranyrögök",
  "gd_starts_soon": "Hamarosan indul az Aranyrögök",
- "gd_badge": "⛏️ Aranyrögök %1$s %2$s"
+ "gd_badge": "⛏️ Aranyrögök %1$s %2$s",
+ "cb_join_now_title": "Csatlakozz most az egész ország csatájához: {country}",
+ "cb_join_now_live": "ÉLŐ most — koppints, menj élőbe és csatlakozz",
+ "cb_join_now_open": "A szoba nyitva — a csata {time} múlva kezdődik · koppints a csatlakozáshoz",
+ "cb_join_now_next": "Következő csata {time} múlva",
+ "cb_join_now_ms": "{m} perc {s} másodperc",
+ "cb_join_now_hms": "{h} óra {m} perc {s} másodperc"
 }

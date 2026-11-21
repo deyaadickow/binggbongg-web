@@ -1934,5 +1934,11 @@
  "fname_gold_digger": "Pepite d'Oro",
  "gd_title": "Pepite d'Oro",
  "gd_starts_soon": "Pepite d'Oro inizia presto",
- "gd_badge": "⛏️ Pepite d'Oro %1$s %2$s"
+ "gd_badge": "⛏️ Pepite d'Oro %1$s %2$s",
+ "cb_join_now_title": "Unisciti ora alla sfida di tutto il paese: {country}",
+ "cb_join_now_live": "LIVE ora — tocca per andare in diretta e unirti",
+ "cb_join_now_open": "La stanza è aperta — la sfida inizia tra {time} · tocca per unirti",
+ "cb_join_now_next": "Prossima sfida tra {time}",
+ "cb_join_now_ms": "{m} min {s} secondi",
+ "cb_join_now_hms": "{h} h {m} min {s} secondi"
 }

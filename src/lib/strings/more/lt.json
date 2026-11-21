@@ -1932,5 +1932,11 @@
  "fname_gold_digger": "Aukso grynuoliai",
  "gd_title": "Aukso grynuoliai",
  "gd_starts_soon": "Aukso grynuoliai netrukus prasidės",
- "gd_badge": "⛏️ Aukso grynuoliai %1$s %2$s"
+ "gd_badge": "⛏️ Aukso grynuoliai %1$s %2$s",
+ "cb_join_now_title": "Prisijunk dabar prie visos šalies kovos: {country}",
+ "cb_join_now_live": "TIESIOGIAI dabar — bakstelėk, pradėk transliaciją ir prisijunk",
+ "cb_join_now_open": "Kambarys atidarytas — kova prasidės po {time} · bakstelėk, kad prisijungtum",
+ "cb_join_now_next": "Kita kova po {time}",
+ "cb_join_now_ms": "{m} min. {s} sek.",
+ "cb_join_now_hms": "{h} val. {m} min. {s} sek."
 }

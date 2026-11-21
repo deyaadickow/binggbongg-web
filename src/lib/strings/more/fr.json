@@ -1935,5 +1935,11 @@
  "fname_gold_digger": "Pépites d'Or",
  "gd_title": "Pépites d'Or",
  "gd_starts_soon": "Pépites d'Or commence bientôt",
- "gd_badge": "⛏️ Pépites d'Or %1$s %2$s"
+ "gd_badge": "⛏️ Pépites d'Or %1$s %2$s",
+ "cb_join_now_title": "Rejoins maintenant la bataille de tout le pays : {country}",
+ "cb_join_now_live": "EN DIRECT — touche pour passer en direct et rejoindre",
+ "cb_join_now_open": "La salle est ouverte — la bataille commence dans {time} · touche pour rejoindre",
+ "cb_join_now_next": "Prochaine bataille dans {time}",
+ "cb_join_now_ms": "{m} min {s} secondes",
+ "cb_join_now_hms": "{h} h {m} min {s} secondes"
 }

@@ -3573,4 +3573,11 @@ export const en = {
   mb_year: "This year",
   mb_all: "Since day one",
   mb_open: "See badges",
+  // Join the whole country battle Now (Steve, 2026-11-20).
+  cb_join_now_title: "Join the {country} whole country battle Now",
+  cb_join_now_live: "LIVE now — tap to go live and join",
+  cb_join_now_open: "Room is open — battle starts in {time} · tap to join",
+  cb_join_now_next: "Next battle in {time}",
+  cb_join_now_ms: "{m} min {s} seconds",
+  cb_join_now_hms: "{h} h {m} min {s} seconds",
 } as const;

@@ -1935,5 +1935,11 @@
  "fname_gold_digger": "Altın Külçeler",
  "gd_title": "Altın Külçeler",
  "gd_starts_soon": "Altın Külçeler yakında başlıyor",
- "gd_badge": "⛏️ Altın Külçeler %1$s %2$s"
+ "gd_badge": "⛏️ Altın Külçeler %1$s %2$s",
+ "cb_join_now_title": "Hemen {country} ülke çapındaki savaşa katıl",
+ "cb_join_now_live": "Şu an CANLI — canlı yayına geçip katılmak için dokun",
+ "cb_join_now_open": "Oda açık — savaş {time} sonra başlıyor · katılmak için dokun",
+ "cb_join_now_next": "Sonraki savaş {time} sonra",
+ "cb_join_now_ms": "{m} dk {s} saniye",
+ "cb_join_now_hms": "{h} sa {m} dk {s} saniye"
 }

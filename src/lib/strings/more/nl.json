@@ -1935,5 +1935,11 @@
  "fname_gold_digger": "Goudklompjes",
  "gd_title": "Goudklompjes",
  "gd_starts_soon": "Goudklompjes begint binnenkort",
- "gd_badge": "⛏️ Goudklompjes %1$s %2$s"
+ "gd_badge": "⛏️ Goudklompjes %1$s %2$s",
+ "cb_join_now_title": "Doe nu mee aan de landelijke battle van {country}",
+ "cb_join_now_live": "Nu LIVE — tik om live te gaan en mee te doen",
+ "cb_join_now_open": "De kamer is open — de battle begint over {time} · tik om mee te doen",
+ "cb_join_now_next": "Volgende battle over {time}",
+ "cb_join_now_ms": "{m} min {s} seconden",
+ "cb_join_now_hms": "{h} u {m} min {s} seconden"
 }

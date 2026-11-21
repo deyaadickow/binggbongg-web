@@ -1935,5 +1935,11 @@
  "fname_gold_digger": "Goldnuggets",
  "gd_title": "Goldnuggets",
  "gd_starts_soon": "Goldnuggets startet bald",
- "gd_badge": "⛏️ Goldnuggets %1$s %2$s"
+ "gd_badge": "⛏️ Goldnuggets %1$s %2$s",
+ "cb_join_now_title": "Jetzt beim landesweiten Battle von {country} mitmachen",
+ "cb_join_now_live": "Jetzt LIVE — tippen, live gehen und mitmachen",
+ "cb_join_now_open": "Der Raum ist offen — das Battle beginnt in {time} · tippen zum Mitmachen",
+ "cb_join_now_next": "Nächstes Battle in {time}",
+ "cb_join_now_ms": "{m} Min. {s} Sekunden",
+ "cb_join_now_hms": "{h} Std. {m} Min. {s} Sekunden"
 }

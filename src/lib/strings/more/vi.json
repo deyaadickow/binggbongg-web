@@ -1935,5 +1935,11 @@
  "fname_gold_digger": "Cục Vàng",
  "gd_title": "Cục Vàng",
  "gd_starts_soon": "Cục Vàng sắp bắt đầu",
- "gd_badge": "⛏️ Cục Vàng %1$s %2$s"
+ "gd_badge": "⛏️ Cục Vàng %1$s %2$s",
+ "cb_join_now_title": "Tham gia ngay trận chiến toàn quốc của {country}",
+ "cb_join_now_live": "Đang LIVE — chạm để phát trực tiếp và tham gia",
+ "cb_join_now_open": "Phòng đã mở — trận chiến bắt đầu sau {time} · chạm để tham gia",
+ "cb_join_now_next": "Trận tiếp theo sau {time}",
+ "cb_join_now_ms": "{m} phút {s} giây",
+ "cb_join_now_hms": "{h} giờ {m} phút {s} giây"
 }

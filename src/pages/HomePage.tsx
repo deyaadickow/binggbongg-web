@@ -8,6 +8,7 @@ import { openRandomLive } from "../lib/liveSwipe";
 import { useSession } from "../lib/session";
 import { PostCard } from "../components/PostCard";
 import { FeedAvatarRow } from "../components/FeedAvatarRow";
+import { CountryBattleJoinNow } from "../components/CountryBattleJoinNow";
 import { Loading, Notice, StoreBadges } from "../components/Common";
 import { getFeedSource, setFeed, setFeedSource } from "../lib/feed";
 import { FeedPhotoCard } from "../components/FeedPhotoCard";
@@ -157,6 +158,11 @@ export function HomePage() {
       {/* Steve, 2026-11-17: "Please center the buttons from side to side of the screen and go up a
           little bit more." Three columns: empty | the buttons | the store badges, so the buttons
           sit in the middle of the page whatever the badges take. */}
+      {/* "Join the Philippine whole country battle Now" (Steve, 2026-11-20: "same banner above the
+          information center and the search section"). The web's Information Center is the site
+          header's button, so the banner opens the feed: right under it, above the Live button,
+          the feeds and every video's Search · topic bar. Only while the server says show. */}
+      <CountryBattleJoinNow variant="banner" />
       <div className="feed-top-row">
         <span />
         <div className="feed-top-buttons">

@@ -1932,5 +1932,11 @@
  "fname_gold_digger": "Gullmolar",
  "gd_title": "Gullmolar",
  "gd_starts_soon": "Gullmolar byrjar bráðum",
- "gd_badge": "⛏️ Gullmolar %1$s %2$s"
+ "gd_badge": "⛏️ Gullmolar %1$s %2$s",
+ "cb_join_now_title": "Taktu þátt núna í baráttu alls landsins: {country}",
+ "cb_join_now_live": "Í BEINNI núna — ýttu til að fara í beina og taka þátt",
+ "cb_join_now_open": "Herbergið er opið — baráttan hefst eftir {time} · ýttu til að taka þátt",
+ "cb_join_now_next": "Næsta barátta eftir {time}",
+ "cb_join_now_ms": "{m} mín {s} sekúndur",
+ "cb_join_now_hms": "{h} klst {m} mín {s} sekúndur"
 }

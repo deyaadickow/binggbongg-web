@@ -1926,5 +1926,11 @@
  "fname_gold_digger": "Kultahiput",
  "gd_title": "Kultahiput",
  "gd_starts_soon": "Kultahiput alkaa pian",
- "gd_badge": "⛏️ Kultahiput %1$s %2$s"
+ "gd_badge": "⛏️ Kultahiput %1$s %2$s",
+ "cb_join_now_title": "Liity nyt koko maan taisteluun: {country}",
+ "cb_join_now_live": "LIVE nyt — napauta, lähde liveen ja liity",
+ "cb_join_now_open": "Huone on auki — taistelu alkaa {time} kuluttua · napauta liittyäksesi",
+ "cb_join_now_next": "Seuraava taistelu {time} kuluttua",
+ "cb_join_now_ms": "{m} min {s} sekuntia",
+ "cb_join_now_hms": "{h} t {m} min {s} sekuntia"
 }

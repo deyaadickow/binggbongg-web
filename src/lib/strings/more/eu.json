@@ -1935,5 +1935,11 @@
  "fname_gold_digger": "Urrezko Pepitak",
  "gd_title": "Urrezko Pepitak",
  "gd_starts_soon": "Urrezko Pepitak laster hasiko da",
- "gd_badge": "⛏️ Urrezko Pepitak %1$s %2$s"
+ "gd_badge": "⛏️ Urrezko Pepitak %1$s %2$s",
+ "cb_join_now_title": "Batu orain {country} herrialde osoko borrokara",
+ "cb_join_now_live": "ZUZENEAN orain — sakatu zuzenean emateko eta batzeko",
+ "cb_join_now_open": "Gela irekita dago — borroka {time} barru hasiko da · sakatu batzeko",
+ "cb_join_now_next": "Hurrengo borroka {time} barru",
+ "cb_join_now_ms": "{m} min {s} segundo",
+ "cb_join_now_hms": "{h} h {m} min {s} segundo"
 }

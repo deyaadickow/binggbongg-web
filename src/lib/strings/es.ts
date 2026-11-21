@@ -2591,4 +2591,10 @@ export const es = {
   mb_year: "Este año",
   mb_all: "Desde el primer día",
   mb_open: "Ver insignias",
+  cb_join_now_title: "Únete ya a la batalla de todo el país de {country}",
+  cb_join_now_live: "EN VIVO ahora — toca para transmitir y unirte",
+  cb_join_now_open: "La sala está abierta — la batalla empieza en {time} · toca para unirte",
+  cb_join_now_next: "Próxima batalla en {time}",
+  cb_join_now_ms: "{m} min {s} segundos",
+  cb_join_now_hms: "{h} h {m} min {s} segundos",
 };

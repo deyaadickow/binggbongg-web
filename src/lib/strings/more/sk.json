@@ -1935,5 +1935,11 @@
  "fname_gold_digger": "Zlaté nugety",
  "gd_title": "Zlaté nugety",
  "gd_starts_soon": "Zlaté nugety čoskoro začnú",
- "gd_badge": "⛏️ Zlaté nugety %1$s %2$s"
+ "gd_badge": "⛏️ Zlaté nugety %1$s %2$s",
+ "cb_join_now_title": "Pridaj sa teraz do bitky celej krajiny: {country}",
+ "cb_join_now_live": "NAŽIVO teraz — ťukni, vysielaj a pridaj sa",
+ "cb_join_now_open": "Miestnosť je otvorená — bitka začne o {time} · ťukni a pridaj sa",
+ "cb_join_now_next": "Ďalšia bitka o {time}",
+ "cb_join_now_ms": "{m} min {s} sekúnd",
+ "cb_join_now_hms": "{h} h {m} min {s} sekúnd"
 }

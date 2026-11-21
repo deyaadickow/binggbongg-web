@@ -1935,5 +1935,11 @@
  "fname_gold_digger": "Ketulan Emas",
  "gd_title": "Ketulan Emas",
  "gd_starts_soon": "Ketulan Emas akan bermula tidak lama lagi",
- "gd_badge": "⛏️ Ketulan Emas %1$s %2$s"
+ "gd_badge": "⛏️ Ketulan Emas %1$s %2$s",
+ "cb_join_now_title": "Sertai sekarang pertarungan seluruh negara {country}",
+ "cb_join_now_live": "LANGSUNG sekarang — ketik untuk siaran langsung dan sertai",
+ "cb_join_now_open": "Bilik sudah dibuka — pertarungan bermula dalam {time} · ketik untuk sertai",
+ "cb_join_now_next": "Pertarungan seterusnya dalam {time}",
+ "cb_join_now_ms": "{m} min {s} saat",
+ "cb_join_now_hms": "{h} j {m} min {s} saat"
 }

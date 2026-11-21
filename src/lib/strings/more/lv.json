@@ -1931,5 +1931,11 @@
  "fname_gold_digger": "Zelta tīrradņi",
  "gd_title": "Zelta tīrradņi",
  "gd_starts_soon": "Zelta tīrradņi drīz sāksies",
- "gd_badge": "⛏️ Zelta tīrradņi %1$s %2$s"
+ "gd_badge": "⛏️ Zelta tīrradņi %1$s %2$s",
+ "cb_join_now_title": "Pievienojies tagad visas valsts cīņai: {country}",
+ "cb_join_now_live": "TIEŠRAIDĒ tagad — pieskaries, lai sāktu tiešraidi un pievienotos",
+ "cb_join_now_open": "Istaba ir atvērta — cīņa sāksies pēc {time} · pieskaries, lai pievienotos",
+ "cb_join_now_next": "Nākamā cīņa pēc {time}",
+ "cb_join_now_ms": "{m} min {s} sekundes",
+ "cb_join_now_hms": "{h} st. {m} min {s} sekundes"
 }

@@ -1934,5 +1934,11 @@
  "fname_gold_digger": "Pepites d'Or",
  "gd_title": "Pepites d'Or",
  "gd_starts_soon": "Pepites d'Or comença aviat",
- "gd_badge": "⛏️ Pepites d'Or %1$s %2$s"
+ "gd_badge": "⛏️ Pepites d'Or %1$s %2$s",
+ "cb_join_now_title": "Uneix-te ara a la batalla de tot el país de {country}",
+ "cb_join_now_live": "EN DIRECTE ara — toca per emetre i unir-te",
+ "cb_join_now_open": "La sala és oberta — la batalla comença d'aquí a {time} · toca per unir-te",
+ "cb_join_now_next": "Propera batalla d'aquí a {time}",
+ "cb_join_now_ms": "{m} min {s} segons",
+ "cb_join_now_hms": "{h} h {m} min {s} segons"
 }

@@ -1931,5 +1931,11 @@
  "fname_gold_digger": "גושי זהב",
  "gd_title": "גושי זהב",
  "gd_starts_soon": "גושי זהב מתחיל בקרוב",
- "gd_badge": "⛏️ גושי זהב %1$s %2$s"
+ "gd_badge": "⛏️ גושי זהב %1$s %2$s",
+ "cb_join_now_title": "הצטרפו עכשיו לקרב של כל המדינה: {country}",
+ "cb_join_now_live": "בשידור חי עכשיו — הקישו כדי לעלות לשידור ולהצטרף",
+ "cb_join_now_open": "החדר פתוח — הקרב מתחיל בעוד {time} · הקישו כדי להצטרף",
+ "cb_join_now_next": "הקרב הבא בעוד {time}",
+ "cb_join_now_ms": "{m} דק׳ {s} שניות",
+ "cb_join_now_hms": "{h} שע׳ {m} דק׳ {s} שניות"
 }

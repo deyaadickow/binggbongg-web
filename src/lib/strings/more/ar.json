@@ -2233,5 +2233,11 @@
  "fname_gold_digger": "كتل ذهبية",
  "gd_title": "كتل ذهبية",
  "gd_starts_soon": "كتل ذهبية تبدأ قريبًا",
- "gd_badge": "⛏️ كتل ذهبية %1$s %2$s"
+ "gd_badge": "⛏️ كتل ذهبية %1$s %2$s",
+ "cb_join_now_title": "انضم الآن إلى معركة {country} على مستوى البلد كله",
+ "cb_join_now_live": "مباشر الآن — اضغط لتبث مباشرة وتنضم",
+ "cb_join_now_open": "الغرفة مفتوحة — تبدأ المعركة خلال {time} · اضغط للانضمام",
+ "cb_join_now_next": "المعركة التالية خلال {time}",
+ "cb_join_now_ms": "{m} دقيقة {s} ثانية",
+ "cb_join_now_hms": "{h} س {m} دقيقة {s} ثانية"
 }

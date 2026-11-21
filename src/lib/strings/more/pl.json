@@ -1935,5 +1935,11 @@
  "fname_gold_digger": "Złote Samorodki",
  "gd_title": "Złote Samorodki",
  "gd_starts_soon": "Złote Samorodki wkrótce",
- "gd_badge": "⛏️ Złote Samorodki %1$s %2$s"
+ "gd_badge": "⛏️ Złote Samorodki %1$s %2$s",
+ "cb_join_now_title": "Dołącz teraz do bitwy całego kraju: {country}",
+ "cb_join_now_live": "NA ŻYWO — stuknij, aby nadawać i dołączyć",
+ "cb_join_now_open": "Pokój jest otwarty — bitwa zaczyna się za {time} · stuknij, aby dołączyć",
+ "cb_join_now_next": "Następna bitwa za {time}",
+ "cb_join_now_ms": "{m} min {s} sekund",
+ "cb_join_now_hms": "{h} godz. {m} min {s} sekund"
 }

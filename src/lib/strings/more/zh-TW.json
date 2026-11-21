@@ -1935,5 +1935,11 @@
  "fname_gold_digger": "金塊",
  "gd_title": "金塊",
  "gd_starts_soon": "金塊即將開始",
- "gd_badge": "⛏️ 金塊 %1$s %2$s"
+ "gd_badge": "⛏️ 金塊 %1$s %2$s",
+ "cb_join_now_title": "立即加入{country}全國大對戰",
+ "cb_join_now_live": "正在直播 — 點擊開播並加入",
+ "cb_join_now_open": "房間已開放 — 對戰將在{time}後開始 · 點擊加入",
+ "cb_join_now_next": "下一場對戰還有{time}",
+ "cb_join_now_ms": "{m}分{s}秒",
+ "cb_join_now_hms": "{h}小時{m}分{s}秒"
 }

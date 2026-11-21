@@ -2627,4 +2627,10 @@ export const id = {
   mb_year: "Tahun ini",
   mb_all: "Sejak hari pertama",
   mb_open: "Lihat lencana",
+  cb_join_now_title: "Ikut sekarang battle seluruh negeri {country}",
+  cb_join_now_live: "LIVE sekarang — ketuk untuk live dan ikut",
+  cb_join_now_open: "Ruang sudah dibuka — battle mulai dalam {time} · ketuk untuk ikut",
+  cb_join_now_next: "Battle berikutnya dalam {time}",
+  cb_join_now_ms: "{m} mnt {s} detik",
+  cb_join_now_hms: "{h} j {m} mnt {s} detik",
 };

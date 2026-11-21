@@ -1930,5 +1930,11 @@
  "fname_gold_digger": "Pepite de Aur",
  "gd_title": "Pepite de Aur",
  "gd_starts_soon": "Pepite de Aur începe în curând",
- "gd_badge": "⛏️ Pepite de Aur %1$s %2$s"
+ "gd_badge": "⛏️ Pepite de Aur %1$s %2$s",
+ "cb_join_now_title": "Intră acum în bătălia întregii țări: {country}",
+ "cb_join_now_live": "LIVE acum — atinge ca să intri live și să participi",
+ "cb_join_now_open": "Camera e deschisă — bătălia începe în {time} · atinge ca să intri",
+ "cb_join_now_next": "Următoarea bătălie în {time}",
+ "cb_join_now_ms": "{m} min {s} secunde",
+ "cb_join_now_hms": "{h} h {m} min {s} secunde"
 }

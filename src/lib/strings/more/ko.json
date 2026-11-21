@@ -1935,5 +1935,11 @@
  "fname_gold_digger": "골든 너겟",
  "gd_title": "골든 너겟",
  "gd_starts_soon": "골든 너겟 곧 시작",
- "gd_badge": "⛏️ 골든 너겟 %1$s %2$s"
+ "gd_badge": "⛏️ 골든 너겟 %1$s %2$s",
+ "cb_join_now_title": "지금 {country} 전국 배틀에 참여하세요",
+ "cb_join_now_live": "지금 라이브 — 탭해서 라이브로 참여",
+ "cb_join_now_open": "방이 열렸어요 — {time} 후 배틀 시작 · 탭해서 참여",
+ "cb_join_now_next": "다음 배틀까지 {time}",
+ "cb_join_now_ms": "{m}분 {s}초",
+ "cb_join_now_hms": "{h}시간 {m}분 {s}초"
 }

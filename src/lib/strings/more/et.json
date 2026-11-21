@@ -1932,5 +1932,11 @@
  "fname_gold_digger": "Kullatükid",
  "gd_title": "Kullatükid",
  "gd_starts_soon": "Kullatükid algab peagi",
- "gd_badge": "⛏️ Kullatükid %1$s %2$s"
+ "gd_badge": "⛏️ Kullatükid %1$s %2$s",
+ "cb_join_now_title": "Liitu kohe kogu riigi lahinguga: {country}",
+ "cb_join_now_live": "OTSE nüüd — puuduta, et minna otse ja liituda",
+ "cb_join_now_open": "Tuba on avatud — lahing algab {time} pärast · puuduta, et liituda",
+ "cb_join_now_next": "Järgmine lahing {time} pärast",
+ "cb_join_now_ms": "{m} min {s} sekundit",
+ "cb_join_now_hms": "{h} h {m} min {s} sekundit"
 }

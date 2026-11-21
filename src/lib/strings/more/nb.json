@@ -1932,5 +1932,11 @@
  "fname_gold_digger": "Gullklumper",
  "gd_title": "Gullklumper",
  "gd_starts_soon": "Gullklumper starter snart",
- "gd_badge": "⛏️ Gullklumper %1$s %2$s"
+ "gd_badge": "⛏️ Gullklumper %1$s %2$s",
+ "cb_join_now_title": "Bli med nå i hele landets kamp i {country}",
+ "cb_join_now_live": "LIVE nå — trykk for å gå live og bli med",
+ "cb_join_now_open": "Rommet er åpent — kampen starter om {time} · trykk for å bli med",
+ "cb_join_now_next": "Neste kamp om {time}",
+ "cb_join_now_ms": "{m} min {s} sekunder",
+ "cb_join_now_hms": "{h} t {m} min {s} sekunder"
 }

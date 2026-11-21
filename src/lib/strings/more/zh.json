@@ -1935,5 +1935,11 @@
  "fname_gold_digger": "金块",
  "gd_title": "金块",
  "gd_starts_soon": "金块即将开始",
- "gd_badge": "⛏️ 金块 %1$s %2$s"
+ "gd_badge": "⛏️ 金块 %1$s %2$s",
+ "cb_join_now_title": "立即加入{country}全国大对战",
+ "cb_join_now_live": "正在直播 — 点击开播并加入",
+ "cb_join_now_open": "房间已开放 — 对战将在{time}后开始 · 点击加入",
+ "cb_join_now_next": "下一场对战还有{time}",
+ "cb_join_now_ms": "{m}分{s}秒",
+ "cb_join_now_hms": "{h}小时{m}分{s}秒"
 }

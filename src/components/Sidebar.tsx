@@ -1,12 +1,14 @@
 // Steve, 2026-09-24: "add all the settings links on the left side of the screen on chrome…
 // even if all the links are not working now we should add them anyway and work it out one at
 // a time." Every row of the phones' Settings screen, in the same order, plus the main tabs.
+import { Fragment } from "react";
 import { NavLink } from "react-router-dom";
 import { useSession } from "../lib/session";
 import { APP_STORE_URL, PLAY_STORE_URL } from "./Common";
 import { useT, type StringKey } from "../lib/i18n";
 import { useContestOn } from "../lib/contests";
 import { usePodcastEnabled } from "../lib/podcast";
+import { CountryBattleJoinNow } from "./CountryBattleJoinNow";
 
 // `label` is a translation KEY, not text. sidebarSections() is a plain function with no hook,
 // so the data carries the key and the view translates it; typing it as StringKey means a
@@ -160,7 +162,10 @@ export function Sidebar() {
         return (
           <div key={i} className="side-section">
             {sec.title && <div className="side-title">{t(sec.title)}</div>}
-            {links.map((l) => <SideLinkItem key={l.label} link={l} onSignOut={signOut} />)}
+            {links.map((l) => l.to === "/go-live" ? (
+              // "Join the Philippine whole country battle Now" right under Go Live (Steve, 2026-11-20).
+              <Fragment key={l.label}><SideLinkItem link={l} onSignOut={signOut} /><CountryBattleJoinNow variant="button" /></Fragment>
+            ) : <SideLinkItem key={l.label} link={l} onSignOut={signOut} />)}
           </div>
         );
       })}

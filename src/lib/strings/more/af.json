@@ -1933,5 +1933,11 @@
  "fname_gold_digger": "Goue Klonte",
  "gd_title": "Goue Klonte",
  "gd_starts_soon": "Goue Klonte begin binnekort",
- "gd_badge": "⛏️ Goue Klonte %1$s %2$s"
+ "gd_badge": "⛏️ Goue Klonte %1$s %2$s",
+ "cb_join_now_title": "Sluit nou aan by die hele land se stryd van {country}",
+ "cb_join_now_live": "LEWENDIG nou — tik om lewendig te gaan en aan te sluit",
+ "cb_join_now_open": "Die kamer is oop — die stryd begin oor {time} · tik om aan te sluit",
+ "cb_join_now_next": "Volgende stryd oor {time}",
+ "cb_join_now_ms": "{m} min {s} sekondes",
+ "cb_join_now_hms": "{h} h {m} min {s} sekondes"
 }

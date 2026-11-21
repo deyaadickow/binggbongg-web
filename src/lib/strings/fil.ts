@@ -2790,4 +2790,10 @@ export const fil = {
   mb_year: "Ngayong taon",
   mb_all: "Mula unang araw",
   mb_open: "Tingnan ang mga badge",
+  cb_join_now_title: "Sumali na sa whole country battle ng {country}!",
+  cb_join_now_live: "LIVE na — i-tap para mag-live at sumali",
+  cb_join_now_open: "Bukas na ang room — magsisimula ang battle sa {time} · i-tap para sumali",
+  cb_join_now_next: "Susunod na battle sa {time}",
+  cb_join_now_ms: "{m} min {s} segundo",
+  cb_join_now_hms: "{h} oras {m} min {s} segundo",
 };

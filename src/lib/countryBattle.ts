@@ -456,3 +456,104 @@ export function useCountryBattleVisible(): boolean {
   }, [uid, tester]);
   return on;
 }
+
+// ---- "Join the Philippine whole country battle Now" ----------------------------------------
+// Steve, 2026-11-20: "We have to make it easier to join the battle ... when they click it, they
+// will go right in the battle." fetchCountryBattleJoinNow says whether to show the one-tap button
+// (show=false: signed out, or not in a battle country) and whether a join would work right now.
+// Every button on screen shares ONE poll: on mount, every 30 s while the tab is visible, and the
+// moment the countdown runs out.
+
+export interface CbJoinNow {
+  show: boolean;
+  joinable: boolean;
+  phase: CbDayPhase;
+  day_id: number | null;
+  room_name: string | null;
+  opens_at: string | null;
+  starts_at: string | null;
+  ends_at: string | null;
+  country: string;
+  country_adjective: string;
+  every_hour: boolean;
+  duration_minutes: number;
+  server_now: string | null;
+  is_test: boolean;
+}
+
+export async function fetchCountryBattleJoinNow(userId: number): Promise<CbJoinNow | null> {
+  const res = await post<CbJoinNow>("fetchCountryBattleJoinNow", { user_id: userId });
+  const d = res.status && res.data ? res.data : null;
+  if (!d) return null;
+  noteServerNow(d.server_now);
+  const id = Number(d.day_id);
+  return {
+    ...d,
+    show: flag(d.show),
+    joinable: flag(d.joinable),
+    every_hour: flag(d.every_hour),
+    is_test: flag(d.is_test),
+    day_id: Number.isFinite(id) && id > 0 ? id : null,
+    country: d.country || "",
+    country_adjective: d.country_adjective || d.country || "",
+  };
+}
+
+const joinNowStore = {
+  uid: 0,
+  value: null as CbJoinNow | null,
+  subs: new Set<(v: CbJoinNow | null) => void>(),
+  timer: 0 as ReturnType<typeof setInterval> | 0,
+  inflight: false,
+};
+
+function joinNowSet(v: CbJoinNow | null) {
+  joinNowStore.value = v;
+  joinNowStore.subs.forEach((f) => f(v));
+}
+
+export function refreshCountryBattleJoinNow() {
+  const uid = joinNowStore.uid;
+  if (!uid) { joinNowSet(null); return; }
+  if (joinNowStore.inflight || document.visibilityState !== "visible") return;
+  joinNowStore.inflight = true;
+  fetchCountryBattleJoinNow(uid)
+    .then((v) => { if (joinNowStore.uid === uid) joinNowSet(v); })
+    .catch(() => undefined) // a failed poll keeps the last answer; the next one tries again
+    .finally(() => { joinNowStore.inflight = false; });
+}
+
+const onJoinNowVisible = () => { if (document.visibilityState === "visible") refreshCountryBattleJoinNow(); };
+
+/** The join-now answer for the signed-in member, or null while unknown / signed out. */
+export function useCountryBattleJoinNow(): CbJoinNow | null {
+  const { user } = useSession();
+  const uid = user?.id ?? 0;
+  const [v, setV] = useState<CbJoinNow | null>(() => (joinNowStore.uid === uid ? joinNowStore.value : null));
+  useEffect(() => {
+    if (joinNowStore.uid !== uid) { joinNowStore.uid = uid; joinNowStore.value = null; }
+    const s = joinNowStore;
+    s.subs.add(setV);
+    setV(s.value);
+    if (s.subs.size === 1) {
+      refreshCountryBattleJoinNow();
+      s.timer = setInterval(refreshCountryBattleJoinNow, 30000);
+      document.addEventListener("visibilitychange", onJoinNowVisible);
+    } else if (!s.value) refreshCountryBattleJoinNow();
+    return () => {
+      s.subs.delete(setV);
+      if (s.subs.size === 0) {
+        if (s.timer) clearInterval(s.timer);
+        s.timer = 0;
+        document.removeEventListener("visibilitychange", onJoinNowVisible);
+      }
+    };
+  }, [uid]);
+  return uid ? v : null;
+}
+
+/** The pieces of a wait: 23 min 55 s -> { h: 0, m: 23, s: 55 }. */
+export function joinNowParts(ms: number): { h: number; m: number; s: number } {
+  const total = Math.max(0, Math.ceil(ms / 1000));
+  return { h: Math.floor(total / 3600), m: Math.floor((total % 3600) / 60), s: total % 60 };
+}

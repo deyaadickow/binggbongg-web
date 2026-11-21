@@ -1935,5 +1935,11 @@
  "fname_gold_digger": "ወርቃማ ጉብታዎች",
  "gd_title": "ወርቃማ ጉብታዎች",
  "gd_starts_soon": "ወርቃማ ጉብታዎች በቅርቡ ይጀምራል",
- "gd_badge": "⛏️ ወርቃማ ጉብታዎች %1$s %2$s"
+ "gd_badge": "⛏️ ወርቃማ ጉብታዎች %1$s %2$s",
+ "cb_join_now_title": "አሁን የ{country} የመላው ሀገር ውድድርን ይቀላቀሉ",
+ "cb_join_now_live": "አሁን በቀጥታ — በቀጥታ ለመግባትና ለመቀላቀል ይንኩ",
+ "cb_join_now_open": "ክፍሉ ክፍት ነው — ውድድሩ በ{time} ይጀምራል · ለመቀላቀል ይንኩ",
+ "cb_join_now_next": "ቀጣይ ውድድር በ{time}",
+ "cb_join_now_ms": "{m} ደቂቃ {s} ሰከንድ",
+ "cb_join_now_hms": "{h} ሰዓት {m} ደቂቃ {s} ሰከንድ"
 }
