@@ -394,7 +394,7 @@ export function ProfilePage() {
   const [tabError, setTabError] = useState<string | null>(null);
   const [playlists, setPlaylists] = useState<PlaylistRow[]>([]);
   const [playlistCreate] = useState(0); // Create Playlist is gone (2026-11-20); kept so the panel prop stays put
-  const [seriesCreate, setSeriesCreate] = useState(0); // folder id whose "Create Playlist" sheet is open
+  const [seriesCreate, setSeriesCreate] = useState(0); // -1 = the Create Playlist sheet (new numbered folder) is open
   const [series, setSeries] = useState<Series[] | null>(null);
   // Q&A (2026-11-17): how many questions, once the tab has loaded them.
   const [qaCount, setQaCount] = useState<number | null>(null);
@@ -719,7 +719,7 @@ export function ProfilePage() {
   return (
     <div className="page" style={{ maxWidth: 600, margin: "0 auto" }}>
       {seriesCreate && me?.id && (
-        <CreateSeriesSheet myId={Number(socialMe?.id ?? me.id)} folderId={seriesCreate} onClose={() => setSeriesCreate(0)}
+        <CreateSeriesSheet myId={Number(socialMe?.id ?? me.id)} folderId={Math.max(0, seriesCreate)} onClose={() => setSeriesCreate(0)}
           onSaved={(fid) => { setSeriesCreate(0); switchTab("videos"); setFolderSel(0); window.setTimeout(() => setFolderSel(fid), 0); }} />
       )}
       {/* Header card. My Information (Steve, 2026-11-18: "Right under the image, Please add a
@@ -978,19 +978,12 @@ export function ProfilePage() {
         ) : (<>
           {/* Profile video folders (Steve, 2026-11-20): All videos + each folder, gold chips. */}
           {tab === "videos" && (
-            <ProfileFolders profileId={profile.id} isMe={isMe} myId={socialMe?.id ?? me?.id} selected={folderSel} onSelect={setFolderSel} />
+            <ProfileFolders profileId={profile.id} isMe={isMe} myId={socialMe?.id ?? me?.id} selected={folderSel} onSelect={setFolderSel} onCreatePlaylist={() => setSeriesCreate(-1)} />
           )}
-          {tabVideos.length === 0 && !(isMe && tab === "videos" && (folderSel > 0 || (draftCount > 0 && folderSel === 0))) ? (
+          {tabVideos.length === 0 && !(isMe && tab === "videos" && draftCount > 0 && folderSel === 0) ? (
             <p className="muted" style={{ padding: "24px 0", textAlign: "center" }}>{t(tab === "videos" && folderSel > 0 ? "fld_empty" : "no_videos_yet")}</p>
           ) : (
             <div className="profile-vid-grid">
-              {/* Create Playlist, first in each of your folders (Steve, 2026-11-21). */}
-              {isMe && tab === "videos" && folderSel > 0 && (
-                <button type="button" className="drafts-tile" style={{ border: "2px dashed var(--gold-border)" }} onClick={() => setSeriesCreate(folderSel)}>
-                  <span style={{ width: 34, height: 34, borderRadius: 17, background: "var(--gold-bright)", color: "#000", fontSize: 26, fontWeight: 900, lineHeight: "34px", textAlign: "center" }}>+</span>
-                  <span>{t("create_playlist")}</span>
-                </button>
-              )}
               {/* Drafts (Steve, 2026-11-17): first in your own videos, only when there are some. */}
               {isMe && tab === "videos" && draftCount > 0 && folderSel === 0 && (
                 <button type="button" className="drafts-tile" onClick={() => navigate("/drafts")}>

@@ -148,8 +148,9 @@ export function pickFolder(myId: number, currentId: number | null | undefined): 
 }
 
 /** The chip row over the Videos grid. selected 0 = All videos. */
-export function ProfileFolders({ profileId, isMe, myId, selected, onSelect }: {
+export function ProfileFolders({ profileId, isMe, myId, selected, onSelect, onCreatePlaylist }: {
   profileId: number; isMe: boolean; myId?: number | null; selected: number; onSelect: (id: number) => void;
+  onCreatePlaylist?: () => void;
 }) {
   const { t } = useT();
   const [folders, setFolders] = useState<PostFolder[]>([]);
@@ -212,8 +213,10 @@ export function ProfileFolders({ profileId, isMe, myId, selected, onSelect }: {
           onEdit={isMe ? () => setEditFor(f) : undefined} />
       ))}
       {isMe && myId && (
-        <FolderTile label={t("fld_new_folder")} icon="+" dashed
-          onClick={async () => { const f = await createFolderFlow(myId); if (f) onSelect(f.id); }} />
+        // Steve, 2026-11-21: "remove the new folder. from the start the only folders should be there is
+        // \"All Videos\" and \"Create Playlist\"" — name, pick from all videos (#1 first), order, Add makes
+        // the new numbered folder; this tile stays last for the next one.
+        <FolderTile label={t("create_playlist")} icon="+" dashed onClick={() => onCreatePlaylist?.()} />
       )}
       {editFor && myId && (
         <FolderOrderSheet folder={editFor} profileId={profileId} myId={myId} onClose={() => setEditFor(null)}
@@ -528,7 +531,7 @@ export function CreateSeriesSheet({ myId, folderId = 0, onClose, onSaved }: { my
         onClick={(e) => e.stopPropagation()}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {step > first && <button className="btn small ghost" aria-label="‹" onClick={() => setStep(step - 1)}>‹</button>}
-          <h2 style={{ margin: 0, color: "var(--gold)", flex: 1, fontWeight: 900 }}>{t(folderId > 0 ? "create_playlist" : "fld_create_series")}</h2>
+          <h2 style={{ margin: 0, color: "var(--gold)", flex: 1, fontWeight: 900 }}>{t("create_playlist")}</h2>
           <button className="btn small ghost" aria-label={t("fld_cancel")} onClick={onClose}>✕</button>
         </div>
         {step > 0 && <div style={{ color: "var(--gold)", opacity: .85, fontWeight: 700, margin: "2px 0 4px" }}>📁 {clean}</div>}
