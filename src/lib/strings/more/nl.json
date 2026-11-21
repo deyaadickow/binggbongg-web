@@ -1941,5 +1941,7 @@
  "cb_join_now_open": "De kamer is open — de battle begint over {time} · tik om mee te doen",
  "cb_join_now_next": "Volgende battle over {time}",
  "cb_join_now_ms": "{m} min {s} seconden",
- "cb_join_now_hms": "{h} u {m} min {s} seconden"
+ "cb_join_now_hms": "{h} u {m} min {s} seconden",
+ "cbp_title": "Battles beginnen over",
+ "cbp_under_way": "Bezig"
 }

@@ -2239,5 +2239,7 @@
  "cb_join_now_open": "الغرفة مفتوحة — تبدأ المعركة خلال {time} · اضغط للانضمام",
  "cb_join_now_next": "المعركة التالية خلال {time}",
  "cb_join_now_ms": "{m} دقيقة {s} ثانية",
- "cb_join_now_hms": "{h} س {m} دقيقة {s} ثانية"
+ "cb_join_now_hms": "{h} س {m} دقيقة {s} ثانية",
+ "cbp_title": "تبدأ المعارك بعد",
+ "cbp_under_way": "جارية الآن"
 }

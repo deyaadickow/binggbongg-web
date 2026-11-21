@@ -1969,7 +1969,22 @@ body:has(.story-viewer) .get-app-bar { display: none; }
 .cb-join-now.button .cb-join-now-title { font-size: 13.5px; }
 .cb-join-now-wrap { max-width: 640px; margin: -4px auto 14px; display: flex; flex-direction: column; align-items: stretch; gap: 6px; }
 .cb-join-now-wrap .cb-join-now.banner { margin: 0; }
-.cb-join-now-pick { align-self: center; min-width: 200px; }
+.cb-join-now-pickbtn { align-self: center; background: #000; color: var(--gold); border: 1.5px solid var(--gold-border); border-radius: 999px; padding: 6px 16px; font-weight: 800; font-size: 14px; cursor: pointer; }
+.cb-join-now-pickbtn:hover { color: var(--gold-bright); border-color: var(--gold-bright); }
+.cbp-overlay { position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,.72); display: flex; align-items: center; justify-content: center; padding: 16px; }
+.cbp-panel { width: 100%; max-width: 520px; max-height: min(86vh, 900px); display: flex; flex-direction: column; background: #000; border: 2px solid var(--gold-border); border-radius: 22px; padding: 14px 14px 10px; box-shadow: 0 10px 40px rgba(0,0,0,.6); }
+.cbp-head { position: relative; display: flex; align-items: center; justify-content: center; min-height: 46px; margin-bottom: 8px; }
+.cbp-head h2 { margin: 0; color: var(--gold); font-size: 22px; font-weight: 900; text-align: center; }
+.cbp-close { position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%; background: #000; border: 2px solid var(--gold-border); color: var(--gold); font-size: 26px; font-weight: 900; line-height: 1; cursor: pointer; }
+.cbp-search { margin: 0 0 10px; height: 42px; border-radius: 999px; border: 1.5px solid var(--gold-border); background: #0b0b0b; color: #fff; padding: 0 16px; font: inherit; }
+.cbp-list { overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 2px; }
+.cbp-row { display: flex; align-items: center; gap: 10px; width: 100%; background: #000; border: 1.5px solid var(--gold-border); border-radius: 16px; padding: 10px 14px; color: #fff; font: inherit; cursor: pointer; text-align: left; }
+.cbp-row:hover, .cbp-row.on { border-color: var(--gold-bright); background: #120e02; }
+.cbp-flag { font-size: 24px; }
+.cbp-name { font-weight: 800; color: var(--gold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cbp-dots { flex: 1; min-width: 12px; border-bottom: 2px dotted rgba(212,175,55,.45); margin: 0 4px; transform: translateY(4px); }
+.cbp-time { font-weight: 800; font-variant-numeric: tabular-nums; color: #fff; white-space: nowrap; }
+.cbp-time.live { color: #ff6b6b; }
 .cb-join-now.banner { max-width: 640px; margin: -4px auto 14px; border-radius: 16px; padding: 12px 18px; }
 .cb-join-now.banner .cb-join-now-title { font-size: 17px; }
 .cb-join-now.banner .cb-join-now-sub { font-size: 14px; }

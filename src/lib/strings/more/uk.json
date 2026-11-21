@@ -1940,5 +1940,7 @@
  "cb_join_now_open": "Кімната відкрита — битва почнеться за {time} · торкнися, щоб приєднатися",
  "cb_join_now_next": "Наступна битва за {time}",
  "cb_join_now_ms": "{m} хв {s} сек.",
- "cb_join_now_hms": "{h} год {m} хв {s} сек."
+ "cb_join_now_hms": "{h} год {m} хв {s} сек.",
+ "cbp_title": "Битви почнуться через",
+ "cbp_under_way": "Триває"
 }

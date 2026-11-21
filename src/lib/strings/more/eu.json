@@ -1941,5 +1941,7 @@
  "cb_join_now_open": "Gela irekita dago — borroka {time} barru hasiko da · sakatu batzeko",
  "cb_join_now_next": "Hurrengo borroka {time} barru",
  "cb_join_now_ms": "{m} min {s} segundo",
- "cb_join_now_hms": "{h} h {m} min {s} segundo"
+ "cb_join_now_hms": "{h} h {m} min {s} segundo",
+ "cbp_title": "Borrokak hasiko dira",
+ "cbp_under_way": "Martxan"
 }

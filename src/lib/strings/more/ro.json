@@ -1936,5 +1936,7 @@
  "cb_join_now_open": "Camera e deschisă — bătălia începe în {time} · atinge ca să intri",
  "cb_join_now_next": "Următoarea bătălie în {time}",
  "cb_join_now_ms": "{m} min {s} secunde",
- "cb_join_now_hms": "{h} h {m} min {s} secunde"
+ "cb_join_now_hms": "{h} h {m} min {s} secunde",
+ "cbp_title": "Luptele încep în",
+ "cbp_under_way": "În desfășurare"
 }

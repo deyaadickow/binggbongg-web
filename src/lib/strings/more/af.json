@@ -1939,5 +1939,7 @@
  "cb_join_now_open": "Die kamer is oop — die stryd begin oor {time} · tik om aan te sluit",
  "cb_join_now_next": "Volgende stryd oor {time}",
  "cb_join_now_ms": "{m} min {s} sekondes",
- "cb_join_now_hms": "{h} h {m} min {s} sekondes"
+ "cb_join_now_hms": "{h} h {m} min {s} sekondes",
+ "cbp_title": "Gevegte begin oor",
+ "cbp_under_way": "Aan die gang"
 }

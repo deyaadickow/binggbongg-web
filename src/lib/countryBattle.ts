@@ -480,7 +480,7 @@ export interface CbJoinNow {
   server_now: string | null;
   is_test: boolean;
   /** Every country running a battle, for the banner's dropdown (Steve, 2026-11-21). */
-  countries: { country: string; country_adjective: string }[];
+  countries: { country: string; country_adjective: string; live?: boolean; starts_at?: string | null; ends_at?: string | null }[];
   my_country: string | null;
 }
 

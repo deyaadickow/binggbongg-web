@@ -1934,5 +1934,7 @@
  "cb_join_now_open": "A szoba nyitva — a csata {time} múlva kezdődik · koppints a csatlakozáshoz",
  "cb_join_now_next": "Következő csata {time} múlva",
  "cb_join_now_ms": "{m} perc {s} másodperc",
- "cb_join_now_hms": "{h} óra {m} perc {s} másodperc"
+ "cb_join_now_hms": "{h} óra {m} perc {s} másodperc",
+ "cbp_title": "A csaták kezdete",
+ "cbp_under_way": "Folyamatban"
 }

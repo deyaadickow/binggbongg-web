@@ -1940,5 +1940,7 @@
  "cb_join_now_open": "La sala és oberta — la batalla comença d'aquí a {time} · toca per unir-te",
  "cb_join_now_next": "Propera batalla d'aquí a {time}",
  "cb_join_now_ms": "{m} min {s} segons",
- "cb_join_now_hms": "{h} h {m} min {s} segons"
+ "cb_join_now_hms": "{h} h {m} min {s} segons",
+ "cbp_title": "Les batalles comencen en",
+ "cbp_under_way": "En curs"
 }

@@ -1939,5 +1939,7 @@
  "cb_join_now_open": "ห้องเปิดแล้ว — แบทเทิลเริ่มใน {time} · แตะเพื่อเข้าร่วม",
  "cb_join_now_next": "แบทเทิลถัดไปใน {time}",
  "cb_join_now_ms": "{m} นาที {s} วินาที",
- "cb_join_now_hms": "{h} ชม. {m} นาที {s} วินาที"
+ "cb_join_now_hms": "{h} ชม. {m} นาที {s} วินาที",
+ "cbp_title": "แบทเทิลเริ่มใน",
+ "cbp_under_way": "กำลังแข่ง"
 }

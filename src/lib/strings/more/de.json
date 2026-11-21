@@ -1941,5 +1941,7 @@
  "cb_join_now_open": "Der Raum ist offen — das Battle beginnt in {time} · tippen zum Mitmachen",
  "cb_join_now_next": "Nächstes Battle in {time}",
  "cb_join_now_ms": "{m} Min. {s} Sekunden",
- "cb_join_now_hms": "{h} Std. {m} Min. {s} Sekunden"
+ "cb_join_now_hms": "{h} Std. {m} Min. {s} Sekunden",
+ "cbp_title": "Battles starten in",
+ "cbp_under_way": "Läuft"
 }

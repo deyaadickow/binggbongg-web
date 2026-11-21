@@ -1941,5 +1941,7 @@
  "cb_join_now_open": "રૂમ ખુલ્લો છે — બેટલ {time}માં શરૂ થશે · જોડાવા ટૅપ કરો",
  "cb_join_now_next": "આગલી બેટલ {time}માં",
  "cb_join_now_ms": "{m} મિનિટ {s} સેકન્ડ",
- "cb_join_now_hms": "{h} કલાક {m} મિનિટ {s} સેકન્ડ"
+ "cb_join_now_hms": "{h} કલાક {m} મિનિટ {s} સેકન્ડ",
+ "cbp_title": "બેટલ શરૂ થશે",
+ "cbp_under_way": "ચાલુ છે"
 }

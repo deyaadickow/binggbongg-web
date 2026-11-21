@@ -1941,5 +1941,7 @@
  "cb_join_now_open": "房間已開放 — 對戰將在{time}後開始 · 點擊加入",
  "cb_join_now_next": "下一場對戰還有{time}",
  "cb_join_now_ms": "{m}分{s}秒",
- "cb_join_now_hms": "{h}小時{m}分{s}秒"
+ "cb_join_now_hms": "{h}小時{m}分{s}秒",
+ "cbp_title": "對戰開始倒數",
+ "cbp_under_way": "進行中"
 }

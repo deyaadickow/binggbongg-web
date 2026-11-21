@@ -1941,5 +1941,7 @@
  "cb_join_now_open": "روم کھلا ہے — بیٹل {time} میں شروع ہوگی · شامل ہونے کے لیے ٹیپ کریں",
  "cb_join_now_next": "اگلی بیٹل {time} میں",
  "cb_join_now_ms": "{m} منٹ {s} سیکنڈ",
- "cb_join_now_hms": "{h} گھنٹے {m} منٹ {s} سیکنڈ"
+ "cb_join_now_hms": "{h} گھنٹے {m} منٹ {s} سیکنڈ",
+ "cbp_title": "بیٹل شروع ہوں گی",
+ "cbp_under_way": "جاری ہے"
 }

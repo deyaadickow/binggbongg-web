@@ -1940,5 +1940,7 @@
  "cb_join_now_open": "ルームが開いています — バトル開始まで{time} · タップして参加",
  "cb_join_now_next": "次のバトルまで{time}",
  "cb_join_now_ms": "{m}分{s}秒",
- "cb_join_now_hms": "{h}時間{m}分{s}秒"
+ "cb_join_now_hms": "{h}時間{m}分{s}秒",
+ "cbp_title": "バトル開始まで",
+ "cbp_under_way": "開催中"
 }

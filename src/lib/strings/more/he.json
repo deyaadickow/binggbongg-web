@@ -1937,5 +1937,7 @@
  "cb_join_now_open": "החדר פתוח — הקרב מתחיל בעוד {time} · הקישו כדי להצטרף",
  "cb_join_now_next": "הקרב הבא בעוד {time}",
  "cb_join_now_ms": "{m} דק׳ {s} שניות",
- "cb_join_now_hms": "{h} שע׳ {m} דק׳ {s} שניות"
+ "cb_join_now_hms": "{h} שע׳ {m} דק׳ {s} שניות",
+ "cbp_title": "הקרבות מתחילים בעוד",
+ "cbp_under_way": "מתקיים עכשיו"
 }

@@ -1938,5 +1938,7 @@
  "cb_join_now_open": "Rummet er åbent — kampen starter om {time} · tryk for at deltage",
  "cb_join_now_next": "Næste kamp om {time}",
  "cb_join_now_ms": "{m} min {s} sekunder",
- "cb_join_now_hms": "{h} t {m} min {s} sekunder"
+ "cb_join_now_hms": "{h} t {m} min {s} sekunder",
+ "cbp_title": "Kampe starter om",
+ "cbp_under_way": "I gang"
 }

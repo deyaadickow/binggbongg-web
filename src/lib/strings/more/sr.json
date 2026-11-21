@@ -1941,5 +1941,7 @@
  "cb_join_now_open": "Соба је отворена — битка почиње за {time} · додирни да се придружиш",
  "cb_join_now_next": "Следећа битка за {time}",
  "cb_join_now_ms": "{m} мин {s} секунди",
- "cb_join_now_hms": "{h} ч {m} мин {s} секунди"
+ "cb_join_now_hms": "{h} ч {m} мин {s} секунди",
+ "cbp_title": "Битке почињу за",
+ "cbp_under_way": "У току"
 }

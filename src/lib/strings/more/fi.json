@@ -1932,5 +1932,7 @@
  "cb_join_now_open": "Huone on auki — taistelu alkaa {time} kuluttua · napauta liittyäksesi",
  "cb_join_now_next": "Seuraava taistelu {time} kuluttua",
  "cb_join_now_ms": "{m} min {s} sekuntia",
- "cb_join_now_hms": "{h} t {m} min {s} sekuntia"
+ "cb_join_now_hms": "{h} t {m} min {s} sekuntia",
+ "cbp_title": "Taistelut alkavat",
+ "cbp_under_way": "Käynnissä"
 }

@@ -13,10 +13,10 @@
 // Countdown (Steve, 2026-11-20: "Show the countdown between battles 'Next battle in 23 min 55
 // seconds', Open all rooms 5 minutes before the battle"): between battles it ticks to starts_at;
 // once the room is open (phase joining) it says "Room is open — battle starts in …".
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { useT } from "../lib/i18n";
-import { GoldSelect } from "./GoldSelect";
 import { countryFlag } from "../lib/allCountryBattles";
 import {
   cbText, countryBattlePath, setCountryBattlePick, joinNowParts, refreshCountryBattleJoinNow, useCountryBattleJoinNow, useTick,
@@ -92,16 +92,70 @@ export function CountryBattleJoinNow({ variant }: { variant: "button" | "banner"
   );
   if (variant !== "banner") return btn;
   // The country dropdown under the banner (Steve, 2026-11-21): every country running a battle; the
-  // member's own country by default, else the server's (the hourly Philippine one).
-  const list = d.countries.length ? d.countries : [{ country: d.country, country_adjective: d.country_adjective }];
+  // member's own country by default. It opens our black and gold list with "Battles Start In" and each
+  // country's own countdown, or "Under Way" while its battle runs.
   return (
     <div className="cb-join-now-wrap">
       {btn}
-      <div className="cb-join-now-pick">
-        <GoldSelect value={d.country} ariaLabel={t("choose_a_country")} searchable={list.length > 8}
-          options={list.map((c) => ({ value: c.country, label: `${countryFlag(c.country)} ${c.country}` }))}
-          onChange={(c) => setCountryBattlePick(c)} />
-      </div>
+      <CountryBattlePicker d={d} now={now} />
     </div>
+  );
+}
+
+/** 45:58 / 1:05:03. */
+function clockText(ms: number): string {
+  const p = joinNowParts(ms);
+  const two = (n: number) => String(n).padStart(2, "0");
+  return p.h > 0 ? `${p.h}:${two(p.m)}:${two(p.s)}` : `${p.m}:${two(p.s)}`;
+}
+
+function CountryBattlePicker({ d, now }: { d: CbJoinNow; now: number }) {
+  const { t } = useT();
+  const [open, setOpen] = useState(false);
+  const [q, setQ] = useState("");
+  const list = d.countries.length ? d.countries : [{ country: d.country, country_adjective: d.country_adjective }];
+  const shown = q.trim() ? list.filter((c) => c.country.toLowerCase().includes(q.trim().toLowerCase())) : list;
+  useEffect(() => {
+    if (!open) return;
+    const k = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    window.addEventListener("keydown", k);
+    return () => window.removeEventListener("keydown", k);
+  }, [open]);
+  return (
+    <>
+      <button type="button" className="cb-join-now-pickbtn" aria-label={t("choose_a_country")} onClick={() => setOpen(true)}>
+        {countryFlag(d.country)} {d.country} <span aria-hidden>▾</span>
+      </button>
+      {open && createPortal(
+        <div className="cbp-overlay" role="dialog" aria-modal="true" aria-label={t("cbp_title")} onClick={() => setOpen(false)}>
+          <div className="cbp-panel" onClick={(e) => e.stopPropagation()}>
+            <div className="cbp-head">
+              <button type="button" className="cbp-close" aria-label={t("close")} onClick={() => setOpen(false)}>‹</button>
+              <h2>{t("cbp_title")}</h2>
+            </div>
+            {list.length > 8 && (
+              <input className="cbp-search" type="search" value={q} placeholder={t("search")} onChange={(e) => setQ(e.target.value)} autoFocus />
+            )}
+            <div className="cbp-list">
+              {shown.map((c) => {
+                const live = !!c.live && (!c.ends_at || Date.parse(c.ends_at) > now);
+                const at = Date.parse(c.starts_at ?? "");
+                const left = Number.isNaN(at) ? NaN : at - now;
+                return (
+                  <button type="button" key={c.country} className={`cbp-row${c.country === d.country ? " on" : ""}`}
+                    onClick={() => { setCountryBattlePick(c.country); setOpen(false); }}>
+                    <span className="cbp-flag" aria-hidden>{countryFlag(c.country)}</span>
+                    <span className="cbp-name">{c.country}</span>
+                    <span className="cbp-dots" aria-hidden />
+                    <span className={`cbp-time${live ? " live" : ""}`}>
+                      {live ? t("cbp_under_way") : Number.isNaN(left) ? "" : clockText(Math.max(0, left))}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>, document.body)}
+    </>
   );
 }

@@ -1940,5 +1940,7 @@
  "cb_join_now_open": "Místnost je otevřená — bitva začne za {time} · klepni a přidej se",
  "cb_join_now_next": "Další bitva za {time}",
  "cb_join_now_ms": "{m} min {s} sekund",
- "cb_join_now_hms": "{h} h {m} min {s} sekund"
+ "cb_join_now_hms": "{h} h {m} min {s} sekund",
+ "cbp_title": "Bitvy začínají za",
+ "cbp_under_way": "Probíhá"
 }

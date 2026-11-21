@@ -1941,5 +1941,7 @@
  "cb_join_now_open": "Oda açık — savaş {time} sonra başlıyor · katılmak için dokun",
  "cb_join_now_next": "Sonraki savaş {time} sonra",
  "cb_join_now_ms": "{m} dk {s} saniye",
- "cb_join_now_hms": "{h} sa {m} dk {s} saniye"
+ "cb_join_now_hms": "{h} sa {m} dk {s} saniye",
+ "cbp_title": "Savaşlar başlıyor",
+ "cbp_under_way": "Devam ediyor"
 }

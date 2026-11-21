@@ -1941,5 +1941,7 @@
  "cb_join_now_open": "Phòng đã mở — trận chiến bắt đầu sau {time} · chạm để tham gia",
  "cb_join_now_next": "Trận tiếp theo sau {time}",
  "cb_join_now_ms": "{m} phút {s} giây",
- "cb_join_now_hms": "{h} giờ {m} phút {s} giây"
+ "cb_join_now_hms": "{h} giờ {m} phút {s} giây",
+ "cbp_title": "Trận đấu bắt đầu sau",
+ "cbp_under_way": "Đang diễn ra"
 }

@@ -1941,5 +1941,7 @@
  "cb_join_now_open": "ክፍሉ ክፍት ነው — ውድድሩ በ{time} ይጀምራል · ለመቀላቀል ይንኩ",
  "cb_join_now_next": "ቀጣይ ውድድር በ{time}",
  "cb_join_now_ms": "{m} ደቂቃ {s} ሰከንድ",
- "cb_join_now_hms": "{h} ሰዓት {m} ደቂቃ {s} ሰከንድ"
+ "cb_join_now_hms": "{h} ሰዓት {m} ደቂቃ {s} ሰከንድ",
+ "cbp_title": "ውጊያዎች የሚጀምሩት በ",
+ "cbp_under_way": "እየተካሄደ ነው"
 }

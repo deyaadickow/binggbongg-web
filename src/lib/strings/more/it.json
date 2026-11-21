@@ -1940,5 +1940,7 @@
  "cb_join_now_open": "La stanza è aperta — la sfida inizia tra {time} · tocca per unirti",
  "cb_join_now_next": "Prossima sfida tra {time}",
  "cb_join_now_ms": "{m} min {s} secondi",
- "cb_join_now_hms": "{h} h {m} min {s} secondi"
+ "cb_join_now_hms": "{h} h {m} min {s} secondi",
+ "cbp_title": "Le sfide iniziano tra",
+ "cbp_under_way": "In corso"
 }

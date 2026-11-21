@@ -1938,5 +1938,7 @@
  "cb_join_now_open": "Kambarys atidarytas — kova prasidės po {time} · bakstelėk, kad prisijungtum",
  "cb_join_now_next": "Kita kova po {time}",
  "cb_join_now_ms": "{m} min. {s} sek.",
- "cb_join_now_hms": "{h} val. {m} min. {s} sek."
+ "cb_join_now_hms": "{h} val. {m} min. {s} sek.",
+ "cbp_title": "Kovos prasideda po",
+ "cbp_under_way": "Vyksta"
 }

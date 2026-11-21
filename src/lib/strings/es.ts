@@ -2597,4 +2597,6 @@ export const es = {
   cb_join_now_next: "Próxima batalla en {time}",
   cb_join_now_ms: "{m} min {s} segundos",
   cb_join_now_hms: "{h} h {m} min {s} segundos",
+  cbp_title: "Las batallas empiezan en",
+  cbp_under_way: "En curso",
 };

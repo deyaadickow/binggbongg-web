@@ -3580,4 +3580,6 @@ export const en = {
   cb_join_now_next: "Next battle in {time}",
   cb_join_now_ms: "{m} min {s} seconds",
   cb_join_now_hms: "{h} h {m} min {s} seconds",
+  cbp_title: "Battles Start In",
+  cbp_under_way: "Under Way",
 } as const;

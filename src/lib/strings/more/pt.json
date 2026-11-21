@@ -1941,5 +1941,7 @@
  "cb_join_now_open": "A sala está aberta — a batalha começa em {time} · toque para entrar",
  "cb_join_now_next": "Próxima batalha em {time}",
  "cb_join_now_ms": "{m} min {s} segundos",
- "cb_join_now_hms": "{h} h {m} min {s} segundos"
+ "cb_join_now_hms": "{h} h {m} min {s} segundos",
+ "cbp_title": "As batalhas começam em",
+ "cbp_under_way": "Em andamento"
 }
