@@ -479,10 +479,27 @@ export interface CbJoinNow {
   duration_minutes: number;
   server_now: string | null;
   is_test: boolean;
+  /** Every country running a battle, for the banner's dropdown (Steve, 2026-11-21). */
+  countries: { country: string; country_adjective: string }[];
+  my_country: string | null;
+}
+
+// The country chosen in the banner's dropdown (Steve, 2026-11-21: "There should be a dropdown box to
+// show all country battles in every country and they can choose what country to watch, with their
+// country on the banner by default."). Kept on this browser; none = the server's default.
+const PICK_KEY = "cb_join_now_pick";
+export function countryBattlePick(): string {
+  try { return localStorage.getItem(PICK_KEY) || ""; } catch { return ""; }
+}
+export function setCountryBattlePick(country: string) {
+  try { localStorage.setItem(PICK_KEY, country); } catch { /* private window: this visit only */ }
+  joinNowStore.inflight = false;
+  refreshCountryBattleJoinNow();
 }
 
 export async function fetchCountryBattleJoinNow(userId: number): Promise<CbJoinNow | null> {
-  const res = await post<CbJoinNow>("fetchCountryBattleJoinNow", { user_id: userId });
+  const pick = countryBattlePick();
+  const res = await post<CbJoinNow>("fetchCountryBattleJoinNow", { user_id: userId, ...(pick ? { pick } : {}) });
   const d = res.status && res.data ? res.data : null;
   if (!d) return null;
   noteServerNow(d.server_now);
@@ -496,6 +513,8 @@ export async function fetchCountryBattleJoinNow(userId: number): Promise<CbJoinN
     day_id: Number.isFinite(id) && id > 0 ? id : null,
     country: d.country || "",
     country_adjective: d.country_adjective || d.country || "",
+    countries: Array.isArray(d.countries) ? d.countries.filter((c) => c && c.country) : [],
+    my_country: d.my_country || null,
   };
 }
 

@@ -1967,6 +1967,9 @@ body:has(.story-viewer) .get-app-bar { display: none; }
 .cb-join-now-dot { flex: none; width: 10px; height: 10px; border-radius: 50%; background: #ff2d2d; animation: dm-rec-pulse 1s ease-in-out infinite; }
 .cb-join-now.button { margin: 0 0 6px; padding: 9px 13px; border-radius: 18px; }
 .cb-join-now.button .cb-join-now-title { font-size: 13.5px; }
+.cb-join-now-wrap { max-width: 640px; margin: -4px auto 14px; display: flex; flex-direction: column; align-items: stretch; gap: 6px; }
+.cb-join-now-wrap .cb-join-now.banner { margin: 0; }
+.cb-join-now-pick { align-self: center; min-width: 200px; }
 .cb-join-now.banner { max-width: 640px; margin: -4px auto 14px; border-radius: 16px; padding: 12px 18px; }
 .cb-join-now.banner .cb-join-now-title { font-size: 17px; }
 .cb-join-now.banner .cb-join-now-sub { font-size: 14px; }

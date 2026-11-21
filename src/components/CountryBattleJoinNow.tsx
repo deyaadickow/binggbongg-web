@@ -16,8 +16,10 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useT } from "../lib/i18n";
+import { GoldSelect } from "./GoldSelect";
+import { countryFlag } from "../lib/allCountryBattles";
 import {
-  cbText, countryBattlePath, joinNowParts, refreshCountryBattleJoinNow, useCountryBattleJoinNow, useTick,
+  cbText, countryBattlePath, setCountryBattlePick, joinNowParts, refreshCountryBattleJoinNow, useCountryBattleJoinNow, useTick,
   type CbJoinNow,
 } from "../lib/countryBattle";
 
@@ -78,13 +80,28 @@ export function CountryBattleJoinNow({ variant }: { variant: "button" | "banner"
     else navigate(`/country-battle?country=${encodeURIComponent(d.country)}`);
   };
 
-  return (
+  const btn = (
     <button type="button" className={`cb-join-now ${variant}${join ? " live" : ""}`} onClick={open}>
       <span className="cb-join-now-title">
-        {join && <span className="cb-join-now-dot" aria-hidden />}
+        {/* Always blinking, so members notice it (Steve, 2026-11-21: "Please make the red dot blink"). */}
+        <span className="cb-join-now-dot" aria-hidden />
         {cbText(t("cb_join_now_title"), { country: countryWord(d, lang) })}
       </span>
       {sub && <span className="cb-join-now-sub">{sub}</span>}
     </button>
+  );
+  if (variant !== "banner") return btn;
+  // The country dropdown under the banner (Steve, 2026-11-21): every country running a battle; the
+  // member's own country by default, else the server's (the hourly Philippine one).
+  const list = d.countries.length ? d.countries : [{ country: d.country, country_adjective: d.country_adjective }];
+  return (
+    <div className="cb-join-now-wrap">
+      {btn}
+      <div className="cb-join-now-pick">
+        <GoldSelect value={d.country} ariaLabel={t("choose_a_country")} searchable={list.length > 8}
+          options={list.map((c) => ({ value: c.country, label: `${countryFlag(c.country)} ${c.country}` }))}
+          onChange={(c) => setCountryBattlePick(c)} />
+      </div>
+    </div>
   );
 }
