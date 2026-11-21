@@ -773,8 +773,10 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
       {joinNote && <div className="cb-join-note" role="status">{joinNote}</div>}
       {roomHook.error && <Notice error>{roomHook.error}</Notice>}
       <StarredYouBar ids={awaitingBack} nameOf={(id) => nameOf(grid.byId.get(id))} onStarBack={(id) => grid.star.toggle(id)} />
+      {/* No "Waiting for members to go live" box any more (Steve, 2026-11-21: "please remove this
+          banner") — the header already says when the room opens and the battle starts. */}
       {tiles.length === 0
-        ? <div className="card cb-empty">{ended ? t("chb_ended") : source.emptyText(st, now)}</div>
+        ? (ended ? <div className="card cb-empty">{t("chb_ended")}</div> : null)
         : (
           <CountryBattleGrid stage={grid.stage} shape={source.kind === "country" ? grid.shape : undefined} tiles={giftShow.withGift(tiles)} listen={heardNow} reserve={CHAT_RESERVE + ACTION_BAR_RESERVE} phoneFullWidth
             onTap={(id) => {
