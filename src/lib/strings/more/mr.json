@@ -1939,5 +1939,6 @@
  "cbp_title": "बॅटल सुरू होतील",
  "cbp_under_way": "सुरू आहे",
  "cbp_battle_underway": "बॅटल सुरू आहे",
- "cb_members_battling": "लढणारे सदस्य: {n}"
+ "cb_members_battling": "लढणारे सदस्य: {n}",
+ "cb_nobody_yet": "{country} मधून अजून कोणीही लढत नाही. ते लाइव्ह होताच त्यांचे कॅमेरे इथे दिसतील."
 }

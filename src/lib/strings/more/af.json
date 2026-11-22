@@ -1943,5 +1943,6 @@
  "cbp_title": "Gevegte begin oor",
  "cbp_under_way": "Aan die gang",
  "cbp_battle_underway": "Die geveg is aan die gang",
- "cb_members_battling": "Lede wat veg: {n}"
+ "cb_members_battling": "Lede wat veg: {n}",
+ "cb_nobody_yet": "Niemand van {country} veg nog nie. Hulle kameras verskyn hier sodra hulle regstreeks gaan."
 }

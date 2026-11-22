@@ -1944,5 +1944,6 @@
  "cbp_title": "Битви почнуться через",
  "cbp_under_way": "Триває",
  "cbp_battle_underway": "Битва триває",
- "cb_members_battling": "Учасники в битві: {n}"
+ "cb_members_battling": "Учасники в битві: {n}",
+ "cb_nobody_yet": "З {country} поки ніхто не змагається. Їхні камери з'являться тут, щойно вони вийдуть в ефір."
 }

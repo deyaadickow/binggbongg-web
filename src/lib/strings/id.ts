@@ -1708,6 +1708,7 @@ export const id = {
   cb_participants_count: "{n} peserta",
   cb_live_count: "{n} live",
   cb_members_battling: "Anggota yang bertanding: {n}",
+  cb_nobody_yet: "Belum ada anggota dari {country} yang bertanding. Kamera mereka muncul di sini begitu mereka live.",
   cb_waiting: "Menunggu anggota untuk live…",
   cb_test: "Battle uji coba — hanya penguji yang dapat melihat ini",
   cb_off: "Country Battle sedang tidak aktif saat ini.",

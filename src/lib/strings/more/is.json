@@ -1942,5 +1942,6 @@
  "cbp_title": "Bardagar hefjast eftir",
  "cbp_under_way": "Í gangi",
  "cbp_battle_underway": "Bardaginn er í gangi",
- "cb_members_battling": "Meðlimir í keppni: {n}"
+ "cb_members_battling": "Meðlimir í keppni: {n}",
+ "cb_nobody_yet": "Enginn frá {country} keppir enn. Myndavélar þeirra birtast hér um leið og þau fara í beina útsendingu."
 }

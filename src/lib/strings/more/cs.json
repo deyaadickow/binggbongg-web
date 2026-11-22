@@ -1944,5 +1944,6 @@
  "cbp_title": "Bitvy začínají za",
  "cbp_under_way": "Probíhá",
  "cbp_battle_underway": "Bitva právě probíhá",
- "cb_members_battling": "Členové v bitvě: {n}"
+ "cb_members_battling": "Členové v bitvě: {n}",
+ "cb_nobody_yet": "Zatím nikdo z {country} nebojuje. Jejich kamery se tu objeví, jakmile začnou vysílat živě."
 }

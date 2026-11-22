@@ -1911,6 +1911,7 @@ export const en = {
   cb_participants_count: "{n} participants",
   cb_live_count: "{n} live",
   cb_members_battling: "Members battling: {n}",
+  cb_nobody_yet: "No one from {country} is battling yet. Their cameras show up here as soon as they go live.",
   cb_waiting: "Waiting for members to go live…",
   cb_test: "Test battle — only testers can see this",
   cb_off: "Country Battle is not on right now.",

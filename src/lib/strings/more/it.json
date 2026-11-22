@@ -1944,5 +1944,6 @@
  "cbp_title": "Le sfide iniziano tra",
  "cbp_under_way": "In corso",
  "cbp_battle_underway": "La sfida è in corso",
- "cb_members_battling": "Membri in battaglia: {n}"
+ "cb_members_battling": "Membri in battaglia: {n}",
+ "cb_nobody_yet": "Nessuno da {country} sta ancora combattendo. Le loro telecamere appaiono qui appena vanno in diretta."
 }

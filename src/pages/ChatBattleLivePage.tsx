@@ -70,7 +70,7 @@ function ChatBattleLive({ contestId, home, battlerHint }: { contestId: number; h
     joinLabel: (st, now) => (st.phase === "joining" && st.phase_ends_at
       ? cbText(t("chb_join_in"), { time: clock(Date.parse(st.phase_ends_at) - now) })
       : t("cb_join")),
-    emptyText: () => t("chb_waiting"),
+    emptyText: () => "",
     leaveConfirm: t("chb_leave_confirm"),
     goneReasons: ["not_found"],
     goneText: () => t("chb_over"),

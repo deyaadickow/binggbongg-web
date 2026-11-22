@@ -1944,5 +1944,6 @@
  "cbp_title": "Les batalles comencen en",
  "cbp_under_way": "En curs",
  "cbp_battle_underway": "La batalla és en curs",
- "cb_members_battling": "Membres en batalla: {n}"
+ "cb_members_battling": "Membres en batalla: {n}",
+ "cb_nobody_yet": "Encara no hi ha ningú de {country} a la batalla. Les seves càmeres apareixen aquí tan bon punt surten en directe."
 }

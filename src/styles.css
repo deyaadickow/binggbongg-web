@@ -953,6 +953,7 @@ h1, h2, h3 { margin: 0; text-wrap: balance; }
 }
 .cb-hint { text-align: center; margin: 6px auto 0; font-size: 12px; color: var(--text-soft); }
 .cb-empty { display: flex; align-items: center; justify-content: center; text-align: center; min-height: 160px; padding: 20px; color: var(--text-soft); }
+.cb-nobody { flex-direction: column; gap: 14px; font-size: 15px; line-height: 1.45; color: var(--text); border: 1px solid var(--gold, #d4af37); }
 @keyframes cb-pop { from { transform: scale(.9); filter: brightness(1.8); } to { transform: scale(1); filter: none; } }
 @media (prefers-reduced-motion: reduce) { .cb-tile { animation: none; } }
 .cb-people { display: flex; flex-direction: column; gap: 6px; }

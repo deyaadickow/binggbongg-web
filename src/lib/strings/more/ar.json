@@ -2243,5 +2243,6 @@
  "cbp_title": "تبدأ المعارك بعد",
  "cbp_under_way": "جارية الآن",
  "cbp_battle_underway": "المعركة جارية الآن",
- "cb_members_battling": "الأعضاء المتنافسون: {n}"
+ "cb_members_battling": "الأعضاء المتنافسون: {n}",
+ "cb_nobody_yet": "لا أحد من {country} يتنافس بعد. ستظهر كاميراتهم هنا بمجرد أن يبدأوا البث المباشر."
 }

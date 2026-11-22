@@ -1713,6 +1713,7 @@ export const fil = {
   cb_participants_count: "{n} kalahok",
   cb_live_count: "{n} ang live",
   cb_members_battling: "Mga miyembrong naglalaban: {n}",
+  cb_nobody_yet: "Wala pang taga-{country} na naglalaban. Lalabas dito ang kanilang camera sa sandaling mag-live sila.",
   cb_waiting: "Naghihintay sa mga miyembrong mag-live…",
   cb_test: "Test battle — mga tester lang ang makakakita nito",
   cb_off: "Walang Country Battle ngayon.",

@@ -1945,5 +1945,6 @@
  "cbp_title": "Battles starten in",
  "cbp_under_way": "Läuft",
  "cbp_battle_underway": "Das Battle läuft",
- "cb_members_battling": "Mitglieder im Kampf: {n}"
+ "cb_members_battling": "Mitglieder im Kampf: {n}",
+ "cb_nobody_yet": "Noch kämpft niemand aus {country}. Ihre Kameras erscheinen hier, sobald sie live gehen."
 }

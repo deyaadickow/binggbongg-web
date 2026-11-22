@@ -838,6 +838,7 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
   }
 
   const pl = source.phaseLines(st, now);
+  const emptyLine = source.emptyText(st, now);
   const me = st.me;
   const showJoin = !isBattler && me.can_join && !ended;
   const rejoin = me.is_battler && (me.left || !me.is_live);
@@ -868,10 +869,17 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
       {joinNote && <div className="cb-join-note" role="status">{joinNote}</div>}
       {roomHook.error && <Notice error>{roomHook.error}</Notice>}
       <StarredYouBar ids={awaitingBack} nameOf={(id) => nameOf(grid.byId.get(id))} onStarBack={(id) => grid.star.toggle(id)} />
-      {/* No "Waiting for members to go live" box any more (Steve, 2026-11-21: "please remove this
-          banner") — the header already says when the room opens and the battle starts. */}
+      {/* No "Waiting for members to go live" box over a battler's camera (Steve, 2026-11-21: "please
+          remove this banner"). With no tiles at all — nobody live yet — a card says so instead of a
+          blank black page (Steve, 2026-11-22), with a way to the other countries' battles. */}
       {tiles.length === 0
-        ? (ended ? <div className="card cb-empty">{t("chb_ended")}</div> : null)
+        ? (ended ? <div className="card cb-empty">{t("chb_ended")}</div>
+          : emptyLine ? (
+            <div className="card cb-empty cb-nobody">
+              <div>🌍 {emptyLine}</div>
+              {source.kind === "country" && <button type="button" className="btn small ghost" onClick={() => navigate("/country-battles")}>{t("acb_tab")}</button>}
+            </div>
+          ) : null)
         : (
           <CountryBattleGrid stage={grid.stage} shape={source.kind === "country" ? grid.shape : undefined} tiles={giftShow.withGift(tiles)} listen={heardNow} reserve={CHAT_RESERVE + ACTION_BAR_RESERVE} phoneFullWidth
             onTap={(id) => {

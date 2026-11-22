@@ -1944,5 +1944,6 @@
  "cbp_title": "যুদ্ধ শুরু হবে",
  "cbp_under_way": "চলছে",
  "cbp_battle_underway": "যুদ্ধ চলছে",
- "cb_members_battling": "লড়াইরত সদস্য: {n}"
+ "cb_members_battling": "লড়াইরত সদস্য: {n}",
+ "cb_nobody_yet": "{country} থেকে এখনও কেউ লড়ছে না। লাইভে আসার সঙ্গে সঙ্গে তাদের ক্যামেরা এখানে দেখা যাবে।"
 }

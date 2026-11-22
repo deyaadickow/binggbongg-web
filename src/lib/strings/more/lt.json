@@ -1942,5 +1942,6 @@
  "cbp_title": "Kovos prasideda po",
  "cbp_under_way": "Vyksta",
  "cbp_battle_underway": "Kova vyksta",
- "cb_members_battling": "Kovojantys nariai: {n}"
+ "cb_members_battling": "Kovojantys nariai: {n}",
+ "cb_nobody_yet": "Dar niekas iš {country} nekovoja. Jų kameros pasirodys čia, vos tik jie pradės tiesioginę transliaciją."
 }

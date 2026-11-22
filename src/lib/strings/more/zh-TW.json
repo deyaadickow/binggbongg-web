@@ -1945,5 +1945,6 @@
  "cbp_title": "對戰開始倒數",
  "cbp_under_way": "進行中",
  "cbp_battle_underway": "對戰進行中",
- "cb_members_battling": "正在對戰的成員：{n}"
+ "cb_members_battling": "正在對戰的成員：{n}",
+ "cb_nobody_yet": "{country}還沒有人參加對戰。他們一開始直播，鏡頭就會出現在這裡。"
 }

@@ -33,7 +33,7 @@ export function CountryBattleLivePage() {
   const [sp] = useSearchParams();
   const demo = sp.get("demo");
   if (demo) {
-    return <CountryBattleDemo key={sp.toString()} n={Number(demo) || 24} withOwn={sp.get("own") !== "0"}
+    return <CountryBattleDemo key={sp.toString()} n={demo === "0" ? 0 : Number(demo) || 24} withOwn={sp.get("own") !== "0"}
       phase={(sp.get("phase") as ChbState["phase"]) || "battle"} imgBase={sp.get("img")} recapDemo={sp.get("reason") ?? ""} />;
   }
   return <CountryBattleLive key={dayId} dayId={Number(dayId)} home={Number(sp.get("home")) || null}
@@ -71,7 +71,9 @@ function makeSource(t: T, dayId: number, countryRef: { current: string }, calls:
     joinNote: (st) => joinNote(t, st, countryRef.current),
     emptyText: (st) => (st.phase === "upcoming"
       ? cbText(t("cb2_room_opens_at"), { time: localTime(st.opens_at) })
-      : t("cb_waiting")),
+      // Steve, 2026-11-22: a battle with nobody live was a blank black page. Only shows when there
+      // are no tiles at all, so never over a battler's own camera (the old "Waiting" box did).
+      : cbText(t("cb_nobody_yet"), { country: countryRef.current || st.name })),
     leaveConfirm: t("cb2_leave_confirm"),
     goneReasons: ["not_found", "off"],
     goneText: (reason) => (reason === "off" ? t("cb_off") : t("cb2_over")),
@@ -125,7 +127,7 @@ function CountryBattleDemo({ n, withOwn, phase, imgBase, recapDemo }: { n: numbe
   const { t } = useT();
   const countryRef = useRef("Philippines");
   const source = useMemo(() => {
-    const count = Math.max(1, Math.min(n, DEMO_NAMES.length));
+    const count = Math.max(0, Math.min(n, DEMO_NAMES.length));
     // More battlers than tiles at 24, so the rotation has someone to bring in.
     const total = count >= 24 ? DEMO_NAMES.length : count;
     const t0 = serverNow();

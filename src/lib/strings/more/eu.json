@@ -1945,5 +1945,6 @@
  "cbp_title": "Borrokak hasiko dira",
  "cbp_under_way": "Martxan",
  "cbp_battle_underway": "Borroka martxan dago",
- "cb_members_battling": "Borrokan dauden kideak: {n}"
+ "cb_members_battling": "Borrokan dauden kideak: {n}",
+ "cb_nobody_yet": "Oraindik ez dago {country}ko inor borrokan. Haien kamerak hemen agertuko dira zuzenean hasi bezain laster."
 }
