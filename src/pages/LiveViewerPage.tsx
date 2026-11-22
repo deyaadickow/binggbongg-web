@@ -36,6 +36,8 @@ import { WordSearchPanel, WordSearchPicker } from "../components/WordSearch";
 import { endWordSearch, findWord, hostFindWord, startWordSearch, type WordSearch } from "../lib/wordsearch";
 import { BehindGamePanel } from "../components/BehindGame";
 import { answerBehindGame, behindRemoveWrong, endBehindGame, type BehindGame } from "../lib/behind";
+import { LiveVotePanel, LiveVoteStartDialog } from "../components/LiveVote";
+import { castLiveVote, endLiveVote, setLiveVoteShowCounts, startLiveVote, type LiveVote } from "../lib/livevote";
 import { buyGuess, cancelGuess, changeGuess, lockGuess, resolveGuess, startGuessGame, type GuessGame, type GuessValue } from "../lib/guess";
 import { fetchActiveTapGame, gameTitle, type TapGameType } from "../lib/tapgame";
 import { TapGameOverlay } from "../components/TapGameOverlay";
@@ -364,6 +366,11 @@ export function LiveViewerPage() {
   // What's Behind Me? (#21, Steve 2026-11-02) — arrives with the room's one combined poll. Started
   // from the phones only (they draw the word behind the host); the web plays it.
   const [behind, setBehind] = useState<BehindGame | null>(null);
+  // Live Vote (2026-11-22): the open vote (or its results), the host's setup sheet, a closed card's id.
+  const [liveVote, setLiveVote] = useState<LiveVote | null>(null);
+  const [liveVoteStartOpen, setLiveVoteStartOpen] = useState(false);
+  const liveVoteClosedId = useRef<number | null>(null);
+  const liveVoteBusy = useRef(false);
   const behindClosedId = useRef<number | null>(null);
   const behindBusy = useRef(false);
 
@@ -857,6 +864,15 @@ export function LiveViewerPage() {
     setToast(tt("wbm_host_starts_it"));
   }
 
+  function applyVote(fresh: LiveVote | null) {
+    setLiveVote(fresh);
+  }
+  function openLiveVote() {
+    if (liveVote && liveVote.status === "open") { liveVoteClosedId.current = null; setLiveVote({ ...liveVote }); setToast(tt("lv_is_running")); return; }
+    if (role !== "host") { setToast(tt("lv_host_starts_it")); return; }
+    setLiveVoteStartOpen(true);
+  }
+
   function applyAudience(r: AudienceRound | null) {
     // A finished round stays up for a minute so everyone sees the result and the forfeit.
     if (r && r.status === "open") audienceSeenAt.current = Date.now();
@@ -867,8 +883,8 @@ export function LiveViewerPage() {
   // request") — it used to be five polls per viewer. The server says when to ask again: 1.5s
   // while a board game or Trivia runs, 3s for Bingo / Pyramid / an audience card, 10s when idle.
   // The apply functions sit in a ref so the loop always calls the latest render's closures.
-  const roomApply = useRef({ applyBingo, applyPyramid, applyBoard, applyTrivia, applyAudience, applyGuess, applyTriviaNight, applyWordSearch, applyBehind });
-  roomApply.current = { applyBingo, applyPyramid, applyBoard, applyTrivia, applyAudience, applyGuess, applyTriviaNight, applyWordSearch, applyBehind };
+  const roomApply = useRef({ applyBingo, applyPyramid, applyBoard, applyTrivia, applyAudience, applyGuess, applyTriviaNight, applyWordSearch, applyBehind, applyVote });
+  roomApply.current = { applyBingo, applyPyramid, applyBoard, applyTrivia, applyAudience, applyGuess, applyTriviaNight, applyWordSearch, applyBehind, applyVote };
   useEffect(() => {
     if (!roomName) return;
     let alive = true;
@@ -880,7 +896,7 @@ export function LiveViewerPage() {
         if (!alive) return;
         if (g) {
           const a = roomApply.current;
-          a.applyBingo(g.bingo); a.applyPyramid(g.pyramid); a.applyBoard(g.board); a.applyTrivia(g.trivia); a.applyAudience(g.audience); a.applyGuess(g.guess); a.applyTriviaNight(g.triviaNight); a.applyWordSearch(g.wordSearch); a.applyBehind(g.behind);
+          a.applyBingo(g.bingo); a.applyPyramid(g.pyramid); a.applyBoard(g.board); a.applyTrivia(g.trivia); a.applyAudience(g.audience); a.applyGuess(g.guess); a.applyTriviaNight(g.triviaNight); a.applyWordSearch(g.wordSearch); a.applyBehind(g.behind); a.applyVote(g.vote);
           wait = g.nextPollMs;
         }
       } catch { wait = 5000; /* keep the last good state; try again shortly */ }
@@ -2428,6 +2444,54 @@ export function LiveViewerPage() {
           onClose={() => { behindClosedId.current = behind.game_id; setBehind({ ...behind }); }}
         />
       )}
+      {liveVote && liveVoteClosedId.current !== liveVote.vote_id && (
+        <LiveVotePanel
+          vote={liveVote}
+          myUserId={myId}
+          onVote={async (i) => {
+            // One tap = one vote, paid as a gift to the host; the fresh counts come back with it.
+            if (myId === null || liveVoteBusy.current) return null;
+            liveVoteBusy.current = true;
+            try {
+              const r = await castLiveVote(myId, liveVote, i);
+              if (r.message && r.message !== "not_enough_coins") setToast(r.message === "vote_failed" ? tt("lv_vote_failed") : r.message);
+              if (r.vote) applyVote(r.vote);
+              if (r.coinsLeft !== null) refresh();
+              return r;
+            } catch {
+              setToast(tt("lv_vote_failed"));
+              return null;
+            } finally { liveVoteBusy.current = false; }
+          }}
+          onToggleCounts={(show) => {
+            if (myId === null) return;
+            setLiveVote({ ...liveVote, show_counts: show });
+            void setLiveVoteShowCounts(myId, liveVote, show).then(({ vote, message }) => { if (message) setToast(message); if (vote) applyVote(vote); });
+          }}
+          onEnd={() => {
+            if (myId === null || liveVoteBusy.current) return;
+            liveVoteBusy.current = true;
+            void endLiveVote(myId, liveVote).then(({ vote, message }) => {
+              setToast(message ?? tt("lv_ended"));
+              if (vote) applyVote(vote);
+            }).finally(() => { liveVoteBusy.current = false; });
+          }}
+          onClose={() => { liveVoteClosedId.current = liveVote.vote_id; setLiveVote({ ...liveVote }); }}
+        />
+      )}
+      {liveVoteStartOpen && myId !== null && (
+        <LiveVoteStartDialog
+          onClose={() => setLiveVoteStartOpen(false)}
+          onStart={async (s) => {
+            const { vote, message } = await startLiveVote(myId, roomName, s);
+            if (!vote) { setToast(message ?? tt("lv_couldnt_start")); return; }
+            setLiveVoteStartOpen(false);
+            liveVoteClosedId.current = null;
+            applyVote(vote);
+            setToast(tt("lv_is_on"));
+          }}
+        />
+      )}
       {wordSearchStartOpen && myId !== null && (
         <WordSearchPicker
           onClose={() => setWordSearchStartOpen(false)}
@@ -2503,6 +2567,7 @@ export function LiveViewerPage() {
           else if (k === "trivianight") openTriviaNight();
           else if (k === "wordsearch") openWordSearch();
           else if (k === "behind") openBehind();
+          else if (k === "livevote") openLiveVote();
           else if (k === "bingoBoard") setBingoBoardOpen(true);
           else if (k === "countryBoard") { setMenuOpen(false); navigate("/country-board"); }
           // The 31-day challenge and the three reference rows open their own overlay off the

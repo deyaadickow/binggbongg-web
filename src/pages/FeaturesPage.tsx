@@ -151,6 +151,8 @@ export const FEATURES: Section[] = [
       { icon: "🔤", nameKey: "fname_word_search", blurbKey: "fblurb_word_search", to: "/feature/word-search", whereKey: "fwhere_the_live_room" },
       // Steve, 2026-11-02: "Yes, build both on all three platforms" — a word hides behind the host.
       { icon: "🫣", nameKey: "fname_whats_behind_me", blurbKey: "fblurb_whats_behind_me", to: "/feature/whats-behind-me", whereKey: "fwhere_the_live_room" },
+      // Steve, 2026-11-22: "Voting game Feature" — the host's question, the room votes with BBs.
+      { icon: "🗳️", nameKey: "fname_live_vote", blurbKey: "fblurb_live_vote", to: "/feature/live-vote", whereKey: "fwhere_the_live_room" },
       { icon: "🏁", nameKey: "fname_race_games", blurbKey: "fblurb_race_games", to: "/feature/race-games", whereKey: "fwhere_the_live_room" },
       { icon: "🧩", nameKey: "fname_one_stroke_and_block_escape", blurbKey: "fblurb_one_stroke_and_block_escape", to: "/feature/puzzles", whereKey: "fwhere_the_live_room" },
       { icon: "🏅", nameKey: "fname_game_leaderboards", blurbKey: "fblurb_game_leaderboards", to: "/feature/game-leaderboards", whereKey: "fwhere_the_live_room" },
