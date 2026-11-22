@@ -1,9 +1,10 @@
 // Steve, 2026-09-24: "add all the settings links on the left side of the screen on chrome…
 // even if all the links are not working now we should add them anyway and work it out one at
 // a time." Every row of the phones' Settings screen, in the same order, plus the main tabs.
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useSession } from "../lib/session";
+import { post } from "../lib/api";
 import { APP_STORE_URL, PLAY_STORE_URL } from "./Common";
 import { useT, type StringKey } from "../lib/i18n";
 import { useContestOn } from "../lib/contests";
@@ -154,27 +155,103 @@ export function Sidebar() {
   const { user, isLoggedIn, signOut } = useSession();
   const contestOn = useContestOn();
   const podcastOn = usePodcastEnabled();
+  const order = useSidebarOrder(user?.id ?? 0);
   return (
     <aside className="sidebar">
       <SidebarSearch />
       {sidebarSections(user?.id ?? null, contestOn, podcastOn).map((sec, i) => {
-        const links = sec.links.filter((l) => !l.needsLogin || isLoggedIn);
+        const shown = sec.links.filter((l) => !l.needsLogin || isLoggedIn);
         // Signed out, every ACCOUNT link is filtered away and the heading was left stranded
         // over nothing — drop a section once it has no links left to show.
-        if (links.length === 0) return null;
+        if (shown.length === 0) return null;
+        // The main list is in the member's own dragged order; the store badges stay put.
+        const draggable = i === 0;
+        const links = draggable ? applySidebarOrder(shown, order.items) : shown;
         return (
           <div key={i} className="side-section">
             {sec.title && <div className="side-title">{t(sec.title)}</div>}
-            {links.map((l) => l.to === "/go-live" ? (
-              // "Join the Philippine whole country battle Now" right under Go Live (Steve, 2026-11-20).
-              <Fragment key={l.label}><SideLinkItem link={l} onSignOut={signOut} /><CountryBattleJoinNow variant="button" /></Fragment>
-            ) : <SideLinkItem key={l.label} link={l} onSignOut={signOut} />)}
+            {links.map((l) => {
+              const item = l.to === "/go-live"
+                // "Join the Philippine whole country battle Now" right under Go Live (Steve, 2026-11-20).
+                ? <><SideLinkItem link={l} onSignOut={signOut} /><CountryBattleJoinNow variant="button" /></>
+                : <SideLinkItem link={l} onSignOut={signOut} />;
+              if (!draggable) return <Fragment key={l.label}>{item}</Fragment>;
+              return (
+                <div key={l.label} className={`side-drag${order.dragging === l.to ? " dragging" : ""}${order.over === l.to ? " over" : ""}`}
+                  draggable
+                  onDragStart={(e) => { e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", l.to); order.start(l.to); }}
+                  onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; order.hover(l.to); }}
+                  onDrop={(e) => { e.preventDefault(); order.drop(links.map((x) => x.to), l.to); }}
+                  onDragEnd={order.end}>
+                  {item}
+                </div>
+              );
+            })}
           </div>
         );
       })}
       <SiteFooter />
     </aside>
   );
+}
+
+const SIDEBAR_ORDER_KEY = "bb_sidebar_order";
+
+/** The links in the member's saved order; links not in it (new ones) keep their place at the end. */
+function applySidebarOrder(links: SideLink[], items: string[]): SideLink[] {
+  if (!items.length) return links;
+  const rank = new Map(items.map((p, i) => [p, i]));
+  return links
+    .map((l, i) => ({ l, i }))
+    .sort((a, b) => (rank.get(a.l.to) ?? items.length + a.i) - (rank.get(b.l.to) ?? items.length + b.i))
+    .map((x) => x.l);
+}
+
+/**
+ * Steve, 2026-11-22: "Please make the side bar draggable on the website, every member will drag
+ * their own website." — each member drags the sidebar rows into their own order. Signed in it is
+ * kept on the server (it follows them to any computer); this browser keeps a copy so the sidebar
+ * shows their order at once, and signed out the copy is all there is.
+ */
+function useSidebarOrder(userId: number) {
+  const [items, setItems] = useState<string[]>(() => {
+    try { const v = JSON.parse(localStorage.getItem(SIDEBAR_ORDER_KEY) || "[]"); return Array.isArray(v) ? v.filter((x) => typeof x === "string") : []; } catch { return []; }
+  });
+  const [dragging, setDragging] = useState<string | null>(null);
+  const [over, setOver] = useState<string | null>(null);
+  const draggingRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!userId) return;
+    let alive = true;
+    post<{ items?: string[] }>("fetchMySidebarOrder", { my_user_id: userId }).then((r) => {
+      if (!alive || !r.status) return;
+      const v = Array.isArray(r.data?.items) ? r.data!.items!.filter((x) => typeof x === "string") : [];
+      setItems(v);
+      try { localStorage.setItem(SIDEBAR_ORDER_KEY, JSON.stringify(v)); } catch { /* private mode */ }
+    }).catch(() => undefined);
+    return () => { alive = false; };
+  }, [userId]);
+
+  const end = () => { draggingRef.current = null; setDragging(null); setOver(null); };
+  return {
+    items, dragging, over, end,
+    start: (to: string) => { draggingRef.current = to; setDragging(to); },
+    hover: (to: string) => { if (draggingRef.current && over !== to) setOver(to); },
+    /** Drop the dragged row onto [target]'s place; [current] is the order on screen right now. */
+    drop: (current: string[], target: string) => {
+      const from = draggingRef.current;
+      end();
+      if (!from || from === target) return;
+      const next = current.filter((p) => p !== from);
+      const at = next.indexOf(target);
+      // Dragging down lands after the target, dragging up lands before it.
+      next.splice(current.indexOf(from) < current.indexOf(target) ? at + 1 : at, 0, from);
+      setItems(next);
+      try { localStorage.setItem(SIDEBAR_ORDER_KEY, JSON.stringify(next)); } catch { /* private mode */ }
+      if (userId) post("saveMySidebarOrder", { my_user_id: userId, items: next }).catch(() => undefined);
+    },
+  };
 }
 
 /** Search box on top of the sidebar (Steve, 2026-11-21: "On the website sidebar please add search
