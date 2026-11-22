@@ -423,7 +423,8 @@ export function CbHeader({ stage, sub, line, liveCount, myScore, onBack, isTest,
       <div className="cb-head">
         <div className="cb-head-row">
           <button className="back-circle" onClick={onBack} aria-label={backLabel ?? t("cb_leave")} title={backLabel ?? t("cb_leave")}>‹</button>
-          <div style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
+          {/* Steve, 2026-11-22: title, country and members battling centred side to side. */}
+          <div className="cb-head-mid">
             <span className="cb-head-title">{title ?? t("cb_title")}</span>
             <span className="cb-head-stage">{stage}</span>
           </div>
