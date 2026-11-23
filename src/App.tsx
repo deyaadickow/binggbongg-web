@@ -117,7 +117,7 @@ function LandingSwitch({ children }: { children: ReactNode }) {
   return pathname.replace(/\/+$/, "") === "/ph" ? <LandingPage /> : <>{children}</>;
 }
 
-/** Someone arriving on the website from one of our ads (Facebook adds fbclid; our own links add
+/** Someone arriving on the website from one of our ads (Facebook adds fbclid, TikTok ttclid; our own links add
  *  src) is counted once per visit as "Ad → our website" on the admin dashboard (AdLinkController).
  *  Also tells the Meta Pixel about every page as the visitor moves around. */
 function AdArrival() {
@@ -127,7 +127,8 @@ function AdArrival() {
     let q: URLSearchParams;
     try { q = new URLSearchParams(window.location.search); } catch { return; }
     const fbclid = q.get("fbclid");
-    const src = q.get("src") || q.get("utm_campaign") || "";
+    const ttclid = q.get("ttclid"); // TikTok's click id (Steve, 2026-11-23)
+    const src = q.get("src") || q.get("utm_campaign") || (ttclid ? "tiktok" : "");
     // Kept for the visit's store links (GetAppBar, the sign-in page), so an install is credited to its ad.
     rememberAdSource((src || (fbclid ? "facebook" : "")).toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 60));
     if (window.location.pathname.replace(/\/+$/, "") === "/ph") return; // the landing page counts itself

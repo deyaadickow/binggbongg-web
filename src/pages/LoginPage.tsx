@@ -121,7 +121,7 @@ export function LoginPage({ wall = false, from: wallFrom }: { wall?: boolean; fr
   const devMode = new URLSearchParams(location.search).get("dev") === "1";
   const [devUserId, setDevUserId] = useState("");
   const [devToken, setDevToken] = useState("");
-  // Inside Facebook's or Instagram's browser Google refuses to sign anyone in. Email and password
+  // Inside Facebook's, Instagram's or TikTok's browser Google refuses to sign anyone in. Email and password
   // work there, so that is the way in; the Google button is swapped for "get the app".
   const inApp = inAppBrowser() && !devMode;
   const os = phoneOs();

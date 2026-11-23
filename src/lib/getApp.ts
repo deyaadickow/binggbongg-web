@@ -21,9 +21,25 @@ export function phoneOs(): PhoneOs | null {
   return null;
 }
 
-/** The browser built into Facebook, Messenger or Instagram (Google sign-in does not work there). */
+/** The browser built into Facebook, Messenger, Instagram, TikTok or another app (Google sign-in
+ *  does not work there: "disallowed_useragent").
+ *  TikTok (Steve, 2026-11-23: "TikTok signup still not working"): TikTok's own browser was not on
+ *  this list, so the sign-up page showed it the Google button Google refuses there, and no way to
+ *  the app or to Chrome. TikTok says musical_ly / trill_ / BytedanceWebview / ByteLocale in its
+ *  user agent. Any Android WebView ("; wv)") is refused by Google too, so it counts as well. */
 export function inAppBrowser(): boolean {
-  return /FBAN|FBAV|FB_IAB|FBIOS|FB4A|Messenger|Instagram/i.test(navigator.userAgent || "");
+  const ua = navigator.userAgent || "";
+  return /FBAN|FBAV|FB_IAB|FBIOS|FB4A|Messenger|Instagram/i.test(ua)
+    || /musical_ly|trill_|BytedanceWebview|ByteLocale|TikTok/i.test(ua)
+    || /Snapchat|Line\/|Twitter|LinkedInApp/i.test(ua)
+    || /; wv\)/.test(ua);
+}
+
+/** The ad network behind a click id in the link (Facebook adds fbclid, TikTok adds ttclid). */
+export function clickIdSource(q: URLSearchParams): string {
+  if (q.get("fbclid")) return "facebook";
+  if (q.get("ttclid")) return "tiktok";
+  return "";
 }
 
 /** Remember which ad brought this visit, for the store links later in the visit. */
@@ -41,7 +57,7 @@ function adSource(): string {
   try {
     const q = new URLSearchParams(window.location.search);
     const src = (q.get("src") || q.get("utm_campaign") || "").toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 60);
-    return src || (q.get("fbclid") ? "facebook" : "web");
+    return src || clickIdSource(q) || "web";
   } catch { return "web"; }
 }
 

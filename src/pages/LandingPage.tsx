@@ -48,7 +48,7 @@ function adSource(): string {
     const q = new URLSearchParams(window.location.search);
     const src = (q.get("src") || q.get("utm_campaign") || "").toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 60);
     if (src) return src;
-    return q.get("fbclid") ? "facebook" : "direct";
+    return q.get("fbclid") ? "facebook" : q.get("ttclid") ? "tiktok" : "direct";
   } catch { return "direct"; }
 }
 
