@@ -14,11 +14,12 @@ import { norm as normTriviaNight, type TriviaNight } from "./trivianight";
 import { norm as normWordSearch, type WordSearch } from "./wordsearch";
 import { norm as normBehind, type BehindGame } from "./behind";
 import { norm as normVote, type LiveVote } from "./livevote";
+import { norm as normBanger, type Banger } from "./banger";
 
 export type RoomGames = {
   bingo: BingoGame | null; pyramid: PyramidGame | null; board: BoardGame | null;
   trivia: TriviaGame | null; audience: AudienceRound | null; guess: GuessGame | null; triviaNight: TriviaNight | null;
-  wordSearch: WordSearch | null; behind: BehindGame | null; vote: LiveVote | null; nextPollMs: number;
+  wordSearch: WordSearch | null; behind: BehindGame | null; vote: LiveVote | null; banger: Banger | null; nextPollMs: number;
 };
 
 export async function fetchRoomGames(roomName: string, myUserId: number | null): Promise<RoomGames | null> {
@@ -38,6 +39,7 @@ export async function fetchRoomGames(roomName: string, myUserId: number | null):
     wordSearch: normWordSearch(d.word_search),
     behind: normBehind(d.behind),
     vote: normVote(d.vote),
+    banger: normBanger(d.banger),
     nextPollMs: Math.max(1000, Number(d.next_poll_ms) || 10000),
   };
 }

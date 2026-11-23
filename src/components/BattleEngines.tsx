@@ -44,6 +44,8 @@ export type BattleKind =
   | "bingo" | "bingoBoard" | "pyramid" | "checkers" | "chess" | "fourinarow" | "reversi" | "mancala" | "trivia" | "guess" | "trivianight" | "wordsearch" | "behind"
   // Live Vote (Steve, 2026-11-22): the host's question + answer buttons, every tap a paid vote.
   | "livevote"
+  // Bingg Bongg Banger (Steve, 2026-11-23): the host's connect-the-line board, viewers send boosters.
+  | "banger"
   // Android numbers this one #5 and it belongs between Best Out Of and 5-5-5. It isn't a battle
   // you start against someone in the room — it's a personal 31-day streak you opt into — so it
   // needs no people on screen.
@@ -149,6 +151,9 @@ export const BATTLE_KINDS: {
   // many answer buttons as he wants." Every tap is 1 vote, the host's BBs per vote, a gift to the host.
   { kind: "livevote", number: "#22", title: "lv_title", blurb: "lv_blurb", minPeople: 1,
     info: "lv_info" },
+  // Bingg Bongg Banger (Steve, 2026-11-23: "build it as a live game, Call it Bingg Bongg Banger").
+  { kind: "banger", number: "#23", title: "banger_title", blurb: "fblurb_banger", minPeople: 1,
+    info: "banger_info" },
   // Unnumbered from here down, exactly as on the phones: these aren't battles you can start, so
   // they carry no "#n" and never check how many people are on screen.
   { kind: "pkContests", title: "pk_battle_contests", blurb: "admin_run_scored_by_gift_coins", minPeople: 1, reference: true,

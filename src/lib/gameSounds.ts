@@ -102,6 +102,22 @@ export const sfx = {
   letter: () => tone(880, 990, 35, 0, "sine", 0.05),
   /** That pour isn't allowed: a short, soft buzz — softer than a wrong answer. */
   nope: () => { tone(150, 130, 120, 0, "square", 0.045); tone(140, 110, 140, 130, "square", 0.04); },
+  // Bingg Bongg Banger (2026-11-23). Each piece added to the line plays the next note up a major
+  // pentatonic scale, so a long line climbs; a clear pops once per piece; 6+ adds a big hit.
+  linkNote: (step: number) => {
+    const scale = [0, 2, 4, 7, 9];
+    const semis = scale[step % 5] + 12 * Math.floor(step / 5);
+    const f = 392 * Math.pow(2, Math.min(semis, 36) / 12);
+    tone(f, f * 1.02, 110, 0, "triangle", 0.12);
+  },
+  bangerClear: (n: number) => {
+    for (let i = 0; i < Math.min(n, 10); i++) { noise(28, i * 38, 0.16); tone(900 + i * 120, 500 + i * 60, 60, i * 38, "triangle", 0.08); }
+    if (n >= 6) { tone(130, 65, 420, 0, "sine", 0.32); [523, 784, 1047, 1568].forEach((f, i) => tone(f, f, 200, 80 + i * 90, "triangle", 0.14)); }
+  },
+  boom: () => { noise(650, 0, 0.42); tone(120, 38, 700, 0, "sine", 0.45); tone(70, 30, 900, 60, "sine", 0.3); },
+  blastSweep: () => { swish(700, 0, 300, 4200, 0.25); [1047, 1319, 1568, 2093, 2637].forEach((f, i) => tone(f, f, 240, 300 + i * 70, "sine", 0.08)); },
+  shuffleSwish: () => { swish(420, 0, 2400, 700, 0.22); swish(380, 260, 700, 2400, 0.18); },
+  boosterIn: () => { tone(660, 990, 90, 0, "triangle", 0.15); tone(990, 1320, 120, 90, "triangle", 0.13); },
 };
 
 /** Noise through a band-pass filter whose centre slides f0 -> f1: water, wind, a whoosh. */

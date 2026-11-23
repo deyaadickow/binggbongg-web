@@ -24,6 +24,7 @@ export const LIVE_FEATURES: Record<string, { nameKey: StringKey; labelKey?: Stri
   "word-search": { nameKey: "fname_word_search", icon: "🔤", what: "fx_word_search_what", how: "fx_word_search_how" },
   "whats-behind-me": { nameKey: "fname_whats_behind_me", icon: "🫣", what: "fx_whats_behind_me_what", how: "fx_whats_behind_me_how" },
   "live-vote": { nameKey: "fname_live_vote", icon: "🗳️", what: "fx_live_vote_what", how: "fx_live_vote_how" },
+  "banger": { nameKey: "fname_banger", icon: "💥", what: "banger_info", how: "banger_how_to" },
   "race-games": { nameKey: "fname_race_games", icon: "🏁", what: "fx_race_games_what", how: "fx_race_games_how" },
   "puzzles": { nameKey: "fname_one_stroke_and_block_escape", icon: "🧩", what: "fx_one_stroke_and_block_escape_what", how: "fx_one_stroke_and_block_escape_how" },
   "game-leaderboards": { nameKey: "fname_game_leaderboards", icon: "🏅", what: "fx_game_leaderboards_what", how: "fx_game_leaderboards_how" },

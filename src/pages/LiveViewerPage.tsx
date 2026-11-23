@@ -38,6 +38,8 @@ import { endWordSearch, findWord, hostFindWord, startWordSearch, type WordSearch
 import { BehindGamePanel } from "../components/BehindGame";
 import { answerBehindGame, behindRemoveWrong, endBehindGame, type BehindGame } from "../lib/behind";
 import { LiveVotePanel, LiveVoteStartDialog } from "../components/LiveVote";
+import { BangerPanel, BangerStartDialog } from "../components/Banger";
+import { sendBangerBooster, startBanger, type Banger } from "../lib/banger";
 import { castLiveVote, endLiveVote, setLiveVoteShowCounts, startLiveVote, type LiveVote } from "../lib/livevote";
 import { buyGuess, cancelGuess, changeGuess, lockGuess, resolveGuess, startGuessGame, type GuessGame, type GuessValue } from "../lib/guess";
 import { fetchActiveTapGame, gameTitle, type TapGameType } from "../lib/tapgame";
@@ -372,6 +374,10 @@ export function LiveViewerPage() {
   const [liveVoteStartOpen, setLiveVoteStartOpen] = useState(false);
   const liveVoteClosedId = useRef<number | null>(null);
   const liveVoteBusy = useRef(false);
+  // Bingg Bongg Banger (2026-11-23): the host's board (or its results), the setup sheet, a closed card's id.
+  const [banger, setBanger] = useState<Banger | null>(null);
+  const [bangerStartOpen, setBangerStartOpen] = useState(false);
+  const bangerClosedId = useRef<number | null>(null);
   const behindClosedId = useRef<number | null>(null);
   const behindBusy = useRef(false);
 
@@ -865,6 +871,15 @@ export function LiveViewerPage() {
     setToast(tt("wbm_host_starts_it"));
   }
 
+  function applyBanger(fresh: Banger | null) {
+    // A poll that left before the last push can come back after it: never step the board backwards.
+    setBanger((cur) => (fresh && cur && cur.banger_id === fresh.banger_id && fresh.seq < cur.seq ? cur : fresh));
+  }
+  function openBanger() {
+    if (banger && banger.status === "active") { bangerClosedId.current = null; setBanger({ ...banger }); setToast(tt("banger_is_running")); return; }
+    if (role !== "host") { setToast(tt("banger_host_starts_it")); return; }
+    setBangerStartOpen(true);
+  }
   function applyVote(fresh: LiveVote | null) {
     setLiveVote(fresh);
   }
@@ -884,8 +899,8 @@ export function LiveViewerPage() {
   // request") — it used to be five polls per viewer. The server says when to ask again: 1.5s
   // while a board game or Trivia runs, 3s for Bingo / Pyramid / an audience card, 10s when idle.
   // The apply functions sit in a ref so the loop always calls the latest render's closures.
-  const roomApply = useRef({ applyBingo, applyPyramid, applyBoard, applyTrivia, applyAudience, applyGuess, applyTriviaNight, applyWordSearch, applyBehind, applyVote });
-  roomApply.current = { applyBingo, applyPyramid, applyBoard, applyTrivia, applyAudience, applyGuess, applyTriviaNight, applyWordSearch, applyBehind, applyVote };
+  const roomApply = useRef({ applyBingo, applyPyramid, applyBoard, applyTrivia, applyAudience, applyGuess, applyTriviaNight, applyWordSearch, applyBehind, applyVote, applyBanger });
+  roomApply.current = { applyBingo, applyPyramid, applyBoard, applyTrivia, applyAudience, applyGuess, applyTriviaNight, applyWordSearch, applyBehind, applyVote, applyBanger };
   useEffect(() => {
     if (!roomName) return;
     let alive = true;
@@ -897,7 +912,7 @@ export function LiveViewerPage() {
         if (!alive) return;
         if (g) {
           const a = roomApply.current;
-          a.applyBingo(g.bingo); a.applyPyramid(g.pyramid); a.applyBoard(g.board); a.applyTrivia(g.trivia); a.applyAudience(g.audience); a.applyGuess(g.guess); a.applyTriviaNight(g.triviaNight); a.applyWordSearch(g.wordSearch); a.applyBehind(g.behind); a.applyVote(g.vote);
+          a.applyBingo(g.bingo); a.applyPyramid(g.pyramid); a.applyBoard(g.board); a.applyTrivia(g.trivia); a.applyAudience(g.audience); a.applyGuess(g.guess); a.applyTriviaNight(g.triviaNight); a.applyWordSearch(g.wordSearch); a.applyBehind(g.behind); a.applyVote(g.vote); a.applyBanger(g.banger);
           wait = g.nextPollMs;
         }
       } catch { wait = 5000; /* keep the last good state; try again shortly */ }
@@ -2502,6 +2517,40 @@ export function LiveViewerPage() {
           onClose={() => { liveVoteClosedId.current = liveVote.vote_id; setLiveVote({ ...liveVote }); }}
         />
       )}
+      {banger && bangerClosedId.current !== banger.banger_id && (
+        <BangerPanel
+          game={banger}
+          myUserId={myId}
+          onGame={applyBanger}
+          onBoost={async (kind) => {
+            // One booster = a gift to the host at the server's price; the host's board plays it.
+            if (myId === null) return null;
+            try {
+              const r = await sendBangerBooster(myId, banger.banger_id, kind);
+              if (r.message && r.message !== "not_enough_coins") setToast(r.message === "boost_failed" ? tt("banger_boost_failed") : r.message);
+              if (r.game) applyBanger(r.game);
+              if (r.ok) refresh();
+              return r;
+            } catch {
+              setToast(tt("banger_boost_failed"));
+              return null;
+            }
+          }}
+          onClose={() => { bangerClosedId.current = banger.banger_id; setBanger({ ...banger }); }}
+        />
+      )}
+      {bangerStartOpen && myId !== null && (
+        <BangerStartDialog
+          onClose={() => setBangerStartOpen(false)}
+          onStart={async (limit) => {
+            const { game, message } = await startBanger(myId, roomName, limit);
+            if (!game) { setToast(message ?? tt("banger_boost_failed")); return; }
+            setBangerStartOpen(false);
+            bangerClosedId.current = null;
+            applyBanger(game);
+          }}
+        />
+      )}
       {liveVoteStartOpen && myId !== null && (
         <LiveVoteStartDialog
           onClose={() => setLiveVoteStartOpen(false)}
@@ -2591,6 +2640,7 @@ export function LiveViewerPage() {
           else if (k === "wordsearch") openWordSearch();
           else if (k === "behind") openBehind();
           else if (k === "livevote") openLiveVote();
+          else if (k === "banger") openBanger();
           else if (k === "bingoBoard") setBingoBoardOpen(true);
           else if (k === "countryBoard") { setMenuOpen(false); navigate("/country-board"); }
           // The 31-day challenge and the three reference rows open their own overlay off the
