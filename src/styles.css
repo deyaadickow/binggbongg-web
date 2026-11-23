@@ -2086,3 +2086,4 @@ body:has(.story-viewer) .get-app-bar { display: none; }
 .lt-label { color: var(--gold); font-weight: 700; font-size: 13px; margin: 12px 0 6px; }
 .lt-switch { display: flex; align-items: center; gap: 8px; color: #fff; font-size: 14px; margin: 6px 0; cursor: pointer; }
 .lt-switch input { accent-color: #D4AF37; width: 18px; height: 18px; }
+.lt-tile img.lt-light { background: radial-gradient(circle, #f4f4f4 0%, #b9b9b9 100%); }

@@ -134,10 +134,19 @@ export function useLiveTools(input: LiveToolsInput) {
   useEffect(() => { fx.mic?.setLive(micOn); }, [micOn, fx]);
 
   const [panel, setPanel] = useState<Panel>(null);
-  const togglePanel = (p: Exclude<Panel, null>) => setPanel((cur) => {
+  // The panel sits just above the bar when the bar is at the bottom of the window, so the bar's
+  // own icon still closes it (as on the phones).
+  const [panelBottom, setPanelBottom] = useState(0);
+  const placePanel = () => {
+    const bar = document.querySelector(".cb-bar");
+    const r = bar?.getBoundingClientRect();
+    const h = window.innerHeight;
+    setPanelBottom(r && r.top < h && r.bottom > h - 160 ? Math.max(0, h - r.top) : 0);
+  };
+  const togglePanel = (p: Exclude<Panel, null>) => { if (panel !== p) placePanel(); setPanel((cur) => {
     if (cur === "sounds" && p !== "sounds") { fx.mic?.stopSound(); setSoundId(null); }
     return cur === p ? null : p;
-  });
+  }); };
   const closePanel = useCallback(() => {
     setPanel((cur) => { if (cur === "sounds") { fx.mic?.stopSound(); setSoundId(null); } return null; });
   }, [fx]);
@@ -498,7 +507,7 @@ export function useLiveTools(input: LiveToolsInput) {
   const overlay = (
     <>
       {panel && (
-        <div className="lt-panel" role="dialog" aria-label={t(panel === "sounds" ? "lt_sounds" : panel === "backgrounds" ? "lt_backgrounds" : panel === "filters" ? "lt_filters" : "lt_music")}>
+        <div className="lt-panel" style={{ bottom: panelBottom }} role="dialog" aria-label={t(panel === "sounds" ? "lt_sounds" : panel === "backgrounds" ? "lt_backgrounds" : panel === "filters" ? "lt_filters" : "lt_music")}>
           <div className="lt-head">
             <b>{panel === "sounds" ? `🔊 ${t("lt_sounds")}` : panel === "backgrounds" ? `🖼️ ${t("lt_backgrounds")}` : panel === "filters" ? `✨ ${t("lt_filters")}` : `🎵 ${t("lt_music")}`}</b>
             {panel === "music" && playing && <button type="button" className="lt-chip" onClick={stopMusic}>■ {t("lt_stop")}</button>}
@@ -540,7 +549,7 @@ export function useLiveTools(input: LiveToolsInput) {
                 <button type="button" className={`lt-tile${filter == null ? " on" : ""}`} onClick={() => { void pickFilter(null); }}><span className="lt-emoji">🚫</span><span>{t("none")}</span></button>
                 {FACE_FILTERS.filter((f) => f.tab === filterTab).map((f) => (
                   <button key={f.id} type="button" className={`lt-tile${filter === f.id ? " on" : ""}`} onClick={() => { void pickFilter(f); }} title={f.label}>
-                    {f.anchor ? <img src={filterImageUrl(f)} alt="" /> : <span className="lt-swatch" style={{ background: f.color }} />}
+                    {f.anchor ? <img className="lt-light" src={filterImageUrl(f)} alt="" /> : <span className="lt-swatch" style={{ background: f.color }} />}
                     <span>{f.label}</span>
                   </button>
                 ))}
