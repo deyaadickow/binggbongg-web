@@ -1950,5 +1950,7 @@
  "from_row": "നിങ്ങളുടെ സ്വന്തം രാജ്യം",
  "from_locked": "{date}-ന് നിങ്ങൾക്ക് ഇത് മാറ്റാം",
  "from_line_from": "{country} സ്വദേശി",
- "from_line_lives": "{country}-ൽ താമസം"
+ "from_line_lives": "{country}-ൽ താമസം",
+ "fname_bb_algorithm": "Bingg Bongg അൽഗോരിതം എങ്ങനെ പ്രവർത്തിക്കുന്നു",
+ "fblurb_bb_algorithm": "നിങ്ങൾ ആദ്യം കാണുന്ന വീഡിയോകളും ലൈവുകളും Bingg Bongg എങ്ങനെ തീരുമാനിക്കുന്നു എന്ന് കാണൂ."
 }

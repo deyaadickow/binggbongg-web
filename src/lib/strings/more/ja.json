@@ -1954,5 +1954,7 @@
  "from_row": "出身の国",
  "from_locked": "{date}に変更できます",
  "from_line_from": "出身：{country}",
- "from_line_lives": "在住：{country}"
+ "from_line_lives": "在住：{country}",
+ "fname_bb_algorithm": "Bingg Bonggのアルゴリズムのしくみ",
+ "fblurb_bb_algorithm": "どの動画やライブが最初に表示されるか、Bingg Bonggの決め方を見てみよう。"
 }

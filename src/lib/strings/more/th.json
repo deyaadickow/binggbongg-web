@@ -1953,5 +1953,7 @@
  "from_row": "ประเทศบ้านเกิดของคุณ",
  "from_locked": "คุณเปลี่ยนได้ในวันที่ {date}",
  "from_line_from": "มาจาก {country}",
- "from_line_lives": "อาศัยอยู่ที่ {country}"
+ "from_line_lives": "อาศัยอยู่ที่ {country}",
+ "fname_bb_algorithm": "อัลกอริทึมของ Bingg Bongg ทำงานอย่างไร",
+ "fblurb_bb_algorithm": "ดูว่า Bingg Bongg เลือกวิดีโอและไลฟ์ไหนให้คุณเห็นก่อนอย่างไร"
 }

@@ -2685,4 +2685,6 @@ export const id = {
   from_locked: "Kamu bisa mengubah ini pada {date}",
   from_line_from: "Dari {country}",
   from_line_lives: "Tinggal di {country}",
+  fname_bb_algorithm: "Cara kerja algoritma Bingg Bongg",
+  fblurb_bb_algorithm: "Tonton bagaimana Bingg Bongg memilih video dan live mana yang kamu lihat lebih dulu.",
 };

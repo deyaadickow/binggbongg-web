@@ -2253,5 +2253,7 @@
  "from_row": "البلد الذي أتيت منه",
  "from_locked": "يمكنك تغيير هذا في {date}",
  "from_line_from": "من {country}",
- "from_line_lives": "يعيش في {country}"
+ "from_line_lives": "يعيش في {country}",
+ "fname_bb_algorithm": "كيف تعمل خوارزمية Bingg Bongg",
+ "fblurb_bb_algorithm": "شاهد كيف تقرر Bingg Bongg أي الفيديوهات والبثوث المباشرة تراها أولاً."
 }

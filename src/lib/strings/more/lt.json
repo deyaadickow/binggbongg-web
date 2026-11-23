@@ -1952,5 +1952,7 @@
  "from_row": "Šalis, iš kurios esi",
  "from_locked": "Tai pakeisti galėsi {date}",
  "from_line_from": "Kilęs iš: {country}",
- "from_line_lives": "Gyvena: {country}"
+ "from_line_lives": "Gyvena: {country}",
+ "fname_bb_algorithm": "Kaip veikia Bingg Bongg algoritmas",
+ "fblurb_bb_algorithm": "Pažiūrėkite, kaip Bingg Bongg nusprendžia, kuriuos vaizdo įrašus ir tiesiogines transliacijas matote pirmiausia."
 }

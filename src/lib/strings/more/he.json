@@ -1951,5 +1951,7 @@
  "from_row": "המדינה שממנה באת",
  "from_locked": "אפשר לשנות את זה ב-{date}",
  "from_line_from": "מ{country}",
- "from_line_lives": "גר ב{country}"
+ "from_line_lives": "גר ב{country}",
+ "fname_bb_algorithm": "איך עובד האלגוריתם של Bingg Bongg",
+ "fblurb_bb_algorithm": "צפו איך Bingg Bongg מחליט אילו סרטונים ושידורים חיים תראו קודם."
 }

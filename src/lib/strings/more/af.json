@@ -1953,5 +1953,7 @@
  "from_row": "Land waar jy vandaan kom",
  "from_locked": "Jy kan dit op {date} verander",
  "from_line_from": "Van {country}",
- "from_line_lives": "Woon in {country}"
+ "from_line_lives": "Woon in {country}",
+ "fname_bb_algorithm": "Hoe die Bingg Bongg-algoritme werk",
+ "fblurb_bb_algorithm": "Kyk hoe Bingg Bongg besluit watter video's en lives jy eerste sien."
 }

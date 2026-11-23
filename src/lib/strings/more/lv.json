@@ -1951,5 +1951,7 @@
  "from_row": "Valsts, no kuras esi",
  "from_locked": "To varēsi mainīt {date}",
  "from_line_from": "No: {country}",
- "from_line_lives": "Dzīvo: {country}"
+ "from_line_lives": "Dzīvo: {country}",
+ "fname_bb_algorithm": "Kā darbojas Bingg Bongg algoritms",
+ "fblurb_bb_algorithm": "Noskaties, kā Bingg Bongg izlemj, kurus video un tiešraides tu redzi vispirms."
 }

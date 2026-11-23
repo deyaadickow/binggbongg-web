@@ -1955,5 +1955,7 @@
  "from_row": "你的家鄉國家",
  "from_locked": "你可以在{date}更改",
  "from_line_from": "來自{country}",
- "from_line_lives": "居住在{country}"
+ "from_line_lives": "居住在{country}",
+ "fname_bb_algorithm": "Bingg Bongg 的演算法如何運作",
+ "fblurb_bb_algorithm": "看看 Bingg Bongg 如何決定你先看到哪些影片和直播。"
 }

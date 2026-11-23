@@ -1954,5 +1954,7 @@
  "from_row": "Země, odkud pocházíš",
  "from_locked": "Změnit to můžeš {date}",
  "from_line_from": "Z: {country}",
- "from_line_lives": "Žije v: {country}"
+ "from_line_lives": "Žije v: {country}",
+ "fname_bb_algorithm": "Jak funguje algoritmus Bingg Bongg",
+ "fblurb_bb_algorithm": "Podívejte se, jak Bingg Bongg rozhoduje, která videa a živá vysílání uvidíte jako první."
 }

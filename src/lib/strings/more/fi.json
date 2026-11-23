@@ -1946,5 +1946,7 @@
  "from_row": "Maa, josta olet kotoisin",
  "from_locked": "Voit muuttaa tämän {date}",
  "from_line_from": "Kotoisin: {country}",
- "from_line_lives": "Asuu: {country}"
+ "from_line_lives": "Asuu: {country}",
+ "fname_bb_algorithm": "Näin Bingg Bonggin algoritmi toimii",
+ "fblurb_bb_algorithm": "Katso, miten Bingg Bongg päättää, mitkä videot ja livet näet ensimmäisenä."
 }

@@ -2848,4 +2848,6 @@ export const fil = {
   from_locked: "Mapapalitan mo ito sa {date}",
   from_line_from: "Taga-{country}",
   from_line_lives: "Nakatira sa {country}",
+  fname_bb_algorithm: "Paano gumagana ang algorithm ng Bingg Bongg",
+  fblurb_bb_algorithm: "Panoorin kung paano pinipili ng Bingg Bongg kung aling mga video at live ang una mong makikita.",
 };

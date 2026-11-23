@@ -1955,5 +1955,7 @@
  "from_row": "நீங்கள் வந்த நாடு",
  "from_locked": "இதை {date} அன்று மாற்றலாம்",
  "from_line_from": "{country} நாட்டவர்",
- "from_line_lives": "{country}-இல் வசிக்கிறார்"
+ "from_line_lives": "{country}-இல் வசிக்கிறார்",
+ "fname_bb_algorithm": "Bingg Bongg அல்காரிதம் எப்படி வேலை செய்கிறது",
+ "fblurb_bb_algorithm": "நீங்கள் முதலில் எந்த வீடியோக்களையும் லைவ்களையும் பார்க்க வேண்டும் என்று Bingg Bongg எப்படி முடிவு செய்கிறது என்று பாருங்கள்."
 }

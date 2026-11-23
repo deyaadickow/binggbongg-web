@@ -1955,5 +1955,7 @@
  "from_row": "የመጣህበት ሀገር",
  "from_locked": "ይህን በ{date} መቀየር ትችላለህ",
  "from_line_from": "ከ{country}",
- "from_line_lives": "በ{country} ይኖራል"
+ "from_line_lives": "በ{country} ይኖራል",
+ "fname_bb_algorithm": "የBingg Bongg አልጎሪዝም እንዴት እንደሚሰራ",
+ "fblurb_bb_algorithm": "Bingg Bongg የትኞቹን ቪዲዮዎችና የቀጥታ ስርጭቶች መጀመሪያ እንደሚያሳይዎ እንዴት እንደሚወስን ይመልከቱ።"
 }

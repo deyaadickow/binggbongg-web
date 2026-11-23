@@ -1955,5 +1955,7 @@
  "from_row": "Zure jatorrizko herrialdea",
  "from_locked": "Hau {date} egunean alda dezakezu",
  "from_line_from": "Jatorria: {country}",
- "from_line_lives": "Bizilekua: {country}"
+ "from_line_lives": "Bizilekua: {country}",
+ "fname_bb_algorithm": "Nola dabilen Bingg Bongg-en algoritmoa",
+ "fblurb_bb_algorithm": "Ikusi nola erabakitzen duen Bingg Bongg-ek zein bideo eta zuzeneko ikusten dituzun lehenik."
 }

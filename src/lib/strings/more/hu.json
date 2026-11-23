@@ -1948,5 +1948,7 @@
  "from_row": "Ország, ahonnan származol",
  "from_locked": "Ezt {date} napon módosíthatod",
  "from_line_from": "Származás: {country}",
- "from_line_lives": "Lakhely: {country}"
+ "from_line_lives": "Lakhely: {country}",
+ "fname_bb_algorithm": "Így működik a Bingg Bongg algoritmusa",
+ "fblurb_bb_algorithm": "Nézd meg, hogyan dönti el a Bingg Bongg, mely videókat és élő adásokat látod először."
 }

@@ -1952,5 +1952,7 @@
  "from_row": "Riik, kust oled pärit",
  "from_locked": "Saad seda muuta {date}",
  "from_line_from": "Pärit: {country}",
- "from_line_lives": "Elab: {country}"
+ "from_line_lives": "Elab: {country}",
+ "fname_bb_algorithm": "Kuidas Bingg Bonggi algoritm töötab",
+ "fblurb_bb_algorithm": "Vaata, kuidas Bingg Bongg otsustab, milliseid videoid ja otseülekandeid sa esimesena näed."
 }

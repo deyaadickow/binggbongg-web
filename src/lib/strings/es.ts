@@ -2649,4 +2649,6 @@ export const es = {
   from_locked: "Podrás cambiarlo el {date}",
   from_line_from: "De {country}",
   from_line_lives: "Vive en {country}",
+  fname_bb_algorithm: "Cómo funciona el algoritmo de Bingg Bongg",
+  fblurb_bb_algorithm: "Mira cómo Bingg Bongg decide qué videos y transmisiones en vivo ves primero.",
 };

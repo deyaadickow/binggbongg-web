@@ -1955,5 +1955,7 @@
  "from_row": "તમે જે દેશના છો",
  "from_locked": "તમે આ {date} એ બદલી શકશો",
  "from_line_from": "{country}ના",
- "from_line_lives": "{country}માં રહે છે"
+ "from_line_lives": "{country}માં રહે છે",
+ "fname_bb_algorithm": "Bingg Bongg નો અલ્ગોરિધમ કેવી રીતે કામ કરે છે",
+ "fblurb_bb_algorithm": "જુઓ Bingg Bongg કેવી રીતે નક્કી કરે છે કે તમે કયા વીડિયો અને લાઇવ પહેલા જુઓ."
 }

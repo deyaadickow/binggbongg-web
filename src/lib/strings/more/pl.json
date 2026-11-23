@@ -1955,5 +1955,7 @@
  "from_row": "Kraj pochodzenia",
  "from_locked": "Możesz to zmienić {date}",
  "from_line_from": "Pochodzi z: {country}",
- "from_line_lives": "Mieszka w: {country}"
+ "from_line_lives": "Mieszka w: {country}",
+ "fname_bb_algorithm": "Jak działa algorytm Bingg Bongg",
+ "fblurb_bb_algorithm": "Zobacz, jak Bingg Bongg decyduje, które filmy i transmisje na żywo widzisz jako pierwsze."
 }

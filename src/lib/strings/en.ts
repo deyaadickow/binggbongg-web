@@ -3632,4 +3632,6 @@ export const en = {
   from_locked: "You can change this on {date}",
   from_line_from: "From {country}",
   from_line_lives: "Lives in {country}",
+  fname_bb_algorithm: "How the Bingg Bongg algorithm works",
+  fblurb_bb_algorithm: "Watch how Bingg Bongg decides which videos and lives you see first.",
 } as const;

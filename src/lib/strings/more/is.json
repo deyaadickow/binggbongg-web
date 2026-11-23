@@ -1952,5 +1952,7 @@
  "from_row": "Landið sem þú ert frá",
  "from_locked": "Þú getur breytt þessu {date}",
  "from_line_from": "Frá {country}",
- "from_line_lives": "Býr í {country}"
+ "from_line_lives": "Býr í {country}",
+ "fname_bb_algorithm": "Svona virkar reiknirit Bingg Bongg",
+ "fblurb_bb_algorithm": "Sjáðu hvernig Bingg Bongg ákveður hvaða myndbönd og beinar útsendingar þú sérð fyrst."
 }

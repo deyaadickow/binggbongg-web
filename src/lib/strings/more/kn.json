@@ -1953,5 +1953,7 @@
  "from_row": "ನೀವು ಬಂದ ದೇಶ",
  "from_locked": "ನೀವು ಇದನ್ನು {date} ರಂದು ಬದಲಾಯಿಸಬಹುದು",
  "from_line_from": "{country} ಮೂಲದವರು",
- "from_line_lives": "{country}ನಲ್ಲಿ ವಾಸ"
+ "from_line_lives": "{country}ನಲ್ಲಿ ವಾಸ",
+ "fname_bb_algorithm": "Bingg Bongg ಅಲ್ಗಾರಿದಮ್ ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ",
+ "fblurb_bb_algorithm": "ನೀವು ಮೊದಲು ಯಾವ ವೀಡಿಯೊಗಳು ಮತ್ತು ಲೈವ್‌ಗಳನ್ನು ನೋಡಬೇಕು ಎಂದು Bingg Bongg ಹೇಗೆ ನಿರ್ಧರಿಸುತ್ತದೆ ಎಂದು ನೋಡಿ."
 }

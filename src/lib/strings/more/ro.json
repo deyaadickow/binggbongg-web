@@ -1950,5 +1950,7 @@
  "from_row": "Țara din care vii",
  "from_locked": "Poți schimba asta pe {date}",
  "from_line_from": "Din {country}",
- "from_line_lives": "Locuiește în {country}"
+ "from_line_lives": "Locuiește în {country}",
+ "fname_bb_algorithm": "Cum funcționează algoritmul Bingg Bongg",
+ "fblurb_bb_algorithm": "Vezi cum decide Bingg Bongg ce videoclipuri și transmisiuni live vezi primele."
 }

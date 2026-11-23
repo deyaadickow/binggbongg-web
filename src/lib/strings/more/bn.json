@@ -1954,5 +1954,7 @@
  "from_row": "তোমার নিজের দেশ",
  "from_locked": "তুমি এটি {date} তারিখে বদলাতে পারবে",
  "from_line_from": "{country} থেকে",
- "from_line_lives": "{country}-এ থাকেন"
+ "from_line_lives": "{country}-এ থাকেন",
+ "fname_bb_algorithm": "Bingg Bongg-এর অ্যালগরিদম কীভাবে কাজ করে",
+ "fblurb_bb_algorithm": "দেখুন Bingg Bongg কীভাবে ঠিক করে কোন ভিডিও আর লাইভ আপনি আগে দেখবেন।"
 }

@@ -1955,5 +1955,7 @@
  "from_row": "출신 나라",
  "from_locked": "{date}에 변경할 수 있어요",
  "from_line_from": "출신: {country}",
- "from_line_lives": "거주: {country}"
+ "from_line_lives": "거주: {country}",
+ "fname_bb_algorithm": "Bingg Bongg 알고리즘은 이렇게 작동해요",
+ "fblurb_bb_algorithm": "Bingg Bongg가 어떤 영상과 라이브를 먼저 보여 주는지 확인해 보세요."
 }

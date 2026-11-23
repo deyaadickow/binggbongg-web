@@ -1955,5 +1955,7 @@
  "from_row": "Negara asal anda",
  "from_locked": "Anda boleh menukar ini pada {date}",
  "from_line_from": "Dari {country}",
- "from_line_lives": "Tinggal di {country}"
+ "from_line_lives": "Tinggal di {country}",
+ "fname_bb_algorithm": "Cara algoritma Bingg Bongg berfungsi",
+ "fblurb_bb_algorithm": "Tonton cara Bingg Bongg memilih video dan siaran langsung yang anda lihat dahulu."
 }

@@ -1953,5 +1953,7 @@
  "from_row": "Landet du kommer ifrån",
  "from_locked": "Du kan ändra detta den {date}",
  "from_line_from": "Från {country}",
- "from_line_lives": "Bor i {country}"
+ "from_line_lives": "Bor i {country}",
+ "fname_bb_algorithm": "Så fungerar Bingg Bonggs algoritm",
+ "fblurb_bb_algorithm": "Se hur Bingg Bongg bestämmer vilka videor och lives du ser först."
 }

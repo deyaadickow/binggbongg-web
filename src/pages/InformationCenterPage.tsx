@@ -100,11 +100,9 @@ export function InformationCenterPage() {
     { to: "/features", key: "tab_70_features" },
     { to: "/feature-videos", key: "tab_70_videos" },
     { to: "/one-video", key: "ic_one_video" },
-    { to: "/our-ads", key: "our_ads_tab" },
-    { to: "/feature-videos?play=86", key: "ic_algorithm" },
-    { to: "/exciting-news", key: "ic_exciting_news" },
-    // The daily Video of the Day email is one of these videos.
-    { to: "/feature-videos", key: "ic_daily_email" },
+    // Steve, 2026-11-23: "Remove Our Ads, Remove BB Algorithm from here and add it to 100+ Features
+    // and 120+ videos. Remove latest exciting news. Remove email will be sent." Their pages stay;
+    // the algorithm video is now a tile on 100+ Features.
   ];
   return (
     <div className="page ic-page">
@@ -112,7 +110,12 @@ export function InformationCenterPage() {
       <InfoBanner />
       <nav className="ic-list" aria-label={t("information_center")}>
         {items.map((it) => (
-          <Link key={it.key} to={it.to} className="ic-btn">{t(it.key)}</Link>
+          // Steve, 2026-11-23: "add 2 red stars in each box one on each side."
+          <Link key={it.key} to={it.to} className="ic-btn">
+            <span className="ic-star" aria-hidden>★</span>
+            <span className="ic-label">{t(it.key)}</span>
+            <span className="ic-star" aria-hidden>★</span>
+          </Link>
         ))}
       </nav>
     </div>

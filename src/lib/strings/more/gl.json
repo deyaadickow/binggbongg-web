@@ -1951,5 +1951,7 @@
  "from_row": "País de onde es",
  "from_locked": "Poderás cambialo o {date}",
  "from_line_from": "De {country}",
- "from_line_lives": "Vive en {country}"
+ "from_line_lives": "Vive en {country}",
+ "fname_bb_algorithm": "Como funciona o algoritmo de Bingg Bongg",
+ "fblurb_bb_algorithm": "Mira como Bingg Bongg decide que vídeos e directos ves primeiro."
 }

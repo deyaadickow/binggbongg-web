@@ -27,7 +27,7 @@ import { BingoCardIcon } from "../components/BingoCardIcon";
 import { GoldNugget } from "../components/GoldDigger";
 import { FeatureIcon } from "../components/ArtIcon";
 import { Link } from "react-router-dom";
-import { translate, useT, type StringKey } from "../lib/i18n";
+import { currentLang, translate, useT, type StringKey } from "../lib/i18n";
 import { PageTitle } from "../components/PageTitle";
 import { useSession } from "../lib/session";
 import { useEffect, useState } from "react";
@@ -47,6 +47,8 @@ export interface Feature {
   blurbKey: StringKey;
   /** Where it lives on the web. Omitted means it is a phone-app feature. */
   to?: string;
+  /** Where it lives when the page language is Filipino/Tagalog (fil or tl), when that differs. */
+  toFil?: string;
   /** Where to find it on the phone, shown when there is no web route. */
   whereKey?: StringKey;
   /** Your OWN profile, whose id is only known once somebody is signed in. */
@@ -79,6 +81,9 @@ export const FEATURES: Section[] = [
     features: [
       // Steve, 2026-11-16: "add the referral program the first one on the list above exciting news."
       { icon: "💸", nameKey: "fname_referral_program", blurbKey: "fblurb_referral_program", to: "/referral-program" },
+      // Steve, 2026-11-23: "Remove BB Algorithm from here [the Information Center] and add it to 100+
+      // Features and 120+ videos." The video is 120+ Videos row 86 (English) / 87 (Tagalog).
+      { icon: "🧠", nameKey: "fname_bb_algorithm", blurbKey: "fblurb_bb_algorithm", to: "/feature-videos?play=86", toFil: "/feature-videos?play=87" },
       // Steve, 2026-11-18: the Bingg Bongg AI Assistant — the same popup as the Bingg / Bongg icon on the feed.
       { icon: "🐼", nameKey: "fname_ai_assistant", blurbKey: "fblurb_ai_assistant", to: "/?assistant=1" },
       // Pre-Launch Special (Steve, 2026-11-10; changed 2026-11-11 to 100 FBBs each: "1000 free BBs is too much, make it 100 Free BBs" — "We will give everyone 1000 FBBs
@@ -313,7 +318,9 @@ export const FEATURES: Section[] = [
 /** Where tapping a tile goes — also what the feed's feature promo card's TRY IT opens, so the two
  *  can never disagree. Undefined: the tile has no link. */
 export function featureHref(f: Feature, userId?: number | null): string | undefined {
-  return f.myProfile ? (userId ? `/profile/${userId}${f.profileTab ? `?tab=${f.profileTab}` : ""}` : "/login") : f.to;
+  if (f.myProfile) return userId ? `/profile/${userId}${f.profileTab ? `?tab=${f.profileTab}` : ""}` : "/login";
+  const lang = currentLang();
+  return f.toFil && (lang === "fil" || lang === "tl") ? f.toFil : f.to;
 }
 
 // Steve, 2026-10-25: "add a number on top right corner of each feature starting from #1". The

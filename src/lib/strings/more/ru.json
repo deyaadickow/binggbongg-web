@@ -1954,5 +1954,7 @@
  "from_row": "Страна, откуда ты",
  "from_locked": "Изменить это можно {date}",
  "from_line_from": "Родом из: {country}",
- "from_line_lives": "Живёт в: {country}"
+ "from_line_lives": "Живёт в: {country}",
+ "fname_bb_algorithm": "Как работает алгоритм Bingg Bongg",
+ "fblurb_bb_algorithm": "Узнайте, как Bingg Bongg решает, какие видео и эфиры вы увидите первыми."
 }

@@ -1954,5 +1954,7 @@
  "from_row": "Paese d'origine",
  "from_locked": "Potrai cambiarlo il {date}",
  "from_line_from": "Da {country}",
- "from_line_lives": "Vive in {country}"
+ "from_line_lives": "Vive in {country}",
+ "fname_bb_algorithm": "Come funziona l'algoritmo di Bingg Bongg",
+ "fblurb_bb_algorithm": "Guarda come Bingg Bongg decide quali video e live vedi per primi."
 }
