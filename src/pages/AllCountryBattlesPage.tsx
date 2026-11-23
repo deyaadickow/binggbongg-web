@@ -17,7 +17,7 @@ import { useAllCountryBattles, type AcbKind } from "../lib/allCountryBattles";
 import { FromCountryAsk } from "../components/FromCountry";
 import { CountryBattleCard } from "../components/CountryBattleCard";
 
-export function AllCountryBattlesPage() {
+export function AllCountryBattlesPage({ startKind }: { startKind?: AcbKind } = {}) {
   const { t } = useT();
   const { user } = useSession();
   const now = useTick();
@@ -27,7 +27,7 @@ export function AllCountryBattlesPage() {
   // Opens on Whole Country Battle; ?kind=rival (the Information Center's Country VS Country button)
   // opens on Country VS Country.
   const [params] = useSearchParams();
-  const [kind, setKind] = useState<AcbKind>(params.get("kind") === "rival" ? "rival" : "country");
+  const [kind, setKind] = useState<AcbKind>(startKind === "rival" || params.get("kind") === "rival" ? "rival" : "country");
   const { battles, error, search } = useAllCountryBattles(query, kind, user?.id, t("acb_empty"));
   const chips: [AcbKind, string][] = [["rival", t("acb_filter_vs")], ["country", t("acb_tab")]];
 

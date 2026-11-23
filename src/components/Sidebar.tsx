@@ -9,7 +9,6 @@ import { APP_STORE_URL, PLAY_STORE_URL } from "./Common";
 import { useT, type StringKey } from "../lib/i18n";
 import { useContestOn } from "../lib/contests";
 import { usePodcastEnabled } from "../lib/podcast";
-import { CountryBattleJoinNow } from "./CountryBattleJoinNow";
 
 // `label` is a translation KEY, not text. sidebarSections() is a plain function with no hook,
 // so the data carries the key and the view translates it; typing it as StringKey means a
@@ -27,9 +26,10 @@ export function sidebarSections(userId: number | null, contestOn = false, podcas
       { to: "/upcoming", label: "l_and_b", icon: "🗓" },
       { to: "/business", label: "business", icon: "🏪" },
       { to: "/live", label: "live_now", icon: "🔴" },
-      // Steve, 2026-11-21: "Where can i find Country Battle on the website?" → "Yes, add it".
-      // For everyone; the page opens the member's own country's battle, else the Philippines.
-      { to: "/country-battle", label: "cb_title", icon: "🌏" },
+      // Steve, 2026-11-23: "one button for all country battles and one button for Country VS Country" —
+      // these two replace the old "Country Battle" link and the "Join the … whole country battle Now" box.
+      { to: "/country-battles", label: "acb_tab", icon: "🌏" },
+      { to: "/country-vs-country", label: "acb_filter_vs", icon: "⚔️" },
       // Your own live Bingg Bongg show (Steve, 2026-10-17).
       { to: "/shows", label: "shows", icon: "📺" },
       // Video Ad Gig (Steve, 2026-10-17) RETIRED 2026-11-17 (Steve: "we can eliminate our influencers
@@ -171,10 +171,7 @@ export function Sidebar() {
           <div key={i} className="side-section">
             {sec.title && <div className="side-title">{t(sec.title)}</div>}
             {links.map((l) => {
-              const item = l.to === "/go-live"
-                // "Join the Philippine whole country battle Now" right under Go Live (Steve, 2026-11-20).
-                ? <><SideLinkItem link={l} onSignOut={signOut} /><CountryBattleJoinNow variant="button" /></>
-                : <SideLinkItem link={l} onSignOut={signOut} />;
+              const item = <SideLinkItem link={l} onSignOut={signOut} />;
               if (!draggable) return <Fragment key={l.label}>{item}</Fragment>;
               return (
                 <div key={l.label} className={`side-drag${order.dragging === l.to ? " dragging" : ""}${order.over === l.to ? " over" : ""}`}
@@ -200,6 +197,10 @@ const SIDEBAR_ORDER_KEY = "bb_sidebar_order";
 /** The links in the member's saved order; links not in it (new ones) keep their place at the end. */
 function applySidebarOrder(links: SideLink[], items: string[]): SideLink[] {
   if (!items.length) return links;
+  // The old "Country Battle" link became All Country Battles + Country VS Country (2026-11-23): a saved
+  // order keeps the two new buttons where the old one was.
+  const old = items.indexOf("/country-battle");
+  if (old >= 0 && !items.includes("/country-battles")) items = [...items.slice(0, old), "/country-battles", "/country-vs-country", ...items.slice(old + 1)];
   const rank = new Map(items.map((p, i) => [p, i]));
   return links
     .map((l, i) => ({ l, i }))
