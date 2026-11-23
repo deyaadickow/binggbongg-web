@@ -15,7 +15,6 @@ import { FEATURES, featureHref } from "./FeaturesPage";
 import { fetchMyVirtualBattles, fetchVirtualGiftRecord, sendVirtualThankYou, type VirtualBattleData, type VirtualGiftRecord } from "../lib/battles";
 import { VirtualGiftRecordOverlay, personName } from "../components/BattleEngines";
 import { GoldSelect } from "../components/GoldSelect";
-import { FromCountryRow } from "../components/FromCountry";
 import { tt, useT, type StringKey  } from "../lib/i18n";
 import { PageTitle } from "../components/PageTitle";
 import { IDEA_SUPPORT_REASON } from "../lib/ideas";
@@ -291,8 +290,6 @@ export function AccountSettingsPage() {
             <input className="input" value={city} onChange={(e) => setCity(e.target.value)} maxLength={100} style={{ width: "100%", marginBottom: 10 }} />
             <button className="btn" disabled={busy} onClick={() => save({ city: city.trim(), state: areaState, country: areaCountry })}>{t("save")}</button>
           </div>
-          {/* "Country you're from" (Steve, 2026-11-23): battle for where you live AND where you're from. */}
-          <div className="card" style={{ marginTop: 12 }}><FromCountryRow /></div>
         </>
       )}
       {el}
