@@ -10,6 +10,7 @@ import { useSession } from "../lib/session";
 import { memberLabel, trackPage } from "../lib/pageTracker";
 import { chatChannel, ensureFirebaseSignIn, observeChat, observeLiveCaption, sendChat, type ChatMessage } from "../lib/firebase";
 import { BattleActionBar } from "../components/BattleActionBar";
+import { useLiveTools } from "../components/LiveTools";
 import { useLiveRoom, type LiveRole, type LiveTile } from "../lib/live";
 import { activeBoxingWindow, useBattle, type BattleData } from "../lib/battle";
 import { VIRTUAL, fetchVirtualGiftRecord, sendVirtualThankYou, startVirtualBattle, type VirtualBattleData, type VirtualGiftRecord, type VirtualParticipant, FIVE_FIVE_FIVE, MARATHON, SERIES, TWO_V_TWO, cancel555, createSeries, finalize2v2, finalizeSeriesRound, invite2v2, invite555, inviteMarathon, secondsUntil, useEngine, voteMarathonCancel, type B555Data, type Battle2v2Data, type MarathonData, type SeriesData } from "../lib/battles";
@@ -1099,6 +1100,8 @@ export function LiveViewerPage() {
   async function submitChat(e: React.FormEvent) {
     e.preventDefault();
     if (!user || !draft.trim()) return;
+    // Pause Chat (the host's): nobody but the host talks while it is on, as on the phones.
+    if (tools.chatPaused && role !== "host") { setToast(t("lt_chat_paused_viewer")); return; }
     // Live chat goes straight to Firestore, so the server cannot ask for the email (2026-11-05).
     if (!requireVerified()) return;
     const text = draft;
@@ -1466,6 +1469,24 @@ export function LiveViewerPage() {
     const id = window.setInterval(() => setMenuNow(Date.now()), 1000);
     return () => window.clearInterval(id);
   }, [roomMenuOpen]);
+
+  // ---- the live tools (Steve, 2026-11-23: "Missing I-cons from the bottom. Caption, Voice to
+  // text, Sound, Music, Stickers, Background, Filters, Text to Voice, Pause Chat.") — whoever is
+  // on camera here gets the camera/mic tools; the host owns this chat, so Pause Chat is theirs. ----
+  const tools = useLiveTools({
+    myId: user?.id ?? 0, publishing: isPublisher, audioOnly: podcastAudio, micOn: live.micOn, tracks: live.localTracks,
+    captionRoom: roomName, showPauseChat: role === "host" && isPublisher, pauseRoom: role === "host" ? roomName : null,
+    chatRoom: isLoggedIn && !roomClosed ? roomName : null, ownsChat: role === "host",
+    ownMessages: role === "host" ? messages : null,
+    canChat: isLoggedIn && !!user,
+    onDictate: (text, final) => {
+      if (!final || !user) { setDraft(text); return; }
+      setDraft("");
+      if (tools.chatPaused && role !== "host") { setToast(t("lt_chat_paused_viewer")); return; }
+      if (!requireVerified()) return;
+      sendChat(chatChannel(roomName, hostUserId), user.id, displayName(user), text, user.profile_image ?? "").catch((err) => setToast(`Couldn't send: ${(err as Error).message}`));
+    },
+  });
 
   // Moved down here from above the hooks (2026-10-29): an early return BEFORE hooks changes
   // their order when the session changes, the crash VideoPage.tsx already fixed.
@@ -1926,7 +1947,9 @@ export function LiveViewerPage() {
               const to = broadcasters.find((b) => b.user_id !== user?.id);
               if (to) setGiftTarget(to.user_id);
             }}
-            onShare={() => { void shareLive(); }} />
+            onShare={() => { void shareLive(); }}
+            afterCc={tools.afterCc} afterMic={tools.afterMic} tail={tools.tail} />
+          {tools.overlay}
           {isPublisher && (
             <div className="row" style={{ marginTop: 12, flexWrap: "wrap" }}>
               {/* An audio podcast has no camera at all — only the microphone. */}
