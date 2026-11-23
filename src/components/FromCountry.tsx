@@ -132,6 +132,8 @@ export function FromCountrySheet({ data, mode, onSaved, onClose, demo }: {
  * signed in and fetchFromCountry says asked=false. "Not now" waits for the next app start.
  * ?from_demo=1 shows it with sample countries under `vite` only (never in a build).
  */
+const ASK_ENABLED = false as boolean;
+
 export function FromCountryAsk() {
   const { user } = useSession();
   const [sp] = useSearchParams();
@@ -140,6 +142,9 @@ export function FromCountryAsk() {
   const [data, setData] = useState<FromCountry | null>(null);
   useEffect(() => {
     if (demo) { setData(demoFromCountry()); return; }
+    // The popup is gone (Steve, 2026-11-23: "Remove this page, it is no longer needed" — any member battles
+    // for any country now). "Country you're from" stays as an optional row in Account Settings.
+    if (ASK_ENABLED === false) return;
     if (!uid || fromCountryDismissed()) return;
     let live = true;
     fromCountryAskData(uid).then((d) => { if (live && d && !d.asked && !fromCountryDismissed()) setData(d); });
