@@ -2010,5 +2010,10 @@
  "lt_tts_min_bbs": "BB tối thiểu",
  "lt_tts_test": "Thử: nghe xem như thế nào",
  "lt_tts_saved": "Đã lưu cài đặt chuyển văn bản thành giọng nói.",
- "lt_save_failed": "Không thể lưu."
+ "lt_save_failed": "Không thể lưu.",
+ "rival_your_battle": "Trận đấu đối thủ của bạn",
+ "rival_country_battle": "Trận đấu đối thủ của {country}",
+ "acb_filter_all": "Tất cả",
+ "acb_filter_vs": "Quốc gia VS Quốc gia",
+ "acb_filter_countries": "Quốc gia"
 }

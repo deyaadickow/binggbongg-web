@@ -5,9 +5,9 @@
 //
 // One call, fetchAllCountryBattles {search}. Never an empty POST body (the host WAF 403s it), so
 // `search` is always sent, "" when the box is empty.
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { post } from "./api";
-import { flag, noteServerNow, rivalOf, type CbRival } from "./countryBattle";
+import { flag, noteServerNow, rivalOf, type CbRival, type CbRivalCard } from "./countryBattle";
 import { flagOf } from "./countryChallenges";
 
 export type AcbPhase = "battle" | "joining" | "upcoming" | "scheduled" | "ended";
@@ -58,7 +58,7 @@ function person(v: unknown): AcbPerson | null {
   };
 }
 
-function battle(v: Record<string, unknown>): AcbBattle {
+export function parseAcbBattle(v: Record<string, unknown>): AcbBattle {
   const phase = PHASES.includes(v.phase as AcbPhase) ? (v.phase as AcbPhase) : "scheduled";
   const rival = rivalOf(v.rival);
   return {
@@ -89,8 +89,11 @@ function battle(v: Record<string, unknown>): AcbBattle {
   };
 }
 
-export async function fetchAllCountryBattles(search: string): Promise<AcbList> {
-  const res = await post<{ enabled?: unknown; server_now?: string; battles?: unknown[] }>("fetchAllCountryBattles", { search: search.trim() });
+/** Which cards: everything (rival cards come first), only Country VS Country, or only single countries. */
+export type AcbKind = "rival" | "country";
+
+export async function fetchAllCountryBattles(search: string, kind?: AcbKind): Promise<AcbList> {
+  const res = await post<{ enabled?: unknown; server_now?: string; battles?: unknown[] }>("fetchAllCountryBattles", { search: search.trim(), ...(kind ? { kind } : {}) });
   const d = res.status && res.data ? res.data : null;
   if (!d) throw new Error(res.message || "");
   noteServerNow(d.server_now);
@@ -99,8 +102,46 @@ export async function fetchAllCountryBattles(search: string): Promise<AcbList> {
     server_now: d.server_now ?? "",
     battles: (Array.isArray(d.battles) ? d.battles : [])
       .filter((x): x is Record<string, unknown> => !!x && typeof x === "object")
-      .map(battle),
+      .map(parseAcbBattle),
   };
+}
+
+/** A country page's rival card (fetchCountryBattleDaily.rival_battles) as an All Country Battles card. */
+export function acbFromRivalCard(c: CbRivalCard): AcbBattle {
+  return {
+    kind: "rival", rival: c.rival, day_id: c.day_id, country: c.country, is_test: false, phase: c.phase,
+    opens_at: c.opens_at, starts_at: c.starts_at, ends_at: c.ends_at, phase_ends_at: c.phase_ends_at,
+    start_time: null, timezone: null, duration_minutes: 10, live_count: c.live_count, room_open: c.room_open,
+    can_watch: c.can_watch, can_battle: c.can_battle, is_my_country: false, leader: null, winner: null, next_starts_at: null,
+  };
+}
+
+/** The list, searched (~300 ms after the last keystroke) and refreshed every 20 s while the tab is in view. */
+export function useAllCountryBattles(query: string, kind: AcbKind | undefined, userId: number | undefined, emptyText: string) {
+  const [search, setSearch] = useState("");
+  const [battles, setBattles] = useState<AcbBattle[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const seq = useRef(0);
+  useEffect(() => {
+    const h = setTimeout(() => setSearch(query.trim()), 300);
+    return () => clearTimeout(h);
+  }, [query]);
+  const load = useCallback(() => {
+    const mine = ++seq.current;
+    fetchAllCountryBattles(search, kind)
+      .then((d) => { if (mine === seq.current) { setBattles(d.battles); setError(null); } })
+      .catch((e) => { if (mine === seq.current) setError((e as Error).message || emptyText); });
+  }, [search, kind, emptyText]);
+  // A new filter shows the loader instead of the other filter's cards.
+  useEffect(() => { setBattles(null); }, [kind]);
+  useEffect(() => {
+    load();
+    const timer = setInterval(() => { if (document.visibilityState === "visible") load(); }, 20000);
+    const vis = () => { if (document.visibilityState === "visible") load(); };
+    document.addEventListener("visibilitychange", vis);
+    return () => { clearInterval(timer); document.removeEventListener("visibilitychange", vis); };
+  }, [load, userId]);
+  return { battles, error, search };
 }
 
 // ---- the flag from a country NAME -----------------------------------------------------------

@@ -2010,5 +2010,10 @@
  "lt_tts_min_bbs": "BB minimum",
  "lt_tts_test": "Uji: dengar bunyinya",
  "lt_tts_saved": "Tetapan teks ke suara disimpan.",
- "lt_save_failed": "Tidak dapat menyimpan."
+ "lt_save_failed": "Tidak dapat menyimpan.",
+ "rival_your_battle": "Pertarungan saingan anda",
+ "rival_country_battle": "Pertarungan saingan {country}",
+ "acb_filter_all": "Semua",
+ "acb_filter_vs": "Negara VS Negara",
+ "acb_filter_countries": "Negara"
 }

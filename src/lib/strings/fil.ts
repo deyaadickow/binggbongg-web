@@ -2903,4 +2903,9 @@ export const fil = {
   lt_tts_test: "Subukan: pakinggan kung paano tumunog",
   lt_tts_saved: "Na-save ang settings ng Text to Voice.",
   lt_save_failed: "Hindi ma-save.",
+  rival_your_battle: "Ang rival battle mo",
+  rival_country_battle: "Rival battle ng {country}",
+  acb_filter_all: "Lahat",
+  acb_filter_vs: "Bansa VS Bansa",
+  acb_filter_countries: "Mga Bansa",
 };

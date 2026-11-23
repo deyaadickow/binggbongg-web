@@ -2009,5 +2009,10 @@
  "lt_tts_min_bbs": "最低 BB",
  "lt_tts_test": "テスト：聞いてみる",
  "lt_tts_saved": "読み上げの設定を保存しました。",
- "lt_save_failed": "保存できませんでした。"
+ "lt_save_failed": "保存できませんでした。",
+ "rival_your_battle": "あなたのライバルバトル",
+ "rival_country_battle": "{country}のライバルバトル",
+ "acb_filter_all": "すべて",
+ "acb_filter_vs": "国 VS 国",
+ "acb_filter_countries": "国"
 }

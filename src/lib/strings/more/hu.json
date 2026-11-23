@@ -2003,5 +2003,10 @@
  "lt_tts_min_bbs": "Minimum BB",
  "lt_tts_test": "Teszt: hallgasd meg, hogyan szól",
  "lt_tts_saved": "A szövegfelolvasás beállításai mentve.",
- "lt_save_failed": "A mentés nem sikerült."
+ "lt_save_failed": "A mentés nem sikerült.",
+ "rival_your_battle": "A riválisharcod",
+ "rival_country_battle": "{country} riválisharca",
+ "acb_filter_all": "Összes",
+ "acb_filter_vs": "Ország VS Ország",
+ "acb_filter_countries": "Országok"
 }

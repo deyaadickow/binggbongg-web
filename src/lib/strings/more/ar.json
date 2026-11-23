@@ -2308,5 +2308,10 @@
  "lt_tts_min_bbs": "الحد الأدنى من BB",
  "lt_tts_test": "تجربة: استمع إلى الصوت",
  "lt_tts_saved": "تم حفظ إعدادات تحويل النص إلى صوت.",
- "lt_save_failed": "تعذّر الحفظ."
+ "lt_save_failed": "تعذّر الحفظ.",
+ "rival_your_battle": "معركة منافسك",
+ "rival_country_battle": "معركة منافس {country}",
+ "acb_filter_all": "الكل",
+ "acb_filter_vs": "دولة ضد دولة",
+ "acb_filter_countries": "الدول"
 }

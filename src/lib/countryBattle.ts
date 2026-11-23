@@ -202,8 +202,44 @@ export interface CbLastDay {
   top3: CbTopRow[];
 }
 
+/** A Country VS Country battle this country is in (fetchCountryBattleDaily.rival_battles, Round 4). */
+export interface CbRivalCard {
+  day_id: number;
+  /** "Philippines vs Indonesia". */
+  country: string;
+  rival: CbRival;
+  phase: CbDayPhase;
+  opens_at: string | null;
+  starts_at: string | null;
+  ends_at: string | null;
+  phase_ends_at: string | null;
+  live_count: number;
+  room_open: boolean;
+  can_watch: boolean;
+  can_battle: boolean;
+}
+
+function rivalCard(v: unknown): CbRivalCard | null {
+  if (!v || typeof v !== "object") return null;
+  const r = v as Record<string, unknown>;
+  const rival = rivalOf(r.rival);
+  const day = Number(r.day_id) || 0;
+  if (!rival || !day) return null;
+  const s = (x: unknown) => (typeof x === "string" && x ? x : null);
+  const phases: CbDayPhase[] = ["upcoming", "joining", "battle", "ended"];
+  return {
+    day_id: day, country: String(r.country ?? rival.label), rival,
+    phase: phases.includes(r.phase as CbDayPhase) ? (r.phase as CbDayPhase) : "upcoming",
+    opens_at: s(r.opens_at), starts_at: s(r.starts_at), ends_at: s(r.ends_at), phase_ends_at: s(r.phase_ends_at),
+    live_count: Number(r.live_count) || 0, room_open: flag(r.room_open),
+    can_watch: r.can_watch === undefined ? true : flag(r.can_watch), can_battle: flag(r.can_battle),
+  };
+}
+
 /** fetchCountryBattleDaily's `data` (§3). */
 export interface CbDaily {
+  /** This country's Country VS Country battle(s) — usually one; [] on old servers or a VS page. */
+  rival_battles: CbRivalCard[];
   enabled: boolean;
   country: string | null;
   countries: CbCountry[];
@@ -330,9 +366,10 @@ export async function fetchCountryBattleDaily(userId: number, country?: string):
   const res = await post<CbDaily>("fetchCountryBattleDaily", { user_id: userId, ...(country ? { country } : {}) });
   const d = res.status && res.data ? res.data : null;
   noteServerNow(d?.server_now);
-  if (!d) return { enabled: false, country: null, countries: [], battle: null, next_starts_at: null, last: null, server_now: "", me: null };
+  if (!d) return { enabled: false, country: null, countries: [], battle: null, next_starts_at: null, last: null, server_now: "", me: null, rival_battles: [] };
   return {
     ...d,
+    rival_battles: (Array.isArray(d.rival_battles) ? (d.rival_battles as unknown[]) : []).map(rivalCard).filter((x): x is CbRivalCard => !!x),
     enabled: flag(d.enabled),
     countries: Array.isArray(d.countries) ? d.countries : [],
     battle: d.battle ? cleanDay(d.battle) : null,

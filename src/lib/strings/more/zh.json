@@ -2010,5 +2010,10 @@
  "lt_tts_min_bbs": "最少 BB",
  "lt_tts_test": "试听：听听效果",
  "lt_tts_saved": "文字转语音设置已保存。",
- "lt_save_failed": "无法保存。"
+ "lt_save_failed": "无法保存。",
+ "rival_your_battle": "你的宿敌对战",
+ "rival_country_battle": "{country}的宿敌对战",
+ "acb_filter_all": "全部",
+ "acb_filter_vs": "国家 VS 国家",
+ "acb_filter_countries": "国家"
 }

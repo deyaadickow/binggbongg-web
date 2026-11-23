@@ -2004,5 +2004,10 @@
  "lt_tts_min_bbs": "किमान BBs",
  "lt_tts_test": "चाचणी: कसे ऐकू येते ते ऐका",
  "lt_tts_saved": "मजकूर ते आवाज सेटिंग्ज जतन केल्या.",
- "lt_save_failed": "जतन करता आले नाही."
+ "lt_save_failed": "जतन करता आले नाही.",
+ "rival_your_battle": "तुमची प्रतिस्पर्धी बॅटल",
+ "rival_country_battle": "{country} ची प्रतिस्पर्धी बॅटल",
+ "acb_filter_all": "सर्व",
+ "acb_filter_vs": "देश VS देश",
+ "acb_filter_countries": "देश"
 }

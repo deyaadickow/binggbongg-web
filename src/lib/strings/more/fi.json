@@ -2001,5 +2001,10 @@
  "lt_tts_min_bbs": "Vähimmäis-BB:t",
  "lt_tts_test": "Testaa: kuuntele miltä se kuulostaa",
  "lt_tts_saved": "Tekstistä puheeksi -asetukset tallennettu.",
- "lt_save_failed": "Tallennus epäonnistui."
+ "lt_save_failed": "Tallennus epäonnistui.",
+ "rival_your_battle": "Sinun kilpakumppanitaistelusi",
+ "rival_country_battle": "{country}: kilpakumppanitaistelu",
+ "acb_filter_all": "Kaikki",
+ "acb_filter_vs": "Maa VS Maa",
+ "acb_filter_countries": "Maat"
 }

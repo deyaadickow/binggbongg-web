@@ -2010,5 +2010,10 @@
  "lt_tts_min_bbs": "En az BB",
  "lt_tts_test": "Test: nasıl duyulduğunu dinle",
  "lt_tts_saved": "Metinden sese ayarları kaydedildi.",
- "lt_save_failed": "Kaydedilemedi."
+ "lt_save_failed": "Kaydedilemedi.",
+ "rival_your_battle": "Rakip savaşın",
+ "rival_country_battle": "{country} rakip savaşı",
+ "acb_filter_all": "Tümü",
+ "acb_filter_vs": "Ülke VS Ülke",
+ "acb_filter_countries": "Ülkeler"
 }

@@ -2704,4 +2704,9 @@ export const es = {
   lt_tts_test: "Prueba: escucha cómo suena",
   lt_tts_saved: "Ajustes de texto a voz guardados.",
   lt_save_failed: "No se pudo guardar.",
+  rival_your_battle: "Tu batalla de rivales",
+  rival_country_battle: "Batalla de rivales de {country}",
+  acb_filter_all: "Todas",
+  acb_filter_vs: "País VS País",
+  acb_filter_countries: "Países",
 };

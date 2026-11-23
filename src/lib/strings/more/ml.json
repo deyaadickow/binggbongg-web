@@ -2005,5 +2005,10 @@
  "lt_tts_min_bbs": "കുറഞ്ഞ BBs",
  "lt_tts_test": "പരീക്ഷണം: എങ്ങനെ കേൾക്കുന്നുവെന്ന് കേൾക്കൂ",
  "lt_tts_saved": "ടെക്സ്റ്റ് ടു വോയ്സ് ക്രമീകരണങ്ങൾ സേവ് ചെയ്തു.",
- "lt_save_failed": "സേവ് ചെയ്യാനായില്ല."
+ "lt_save_failed": "സേവ് ചെയ്യാനായില്ല.",
+ "rival_your_battle": "നിങ്ങളുടെ എതിരാളി ബാറ്റിൽ",
+ "rival_country_battle": "{country}-ന്റെ എതിരാളി ബാറ്റിൽ",
+ "acb_filter_all": "എല്ലാം",
+ "acb_filter_vs": "രാജ്യം VS രാജ്യം",
+ "acb_filter_countries": "രാജ്യങ്ങൾ"
 }

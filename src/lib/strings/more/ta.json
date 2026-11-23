@@ -2010,5 +2010,10 @@
  "lt_tts_min_bbs": "குறைந்தபட்ச BBs",
  "lt_tts_test": "சோதனை: எப்படி ஒலிக்கிறது என்று கேளுங்கள்",
  "lt_tts_saved": "உரையிலிருந்து குரல் அமைப்புகள் சேமிக்கப்பட்டன.",
- "lt_save_failed": "சேமிக்க முடியவில்லை."
+ "lt_save_failed": "சேமிக்க முடியவில்லை.",
+ "rival_your_battle": "உங்கள் போட்டியாளர் போர்",
+ "rival_country_battle": "{country} போட்டியாளர் போர்",
+ "acb_filter_all": "அனைத்தும்",
+ "acb_filter_vs": "நாடு VS நாடு",
+ "acb_filter_countries": "நாடுகள்"
 }

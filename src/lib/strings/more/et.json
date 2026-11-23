@@ -2007,5 +2007,10 @@
  "lt_tts_min_bbs": "Minimaalsed BB-d",
  "lt_tts_test": "Test: kuula, kuidas see kõlab",
  "lt_tts_saved": "Tekst kõneks seaded salvestati.",
- "lt_save_failed": "Salvestamine ebaõnnestus."
+ "lt_save_failed": "Salvestamine ebaõnnestus.",
+ "rival_your_battle": "Sinu rivaalilahing",
+ "rival_country_battle": "Riigi {country} rivaalilahing",
+ "acb_filter_all": "Kõik",
+ "acb_filter_vs": "Riik VS Riik",
+ "acb_filter_countries": "Riigid"
 }

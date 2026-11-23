@@ -2010,5 +2010,10 @@
  "lt_tts_min_bbs": "کم از کم BBs",
  "lt_tts_test": "ٹیسٹ: سنیں کیسا لگتا ہے",
  "lt_tts_saved": "متن سے آواز کی ترتیبات محفوظ ہو گئیں۔",
- "lt_save_failed": "محفوظ نہیں ہو سکا۔"
+ "lt_save_failed": "محفوظ نہیں ہو سکا۔",
+ "rival_your_battle": "آپ کی حریف بیٹل",
+ "rival_country_battle": "{country} کی حریف بیٹل",
+ "acb_filter_all": "سب",
+ "acb_filter_vs": "ملک VS ملک",
+ "acb_filter_countries": "ممالک"
 }

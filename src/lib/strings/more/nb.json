@@ -2007,5 +2007,10 @@
  "lt_tts_min_bbs": "Minimum BB-er",
  "lt_tts_test": "Test: hør hvordan det høres ut",
  "lt_tts_saved": "Innstillingene for tekst til tale er lagret.",
- "lt_save_failed": "Kunne ikke lagre."
+ "lt_save_failed": "Kunne ikke lagre.",
+ "rival_your_battle": "Din rivalkamp",
+ "rival_country_battle": "{country}s rivalkamp",
+ "acb_filter_all": "Alle",
+ "acb_filter_vs": "Land VS Land",
+ "acb_filter_countries": "Land"
 }

@@ -20,6 +20,8 @@ import { TestBanner } from "../components/BattleGrid";
 import { CbPersonRow, CountryBattleReminderToggle, PlacePill } from "../components/CountryBattleBits";
 import { CountryHookBanner, ShareMyRowIcon } from "../components/CountryBoardBits";
 import { FromCountryAsk } from "../components/FromCountry";
+import { CountryBattleCard } from "../components/CountryBattleCard";
+import { acbFromRivalCard } from "../lib/allCountryBattles";
 import { demoKind, type DemoKind } from "../lib/countryBoard";
 import { useSession } from "../lib/session";
 import { fetchFeatureVideos } from "../lib/featureVideos";
@@ -171,6 +173,17 @@ export function CountryBattlePage() {
         <div className="notice" style={{ textAlign: "center", marginBottom: 12 }}>
           {t("cb2_none")}
           {daily.next_starts_at && <div style={{ marginTop: 4 }}>{cbText(t("cb2_next_in"), { time: clock(Date.parse(daily.next_starts_at) - now) })}</div>}
+        </div>
+      )}
+
+      {/* Round 4 (Steve, 2026-11-23: "I don't see the Country VS Country battles anywhere, Where did you add
+          them?"): this country's Country VS Country battle, with Watch + Join. */}
+      {daily.rival_battles.length > 0 && (
+        <div className="card pad cb-rival-box" style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 12, borderColor: "var(--gold)" }}>
+          <b style={{ color: "var(--gold)", fontSize: 17, textAlign: "center" }}>
+            ⚔️ {!country || (daily.me?.country ?? "").toLowerCase() === country.toLowerCase() ? t("rival_your_battle") : cbText(t("rival_country_battle"), { country })}
+          </b>
+          {daily.rival_battles.map((r) => <CountryBattleCard key={r.day_id} b={acbFromRivalCard(r)} now={now} />)}
         </div>
       )}
 

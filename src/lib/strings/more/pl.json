@@ -2010,5 +2010,10 @@
  "lt_tts_min_bbs": "Minimum BB",
  "lt_tts_test": "Test: posłuchaj, jak brzmi",
  "lt_tts_saved": "Ustawienia zamiany tekstu na mowę zapisane.",
- "lt_save_failed": "Nie udało się zapisać."
+ "lt_save_failed": "Nie udało się zapisać.",
+ "rival_your_battle": "Twoja bitwa z rywalem",
+ "rival_country_battle": "Bitwa z rywalem: {country}",
+ "acb_filter_all": "Wszystkie",
+ "acb_filter_vs": "Kraj VS Kraj",
+ "acb_filter_countries": "Kraje"
 }

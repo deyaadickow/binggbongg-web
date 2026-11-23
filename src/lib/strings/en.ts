@@ -3687,4 +3687,9 @@ export const en = {
   lt_tts_test: "Test: hear how it sounds",
   lt_tts_saved: "Text to Voice settings saved.",
   lt_save_failed: "Couldn't save.",
+  rival_your_battle: "Your rival battle",
+  rival_country_battle: "{country}'s rival battle",
+  acb_filter_all: "All",
+  acb_filter_vs: "Country VS Country",
+  acb_filter_countries: "Countries",
 } as const;

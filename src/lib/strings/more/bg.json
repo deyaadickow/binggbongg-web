@@ -2010,5 +2010,10 @@
  "lt_tts_min_bbs": "Минимум BB",
  "lt_tts_test": "Тест: чуй как звучи",
  "lt_tts_saved": "Настройките за текст към глас са запазени.",
- "lt_save_failed": "Неуспешно запазване."
+ "lt_save_failed": "Неуспешно запазване.",
+ "rival_your_battle": "Твоята битка със съперник",
+ "rival_country_battle": "Битката със съперник на {country}",
+ "acb_filter_all": "Всички",
+ "acb_filter_vs": "Държава VS Държава",
+ "acb_filter_countries": "Държави"
 }

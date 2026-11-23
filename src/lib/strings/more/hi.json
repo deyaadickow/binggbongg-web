@@ -2010,5 +2010,10 @@
  "lt_tts_min_bbs": "न्यूनतम BBs",
  "lt_tts_test": "टेस्ट: सुनें कैसा लगता है",
  "lt_tts_saved": "टेक्स्ट से आवाज़ की सेटिंग सेव हो गई।",
- "lt_save_failed": "सेव नहीं हो सका।"
+ "lt_save_failed": "सेव नहीं हो सका।",
+ "rival_your_battle": "आपकी प्रतिद्वंद्वी बैटल",
+ "rival_country_battle": "{country} की प्रतिद्वंद्वी बैटल",
+ "acb_filter_all": "सभी",
+ "acb_filter_vs": "देश VS देश",
+ "acb_filter_countries": "देश"
 }

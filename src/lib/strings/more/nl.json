@@ -2010,5 +2010,10 @@
  "lt_tts_min_bbs": "Minimum BB's",
  "lt_tts_test": "Test: hoor hoe het klinkt",
  "lt_tts_saved": "Instellingen voor tekst naar spraak opgeslagen.",
- "lt_save_failed": "Opslaan mislukt."
+ "lt_save_failed": "Opslaan mislukt.",
+ "rival_your_battle": "Jouw rivalenbattle",
+ "rival_country_battle": "Rivalenbattle van {country}",
+ "acb_filter_all": "Alle",
+ "acb_filter_vs": "Land VS Land",
+ "acb_filter_countries": "Landen"
 }

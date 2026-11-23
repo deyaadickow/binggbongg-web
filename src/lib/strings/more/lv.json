@@ -2006,5 +2006,10 @@
  "lt_tts_min_bbs": "Minimālie BB",
  "lt_tts_test": "Pārbaude: klausies, kā tas skan",
  "lt_tts_saved": "Teksta uz runu iestatījumi saglabāti.",
- "lt_save_failed": "Neizdevās saglabāt."
+ "lt_save_failed": "Neizdevās saglabāt.",
+ "rival_your_battle": "Tava sāncenšu cīņa",
+ "rival_country_battle": "{country} sāncenšu cīņa",
+ "acb_filter_all": "Visas",
+ "acb_filter_vs": "Valsts VS Valsts",
+ "acb_filter_countries": "Valstis"
 }

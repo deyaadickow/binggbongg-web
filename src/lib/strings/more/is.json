@@ -2007,5 +2007,10 @@
  "lt_tts_min_bbs": "Lágmark BB",
  "lt_tts_test": "Prófa: heyrðu hvernig það hljómar",
  "lt_tts_saved": "Stillingar fyrir texta í tal vistaðar.",
- "lt_save_failed": "Ekki tókst að vista."
+ "lt_save_failed": "Ekki tókst að vista.",
+ "rival_your_battle": "Keppnin þín við keppinautinn",
+ "rival_country_battle": "Keppni {country} við keppinautinn",
+ "acb_filter_all": "Allt",
+ "acb_filter_vs": "Land VS Land",
+ "acb_filter_countries": "Lönd"
 }

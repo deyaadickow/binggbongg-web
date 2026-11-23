@@ -2740,4 +2740,9 @@ export const id = {
   lt_tts_test: "Tes: dengarkan suaranya",
   lt_tts_saved: "Pengaturan Teks ke Suara disimpan.",
   lt_save_failed: "Tidak dapat menyimpan.",
+  rival_your_battle: "Pertarungan rivalmu",
+  rival_country_battle: "Pertarungan rival {country}",
+  acb_filter_all: "Semua",
+  acb_filter_vs: "Negara VS Negara",
+  acb_filter_countries: "Negara",
 };

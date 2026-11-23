@@ -2010,5 +2010,10 @@
  "lt_tts_min_bbs": "ન્યૂનતમ BBs",
  "lt_tts_test": "પરીક્ષણ: કેવું સંભળાય છે તે સાંભળો",
  "lt_tts_saved": "ટેક્સ્ટથી અવાજ સેટિંગ્સ સાચવી.",
- "lt_save_failed": "સાચવી શકાયું નહીં."
+ "lt_save_failed": "સાચવી શકાયું નહીં.",
+ "rival_your_battle": "તમારી હરીફ બેટલ",
+ "rival_country_battle": "{country}ની હરીફ બેટલ",
+ "acb_filter_all": "બધી",
+ "acb_filter_vs": "દેશ VS દેશ",
+ "acb_filter_countries": "દેશો"
 }

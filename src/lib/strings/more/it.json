@@ -2009,5 +2009,10 @@
  "lt_tts_min_bbs": "BB minimi",
  "lt_tts_test": "Prova: ascolta come suona",
  "lt_tts_saved": "Impostazioni della sintesi vocale salvate.",
- "lt_save_failed": "Impossibile salvare."
+ "lt_save_failed": "Impossibile salvare.",
+ "rival_your_battle": "La tua battaglia tra rivali",
+ "rival_country_battle": "Battaglia tra rivali di {country}",
+ "acb_filter_all": "Tutte",
+ "acb_filter_vs": "Paese VS Paese",
+ "acb_filter_countries": "Paesi"
 }

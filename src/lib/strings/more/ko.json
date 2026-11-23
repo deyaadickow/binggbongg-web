@@ -2010,5 +2010,10 @@
  "lt_tts_min_bbs": "최소 BB",
  "lt_tts_test": "테스트: 어떻게 들리는지 듣기",
  "lt_tts_saved": "텍스트 음성 변환 설정을 저장했어요.",
- "lt_save_failed": "저장하지 못했어요."
+ "lt_save_failed": "저장하지 못했어요.",
+ "rival_your_battle": "나의 라이벌 배틀",
+ "rival_country_battle": "{country}의 라이벌 배틀",
+ "acb_filter_all": "전체",
+ "acb_filter_vs": "국가 VS 국가",
+ "acb_filter_countries": "국가"
 }

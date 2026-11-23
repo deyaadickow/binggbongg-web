@@ -2009,5 +2009,10 @@
  "lt_tts_min_bbs": "Minimum BB",
  "lt_tts_test": "Test: poslechni si, jak to zní",
  "lt_tts_saved": "Nastavení převodu textu na řeč uloženo.",
- "lt_save_failed": "Uložení se nezdařilo."
+ "lt_save_failed": "Uložení se nezdařilo.",
+ "rival_your_battle": "Tvoje bitva s rivalem",
+ "rival_country_battle": "Bitva s rivalem: {country}",
+ "acb_filter_all": "Vše",
+ "acb_filter_vs": "Země VS Země",
+ "acb_filter_countries": "Země"
 }

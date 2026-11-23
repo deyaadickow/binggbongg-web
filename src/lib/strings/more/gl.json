@@ -2006,5 +2006,10 @@
  "lt_tts_min_bbs": "BBs mínimos",
  "lt_tts_test": "Proba: escoita como soa",
  "lt_tts_saved": "Configuración de texto a voz gardada.",
- "lt_save_failed": "Non se puido gardar."
+ "lt_save_failed": "Non se puido gardar.",
+ "rival_your_battle": "A túa batalla de rivais",
+ "rival_country_battle": "Batalla de rivais de {country}",
+ "acb_filter_all": "Todas",
+ "acb_filter_vs": "País VS País",
+ "acb_filter_countries": "Países"
 }

@@ -2010,5 +2010,10 @@
  "lt_tts_min_bbs": "Gutxieneko BBak",
  "lt_tts_test": "Proba: entzun nola entzuten den",
  "lt_tts_saved": "Testutik ahotserako ezarpenak gorde dira.",
- "lt_save_failed": "Ezin izan da gorde."
+ "lt_save_failed": "Ezin izan da gorde.",
+ "rival_your_battle": "Zure arerio-borroka",
+ "rival_country_battle": "{country}-(r)en arerio-borroka",
+ "acb_filter_all": "Guztiak",
+ "acb_filter_vs": "Herrialdea VS Herrialdea",
+ "acb_filter_countries": "Herrialdeak"
 }

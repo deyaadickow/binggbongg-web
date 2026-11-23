@@ -2009,5 +2009,10 @@
  "lt_tts_min_bbs": "Ελάχιστα BB",
  "lt_tts_test": "Δοκιμή: άκου πώς ακούγεται",
  "lt_tts_saved": "Οι ρυθμίσεις κειμένου σε φωνή αποθηκεύτηκαν.",
- "lt_save_failed": "Η αποθήκευση απέτυχε."
+ "lt_save_failed": "Η αποθήκευση απέτυχε.",
+ "rival_your_battle": "Η μάχη αντιπάλων σου",
+ "rival_country_battle": "Η μάχη αντιπάλων: {country}",
+ "acb_filter_all": "Όλα",
+ "acb_filter_vs": "Χώρα VS Χώρα",
+ "acb_filter_countries": "Χώρες"
 }

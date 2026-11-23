@@ -2010,5 +2010,10 @@
  "lt_tts_min_bbs": "Minimum BB",
  "lt_tts_test": "Test: vypočuj si, ako to znie",
  "lt_tts_saved": "Nastavenia prevodu textu na reč uložené.",
- "lt_save_failed": "Uloženie zlyhalo."
+ "lt_save_failed": "Uloženie zlyhalo.",
+ "rival_your_battle": "Tvoja bitka s rivalom",
+ "rival_country_battle": "Bitka s rivalom: {country}",
+ "acb_filter_all": "Všetko",
+ "acb_filter_vs": "Krajina VS Krajina",
+ "acb_filter_countries": "Krajiny"
 }

@@ -2006,5 +2006,10 @@
  "lt_tts_min_bbs": "מינימום BB",
  "lt_tts_test": "בדיקה: שמע איך זה נשמע",
  "lt_tts_saved": "הגדרות הטקסט לקול נשמרו.",
- "lt_save_failed": "השמירה נכשלה."
+ "lt_save_failed": "השמירה נכשלה.",
+ "rival_your_battle": "קרב היריבות שלך",
+ "rival_country_battle": "קרב היריבות של {country}",
+ "acb_filter_all": "הכול",
+ "acb_filter_vs": "מדינה VS מדינה",
+ "acb_filter_countries": "מדינות"
 }

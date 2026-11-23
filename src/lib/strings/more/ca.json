@@ -2009,5 +2009,10 @@
  "lt_tts_min_bbs": "BBs mínims",
  "lt_tts_test": "Prova: escolta com sona",
  "lt_tts_saved": "Configuració de text a veu desada.",
- "lt_save_failed": "No s'ha pogut desar."
+ "lt_save_failed": "No s'ha pogut desar.",
+ "rival_your_battle": "La teva batalla de rivals",
+ "rival_country_battle": "Batalla de rivals de {country}",
+ "acb_filter_all": "Totes",
+ "acb_filter_vs": "País VS País",
+ "acb_filter_countries": "Països"
 }

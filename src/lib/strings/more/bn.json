@@ -2009,5 +2009,10 @@
  "lt_tts_min_bbs": "সর্বনিম্ন BB",
  "lt_tts_test": "পরীক্ষা: কেমন শোনায় শুনুন",
  "lt_tts_saved": "টেক্সট থেকে ভয়েস সেটিংস সংরক্ষিত হয়েছে।",
- "lt_save_failed": "সংরক্ষণ করা যায়নি।"
+ "lt_save_failed": "সংরক্ষণ করা যায়নি।",
+ "rival_your_battle": "আপনার প্রতিদ্বন্দ্বী ব্যাটেল",
+ "rival_country_battle": "{country}-এর প্রতিদ্বন্দ্বী ব্যাটেল",
+ "acb_filter_all": "সব",
+ "acb_filter_vs": "দেশ VS দেশ",
+ "acb_filter_countries": "দেশসমূহ"
 }

@@ -2008,5 +2008,10 @@
  "lt_tts_min_bbs": "ಕನಿಷ್ಠ BBs",
  "lt_tts_test": "ಪರೀಕ್ಷೆ: ಹೇಗೆ ಕೇಳುತ್ತದೆ ಎಂದು ಕೇಳಿ",
  "lt_tts_saved": "ಪಠ್ಯದಿಂದ ಧ್ವನಿ ಸೆಟ್ಟಿಂಗ್‌ಗಳನ್ನು ಉಳಿಸಲಾಗಿದೆ.",
- "lt_save_failed": "ಉಳಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ."
+ "lt_save_failed": "ಉಳಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.",
+ "rival_your_battle": "ನಿಮ್ಮ ಪ್ರತಿಸ್ಪರ್ಧಿ ಬ್ಯಾಟಲ್",
+ "rival_country_battle": "{country} ಪ್ರತಿಸ್ಪರ್ಧಿ ಬ್ಯಾಟಲ್",
+ "acb_filter_all": "ಎಲ್ಲಾ",
+ "acb_filter_vs": "ದೇಶ VS ದೇಶ",
+ "acb_filter_countries": "ದೇಶಗಳು"
 }

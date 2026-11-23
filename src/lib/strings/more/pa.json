@@ -2010,5 +2010,10 @@
  "lt_tts_min_bbs": "ਘੱਟੋ-ਘੱਟ BBs",
  "lt_tts_test": "ਟੈਸਟ: ਸੁਣੋ ਕਿਵੇਂ ਲੱਗਦਾ ਹੈ",
  "lt_tts_saved": "ਟੈਕਸਟ ਤੋਂ ਆਵਾਜ਼ ਸੈਟਿੰਗਾਂ ਸੰਭਾਲੀਆਂ ਗਈਆਂ।",
- "lt_save_failed": "ਸੰਭਾਲਿਆ ਨਹੀਂ ਜਾ ਸਕਿਆ।"
+ "lt_save_failed": "ਸੰਭਾਲਿਆ ਨਹੀਂ ਜਾ ਸਕਿਆ।",
+ "rival_your_battle": "ਤੁਹਾਡੀ ਵਿਰੋਧੀ ਬੈਟਲ",
+ "rival_country_battle": "{country} ਦੀ ਵਿਰੋਧੀ ਬੈਟਲ",
+ "acb_filter_all": "ਸਾਰੇ",
+ "acb_filter_vs": "ਦੇਸ਼ VS ਦੇਸ਼",
+ "acb_filter_countries": "ਦੇਸ਼"
 }

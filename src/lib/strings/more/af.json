@@ -2008,5 +2008,10 @@
  "lt_tts_min_bbs": "Minimum BB's",
  "lt_tts_test": "Toets: hoor hoe dit klink",
  "lt_tts_saved": "Teks-na-stem-instellings gestoor.",
- "lt_save_failed": "Kon nie stoor nie."
+ "lt_save_failed": "Kon nie stoor nie.",
+ "rival_your_battle": "Jou mededingerstryd",
+ "rival_country_battle": "{country} se mededingerstryd",
+ "acb_filter_all": "Alles",
+ "acb_filter_vs": "Land VS Land",
+ "acb_filter_countries": "Lande"
 }

@@ -2010,5 +2010,10 @@
  "lt_tts_min_bbs": "ዝቅተኛ BBs",
  "lt_tts_test": "ሙከራ፦ እንዴት እንደሚሰማ ያዳምጡ",
  "lt_tts_saved": "የጽሑፍ ወደ ድምፅ ቅንብሮች ተቀምጠዋል።",
- "lt_save_failed": "ማስቀመጥ አልተቻለም።"
+ "lt_save_failed": "ማስቀመጥ አልተቻለም።",
+ "rival_your_battle": "የእርስዎ የተቀናቃኝ ውጊያ",
+ "rival_country_battle": "የ{country} የተቀናቃኝ ውጊያ",
+ "acb_filter_all": "ሁሉም",
+ "acb_filter_vs": "ሀገር VS ሀገር",
+ "acb_filter_countries": "ሀገሮች"
 }

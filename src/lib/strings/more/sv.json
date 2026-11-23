@@ -2008,5 +2008,10 @@
  "lt_tts_min_bbs": "Minsta antal BB",
  "lt_tts_test": "Test: hör hur det låter",
  "lt_tts_saved": "Inställningarna för text till tal har sparats.",
- "lt_save_failed": "Det gick inte att spara."
+ "lt_save_failed": "Det gick inte att spara.",
+ "rival_your_battle": "Din rivalbattle",
+ "rival_country_battle": "{country}s rivalbattle",
+ "acb_filter_all": "Alla",
+ "acb_filter_vs": "Land VS Land",
+ "acb_filter_countries": "Länder"
 }

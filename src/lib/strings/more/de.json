@@ -2010,5 +2010,10 @@
  "lt_tts_min_bbs": "Mindest-BBs",
  "lt_tts_test": "Test: hör, wie es klingt",
  "lt_tts_saved": "Einstellungen für Text zu Sprache gespeichert.",
- "lt_save_failed": "Speichern fehlgeschlagen."
+ "lt_save_failed": "Speichern fehlgeschlagen.",
+ "rival_your_battle": "Dein Rivalen-Battle",
+ "rival_country_battle": "Rivalen-Battle von {country}",
+ "acb_filter_all": "Alle",
+ "acb_filter_vs": "Land VS Land",
+ "acb_filter_countries": "Länder"
 }

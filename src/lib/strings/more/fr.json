@@ -2010,5 +2010,10 @@
  "lt_tts_min_bbs": "BBs minimum",
  "lt_tts_test": "Test : écoute le rendu",
  "lt_tts_saved": "Réglages de la voix enregistrés.",
- "lt_save_failed": "Impossible d'enregistrer."
+ "lt_save_failed": "Impossible d'enregistrer.",
+ "rival_your_battle": "Ta bataille de rivaux",
+ "rival_country_battle": "Bataille de rivaux : {country}",
+ "acb_filter_all": "Toutes",
+ "acb_filter_vs": "Pays VS Pays",
+ "acb_filter_countries": "Pays"
 }

@@ -2010,5 +2010,10 @@
  "lt_tts_min_bbs": "BBs mínimos",
  "lt_tts_test": "Teste: ouça como fica",
  "lt_tts_saved": "Configurações de texto para voz salvas.",
- "lt_save_failed": "Não foi possível salvar."
+ "lt_save_failed": "Não foi possível salvar.",
+ "rival_your_battle": "Sua batalha de rivais",
+ "rival_country_battle": "Batalha de rivais de {country}",
+ "acb_filter_all": "Todas",
+ "acb_filter_vs": "País VS País",
+ "acb_filter_countries": "Países"
 }

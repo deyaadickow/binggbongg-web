@@ -2010,5 +2010,10 @@
  "lt_tts_min_bbs": "కనీస BBs",
  "lt_tts_test": "పరీక్ష: ఎలా వినిపిస్తుందో వినండి",
  "lt_tts_saved": "టెక్స్ట్ నుండి వాయిస్ సెట్టింగ్‌లు సేవ్ అయ్యాయి.",
- "lt_save_failed": "సేవ్ చేయలేకపోయాం."
+ "lt_save_failed": "సేవ్ చేయలేకపోయాం.",
+ "rival_your_battle": "మీ ప్రత్యర్థి బ్యాటిల్",
+ "rival_country_battle": "{country} ప్రత్యర్థి బ్యాటిల్",
+ "acb_filter_all": "అన్నీ",
+ "acb_filter_vs": "దేశం VS దేశం",
+ "acb_filter_countries": "దేశాలు"
 }

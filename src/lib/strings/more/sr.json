@@ -2010,5 +2010,10 @@
  "lt_tts_min_bbs": "Минимум BB",
  "lt_tts_test": "Тест: чуј како звучи",
  "lt_tts_saved": "Подешавања текста у глас су сачувана.",
- "lt_save_failed": "Чување није успело."
+ "lt_save_failed": "Чување није успело.",
+ "rival_your_battle": "Твоја битка са ривалом",
+ "rival_country_battle": "Битка са ривалом: {country}",
+ "acb_filter_all": "Све",
+ "acb_filter_vs": "Држава VS Држава",
+ "acb_filter_countries": "Државе"
 }

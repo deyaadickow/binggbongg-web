@@ -2005,5 +2005,10 @@
  "lt_tts_min_bbs": "BB minime",
  "lt_tts_test": "Test: ascultă cum sună",
  "lt_tts_saved": "Setările text în voce au fost salvate.",
- "lt_save_failed": "Nu s-a putut salva."
+ "lt_save_failed": "Nu s-a putut salva.",
+ "rival_your_battle": "Bătălia ta cu rivalul",
+ "rival_country_battle": "Bătălia cu rivalul a {country}",
+ "acb_filter_all": "Toate",
+ "acb_filter_vs": "Țară VS Țară",
+ "acb_filter_countries": "Țări"
 }

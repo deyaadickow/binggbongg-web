@@ -14,6 +14,8 @@ import {
 } from "../lib/countryChallenges";
 import { tt, useT  } from "../lib/i18n";
 import { PageTitle } from "../components/PageTitle";
+import { RivalBattlesList } from "../components/CountryBattleCard";
+import { useTick } from "../lib/countryBattle";
 
 const gold = "var(--gold)";
 
@@ -21,6 +23,7 @@ const gold = "var(--gold)";
 
 export function CvCPage() {
   const { t } = useT();
+  const now = useTick();
   const [rows, setRows] = useState<CvCRow[] | null>(null);
   const [upcoming, setUpcoming] = useState<CvCRow[]>([]);
   const [comingSoon, setComingSoon] = useState<CvCComingSoon[]>([]);
@@ -38,7 +41,8 @@ export function CvCPage() {
     return (
       <div className="page" style={{ maxWidth: 900 }}>
         <PageTitle>{t("cvc_page_title")}</PageTitle>
-        <p className="soft">{t("this_isn_t_open_yet_check_back_soon")}</p>
+        {/* The live Country VS Country battles run whether or not this board is switched on. */}
+        <RivalBattlesList now={now} />
       </div>
     );
   }
@@ -47,7 +51,11 @@ export function CvCPage() {
     <div className="page" style={{ maxWidth: 900 }}>
       {/* The tab says CvC; the page says what it means. */}
       <PageTitle>{t("cvc_page_title")}</PageTitle>
-      <p className="soft" style={{ marginTop: -6 }}>
+      {/* Round 4 (Steve, 2026-11-23: "I don't see the Country VS Country battles anywhere, Where did you
+          add them?"): the live Country VS Country battles first — the same cards, Watch + Join, as on
+          All Country Battles — then the board as before. */}
+      <RivalBattlesList now={now} />
+      <p className="soft">
         {t("every_country_battle_ever_fought_and_who")}</p>
 
       {error && <Notice error>{error}</Notice>}
