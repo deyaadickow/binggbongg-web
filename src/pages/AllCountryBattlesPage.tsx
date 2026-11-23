@@ -29,7 +29,7 @@ export function AllCountryBattlesPage() {
   const [params] = useSearchParams();
   const [kind, setKind] = useState<AcbKind>(params.get("kind") === "rival" ? "rival" : "country");
   const { battles, error, search } = useAllCountryBattles(query, kind, user?.id, t("acb_empty"));
-  const chips: [AcbKind, string][] = [["rival", t("acb_filter_vs")], ["country", t("acb_filter_whole")]];
+  const chips: [AcbKind, string][] = [["rival", t("acb_filter_vs")], ["country", t("acb_tab")]];
 
   return (
     <div className="page acb-page" style={{ maxWidth: 760 }}>
