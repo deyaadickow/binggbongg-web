@@ -87,6 +87,11 @@ export function CountryBattlePage() {
   }, [load]);
 
   const battle = daily?.battle ?? null;
+  // ?watch=1 (the Country Board's Watch): straight into the room once it is open; until then this page and its countdown.
+  const autoWatch = sp.get("watch") === "1";
+  useEffect(() => {
+    if (autoWatch && battle && battle.room_open && battle.phase !== "ended" && battle.day_id) navigate(countryBattlePath(battle.day_id), { replace: true });
+  }, [autoWatch, battle, navigate]);
   // Refetch the moment the phase turns (the room opens, the battle starts or ends) rather than up
   // to 30 s late.
   const turnAt = battle?.phase_ends_at ? Date.parse(battle.phase_ends_at) : NaN;

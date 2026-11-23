@@ -1946,5 +1946,6 @@
  "cbp_under_way": "Prebieha",
  "cbp_battle_underway": "Bitka práve prebieha",
  "cb_members_battling": "Členovia v bitke: {n}",
- "cb_nobody_yet": "Zatiaľ nikto z {country} nebojuje. Ich kamery sa tu objavia, hneď ako začnú vysielať naživo."
+ "cb_nobody_yet": "Zatiaľ nikto z {country} nebojuje. Ich kamery sa tu objavia, hneď ako začnú vysielať naživo.",
+ "cbd_join": "Pripojiť sa"
 }

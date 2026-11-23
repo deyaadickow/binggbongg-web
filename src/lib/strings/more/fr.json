@@ -1946,5 +1946,6 @@
  "cbp_under_way": "En cours",
  "cbp_battle_underway": "Le combat est en cours",
  "cb_members_battling": "Membres en bataille : {n}",
- "cb_nobody_yet": "Personne de {country} ne participe encore à la bataille. Leurs caméras apparaissent ici dès qu'ils passent en direct."
+ "cb_nobody_yet": "Personne de {country} ne participe encore à la bataille. Leurs caméras apparaissent ici dès qu'ils passent en direct.",
+ "cbd_join": "Rejoindre"
 }

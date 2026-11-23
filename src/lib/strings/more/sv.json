@@ -1944,5 +1944,6 @@
  "cbp_under_way": "Pågår",
  "cbp_battle_underway": "Battlet pågår",
  "cb_members_battling": "Medlemmar i strid: {n}",
- "cb_nobody_yet": "Ingen från {country} tävlar ännu. Deras kameror visas här så snart de går live."
+ "cb_nobody_yet": "Ingen från {country} tävlar ännu. Deras kameror visas här så snart de går live.",
+ "cbd_join": "Gå med"
 }

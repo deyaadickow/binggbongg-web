@@ -1682,6 +1682,7 @@ export const es = {
   cb_live_count: "{n} en vivo",
   cb_members_battling: "Miembros en batalla: {n}",
   cb_nobody_yet: "Nadie de {country} está en la batalla todavía. Sus cámaras aparecen aquí en cuanto salen en vivo.",
+  cbd_join: "Unirse",
   cb_waiting: "Esperando a que los miembros transmitan en vivo…",
   cb_test: "Batalla de prueba: solo los evaluadores pueden ver esto",
   cb_off: "La Batalla de países no está activa en este momento.",

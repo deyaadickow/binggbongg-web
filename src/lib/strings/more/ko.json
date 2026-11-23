@@ -1946,5 +1946,6 @@
  "cbp_under_way": "진행 중",
  "cbp_battle_underway": "배틀 진행 중",
  "cb_members_battling": "배틀 중인 멤버: {n}",
- "cb_nobody_yet": "아직 {country}에서 배틀 중인 멤버가 없습니다. 라이브를 시작하면 바로 여기에 카메라가 표시됩니다."
+ "cb_nobody_yet": "아직 {country}에서 배틀 중인 멤버가 없습니다. 라이브를 시작하면 바로 여기에 카메라가 표시됩니다.",
+ "cbd_join": "참여"
 }

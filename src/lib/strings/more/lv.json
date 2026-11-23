@@ -1942,5 +1942,6 @@
  "cbp_under_way": "Notiek",
  "cbp_battle_underway": "Cīņa notiek",
  "cb_members_battling": "Cīņā esošie dalībnieki: {n}",
- "cb_nobody_yet": "Vēl neviens no {country} necīnās. Viņu kameras parādīsies šeit, tiklīdz viņi sāks tiešraidi."
+ "cb_nobody_yet": "Vēl neviens no {country} necīnās. Viņu kameras parādīsies šeit, tiklīdz viņi sāks tiešraidi.",
+ "cbd_join": "Pievienoties"
 }

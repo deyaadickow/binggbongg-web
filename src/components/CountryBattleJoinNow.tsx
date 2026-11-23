@@ -19,7 +19,7 @@ import { useNavigate } from "react-router-dom";
 import { useT } from "../lib/i18n";
 import { countryFlag } from "../lib/allCountryBattles";
 import {
-  cbText, countryBattlePath, setCountryBattlePick, joinNowParts, refreshCountryBattleJoinNow, useCountryBattleJoinNow, useTick,
+  cbText, countryBattlePath, joinNowParts, refreshCountryBattleJoinNow, useCountryBattleJoinNow, useTick,
   type CbJoinNow,
 } from "../lib/countryBattle";
 
@@ -117,6 +117,7 @@ function clockText(ms: number): string {
 
 function CountryBattlePicker({ d, now }: { d: CbJoinNow; now: number }) {
   const { t } = useT();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const list = d.countries.length ? d.countries : [{ country: d.country, country_adjective: d.country_adjective }];
@@ -150,7 +151,7 @@ function CountryBattlePicker({ d, now }: { d: CbJoinNow; now: number }) {
                 const left = Number.isNaN(at) ? NaN : at - now;
                 return (
                   <button type="button" key={c.country} className={`cbp-row${c.country === d.country ? " on" : ""}`}
-                    onClick={() => { setCountryBattlePick(c.country); setOpen(false); }}>
+                    onClick={() => { setOpen(false); navigate(`/country-battle?country=${encodeURIComponent(c.country)}`); }}>
                     <span className="cbp-rank">#{rank}</span>
                     <span className="cbp-flag" aria-hidden>{countryFlag(c.country)}</span>
                     <span className="cbp-name">{c.country}</span>

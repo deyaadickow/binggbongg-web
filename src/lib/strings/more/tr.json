@@ -1946,5 +1946,6 @@
  "cbp_under_way": "Devam ediyor",
  "cbp_battle_underway": "Savaş devam ediyor",
  "cb_members_battling": "Savaşan üyeler: {n}",
- "cb_nobody_yet": "{country} ülkesinden henüz kimse savaşmıyor. Canlı yayına geçtikleri anda kameraları burada görünür."
+ "cb_nobody_yet": "{country} ülkesinden henüz kimse savaşmıyor. Canlı yayına geçtikleri anda kameraları burada görünür.",
+ "cbd_join": "Katıl"
 }

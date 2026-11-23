@@ -1946,5 +1946,6 @@
  "cbp_under_way": "እየተካሄደ ነው",
  "cbp_battle_underway": "ውጊያው እየተካሄደ ነው",
  "cb_members_battling": "የሚዋጉ አባላት: {n}",
- "cb_nobody_yet": "ከ{country} እስካሁን የሚወዳደር የለም። ቀጥታ ሲገቡ ካሜራቸው እዚህ ይታያል።"
+ "cb_nobody_yet": "ከ{country} እስካሁን የሚወዳደር የለም። ቀጥታ ሲገቡ ካሜራቸው እዚህ ይታያል።",
+ "cbd_join": "ተቀላቀል"
 }

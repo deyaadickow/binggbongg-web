@@ -1946,5 +1946,6 @@
  "cbp_under_way": "Bezig",
  "cbp_battle_underway": "De battle is bezig",
  "cb_members_battling": "Leden in de strijd: {n}",
- "cb_nobody_yet": "Nog niemand uit {country} doet mee aan de battle. Hun camera's verschijnen hier zodra ze live gaan."
+ "cb_nobody_yet": "Nog niemand uit {country} doet mee aan de battle. Hun camera's verschijnen hier zodra ze live gaan.",
+ "cbd_join": "Meedoen"
 }

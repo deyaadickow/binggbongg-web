@@ -484,22 +484,14 @@ export interface CbJoinNow {
   my_country: string | null;
 }
 
-// The country chosen in the banner's dropdown (Steve, 2026-11-21: "There should be a dropdown box to
-// show all country battles in every country and they can choose what country to watch, with their
-// country on the banner by default."). Kept on this browser; none = the server's default.
-const PICK_KEY = "cb_join_now_pick";
-export function countryBattlePick(): string {
-  try { return localStorage.getItem(PICK_KEY) || ""; } catch { return ""; }
-}
-export function setCountryBattlePick(country: string) {
-  try { localStorage.setItem(PICK_KEY, country); } catch { /* private window: this visit only */ }
-  joinNowStore.inflight = false;
-  refreshCountryBattleJoinNow();
-}
+// The banner's dropdown (Steve, 2026-11-21) used to SAVE the chosen country on the button forever: a
+// member who once tapped Nepal kept being sent to Nepal (Steve, 2026-11-22: "I click watch on united
+// states" -> the Nepal battle). Now a tap opens that country's battle to watch and nothing is saved,
+// so the button is always the member's own country. The old saved choice is wiped here.
+try { localStorage.removeItem("cb_join_now_pick"); } catch { /* private window */ }
 
 export async function fetchCountryBattleJoinNow(userId: number): Promise<CbJoinNow | null> {
-  const pick = countryBattlePick();
-  const res = await post<CbJoinNow>("fetchCountryBattleJoinNow", { user_id: userId, ...(pick ? { pick } : {}) });
+  const res = await post<CbJoinNow>("fetchCountryBattleJoinNow", { user_id: userId });
   const d = res.status && res.data ? res.data : null;
   if (!d) return null;
   noteServerNow(d.server_now);

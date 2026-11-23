@@ -1943,5 +1943,6 @@
  "cbp_under_way": "Käimas",
  "cbp_battle_underway": "Lahing on käimas",
  "cb_members_battling": "Lahingus liikmeid: {n}",
- "cb_nobody_yet": "Keegi riigist {country} ei võistle veel. Nende kaamerad ilmuvad siia kohe, kui nad otse-eetrisse lähevad."
+ "cb_nobody_yet": "Keegi riigist {country} ei võistle veel. Nende kaamerad ilmuvad siia kohe, kui nad otse-eetrisse lähevad.",
+ "cbd_join": "Liitu"
 }

@@ -1941,5 +1941,6 @@
  "cbp_under_way": "În desfășurare",
  "cbp_battle_underway": "Lupta este în desfășurare",
  "cb_members_battling": "Membri în luptă: {n}",
- "cb_nobody_yet": "Nimeni din {country} nu luptă încă. Camerele lor apar aici imediat ce intră live."
+ "cb_nobody_yet": "Nimeni din {country} nu luptă încă. Camerele lor apar aici imediat ce intră live.",
+ "cbd_join": "Alătură-te"
 }

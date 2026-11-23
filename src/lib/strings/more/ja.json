@@ -1945,5 +1945,6 @@
  "cbp_under_way": "開催中",
  "cbp_battle_underway": "バトル開催中",
  "cb_members_battling": "バトル中のメンバー: {n}",
- "cb_nobody_yet": "{country}のメンバーはまだ誰もバトルしていません。ライブを始めるとすぐにここにカメラが表示されます。"
+ "cb_nobody_yet": "{country}のメンバーはまだ誰もバトルしていません。ライブを始めるとすぐにここにカメラが表示されます。",
+ "cbd_join": "参加"
 }

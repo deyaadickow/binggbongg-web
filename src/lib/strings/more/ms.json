@@ -1946,5 +1946,6 @@
  "cbp_under_way": "Sedang berlangsung",
  "cbp_battle_underway": "Pertarungan sedang berlangsung",
  "cb_members_battling": "Ahli yang bertanding: {n}",
- "cb_nobody_yet": "Belum ada sesiapa dari {country} yang bertanding. Kamera mereka akan muncul di sini sebaik sahaja mereka siaran langsung."
+ "cb_nobody_yet": "Belum ada sesiapa dari {country} yang bertanding. Kamera mereka akan muncul di sini sebaik sahaja mereka siaran langsung.",
+ "cbd_join": "Sertai"
 }

@@ -1943,5 +1943,6 @@
  "cbp_under_way": "I gang",
  "cbp_battle_underway": "Kampen er i gang",
  "cb_members_battling": "Medlemmer i kamp: {n}",
- "cb_nobody_yet": "Ingen fra {country} kæmper endnu. Deres kameraer vises her, så snart de går live."
+ "cb_nobody_yet": "Ingen fra {country} kæmper endnu. Deres kameraer vises her, så snart de går live.",
+ "cbd_join": "Deltag"
 }

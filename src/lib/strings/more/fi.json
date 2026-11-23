@@ -1937,5 +1937,6 @@
  "cbp_under_way": "Käynnissä",
  "cbp_battle_underway": "Taistelu on käynnissä",
  "cb_members_battling": "Taistelevia jäseniä: {n}",
- "cb_nobody_yet": "Kukaan maasta {country} ei vielä taistele. Heidän kameransa näkyvät täällä heti, kun he aloittavat livelähetyksen."
+ "cb_nobody_yet": "Kukaan maasta {country} ei vielä taistele. Heidän kameransa näkyvät täällä heti, kun he aloittavat livelähetyksen.",
+ "cbd_join": "Liity"
 }

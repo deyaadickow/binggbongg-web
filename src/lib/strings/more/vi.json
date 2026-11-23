@@ -1946,5 +1946,6 @@
  "cbp_under_way": "Đang diễn ra",
  "cbp_battle_underway": "Trận đấu đang diễn ra",
  "cb_members_battling": "Thành viên đang đấu: {n}",
- "cb_nobody_yet": "Chưa có ai từ {country} tham gia đấu. Camera của họ sẽ hiện ở đây ngay khi họ phát trực tiếp."
+ "cb_nobody_yet": "Chưa có ai từ {country} tham gia đấu. Camera của họ sẽ hiện ở đây ngay khi họ phát trực tiếp.",
+ "cbd_join": "Tham gia"
 }

@@ -1939,5 +1939,6 @@
  "cbp_under_way": "Folyamatban",
  "cbp_battle_underway": "A csata folyamatban van",
  "cb_members_battling": "Harcoló tagok: {n}",
- "cb_nobody_yet": "Még senki sem küzd innen: {country}. A kamerájuk itt jelenik meg, amint élőben adnak."
+ "cb_nobody_yet": "Még senki sem küzd innen: {country}. A kamerájuk itt jelenik meg, amint élőben adnak.",
+ "cbd_join": "Csatlakozás"
 }

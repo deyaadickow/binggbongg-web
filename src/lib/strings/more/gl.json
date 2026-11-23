@@ -1942,5 +1942,6 @@
  "cbp_under_way": "En curso",
  "cbp_battle_underway": "A batalla está en curso",
  "cb_members_battling": "Membros en batalla: {n}",
- "cb_nobody_yet": "Aínda non hai ninguén de {country} na batalla. As súas cámaras aparecen aquí en canto saian en directo."
+ "cb_nobody_yet": "Aínda non hai ninguén de {country} na batalla. As súas cámaras aparecen aquí en canto saian en directo.",
+ "cbd_join": "Unirse"
 }

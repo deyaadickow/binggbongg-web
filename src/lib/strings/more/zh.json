@@ -1946,5 +1946,6 @@
  "cbp_under_way": "进行中",
  "cbp_battle_underway": "对战进行中",
  "cb_members_battling": "正在对战的成员：{n}",
- "cb_nobody_yet": "{country}还没有人参加对战。他们一开始直播，镜头就会出现在这里。"
+ "cb_nobody_yet": "{country}还没有人参加对战。他们一开始直播，镜头就会出现在这里。",
+ "cbd_join": "加入"
 }

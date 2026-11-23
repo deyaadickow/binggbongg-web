@@ -1946,5 +1946,6 @@
  "cbp_under_way": "Trwa",
  "cbp_battle_underway": "Bitwa trwa",
  "cb_members_battling": "Członkowie w bitwie: {n}",
- "cb_nobody_yet": "Nikt z {country} jeszcze nie walczy. Ich kamery pojawią się tutaj, gdy tylko zaczną transmisję na żywo."
+ "cb_nobody_yet": "Nikt z {country} jeszcze nie walczy. Ich kamery pojawią się tutaj, gdy tylko zaczną transmisję na żywo.",
+ "cbd_join": "Dołącz"
 }
