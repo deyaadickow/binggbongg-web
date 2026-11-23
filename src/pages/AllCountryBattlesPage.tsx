@@ -57,10 +57,14 @@ function BattleCard({ b, now }: { b: AcbBattle; now: number }) {
   const live = b.phase === "battle" || b.phase === "joining";
   const lead = b.phase === "ended" ? null : b.leader;
   const showJoin = b.can_battle && !!b.day_id && live;
+  // Steve, 2026-11-23: "We need to add 2 Buttons for all! countries and country VS country "Watch" "Join"".
+  // Join on every card: open now → join (a rival card lets the server pick the side); not open yet → the battle
+  // screen, where its own Join appears when the room opens; no day yet → the country's page.
   const join = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!isLoggedIn) { navigate("/login", { state: { from: location.pathname } }); return; }
-    navigate(countryBattlePath(b.day_id!, { join: true }));
+    if (showJoin) navigate(countryBattlePath(b.day_id!, { join: true }));
+    else navigate(cardPath(b));
   };
   const open = () => navigate(cardPath(b));
   // A Rival Battle (Steve, 2026-11-23): both flags, the two-country score bar, Join for either side.
@@ -102,8 +106,8 @@ function BattleCard({ b, now }: { b: AcbBattle; now: number }) {
       )}
       {b.phase !== "ended" && (
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          {showJoin && !rival && <button className="btn gold" style={{ flex: "1 1 140px" }} onClick={join}>🔴 {t("cb_join")}</button>}
-          <button className="btn" style={{ flex: "1 1 140px" }} onClick={(e) => { e.stopPropagation(); open(); }}>👀 {t("acb_watch")}</button>
+          <button className="btn" style={{ flex: "1 1 140px" }} onClick={(e) => { e.stopPropagation(); open(); }}>👀 {t("cb_watch")}</button>
+          <button className="btn gold" style={{ flex: "1 1 140px" }} onClick={join}>🔴 {t("cbd_join")}</button>
         </div>
       )}
     </div>
