@@ -14,18 +14,22 @@ import {
   sameCountry, setFromCountry, type FromCountry,
 } from "../lib/fromCountry";
 
-/** The server's list, else the app's country list (fetchSettings countryStates). */
-function useCountryNames(fromServer: string[]): string[] {
-  const [fallback, setFallback] = useState<string[]>([]);
+/**
+ * Every country (fetchSettings countryStates, the list the ad-targeting picker uses). NOT the
+ * server's `countries` — that is the member's own one or two countries, and with it the list came
+ * up empty on 2026-11-23 (only "United States", which is hidden as "same as where I live").
+ * `extra` (sample names) is only for the ?from_demo=1 preview.
+ */
+function useCountryNames(extra: string[]): string[] {
+  const [all, setAll] = useState<string[]>([]);
   useEffect(() => {
-    if (fromServer.length) return;
     let live = true;
     post<{ countryStates?: { data?: { name?: string | null }[] } }>("fetchSettings", { x: 1 })
-      .then((r) => { if (live) setFallback((r.data?.countryStates?.data ?? []).map((c) => c.name ?? "").filter(Boolean)); })
+      .then((r) => { if (live) setAll((r.data?.countryStates?.data ?? []).map((c) => c.name ?? "").filter(Boolean)); })
       .catch(() => undefined);
     return () => { live = false; };
-  }, [fromServer.length]);
-  return fromServer.length ? fromServer : fallback;
+  }, []);
+  return all.length ? all : extra;
 }
 
 /**
