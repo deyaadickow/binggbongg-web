@@ -183,18 +183,18 @@ export function burstLabel(gift: Gift): string | null {
 }
 
 /** How long a burst of this gift runs, so the caller knows when to stop showing it. */
-export function tapTapBurstDuration(gift: Gift): number {
+export function tapTapBurstDuration(gift: Gift, maxIcons = MAX_ICONS): number {
   // Surprise runs for a fixed 5 seconds whatever the gift costs.
   if (burstDirection(gift) === "surprise") return SURPRISE_MS + SURPRISE_LIFE_MS;
   // Spot is a stream, so this is when the LAST one lands plus how long it can stay. The worst
   // case (fewest on screen, longest run), because spotOnScreen is random and this must never
   // end a burst before its last gift.
   if (burstDirection(gift) === "spot") {
-    const total = Math.min(Math.max(giftPrice(gift), 1), MAX_ICONS);
+    const total = Math.min(Math.max(giftPrice(gift), 1), maxIcons);
     return spotLastLandsAt(total, spotOnScreenMin(giftPrice(gift)))
       + SPOT_FADE_IN_MS + SPOT_HOLD_MAX_MS + SPOT_FADE_OUT_MS;
   }
-  const count = Math.min(Math.max(giftPrice(gift), 1), MAX_ICONS);
+  const count = Math.min(Math.max(giftPrice(gift), 1), maxIcons);
   return (count - 1) * staggerMs(count) + FLIGHT_MS + 200;
 }
 
@@ -215,7 +215,7 @@ interface Icon {
   dir: BurstDirection;
 }
 
-export function TapTapBurst({ gift, imageUrl, sizeMin = ICON_SIZE_MIN, sizeRange = ICON_SIZE_RANGE, hideName = false, contained = false }: {
+export function TapTapBurst({ gift, imageUrl, sizeMin = ICON_SIZE_MIN, sizeRange = ICON_SIZE_RANGE, hideName = false, contained = false, maxIcons }: {
   gift: Gift;
   /** A ready URL for the icon instead of the gift's own uploaded image (the Bingg Bongg Bonus
    *  flies the gloves logo from /img through this same effect, 2026-11-07). */
@@ -230,6 +230,9 @@ export function TapTapBurst({ gift, imageUrl, sizeMin = ICON_SIZE_MIN, sizeRange
    *  screen. Every distance the effect travels is in the box's own units (cqh/cqw) then, so a
    *  burst crosses the tile the way it crosses the screen; fewer icons, so 24 tiles stay smooth. */
   contained?: boolean;
+  /** A ceiling of its own for a contained burst (a live room's tile, 2026-11-23: 200), instead of
+   *  Dog Race's 60. */
+  maxIcons?: number;
 }) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
@@ -275,7 +278,7 @@ export function TapTapBurst({ gift, imageUrl, sizeMin = ICON_SIZE_MIN, sizeRange
     // cells are reshuffled each time round, so a long shower keeps covering the screen evenly
     // instead of dropping gifts into the same cells in the same order.
     if (dir === "spot") {
-      const total = Math.min(Math.max(giftPrice(gift), 1), contained ? CONTAINED_MAX_ICONS : MAX_ICONS);
+      const total = Math.min(Math.max(giftPrice(gift), 1), contained ? maxIcons ?? CONTAINED_MAX_ICONS : MAX_ICONS);
       const onScreen = Math.min(spotOnScreen(giftPrice(gift)), contained ? 12 : Infinity);
       const interval = spotIntervalMs(total, onScreen);
       const columns = Math.max(1, Math.ceil(Math.sqrt(onScreen)));
@@ -306,7 +309,7 @@ export function TapTapBurst({ gift, imageUrl, sizeMin = ICON_SIZE_MIN, sizeRange
       });
     }
 
-    const count = Math.min(Math.max(giftPrice(gift), 1), contained ? CONTAINED_MAX_ICONS : MAX_ICONS);
+    const count = Math.min(Math.max(giftPrice(gift), 1), contained ? maxIcons ?? CONTAINED_MAX_ICONS : MAX_ICONS);
     const stagger = staggerMs(count);
     // Deterministic per-icon scatter: random() inside render would re-roll every paint.
     return Array.from({ length: count }, (_, i) => {
@@ -335,7 +338,7 @@ export function TapTapBurst({ gift, imageUrl, sizeMin = ICON_SIZE_MIN, sizeRange
       spin: (Math.random() - 0.5) * (d === "up" ? 50 : 30),
       };
     });
-  }, [gift, dir, sizeMin, sizeRange, contained]);
+  }, [gift, dir, sizeMin, sizeRange, contained, maxIcons]);
 
   const src = imageUrl ?? (gift.image ? mediaUrl(gift.image) : undefined);
 

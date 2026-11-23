@@ -34,7 +34,8 @@ import { requireVerified } from "../lib/verifyEmail";
 import { makeBinggBonusWatcher } from "../lib/binggBonus";
 import { BinggBonusOverlay } from "./BinggBonusOverlay";
 import { FishHostControls, LiveFishOverlay } from "./LiveFishOverlay";
-import { TapTapBurst, isTapTapGift, tapTapBurstDuration } from "./TapTapBurst";
+import { isTapTapGift } from "./TapTapBurst";
+import { playGiftInTiles } from "../lib/tileGiftFx";
 import { loadGifts } from "../lib/gifts";
 import { ACTION_BAR_RESERVE, BattleActionBar, BattlesMenu } from "./BattleActionBar";
 import { useLiveTools } from "./LiveTools";
@@ -413,7 +414,6 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
   // A tile tapped to listen to (viewers). Battlers hear their stars; a home viewer always hears home.
   const [listen, setListen] = useState<number | null>(null);
   const [giftTarget, setGiftTarget] = useState<number | null>(null);
-  const [flash, setFlash] = useState<{ userId: number; gift: Gift } | null>(null);
   const [boardOpen, setBoardOpen] = useState(false);
   const [spot, setSpot] = useState<number | null>(null);
   const [endNote, setEndNote] = useState<string | null>(null);
@@ -502,17 +502,11 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
   const stripOwnerRef = useRef(stripOwner);
   stripOwnerRef.current = stripOwner;
   useEffect(() => { setLocalLines([]); }, [stripOwner]);
-  // A Bongg Burst gift (100 roses for a 100-BB rose) bursts over the battle screen as in the live
-  // room, for the sender, the receiver and the receiver's own viewers — no longer one rose.
-  const [burst, setBurst] = useState<{ gift: Gift; key: number } | null>(null);
-  const burstTimer = useRef(0);
-  useEffect(() => () => window.clearTimeout(burstTimer.current), []);
-  const playBurst = useCallback((gift: Gift) => {
-    window.clearTimeout(burstTimer.current);
-    const key = Date.now();
-    setBurst({ gift, key });
-    burstTimer.current = window.setTimeout(() => setBurst((cur) => (cur?.key === key ? null : cur)), tapTapBurstDuration(gift));
-  }, []);
+  // Steve, 2026-11-23: "it is only suppose to show on steve's screen because he gave the gift and
+  // also on eddie's screen because he is the receiver of the gift. it is not suppose to show on the
+  // entire phone screen." Every gift — burst, video or picture — now plays inside the receiver's
+  // tile and the giver's tile (when on camera), for everyone in the room, instead of a burst over
+  // the whole battle screen and the sender's card over the whole grid.
   const giftsRef = useRef<Promise<Gift[]> | null>(null);
   /** The full gift (its effect flags) for a cb_gift, which carries only the id. */
   const giftById = useCallback(async (id: number): Promise<Gift | null> => {
@@ -527,21 +521,22 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
   const onGiftData = async (payload: unknown) => {
     const parsed = parseGiftMsg(payload);
     if (!parsed || parsed.from_user_id === myIdRef.current) return;
+    const full = parsed.gift_id ? await giftById(parsed.gift_id) : null;
+    // Everyone in the room: the gift in the receiver's tile and the giver's (whichever are shown).
+    if (full) playGiftInTiles(full, parsed.to_user_id, parsed.from_user_id);
     const mine = roleRef.current === "guest" && parsed.to_user_id === myIdRef.current;
     if (!mine && !(stripOwnerRef.current && parsed.to_user_id === stripOwnerRef.current)) return;
-    const full = parsed.gift_id ? await giftById(parsed.gift_id) : null;
     const isBurst = !!full && isTapTapGift(full);
     const msg = isBurst ? { ...parsed, count: parsed.coins ?? giftPrice(full) } : parsed;
-    if (isBurst) playBurst(full);
     if (roleRef.current === "guest" && msg.to_user_id === myIdRef.current) {
-      giftShow.popTile(msg.to_user_id, msg.icon_url ?? null);
+      if (!full) giftShow.popTile(msg.to_user_id, msg.icon_url ?? null);
       giftShow.showNote({ kind: "got", who: msg.from_name || "?", giftName: giftLabel(msg.gift_name, msg.count), icon: msg.icon_url ?? null });
       addLine(msg);
       sfx.reveal();
       haptic([30, 40, 30]);
       thankRef.current = msg;
     } else if (stripOwnerRef.current && msg.to_user_id === stripOwnerRef.current) {
-      giftShow.popTile(msg.to_user_id, msg.icon_url ?? null);
+      if (!full) giftShow.popTile(msg.to_user_id, msg.icon_url ?? null);
       addLine(msg);
     }
   };
@@ -566,8 +561,7 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
     const icon = info?.icon_url ?? (gift.image ? gift.image : null);
     const receiver = info?.receiver ?? grid.byId.get(toUserId) ?? null;
     const count = isTapTapGift(gift) ? info?.cb_gift?.coins ?? giftPrice(gift) : undefined;
-    if (count) playBurst(gift);
-    giftShow.popTile(toUserId, icon);
+    playGiftInTiles(gift, toUserId, myId || null);
     giftShow.showNote({ kind: "sent", who: handleOf(receiver), giftName: giftLabel(info?.gift_name ?? gift.name, count), icon });
     // Published only once the server confirmed the gift (GiftSheet calls onSent on status:true).
     if (info?.cb_gift) {
@@ -920,8 +914,7 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
               if (!isLoggedIn) { navigate("/login", { state: { from: location.pathname + location.search } }); return; }
               if (id !== myId) setGiftTarget(id);
             }}
-            attach={roomHook.attachVideo} hasVideo={roomHook.hasVideo} version={roomHook.version}
-            flash={flash} onFlashDone={() => setFlash(null)} />
+            attach={roomHook.attachVideo} hasVideo={roomHook.hasVideo} version={roomHook.version} />
         )}
       <ChatStrip messages={messages} onSend={onSend} inputRef={chatInputRef} translations={mt.mtLang ? mt.translations : undefined} dictated={dictated}
         note={giftShow.note && <GiftNote key={giftShow.note.key} note={giftShow.note} onThank={onThank} onClose={giftShow.closeNote} />} />
@@ -976,7 +969,6 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
           onPick={(code) => { mt.pick(code); setMtOpen(false); }} onClose={() => setMtOpen(false)} />
       )}
       <BinggBonusOverlay />
-      {burst && <TapTapBurst key={burst.key} gift={burst.gift} />}
       {/* Catch the Fish (Steve, 2026-11-07): a viewer's fish is a gift to the battler whose room
           they came in through (their home battler's own live room), never a battle gift. */}
       <LiveFishOverlay streamerId={fishStreamer} roomName={homeRow?.chat_room_name ?? ""}
@@ -984,7 +976,7 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
       {giftTarget != null && (
         <GiftSheet
           onClose={() => setGiftTarget(null)}
-          onSent={(gift) => { if (!isTapTapGift(gift)) setFlash({ userId: giftTarget, gift }); onGiftSent(giftTarget, gift); beat(); }}
+          onSent={(gift) => { onGiftSent(giftTarget, gift); beat(); }}
           sendOverride={async (_coins, gift) => {
             const res = await source.sendGift({ myId, toUserId: giftTarget, giftId: gift.id, roomName: giftRoom });
             lastGiftRef.current = source.giftInfo(res);

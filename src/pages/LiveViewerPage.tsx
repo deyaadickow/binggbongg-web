@@ -6,6 +6,8 @@ import { LiveSwipeNav } from "../components/LiveSwipe";
 import { swipeStateOf } from "../lib/liveSwipe";
 import { displayName, giftPrice, mediaUrl, post, type Gift, type UserSummary } from "../lib/api";
 import { TapTapBurst, isTapTapGift, tapTapBurstDuration } from "../components/TapTapBurst";
+import { TileGiftLayer } from "../components/TileGiftLayer";
+import { playGiftInTiles, playedRecently } from "../lib/tileGiftFx";
 import { useSession } from "../lib/session";
 import { memberLabel, trackPage } from "../lib/pageTracker";
 import { chatChannel, ensureFirebaseSignIn, observeChat, observeLiveCaption, sendChat, type ChatMessage } from "../lib/firebase";
@@ -191,10 +193,30 @@ export function LiveViewerPage() {
   const seenGiftEffectSentAtRef = useRef<number>(Date.now());
   const [giftEffectQueue, setGiftEffectQueue] = useState<GiftEffect[]>([]);
   const [giftEffect, setGiftEffect] = useState<GiftEffect | null>(null);
+  // Steve, 2026-11-23: "it is not suppose to show on the entire phone screen." With two or more
+  // people on camera a gift plays only in the giver's and the receiver's tiles (bb_gift_fx, see
+  // lib/tileGiftFx). Set each render from the tile count further down.
+  const multiTileRef = useRef(false);
+  const backstopTimers = useRef<number[]>([]);
+  useEffect(() => () => { backstopTimers.current.forEach((t) => window.clearTimeout(t)); }, []);
   useEffect(() => {
     const fresh = messages.filter((m) => m.senderUserId < 0 && m.sentAt > seenGiftEffectSentAtRef.current);
     if (fresh.length === 0) return;
     seenGiftEffectSentAtRef.current = Math.max(...fresh.map((m) => m.sentAt));
+    if (multiTileRef.current) {
+      // No full-screen effect. This chat is the HOST's channel, so the host is the receiver. Wait
+      // for the giver's bb_gift_fx; a giver on an older app sends none, so if nothing played this
+      // gift on the host's tile within 8 s, play it there (receiver's tile only).
+      for (const m of fresh) {
+        const gift = gifts.find((g) => Number(g.id) === -m.senderUserId);
+        if (!gift || !hostUserId) continue;
+        const t = window.setTimeout(() => {
+          if (!playedRecently(hostUserId, Number(gift.id))) playGiftInTiles(gift, hostUserId, null);
+        }, 2500);
+        backstopTimers.current.push(t);
+      }
+      return;
+    }
     setGiftEffectQueue((q) => [...q, ...fresh.map((m) => ({
       key: `${m.id}-${m.sentAt}`,
       // A gift chat line carries its gift as a NEGATIVE sender id — see postGiftMessage on the phones.
@@ -1147,6 +1169,12 @@ export function LiveViewerPage() {
       // phones' (it is shared by everyone in the room) and keeps " sent a " for the TTS reader.
       const kind = giftKindKey(paidWithOf(res));
       const kindEn = kind === "gift_pbbs" ? " (FBBs gift)" : kind === "gift_bbs" ? " (BBs gift)" : "";
+      // Two or more on camera: the gift plays in the receiver's tile and mine (if I am on camera),
+      // and everyone else in the room is told to do the same (Steve, 2026-11-23).
+      if (!virtualGiftTarget && multiTileRef.current) {
+        playGiftInTiles(gift, giftTarget, user.id);
+        live.sendGiftFx({ from_user_id: user.id, to_user_id: giftTarget, gift_id: Number(gift.id) });
+      }
       if (!virtualGiftTarget) {
         void sendChat(chatChannel(roomName, giftTarget), -gift.id, "", `${displayName(user)} sent a ${gift.name ?? "gift"}!${kindEn}`, user.profile_image ?? "").catch(() => {});
       }
@@ -1351,6 +1379,16 @@ export function LiveViewerPage() {
     : null;
   const showTopStrip = mlRunning || otherBattleSecs !== null || !!boxing;
   const orderedTiles = [...live.tiles].sort((a, b) => (a.userId === hostUserId ? -1 : b.userId === hostUserId ? 1 : 0));
+  // How many people are on camera: the 24-member grid's seats, else the 2–4 tiles. A solo live
+  // (one) keeps its full-screen gifts exactly as before.
+  multiTileRef.current = (mlBig && ml ? ml.members.length : orderedTiles.length) >= 2;
+  // A gift somebody else sent in a multi-person room: play it in the to-tile and the from-tile.
+  useEffect(() => {
+    const fx = live.incomingGiftFx;
+    if (!fx || fx.from_user_id === myId || !multiTileRef.current) return;
+    const gift = gifts.find((g) => Number(g.id) === fx.gift_id);
+    if (gift) playGiftInTiles(gift, fx.to_user_id, fx.from_user_id);
+  }, [live.incomingGiftFx?.seq]); // eslint-disable-line react-hooks/exhaustive-deps
   const statusLabel = roomClosed || live.status === "ended" ? "ENDED" : live.status === "live" ? "● LIVE" : live.status === "error" ? "ERROR" : "CONNECTING";
 
 
@@ -2921,6 +2959,8 @@ function VideoTile({ tile, label, user, watchers, onWatchers, soundOff, onSpeake
           <div style={{ transform: "scale(2.2)" }}><Avatar user={user ?? { fullname: label }} size="lg" /></div>
         </div>
       )}
+      {/* A gift for (or from) this member plays in here, not over the room (2026-11-23). */}
+      <TileGiftLayer uid={tile.userId} />
       <span className="name">{label || "Guest"}{tile.audioOnly ? " · 🎙" : tile.muted ? " · camera off" : ""}</span>
       {/* A double click on the grid sends a heart; one on these buttons must not. */}
       <div className="tile-acts" onDoubleClick={(e) => e.stopPropagation()}>

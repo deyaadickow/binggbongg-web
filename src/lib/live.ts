@@ -12,6 +12,7 @@ const ML_STATE_TOPIC = "ml_state";
 
 import { ConnectionState, Room, RoomEvent, Track, type LocalAudioTrack, type LocalTrackPublication, type LocalVideoTrack, type RemoteParticipant, type RemoteTrack, type Participant } from "livekit-client";
 import { tokenServer } from "./api";
+import { GIFT_FX_TOPIC, parseGiftFx, type GiftFxMsg } from "./tileGiftFx";
 
 export type LiveRole = "viewer" | "guest" | "host";
 export type LiveStatus = "idle" | "connecting" | "live" | "ended" | "error";
@@ -58,6 +59,10 @@ export function useLiveRoom(roomName: string, role: LiveRole, enabled: boolean, 
   // one event.
   const [incomingHeart, setIncomingHeart] = useState<{ identity: string; seq: number } | null>(null);
   const heartSeq = useRef(0);
+  // Steve, 2026-11-23: a gift plays only in the giver's and the receiver's tiles. A `bb_gift_fx`
+  // somebody published, with a seq so two of the same gift in a row are two.
+  const [incomingGiftFx, setIncomingGiftFx] = useState<(GiftFxMsg & { seq: number }) | null>(null);
+  const giftFxSeq = useRef(0);
   const [status, setStatus] = useState<LiveStatus>("idle");
   const [error, setError] = useState<string | null>(null);
   const [tiles, setTiles] = useState<LiveTile[]>([]);
@@ -144,6 +149,13 @@ export function useLiveRoom(roomName: string, role: LiveRole, enabled: boolean, 
           try { const j = JSON.parse(new TextDecoder().decode(payload)); if (typeof j?.v === "number") v = j.v; } catch { /* still a poke */ }
           mlSeq.current += 1;
           setMlSignal({ v, seq: mlSeq.current });
+          return;
+        }
+        if (topic === GIFT_FX_TOPIC) {
+          const fx = parseGiftFx(payload);
+          if (!fx) return;
+          giftFxSeq.current += 1;
+          setIncomingGiftFx({ ...fx, seq: giftFxSeq.current });
           return;
         }
         if (topic !== HEART_TOPIC) return;
@@ -300,6 +312,17 @@ export function useLiveRoom(roomName: string, role: LiveRole, enabled: boolean, 
       .catch(() => { /* best-effort, same as the phones */ });
   }, []);
 
+  /// Steve, 2026-11-23: "it is only suppose to show on steve's screen because he gave the gift and
+  /// also on eddie's screen because he is the receiver". Reliable (a gift is paid for, unlike a
+  /// heart), JSON {"from_user_id","to_user_id","gift_id"} — the phones' exact shape.
+  const sendGiftFx = useCallback((msg: GiftFxMsg) => {
+    const room = roomRef.current;
+    if (!room) return;
+    room.localParticipant
+      .publishData(new TextEncoder().encode(JSON.stringify(msg)), { reliable: true, topic: GIFT_FX_TOPIC })
+      .catch(() => { /* the receiver's Firestore gift line is the backstop */ });
+  }, []);
+
   /// Steve, 2026-11-03: the watch-time timer in the watchers list. When each member joined THIS
   /// room, as user id -> epoch ms, read from LiveKit's own `participant.joinedAt` (set by the SFU,
   /// so every client agrees on it). A getter rather than state: the open list reads it once per
@@ -331,5 +354,5 @@ export function useLiveRoom(roomName: string, role: LiveRole, enabled: boolean, 
     };
   }, []);
 
-  return { status, error, publishError, tiles, cameraOn, micOn, grantedRole, toggleCamera, toggleMic, flipCamera, disconnect, sendHeart, incomingHeart, joinTimes, mlSignal, localTracks };
+  return { status, error, publishError, tiles, cameraOn, micOn, grantedRole, toggleCamera, toggleMic, flipCamera, disconnect, sendHeart, incomingHeart, sendGiftFx, incomingGiftFx, joinTimes, mlSignal, localTracks };
 }

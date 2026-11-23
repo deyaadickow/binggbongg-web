@@ -9,6 +9,7 @@
 // the account owner/the host. and even the host can show on some one else's screen."
 // "add a small gift box to fit each tile for sending gifts."
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { TileGiftLayer } from "./TileGiftLayer";
 import { initials, mediaUrl, type Gift } from "../lib/api";
 import { useT } from "../lib/i18n";
 import { GiftFlash } from "./GiftSheet";
@@ -112,6 +113,8 @@ function CbTile({ tile, listening, onTap, onGift, attach, hasVideo, version, spa
         ? <img className="cb-photo" src={photo} alt="" loading="lazy" onError={(e) => ((e.target as HTMLImageElement).style.display = "none")} />
         : <div className="cb-ph" style={{ background: tileBackdrop(tile.userId) }}><i>{initials(tile.name || "?")}</i></div>}
       {hasVideo && <video ref={videoRef} autoPlay playsInline muted />}
+      {/* Steve, 2026-11-23: a gift plays only in the giver's and the receiver's tiles. */}
+      <TileGiftLayer uid={tile.userId} />
       {tile.starred && <span className="cb-star" aria-hidden>★</span>}
       {listening && <span className="cb-ear" aria-hidden>🔊</span>}
       {tile.muted && !tile.own && <span className="cb-muted" aria-hidden>🔇</span>}

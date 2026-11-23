@@ -8,6 +8,7 @@
 //
 // Mirrors Android's view/livestream/MultiLiveRoom.kt (same words, same taps).
 import { useEffect, useMemo, useRef, useState } from "react";
+import { TileGiftLayer } from "./TileGiftLayer";
 import { initials, mediaUrl } from "../lib/api";
 import { useT } from "../lib/i18n";
 import type { LiveTile } from "../lib/live";
@@ -53,6 +54,8 @@ function MlTile({ m, me, tile, onSpeaker, onTap, onGift, pulse, score, bombed }:
         ? <img className="cb-photo" src={photo} alt="" loading="lazy" onError={(e) => ((e.target as HTMLImageElement).style.display = "none")} />
         : <div className="cb-ph" style={{ background: tileBackdrop(m.user_id) }}><i>{initials(name || "?")}</i></div>}
       {hasVideo && <video ref={videoRef} autoPlay playsInline muted style={tile?.isLocal ? { transform: "scaleX(-1)" } : undefined} />}
+      {/* A gift for (or from) this member plays in here, not over the room (2026-11-23). */}
+      <TileGiftLayer uid={m.user_id} />
       {/* Steve, 2026-11-06: "A small bomb will show in a corner of the tile for anyone that
           receives it for 40 seconds." Top-left; the score moves over beside it. */}
       {bombed && <span className="ml-bomb" aria-label="💣">💣</span>}
