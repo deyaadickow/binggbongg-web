@@ -1946,5 +1946,13 @@
  "cbp_battle_underway": "La batalla és en curs",
  "cb_members_battling": "Membres en batalla: {n}",
  "cb_nobody_yet": "Encara no hi ha ningú de {country} a la batalla. Les seves càmeres apareixen aquí tan bon punt surten en directe.",
- "cbd_join": "Uneix-te"
+ "cbd_join": "Uneix-te",
+ "from_q_title": "D'on ets?",
+ "from_q_sub": "Pots competir pel país on vius i pel país d'on ets.",
+ "from_same": "El mateix on visc",
+ "from_not_now": "Ara no",
+ "from_row": "País d'on ets",
+ "from_locked": "Ho podràs canviar el {date}",
+ "from_line_from": "De {country}",
+ "from_line_lives": "Viu a {country}"
 }

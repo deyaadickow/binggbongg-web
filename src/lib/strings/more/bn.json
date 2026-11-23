@@ -1946,5 +1946,13 @@
  "cbp_battle_underway": "যুদ্ধ চলছে",
  "cb_members_battling": "লড়াইরত সদস্য: {n}",
  "cb_nobody_yet": "{country} থেকে এখনও কেউ লড়ছে না। লাইভে আসার সঙ্গে সঙ্গে তাদের ক্যামেরা এখানে দেখা যাবে।",
- "cbd_join": "যোগ দিন"
+ "cbd_join": "যোগ দিন",
+ "from_q_title": "তুমি কোথা থেকে এসেছ?",
+ "from_q_sub": "তুমি যে দেশে থাকো এবং যে দেশ থেকে এসেছ, দুই দেশের হয়েই লড়তে পারো।",
+ "from_same": "যেখানে থাকি সেটাই",
+ "from_not_now": "এখন না",
+ "from_row": "তোমার নিজের দেশ",
+ "from_locked": "তুমি এটি {date} তারিখে বদলাতে পারবে",
+ "from_line_from": "{country} থেকে",
+ "from_line_lives": "{country}-এ থাকেন"
 }

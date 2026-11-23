@@ -1947,5 +1947,13 @@
  "cbp_battle_underway": "Битка је у току",
  "cb_members_battling": "Чланови у борби: {n}",
  "cb_nobody_yet": "Још нико из {country} се не бори. Њихове камере ће се појавити овде чим почну уживо.",
- "cbd_join": "Придружи се"
+ "cbd_join": "Придружи се",
+ "from_q_title": "Одакле си?",
+ "from_q_sub": "Можеш да се бориш за земљу у којој живиш и за земљу из које потичеш.",
+ "from_same": "Иста као она у којој живим",
+ "from_not_now": "Не сада",
+ "from_row": "Земља из које потичеш",
+ "from_locked": "Ово можеш да промениш {date}",
+ "from_line_from": "Из: {country}",
+ "from_line_lives": "Живи у: {country}"
 }

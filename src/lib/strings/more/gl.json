@@ -1943,5 +1943,13 @@
  "cbp_battle_underway": "A batalla está en curso",
  "cb_members_battling": "Membros en batalla: {n}",
  "cb_nobody_yet": "Aínda non hai ninguén de {country} na batalla. As súas cámaras aparecen aquí en canto saian en directo.",
- "cbd_join": "Unirse"
+ "cbd_join": "Unirse",
+ "from_q_title": "De onde es?",
+ "from_q_sub": "Podes competir polo país onde vives e polo país de onde es.",
+ "from_same": "O mesmo onde vivo",
+ "from_not_now": "Agora non",
+ "from_row": "País de onde es",
+ "from_locked": "Poderás cambialo o {date}",
+ "from_line_from": "De {country}",
+ "from_line_lives": "Vive en {country}"
 }

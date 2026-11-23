@@ -1940,5 +1940,13 @@
  "cbp_battle_underway": "A csata folyamatban van",
  "cb_members_battling": "Harcoló tagok: {n}",
  "cb_nobody_yet": "Még senki sem küzd innen: {country}. A kamerájuk itt jelenik meg, amint élőben adnak.",
- "cbd_join": "Csatlakozás"
+ "cbd_join": "Csatlakozás",
+ "from_q_title": "Honnan származol?",
+ "from_q_sub": "Harcolhatsz azért az országért, ahol élsz, és azért is, ahonnan származol.",
+ "from_same": "Ugyanaz, ahol élek",
+ "from_not_now": "Most nem",
+ "from_row": "Ország, ahonnan származol",
+ "from_locked": "Ezt {date} napon módosíthatod",
+ "from_line_from": "Származás: {country}",
+ "from_line_lives": "Lakhely: {country}"
 }

@@ -1942,5 +1942,13 @@
  "cbp_battle_underway": "Lupta este în desfășurare",
  "cb_members_battling": "Membri în luptă: {n}",
  "cb_nobody_yet": "Nimeni din {country} nu luptă încă. Camerele lor apar aici imediat ce intră live.",
- "cbd_join": "Alătură-te"
+ "cbd_join": "Alătură-te",
+ "from_q_title": "De unde ești?",
+ "from_q_sub": "Poți lupta pentru țara în care locuiești și pentru țara din care vii.",
+ "from_same": "Aceeași cu cea în care locuiesc",
+ "from_not_now": "Nu acum",
+ "from_row": "Țara din care vii",
+ "from_locked": "Poți schimba asta pe {date}",
+ "from_line_from": "Din {country}",
+ "from_line_lives": "Locuiește în {country}"
 }

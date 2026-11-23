@@ -1944,5 +1944,13 @@
  "cbp_battle_underway": "Bardaginn er í gangi",
  "cb_members_battling": "Meðlimir í keppni: {n}",
  "cb_nobody_yet": "Enginn frá {country} keppir enn. Myndavélar þeirra birtast hér um leið og þau fara í beina útsendingu.",
- "cbd_join": "Taka þátt"
+ "cbd_join": "Taka þátt",
+ "from_q_title": "Hvaðan ertu?",
+ "from_q_sub": "Þú getur keppt fyrir landið sem þú býrð í og landið sem þú ert frá.",
+ "from_same": "Sama og þar sem ég bý",
+ "from_not_now": "Ekki núna",
+ "from_row": "Landið sem þú ert frá",
+ "from_locked": "Þú getur breytt þessu {date}",
+ "from_line_from": "Frá {country}",
+ "from_line_lives": "Býr í {country}"
 }

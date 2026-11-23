@@ -1947,5 +1947,13 @@
  "cbp_battle_underway": "Le combat est en cours",
  "cb_members_battling": "Membres en bataille : {n}",
  "cb_nobody_yet": "Personne de {country} ne participe encore à la bataille. Leurs caméras apparaissent ici dès qu'ils passent en direct.",
- "cbd_join": "Rejoindre"
+ "cbd_join": "Rejoindre",
+ "from_q_title": "D'où viens-tu ?",
+ "from_q_sub": "Tu peux combattre pour le pays où tu vis et pour le pays d'où tu viens.",
+ "from_same": "Le même que là où je vis",
+ "from_not_now": "Pas maintenant",
+ "from_row": "Pays d'origine",
+ "from_locked": "Tu pourras le changer le {date}",
+ "from_line_from": "Originaire de {country}",
+ "from_line_lives": "Vit en {country}"
 }

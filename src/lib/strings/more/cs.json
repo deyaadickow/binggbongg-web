@@ -1946,5 +1946,13 @@
  "cbp_battle_underway": "Bitva právě probíhá",
  "cb_members_battling": "Členové v bitvě: {n}",
  "cb_nobody_yet": "Zatím nikdo z {country} nebojuje. Jejich kamery se tu objeví, jakmile začnou vysílat živě.",
- "cbd_join": "Připojit se"
+ "cbd_join": "Připojit se",
+ "from_q_title": "Odkud jsi?",
+ "from_q_sub": "Můžeš bojovat za zemi, kde žiješ, i za zemi, odkud pocházíš.",
+ "from_same": "Stejná jako ta, kde žiju",
+ "from_not_now": "Teď ne",
+ "from_row": "Země, odkud pocházíš",
+ "from_locked": "Změnit to můžeš {date}",
+ "from_line_from": "Z: {country}",
+ "from_line_lives": "Žije v: {country}"
 }

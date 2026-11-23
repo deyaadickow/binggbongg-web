@@ -482,6 +482,9 @@ export interface CbJoinNow {
   /** Every country running a battle, for the banner's dropdown (Steve, 2026-11-21). */
   countries: { country: string; country_adjective: string; live?: boolean; starts_at?: string | null; ends_at?: string | null }[];
   my_country: string | null;
+  /** Both countries the member battles for — where they live and where they're from (2026-11-23).
+   *  Missing on an older server: then the single my_country / profile country rule. */
+  my_countries?: string[];
 }
 
 // The banner's dropdown (Steve, 2026-11-21) used to SAVE the chosen country on the button forever: a
@@ -507,6 +510,7 @@ export async function fetchCountryBattleJoinNow(userId: number): Promise<CbJoinN
     country_adjective: d.country_adjective || d.country || "",
     countries: Array.isArray(d.countries) ? d.countries.filter((c) => c && c.country) : [],
     my_country: d.my_country || null,
+    my_countries: Array.isArray(d.my_countries) ? d.my_countries.filter((c) => typeof c === "string" && !!c) : undefined,
   };
 }
 

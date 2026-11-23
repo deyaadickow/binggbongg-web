@@ -1944,5 +1944,13 @@
  "cbp_battle_underway": "Kova vyksta",
  "cb_members_battling": "Kovojantys nariai: {n}",
  "cb_nobody_yet": "Dar niekas iš {country} nekovoja. Jų kameros pasirodys čia, vos tik jie pradės tiesioginę transliaciją.",
- "cbd_join": "Prisijungti"
+ "cbd_join": "Prisijungti",
+ "from_q_title": "Iš kur esi?",
+ "from_q_sub": "Gali kovoti už šalį, kurioje gyveni, ir už šalį, iš kurios esi kilęs.",
+ "from_same": "Ta pati, kur gyvenu",
+ "from_not_now": "Ne dabar",
+ "from_row": "Šalis, iš kurios esi",
+ "from_locked": "Tai pakeisti galėsi {date}",
+ "from_line_from": "Kilęs iš: {country}",
+ "from_line_lives": "Gyvena: {country}"
 }

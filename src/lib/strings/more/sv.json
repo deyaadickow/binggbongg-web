@@ -1945,5 +1945,13 @@
  "cbp_battle_underway": "Battlet pågår",
  "cb_members_battling": "Medlemmar i strid: {n}",
  "cb_nobody_yet": "Ingen från {country} tävlar ännu. Deras kameror visas här så snart de går live.",
- "cbd_join": "Gå med"
+ "cbd_join": "Gå med",
+ "from_q_title": "Var kommer du ifrån?",
+ "from_q_sub": "Du kan tävla för landet du bor i och landet du kommer ifrån.",
+ "from_same": "Samma som där jag bor",
+ "from_not_now": "Inte nu",
+ "from_row": "Landet du kommer ifrån",
+ "from_locked": "Du kan ändra detta den {date}",
+ "from_line_from": "Från {country}",
+ "from_line_lives": "Bor i {country}"
 }

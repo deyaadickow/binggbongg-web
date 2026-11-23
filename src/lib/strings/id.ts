@@ -2676,4 +2676,13 @@ export const id = {
   fblurb_live_vote: "Host bertanya dengan tombol jawaban. Setiap ketukan adalah satu suara, dan BBs-nya untuk host.",
   fx_live_vote_what: "Host bertanya ke room dan menambahkan tombol jawaban sebanyak yang dia mau. Semua penonton mengetuk jawaban untuk memilih. Setiap ketukan adalah 1 suara dan seharga BBs yang dipilih host, yang masuk ke host sebagai hadiah. Host yang menentukan apakah suara terlihat di tombol.",
   fx_live_vote_how: "Mulai live, buka menu battle, pilih Voting Live, ketik pertanyaan dan jawabanmu, pilih BBs per suara lalu tekan Mulai. Sedang menonton? Ketuk saja jawabannya.",
+  // Country you're from (2026-11-23)
+  from_q_title: "Kamu berasal dari mana?",
+  from_q_sub: "Kamu bisa bertanding untuk negara tempat tinggalmu dan negara asalmu.",
+  from_same: "Sama dengan tempat tinggalku",
+  from_not_now: "Nanti saja",
+  from_row: "Negara asalmu",
+  from_locked: "Kamu bisa mengubah ini pada {date}",
+  from_line_from: "Dari {country}",
+  from_line_lives: "Tinggal di {country}",
 };

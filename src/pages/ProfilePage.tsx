@@ -31,6 +31,7 @@ import { playlistsFor, socialCall, socialUser, type PlaylistRow } from "../lib/s
 import { LockBadge, SubscribeButton } from "../components/Creators";
 import { SeriesGrid } from "./CreatorPages";
 import { devCreatorDecorate, fetchUserSeries, type Series } from "../lib/creators";
+import { FromCountryLine, FromCountryRow } from "../components/FromCountry";
 
 interface ProfileUser extends UserSummary {
   /** Gold Digger (2026-11-17): every month this member finished in the top 3, newest first.
@@ -764,6 +765,10 @@ export function ProfilePage() {
                   straight on the page. */}
               {/* Country Battle v2 daily badges — 1st gold, 2nd silver, 3rd bronze, newest first, each
                   opening that day's top 100; the lifetime counts beside them. */}
+              {/* "🇵🇭 From Philippines · 🇺🇸 Lives in United States" (Steve, 2026-11-23) — when they're from somewhere else. */}
+              <FromCountryLine country={profile.country} fromCountry={profile.from_country} />
+              {/* My own "Country you're from" row: battle for both countries. Hidden until the server answers. */}
+              {isMe && <div className="card" style={{ marginTop: 8 }}><FromCountryRow /></div>}
               <CountryBattleBadges badges={profile.country_battle_badges} counts={profile.country_battle_badge_counts} />
               {profile.bio && (
                 <p className="gold-plate" style={{ marginTop: 6, fontSize: 13, lineHeight: 1.4 }}>{profile.bio}</p>

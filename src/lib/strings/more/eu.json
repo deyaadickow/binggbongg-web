@@ -1947,5 +1947,13 @@
  "cbp_battle_underway": "Borroka martxan dago",
  "cb_members_battling": "Borrokan dauden kideak: {n}",
  "cb_nobody_yet": "Oraindik ez dago {country}ko inor borrokan. Haien kamerak hemen agertuko dira zuzenean hasi bezain laster.",
- "cbd_join": "Batu"
+ "cbd_join": "Batu",
+ "from_q_title": "Nongoa zara?",
+ "from_q_sub": "Bizi zaren herrialdearen eta jatorrizko herrialdearen alde borroka dezakezu.",
+ "from_same": "Bizi naizen bera",
+ "from_not_now": "Orain ez",
+ "from_row": "Zure jatorrizko herrialdea",
+ "from_locked": "Hau {date} egunean alda dezakezu",
+ "from_line_from": "Jatorria: {country}",
+ "from_line_lives": "Bizilekua: {country}"
 }

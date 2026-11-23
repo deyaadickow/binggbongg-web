@@ -18,6 +18,7 @@ import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { useT } from "../lib/i18n";
 import { countryFlag } from "../lib/allCountryBattles";
+import { myBattleCountries, sameCountry } from "../lib/fromCountry";
 import {
   cbText, countryBattlePath, joinNowParts, refreshCountryBattleJoinNow, useCountryBattleJoinNow, useTick,
   type CbJoinNow,
@@ -122,6 +123,8 @@ function CountryBattlePicker({ d, now }: { d: CbJoinNow; now: number }) {
   const [q, setQ] = useState("");
   const list = d.countries.length ? d.countries : [{ country: d.country, country_adjective: d.country_adjective }];
   const shown = q.trim() ? list.filter((c) => c.country.toLowerCase().includes(q.trim().toLowerCase())) : list;
+  // Both of my countries are marked (where I live and where I'm from, 2026-11-23); an older server: the banner's one.
+  const mine = myBattleCountries(d.my_countries, d.country);
   useEffect(() => {
     if (!open) return;
     const k = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
@@ -150,7 +153,7 @@ function CountryBattlePicker({ d, now }: { d: CbJoinNow; now: number }) {
                 const at = Date.parse(c.starts_at ?? "");
                 const left = Number.isNaN(at) ? NaN : at - now;
                 return (
-                  <button type="button" key={c.country} className={`cbp-row${c.country === d.country ? " on" : ""}`}
+                  <button type="button" key={c.country} className={`cbp-row${mine.some((m) => sameCountry(m, c.country)) ? " on" : ""}`}
                     onClick={() => { setOpen(false); navigate(`/country-battle?country=${encodeURIComponent(c.country)}`); }}>
                     <span className="cbp-rank">#{rank}</span>
                     <span className="cbp-flag" aria-hidden>{countryFlag(c.country)}</span>

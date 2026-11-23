@@ -2839,4 +2839,13 @@ export const fil = {
   fblurb_live_vote: "Nagtatanong ang host na may mga sagot na button. Bawat tap ay isang boto, at ang BBs nito ay sa host.",
   fx_live_vote_what: "Nagtatanong ang host sa room at nagdadagdag ng kahit ilang sagot na button. Ang lahat ng nanonood ay nagta-tap ng sagot para bumoto. Bawat tap ay 1 boto at nagkakahalaga ng BBs na pinili ng host, na mapupunta sa host bilang regalo. Ang host ang magpapasya kung makikita ang mga boto sa mga button.",
   fx_live_vote_how: "Mag-live, buksan ang battle menu, piliin ang Live na Botohan, i-type ang tanong at mga sagot, piliin ang BBs bawat boto at pindutin ang Simulan. Nanonood ka? I-tap lang ang sagot.",
+  // Country you're from (2026-11-23)
+  from_q_title: "Taga-saan ka?",
+  from_q_sub: "Puwede kang lumaban para sa bansang tinitirhan mo at sa bansang pinagmulan mo.",
+  from_same: "Pareho sa tinitirhan ko",
+  from_not_now: "Hindi muna",
+  from_row: "Bansang pinagmulan mo",
+  from_locked: "Mapapalitan mo ito sa {date}",
+  from_line_from: "Taga-{country}",
+  from_line_lives: "Nakatira sa {country}",
 };

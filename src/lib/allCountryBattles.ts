@@ -119,7 +119,8 @@ export function countryFlag(name: string): string {
         for (let b = 65; b <= 90; b++) {
           const code = String.fromCharCode(a, b);
           const n = dn.of(code);
-          if (n && n !== code) nameToCode.set(n.toLowerCase(), code);
+          // First code wins: "United Kingdom" is GB, not the reserved UK that comes later (no flag).
+          if (n && n !== code && !nameToCode.has(n.toLowerCase())) nameToCode.set(n.toLowerCase(), code);
         }
       }
     } catch { /* no Intl.DisplayNames: aliases only */ }

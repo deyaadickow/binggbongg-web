@@ -1943,5 +1943,13 @@
  "cbp_battle_underway": "Cīņa notiek",
  "cb_members_battling": "Cīņā esošie dalībnieki: {n}",
  "cb_nobody_yet": "Vēl neviens no {country} necīnās. Viņu kameras parādīsies šeit, tiklīdz viņi sāks tiešraidi.",
- "cbd_join": "Pievienoties"
+ "cbd_join": "Pievienoties",
+ "from_q_title": "No kurienes tu esi?",
+ "from_q_sub": "Tu vari cīnīties par valsti, kurā dzīvo, un par valsti, no kuras esi.",
+ "from_same": "Tā pati, kur dzīvoju",
+ "from_not_now": "Ne tagad",
+ "from_row": "Valsts, no kuras esi",
+ "from_locked": "To varēsi mainīt {date}",
+ "from_line_from": "No: {country}",
+ "from_line_lives": "Dzīvo: {country}"
 }

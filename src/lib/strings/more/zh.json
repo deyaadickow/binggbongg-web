@@ -1947,5 +1947,13 @@
  "cbp_battle_underway": "对战进行中",
  "cb_members_battling": "正在对战的成员：{n}",
  "cb_nobody_yet": "{country}还没有人参加对战。他们一开始直播，镜头就会出现在这里。",
- "cbd_join": "加入"
+ "cbd_join": "加入",
+ "from_q_title": "你来自哪里？",
+ "from_q_sub": "你可以为你居住的国家和你的家乡国家同时参战。",
+ "from_same": "与我居住的国家相同",
+ "from_not_now": "以后再说",
+ "from_row": "你的家乡国家",
+ "from_locked": "你可以在{date}更改",
+ "from_line_from": "来自{country}",
+ "from_line_lives": "居住在{country}"
 }

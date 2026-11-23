@@ -1944,5 +1944,13 @@
  "cbp_battle_underway": "Kampen pågår",
  "cb_members_battling": "Medlemmer i kamp: {n}",
  "cb_nobody_yet": "Ingen fra {country} kjemper ennå. Kameraene deres vises her så snart de går live.",
- "cbd_join": "Bli med"
+ "cbd_join": "Bli med",
+ "from_q_title": "Hvor kommer du fra?",
+ "from_q_sub": "Du kan kjempe for landet du bor i og landet du kommer fra.",
+ "from_same": "Samme som der jeg bor",
+ "from_not_now": "Ikke nå",
+ "from_row": "Landet du kommer fra",
+ "from_locked": "Du kan endre dette {date}",
+ "from_line_from": "Fra {country}",
+ "from_line_lives": "Bor i {country}"
 }

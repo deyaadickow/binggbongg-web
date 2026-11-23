@@ -1947,5 +1947,13 @@
  "cbp_battle_underway": "Savaş devam ediyor",
  "cb_members_battling": "Savaşan üyeler: {n}",
  "cb_nobody_yet": "{country} ülkesinden henüz kimse savaşmıyor. Canlı yayına geçtikleri anda kameraları burada görünür.",
- "cbd_join": "Katıl"
+ "cbd_join": "Katıl",
+ "from_q_title": "Nerelisin?",
+ "from_q_sub": "Yaşadığın ülke ve geldiğin ülke için savaşabilirsin.",
+ "from_same": "Yaşadığım yerle aynı",
+ "from_not_now": "Şimdi değil",
+ "from_row": "Geldiğin ülke",
+ "from_locked": "Bunu {date} tarihinde değiştirebilirsin",
+ "from_line_from": "{country} kökenli",
+ "from_line_lives": "{country} ülkesinde yaşıyor"
 }

@@ -10,6 +10,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { PageTitle } from "../components/PageTitle";
 import { Loading } from "../components/Common";
 import { hookLine, sayShareOutcome } from "../components/CountryBoardBits";
+import { FromCountryAsk } from "../components/FromCountry";
+import { myBattleCountries, sameCountry } from "../lib/fromCountry";
 import { useT, type StringKey } from "../lib/i18n";
 import { useSession } from "../lib/session";
 import { cbText, clock, countryBattlePath, useCountryBattleJoinNow, useTick, type CbJoinNow } from "../lib/countryBattle";
@@ -52,6 +54,9 @@ export function CountryBoardPage() {
   const jn = realJn ?? (demo && board ? demoBattles(board) : null);
   const share = board?.share ?? null;
   const signedOut = demo === "out" || (!demo && !isLoggedIn);
+  // Join on BOTH of my countries — where I live and where I'm from (Steve, 2026-11-23): the server's
+  // my_countries; an older server without it keeps the single-country rule (the board's own country).
+  const battleCountries = myBattleCountries(jn?.my_countries, me?.country);
 
   return (
     <div className="page cbd-page" style={{ maxWidth: 760 }}>
@@ -60,6 +65,7 @@ export function CountryBoardPage() {
       }>{t("cbd_title")}</PageTitle>
       <p className="cbd-sub">{t("cbd_subtitle")}</p>
       {demo && <div className="cbd-demo">🧪 {t("cbd_demo")}</div>}
+      {!signedOut && <FromCountryAsk />}
 
       {me && (
         <div className="cbd-mine">
@@ -103,6 +109,7 @@ export function CountryBoardPage() {
         <ol className="cbd-list">
           {board.countries.map((c) => {
             const mine = !!me && c.country === me.country;
+            const canJoin = !!me && battleCountries.some((x) => sameCountry(x, c.country));
             return (
               <li key={c.country} className={`cbd-row${mine ? " me" : ""}`}>
                 <span className="cbd-rank">#{c.rank}</span>
@@ -112,7 +119,7 @@ export function CountryBoardPage() {
                   <span className="cbd-members">{t("cbd_members", c.members.toLocaleString())}{c.new_members > 0 ? ` · ${t("cbd_new_members", c.new_members.toLocaleString())}` : ""}</span>
                 </span>
                 <b className="cbd-pts">{c.points.toLocaleString()}</b>
-                <BattleLine country={c.country} mine={mine} jn={jn} />
+                <BattleLine country={c.country} mine={canJoin} jn={jn} />
               </li>
             );
           })}
@@ -129,6 +136,7 @@ export function CountryBoardPage() {
  * game is under way. Please add 2 buttons, one will say "Watch" and the other will say "Join""):
  * "Starts in 12:34" or "Battle Is Underway · 3:15 left", Watch for every country, and Join only on
  * the member's own country (Steve: hide it elsewhere — only members of a country battle in it).
+ * "Own" is both countries since 2026-11-23: where they live and where they're from.
  */
 function BattleLine({ country, mine, jn }: { country: string; mine: boolean; jn: CbJoinNow | null }) {
   const { t } = useT();
@@ -143,7 +151,7 @@ function BattleLine({ country, mine, jn }: { country: string; mine: boolean; jn:
     ? t("cbp_battle_underway") + (Number.isNaN(ends) ? "" : " · " + cbText(t("cb_time_left"), { time: clock(ends - now) }))
     : Number.isNaN(starts) ? "" : cbText(t("cb_starts_in"), { time: clock(Math.max(0, starts - now)) });
   const page = `/country-battle?country=${encodeURIComponent(row.country)}`;
-  // My own country's battle: the join-now answer is about it (it is never another country now).
+  // The join-now answer is about ONE of my countries; the other's Join opens its page (the server's can_join there).
   const own = mine && jn && jn.country.toLowerCase() === row.country.toLowerCase() ? jn : null;
   const watch = () => navigate(own?.day_id && own.phase !== "upcoming" ? countryBattlePath(own.day_id) : page + "&watch=1");
   const join = () => navigate(own?.joinable && own.day_id ? countryBattlePath(own.day_id, { join: true }) : page);
@@ -166,6 +174,8 @@ function demoBattles(board: CountryBoard): CbJoinNow {
   return {
     show: true, joinable: true, phase: "battle", day_id: null, room_name: null, opens_at: null, starts_at: null, ends_at: null,
     country: mineName, country_adjective: mineName, every_hour: true, duration_minutes: 5, server_now: null, is_test: false, my_country: mineName,
+    // A sample second country (where I'm from), so the demo shows Join on two rows.
+    my_countries: [mineName, board.countries.find((c) => c.country !== mineName)?.country ?? ""].filter(Boolean),
     countries: board.countries.map((c, i) => i === 0
       ? { country: c.country, country_adjective: c.country, live: true, starts_at: null, ends_at: new Date(now + 195000).toISOString() }
       : { country: c.country, country_adjective: c.country, live: false, starts_at: next.toISOString(), ends_at: null }),

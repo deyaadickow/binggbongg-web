@@ -1947,5 +1947,13 @@
  "cbp_battle_underway": "배틀 진행 중",
  "cb_members_battling": "배틀 중인 멤버: {n}",
  "cb_nobody_yet": "아직 {country}에서 배틀 중인 멤버가 없습니다. 라이브를 시작하면 바로 여기에 카메라가 표시됩니다.",
- "cbd_join": "참여"
+ "cbd_join": "참여",
+ "from_q_title": "어디 출신이세요?",
+ "from_q_sub": "살고 있는 나라와 출신 나라 모두를 위해 배틀할 수 있어요.",
+ "from_same": "사는 곳과 같음",
+ "from_not_now": "나중에",
+ "from_row": "출신 나라",
+ "from_locked": "{date}에 변경할 수 있어요",
+ "from_line_from": "출신: {country}",
+ "from_line_lives": "거주: {country}"
 }

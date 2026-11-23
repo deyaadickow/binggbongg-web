@@ -1945,5 +1945,13 @@
  "cbp_battle_underway": "Die geveg is aan die gang",
  "cb_members_battling": "Lede wat veg: {n}",
  "cb_nobody_yet": "Niemand van {country} veg nog nie. Hulle kameras verskyn hier sodra hulle regstreeks gaan.",
- "cbd_join": "Sluit aan"
+ "cbd_join": "Sluit aan",
+ "from_q_title": "Waar kom jy vandaan?",
+ "from_q_sub": "Jy kan veg vir die land waar jy woon en die land waar jy vandaan kom.",
+ "from_same": "Dieselfde as waar ek woon",
+ "from_not_now": "Nie nou nie",
+ "from_row": "Land waar jy vandaan kom",
+ "from_locked": "Jy kan dit op {date} verander",
+ "from_line_from": "Van {country}",
+ "from_line_lives": "Woon in {country}"
 }

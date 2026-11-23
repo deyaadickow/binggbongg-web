@@ -1947,5 +1947,13 @@
  "cbp_battle_underway": "A batalha está em andamento",
  "cb_members_battling": "Membros na batalha: {n}",
  "cb_nobody_yet": "Ninguém de {country} está batalhando ainda. As câmeras deles aparecem aqui assim que entrarem ao vivo.",
- "cbd_join": "Entrar"
+ "cbd_join": "Entrar",
+ "from_q_title": "De onde você é?",
+ "from_q_sub": "Você pode batalhar pelo país onde mora e pelo país de onde você é.",
+ "from_same": "O mesmo onde eu moro",
+ "from_not_now": "Agora não",
+ "from_row": "País de onde você é",
+ "from_locked": "Você poderá mudar isso em {date}",
+ "from_line_from": "De {country}",
+ "from_line_lives": "Mora em {country}"
 }

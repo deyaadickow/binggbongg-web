@@ -19,6 +19,7 @@ import { Loading, Notice } from "../components/Common";
 import { TestBanner } from "../components/BattleGrid";
 import { CbPersonRow, CountryBattleReminderToggle, PlacePill } from "../components/CountryBattleBits";
 import { CountryHookBanner, ShareMyRowIcon } from "../components/CountryBoardBits";
+import { FromCountryAsk } from "../components/FromCountry";
 import { demoKind, type DemoKind } from "../lib/countryBoard";
 import { useSession } from "../lib/session";
 import { fetchFeatureVideos } from "../lib/featureVideos";
@@ -127,6 +128,7 @@ export function CountryBattlePage() {
       <PageTitle>{t("cb_title")}</PageTitle>
       {battle?.is_test && <TestBanner />}
       <CountryHookBanner demo={boardDemo} />
+      {isLoggedIn && <FromCountryAsk />}
 
       <div className="card pad" style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: 6, marginBottom: 12 }}>
         <span style={{ fontSize: 13, color: "var(--text-soft)", fontWeight: 700, letterSpacing: ".06em", textTransform: "uppercase" }}>{country}</span>

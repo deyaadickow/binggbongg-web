@@ -1944,5 +1944,13 @@
  "cbp_battle_underway": "Lahing on käimas",
  "cb_members_battling": "Lahingus liikmeid: {n}",
  "cb_nobody_yet": "Keegi riigist {country} ei võistle veel. Nende kaamerad ilmuvad siia kohe, kui nad otse-eetrisse lähevad.",
- "cbd_join": "Liitu"
+ "cbd_join": "Liitu",
+ "from_q_title": "Kust sa pärit oled?",
+ "from_q_sub": "Saad võistelda nii riigi eest, kus elad, kui ka riigi eest, kust oled pärit.",
+ "from_same": "Sama, kus ma elan",
+ "from_not_now": "Mitte praegu",
+ "from_row": "Riik, kust oled pärit",
+ "from_locked": "Saad seda muuta {date}",
+ "from_line_from": "Pärit: {country}",
+ "from_line_lives": "Elab: {country}"
 }

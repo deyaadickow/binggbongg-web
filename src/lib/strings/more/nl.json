@@ -1947,5 +1947,13 @@
  "cbp_battle_underway": "De battle is bezig",
  "cb_members_battling": "Leden in de strijd: {n}",
  "cb_nobody_yet": "Nog niemand uit {country} doet mee aan de battle. Hun camera's verschijnen hier zodra ze live gaan.",
- "cbd_join": "Meedoen"
+ "cbd_join": "Meedoen",
+ "from_q_title": "Waar kom je vandaan?",
+ "from_q_sub": "Je kunt strijden voor het land waar je woont en het land waar je vandaan komt.",
+ "from_same": "Hetzelfde als waar ik woon",
+ "from_not_now": "Niet nu",
+ "from_row": "Land waar je vandaan komt",
+ "from_locked": "Je kunt dit wijzigen op {date}",
+ "from_line_from": "Uit {country}",
+ "from_line_lives": "Woont in {country}"
 }

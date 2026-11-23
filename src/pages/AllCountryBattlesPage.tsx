@@ -14,6 +14,7 @@ import { useT } from "../lib/i18n";
 import { useSession } from "../lib/session";
 import { cbText, clock, countryBattlePath, localTime, useTick } from "../lib/countryBattle";
 import { countryFlag, fetchAllCountryBattles, type AcbBattle } from "../lib/allCountryBattles";
+import { FromCountryAsk } from "../components/FromCountry";
 
 type T = ReturnType<typeof useT>["t"];
 
@@ -136,6 +137,7 @@ export function AllCountryBattlesPage() {
   return (
     <div className="page acb-page" style={{ maxWidth: 760 }}>
       <PageTitle>{t("acb_tab")}</PageTitle>
+      {user && <FromCountryAsk />}
       <div style={{ position: "sticky", top: 0, zIndex: 2, background: "#000", padding: "4px 0 10px" }}>
         <input className="input" type="search" value={query} onChange={(e) => setQuery(e.target.value)}
           placeholder={t("acb_search")} aria-label={t("acb_search")} />

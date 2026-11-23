@@ -2640,4 +2640,13 @@ export const es = {
   fblurb_live_vote: "El anfitrión hace una pregunta con botones de respuesta. Cada toque es un voto y sus BBs van al anfitrión.",
   fx_live_vote_what: "El anfitrión le hace una pregunta a la sala y añade todos los botones de respuesta que quiera. Todos los que miran tocan una respuesta para votar. Cada toque es 1 voto y cuesta los BBs que eligió el anfitrión, que le llegan como regalo. El anfitrión decide si los votos se ven en los botones.",
   fx_live_vote_how: "Haz un directo, abre el menú de batallas, elige Votación en Vivo, escribe tu pregunta y respuestas, elige los BBs por voto y pulsa Empezar. ¿Estás mirando? Solo toca una respuesta.",
+  // Country you're from (2026-11-23)
+  from_q_title: "¿De dónde eres?",
+  from_q_sub: "Puedes competir por el país donde vives y por el país del que eres.",
+  from_same: "El mismo país donde vivo",
+  from_not_now: "Ahora no",
+  from_row: "País del que eres",
+  from_locked: "Podrás cambiarlo el {date}",
+  from_line_from: "De {country}",
+  from_line_lives: "Vive en {country}",
 };

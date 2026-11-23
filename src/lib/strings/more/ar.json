@@ -2245,5 +2245,13 @@
  "cbp_battle_underway": "المعركة جارية الآن",
  "cb_members_battling": "الأعضاء المتنافسون: {n}",
  "cb_nobody_yet": "لا أحد من {country} يتنافس بعد. ستظهر كاميراتهم هنا بمجرد أن يبدأوا البث المباشر.",
- "cbd_join": "انضم"
+ "cbd_join": "انضم",
+ "from_q_title": "من أين أنت؟",
+ "from_q_sub": "يمكنك المنافسة من أجل البلد الذي تعيش فيه والبلد الذي أتيت منه.",
+ "from_same": "نفس البلد الذي أعيش فيه",
+ "from_not_now": "ليس الآن",
+ "from_row": "البلد الذي أتيت منه",
+ "from_locked": "يمكنك تغيير هذا في {date}",
+ "from_line_from": "من {country}",
+ "from_line_lives": "يعيش في {country}"
 }

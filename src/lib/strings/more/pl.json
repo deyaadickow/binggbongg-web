@@ -1947,5 +1947,13 @@
  "cbp_battle_underway": "Bitwa trwa",
  "cb_members_battling": "Członkowie w bitwie: {n}",
  "cb_nobody_yet": "Nikt z {country} jeszcze nie walczy. Ich kamery pojawią się tutaj, gdy tylko zaczną transmisję na żywo.",
- "cbd_join": "Dołącz"
+ "cbd_join": "Dołącz",
+ "from_q_title": "Skąd pochodzisz?",
+ "from_q_sub": "Możesz walczyć za kraj, w którym mieszkasz, i za kraj, z którego pochodzisz.",
+ "from_same": "Ten sam, w którym mieszkam",
+ "from_not_now": "Nie teraz",
+ "from_row": "Kraj pochodzenia",
+ "from_locked": "Możesz to zmienić {date}",
+ "from_line_from": "Pochodzi z: {country}",
+ "from_line_lives": "Mieszka w: {country}"
 }

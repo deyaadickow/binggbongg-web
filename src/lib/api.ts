@@ -194,6 +194,8 @@ export interface UserSummary {
   local_timezone?: string;
   bio?: string;
   country?: string;
+  /** "Country you're from" (2026-11-23): null/missing = the same as where they live. */
+  from_country?: string | null;
   total_followers?: number;
   total_followings?: number;
   total_likes?: number;

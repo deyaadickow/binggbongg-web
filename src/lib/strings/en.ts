@@ -3623,4 +3623,13 @@ export const en = {
   fblurb_live_vote: "The host asks a question with answer buttons. Every tap is a vote, and its BBs go to the host.",
   fx_live_vote_what: "The host asks the room a question and adds as many answer buttons as they like. Everyone watching taps an answer to vote. Every tap is 1 vote and costs the BBs the host chose, which go to the host as a gift. The host decides if the votes show on the buttons.",
   fx_live_vote_how: "Go live, open the battle menu, choose Live Vote, type your question and answers, pick the BBs for each vote and press Start. Watching? Just tap an answer.",
+  // Country you're from (2026-11-23)
+  from_q_title: "Where are you from?",
+  from_q_sub: "You can battle for the country you live in and the country you're from.",
+  from_same: "Same as where I live",
+  from_not_now: "Not now",
+  from_row: "Country you're from",
+  from_locked: "You can change this on {date}",
+  from_line_from: "From {country}",
+  from_line_lives: "Lives in {country}",
 } as const;

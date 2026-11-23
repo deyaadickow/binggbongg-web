@@ -1943,5 +1943,13 @@
  "cbp_battle_underway": "הקרב מתקיים עכשיו",
  "cb_members_battling": "חברים בקרב: {n}",
  "cb_nobody_yet": "עדיין אף אחד מ{country} לא נלחם. המצלמות שלהם יופיעו כאן ברגע שיעלו לשידור חי.",
- "cbd_join": "הצטרפות"
+ "cbd_join": "הצטרפות",
+ "from_q_title": "מאיפה אתה?",
+ "from_q_sub": "אפשר להילחם בשביל המדינה שבה אתה גר ובשביל המדינה שממנה באת.",
+ "from_same": "אותה מדינה שבה אני גר",
+ "from_not_now": "לא עכשיו",
+ "from_row": "המדינה שממנה באת",
+ "from_locked": "אפשר לשנות את זה ב-{date}",
+ "from_line_from": "מ{country}",
+ "from_line_lives": "גר ב{country}"
 }

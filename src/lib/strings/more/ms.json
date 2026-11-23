@@ -1947,5 +1947,13 @@
  "cbp_battle_underway": "Pertarungan sedang berlangsung",
  "cb_members_battling": "Ahli yang bertanding: {n}",
  "cb_nobody_yet": "Belum ada sesiapa dari {country} yang bertanding. Kamera mereka akan muncul di sini sebaik sahaja mereka siaran langsung.",
- "cbd_join": "Sertai"
+ "cbd_join": "Sertai",
+ "from_q_title": "Anda berasal dari mana?",
+ "from_q_sub": "Anda boleh bertanding untuk negara tempat anda tinggal dan negara asal anda.",
+ "from_same": "Sama dengan tempat saya tinggal",
+ "from_not_now": "Bukan sekarang",
+ "from_row": "Negara asal anda",
+ "from_locked": "Anda boleh menukar ini pada {date}",
+ "from_line_from": "Dari {country}",
+ "from_line_lives": "Tinggal di {country}"
 }

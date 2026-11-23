@@ -1946,5 +1946,13 @@
  "cbp_battle_underway": "バトル開催中",
  "cb_members_battling": "バトル中のメンバー: {n}",
  "cb_nobody_yet": "{country}のメンバーはまだ誰もバトルしていません。ライブを始めるとすぐにここにカメラが表示されます。",
- "cbd_join": "参加"
+ "cbd_join": "参加",
+ "from_q_title": "出身はどこですか？",
+ "from_q_sub": "住んでいる国と出身の国、両方のためにバトルできます。",
+ "from_same": "住んでいる国と同じ",
+ "from_not_now": "今はしない",
+ "from_row": "出身の国",
+ "from_locked": "{date}に変更できます",
+ "from_line_from": "出身：{country}",
+ "from_line_lives": "在住：{country}"
 }

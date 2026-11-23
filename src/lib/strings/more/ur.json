@@ -1947,5 +1947,13 @@
  "cbp_battle_underway": "بیٹل جاری ہے",
  "cb_members_battling": "مقابلے میں شریک اراکین: {n}",
  "cb_nobody_yet": "{country} سے ابھی کوئی مقابلہ نہیں کر رہا۔ لائیو ہوتے ہی ان کے کیمرے یہاں نظر آئیں گے۔",
- "cbd_join": "شامل ہوں"
+ "cbd_join": "شامل ہوں",
+ "from_q_title": "آپ کہاں سے ہیں؟",
+ "from_q_sub": "آپ جس ملک میں رہتے ہیں اور جس ملک سے ہیں، دونوں کے لیے بیٹل کر سکتے ہیں۔",
+ "from_same": "وہی جہاں میں رہتا ہوں",
+ "from_not_now": "ابھی نہیں",
+ "from_row": "آپ کا آبائی ملک",
+ "from_locked": "آپ اسے {date} کو بدل سکتے ہیں",
+ "from_line_from": "{country} سے",
+ "from_line_lives": "{country} میں رہتے ہیں"
 }

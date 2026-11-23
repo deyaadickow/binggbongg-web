@@ -1947,5 +1947,13 @@
  "cbp_battle_underway": "ውጊያው እየተካሄደ ነው",
  "cb_members_battling": "የሚዋጉ አባላት: {n}",
  "cb_nobody_yet": "ከ{country} እስካሁን የሚወዳደር የለም። ቀጥታ ሲገቡ ካሜራቸው እዚህ ይታያል።",
- "cbd_join": "ተቀላቀል"
+ "cbd_join": "ተቀላቀል",
+ "from_q_title": "ከየት ነህ?",
+ "from_q_sub": "ለምትኖርበት ሀገርና ለመጣህበት ሀገር መወዳደር ትችላለህ።",
+ "from_same": "ከምኖርበት ጋር አንድ ነው",
+ "from_not_now": "አሁን አይደለም",
+ "from_row": "የመጣህበት ሀገር",
+ "from_locked": "ይህን በ{date} መቀየር ትችላለህ",
+ "from_line_from": "ከ{country}",
+ "from_line_lives": "በ{country} ይኖራል"
 }

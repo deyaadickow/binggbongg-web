@@ -1947,5 +1947,13 @@
  "cbp_battle_underway": "બેટલ ચાલુ છે",
  "cb_members_battling": "લડતા સભ્યો: {n}",
  "cb_nobody_yet": "{country}માંથી હજી કોઈ લડી રહ્યું નથી. તેઓ લાઇવ થાય કે તરત જ તેમના કૅમેરા અહીં દેખાશે.",
- "cbd_join": "જોડાઓ"
+ "cbd_join": "જોડાઓ",
+ "from_q_title": "તમે ક્યાંના છો?",
+ "from_q_sub": "તમે જે દેશમાં રહો છો અને જે દેશના છો, બંને માટે લડી શકો છો.",
+ "from_same": "જ્યાં રહું છું તે જ",
+ "from_not_now": "હમણાં નહીં",
+ "from_row": "તમે જે દેશના છો",
+ "from_locked": "તમે આ {date} એ બદલી શકશો",
+ "from_line_from": "{country}ના",
+ "from_line_lives": "{country}માં રહે છે"
 }

@@ -1938,5 +1938,13 @@
  "cbp_battle_underway": "Taistelu on käynnissä",
  "cb_members_battling": "Taistelevia jäseniä: {n}",
  "cb_nobody_yet": "Kukaan maasta {country} ei vielä taistele. Heidän kameransa näkyvät täällä heti, kun he aloittavat livelähetyksen.",
- "cbd_join": "Liity"
+ "cbd_join": "Liity",
+ "from_q_title": "Mistä olet kotoisin?",
+ "from_q_sub": "Voit taistella sekä asuinmaasi että kotimaasi puolesta.",
+ "from_same": "Sama kuin asuinmaani",
+ "from_not_now": "Ei nyt",
+ "from_row": "Maa, josta olet kotoisin",
+ "from_locked": "Voit muuttaa tämän {date}",
+ "from_line_from": "Kotoisin: {country}",
+ "from_line_lives": "Asuu: {country}"
 }
