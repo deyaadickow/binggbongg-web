@@ -109,7 +109,8 @@ export function CountryBoardPage() {
         <ol className="cbd-list">
           {board.countries.map((c) => {
             const mine = !!me && c.country === me.country;
-            const canJoin = !!me && battleCountries.some((x) => sameCountry(x, c.country));
+            // Any member battles for any country (Steve, 2026-11-23); an older server: only their own.
+            const canJoin = !!me && (!!jn?.anyone_can_battle || battleCountries.some((x) => sameCountry(x, c.country)));
             return (
               <li key={c.country} className={`cbd-row${mine ? " me" : ""}`}>
                 <span className="cbd-rank">#{c.rank}</span>
@@ -134,9 +135,8 @@ export function CountryBoardPage() {
 /**
  * Under a country's row (Steve, 2026-11-22: "Please add the time left the game will start, and, The
  * game is under way. Please add 2 buttons, one will say "Watch" and the other will say "Join""):
- * "Starts in 12:34" or "Battle Is Underway · 3:15 left", Watch for every country, and Join only on
- * the member's own country (Steve: hide it elsewhere — only members of a country battle in it).
- * "Own" is both countries since 2026-11-23: where they live and where they're from.
+ * "Starts in 12:34" or "Battle Is Underway · 3:15 left", Watch for every country, and Join on every
+ * country too since 2026-11-23 (Steve: "any member can battle and support any country they want").
  */
 function BattleLine({ country, mine, jn }: { country: string; mine: boolean; jn: CbJoinNow | null }) {
   const { t } = useT();

@@ -485,6 +485,8 @@ export interface CbJoinNow {
   /** Both countries the member battles for — where they live and where they're from (2026-11-23).
    *  Missing on an older server: then the single my_country / profile country rule. */
   my_countries?: string[];
+  /** Any member battles for any country (Steve, 2026-11-23). */
+  anyone_can_battle?: boolean;
 }
 
 // The banner's dropdown (Steve, 2026-11-21) used to SAVE the chosen country on the button forever: a
@@ -510,6 +512,7 @@ export async function fetchCountryBattleJoinNow(userId: number): Promise<CbJoinN
     country_adjective: d.country_adjective || d.country || "",
     countries: Array.isArray(d.countries) ? d.countries.filter((c) => c && c.country) : [],
     my_country: d.my_country || null,
+    anyone_can_battle: d.anyone_can_battle === true,
     my_countries: Array.isArray(d.my_countries) ? d.my_countries.filter((c) => typeof c === "string" && !!c) : undefined,
   };
 }
