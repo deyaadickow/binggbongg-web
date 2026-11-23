@@ -1371,6 +1371,8 @@ body.signup-black { background: radial-gradient(120% 55% at 50% 0%, #2a2108 0%, 
 .cbd-battle-line { color: var(--gold); font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
 .cbd-battle-line.live { color: #ff5a5a; }
 .cbd-battle-btns { margin-left: auto; display: flex; gap: 8px; }
+/* Watch in a gold border so it stands out (Steve, 2026-11-23: "Add a gold boarder around the watch"). */
+.cbd-battle-btns .btn.ghost { border: 2px solid var(--gold); color: var(--gold); }
 .cbd-rank { color: var(--gold); font-weight: 900; font-size: 18px; min-width: 38px; font-variant-numeric: tabular-nums; }
 .cbd-flag { font-size: 28px; line-height: 1; }
 .cbd-name { display: flex; flex-direction: column; min-width: 0; flex: 1; }
