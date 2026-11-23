@@ -2709,6 +2709,7 @@ export const es = {
   acb_filter_all: "Todas",
   acb_filter_vs: "País VS País",
   acb_filter_countries: "Países",
+  acb_filter_whole: "Batalla de todo el país",
   // Bingg Bongg Banger (Steve, 2026-11-23)
   banger_title: "Bingg Bongg Banger",
   banger_tagline: "Traza una línea por 3 o más piezas iguales para eliminarlas. ¡Tus espectadores envían potenciadores!",

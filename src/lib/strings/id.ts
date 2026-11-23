@@ -2745,6 +2745,7 @@ export const id = {
   acb_filter_all: "Semua",
   acb_filter_vs: "Negara VS Negara",
   acb_filter_countries: "Negara",
+  acb_filter_whole: "Pertarungan Seluruh Negara",
   // Bingg Bongg Banger (Steve, 2026-11-23)
   banger_title: "Bingg Bongg Banger",
   banger_tagline: "Tarik garis melewati 3 kepingan sama atau lebih untuk menghapusnya. Penontonmu mengirim booster!",

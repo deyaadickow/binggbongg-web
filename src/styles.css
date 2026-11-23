@@ -2089,7 +2089,7 @@ body:has(.story-viewer) .get-app-bar { display: none; }
 .lt-tile img.lt-light { background: radial-gradient(circle, #f4f4f4 0%, #b9b9b9 100%); }
 
 /* All Country Battles filter chips + section headers (Round 4, Steve 2026-11-23). */
-.acb-chips { display: flex; gap: 8px; margin-top: 8px; overflow-x: auto; scrollbar-width: none; }
-.acb-filter { flex: 0 0 auto; padding: 7px 14px; border-radius: 999px; border: 1.5px solid var(--gold-border); background: #000; color: var(--gold); font-weight: 700; font-size: 13px; cursor: pointer; white-space: nowrap; }
+.acb-chips { display: flex; gap: 10px; margin-top: 8px; }
+.acb-filter { flex: 1 1 0; min-width: 0; padding: 9px 8px; border-radius: 999px; border: 1.5px solid var(--gold-border); background: #000; color: var(--gold); font-weight: 700; font-size: 14px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; }
 .acb-filter.on { background: var(--gold); color: #000; }
 .acb-section { margin: 6px 0 -4px; font-size: 16px; color: var(--gold); font-weight: 800; }

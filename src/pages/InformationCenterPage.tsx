@@ -97,6 +97,8 @@ export function InformationCenterPage() {
     // The $1,000,000 referral video ad sits at the top of Ads for Referrals.
     { to: "/ads-for-referrals?video=en", key: "ic_million" },
     { to: "/country-battles", key: "acb_tab" },
+    // Steve, 2026-11-23: "Add "Country VS Country" button here." — the same page, on its Country VS Country chip.
+    { to: "/country-battles?kind=rival", key: "acb_filter_vs" },
     { to: "/features", key: "tab_70_features" },
     { to: "/feature-videos", key: "tab_70_videos" },
     { to: "/one-video", key: "ic_one_video" },

@@ -3692,6 +3692,7 @@ export const en = {
   acb_filter_all: "All",
   acb_filter_vs: "Country VS Country",
   acb_filter_countries: "Countries",
+  acb_filter_whole: "Whole Country Battle",
   // Bingg Bongg Banger (Steve, 2026-11-23)
   banger_title: "Bingg Bongg Banger",
   banger_tagline: "Draw a line through 3 or more matching pieces to clear them. Your viewers send boosters!",

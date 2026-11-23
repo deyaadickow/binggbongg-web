@@ -2908,6 +2908,7 @@ export const fil = {
   acb_filter_all: "Lahat",
   acb_filter_vs: "Bansa VS Bansa",
   acb_filter_countries: "Mga Bansa",
+  acb_filter_whole: "Labanan ng Buong Bansa",
   // Bingg Bongg Banger (Steve, 2026-11-23)
   banger_title: "Bingg Bongg Banger",
   banger_tagline: "Mag-drag ng linya sa 3 o higit pang magkaparehong piraso para ma-clear sila. Nagse-send ng boosters ang viewers mo!",

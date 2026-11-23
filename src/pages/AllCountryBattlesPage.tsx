@@ -7,6 +7,7 @@
 // battle screen to WATCH (anyone, any country, and gift from the tiles); "Join live" only where the
 // server says can_battle. A finished day opens its top 100; no day yet opens that country's page.
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { PageTitle } from "../components/PageTitle";
 import { Loading, Notice } from "../components/Common";
 import { useT } from "../lib/i18n";
@@ -21,13 +22,14 @@ export function AllCountryBattlesPage() {
   const { user } = useSession();
   const now = useTick();
   const [query, setQuery] = useState("");
-  // Round 4 (Steve, 2026-11-23: "I don't see the Country VS Country battles anywhere"): All · Country VS
-  // Country · Countries. "All" asks for both kinds — the server puts the rival cards first.
-  const [kind, setKind] = useState<AcbKind | undefined>(undefined);
+  // Two chips, the same size side to side (Steve, 2026-11-23: "Remove the "All" only show "Country VS
+  // Country" and "Whole Country Battle" buttons and make both button same size from side to side").
+  // Opens on Whole Country Battle; ?kind=rival (the Information Center's Country VS Country button)
+  // opens on Country VS Country.
+  const [params] = useSearchParams();
+  const [kind, setKind] = useState<AcbKind>(params.get("kind") === "rival" ? "rival" : "country");
   const { battles, error, search } = useAllCountryBattles(query, kind, user?.id, t("acb_empty"));
-  const chips: [AcbKind | undefined, string][] = [[undefined, t("acb_filter_all")], ["rival", t("acb_filter_vs")], ["country", t("acb_filter_countries")]];
-  const firstRival = kind ? -1 : (battles ?? []).findIndex((b) => b.kind === "rival");
-  const firstCountry = kind ? -1 : (battles ?? []).findIndex((b) => b.kind !== "rival");
+  const chips: [AcbKind, string][] = [["rival", t("acb_filter_vs")], ["country", t("acb_filter_whole")]];
 
   return (
     <div className="page acb-page" style={{ maxWidth: 760 }}>
@@ -50,11 +52,7 @@ export function AllCountryBattlesPage() {
       {battles !== null && battles.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {battles.map((b, i) => (
-            <div key={b.day_id ?? `c-${b.country}-${i}`} style={{ display: "contents" }}>
-              {i === firstRival && <h2 className="acb-section">⚔️ {t("cvc_page_title")}</h2>}
-              {i === firstCountry && <h2 className="acb-section">🌍 {t("acb_filter_countries")}</h2>}
-              <CountryBattleCard b={b} now={now} />
-            </div>
+            <CountryBattleCard key={b.day_id ?? `c-${b.country}-${i}`} b={b} now={now} />
           ))}
         </div>
       )}
