@@ -2850,4 +2850,8 @@ export const fil = {
   from_line_lives: "Nakatira sa {country}",
   fname_bb_algorithm: "Paano gumagana ang algorithm ng Bingg Bongg",
   fblurb_bb_algorithm: "Panoorin kung paano pinipili ng Bingg Bongg kung aling mga video at live ang una mong makikita.",
+  rival_battle: "Rival Battle",
+  rival_join_for: "Sumali para sa {country}",
+  rival_wins: "Panalo ang {country}!",
+  rival_tie: "Tabla!",
 };

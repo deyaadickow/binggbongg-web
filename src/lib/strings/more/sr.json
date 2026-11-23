@@ -1957,5 +1957,9 @@
  "from_line_from": "Из: {country}",
  "from_line_lives": "Живи у: {country}",
  "fname_bb_algorithm": "Како ради Bingg Bongg алгоритам",
- "fblurb_bb_algorithm": "Погледајте како Bingg Bongg одлучује које видео-снимке и преносе уживо прво видите."
+ "fblurb_bb_algorithm": "Погледајте како Bingg Bongg одлучује које видео-снимке и преносе уживо прво видите.",
+ "rival_battle": "Битка ривала",
+ "rival_join_for": "Придружи се за {country}",
+ "rival_wins": "{country} побеђује!",
+ "rival_tie": "Нерешено!"
 }

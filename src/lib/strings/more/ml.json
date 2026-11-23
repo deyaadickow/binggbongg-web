@@ -1952,5 +1952,9 @@
  "from_line_from": "{country} സ്വദേശി",
  "from_line_lives": "{country}-ൽ താമസം",
  "fname_bb_algorithm": "Bingg Bongg അൽഗോരിതം എങ്ങനെ പ്രവർത്തിക്കുന്നു",
- "fblurb_bb_algorithm": "നിങ്ങൾ ആദ്യം കാണുന്ന വീഡിയോകളും ലൈവുകളും Bingg Bongg എങ്ങനെ തീരുമാനിക്കുന്നു എന്ന് കാണൂ."
+ "fblurb_bb_algorithm": "നിങ്ങൾ ആദ്യം കാണുന്ന വീഡിയോകളും ലൈവുകളും Bingg Bongg എങ്ങനെ തീരുമാനിക്കുന്നു എന്ന് കാണൂ.",
+ "rival_battle": "എതിരാളി ബാറ്റിൽ",
+ "rival_join_for": "{country}-ക്കായി ചേരൂ",
+ "rival_wins": "{country} ജയിച്ചു!",
+ "rival_tie": "സമനില!"
 }

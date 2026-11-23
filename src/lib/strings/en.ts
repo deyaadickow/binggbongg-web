@@ -3634,4 +3634,8 @@ export const en = {
   from_line_lives: "Lives in {country}",
   fname_bb_algorithm: "How the Bingg Bongg algorithm works",
   fblurb_bb_algorithm: "Watch how Bingg Bongg decides which videos and lives you see first.",
+  rival_battle: "Rival Battle",
+  rival_join_for: "Join for {country}",
+  rival_wins: "{country} wins!",
+  rival_tie: "It's a tie!",
 } as const;

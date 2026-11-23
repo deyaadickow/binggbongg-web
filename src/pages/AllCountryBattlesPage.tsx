@@ -15,6 +15,7 @@ import { useSession } from "../lib/session";
 import { cbText, clock, countryBattlePath, localTime, useTick } from "../lib/countryBattle";
 import { countryFlag, fetchAllCountryBattles, type AcbBattle } from "../lib/allCountryBattles";
 import { FromCountryAsk } from "../components/FromCountry";
+import { RivalBar } from "../components/RivalBar";
 
 type T = ReturnType<typeof useT>["t"];
 
@@ -62,12 +63,18 @@ function BattleCard({ b, now }: { b: AcbBattle; now: number }) {
     navigate(countryBattlePath(b.day_id!, { join: true }));
   };
   const open = () => navigate(cardPath(b));
+  // A Rival Battle (Steve, 2026-11-23): both flags, the two-country score bar, Join for either side.
+  const rivalJoin = (country: string) => {
+    if (!isLoggedIn) { navigate("/login", { state: { from: location.pathname } }); return; }
+    navigate(countryBattlePath(b.day_id!, { join: true, side: country }));
+  };
+  const rival = b.kind === "rival" ? b.rival : null;
   return (
     <div className="card pad acb-card" role="link" tabIndex={0} onClick={open}
       onKeyDown={(e) => { if (e.key === "Enter") open(); }}
       style={{ cursor: "pointer", display: "flex", flexDirection: "column", gap: 8, borderColor: b.phase === "battle" ? "var(--red)" : b.is_my_country ? "var(--gold)" : undefined }}>
       <div className="row" style={{ gap: 10, alignItems: "center" }}>
-        <span style={{ fontSize: 30, lineHeight: 1 }} aria-hidden>{countryFlag(b.country) || "🌍"}</span>
+        <span style={{ fontSize: 30, lineHeight: 1 }} aria-hidden>{rival ? "⚔️" : countryFlag(b.country) || "🌍"}</span>
         <div style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0, flex: 1 }}>
           <div className="row" style={{ gap: 6, flexWrap: "wrap" }}>
             <b style={{ color: "var(--gold)", fontSize: 17 }}>{b.country}</b>
@@ -80,13 +87,14 @@ function BattleCard({ b, now }: { b: AcbBattle; now: number }) {
         )}
       </div>
       {count && <div style={{ color: "var(--gold)", fontWeight: 800, fontSize: 20, fontVariantNumeric: "tabular-nums" }}>{count}</div>}
-      {lead && (
+      {rival && <RivalBar rival={rival} finished={b.phase === "ended"} onJoin={showJoin ? rivalJoin : undefined} />}
+      {lead && !rival && (
         <div className="row" style={{ gap: 8, fontSize: 14 }}>
           <Avatar user={{ id: lead.user_id, fullname: lead.name, username: lead.username, profile_image: lead.profile_image }} />
           <span style={{ color: "#fff" }}>{cbText(t("acb_leading"), { name: lead.name, n: lead.score.toLocaleString() })}</span>
         </div>
       )}
-      {b.phase === "ended" && b.winner && (
+      {b.phase === "ended" && b.winner && !rival && (
         <div className="row" style={{ gap: 8, fontSize: 14 }}>
           <span aria-hidden>🏆</span>
           <span style={{ color: "#fff" }}>{cbText(t("acb_winner"), { name: b.winner.name })}</span>
@@ -94,7 +102,7 @@ function BattleCard({ b, now }: { b: AcbBattle; now: number }) {
       )}
       {b.phase !== "ended" && (
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          {showJoin && <button className="btn gold" style={{ flex: "1 1 140px" }} onClick={join}>🔴 {t("cb_join")}</button>}
+          {showJoin && !rival && <button className="btn gold" style={{ flex: "1 1 140px" }} onClick={join}>🔴 {t("cb_join")}</button>}
           <button className="btn" style={{ flex: "1 1 140px" }} onClick={(e) => { e.stopPropagation(); open(); }}>👀 {t("acb_watch")}</button>
         </div>
       )}

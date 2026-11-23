@@ -1954,5 +1954,9 @@
  "from_line_from": "Frá {country}",
  "from_line_lives": "Býr í {country}",
  "fname_bb_algorithm": "Svona virkar reiknirit Bingg Bongg",
- "fblurb_bb_algorithm": "Sjáðu hvernig Bingg Bongg ákveður hvaða myndbönd og beinar útsendingar þú sérð fyrst."
+ "fblurb_bb_algorithm": "Sjáðu hvernig Bingg Bongg ákveður hvaða myndbönd og beinar útsendingar þú sérð fyrst.",
+ "rival_battle": "Keppinautabardagi",
+ "rival_join_for": "Taktu þátt fyrir {country}",
+ "rival_wins": "{country} vinnur!",
+ "rival_tie": "Jafntefli!"
 }

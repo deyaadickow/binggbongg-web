@@ -1957,5 +1957,9 @@
  "from_line_from": "Đến từ {country}",
  "from_line_lives": "Sống tại {country}",
  "fname_bb_algorithm": "Thuật toán của Bingg Bongg hoạt động thế nào",
- "fblurb_bb_algorithm": "Xem cách Bingg Bongg quyết định bạn thấy video và buổi live nào trước."
+ "fblurb_bb_algorithm": "Xem cách Bingg Bongg quyết định bạn thấy video và buổi live nào trước.",
+ "rival_battle": "Trận đấu đối thủ",
+ "rival_join_for": "Tham gia cho {country}",
+ "rival_wins": "{country} thắng!",
+ "rival_tie": "Hòa!"
 }

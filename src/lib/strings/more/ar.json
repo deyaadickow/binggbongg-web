@@ -2255,5 +2255,9 @@
  "from_line_from": "من {country}",
  "from_line_lives": "يعيش في {country}",
  "fname_bb_algorithm": "كيف تعمل خوارزمية Bingg Bongg",
- "fblurb_bb_algorithm": "شاهد كيف تقرر Bingg Bongg أي الفيديوهات والبثوث المباشرة تراها أولاً."
+ "fblurb_bb_algorithm": "شاهد كيف تقرر Bingg Bongg أي الفيديوهات والبثوث المباشرة تراها أولاً.",
+ "rival_battle": "معركة المنافسين",
+ "rival_join_for": "انضم من أجل {country}",
+ "rival_wins": "{country} تفوز!",
+ "rival_tie": "تعادل!"
 }

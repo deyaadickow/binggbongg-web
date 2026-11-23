@@ -1956,5 +1956,9 @@
  "from_line_from": "出身：{country}",
  "from_line_lives": "在住：{country}",
  "fname_bb_algorithm": "Bingg Bonggのアルゴリズムのしくみ",
- "fblurb_bb_algorithm": "どの動画やライブが最初に表示されるか、Bingg Bonggの決め方を見てみよう。"
+ "fblurb_bb_algorithm": "どの動画やライブが最初に表示されるか、Bingg Bonggの決め方を見てみよう。",
+ "rival_battle": "ライバルバトル",
+ "rival_join_for": "{country}として参加",
+ "rival_wins": "{country}の勝利！",
+ "rival_tie": "引き分け！"
 }

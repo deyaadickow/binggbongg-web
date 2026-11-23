@@ -1955,5 +1955,9 @@
  "from_line_from": "Van {country}",
  "from_line_lives": "Woon in {country}",
  "fname_bb_algorithm": "Hoe die Bingg Bongg-algoritme werk",
- "fblurb_bb_algorithm": "Kyk hoe Bingg Bongg besluit watter video's en lives jy eerste sien."
+ "fblurb_bb_algorithm": "Kyk hoe Bingg Bongg besluit watter video's en lives jy eerste sien.",
+ "rival_battle": "Mededingerstryd",
+ "rival_join_for": "Sluit aan vir {country}",
+ "rival_wins": "{country} wen!",
+ "rival_tie": "Dis gelykop!"
 }

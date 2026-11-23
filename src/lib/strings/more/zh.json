@@ -1957,5 +1957,9 @@
  "from_line_from": "来自{country}",
  "from_line_lives": "居住在{country}",
  "fname_bb_algorithm": "Bingg Bongg 的算法如何运作",
- "fblurb_bb_algorithm": "看看 Bingg Bongg 如何决定你先看到哪些视频和直播。"
+ "fblurb_bb_algorithm": "看看 Bingg Bongg 如何决定你先看到哪些视频和直播。",
+ "rival_battle": "宿敌对战",
+ "rival_join_for": "为{country}加入",
+ "rival_wins": "{country}获胜！",
+ "rival_tie": "平局！"
 }

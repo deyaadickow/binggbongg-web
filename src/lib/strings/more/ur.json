@@ -1957,5 +1957,9 @@
  "from_line_from": "{country} سے",
  "from_line_lives": "{country} میں رہتے ہیں",
  "fname_bb_algorithm": "Bingg Bongg کا الگورتھم کیسے کام کرتا ہے",
- "fblurb_bb_algorithm": "دیکھیں کہ Bingg Bongg کیسے طے کرتا ہے کہ آپ کون سی ویڈیوز اور لائیو پہلے دیکھیں۔"
+ "fblurb_bb_algorithm": "دیکھیں کہ Bingg Bongg کیسے طے کرتا ہے کہ آپ کون سی ویڈیوز اور لائیو پہلے دیکھیں۔",
+ "rival_battle": "حریفوں کی بیٹل",
+ "rival_join_for": "{country} کی طرف سے شامل ہوں",
+ "rival_wins": "{country} جیت گیا!",
+ "rival_tie": "برابر!"
 }

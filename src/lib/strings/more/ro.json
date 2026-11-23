@@ -1952,5 +1952,9 @@
  "from_line_from": "Din {country}",
  "from_line_lives": "Locuiește în {country}",
  "fname_bb_algorithm": "Cum funcționează algoritmul Bingg Bongg",
- "fblurb_bb_algorithm": "Vezi cum decide Bingg Bongg ce videoclipuri și transmisiuni live vezi primele."
+ "fblurb_bb_algorithm": "Vezi cum decide Bingg Bongg ce videoclipuri și transmisiuni live vezi primele.",
+ "rival_battle": "Bătălia rivalilor",
+ "rival_join_for": "Intră pentru {country}",
+ "rival_wins": "{country} câștigă!",
+ "rival_tie": "Egalitate!"
 }

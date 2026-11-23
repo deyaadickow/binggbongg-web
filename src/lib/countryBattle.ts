@@ -129,8 +129,33 @@ export interface CbDayMe {
   join_reason: string | null;
 }
 
+/** One side of a Rival Battle. */
+export interface CbRivalSide { country: string; flag: string; score: number; battlers: number }
+
+/** A Rival Battle (Steve, 2026-11-23: "Find ever country's rival and let's set up a 10 minutes battle in between
+ *  their own whole country battle"): two countries in one room; a side's score = what its battlers got. */
+export interface CbRival { a: CbRivalSide; b: CbRivalSide; winner: string | null; label: string }
+
+export function rivalOf(v: unknown): CbRival | null {
+  if (!v || typeof v !== "object") return null;
+  const r = v as Record<string, unknown>;
+  const side = (x: unknown): CbRivalSide | null => {
+    if (!x || typeof x !== "object") return null;
+    const s = x as Record<string, unknown>;
+    const country = String(s.country ?? "");
+    return country ? { country, flag: String(s.flag ?? ""), score: Number(s.score) || 0, battlers: Number(s.battlers) || 0 } : null;
+  };
+  const a = side(r.a);
+  const b = side(r.b);
+  if (!a || !b) return null;
+  return { a, b, winner: typeof r.winner === "string" && r.winner ? r.winner : null, label: String(r.label ?? `${a.country} vs ${b.country}`) };
+}
+
 /** countryBattleDayHeartbeat's `data` (§5) — the Chat Battle state shape plus the day. */
 export interface CbDayState {
+  /** "rival" = a Rival Battle, with `rival`. */
+  kind?: "country" | "rival";
+  rival?: CbRival | null;
   day_id: number;
   country: string;
   date: string;
@@ -256,6 +281,7 @@ function cleanDay(d: CbDayState): CbDayState {
   return {
     ...d,
     is_test: flag(d.is_test),
+    rival: rivalOf(d.rival),
     battlers: Array.isArray(d.battlers) ? d.battlers : [],
     live: numList(d.live),
     top3: Array.isArray(d.top3) ? d.top3 : [],
@@ -292,6 +318,7 @@ export function dayAsBattleState(d: CbDayState): ChbState {
     tie: false,
     finished: d.finished,
     me: { ...d.me, starter_bonus: null },
+    rival: d.rival ?? null,
     is_test: d.is_test,
     top3: d.top3,
     opens_at: d.opens_at,
@@ -322,8 +349,9 @@ export async function countryBattleDayHeartbeat(userId: number, dayId: number, l
 }
 
 /** Join, or rejoin, from the lobby until the end (§4). Over the cap: reason "full". */
-export async function joinCountryBattleDay(userId: number, dayId: number): Promise<ChbResult<{ room_name: string; rejoined: boolean; state: CbDayState | null }>> {
-  const res = await post<{ room_name: string; role?: string; rejoined?: boolean; country_battle?: CbDayState }>("joinCountryBattleDay", { user_id: userId, day_id: dayId });
+export async function joinCountryBattleDay(userId: number, dayId: number, side?: string | null): Promise<ChbResult<{ room_name: string; rejoined: boolean; state: CbDayState | null }>> {
+  // `side`: a Rival Battle's country to fight for (only the first join counts).
+  const res = await post<{ room_name: string; role?: string; rejoined?: boolean; country_battle?: CbDayState }>("joinCountryBattleDay", { user_id: userId, day_id: dayId, ...(side ? { side } : {}) });
   if (!res.status || !res.data?.room_name) return fail(res);
   return { ok: true, data: { room_name: res.data.room_name, rejoined: !!res.data.rejoined, state: res.data.country_battle ? cleanDay(res.data.country_battle) : null } };
 }
@@ -388,8 +416,9 @@ export async function setCountryBattleReminder(userId: number, enabled: boolean)
 
 /** The battle screen's URL. `home` pins the battler a viewer followed in; `join` asks the screen
  *  to join (camera + mic) as soon as it opens; `battler` says this browser has already joined. */
-export function countryBattlePath(dayId: number, opts: { home?: number | null; join?: boolean; battler?: boolean } = {}): string {
+export function countryBattlePath(dayId: number, opts: { home?: number | null; join?: boolean; battler?: boolean; side?: string | null } = {}): string {
   const q = new URLSearchParams();
+  if (opts.side) q.set("side", opts.side);
   if (opts.home) q.set("home", String(opts.home));
   if (opts.join) q.set("join", "1");
   if (opts.battler) q.set("battler", "1");

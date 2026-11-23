@@ -1953,5 +1953,9 @@
  "from_line_from": "De {country}",
  "from_line_lives": "Vive en {country}",
  "fname_bb_algorithm": "Como funciona o algoritmo de Bingg Bongg",
- "fblurb_bb_algorithm": "Mira como Bingg Bongg decide que vídeos e directos ves primeiro."
+ "fblurb_bb_algorithm": "Mira como Bingg Bongg decide que vídeos e directos ves primeiro.",
+ "rival_battle": "Batalla de rivais",
+ "rival_join_for": "Únete por {country}",
+ "rival_wins": "Gaña {country}!",
+ "rival_tie": "Empate!"
 }

@@ -1951,5 +1951,9 @@
  "from_line_from": "{country} चे",
  "from_line_lives": "{country} मध्ये राहतात",
  "fname_bb_algorithm": "Bingg Bongg चा अल्गोरिदम कसा काम करतो",
- "fblurb_bb_algorithm": "तुम्ही कोणते व्हिडिओ आणि लाइव्ह आधी पाहाल हे Bingg Bongg कसे ठरवते ते पाहा."
+ "fblurb_bb_algorithm": "तुम्ही कोणते व्हिडिओ आणि लाइव्ह आधी पाहाल हे Bingg Bongg कसे ठरवते ते पाहा.",
+ "rival_battle": "प्रतिस्पर्धी बॅटल",
+ "rival_join_for": "{country} साठी सामील व्हा",
+ "rival_wins": "{country} जिंकले!",
+ "rival_tie": "बरोबरी!"
 }

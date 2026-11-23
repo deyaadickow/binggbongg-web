@@ -1953,5 +1953,9 @@
  "from_line_from": "No: {country}",
  "from_line_lives": "Dzīvo: {country}",
  "fname_bb_algorithm": "Kā darbojas Bingg Bongg algoritms",
- "fblurb_bb_algorithm": "Noskaties, kā Bingg Bongg izlemj, kurus video un tiešraides tu redzi vispirms."
+ "fblurb_bb_algorithm": "Noskaties, kā Bingg Bongg izlemj, kurus video un tiešraides tu redzi vispirms.",
+ "rival_battle": "Sāncenšu cīņa",
+ "rival_join_for": "Pievienojies {country} pusē",
+ "rival_wins": "{country} uzvar!",
+ "rival_tie": "Neizšķirts!"
 }

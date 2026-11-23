@@ -7,7 +7,7 @@
 // `search` is always sent, "" when the box is empty.
 import { useEffect, useState } from "react";
 import { post } from "./api";
-import { flag, noteServerNow } from "./countryBattle";
+import { flag, noteServerNow, rivalOf, type CbRival } from "./countryBattle";
 import { flagOf } from "./countryChallenges";
 
 export type AcbPhase = "battle" | "joining" | "upcoming" | "scheduled" | "ended";
@@ -15,6 +15,9 @@ export type AcbPhase = "battle" | "joining" | "upcoming" | "scheduled" | "ended"
 export interface AcbPerson { user_id: number; name: string; username: string; profile_image: string; score: number }
 
 export interface AcbBattle {
+  /** "rival" = a Rival Battle card ("Philippines vs Indonesia"), with `rival`. */
+  kind: "country" | "rival";
+  rival: CbRival | null;
   day_id: number | null;
   country: string;
   is_test: boolean;
@@ -57,7 +60,10 @@ function person(v: unknown): AcbPerson | null {
 
 function battle(v: Record<string, unknown>): AcbBattle {
   const phase = PHASES.includes(v.phase as AcbPhase) ? (v.phase as AcbPhase) : "scheduled";
+  const rival = rivalOf(v.rival);
   return {
+    kind: v.kind === "rival" && rival ? "rival" : "country",
+    rival,
     day_id: Number(v.day_id) > 0 ? Number(v.day_id) : null,
     country: String(v.country ?? ""),
     is_test: flag(v.is_test),

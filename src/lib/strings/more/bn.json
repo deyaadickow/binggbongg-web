@@ -1956,5 +1956,9 @@
  "from_line_from": "{country} থেকে",
  "from_line_lives": "{country}-এ থাকেন",
  "fname_bb_algorithm": "Bingg Bongg-এর অ্যালগরিদম কীভাবে কাজ করে",
- "fblurb_bb_algorithm": "দেখুন Bingg Bongg কীভাবে ঠিক করে কোন ভিডিও আর লাইভ আপনি আগে দেখবেন।"
+ "fblurb_bb_algorithm": "দেখুন Bingg Bongg কীভাবে ঠিক করে কোন ভিডিও আর লাইভ আপনি আগে দেখবেন।",
+ "rival_battle": "প্রতিদ্বন্দ্বী লড়াই",
+ "rival_join_for": "{country}-এর হয়ে যোগ দিন",
+ "rival_wins": "{country} জিতেছে!",
+ "rival_tie": "টাই!"
 }

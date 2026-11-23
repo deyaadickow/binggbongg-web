@@ -1954,5 +1954,9 @@
  "from_line_from": "Kilęs iš: {country}",
  "from_line_lives": "Gyvena: {country}",
  "fname_bb_algorithm": "Kaip veikia Bingg Bongg algoritmas",
- "fblurb_bb_algorithm": "Pažiūrėkite, kaip Bingg Bongg nusprendžia, kuriuos vaizdo įrašus ir tiesiogines transliacijas matote pirmiausia."
+ "fblurb_bb_algorithm": "Pažiūrėkite, kaip Bingg Bongg nusprendžia, kuriuos vaizdo įrašus ir tiesiogines transliacijas matote pirmiausia.",
+ "rival_battle": "Varžovų mūšis",
+ "rival_join_for": "Prisijunk už {country}",
+ "rival_wins": "{country} laimi!",
+ "rival_tie": "Lygiosios!"
 }

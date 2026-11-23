@@ -1957,5 +1957,9 @@
  "from_line_from": "{country} kökenli",
  "from_line_lives": "{country} ülkesinde yaşıyor",
  "fname_bb_algorithm": "Bingg Bongg algoritması nasıl çalışır",
- "fblurb_bb_algorithm": "Bingg Bongg'un önce hangi videoları ve canlı yayınları göreceğine nasıl karar verdiğini izle."
+ "fblurb_bb_algorithm": "Bingg Bongg'un önce hangi videoları ve canlı yayınları göreceğine nasıl karar verdiğini izle.",
+ "rival_battle": "Rakip Savaşı",
+ "rival_join_for": "{country} için katıl",
+ "rival_wins": "{country} kazandı!",
+ "rival_tie": "Berabere!"
 }

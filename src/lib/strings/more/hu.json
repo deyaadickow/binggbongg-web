@@ -1950,5 +1950,9 @@
  "from_line_from": "Származás: {country}",
  "from_line_lives": "Lakhely: {country}",
  "fname_bb_algorithm": "Így működik a Bingg Bongg algoritmusa",
- "fblurb_bb_algorithm": "Nézd meg, hogyan dönti el a Bingg Bongg, mely videókat és élő adásokat látod először."
+ "fblurb_bb_algorithm": "Nézd meg, hogyan dönti el a Bingg Bongg, mely videókat és élő adásokat látod először.",
+ "rival_battle": "Riválisok csatája",
+ "rival_join_for": "Csatlakozz: {country}",
+ "rival_wins": "{country} nyer!",
+ "rival_tie": "Döntetlen!"
 }

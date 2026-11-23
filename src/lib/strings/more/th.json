@@ -1955,5 +1955,9 @@
  "from_line_from": "มาจาก {country}",
  "from_line_lives": "อาศัยอยู่ที่ {country}",
  "fname_bb_algorithm": "อัลกอริทึมของ Bingg Bongg ทำงานอย่างไร",
- "fblurb_bb_algorithm": "ดูว่า Bingg Bongg เลือกวิดีโอและไลฟ์ไหนให้คุณเห็นก่อนอย่างไร"
+ "fblurb_bb_algorithm": "ดูว่า Bingg Bongg เลือกวิดีโอและไลฟ์ไหนให้คุณเห็นก่อนอย่างไร",
+ "rival_battle": "ศึกคู่ปรับ",
+ "rival_join_for": "เข้าร่วมฝั่ง {country}",
+ "rival_wins": "{country} ชนะ!",
+ "rival_tie": "เสมอ!"
 }

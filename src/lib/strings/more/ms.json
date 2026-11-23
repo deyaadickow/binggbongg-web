@@ -1957,5 +1957,9 @@
  "from_line_from": "Dari {country}",
  "from_line_lives": "Tinggal di {country}",
  "fname_bb_algorithm": "Cara algoritma Bingg Bongg berfungsi",
- "fblurb_bb_algorithm": "Tonton cara Bingg Bongg memilih video dan siaran langsung yang anda lihat dahulu."
+ "fblurb_bb_algorithm": "Tonton cara Bingg Bongg memilih video dan siaran langsung yang anda lihat dahulu.",
+ "rival_battle": "Pertarungan Saingan",
+ "rival_join_for": "Sertai untuk {country}",
+ "rival_wins": "{country} menang!",
+ "rival_tie": "Seri!"
 }

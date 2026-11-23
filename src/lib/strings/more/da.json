@@ -1954,5 +1954,9 @@
  "from_line_from": "Fra {country}",
  "from_line_lives": "Bor i {country}",
  "fname_bb_algorithm": "Sådan virker Bingg Bonggs algoritme",
- "fblurb_bb_algorithm": "Se hvordan Bingg Bongg bestemmer, hvilke videoer og lives du ser først."
+ "fblurb_bb_algorithm": "Se hvordan Bingg Bongg bestemmer, hvilke videoer og lives du ser først.",
+ "rival_battle": "Rivalkamp",
+ "rival_join_for": "Deltag for {country}",
+ "rival_wins": "{country} vinder!",
+ "rival_tie": "Uafgjort!"
 }

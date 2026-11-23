@@ -94,6 +94,8 @@ export interface GridBattleSource {
   /** More on the end screen under the podium (Country Battle: "Share my result"). `hold` keeps the
    *  member on the end screen — the trip home after the podium is skipped once they press it. */
   endExtra?: (st: ChbState, hold: () => void) => ReactNode;
+  /** Under the header, above the tiles (Country Battle: a Rival Battle's two-country score bar). */
+  topExtra?: (st: ChbState) => ReactNode;
 }
 
 // ---- gift visibility (Steve, 2026-11-03: "Who ever is gifing a gift they will be able to see the
@@ -867,6 +869,7 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
           {isBattler && !demoUserId && myId > 0 && meRow?.chat_room_name && <FishHostControls myId={myId} roomName={meRow.chat_room_name} messages={threadMessages} />}
         </>} />
       {joinNote && <div className="cb-join-note" role="status">{joinNote}</div>}
+      {source.topExtra?.(st)}
       {roomHook.error && <Notice error>{roomHook.error}</Notice>}
       <StarredYouBar ids={awaitingBack} nameOf={(id) => nameOf(grid.byId.get(id))} onStarBack={(id) => grid.star.toggle(id)} />
       {/* No "Waiting for members to go live" box over a battler's camera (Steve, 2026-11-21: "please

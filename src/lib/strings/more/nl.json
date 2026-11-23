@@ -1957,5 +1957,9 @@
  "from_line_from": "Uit {country}",
  "from_line_lives": "Woont in {country}",
  "fname_bb_algorithm": "Zo werkt het algoritme van Bingg Bongg",
- "fblurb_bb_algorithm": "Bekijk hoe Bingg Bongg bepaalt welke video's en lives je als eerste ziet."
+ "fblurb_bb_algorithm": "Bekijk hoe Bingg Bongg bepaalt welke video's en lives je als eerste ziet.",
+ "rival_battle": "Rivalenstrijd",
+ "rival_join_for": "Doe mee voor {country}",
+ "rival_wins": "{country} wint!",
+ "rival_tie": "Gelijkspel!"
 }

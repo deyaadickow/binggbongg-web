@@ -56,6 +56,8 @@ export interface ChbStarterBonus {
 }
 
 export interface ChbState {
+  /** Country Battle only: a Rival Battle's two sides (Steve, 2026-11-23). */
+  rival?: import("./countryBattle").CbRival | null;
   contest_id: number;
   name: string;
   shared: boolean;

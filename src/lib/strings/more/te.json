@@ -1957,5 +1957,9 @@
  "from_line_from": "{country} వారు",
  "from_line_lives": "{country}లో నివసిస్తున్నారు",
  "fname_bb_algorithm": "Bingg Bongg అల్గారిథమ్ ఎలా పనిచేస్తుంది",
- "fblurb_bb_algorithm": "మీరు ముందుగా ఏ వీడియోలు, లైవ్‌లు చూడాలో Bingg Bongg ఎలా నిర్ణయిస్తుందో చూడండి."
+ "fblurb_bb_algorithm": "మీరు ముందుగా ఏ వీడియోలు, లైవ్‌లు చూడాలో Bingg Bongg ఎలా నిర్ణయిస్తుందో చూడండి.",
+ "rival_battle": "ప్రత్యర్థి బ్యాటిల్",
+ "rival_join_for": "{country} తరఫున చేరండి",
+ "rival_wins": "{country} గెలిచింది!",
+ "rival_tie": "టై!"
 }

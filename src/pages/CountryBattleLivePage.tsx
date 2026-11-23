@@ -16,15 +16,16 @@
 //                                           &phase=ended: the podium with "Share my result" (a
 //                                           sample recap; &reason=not_finished|not_participant|not_found).
 import { useMemo, useRef } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useT } from "../lib/i18n";
 import { GridBattleLive, type GridBattleSource } from "../components/GridBattleScreen";
 import {
-  cbReasonText, cbText, clock, countryBattleDayHeartbeat, countryGiftInfo, dayAsBattleState, joinCountryBattleDay,
+  cbReasonText, cbText, clock, countryBattleDayHeartbeat, countryBattlePath, countryGiftInfo, dayAsBattleState, joinCountryBattleDay,
   leaveCountryBattleDay, localTime, sendCountryBattleDayGift, serverNow,
 } from "../lib/countryBattle";
 import type { ChbBattler, ChbState } from "../lib/chatBattle";
 import { ShareResultButton } from "../components/CountryBoardBits";
+import { RivalBar } from "../components/RivalBar";
 
 type T = ReturnType<typeof useT>["t"];
 
@@ -36,8 +37,10 @@ export function CountryBattleLivePage() {
     return <CountryBattleDemo key={sp.toString()} n={demo === "0" ? 0 : Number(demo) || 24} withOwn={sp.get("own") !== "0"}
       phase={(sp.get("phase") as ChbState["phase"]) || "battle"} imgBase={sp.get("img")} recapDemo={sp.get("reason") ?? ""} />;
   }
-  return <CountryBattleLive key={dayId} dayId={Number(dayId)} home={Number(sp.get("home")) || null}
-    battlerHint={sp.get("battler") === "1"} autoJoin={sp.get("join") === "1"} />;
+  // ?side= — a Rival Battle's country to fight for; a new side means a fresh screen that joins for it.
+  const side = sp.get("side");
+  return <CountryBattleLive key={`${dayId}-${side ?? ""}`} dayId={Number(dayId)} home={Number(sp.get("home")) || null}
+    battlerHint={sp.get("battler") === "1"} autoJoin={sp.get("join") === "1"} side={side} />;
 }
 
 /** The header lines: "Opens in mm:ss", "Starts in mm:ss — go live and join!", "mm:ss left". */
@@ -58,7 +61,7 @@ function joinNote(t: T, st: ChbState, country: string): string | null {
 }
 
 /** Country Battle's side of the shared screen: its calls and its texts. */
-function makeSource(t: T, dayId: number, countryRef: { current: string }, calls: Pick<GridBattleSource, "heartbeat" | "join" | "leave" | "sendGift">, recapDemo?: string): GridBattleSource {
+function makeSource(t: T, dayId: number, countryRef: { current: string }, calls: Pick<GridBattleSource, "heartbeat" | "join" | "leave" | "sendGift">, recapDemo?: string, onRivalJoin?: (country: string) => void): GridBattleSource {
   return {
     kind: "country",
     id: dayId,
@@ -81,14 +84,20 @@ function makeSource(t: T, dayId: number, countryRef: { current: string }, calls:
     noTie: true,
     fallbackPath: "/country-battle",
     // Country Battle Recap (Steve, 2026-11-11): a battler's "Share my result" under the podium.
+    // A Rival Battle: the two countries' score bar; a viewer who can join picks a side there.
+    topExtra: (st) => (st.rival
+      ? <RivalBar rival={st.rival} finished={st.phase === "ended"}
+          onJoin={!st.me.is_battler && st.me.can_join && onRivalJoin ? onRivalJoin : undefined} />
+      : null),
     endExtra: (st, hold) => (st.finished && (st.me.is_battler || (st.me.score ?? 0) > 0)
       ? <ShareResultButton dayId={dayId} demo={recapDemo} onOpen={hold} />
       : null),
   };
 }
 
-function CountryBattleLive({ dayId, home, battlerHint, autoJoin }: { dayId: number; home: number | null; battlerHint: boolean; autoJoin: boolean }) {
+function CountryBattleLive({ dayId, home, battlerHint, autoJoin, side }: { dayId: number; home: number | null; battlerHint: boolean; autoJoin: boolean; side?: string | null }) {
   const { t } = useT();
+  const navigate = useNavigate();
   // The battle's country, for "This battle is for members in {country}." — off the last heartbeat.
   const countryRef = useRef("");
   const source = useMemo(() => makeSource(t, dayId, countryRef, {
@@ -99,13 +108,13 @@ function CountryBattleLive({ dayId, home, battlerHint, autoJoin }: { dayId: numb
       return { ok: true, data: dayAsBattleState(r.data) };
     },
     join: async (userId) => {
-      const r = await joinCountryBattleDay(userId, dayId);
+      const r = await joinCountryBattleDay(userId, dayId, side);
       if (!r.ok) return r;
       return { ok: true, data: { state: r.data.state ? dayAsBattleState(r.data.state) : null } };
     },
     leave: (userId) => leaveCountryBattleDay(userId, dayId),
     sendGift: (i) => sendCountryBattleDayGift({ ...i, dayId }),
-  }), [t, dayId]);
+  }, undefined, (country) => navigate(countryBattlePath(dayId, { join: true, side: country }), { replace: true })), [t, dayId, side, navigate]);
   return <GridBattleLive source={source} home={home} battlerHint={battlerHint} autoJoin={autoJoin} />;
 }
 

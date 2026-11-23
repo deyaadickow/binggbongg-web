@@ -1956,5 +1956,9 @@
  "from_line_from": "Από: {country}",
  "from_line_lives": "Ζει σε: {country}",
  "fname_bb_algorithm": "Πώς λειτουργεί ο αλγόριθμος του Bingg Bongg",
- "fblurb_bb_algorithm": "Δες πώς το Bingg Bongg αποφασίζει ποια βίντεο και ποια live βλέπεις πρώτα."
+ "fblurb_bb_algorithm": "Δες πώς το Bingg Bongg αποφασίζει ποια βίντεο και ποια live βλέπεις πρώτα.",
+ "rival_battle": "Μάχη αντιπάλων",
+ "rival_join_for": "Μπες για {country}",
+ "rival_wins": "Κερδίζει {country}!",
+ "rival_tie": "Ισοπαλία!"
 }

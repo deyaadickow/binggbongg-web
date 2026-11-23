@@ -2651,4 +2651,8 @@ export const es = {
   from_line_lives: "Vive en {country}",
   fname_bb_algorithm: "Cómo funciona el algoritmo de Bingg Bongg",
   fblurb_bb_algorithm: "Mira cómo Bingg Bongg decide qué videos y transmisiones en vivo ves primero.",
+  rival_battle: "Batalla de rivales",
+  rival_join_for: "Únete por {country}",
+  rival_wins: "¡Gana {country}!",
+  rival_tie: "¡Empate!",
 };

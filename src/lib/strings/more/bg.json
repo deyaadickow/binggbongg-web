@@ -1957,5 +1957,9 @@
  "from_line_from": "От {country}",
  "from_line_lives": "Живее в {country}",
  "fname_bb_algorithm": "Как работи алгоритъмът на Bingg Bongg",
- "fblurb_bb_algorithm": "Вижте как Bingg Bongg решава кои видеа и предавания на живо да видите първи."
+ "fblurb_bb_algorithm": "Вижте как Bingg Bongg решава кои видеа и предавания на живо да видите първи.",
+ "rival_battle": "Битка на съперници",
+ "rival_join_for": "Присъедини се за {country}",
+ "rival_wins": "{country} печели!",
+ "rival_tie": "Равенство!"
 }
