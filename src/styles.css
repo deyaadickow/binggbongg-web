@@ -1367,7 +1367,7 @@ body.signup-black { background: radial-gradient(120% 55% at 50% 0%, #2a2108 0%, 
 .cbd-row { display: flex; align-items: center; gap: 10px; background: #000; border: 1px solid var(--gold-border); border-radius: 12px; padding: 12px 14px; }
 .cbd-row.me { border: 2.5px solid var(--gold-bright); background: rgba(240, 196, 32, .10); }
 .cbd-row { flex-wrap: wrap; }
-.cbd-battle { flex: 1 0 100%; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding-top: 8px; border-top: 1px solid var(--gold-border); margin-top: 2px; }
+.cbd-battle { flex: 1 0 100%; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding-top: 4px; margin-top: 2px; } /* no divider line (Steve, 2026-11-23: "Remove the line in the middle") */
 .cbd-battle-line { color: var(--gold); font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
 .cbd-battle-line.live { color: #ff5a5a; }
 .cbd-battle-btns { margin-left: auto; display: flex; gap: 8px; }
