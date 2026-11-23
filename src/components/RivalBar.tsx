@@ -5,7 +5,7 @@ import { useT } from "../lib/i18n";
 import { cbText, type CbRival } from "../lib/countryBattle";
 import { countryFlag } from "../lib/allCountryBattles";
 
-export function RivalBar({ rival, finished, onJoin }: { rival: CbRival; finished: boolean; onJoin?: (country: string) => void }) {
+export function RivalBar({ rival, finished, onJoin, bordered = true }: { rival: CbRival; finished: boolean; onJoin?: (country: string) => void; bordered?: boolean }) {
   const { t } = useT();
   const { a, b } = rival;
   const total = a.score + b.score;
@@ -19,7 +19,7 @@ export function RivalBar({ rival, finished, onJoin }: { rival: CbRival; finished
     </div>
   );
   return (
-    <div className="rival-bar card" role="group" aria-label={rival.label}>
+    <div className="rival-bar card" style={bordered ? undefined : { borderColor: "transparent" }} role="group" aria-label={rival.label}>
       <div className="rival-title">⚔️ {t("rival_battle")}</div>
       <div className="rival-row">
         {side(a, "left")}

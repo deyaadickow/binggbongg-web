@@ -71,6 +71,19 @@ export function CountryBattleCard({ b, now }: { b: AcbBattle; now: number }) {
     <div className="card pad acb-card" role="link" tabIndex={0} onClick={open}
       onKeyDown={(e) => { if (e.key === "Enter") open(); }}
       style={{ cursor: "pointer", display: "flex", flexDirection: "column", gap: 8, borderColor: b.phase === "battle" ? "var(--red)" : b.is_my_country ? "var(--gold)" : undefined }}>
+      {rival ? (
+        // Country VS Country: everything centred side to side (Steve, 2026-11-23: "center all the text from side to side").
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, textAlign: "center" }}>
+          <div className="row" style={{ gap: 6, flexWrap: "wrap", justifyContent: "center" }}>
+            <b style={{ color: "var(--gold)", fontSize: 18 }}>⚔️ {b.country}</b>
+            {b.is_test && <span className="pill" style={{ borderColor: "#ff8a65", color: "#ffcc80" }}>{t("acb_test")}</span>}
+          </div>
+          <div style={{ fontSize: 13, color: "#fff" }}>{status}</div>
+          {b.room_open && b.phase !== "ended" && b.live_count > 0 && (
+            <span className="pill" style={{ whiteSpace: "nowrap" }}>{cbText(t("cb_live_count"), { n: b.live_count.toLocaleString() })}</span>
+          )}
+        </div>
+      ) : (
       <div className="row" style={{ gap: 10, alignItems: "center" }}>
         <span style={{ fontSize: 30, lineHeight: 1 }} aria-hidden>{rival ? "⚔️" : countryFlag(b.country) || "🌍"}</span>
         <div style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0, flex: 1 }}>
@@ -84,8 +97,10 @@ export function CountryBattleCard({ b, now }: { b: AcbBattle; now: number }) {
           <span className="pill" style={{ whiteSpace: "nowrap", flex: "0 0 auto" }}>{cbText(t("cb_live_count"), { n: b.live_count.toLocaleString() })}</span>
         )}
       </div>
-      {count && <div style={{ color: "var(--gold)", fontWeight: 800, fontSize: 20, fontVariantNumeric: "tabular-nums" }}>{count}</div>}
-      {rival && <RivalBar rival={rival} finished={b.phase === "ended"} onJoin={showJoin ? rivalJoin : undefined} />}
+      )}
+      {count && <div style={{ color: "var(--gold)", fontWeight: 800, fontSize: 20, fontVariantNumeric: "tabular-nums", textAlign: rival ? "center" : undefined }}>{count}</div>}
+      {/* No gold border round the score box on the card (Steve, 2026-11-23: "remove the yellow border"). */}
+      {rival && <RivalBar bordered={false} rival={rival} finished={b.phase === "ended"} onJoin={showJoin ? rivalJoin : undefined} />}
       {lead && !rival && (
         <div className="row" style={{ gap: 8, fontSize: 14 }}>
           <Avatar user={{ id: lead.user_id, fullname: lead.name, username: lead.username, profile_image: lead.profile_image }} />
