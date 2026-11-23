@@ -12,7 +12,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Room, RoomEvent, Track,
-  type LocalVideoTrack, type Participant, type RemoteParticipant, type RemoteTrack, type RemoteTrackPublication,
+  type LocalAudioTrack, type LocalVideoTrack, type Participant, type RemoteParticipant, type RemoteTrack, type RemoteTrackPublication,
 } from "livekit-client";
 import { tokenServer } from "./api";
 
@@ -257,5 +257,14 @@ export function useCountryBattleRoom(opts: {
   /** This browser's LiveKit identity (`user_{id}` for a battler), once connected. */
   const identity = useCallback(() => roomRef.current?.localParticipant.identity ?? "", []);
 
-  return { status, error, version, publishers, attachVideo, hasVideo, disconnect, flipCamera, setCamera, setMic, sendData, identity };
+  /** The camera and mic this browser publishes right now (the live tools process them). */
+  const localTracks = useCallback(() => {
+    const lp = roomRef.current?.localParticipant;
+    return {
+      camera: (lp?.getTrackPublication(Track.Source.Camera)?.track ?? null) as LocalVideoTrack | null,
+      mic: (lp?.getTrackPublication(Track.Source.Microphone)?.track ?? null) as LocalAudioTrack | null,
+    };
+  }, []);
+
+  return { status, error, version, publishers, attachVideo, hasVideo, disconnect, flipCamera, setCamera, setMic, sendData, identity, localTracks };
 }

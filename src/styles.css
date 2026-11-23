@@ -2053,3 +2053,36 @@ body:has(.story-viewer) .get-app-bar { display: none; }
 .rival-result { text-align: center; color: var(--gold); font-weight: 800; font-size: 16px; }
 .rival-join { display: flex; gap: 8px; flex-wrap: wrap; }
 .rival-join .btn { flex: 1 1 140px; }
+
+/* The live tools' panels (Sounds, Backgrounds, Filters, Music) — the phones' strips over the
+   bottom of the screen, black with a gold line, the same icon closes them (Steve, 2026-11-23). */
+.lt-panel { position: fixed; left: 50%; transform: translateX(-50%); bottom: 0; z-index: 58; width: min(100%, 720px); max-height: 70vh; display: flex; flex-direction: column; background: #000; border-top: 2px solid var(--gold); border-radius: 14px 14px 0 0; padding: 8px 10px calc(10px + env(safe-area-inset-bottom)); box-shadow: 0 -8px 24px rgba(0,0,0,.6); }
+.lt-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.lt-head b { flex: 1; color: var(--gold); font-size: 16px; }
+.lt-chip { flex: 0 0 auto; padding: 6px 12px; border-radius: 999px; border: 1.5px solid var(--gold-border); background: rgba(240,196,32,.13); color: #F0C420; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; opacity: .7; }
+.lt-chip.on, .lt-head .lt-chip { opacity: 1; }
+.lt-chip.on { background: var(--gold); color: #000; }
+.lt-tabs { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 2px 0 6px; }
+.lt-tabs.scroll { justify-content: flex-start; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+.lt-strip { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 6px; scrollbar-width: thin; overscroll-behavior-x: contain; }
+.lt-tile { flex: 0 0 72px; width: 72px; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 4px; border-radius: 12px; border: 1.5px solid #333; background: #0d0d0d; color: #fff; font-size: 11px; cursor: pointer; }
+.lt-tile.wide { flex-basis: 96px; width: 96px; }
+.lt-tile.on { border-color: var(--gold); background: rgba(212,175,55,.16); }
+.lt-tile img, .lt-tile video { width: 100%; height: 52px; object-fit: contain; border-radius: 8px; background: #111; }
+.lt-tile.wide img, .lt-tile.wide video { object-fit: cover; }
+.lt-tile > span:last-child { width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; }
+.lt-emoji { font-size: 30px; line-height: 52px; height: 52px; }
+.lt-swatch { width: 44px; height: 44px; margin: 4px 0; border-radius: 50%; border: 2px solid #fff3; }
+.lt-list { flex: 1; min-height: 160px; max-height: 42vh; overflow-y: auto; }
+.lt-row { display: flex; align-items: center; gap: 6px; border-bottom: 1px solid #1d1d1d; }
+.lt-row.on { background: rgba(212,175,55,.1); }
+.lt-row-main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; padding: 7px 4px; background: none; border: 0; color: #fff; cursor: pointer; text-align: left; }
+.lt-cover { flex: 0 0 44px; width: 44px; height: 44px; border-radius: 10px; border: 1.5px solid var(--gold-border); background: #111 center / cover no-repeat; display: flex; align-items: center; justify-content: center; color: var(--gold); font-size: 16px; text-shadow: 0 0 4px #000; }
+.lt-row-text { min-width: 0; display: flex; flex-direction: column; }
+.lt-row-text b, .lt-row-text small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lt-row-text small { color: #aaa; font-size: 12px; }
+.lt-fav { background: none; border: 0; color: var(--gold); font-size: 22px; cursor: pointer; padding: 4px 8px; }
+.lt-tts { max-height: 88vh; overflow-y: auto; }
+.lt-label { color: var(--gold); font-weight: 700; font-size: 13px; margin: 12px 0 6px; }
+.lt-switch { display: flex; align-items: center; gap: 8px; color: #fff; font-size: 14px; margin: 6px 0; cursor: pointer; }
+.lt-switch input { accent-color: #D4AF37; width: 18px; height: 18px; }

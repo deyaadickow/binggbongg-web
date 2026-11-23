@@ -10,6 +10,9 @@
 // switch), and nobody in a battle runs it — a CC button there would show nothing.
 import { useT } from "../lib/i18n";
 
+/** One more button on the bar (the live tools: Voice to Text, Captions, Sounds ... Pause Chat). */
+export interface BarItem { key: string; icon: React.ReactNode; label: string; onClick: () => void; active?: boolean }
+
 /** The bar's height, kept free under the grid with the chat strip. */
 export const ACTION_BAR_RESERVE = 62;
 
@@ -100,7 +103,7 @@ function BarButton({ icon, label, onClick, active }: { icon: React.ReactNode; la
 }
 
 export function BattleActionBar({ onBattles, onMessages, onMt, mtOn, onCc, ccOn, onFlip, className,
-  onCamera, cameraOn, onMic, micOn, joinLabel, onJoin, onGifts, onShare }: {
+  onCamera, cameraOn, onMic, micOn, joinLabel, onJoin, onGifts, onShare, afterCc, afterMic, tail }: {
   onBattles: () => void;
   onMessages: () => void;
   onMt: () => void;
@@ -123,6 +126,12 @@ export function BattleActionBar({ onBattles, onMessages, onMt, mtOn, onCc, ccOn,
   onJoin?: () => void;
   onGifts?: (() => void) | null;
   onShare?: () => void;
+  /** The live tools (Steve, 2026-11-23: "Missing I-cons from the bottom. Caption, Voice to text,
+   *  Sound, Music, Stickers, Background, Filters, Text to Voice, Pause Chat."), in the phones'
+   *  places: Voice to Text by the chat icons, Captions after Mic, the rest after Share. */
+  afterCc?: BarItem[];
+  afterMic?: BarItem[];
+  tail?: BarItem[];
 }) {
   const { t } = useT();
   return (
@@ -131,12 +140,15 @@ export function BattleActionBar({ onBattles, onMessages, onMt, mtOn, onCc, ccOn,
       <BarButton icon={<BubbleIcon color="#fff" />} label={t("messages")} onClick={onMessages} />
       <BarButton icon={<BubbleIcon color="#4FC3F7" />} label="MT" onClick={onMt} active={mtOn} />
       {onCc && <BarButton icon={<CcIcon />} label="CC" onClick={onCc} active={ccOn} />}
+      {afterCc?.map((b) => <BarButton key={b.key} icon={b.icon} label={b.label} onClick={b.onClick} active={b.active} />)}
       {onFlip && <BarButton icon={<FlipIcon />} label={noEmoji(t("flip"))} onClick={onFlip} />}
       {onCamera && <BarButton icon={<CameraIcon on={cameraOn !== false} />} label="Camera" onClick={onCamera} />}
       {onMic && <BarButton icon={<MicIcon on={micOn !== false} />} label={micOn === false ? "Mic Off" : "Mic"} onClick={onMic} />}
+      {afterMic?.map((b) => <BarButton key={b.key} icon={b.icon} label={b.label} onClick={b.onClick} active={b.active} />)}
       {joinLabel && onJoin && <BarButton icon={<PersonIcon />} label={joinLabel} onClick={onJoin} />}
       {onGifts && <BarButton icon={<GiftIcon />} label="Gifts" onClick={onGifts} />}
       {onShare && <BarButton icon={<ShareIcon />} label="Share & Earn 10%" onClick={onShare} />}
+      {tail?.map((b) => <BarButton key={b.key} icon={b.icon} label={b.label} onClick={b.onClick} active={b.active} />)}
     </nav>
   );
 }

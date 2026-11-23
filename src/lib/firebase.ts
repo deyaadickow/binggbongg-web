@@ -2,7 +2,7 @@
 // The browser signs in with a Firebase custom token minted by the LiveKit token server for this session.
 import { initializeApp, getApps } from "firebase/app";
 import { getAuth, signInWithCustomToken } from "firebase/auth";
-import { addDoc, collection, getFirestore, limit, limitToLast, onSnapshot, orderBy, query } from "firebase/firestore";
+import { addDoc, collection, getFirestore, limit, limitToLast, onSnapshot, orderBy, query, setDoc, type DocumentReference } from "firebase/firestore";
 import { tokenServer } from "./api";
 
 const config = {
@@ -104,4 +104,28 @@ export function observeLiveCaption(roomName: string, speakerUserId: number, onLi
     const d = snap.docs[0]?.data();
     if (d && typeof d.text === "string") onLine(d.text, d.isFinal !== false, Number(d.updatedAt) || 0);
   }, () => undefined);
+}
+
+/** The speaker's side of live captions (the phones' LiveCaptionsManager.updateSegment): one
+ *  document per utterance, created on its first words and updated in place until it is final. */
+export function liveCaptionWriter(roomName: string, speakerUserId: number) {
+  const segments = collection(getFirestore(app()), "liveCaptions", `${roomName}__${speakerUserId}`, "segments");
+  let current: Promise<DocumentReference | null> | null = null;
+  return {
+    update(text: string, isFinal: boolean) {
+      const trimmed = text.trim();
+      if (!trimmed) return;
+      const now = Date.now();
+      if (!current) {
+        const made = addDoc(segments, { text: trimmed, isFinal, startedAt: now, updatedAt: now }).catch(() => null);
+        current = isFinal ? null : made;
+        return;
+      }
+      const ref = current;
+      if (isFinal) current = null;
+      void ref.then((r) => (r ? setDoc(r, { text: trimmed, isFinal, updatedAt: now }, { merge: true }) : undefined)).catch(() => undefined);
+    },
+    /** Captions switched off mid-sentence: the next words start a new line. */
+    reset() { current = null; },
+  };
 }

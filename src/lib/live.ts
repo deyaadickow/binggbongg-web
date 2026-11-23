@@ -10,7 +10,7 @@ const HEART_TOPIC = "bb_heart";
 /// Only ever a reason to refetch fetchLiveRoomMembers — never trusted beyond that.
 const ML_STATE_TOPIC = "ml_state";
 
-import { ConnectionState, Room, RoomEvent, Track, type LocalTrackPublication, type RemoteParticipant, type RemoteTrack, type Participant } from "livekit-client";
+import { ConnectionState, Room, RoomEvent, Track, type LocalAudioTrack, type LocalTrackPublication, type LocalVideoTrack, type RemoteParticipant, type RemoteTrack, type Participant } from "livekit-client";
 import { tokenServer } from "./api";
 
 export type LiveRole = "viewer" | "guest" | "host";
@@ -322,5 +322,14 @@ export function useLiveRoom(roomName: string, role: LiveRole, enabled: boolean, 
     return out;
   }, []);
 
-  return { status, error, publishError, tiles, cameraOn, micOn, grantedRole, toggleCamera, toggleMic, flipCamera, disconnect, sendHeart, incomingHeart, joinTimes, mlSignal };
+  /** The camera and mic this browser publishes right now (the live tools process them). */
+  const localTracks = useCallback(() => {
+    const lp = roomRef.current?.localParticipant;
+    return {
+      camera: (lp?.getTrackPublication(Track.Source.Camera)?.track ?? null) as LocalVideoTrack | null,
+      mic: (lp?.getTrackPublication(Track.Source.Microphone)?.track ?? null) as LocalAudioTrack | null,
+    };
+  }, []);
+
+  return { status, error, publishError, tiles, cameraOn, micOn, grantedRole, toggleCamera, toggleMic, flipCamera, disconnect, sendHeart, incomingHeart, joinTimes, mlSignal, localTracks };
 }

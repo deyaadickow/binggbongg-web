@@ -37,6 +37,7 @@ import { FishHostControls, LiveFishOverlay } from "./LiveFishOverlay";
 import { TapTapBurst, isTapTapGift, tapTapBurstDuration } from "./TapTapBurst";
 import { loadGifts } from "../lib/gifts";
 import { ACTION_BAR_RESERVE, BattleActionBar, BattlesMenu } from "./BattleActionBar";
+import { useLiveTools } from "./LiveTools";
 import { PickerSheet } from "./PickerSheet";
 import { TRANSLATION_LANGUAGES, defaultTargetLanguage, translateChatMessage, type TranslationResult } from "../lib/translate";
 
@@ -266,8 +267,10 @@ function useRoomChat(room: string | null, enabled: boolean, myId: number | null)
 
 /** The small strip under the tiles: the home battler's own viewers' chat (Steve: "each battler
  *  keeps their OWN viewers' chat in a small strip under the tiles"). */
-export function ChatStrip({ messages, onSend, note, inputRef, translations }: {
+export function ChatStrip({ messages, onSend, note, inputRef, translations, dictated }: {
   messages: ChatMessage[]; onSend: ((text: string) => void) | null; note?: ReactNode;
+  /** Voice to Text: the words heard so far go into the box (empty once they were sent). */
+  dictated?: { text: string; seq: number } | null;
   /** The bar's Messages icon focuses this input. */
   inputRef?: React.RefObject<HTMLInputElement | null>;
   /** MT: each line's translation, shown after the original when it differs. */
@@ -278,6 +281,7 @@ export function ChatStrip({ messages, onSend, note, inputRef, translations }: {
   const logRef = useRef<HTMLDivElement>(null);
   const recent = messages.slice(-30);
   useEffect(() => { logRef.current?.scrollTo({ top: logRef.current.scrollHeight }); }, [messages]);
+  useEffect(() => { if (dictated) setDraft(dictated.text); }, [dictated]);
   return (
     <div className="chb-chat">
       {note}
@@ -804,8 +808,12 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
     if (nav.share) { nav.share({ title: text, text, url }).catch(() => undefined); return; }
     navigator.clipboard?.writeText(`${text}\n${url}`).then(() => showGoldAlert(t("link_copied")), () => undefined);
   };
+  // Pause Chat: the chat on screen paused by its owner — nobody else talks (the phones'
+  // `chatPaused && !(battler && ownsChat())`).
+  const ownsChat = isBattler && !!meRow?.chat_room_name && meRow.chat_room_name !== st?.room_name;
+  const chatPausedRef = useRef(false);
   const onSend = isLoggedIn && user && chatRoom
-    ? (text: string) => { if (!requireVerified()) return; sendChat(chatChannel(chatRoom, roomHostId(chatRoom)), user.id, displayName(user), text, user.profile_image ?? "").catch(() => undefined); }
+    ? (text: string) => { if (chatPausedRef.current && !ownsChat) { showGoldAlert(t("lt_chat_paused_viewer")); return; } if (!requireVerified()) return; sendChat(chatChannel(chatRoom, roomHostId(chatRoom)), user.id, displayName(user), text, user.profile_image ?? "").catch(() => undefined); }
     : null;
   // The receiver's Thank you: an ordinary chat line in their own strip, nothing more to the server.
   const onThank = onSend
@@ -821,6 +829,24 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
       giftShow.closeNote();
     }
     : null;
+
+  // ---- the live tools (Steve, 2026-11-23: "Missing I-cons from the bottom. Caption, Voice to
+  // text, Sound, Music, Stickers, Background, Filters, Text to Voice, Pause Chat.") ----
+  const [dictated, setDictated] = useState<{ text: string; seq: number } | null>(null);
+  const tools = useLiveTools({
+    myId, publishing: isBattler && !demoUserId, micOn, tracks: roomHook.localTracks,
+    captionRoom: meRow?.chat_room_name || st?.room_name || null,
+    // Pause Chat always shows for a battler; it pauses only their own live's chat.
+    showPauseChat: isBattler && !demoUserId, pauseRoom: ownsChat ? meRow?.chat_room_name ?? null : null,
+    chatRoom: isLoggedIn ? chatRoom : null, ownsChat,
+    ownMessages: isBattler ? threadMessages : null,
+    canChat: !!onSend,
+    onDictate: (text, final) => {
+      if (final && onSend) { onSend(text); setDictated({ text: "", seq: Date.now() }); }
+      else setDictated({ text, seq: Date.now() });
+    },
+  });
+  chatPausedRef.current = tools.chatPaused;
 
   if (gone) {
     return (
@@ -897,7 +923,7 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
             attach={roomHook.attachVideo} hasVideo={roomHook.hasVideo} version={roomHook.version}
             flash={flash} onFlashDone={() => setFlash(null)} />
         )}
-      <ChatStrip messages={messages} onSend={onSend} inputRef={chatInputRef} translations={mt.mtLang ? mt.translations : undefined}
+      <ChatStrip messages={messages} onSend={onSend} inputRef={chatInputRef} translations={mt.mtLang ? mt.translations : undefined} dictated={dictated}
         note={giftShow.note && <GiftNote key={giftShow.note.key} note={giftShow.note} onThank={onThank} onClose={giftShow.closeNote} />} />
       <BattleActionBar
         onBattles={() => setBattlesOpen(true)}
@@ -919,7 +945,9 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
           const who = [listen, home, ...shown].find((id): id is number => typeof id === "number" && id > 0 && id !== myId);
           if (who) setGiftTarget(who);
         }}
-        onShare={shareBattle} />
+        onShare={shareBattle}
+        afterCc={tools.afterCc} afterMic={tools.afterMic} tail={tools.tail} />
+      {tools.overlay}
       {caption && <div className="cb-caption" role="status">{caption}</div>}
       {giftsOpen && (
         <div className="cb-menu-backdrop" onClick={() => setGiftsOpen(false)} role="dialog" aria-modal="true">
