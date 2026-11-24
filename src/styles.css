@@ -2170,8 +2170,8 @@ body:has(.story-viewer) .get-app-bar { display: none; }
    please."): Country VS Country red (#E53935, the bar's left), All Country Battles blue (#1565C0, its right). White
    text; the chosen chip solid with a white border, the other a dark shade of its colour with a coloured border. The
    blinking Live pill sits on the blue chip, so its red stays distinct. */
-.acb-filter.red { background: #3a0f0e; border-color: #fff; color: #fff; }
-.acb-filter.blue { background: #0b2340; border-color: #fff; color: #fff; }
+.acb-filter.red { background: #A31F1B; border-color: #fff; color: #fff; }
+.acb-filter.blue { background: #0E3F80; border-color: #fff; color: #fff; }
 .acb-filter.red.on { background: #E53935; border-color: #fff; color: #fff; }
 .acb-filter.blue.on { background: #1565C0; border-color: #fff; color: #fff; }
 .ic-btn.red, .ic-btn.red:hover { background: #E53935; border-color: #fff; color: #fff; box-shadow: 0 0 12px rgba(229,57,53,.35); }
