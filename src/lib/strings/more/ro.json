@@ -2059,5 +2059,7 @@
  "vcb_show_me_sub": "Fotografia ta de profil poate apărea în Country Battles cât timp nu ești live. BBs reali primiți în dar sunt ai tăi.",
  "vcb_virtual": "Virtual",
  "vcb_no_members": "Încă nu există membri din {country}",
- "vcb_host": "Gazdă"
+ "vcb_host": "Gazdă",
+ "lbq_next": "Următoarea bătălie",
+ "lbq_prev": "Bătălia anterioară"
 }

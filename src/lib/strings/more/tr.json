@@ -2064,5 +2064,7 @@
  "vcb_show_me_sub": "Canlı yayında değilken profil fotoğrafın Country Battles'ta görünebilir. Sana hediye edilen gerçek BBs senindir.",
  "vcb_virtual": "Sanal",
  "vcb_no_members": "Henüz {country} üyesi yok",
- "vcb_host": "Sunucu"
+ "vcb_host": "Sunucu",
+ "lbq_next": "Sonraki savaş",
+ "lbq_prev": "Önceki savaş"
 }

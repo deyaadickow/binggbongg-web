@@ -2061,5 +2061,7 @@
  "vcb_show_me_sub": "Jūsų profilio nuotrauka gali būti rodoma Country Battles, kai nesate tiesioginiame eteryje. Jums padovanoti tikri BBs yra jūsų.",
  "vcb_virtual": "Virtualus",
  "vcb_no_members": "Kol kas nėra narių iš {country}",
- "vcb_host": "Vedėjas"
+ "vcb_host": "Vedėjas",
+ "lbq_next": "Kita kova",
+ "lbq_prev": "Ankstesnė kova"
 }

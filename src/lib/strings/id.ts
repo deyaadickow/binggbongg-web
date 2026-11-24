@@ -2796,4 +2796,7 @@ export const id = {
   vcb_virtual: "Virtual",
   vcb_host: "Host",
   vcb_no_members: "Belum ada anggota dari {country}",
+  // Live button bar (Steve, 2026-11-24).
+  lbq_next: "Battle berikutnya",
+  lbq_prev: "Battle sebelumnya",
 };

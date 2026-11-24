@@ -2057,5 +2057,7 @@
  "vcb_show_me_sub": "A profilképed megjelenhet a Country Battles-ben, amikor nem vagy élőben. A neked ajándékozott valódi BBs a tieid.",
  "vcb_virtual": "Virtuális",
  "vcb_no_members": "Még nincsenek tagok innen: {country}",
- "vcb_host": "Házigazda"
+ "vcb_host": "Házigazda",
+ "lbq_next": "Következő csata",
+ "lbq_prev": "Előző csata"
 }

@@ -2064,5 +2064,7 @@
  "vcb_show_me_sub": "라이브 중이 아닐 때도 프로필 사진이 Country Battles에 나타날 수 있어요. 나에게 선물된 실제 BBs는 내 것이에요.",
  "vcb_virtual": "가상",
  "vcb_no_members": "아직 {country} 멤버가 없어요",
- "vcb_host": "호스트"
+ "vcb_host": "호스트",
+ "lbq_next": "다음 배틀",
+ "lbq_prev": "이전 배틀"
 }

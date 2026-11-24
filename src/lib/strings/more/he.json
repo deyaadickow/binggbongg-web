@@ -2060,5 +2060,7 @@
  "vcb_show_me_sub": "תמונת הפרופיל שלך יכולה להופיע ב-Country Battles כשאתה לא בשידור חי. ה-BBs האמיתיים שמעניקים לך שייכים לך.",
  "vcb_virtual": "וירטואלי",
  "vcb_no_members": "עדיין אין חברים מ{country}",
- "vcb_host": "מארח"
+ "vcb_host": "מארח",
+ "lbq_next": "הקרב הבא",
+ "lbq_prev": "הקרב הקודם"
 }

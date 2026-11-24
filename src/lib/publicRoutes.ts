@@ -45,6 +45,14 @@ export function isPublicPath(pathname: string): boolean {
   const p = clean(pathname);
   // DEV ONLY: the Virtual Country Battles demos (?vcbdemo=, 2026-11-24) open signed out. Never in a production build.
   if (import.meta.env.DEV && typeof window !== "undefined" && new URLSearchParams(window.location.search).has("vcbdemo")) return true;
+  // DEV ONLY: ?lbdemo=1 (the red Live button, 2026-11-24) — the chips and the battles it steps through, signed out,
+  // for the whole tab (the battle screens it opens have no ?lbdemo). Never in a production build.
+  if (import.meta.env.DEV && typeof window !== "undefined") {
+    try {
+      if (new URLSearchParams(window.location.search).has("lbdemo")) sessionStorage.setItem("lbdemo", "1");
+      if (sessionStorage.getItem("lbdemo") === "1") return true;
+    } catch { /* no storage */ }
+  }
   return EXACT.has(p) || PREFIXES.some((x) => p.startsWith(x));
 }
 

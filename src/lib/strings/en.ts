@@ -3743,4 +3743,7 @@ export const en = {
   vcb_virtual: "Virtual",
   vcb_host: "Host",
   vcb_no_members: "No members from {country} yet",
+  // Live button bar (Steve, 2026-11-24).
+  lbq_next: "Next battle",
+  lbq_prev: "Previous battle",
 } as const;

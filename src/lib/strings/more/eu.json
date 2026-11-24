@@ -2064,5 +2064,7 @@
  "vcb_show_me_sub": "Zure profileko argazkia Country Battles-en ager daiteke zuzenean ez zaudenean. Oparitzen dizkizuten benetako BBs zureak dira.",
  "vcb_virtual": "Birtuala",
  "vcb_no_members": "Oraindik ez dago {country}ko kiderik",
- "vcb_host": "Ostalaria"
+ "vcb_host": "Ostalaria",
+ "lbq_next": "Hurrengo borroka",
+ "lbq_prev": "Aurreko borroka"
 }

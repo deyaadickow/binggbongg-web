@@ -2760,4 +2760,7 @@ export const es = {
   vcb_virtual: "Virtual",
   vcb_host: "Anfitri\u00f3n",
   vcb_no_members: "Todavía no hay miembros de {country}",
+  // Live button bar (Steve, 2026-11-24).
+  lbq_next: "Siguiente batalla",
+  lbq_prev: "Batalla anterior",
 };

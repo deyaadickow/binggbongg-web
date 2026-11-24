@@ -2959,4 +2959,7 @@ export const fil = {
   vcb_virtual: "Virtual",
   vcb_host: "Host",
   vcb_no_members: "Wala pang miyembro mula sa {country}",
+  // Live button bar (Steve, 2026-11-24).
+  lbq_next: "Susunod na laban",
+  lbq_prev: "Nakaraang laban",
 };

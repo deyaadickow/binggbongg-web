@@ -2064,5 +2064,7 @@
  "vcb_show_me_sub": "Sua foto de perfil pode aparecer nas Country Battles enquanto você não está ao vivo. Os BBs reais que te derem são seus.",
  "vcb_virtual": "Virtual",
  "vcb_no_members": "Ainda não há membros de {country}",
- "vcb_host": "Anfitrião"
+ "vcb_host": "Anfitrião",
+ "lbq_next": "Próxima batalha",
+ "lbq_prev": "Batalha anterior"
 }

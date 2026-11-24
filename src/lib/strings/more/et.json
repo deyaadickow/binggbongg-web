@@ -2061,5 +2061,7 @@
  "vcb_show_me_sub": "Sinu profiilipilt võib ilmuda Country Battles'is, kui sa pole otseülekandes. Sulle kingitud päris BBs on sinu omad.",
  "vcb_virtual": "Virtuaalne",
  "vcb_no_members": "{country} liikmeid veel pole",
- "vcb_host": "Võõrustaja"
+ "vcb_host": "Võõrustaja",
+ "lbq_next": "Järgmine lahing",
+ "lbq_prev": "Eelmine lahing"
 }

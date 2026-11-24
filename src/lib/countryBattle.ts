@@ -491,8 +491,10 @@ export async function setCountryBattleReminder(userId: number, enabled: boolean)
 
 /** The battle screen's URL. `home` pins the battler a viewer followed in; `join` asks the screen
  *  to join (camera + mic) as soon as it opens; `battler` says this browser has already joined. */
-export function countryBattlePath(dayId: number, opts: { home?: number | null; join?: boolean; battler?: boolean; side?: string | null } = {}): string {
+export function countryBattlePath(dayId: number, opts: { home?: number | null; join?: boolean; battler?: boolean; side?: string | null; live?: boolean } = {}): string {
   const q = new URLSearchParams();
+  // ?live=1 — opened from the red Live button: the screen shows the bar that steps through every battle under way.
+  if (opts.live) q.set("live", "1");
   if (opts.side) q.set("side", opts.side);
   if (opts.home) q.set("home", String(opts.home));
   if (opts.join) q.set("join", "1");
