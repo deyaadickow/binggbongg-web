@@ -1,0 +1,333 @@
+<!doctype html>
+<!--
+  Bingg Bongg broadcast template (free marketing #1, Steve 2026-11-23: "All the free ideas").
+  LiveKit Egress opens this page in its own headless Chrome as
+    battle.html?url=<ws>&token=<token>&layout=<our string>
+  and streams exactly what it shows (1280x720 or 720x1280) to TikTok / Facebook / YouTube.
+  The page must console.log('START_RECORDING') once it is ready and 'END_RECORDING' when the
+  room is over — that is the whole Egress template contract.
+
+  layout (built by the token server, '~'-separated, URL-encoded by Egress):
+    cb~<country>~<startsUnix>~<endsUnix>~<dayId>   a Country Battle room (24-tile grid)
+    live~<host name>                               anyone's own live
+  Anything else (or a bare 'grid') still renders: tiles + the Join bar, no countdown.
+
+  Preview without a room: battle.html?demo=8&layout=cb~Philippines~0~0~0
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bingg Bongg Live</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #f5c542; --gold-2: #ffdf73; --gold-deep: #b8860b;
+    --black: #000; --panel: #0b0b0b; --red: #ff2d3a;
+    --bar-top: 9.5vh; --bar-bottom: 21vh;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; background: var(--black); overflow: hidden;
+    font-family: Montserrat, "Noto Sans", "DejaVu Sans", Arial, sans-serif; color: #fff; }
+
+  /* ---- top bar ---- */
+  #top { position: absolute; left: 0; right: 0; top: 0; height: var(--bar-top);
+    display: flex; align-items: center; gap: 1.6vh; padding: 0 2.2vh;
+    background: linear-gradient(#000 70%, rgba(0,0,0,0)); z-index: 3; }
+  #logo { height: 6.4vh; width: 6.4vh; border-radius: 50%; border: .35vh solid var(--gold);
+    background: #000 url(/logo_round.png) center/cover no-repeat; flex: none; }
+  #titles { flex: 1; min-width: 0; }
+  #title { color: var(--gold); font-weight: 900; font-size: 2.55vh; letter-spacing: .05em;
+    text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #sub { color: #fff; font-weight: 600; font-size: 1.7vh; opacity: .9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #right { display: flex; flex-direction: column; align-items: flex-end; gap: .6vh; flex: none; }
+  #live { background: var(--red); color: #fff; font-weight: 900; font-size: 1.6vh; letter-spacing: .12em;
+    padding: .35vh 1.1vh; border-radius: .6vh; display: flex; align-items: center; gap: .7vh; }
+  #live i { width: 1vh; height: 1vh; border-radius: 50%; background: #fff; animation: blink 1s infinite; }
+  #clock { color: var(--gold); font-weight: 900; font-size: 2.3vh; font-variant-numeric: tabular-nums;
+    border: .25vh solid var(--gold); border-radius: .8vh; padding: .1vh 1vh; background: #000; }
+  #clock:empty { display: none; }
+  @keyframes blink { 50% { opacity: .2; } }
+
+  /* ---- top 3 ribbon (Country Battle only) ---- */
+  #top3 { position: absolute; left: 1.4vh; right: 1.4vh; top: var(--bar-top); height: 4.4vh; z-index: 3;
+    display: none; gap: .8vh; }
+  #top3.on { display: flex; }
+  .t3 { flex: 1; min-width: 0; display: flex; align-items: center; gap: .7vh; background: rgba(0,0,0,.82);
+    border: .2vh solid var(--gold-deep); border-radius: 2.2vh; padding: 0 1.1vh; font-size: 1.55vh; font-weight: 800; }
+  .t3 b { color: #000; background: var(--gold); border-radius: 50%; width: 2.6vh; height: 2.6vh; flex: none;
+    display: grid; place-items: center; font-size: 1.45vh; }
+  .t3 span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .t3 em { color: var(--gold); font-style: normal; font-variant-numeric: tabular-nums; }
+
+  /* ---- tiles ---- */
+  #stage { position: absolute; left: 1.4vh; right: 1.4vh; top: calc(var(--bar-top) + .6vh);
+    bottom: calc(var(--bar-bottom) + .8vh); display: grid; gap: .8vh; align-content: center; justify-content: center; z-index: 1; }
+  #stage.cb { top: calc(var(--bar-top) + 5.4vh); }
+  .tile { position: relative; overflow: hidden; border-radius: 1.2vh; background: #111;
+    border: .25vh solid var(--gold-deep); box-shadow: 0 0 1.4vh rgba(245,197,66,.18); }
+  .tile.speaking { border-color: var(--gold-2); box-shadow: 0 0 2vh rgba(255,223,115,.65); }
+  .tile video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
+  .tile .name, .tile .rank { z-index: 2; }
+  .tile .ini { position: absolute; inset: 0; display: grid; place-items: center; color: var(--gold);
+    font-weight: 900; font-size: 6vh; background: radial-gradient(#2a2208, #000 70%); }
+  .tile .name { position: absolute; left: .6vh; bottom: .6vh; max-width: calc(100% - 1.2vh);
+    background: rgba(0,0,0,.72); color: #fff; font-weight: 800; font-size: 1.45vh; padding: .25vh .8vh;
+    border-radius: .6vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-left: .35vh solid var(--gold); }
+  .tile .rank { position: absolute; right: .6vh; top: .6vh; background: var(--gold); color: #000; font-weight: 900;
+    font-size: 1.4vh; padding: .2vh .7vh; border-radius: .6vh; }
+  .tile.small .name { font-size: 1.15vh; } .tile.small .ini { font-size: 3.5vh; }
+
+  #empty { position: absolute; left: 4vh; right: 4vh; top: calc(var(--bar-top) + 4vh); bottom: calc(var(--bar-bottom) + 3vh);
+    display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 2.2vh; z-index: 2; }
+  #empty.on { display: flex; }
+  #empty h1 { color: var(--gold); font-weight: 900; font-size: 4.2vh; line-height: 1.12; text-transform: uppercase; }
+  #empty p { font-weight: 600; font-size: 2.1vh; opacity: .92; }
+  #empty .bigqr { width: 26vh; height: 26vh; background: #fff url(qr-country-battles.svg) center/92% no-repeat;
+    border: .5vh solid var(--gold); border-radius: 1.6vh; }
+
+  /* ---- the Join bar (always on screen) ---- */
+  #join { position: absolute; left: 0; right: 0; bottom: 0; height: var(--bar-bottom); z-index: 3;
+    background: linear-gradient(rgba(0,0,0,0), #000 14%); display: flex; align-items: flex-end; }
+  #joinIn { width: 100%; margin: 0 1.4vh 1.6vh; border: .35vh solid var(--gold); border-radius: 1.8vh;
+    background: linear-gradient(135deg, #141005, #000 55%); display: flex; align-items: center; gap: 1.8vh; padding: 1.4vh 1.8vh;
+    box-shadow: 0 0 2.4vh rgba(245,197,66,.35); }
+  #joinText { flex: 1; min-width: 0; }
+  #cta { color: var(--gold); font-weight: 900; font-size: 3.15vh; line-height: 1.08; text-transform: uppercase; transition: opacity .5s; }
+  #url { margin-top: .9vh; display: inline-block; background: var(--gold); color: #000; font-weight: 900;
+    font-size: 2.5vh; padding: .35vh 1.3vh; border-radius: .8vh; letter-spacing: .02em; }
+  #small { margin-top: .9vh; font-weight: 600; font-size: 1.55vh; opacity: .85; transition: opacity .5s; }
+  #qr { width: 13.5vh; height: 13.5vh; flex: none; border-radius: 1vh; border: .3vh solid var(--gold);
+    background: #fff url(qr-country-battles.svg) center/94% no-repeat; position: relative; }
+  #qr:after { content: "SCAN"; position: absolute; left: 50%; bottom: -1.2vh; transform: translateX(-50%);
+    background: #000; color: var(--gold); font-weight: 900; font-size: 1.2vh; padding: 0 .7vh; border-radius: .4vh;
+    border: .15vh solid var(--gold); letter-spacing: .1em; }
+  .fade { opacity: 0 !important; }
+
+  /* landscape output (1280x720): the same pieces, side bar instead of bottom bar */
+  @media (min-aspect-ratio: 1/1) {
+    :root { --bar-top: 11vh; --bar-bottom: 0vh; }
+    #stage, #stage.cb, #empty { right: 39vh; bottom: 1.6vh; }
+    #top3 { right: 39vh; }
+    #join { left: auto; width: 38vh; top: var(--bar-top); height: auto; background: none; align-items: stretch; }
+    #joinIn { flex-direction: column; justify-content: center; gap: 3.5vh; text-align: center; margin: 0 1.4vh 1.6vh 0; }
+    #joinText { flex: none; } #cta { font-size: 3.6vh; } #qr { width: 20vh; height: 20vh; margin-top: 1vh; }
+  }
+</style>
+</head>
+<body>
+  <div id="top">
+    <div id="logo"></div>
+    <div id="titles"><div id="title">Bingg Bongg Live</div><div id="sub">Live right now on Bingg Bongg</div></div>
+    <div id="right"><div id="live"><i></i>LIVE</div><div id="clock"></div></div>
+  </div>
+  <div id="top3"></div>
+  <div id="stage"></div>
+  <div id="empty"><h1 id="emptyH">The battle is about to start</h1><div class="bigqr"></div><p id="emptyP">Scan to join — free on Bingg Bongg</p></div>
+  <div id="join"><div id="joinIn">
+    <div id="joinText">
+      <div id="cta">Join the battle on Bingg Bongg</div>
+      <div id="url">binggbongg.com</div>
+      <div id="small">Free · every hour · 197 countries</div>
+    </div>
+    <div id="qr"></div>
+  </div></div>
+
+<script src="livekit-client.umd.js"></script>
+<script>
+(function () {
+  'use strict';
+  var API = 'https://admin.binggbongg.com/api/';
+  var q = new URLSearchParams(location.search);
+  var layout = String(q.get('layout') || '');
+  var parts = layout.split('~');
+  var mode = parts[0] === 'cb' ? 'cb' : (parts[0] === 'live' ? 'live' : 'grid');
+  var cb = mode === 'cb' ? { country: parts[1] || '', starts: +parts[2] || 0, ends: +parts[3] || 0, dayId: +parts[4] || 0 } : null;
+  var $ = function (id) { return document.getElementById(id); };
+  var names = {};   // user id -> display name (from the battle's own board)
+  var ranks = {};   // user id -> rank 1..3
+  var started = false, ended = false;
+
+  function start() { if (!started) { started = true; console.log('START_RECORDING'); } }
+  function end() { if (!ended) { ended = true; console.log('END_RECORDING'); } }
+
+  // ---- words: English, and Tagalog alternating for the Philippines ----
+  var EN = { cta: 'Join the battle on Bingg Bongg', small: 'Free · every hour · 197 countries',
+    emptyH: 'The battle is about to start', emptyP: 'Scan to join — free on Bingg Bongg' };
+  var TL = { cta: 'Sumali sa battle sa Bingg Bongg', small: 'Libre · bawat oras · 197 bansa',
+    emptyH: 'Magsisimula na ang battle', emptyP: 'I-scan para sumali — libre sa Bingg Bongg' };
+  var langs = [EN];
+  if (cb && /philippines/i.test(cb.country)) langs.push(TL);
+  if (mode === 'live') { EN.cta = 'Watch & join on Bingg Bongg'; EN.small = 'Free live streams, battles & games'; }
+  var li = 0;
+  function words() {
+    var w = langs[li % langs.length];
+    ['cta', 'small'].forEach(function (k) { $(k).classList.add('fade'); });
+    setTimeout(function () {
+      $('cta').textContent = w.cta; $('small').textContent = w.small;
+      $('emptyH').textContent = w.emptyH; $('emptyP').textContent = w.emptyP;
+      ['cta', 'small'].forEach(function (k) { $(k).classList.remove('fade'); });
+    }, langs.length > 1 ? 450 : 0);
+    li++;
+  }
+  words(); if (langs.length > 1) setInterval(words, 7000);
+
+  if (cb) {
+    $('title').textContent = cb.country || 'Country Battle';
+    $('sub').textContent = 'Whole Country Battle · live every hour';
+    $('stage').classList.add('cb');
+  } else if (mode === 'live') {
+    $('title').textContent = (parts[1] || 'Bingg Bongg') + ' is live';
+  }
+
+  // ---- countdown ----
+  function mmss(s) { s = Math.max(0, Math.floor(s)); return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
+  function tick() {
+    if (!cb || !cb.ends) return;
+    var now = Date.now() / 1000;
+    if (cb.starts && now < cb.starts) $('clock').textContent = 'STARTS ' + mmss(cb.starts - now);
+    else if (now < cb.ends) $('clock').textContent = mmss(cb.ends - now) + ' LEFT';
+    else $('clock').textContent = 'FINAL';
+  }
+  tick(); setInterval(tick, 500);
+
+  // ---- top 3 + names, from the battle's own board (the same numbers the app shows) ----
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function board() {
+    if (!cb || !cb.dayId) return;
+    var body = new URLSearchParams({ day_id: String(cb.dayId), user_id: '0' });
+    fetch(API + 'fetchCountryBattleDayTop', { method: 'POST', headers: { apikey: '123' }, body: body })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (!j || !j.status || !j.data) return;
+        var rows = j.data.rows || [];
+        ranks = {};
+        rows.forEach(function (r) {
+          names[r.user_id] = r.name || r.username || names[r.user_id];
+          if (r.rank <= 3 && r.score > 0) ranks[r.user_id] = r.rank;
+        });
+        var top = rows.filter(function (r) { return r.score > 0; }).slice(0, 3);
+        $('top3').innerHTML = top.map(function (r) {
+          return '<div class="t3"><b>' + r.rank + '</b><span>' + esc(r.name || r.username || 'Member') + '</span><em>' + Number(r.score).toLocaleString() + '</em></div>';
+        }).join('');
+        $('top3').classList.toggle('on', top.length > 0);
+        render();
+      }).catch(function () {});
+  }
+  board(); setInterval(board, 5000);
+
+  // ---- tiles ----
+  var room = null;
+  var tiles = {};   // identity -> {el, video}
+  function uid(identity) { var m = /^user_(\d+)/.exec(identity || ''); return m ? +m[1] : 0; }
+  function displayName(p) {
+    var id = uid(p.identity);
+    return names[id] || (p.name && p.name !== p.identity ? p.name : '') || 'Member';
+  }
+  function shown() {
+    if (!room) return [];
+    return Array.from(room.remoteParticipants.values()).filter(function (p) {
+      // Battlers publish; viewers and Egress itself don't. Never more than 24 tiles.
+      return p.trackPublications.size > 0 && !/^EG_/.test(p.identity);
+    }).slice(0, 24);
+  }
+  function fit(n, W, H) {
+    // the column count that makes the biggest 3:4 tiles fit the stage
+    var best = { cols: 1, w: 0, h: 0 }, gap = H * 0.008;
+    for (var c = 1; c <= Math.min(n, 6); c++) {
+      var r = Math.ceil(n / c);
+      var w = (W - gap * (c - 1)) / c, h = w * 4 / 3;
+      if (h * r + gap * (r - 1) > H) { h = (H - gap * (r - 1)) / r; w = h * 3 / 4; }
+      if (w > best.w) best = { cols: c, w: w, h: h };
+    }
+    return best;
+  }
+  function render() {
+    var list = shown();
+    var stage = $('stage');
+    $('empty').classList.toggle('on', list.length === 0);
+    var seen = {};
+    list.forEach(function (p) {
+      seen[p.identity] = true;
+      var t = tiles[p.identity];
+      if (!t) {
+        var el = document.createElement('div'); el.className = 'tile';
+        el.innerHTML = '<div class="ini"></div><div class="name"></div><div class="rank" style="display:none"></div>';
+        t = tiles[p.identity] = { el: el, video: null };
+      }
+      if (t.el.parentNode !== stage) stage.appendChild(t.el);
+      var nm = displayName(p);
+      t.el.querySelector('.name').textContent = nm;
+      t.el.querySelector('.ini').textContent = (nm.trim()[0] || 'B').toUpperCase();
+      var rk = ranks[uid(p.identity)], rkEl = t.el.querySelector('.rank');
+      rkEl.style.display = rk ? '' : 'none'; rkEl.textContent = rk ? '#' + rk : '';
+      t.el.classList.toggle('speaking', !!p.isSpeaking);
+      // The camera first; else any video they publish (a PC/OBS host or a screen share has no 'camera').
+      var cam = p.getTrackPublication(LivekitClient.Track.Source.Camera);
+      if (!cam || !cam.videoTrack) {
+        cam = Array.from(p.trackPublications.values()).filter(function (x) { return x.kind === 'video' && x.videoTrack; })[0] || cam;
+      }
+      var track = cam && cam.isSubscribed && !cam.isMuted ? cam.videoTrack : null;
+      if (track && (!t.video || t.video._track !== track)) {
+        if (t.video) t.video.remove();
+        var v = track.attach(); v.muted = true; v.playsInline = true; v._track = track;
+        t.el.insertBefore(v, t.el.firstChild); t.video = v;
+      } else if (!track && t.video) { t.video.remove(); t.video = null; }
+    });
+    Object.keys(tiles).forEach(function (id) { if (!seen[id]) { tiles[id].el.remove(); if (tiles[id].video) tiles[id].video.remove(); delete tiles[id]; } });
+    var n = Math.max(1, list.length), r = stage.getBoundingClientRect();
+    var f = fit(n, r.width, r.height);
+    stage.style.gridTemplateColumns = 'repeat(' + f.cols + ',' + f.w + 'px)';
+    stage.style.gridAutoRows = f.h + 'px';
+    Array.prototype.forEach.call(stage.children, function (el) { el.classList.toggle('small', f.w < 150); });
+  }
+  window.addEventListener('resize', render);
+
+  // ---- demo mode: battle.html?demo=8 — fake tiles, for checking the look in a browser ----
+  var demo = +q.get('demo');
+  if (demo) {
+    var st = $('stage');
+    var f0 = function () {
+      st.innerHTML = '';
+      for (var i = 0; i < demo; i++) {
+        var el = document.createElement('div'); el.className = 'tile' + (i === 1 ? ' speaking' : '');
+        el.innerHTML = '<div class="ini">' + 'ABCDEFGHIJKLMNOPQRSTUVWX'[i] + '</div><div class="name">Battler ' + (i + 1) + '</div>' + (i < 3 ? '<div class="rank">#' + (i + 1) + '</div>' : '');
+        st.appendChild(el);
+      }
+      var r = st.getBoundingClientRect(), f = fit(demo, r.width, r.height);
+      st.style.gridTemplateColumns = 'repeat(' + f.cols + ',' + f.w + 'px)'; st.style.gridAutoRows = f.h + 'px';
+      $('top3').innerHTML = '<div class="t3"><b>1</b><span>Maria</span><em>12,400</em></div><div class="t3"><b>2</b><span>Jun</span><em>9,050</em></div><div class="t3"><b>3</b><span>Ana</span><em>4,210</em></div>';
+      $('top3').classList.toggle('on', !!cb);
+      $('empty').classList.toggle('on', demo < 0);
+    };
+    if (cb && !cb.ends) { cb.starts = Date.now() / 1000 - 60; cb.ends = cb.starts + 600; }
+    f0(); window.addEventListener('resize', f0);
+    return;
+  }
+
+  // ---- the real room ----
+  var url = q.get('url'), token = q.get('token');
+  if (!url || !token) { render(); return; }
+  var L = LivekitClient;
+  room = new L.Room({ adaptiveStream: false, dynacast: false });
+  var audioBox = document.createElement('div'); audioBox.style.display = 'none'; document.body.appendChild(audioBox);
+  room
+    .on(L.RoomEvent.TrackSubscribed, function (track) {
+      if (track.kind === 'audio') audioBox.appendChild(track.attach());   // Egress records the page's sound
+      render();
+    })
+    .on(L.RoomEvent.TrackUnsubscribed, function (track) { track.detach().forEach(function (e) { e.remove(); }); render(); })
+    .on(L.RoomEvent.TrackMuted, render).on(L.RoomEvent.TrackUnmuted, render)
+    .on(L.RoomEvent.ParticipantConnected, render).on(L.RoomEvent.ParticipantDisconnected, render)
+    .on(L.RoomEvent.TrackPublished, render).on(L.RoomEvent.ActiveSpeakersChanged, render)
+    .on(L.RoomEvent.Disconnected, function () { end(); });
+  room.connect(url, token, { autoSubscribe: true })
+    .then(function () { render(); setTimeout(start, 1200); })   // a beat for the first frames to land
+    .catch(function (e) { console.error('connect failed', e); end(); });
+  // A battle room outlives its battle by a little; stop the broadcast 90 s after the end at the latest.
+  if (cb && cb.ends) setInterval(function () { if (Date.now() / 1000 > cb.ends + 90) end(); }, 5000);
+})();
+</script>
+</body>
+</html>
