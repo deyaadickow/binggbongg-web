@@ -82,8 +82,10 @@ export function TileGiftLayer({ uid }: { uid: number | null | undefined }) {
       {now && kind === "picture" && <TilePicture key={now.key} gift={now.gift} size={Math.round(now.short * 0.55)} />}
       {/* A gift from Bingg Bongg (the admin's free BBs): who it is from and how many BBs. */}
       {now?.from && (
-        <div key={`l-${now.key}`} className="tile-gift-from" style={{ fontSize: Math.max(9, Math.min(15, Math.round(now.short / 11))) }}>
-          <span className="tile-gift-from-n">🎁 {now.from.name}</span>
+        // A small tile (the 24-tile grid on a phone, ~80 px): no 🎁, tighter, so "Bingg Bongg" fits whole.
+        <div key={`l-${now.key}`} className={`tile-gift-from${now.short < 120 ? " compact" : ""}`} style={{ fontSize: Math.max(9, Math.min(15, Math.round(now.short / 11))) }}>
+          {/* A tiny tile (Country VS Country halves on a phone, ~40 px): the amount alone. */}
+          {now.short >= 70 && <span className="tile-gift-from-n">{now.short < 120 ? "" : "🎁 "}{now.from.name}</span>}
           <b>+{t("cm_n_bbs", now.from.amount.toLocaleString())}</b>
         </div>
       )}

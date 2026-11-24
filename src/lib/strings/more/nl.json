@@ -2063,5 +2063,6 @@
  "vcb_show_me": "Toon mij in virtuele battles",
  "vcb_show_me_sub": "Je profielfoto kan in Country Battles verschijnen terwijl je niet live bent. Echte BBs die je krijgt, zijn van jou.",
  "vcb_virtual": "Virtueel",
- "vcb_no_members": "Nog geen leden uit {country}"
+ "vcb_no_members": "Nog geen leden uit {country}",
+ "vcb_host": "Host"
 }

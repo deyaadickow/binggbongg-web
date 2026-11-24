@@ -2062,5 +2062,6 @@
  "vcb_show_me": "Zobrazovat mě ve virtuálních bitvách",
  "vcb_show_me_sub": "Vaše profilová fotka se může objevit v Country Battles, když nejste živě. Skutečné BBs, které dostanete, jsou vaše.",
  "vcb_virtual": "Virtuální",
- "vcb_no_members": "Zatím žádní členové z {country}"
+ "vcb_no_members": "Zatím žádní členové z {country}",
+ "vcb_host": "Hostitel"
 }

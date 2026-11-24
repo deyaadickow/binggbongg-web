@@ -2061,5 +2061,6 @@
  "vcb_show_me": "Visa mig i virtuella battles",
  "vcb_show_me_sub": "Din profilbild kan visas i Country Battles medan du inte är live. Riktiga BBs som du får i gåva är dina.",
  "vcb_virtual": "Virtuell",
- "vcb_no_members": "Inga medlemmar från {country} än"
+ "vcb_no_members": "Inga medlemmar från {country} än",
+ "vcb_host": "Värd"
 }

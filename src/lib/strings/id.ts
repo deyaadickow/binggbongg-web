@@ -2794,5 +2794,6 @@ export const id = {
   vcb_show_me: "Tampilkan saya di battle virtual",
   vcb_show_me_sub: "Foto profilmu bisa muncul di Country Battle saat kamu tidak live. BBs asli yang dihadiahkan untukmu adalah milikmu.",
   vcb_virtual: "Virtual",
+  vcb_host: "Host",
   vcb_no_members: "Belum ada anggota dari {country}",
 };

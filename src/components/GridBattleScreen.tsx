@@ -226,6 +226,10 @@ export function useGridBattleTiles(input: {
   virtual?: number[];
   /** Country VS Country: the two countries — the screen splits into a half for each. */
   split?: { a: string; b: string } | null;
+  /** Round 2b (Steve, 2026-11-24): a virtual tile's double arrow opened this screen with that member
+   *  as the HOST — the big top-left tile (their half's first in Country VS Country). Not in the state
+   *  any more = the normal order. Your own tile (battler) and a followed-in home battler come first. */
+  host?: number | null;
 }) {
   const { battlers, live, publishers, myId, isBattler, home, giftTarget, spot } = input;
   const byId = useMemo(() => new Map(battlers.map((b) => [b.user_id, b])), [battlers]);
@@ -237,7 +241,9 @@ export function useGridBattleTiles(input: {
     return s;
   }, [live, publishers, byId]);
   const homeRow = home ? byId.get(home) : undefined;
-  const pinnedId = isBattler ? myId : homeRow && !homeRow.left ? homeRow.user_id : null;
+  const hostRow = input.host ? byId.get(input.host) : undefined;
+  const pinnedId = isBattler ? myId : homeRow && !homeRow.left ? homeRow.user_id : hostRow && !hostRow.left ? hostRow.user_id : null;
+  const pinnedIsHost = pinnedId != null && !isBattler && pinnedId === hostRow?.user_id && pinnedId !== homeRow?.user_id;
   const total = liveIds.size + (pinnedId != null && !liveIds.has(pinnedId) ? 1 : 0);
   const stage = chatBattleStage(total);
   const liveShape = input.byCount ? countShape(total) : gridShape(stage);
@@ -279,18 +285,23 @@ export function useGridBattleTiles(input: {
   const vShownA = useVirtualWindow(vA, VIRTUAL_HALF_FILL - liveCountA, paused);
   const vShownB = useVirtualWindow(vB, VIRTUAL_HALF_FILL - liveCountB, paused);
 
-  const pinnedTile: CbTileData[] = pinnedId != null ? [{
-    userId: pinnedId, name: nameOf(byId.get(pinnedId)), photo: byId.get(pinnedId)?.profile_image ?? null,
-    own: isBattler, home: !isBattler, spot: spot === pinnedId,
-  }] : [];
-  const liveTile = (id: number): CbTileData => {
+  const pinnedTile: CbTileData[] = pinnedId == null ? [] : pinnedIsHost
+    // The host a double arrow opened: shown as they are — their photo while virtual, their video once live.
+    ? [liveIds.has(pinnedId) ? liveTileOf(pinnedId) : virtualTileOf(pinnedId)]
+    : [{
+      userId: pinnedId, name: nameOf(byId.get(pinnedId)), photo: byId.get(pinnedId)?.profile_image ?? null,
+      own: isBattler, home: !isBattler, spot: spot === pinnedId,
+    }];
+  function liveTileOf(id: number): CbTileData {
     const b = byId.get(id);
     return { userId: id, name: nameOf(b), photo: b?.profile_image ?? null, spot: spot === id, starred: star.pins.includes(id) };
-  };
-  const virtualTile = (id: number): CbTileData => {
+  }
+  function virtualTileOf(id: number): CbTileData {
     const b = byId.get(id);
     return { userId: id, name: nameOf(b), photo: b?.profile_image ?? null, virtual: true, score: b?.score ?? 0, muted: false };
-  };
+  }
+  const liveTile = liveTileOf;
+  const virtualTile = virtualTileOf;
   const halves = split ? {
     a: [...(pinA ? pinnedTile : []), ...shownA.map(liveTile), ...vShownA.map(virtualTile)],
     b: [...(pinnedId != null && !pinA ? pinnedTile : []), ...shownB.map(liveTile), ...vShownB.map(virtualTile)],
@@ -453,6 +464,8 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
   const navigate = useNavigate();
   const location = useLocation();
   const myId = demoUserId ?? user?.id ?? 0;
+  // ?host=<user id>: a virtual tile's double arrow opened this screen with that member as the host.
+  const hostParam = Number(new URLSearchParams(location.search).get("host")) || null;
   const now = useTick();
   const srcRef = useRef(source);
   srcRef.current = source;
@@ -544,6 +557,7 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
     byCount: source.kind === "country",
     virtual: source.kind === "country" ? st?.virtual ?? [] : [],
     split: source.kind === "country" && st?.rival ? { a: st.rival.a.country, b: st.rival.b.country } : null,
+    host: source.kind === "country" ? hostParam : null,
   });
   const { shown, pinnedId } = grid;
   // Sound follows the star: who this screen hears, and who starred me.
@@ -1009,8 +1023,17 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
               if (!isLoggedIn) { navigate("/login", { state: { from: location.pathname + location.search } }); return; }
               if (id !== myId) setGiftTarget(id);
             };
-            // A virtual tile's double arrow: that member's own profile (they are not live).
-            const onOpen = (id: number) => leaveTo(`/profile/${id}`);
+            // A virtual tile's double arrow (round 2b, Steve 2026-11-24: "It is supposed to link me to her
+            // same battle page where she is the host on top left tile."): this same battle again, pushed
+            // so Back returns, with that member as the host — the big top-left tile. A battler leaves
+            // their seat to watch it (asked first); a viewer stays connected.
+            const onOpen = (id: number) => {
+              const q = new URLSearchParams(location.search);
+              q.set("host", String(id));
+              q.delete("join"); q.delete("battler"); q.delete("home");
+              const path = `${location.pathname}?${q.toString()}`;
+              if (isBattler) leaveTo(path); else navigate(path);
+            };
             const marked = (list: CbTileData[]) => giftShow.withGift(awaitingBack.length ? list.map((x) => (awaitingBack.includes(x.userId) ? { ...x, starredMe: true } : x)) : list);
             if (grid.halves && grid.split && st.rival) {
               // Country VS Country (Steve, 2026-11-24): the tile area split in half, one country each.

@@ -48,6 +48,8 @@ export interface CbTileData {
   virtual?: boolean;
   /** Shown on a virtual tile's name strip: their battle score (BBs). */
   score?: number | null;
+  /** Round 2b: the host tile (the first, bigger one) — a small gold "Host" pill top-left. */
+  host?: boolean;
 }
 
 /** Height the grid may use: from its own top edge (below the site's header and the battle
@@ -122,7 +124,10 @@ function CbTile({ tile, listening, onTap, onGift, onOpen, attach, hasVideo, vers
           ? <img className="cb-photo" src={photo} alt="" loading="lazy" onError={() => setPhotoBroken(true)} />
           : <div className="cb-vph"><i>{initials(tile.name || "?")}</i></div>}
         <TileGiftLayer uid={tile.userId} />
-        <span className="cb-vbadge">{t("vcb_virtual")}</span>
+        <span className="cb-pills">
+          {tile.host && <span className="cb-vbadge">{t("vcb_host")}</span>}
+          <span className="cb-vbadge">{t("vcb_virtual")}</span>
+        </span>
         {tile.gift && <TileGift key={tile.gift.key} icon={tile.gift.icon} />}
         {onGift && (
           <button type="button" className="cb-gift cb-gift-red" aria-label="🎁"
@@ -140,7 +145,7 @@ function CbTile({ tile, listening, onTap, onGift, onOpen, attach, hasVideo, vers
     );
   }
   return (
-    <div className={`cb-tile${tile.own ? " own" : ""}${tile.home ? " home" : ""}${tile.spot ? " spot" : ""}${tile.starred ? " starred" : ""}${tile.starredMe ? " starred-me" : ""}${listening ? " listening" : ""}`}
+    <div className={`cb-tile${tile.host ? " host" : ""}${tile.own ? " own" : ""}${tile.home ? " home" : ""}${tile.spot ? " spot" : ""}${tile.starred ? " starred" : ""}${tile.starredMe ? " starred-me" : ""}${listening ? " listening" : ""}`}
       role={tile.own ? undefined : "button"} tabIndex={tile.own ? undefined : 0}
       onClick={tile.own ? undefined : onTap}
       style={span && (span.cols > 1 || span.rows > 1) ? {
@@ -155,6 +160,7 @@ function CbTile({ tile, listening, onTap, onGift, onOpen, attach, hasVideo, vers
       {hasVideo && <video ref={videoRef} autoPlay playsInline muted />}
       {/* Steve, 2026-11-23: a gift plays only in the giver's and the receiver's tiles. */}
       <TileGiftLayer uid={tile.userId} />
+      {tile.host && <span className="cb-pills"><span className="cb-vbadge">{t("vcb_host")}</span></span>}
       {tile.starred && <span className="cb-star" aria-hidden>★</span>}
       {listening && <span className="cb-ear" aria-hidden>🔊</span>}
       {tile.muted && !tile.own && <span className="cb-muted" aria-hidden>🔇</span>}
@@ -190,6 +196,11 @@ function TileGift({ icon }: { icon: string | null }) {
       {icon && !broken ? <img src={mediaUrl(icon)} alt="" onError={() => setBroken(true)} /> : "🎁"}
     </span>
   );
+}
+
+/** Country Battle: the first (bigger, top-left) tile of a grid is the host tile (round 2b). */
+function withHost(tile: CbTileData, host: boolean): CbTileData {
+  return host ? { ...tile, host: true } : tile;
 }
 
 /** A dark tint per member, so photo-less tiles are told apart at a glance. */
@@ -234,7 +245,8 @@ export function CountryBattleGrid({ stage, shape, tiles, listen, onTap, onGift, 
     <div ref={stageRef} className="cb-stage" style={{ width: avail ? `min(100%, ${Math.round(avail * ratio)}px)` : "100%", minWidth: Math.min(240, cols * 70) }}>
       <div className={`cb-grid cols-${cols}`} style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
         {tiles.map((tile) => (
-          <CbTile key={`${tile.own ? "own" : tile.home ? "home" : tile.virtual ? "v" : "m"}-${tile.userId}`} tile={tile.muted == null && !tile.own ? { ...tile, muted: !heard.has(tile.userId) } : tile} listening={heard.has(tile.userId)}
+          <CbTile key={`${tile.own ? "own" : tile.home ? "home" : tile.virtual ? "v" : "m"}-${tile.userId}`}
+            tile={withHost(tile.muted == null && !tile.own ? { ...tile, muted: !heard.has(tile.userId) } : tile, !!shape && tile === tiles[0])} listening={heard.has(tile.userId)}
             onTap={onTap ? () => onTap(tile.userId) : undefined}
             onGift={onGift ? () => onGift(tile.userId) : undefined}
             onOpen={onOpen && tile.virtual ? () => onOpen(tile.userId) : undefined}

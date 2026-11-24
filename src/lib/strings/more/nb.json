@@ -2060,5 +2060,6 @@
  "vcb_show_me": "Vis meg i virtuelle kamper",
  "vcb_show_me_sub": "Profilbildet ditt kan vises i Country Battles mens du ikke er live. Ekte BBs du får i gave, er dine.",
  "vcb_virtual": "Virtuell",
- "vcb_no_members": "Ingen medlemmer fra {country} ennå"
+ "vcb_no_members": "Ingen medlemmer fra {country} ennå",
+ "vcb_host": "Vert"
 }

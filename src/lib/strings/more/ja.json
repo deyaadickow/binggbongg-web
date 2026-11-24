@@ -2062,5 +2062,6 @@
  "vcb_show_me": "バーチャルバトルに自分を表示する",
  "vcb_show_me_sub": "ライブ配信していない間も、あなたのプロフィール写真がCountry Battlesに表示されることがあります。あなたに贈られた本物のBBsはあなたのものです。",
  "vcb_virtual": "バーチャル",
- "vcb_no_members": "{country}のメンバーはまだいません"
+ "vcb_no_members": "{country}のメンバーはまだいません",
+ "vcb_host": "ホスト"
 }

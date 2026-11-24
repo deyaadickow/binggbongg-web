@@ -2059,5 +2059,6 @@
  "vcb_show_me": "Amosarme nas batallas virtuais",
  "vcb_show_me_sub": "A túa foto de perfil pode aparecer nas Country Battles mentres non estás en directo. Os BBs reais que che regalen son teus.",
  "vcb_virtual": "Virtual",
- "vcb_no_members": "Aínda non hai membros de {country}"
+ "vcb_no_members": "Aínda non hai membros de {country}",
+ "vcb_host": "Anfitrión"
 }

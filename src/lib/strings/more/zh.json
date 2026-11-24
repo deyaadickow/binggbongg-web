@@ -2063,5 +2063,6 @@
  "vcb_show_me": "在虚拟对战中显示我",
  "vcb_show_me_sub": "你不在直播时,你的头像也可能出现在 Country Battles 中。别人送给你的真实 BBs 归你所有。",
  "vcb_virtual": "虚拟",
- "vcb_no_members": "还没有来自{country}的成员"
+ "vcb_no_members": "还没有来自{country}的成员",
+ "vcb_host": "主播"
 }

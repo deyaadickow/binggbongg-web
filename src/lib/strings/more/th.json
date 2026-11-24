@@ -2061,5 +2061,6 @@
  "vcb_show_me": "แสดงฉันในแบทเทิลเสมือน",
  "vcb_show_me_sub": "รูปโปรไฟล์ของคุณอาจแสดงใน Country Battles ขณะที่คุณไม่ได้ไลฟ์ BBs จริงที่มีคนมอบให้คุณเป็นของคุณ",
  "vcb_virtual": "เสมือน",
- "vcb_no_members": "ยังไม่มีสมาชิกจาก {country}"
+ "vcb_no_members": "ยังไม่มีสมาชิกจาก {country}",
+ "vcb_host": "โฮสต์"
 }

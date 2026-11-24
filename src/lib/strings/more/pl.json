@@ -2063,5 +2063,6 @@
  "vcb_show_me": "Pokazuj mnie w wirtualnych bitwach",
  "vcb_show_me_sub": "Twoje zdjęcie profilowe może pojawiać się w Country Battles, gdy nie nadajesz na żywo. Prawdziwe BBs, które dostaniesz, są Twoje.",
  "vcb_virtual": "Wirtualny",
- "vcb_no_members": "Jeszcze brak członków z {country}"
+ "vcb_no_members": "Jeszcze brak członków z {country}",
+ "vcb_host": "Host"
 }

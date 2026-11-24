@@ -2361,5 +2361,6 @@
  "vcb_show_me": "أظهرني في المعارك الافتراضية",
  "vcb_show_me_sub": "يمكن أن تظهر صورة ملفك الشخصي في Country Battles عندما لا تكون في بث مباشر. الـ BBs الحقيقية المهداة إليك هي لك.",
  "vcb_virtual": "افتراضي",
- "vcb_no_members": "لا يوجد أعضاء من {country} بعد"
+ "vcb_no_members": "لا يوجد أعضاء من {country} بعد",
+ "vcb_host": "المضيف"
 }
