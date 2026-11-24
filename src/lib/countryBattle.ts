@@ -132,7 +132,14 @@ export interface CbDayMe {
 }
 
 /** One side of a Rival Battle. `real_score` = real gift BBs only (the winner is decided on it). */
-export interface CbRivalSide { country: string; flag: string; score: number; battlers: number; real_score?: number }
+export interface CbRivalSide {
+  country: string; flag: string; score: number; battlers: number; real_score?: number;
+  /** The side's admin free BBs so far (2026-11-24 round 2). */
+  free_score?: number;
+  /** Free BBs given to the SIDE ITSELF because it has no members (included in `score`). Rising = a
+   *  gift from Bingg Bongg plays on the empty side's box. */
+  country_free?: number;
+}
 
 /** A Rival Battle (Steve, 2026-11-23: "Find ever country's rival and let's set up a 10 minutes battle in between
  *  their own whole country battle"): two countries in one room; a side's score = what its battlers got. */
@@ -148,6 +155,8 @@ export function rivalOf(v: unknown): CbRival | null {
     return country ? {
       country, flag: String(s.flag ?? ""), score: Number(s.score) || 0, battlers: Number(s.battlers) || 0,
       ...(s.real_score != null ? { real_score: Number(s.real_score) || 0 } : {}),
+      ...(s.free_score != null ? { free_score: Number(s.free_score) || 0 } : {}),
+      ...(s.country_free != null ? { country_free: Number(s.country_free) || 0 } : {}),
     } : null;
   };
   const a = side(r.a);
@@ -192,6 +201,8 @@ export interface CbDayState {
     score: number; rank: number; is_live: boolean; left: boolean; home_room_name: string | null; chat_room_name: string | null;
     /** Virtual Country Battles (2026-11-24): shown by photo while not live; `real_score` = real gift BBs only. */
     is_virtual?: boolean; real_score?: number;
+    /** Admin free BBs on this tile so far (2026-11-24 round 2; = score - real_score). */
+    free_score?: number;
     /** Country VS Country: which country this battler fights for. */
     side?: string | null;
   })[];

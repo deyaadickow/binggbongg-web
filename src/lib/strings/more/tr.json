@@ -2062,5 +2062,6 @@
  "banger_boost_failed": "Güçlendirici gönderilemedi. Tekrar dene.",
  "vcb_show_me": "Beni sanal savaşlarda göster",
  "vcb_show_me_sub": "Canlı yayında değilken profil fotoğrafın Country Battles'ta görünebilir. Sana hediye edilen gerçek BBs senindir.",
- "vcb_virtual": "Sanal"
+ "vcb_virtual": "Sanal",
+ "vcb_no_members": "Henüz {country} üyesi yok"
 }

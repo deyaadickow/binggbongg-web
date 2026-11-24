@@ -29,6 +29,9 @@ export interface TileGiftPlay {
   /** Only ONE copy of a gift video is heard per screen: the receiver's tile, or the giver's when
    *  the receiver is not on this screen. */
   audible: boolean;
+  /** A gift from Bingg Bongg (the admin's free BBs, 2026-11-24 round 2): who it is from and how many
+   *  BBs it brought, shown on the tile under the gift. */
+  from?: { name: string; amount: number };
 }
 
 type Listener = (p: TileGiftPlay) => void;
@@ -82,4 +85,35 @@ export function playGiftInTiles(gift: Gift, toUid: number, fromUid: number | nul
   };
   if (toOn) emit(toUid, true);
   if (fromUid && fromUid !== toUid) emit(fromUid, !toOn);
+}
+
+/** The name the admin's free BBs come from on the tiles. */
+export const FREE_GIFT_FROM = "Bingg Bongg";
+
+/**
+ * Steve, 2026-11-24 (round 2): "When admin gives gifts we need the gifts to show so everyone can see
+ * and enjoy them with sound effect and all." A tile's free BBs went up by `amount`: play `gift` in
+ * that tile, the same effect a real gift plays, labelled from Bingg Bongg with the amount. Not
+ * recorded for the Firestore backstop (that is for real gifts only). `uid` may be a side's empty
+ * box (freeSideUid). Returns whether a tile here showed it.
+ */
+export function playFreeGiftInTile(gift: Gift, uid: number, amount: number, audible: boolean): boolean {
+  const set = listeners.get(uid);
+  if (!set || set.size === 0) return false;
+  const play: TileGiftPlay = { key: `f${++seq}`, gift, audible, from: { name: FREE_GIFT_FROM, amount } };
+  set.forEach((l) => l(play));
+  return true;
+}
+
+/** The empty Country VS Country side's box listens on this id (no member has a negative id). */
+export const freeSideUid = (side: "a" | "b") => (side === "a" ? -1 : -2);
+
+/** The gift to show for `amount` free BBs: the dearest one costing no more than the amount (with a
+ *  picture or video to show), else the cheapest. */
+export function giftForAmount(gifts: Gift[], amount: number): Gift | null {
+  const price = (g: Gift) => Number(g.coin_price ?? g.votes ?? 0);
+  const shown = gifts.filter((g) => (g.image || g.video) && price(g) > 0);
+  if (!shown.length) return null;
+  const fit = shown.filter((g) => price(g) <= amount).sort((a, b) => price(b) - price(a));
+  return fit[0] ?? shown.slice().sort((a, b) => price(a) - price(b))[0];
 }

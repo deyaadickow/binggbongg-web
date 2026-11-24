@@ -2062,5 +2062,6 @@
  "banger_boost_failed": "O reforço não foi enviado. Tente de novo.",
  "vcb_show_me": "Mostrar-me em batalhas virtuais",
  "vcb_show_me_sub": "Sua foto de perfil pode aparecer nas Country Battles enquanto você não está ao vivo. Os BBs reais que te derem são seus.",
- "vcb_virtual": "Virtual"
+ "vcb_virtual": "Virtual",
+ "vcb_no_members": "Ainda não há membros de {country}"
 }

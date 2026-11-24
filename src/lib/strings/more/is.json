@@ -2059,5 +2059,6 @@
  "banger_boost_failed": "Örvunin fór ekki í gegn. Reyndu aftur.",
  "vcb_show_me": "Sýna mig í sýndarbardögum",
  "vcb_show_me_sub": "Prófílmyndin þín getur birst í Country Battles þegar þú ert ekki í beinni. Raunverulegir BBs sem þér eru gefnir eru þínir.",
- "vcb_virtual": "Sýndar"
+ "vcb_virtual": "Sýndar",
+ "vcb_no_members": "Engir meðlimir frá {country} enn"
 }

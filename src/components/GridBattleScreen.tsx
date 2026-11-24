@@ -36,7 +36,8 @@ import { makeBinggBonusWatcher } from "../lib/binggBonus";
 import { BinggBonusOverlay } from "./BinggBonusOverlay";
 import { FishHostControls, LiveFishOverlay } from "./LiveFishOverlay";
 import { isTapTapGift } from "./TapTapBurst";
-import { playGiftInTiles } from "../lib/tileGiftFx";
+import { freeSideUid, giftForAmount, playFreeGiftInTile, playGiftInTiles } from "../lib/tileGiftFx";
+import { TileGiftLayer } from "./TileGiftLayer";
 import { loadGifts } from "../lib/gifts";
 import { ACTION_BAR_RESERVE, BattleActionBar, BattlesMenu } from "./BattleActionBar";
 import { useLiveTools } from "./LiveTools";
@@ -99,6 +100,9 @@ export interface GridBattleSource {
   endExtra?: (st: ChbState, hold: () => void) => ReactNode;
   /** Under the header, above the tiles (Country Battle: a Rival Battle's two-country score bar). */
   topExtra?: (st: ChbState) => ReactNode;
+  /** Country VS Country: join for one side — what the score bar's "Join for {country}" does. The
+   *  empty side's box (no members from that country yet) offers the same button. */
+  rivalJoin?: (country: string) => void;
 }
 
 // ---- gift visibility (Steve, 2026-11-03: "Who ever is gifing a gift they will be able to see the
@@ -566,6 +570,42 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
     giftsRef.current ??= loadGifts().catch(() => { giftsRef.current = null; return []; });
     return (await giftsRef.current).find((g) => g.id === id) ?? null;
   }, []);
+  // Steve, 2026-11-24 (round 2): "When admin gives gifts we need the gifts to show so everyone can
+  // see and enjoy them with sound effect and all." The admin's free BBs arrive in the state: when a
+  // tile's free_score (older servers: score - real_score) or an empty side's country_free went up
+  // since the last state, that tile / box plays a gift from Bingg Bongg for the increase — the same
+  // in-tile effect and sound a real gift plays. The first state only remembers the numbers.
+  const freeSeenRef = useRef<Map<number, number> | null>(null);
+  useEffect(() => {
+    if (!st) return;
+    const cur = new Map<number, number>();
+    for (const b of st.battlers) {
+      const free = b.free_score != null ? Number(b.free_score) || 0
+        : b.real_score != null ? Math.max(0, (Number(b.score) || 0) - (Number(b.real_score) || 0)) : 0;
+      cur.set(b.user_id, free);
+    }
+    if (st.rival) {
+      cur.set(freeSideUid("a"), Number(st.rival.a.country_free) || 0);
+      cur.set(freeSideUid("b"), Number(st.rival.b.country_free) || 0);
+    }
+    const prev = freeSeenRef.current;
+    freeSeenRef.current = cur;
+    if (!prev || st.phase === "ended") return;
+    const rises: [number, number][] = [];
+    cur.forEach((v, id) => { const was = prev.get(id); if (was != null && v > was) rises.push([id, v - was]); });
+    if (!rises.length) return;
+    void (async () => {
+      giftsRef.current ??= loadGifts().catch(() => { giftsRef.current = null; return []; });
+      const gifts = await giftsRef.current;
+      let shown = 0;
+      for (const [id, amount] of rises) {
+        const gift = giftForAmount(gifts, amount) ?? { id: 0, name: "Bingg Bongg" };
+        // One gift video heard at a time; the chime once for the lot.
+        if (playFreeGiftInTile(gift, id, amount, shown === 0)) shown++;
+      }
+      if (shown) sfx.reveal();
+    })();
+  }, [st]);
   /** The gift the receiver's Thank you is for. */
   const thankRef = useRef<ChbGiftMsg | null>(null);
   const addLine = useCallback((msg: ChbGiftMsg) => setLocalLines((cur) => [...cur.slice(-19), giftLine(t, msg)]), [t]);
@@ -974,14 +1014,29 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
             const marked = (list: CbTileData[]) => giftShow.withGift(awaitingBack.length ? list.map((x) => (awaitingBack.includes(x.userId) ? { ...x, starredMe: true } : x)) : list);
             if (grid.halves && grid.split && st.rival) {
               // Country VS Country (Steve, 2026-11-24): the tile area split in half, one country each.
-              const half = (list: CbTileData[], side: { country: string; flag: string }, key: string) => (
+              const half = (list: CbTileData[], side: { country: string; flag: string; score: number }, key: string) => (
                 <div className="vcb-half" key={key}>
                   <div className="vcb-half-head">{side.flag || countryFlag(side.country) || "🌍"} {side.country}</div>
                   {list.length
                     ? <CountryBattleGrid stage={grid.stage} shape={countShape(list.length)} tiles={marked(list)} listen={heardNow}
                         reserve={CHAT_RESERVE + ACTION_BAR_RESERVE + 22} onTap={onTap} onGift={onGift} onOpen={onOpen}
                         attach={roomHook.attachVideo} hasVideo={roomHook.hasVideo} version={roomHook.version} />
-                    : <div className="card cb-empty vcb-half-empty">—</div>}
+                    : (
+                      // Steve, 2026-11-24 (round 2): "What is the big box under the 3 players with the
+                      // world globe in it?" — a side with nobody on it says so, with its score and a
+                      // way to join for it. Its free BBs from Bingg Bongg play here.
+                      <div className="card cb-empty vcb-half-empty">
+                        <TileGiftLayer uid={freeSideUid(key as "a" | "b")} />
+                        <div className="vcb-empty-flag" aria-hidden>{side.flag || countryFlag(side.country) || "🌍"}</div>
+                        <div className="vcb-empty-text">{cbText(t("vcb_no_members"), { country: side.country })}</div>
+                        <div className="vcb-empty-score">{side.score.toLocaleString()}</div>
+                        {source.rivalJoin && !me.is_battler && me.can_join && !ended && (
+                          <button type="button" className="btn gold small" onClick={() => source.rivalJoin?.(side.country)}>
+                            {side.flag || countryFlag(side.country) || "🌍"} {cbText(t("rival_join_for"), { country: side.country })}
+                          </button>
+                        )}
+                      </div>
+                    )}
                 </div>
               );
               return <div className="vcb-halves">{half(grid.halves.a, st.rival.a, "a")}{half(grid.halves.b, st.rival.b, "b")}</div>;

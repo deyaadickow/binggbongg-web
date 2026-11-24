@@ -2058,5 +2058,6 @@
  "banger_boost_failed": "Pastiprinātājs netika nosūtīts. Mēģini vēlreiz.",
  "vcb_show_me": "Rādīt mani virtuālajās cīņās",
  "vcb_show_me_sub": "Jūsu profila foto var parādīties Country Battles, kamēr neesat tiešraidē. Jums uzdāvinātie īstie BBs ir jūsu.",
- "vcb_virtual": "Virtuāls"
+ "vcb_virtual": "Virtuāls",
+ "vcb_no_members": "Vēl nav dalībnieku no {country}"
 }

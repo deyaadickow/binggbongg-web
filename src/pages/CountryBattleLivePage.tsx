@@ -17,7 +17,9 @@
 //                                           sample recap; &reason=not_finished|not_participant|not_found).
 // /country-battle/live/0?vcbdemo=1|rival     DEV ONLY (never in a production build): Virtual Country
 //                                           Battles on a fake state — whole country (1 live + 30
-//                                           virtual) or Country VS Country (two halves).
+//                                           virtual) or Country VS Country (two halves);
+//                                           =empty: Philippines vs Bhutan with no Bhutan members.
+//                                           Free BBs from Bingg Bongg land in bursts (free_score).
 import { useMemo, useRef } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useT } from "../lib/i18n";
@@ -38,7 +40,7 @@ export function CountryBattleLivePage() {
   const demo = sp.get("demo");
   // Virtual Country Battles demo: compiled out of the production build (import.meta.env.DEV is false there).
   const vcbDemo = import.meta.env.DEV ? sp.get("vcbdemo") : null;
-  if (vcbDemo) return <VirtualCbDemo key={vcbDemo} rival={vcbDemo === "rival"} />;
+  if (vcbDemo) return <VirtualCbDemo key={vcbDemo} rival={vcbDemo === "rival" || vcbDemo === "empty"} emptySide={vcbDemo === "empty"} />;
   if (demo) {
     return <CountryBattleDemo key={sp.toString()} n={demo === "0" ? 0 : Number(demo) || 24} withOwn={sp.get("own") !== "0"}
       phase={(sp.get("phase") as ChbState["phase"]) || "battle"} imgBase={sp.get("img")} recapDemo={sp.get("reason") ?? ""} />;
@@ -89,6 +91,7 @@ function makeSource(t: T, dayId: number, countryRef: { current: string }, calls:
     isThis: (r) => r.country_battle_day_id === dayId,
     noTie: true,
     fallbackPath: "/country-battle",
+    rivalJoin: onRivalJoin,
     // Country Battle Recap (Steve, 2026-11-11): a battler's "Share my result" under the podium.
     // A Rival Battle: the two countries' score bar; a viewer who can join picks a side there.
     topExtra: (st) => (st.rival
@@ -193,9 +196,10 @@ const VCB_ID_NAMES = [
   "indah permata", "yoga saputra", "ratna sari", "hendra wijaya", "maya anggraini", "dimas prakoso", "lina marlina",
 ];
 
-function VirtualCbDemo({ rival }: { rival: boolean }) {
+function VirtualCbDemo({ rival, emptySide = false }: { rival: boolean; emptySide?: boolean }) {
   const { t } = useT();
-  const countryRef = useRef(rival ? "Philippines vs Indonesia" : "Philippines");
+  const sideB = emptySide ? "Bhutan" : "Indonesia";
+  const countryRef = useRef(rival ? `Philippines vs ${sideB}` : "Philippines");
   const source = useMemo(() => {
     const t0 = serverNow();
     const opens = new Date(t0 - 7 * 60_000).toISOString();
@@ -219,24 +223,30 @@ function VirtualCbDemo({ rival }: { rival: boolean }) {
     } else {
       // Country VS Country: Philippines (1 live + 16 virtual, rotating) vs Indonesia (1 live + 9 virtual).
       const a = "Philippines";
-      const b = "Indonesia";
+      const b = sideB;
       rows = [
         row(3001, DEMO_NAMES[0], { live: true, photo: vcbPhoto("/lp/live.jpg"), side: a, score: 3900 }),
-        ...DEMO_NAMES.slice(1, 17).map((n, i) => row(3002 + i, n, { live: false, photo: photoOf(i), side: a, score: 1500 - i * 41 })),
+        ...DEMO_NAMES.slice(1, emptySide ? 4 : 17).map((n, i) => row(3002 + i, n, { live: false, photo: photoOf(i), side: a, score: 1500 - i * 41 })),
+      ];
+      if (!emptySide) rows.push(
         row(4001, VCB_ID_NAMES[0], { live: true, photo: vcbPhoto("/lp/live2.jpg"), side: b, score: 4400 }),
         ...VCB_ID_NAMES.slice(1, 10).map((n, i) => row(4002 + i, n, { live: false, photo: photoOf(i + 1), side: b, score: 1700 - i * 53 })),
-      ];
+      );
     }
     const state = (): ChbState => {
-      // Free BBs arrive in bursts on the virtual tiles (here: a little more each beat).
+      // Free BBs from Bingg Bongg arrive in bursts on the virtual tiles: each beat (5 s) about a
+      // quarter of them get 50–250 more, so free_score rises and their tiles play the gift.
       const beat = Math.floor((serverNow() - t0) / 5000);
-      const battlers = rows.map((r) => (r.is_virtual ? { ...r, score: r.score + beat * ((r.user_id % 5) + 1) * 10 } : r))
+      const freeOf = (id: number) => Math.floor((beat + (id % 4)) / 4) * ((id % 5) + 1) * 50;
+      const battlers = rows.map((r) => (r.is_virtual
+        ? { ...r, score: r.score + freeOf(r.user_id), free_score: r.score + freeOf(r.user_id) }
+        : { ...r, free_score: 0 }))
         .sort((x, y) => (y.real_score ?? 0) - (x.real_score ?? 0) || y.score - x.score)
         .map((r, i) => ({ ...r, rank: i + 1 }));
       const live = battlers.filter((r) => !r.is_virtual).map((r) => r.user_id);
       const sideSum = (c: string, real: boolean) => battlers.filter((r) => r.side === c).reduce((n, r) => n + (real ? r.real_score ?? 0 : r.score), 0);
       return {
-        contest_id: 0, name: rival ? "Philippines vs Indonesia · Tue, Nov 24" : "Philippines · Tue, Nov 24", shared: true, phase: "battle",
+        contest_id: 0, name: rival ? `Philippines vs ${sideB} · Tue, Nov 24` : "Philippines · Tue, Nov 24", shared: true, phase: "battle",
         server_now: new Date().toISOString(), created_at: opens, starts_at: starts, ends_at: ends, opens_at: opens, phase_ends_at: ends,
         room_name: null, room_open: true, starter: null, max_battlers: null, battler_count: live.length, live_count: live.length,
         spaces_left: null, unlimited: true, can_join_now: true, battlers, live,
@@ -244,8 +254,11 @@ function VirtualCbDemo({ rival }: { rival: boolean }) {
         finished: false, tie: false, top3: [], winner: null,
         rival: rival ? {
           a: { country: "Philippines", flag: "🇵🇭", score: sideSum("Philippines", false), battlers: 17, real_score: sideSum("Philippines", true) },
-          b: { country: "Indonesia", flag: "🇮🇩", score: sideSum("Indonesia", false), battlers: 10, real_score: sideSum("Indonesia", true) },
-          winner: null, label: "Philippines vs Indonesia",
+          b: emptySide
+            // Nobody from Bhutan: its free BBs go to the side itself (country_free), 500 every 10 s.
+            ? { country: "Bhutan", flag: "🇧🇹", score: Math.floor(beat / 2) * 500, battlers: 0, real_score: 0, free_score: Math.floor(beat / 2) * 500, country_free: Math.floor(beat / 2) * 500 }
+            : { country: "Indonesia", flag: "🇮🇩", score: sideSum("Indonesia", false), battlers: 10, real_score: sideSum("Indonesia", true) },
+          winner: null, label: `Philippines vs ${sideB}`,
         } : null,
         me: { user_id: 0, is_battler: false, is_live: false, left: false, score: null, rank: null, home_room_name: null, can_join: true, join_reason: null, starter_bonus: null },
       };
@@ -255,7 +268,7 @@ function VirtualCbDemo({ rival }: { rival: boolean }) {
       join: async () => ({ ok: false, reason: "demo", message: t("cb2_go_live_join"), full: false }),
       leave: async () => undefined,
       sendGift: async () => ({ status: false, message: t("cb_off") }),
-    });
-  }, [t, rival]);
+    }, undefined, () => undefined);
+  }, [t, rival, emptySide, sideB]);
   return <GridBattleLive source={source} home={null} battlerHint={false} />;
 }

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { giftPrice, mediaUrl, type Gift } from "../lib/api";
 import { subscribeTileGifts, type TileGiftPlay } from "../lib/tileGiftFx";
 import { TapTapBurst, isTapTapGift, tapTapBurstDuration } from "./TapTapBurst";
+import { useT } from "../lib/i18n";
 
 /**
  * A gift playing INSIDE one member's tile (Steve, 2026-11-23: "it is only suppose to show on
@@ -28,6 +29,7 @@ export function tileGiftHoldMs(gift: Gift): number {
 }
 
 export function TileGiftLayer({ uid }: { uid: number | null | undefined }) {
+  const { t } = useT();
   const boxRef = useRef<HTMLDivElement>(null);
   const [queue, setQueue] = useState<TileGiftPlay[]>([]);
   const [now, setNow] = useState<(TileGiftPlay & { short: number }) | null>(null);
@@ -78,6 +80,13 @@ export function TileGiftLayer({ uid }: { uid: number | null | undefined }) {
           onEnded={done} onError={done} />
       )}
       {now && kind === "picture" && <TilePicture key={now.key} gift={now.gift} size={Math.round(now.short * 0.55)} />}
+      {/* A gift from Bingg Bongg (the admin's free BBs): who it is from and how many BBs. */}
+      {now?.from && (
+        <div key={`l-${now.key}`} className="tile-gift-from" style={{ fontSize: Math.max(9, Math.min(15, Math.round(now.short / 11))) }}>
+          <span className="tile-gift-from-n">🎁 {now.from.name}</span>
+          <b>+{t("cm_n_bbs", now.from.amount.toLocaleString())}</b>
+        </div>
+      )}
     </div>
   );
 }

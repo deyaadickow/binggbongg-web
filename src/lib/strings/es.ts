@@ -2758,4 +2758,5 @@ export const es = {
   vcb_show_me: "Mostrarme en batallas virtuales",
   vcb_show_me_sub: "Tu foto de perfil puede aparecer en las Country Battles cuando no estás en vivo. Los BBs reales que te regalen son tuyos.",
   vcb_virtual: "Virtual",
+  vcb_no_members: "Todavía no hay miembros de {country}",
 };

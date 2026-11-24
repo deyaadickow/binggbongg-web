@@ -125,8 +125,8 @@ function CbTile({ tile, listening, onTap, onGift, onOpen, attach, hasVideo, vers
         <span className="cb-vbadge">{t("vcb_virtual")}</span>
         {tile.gift && <TileGift key={tile.gift.key} icon={tile.gift.icon} />}
         {onGift && (
-          <button type="button" className="cb-gift" aria-label="🎁"
-            onClick={(e) => { e.stopPropagation(); onGift(); }}>🎁</button>
+          <button type="button" className="cb-gift cb-gift-red" aria-label="🎁"
+            onClick={(e) => { e.stopPropagation(); onGift(); }}><GiftIcon /></button>
         )}
         {onOpen && (
           <button type="button" className="cb-vopen" aria-label={tile.name} title={tile.name}
@@ -161,11 +161,24 @@ function CbTile({ tile, listening, onTap, onGift, onOpen, attach, hasVideo, vers
       {tile.starredMe && <span className="cb-starme">{t("chb_starred_you_tile")}</span>}
       {tile.gift && <TileGift key={tile.gift.key} icon={tile.gift.icon} />}
       {!tile.own && onGift && (
-        <button type="button" className="cb-gift" aria-label="🎁"
-          onClick={(e) => { e.stopPropagation(); onGift(); }}>🎁</button>
+        <button type="button" className="cb-gift cb-gift-red" aria-label="🎁"
+          onClick={(e) => { e.stopPropagation(); onGift(); }}><GiftIcon /></button>
       )}
       <span className="cb-name">{tile.name}</span>
     </div>
+  );
+}
+
+/** The tile gift button's icon: a white gift box (Steve, 2026-11-24 round 2: "the gold gift box
+ *  please make it red" — a red button, white icon and border). */
+function GiftIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="62%" height="62%" aria-hidden="true" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3.5" y="8" width="17" height="4.5" rx="1" />
+      <path d="M5 12.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7.5" />
+      <path d="M12 8v13" />
+      <path d="M12 8c-1.6-3.6-5.6-4.4-5.6-1.8C6.4 7.6 9 8 12 8Zm0 0c1.6-3.6 5.6-4.4 5.6-1.8C17.6 7.6 15 8 12 8Z" />
+    </svg>
   );
 }
 

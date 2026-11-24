@@ -2957,4 +2957,5 @@ export const fil = {
   vcb_show_me: "Ipakita ako sa mga virtual battle",
   vcb_show_me_sub: "Puwedeng lumabas ang profile photo mo sa mga Country Battle habang hindi ka naka-live. Sa iyo ang mga totoong BBs na iregalo sa iyo.",
   vcb_virtual: "Virtual",
+  vcb_no_members: "Wala pang miyembro mula sa {country}",
 };

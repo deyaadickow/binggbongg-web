@@ -2059,5 +2059,6 @@
  "banger_boost_failed": "Boosteren gik ikke igennem. Prøv igen.",
  "vcb_show_me": "Vis mig i virtuelle kampe",
  "vcb_show_me_sub": "Dit profilbillede kan blive vist i Country Battles, mens du ikke er live. Rigtige BBs, du får i gave, er dine.",
- "vcb_virtual": "Virtuel"
+ "vcb_virtual": "Virtuel",
+ "vcb_no_members": "Ingen medlemmer fra {country} endnu"
 }

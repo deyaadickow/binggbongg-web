@@ -2062,5 +2062,6 @@
  "banger_boost_failed": "ማበረታቻው አልደረሰም። እንደገና ይሞክሩ።",
  "vcb_show_me": "በምናባዊ ውድድሮች ውስጥ አሳየኝ",
  "vcb_show_me_sub": "በቀጥታ ስርጭት ላይ ሳትሆኑ የመገለጫ ፎቶዎ በCountry Battles ውስጥ ሊታይ ይችላል። ለእርስዎ የተሰጡ እውነተኛ BBs የእርስዎ ናቸው።",
- "vcb_virtual": "ምናባዊ"
+ "vcb_virtual": "ምናባዊ",
+ "vcb_no_members": "ከ{country} እስካሁን አባላት የሉም"
 }

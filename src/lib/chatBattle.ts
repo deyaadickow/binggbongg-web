@@ -32,6 +32,9 @@ export interface ChbBattler extends ChbPerson {
   is_virtual?: boolean;
   /** Real gift BBs only (`score` also holds a virtual tile's free BBs). */
   real_score?: number;
+  /** Admin free BBs on this tile so far (= score - real_score). Rising = a gift from Bingg Bongg
+   *  plays on the tile (2026-11-24 round 2). Older servers: missing. */
+  free_score?: number;
   /** Country VS Country: the country this battler fights for (rival.a / rival.b's country). */
   side?: string | null;
 }

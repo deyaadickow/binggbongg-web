@@ -2062,5 +2062,6 @@
  "banger_boost_failed": "Penggalak gagal dihantar. Cuba lagi.",
  "vcb_show_me": "Tunjukkan saya dalam pertarungan maya",
  "vcb_show_me_sub": "Foto profil anda boleh muncul dalam Country Battles semasa anda tidak live. BBs sebenar yang dihadiahkan kepada anda adalah milik anda.",
- "vcb_virtual": "Maya"
+ "vcb_virtual": "Maya",
+ "vcb_no_members": "Belum ada ahli dari {country}"
 }

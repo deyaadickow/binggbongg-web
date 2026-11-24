@@ -2062,5 +2062,6 @@
  "banger_boost_failed": "부스터가 전송되지 않았어요. 다시 시도하세요.",
  "vcb_show_me": "가상 배틀에 나를 표시",
  "vcb_show_me_sub": "라이브 중이 아닐 때도 프로필 사진이 Country Battles에 나타날 수 있어요. 나에게 선물된 실제 BBs는 내 것이에요.",
- "vcb_virtual": "가상"
+ "vcb_virtual": "가상",
+ "vcb_no_members": "아직 {country} 멤버가 없어요"
 }
