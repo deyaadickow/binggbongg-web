@@ -5,7 +5,6 @@ import { useSession } from "../lib/session";
 import { Notice } from "../components/Common";
 import { tt, useT  } from "../lib/i18n";
 import { PageTitle } from "../components/PageTitle";
-import { CountryBattleJoinNow } from "../components/CountryBattleJoinNow";
 import { requireVerified } from "../lib/verifyEmail";
 import { StartPodcastLink } from "./PodcastPages";
 
@@ -69,9 +68,8 @@ export function GoLivePage() {
       <button className="btn block" style={{ marginTop: 14, minHeight: 52, fontSize: 17 }} onClick={goLive} disabled={busy}>
         {busy ? "Starting…" : "Go Live"}
       </button>
-      {/* "Join the Philippine whole country battle Now" (Steve, 2026-11-20: "add another button here
-          under the live button") — only while the server says show. */}
-      <div style={{ marginTop: 10 }}><CountryBattleJoinNow variant="button" /></div>
+      {/* The "Join the … whole country battle Now" button under Go Live was removed (Steve,
+          2026-11-24: "Remove the join the american whole country from this page"). */}
       {/* Bingg Bongg Podcast (Steve, 2026-11-10) — right under Go Live, only while switched on. */}
       <StartPodcastLink />
       {previewError && <p className="muted center" style={{ fontSize: 13, marginTop: 8 }}>{t("you_can_still_go_live_and_turn_the_camer")}</p>}
