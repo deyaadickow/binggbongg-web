@@ -2059,5 +2059,7 @@
  "banger_boost_failed": "Stiprintuvas neišsiųstas. Bandyk dar kartą.",
  "vcb_show_me": "Rodyti mane virtualiose kovose",
  "vcb_show_me_sub": "Jūsų profilio nuotrauka gali būti rodoma Country Battles, kai nesate tiesioginiame eteryje. Jums padovanoti tikri BBs yra jūsų.",
- "vcb_virtual": "Virtualus"
+ "vcb_virtual": "Virtualus",
+ "lbq_next": "Kita kova",
+ "lbq_prev": "Ankstesnė kova"
 }

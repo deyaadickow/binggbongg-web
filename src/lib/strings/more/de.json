@@ -2062,5 +2062,7 @@
  "banger_boost_failed": "Der Booster ist nicht angekommen. Versuch es noch mal.",
  "vcb_show_me": "Mich in virtuellen Battles zeigen",
  "vcb_show_me_sub": "Dein Profilfoto kann in Country Battles erscheinen, während du nicht live bist. Echte BBs, die dir geschenkt werden, gehören dir.",
- "vcb_virtual": "Virtuell"
+ "vcb_virtual": "Virtuell",
+ "lbq_next": "Nächster Battle",
+ "lbq_prev": "Vorheriger Battle"
 }

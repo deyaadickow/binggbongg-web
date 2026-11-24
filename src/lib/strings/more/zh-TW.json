@@ -2062,5 +2062,7 @@
  "banger_boost_failed": "道具沒有送出。請再試一次。",
  "vcb_show_me": "在虛擬對戰中顯示我",
  "vcb_show_me_sub": "你不在直播時,你的大頭貼也可能出現在 Country Battles 中。別人送給你的真實 BBs 歸你所有。",
- "vcb_virtual": "虛擬"
+ "vcb_virtual": "虛擬",
+ "lbq_next": "下一場對戰",
+ "lbq_prev": "上一場對戰"
 }

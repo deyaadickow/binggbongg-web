@@ -2119,3 +2119,24 @@ body:has(.story-viewer) .get-app-bar { display: none; }
 .vcb-half-head { text-align: center; color: var(--gold); font-weight: 800; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .vcb-half .cb-stage { min-width: 0 !important; }
 .vcb-half-empty { min-height: 120px; }
+
+/* The red Live button on the All Country Battles chips (Steve, 2026-11-24: "a "Live" button with red background
+   and a blinking white border and text on any one of those buttons above"). It sits on the right chip's top-right
+   corner, half over its border, so both chips stay full size and tappable. The only red button in the app. */
+.acb-chip-wrap { position: relative; flex: 1 1 0; min-width: 0; display: flex; }
+.acb-chip-wrap .acb-filter { flex: 1 1 auto; }
+.acb-chips.has-live { margin-top: 18px; }
+.acb-live-btn { position: absolute; top: -16px; right: 14px; z-index: 1; padding: 2px 12px; border-radius: 999px; background: #e10600; border: 2px solid #fff; color: #fff; font-weight: 900; font-size: 13px; line-height: 1.25; letter-spacing: .03em; cursor: pointer; animation: lbqBlink 1s steps(1, end) infinite; box-shadow: 0 0 0 2px #000; }
+.acb-live-btn:hover { background: #ff1a12; }
+@keyframes lbqBlink { 0%, 100% { border-color: #fff; color: #fff; } 50% { border-color: rgba(255,255,255,.12); color: rgba(255,255,255,.25); } }
+/* The bar over a battle opened from Live: ‹  Live 2 / 5 · Philippines vs Indonesia  Next battle ›. */
+.lbq-bar { display: flex; align-items: center; gap: 8px; max-width: 980px; margin: 0 auto 8px; padding: 6px 8px; border: 1.5px solid var(--gold-border); border-radius: 999px; background: #000; }
+.lbq-arrow { flex: none; width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid var(--gold); background: #000; color: var(--gold); font-size: 22px; font-weight: 900; line-height: 1; cursor: pointer; display: grid; place-items: center; padding: 0 0 3px; }
+.lbq-mid { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; }
+.lbq-live { flex: none; padding: 1px 9px; border-radius: 999px; background: #e10600; border: 2px solid #fff; color: #fff; font-weight: 900; font-size: 12px; animation: lbqBlink 1s steps(1, end) infinite; }
+.lbq-pos { flex: none; color: var(--gold); font-weight: 800; font-variant-numeric: tabular-nums; font-size: 14px; }
+.lbq-name { min-width: 0; color: #fff; font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lbq-next { flex: none; padding: 8px 14px; border-radius: 999px; border: none; background: var(--gold); color: #000; font-weight: 800; font-size: 14px; cursor: pointer; white-space: nowrap; }
+.lbq-next:disabled, .lbq-arrow:disabled { opacity: .4; cursor: default; }
+/* At phone width the battle's own header names the countries; the bar keeps ‹, Live, 2 / 5 and Next battle ›. */
+@media (max-width: 480px) { .lbq-name { display: none; } .lbq-mid { justify-content: center; } }

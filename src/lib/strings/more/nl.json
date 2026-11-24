@@ -2062,5 +2062,7 @@
  "banger_boost_failed": "Die booster is niet aangekomen. Probeer het opnieuw.",
  "vcb_show_me": "Toon mij in virtuele battles",
  "vcb_show_me_sub": "Je profielfoto kan in Country Battles verschijnen terwijl je niet live bent. Echte BBs die je krijgt, zijn van jou.",
- "vcb_virtual": "Virtueel"
+ "vcb_virtual": "Virtueel",
+ "lbq_next": "Volgende battle",
+ "lbq_prev": "Vorige battle"
 }

@@ -2060,5 +2060,7 @@
  "banger_boost_failed": "Daardie booster het nie deurgegaan nie. Probeer weer.",
  "vcb_show_me": "Wys my in virtuele gevegte",
  "vcb_show_me_sub": "Jou profielfoto kan in Country Battles verskyn terwyl jy nie regstreeks is nie. Regte BBs wat aan jou gegee word, is joune.",
- "vcb_virtual": "Virtueel"
+ "vcb_virtual": "Virtueel",
+ "lbq_next": "Volgende stryd",
+ "lbq_prev": "Vorige stryd"
 }

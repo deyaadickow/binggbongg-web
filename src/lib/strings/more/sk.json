@@ -2062,5 +2062,7 @@
  "banger_boost_failed": "Booster sa nepodarilo poslať. Skús to znova.",
  "vcb_show_me": "Zobrazovať ma vo virtuálnych bitkách",
  "vcb_show_me_sub": "Vaša profilová fotka sa môže zobraziť v Country Battles, keď nie ste naživo. Skutočné BBs, ktoré dostanete, sú vaše.",
- "vcb_virtual": "Virtuálne"
+ "vcb_virtual": "Virtuálne",
+ "lbq_next": "Ďalšia bitka",
+ "lbq_prev": "Predchádzajúca bitka"
 }

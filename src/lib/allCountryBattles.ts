@@ -144,6 +144,31 @@ export function useAllCountryBattles(query: string, kind: AcbKind | undefined, u
   return { battles, error, search };
 }
 
+// ---- the red "Live" button on the chips ---------------------------------------------------
+// Steve, 2026-11-24: "When there is a battle under way please add a "Live" button with red background and a
+// blinking white border and text on any one of those buttons above, when you click the live button, it will
+// show you all the battles that are under way one after another."
+// Every battle under way right now (phase "battle"), Country VS Country first, then single countries — the
+// order fetchAllCountryBattles already gives. Asked on mount, every 20 s while the tab is in view, and when the
+// tab comes back. A failed call keeps the last list.
+export function useRunningBattles(): AcbBattle[] {
+  const [list, setList] = useState<AcbBattle[]>([]);
+  useEffect(() => {
+    let alive = true;
+    const ask = () => {
+      if (document.visibilityState !== "visible") return;
+      fetchAllCountryBattles("")
+        .then((d) => { if (alive) setList(d.battles.filter((b) => b.phase === "battle" && !!b.day_id)); })
+        .catch(() => { /* keep the last list */ });
+    };
+    ask();
+    const timer = setInterval(ask, 20000);
+    document.addEventListener("visibilitychange", ask);
+    return () => { alive = false; clearInterval(timer); document.removeEventListener("visibilitychange", ask); };
+  }, []);
+  return list;
+}
+
 // ---- the flag from a country NAME -----------------------------------------------------------
 // The battles carry "Philippines", not "PH". The browser already knows every region's English
 // name, so the reverse map is built from it once — no list to maintain.

@@ -2057,5 +2057,7 @@
  "banger_boost_failed": "Boosterul nu a ajuns. Încearcă din nou.",
  "vcb_show_me": "Arată-mă în bătăliile virtuale",
  "vcb_show_me_sub": "Fotografia ta de profil poate apărea în Country Battles cât timp nu ești live. BBs reali primiți în dar sunt ai tăi.",
- "vcb_virtual": "Virtual"
+ "vcb_virtual": "Virtual",
+ "lbq_next": "Următoarea bătălie",
+ "lbq_prev": "Bătălia anterioară"
 }

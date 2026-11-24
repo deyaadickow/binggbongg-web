@@ -2055,5 +2055,7 @@
  "banger_boost_failed": "A booster nem ment át. Próbáld újra.",
  "vcb_show_me": "Mutass engem a virtuális csatákban",
  "vcb_show_me_sub": "A profilképed megjelenhet a Country Battles-ben, amikor nem vagy élőben. A neked ajándékozott valódi BBs a tieid.",
- "vcb_virtual": "Virtuális"
+ "vcb_virtual": "Virtuális",
+ "lbq_next": "Következő csata",
+ "lbq_prev": "Előző csata"
 }

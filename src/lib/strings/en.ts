@@ -3741,4 +3741,7 @@ export const en = {
   vcb_show_me: "Show me in virtual battles",
   vcb_show_me_sub: "Your profile photo can appear in Country Battles while you're not live. Real BBs gifted to you are yours.",
   vcb_virtual: "Virtual",
+  // Live button bar (Steve, 2026-11-24).
+  lbq_next: "Next battle",
+  lbq_prev: "Previous battle",
 } as const;

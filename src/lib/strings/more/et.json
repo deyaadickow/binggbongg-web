@@ -2059,5 +2059,7 @@
  "banger_boost_failed": "Võimendi ei läinud läbi. Proovi uuesti.",
  "vcb_show_me": "Näita mind virtuaalsetes lahingutes",
  "vcb_show_me_sub": "Sinu profiilipilt võib ilmuda Country Battles'is, kui sa pole otseülekandes. Sulle kingitud päris BBs on sinu omad.",
- "vcb_virtual": "Virtuaalne"
+ "vcb_virtual": "Virtuaalne",
+ "lbq_next": "Järgmine lahing",
+ "lbq_prev": "Eelmine lahing"
 }

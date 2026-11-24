@@ -2062,5 +2062,7 @@
  "banger_boost_failed": "Le bonus n’est pas passé. Réessayez.",
  "vcb_show_me": "M'afficher dans les combats virtuels",
  "vcb_show_me_sub": "Ta photo de profil peut apparaître dans les Country Battles quand tu n'es pas en direct. Les vrais BBs qu'on t'offre sont à toi.",
- "vcb_virtual": "Virtuel"
+ "vcb_virtual": "Virtuel",
+ "lbq_next": "Bataille suivante",
+ "lbq_prev": "Bataille précédente"
 }

@@ -2062,5 +2062,7 @@
  "banger_boost_failed": "Wzmocnienie nie zostało wysłane. Spróbuj ponownie.",
  "vcb_show_me": "Pokazuj mnie w wirtualnych bitwach",
  "vcb_show_me_sub": "Twoje zdjęcie profilowe może pojawiać się w Country Battles, gdy nie nadajesz na żywo. Prawdziwe BBs, które dostaniesz, są Twoje.",
- "vcb_virtual": "Wirtualny"
+ "vcb_virtual": "Wirtualny",
+ "lbq_next": "Następna bitwa",
+ "lbq_prev": "Poprzednia bitwa"
 }

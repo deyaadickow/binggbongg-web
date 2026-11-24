@@ -2061,5 +2061,7 @@
  "banger_boost_failed": "Il potenziamento non è arrivato. Riprova.",
  "vcb_show_me": "Mostrami nelle battaglie virtuali",
  "vcb_show_me_sub": "La tua foto profilo può comparire nelle Country Battles quando non sei in diretta. I BBs veri che ti regalano sono tuoi.",
- "vcb_virtual": "Virtuale"
+ "vcb_virtual": "Virtuale",
+ "lbq_next": "Battaglia successiva",
+ "lbq_prev": "Battaglia precedente"
 }

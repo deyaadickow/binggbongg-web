@@ -15,10 +15,12 @@
 //                                           a viewer's screen, &img=/path/ = /path/1.jpg… as photos.
 //                                           &phase=ended: the podium with "Share my result" (a
 //                                           sample recap; &reason=not_finished|not_participant|not_found).
+// /country-battle/live/:dayId?live=1        opened from the red Live button on the chips: a bar on top
+//                                           steps through every battle under way (‹ 2 / 5 Next battle ›)
 // /country-battle/live/0?vcbdemo=1|rival     DEV ONLY (never in a production build): Virtual Country
 //                                           Battles on a fake state — whole country (1 live + 30
 //                                           virtual) or Country VS Country (two halves).
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useT } from "../lib/i18n";
 import { GridBattleLive, type GridBattleSource } from "../components/GridBattleScreen";
@@ -29,6 +31,7 @@ import {
 import type { ChbBattler, ChbState } from "../lib/chatBattle";
 import { ShareResultButton } from "../components/CountryBoardBits";
 import { RivalBar } from "../components/RivalBar";
+import { countryFlag, useRunningBattles, type AcbBattle } from "../lib/allCountryBattles";
 
 type T = ReturnType<typeof useT>["t"];
 
@@ -45,8 +48,50 @@ export function CountryBattleLivePage() {
   }
   // ?side= — a Rival Battle's country to fight for; a new side means a fresh screen that joins for it.
   const side = sp.get("side");
-  return <CountryBattleLive key={`${dayId}-${side ?? ""}`} dayId={Number(dayId)} home={Number(sp.get("home")) || null}
+  const screen = <CountryBattleLive key={`${dayId}-${side ?? ""}`} dayId={Number(dayId)} home={Number(sp.get("home")) || null}
     battlerHint={sp.get("battler") === "1"} autoJoin={sp.get("join") === "1"} side={side} />;
+  if (sp.get("live") !== "1") return screen;
+  return <>{<LiveBattlesBar dayId={Number(dayId)} />}{screen}</>;
+}
+
+/** The bar over a battle opened from the red Live button (Steve, 2026-11-24: "when you click the live button, it
+ *  will show you all the battles that are under way one after another"): which one of how many, ‹ and Next battle ›.
+ *  The list refreshes every 20 s, so a battle that ends drops out and a new one joins; after the last comes the first. */
+function LiveBattlesBar({ dayId }: { dayId: number }) {
+  const { t } = useT();
+  const navigate = useNavigate();
+  const running = useRunningBattles();
+  const n = running.length;
+  const i = running.findIndex((b) => b.day_id === dayId);
+  const go = (b: AcbBattle) => navigate(countryBattlePath(b.day_id!, { live: true }), { replace: true });
+  const next = n ? running[(i + 1) % n] : null;
+  const prev = n ? running[i < 0 ? n - 1 : (i - 1 + n) % n] : null;
+  const stepping = n > 1 || (n === 1 && i < 0);
+  // ← and → step too, unless the member is typing in the chat.
+  useEffect(() => {
+    if (!stepping) return;
+    const key = (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement | null;
+      if (el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable)) return;
+      if (e.key === "ArrowRight" && next) go(next);
+      if (e.key === "ArrowLeft" && prev) go(prev);
+    };
+    window.addEventListener("keydown", key);
+    return () => window.removeEventListener("keydown", key);
+  });
+  if (!n) return null;
+  const cur = i >= 0 ? running[i] : null;
+  return (
+    <div className="lbq-bar" role="navigation">
+      <button type="button" className="lbq-arrow" disabled={!stepping} onClick={() => prev && go(prev)} aria-label={t("lbq_prev")} title={t("lbq_prev")}>‹</button>
+      <div className="lbq-mid">
+        <span className="lbq-live">Live</span>
+        <span className="lbq-pos">{i >= 0 ? `${i + 1} / ${n}` : `${n}`}</span>
+        {cur && <span className="lbq-name">{cur.kind === "rival" ? "⚔️" : countryFlag(cur.country) || "🌍"} {cur.country}</span>}
+      </div>
+      <button type="button" className="lbq-next" disabled={!stepping} onClick={() => next && go(next)}>{t("lbq_next")} ›</button>
+    </div>
+  );
 }
 
 /** The header lines: "Opens in mm:ss", "Starts in mm:ss — go live and join!", "mm:ss left". */

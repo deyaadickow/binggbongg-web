@@ -2053,5 +2053,7 @@
  "banger_boost_failed": "Tehoste ei mennyt perille. Yritä uudelleen.",
  "vcb_show_me": "Näytä minut virtuaalitaisteluissa",
  "vcb_show_me_sub": "Profiilikuvasi voi näkyä Country Battlesissa, kun et ole livenä. Sinulle lahjoitetut oikeat BBs ovat sinun.",
- "vcb_virtual": "Virtuaalinen"
+ "vcb_virtual": "Virtuaalinen",
+ "lbq_next": "Seuraava taisto",
+ "lbq_prev": "Edellinen taisto"
 }
