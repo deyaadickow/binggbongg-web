@@ -45,7 +45,7 @@ export function AllCountryBattlesPage({ startKind }: { startKind?: AcbKind } = {
         <div className={`acb-chips${running.length ? " has-live" : ""}`} role="tablist">
           {chips.map(([k, label], i) => (
             <div key={label} className="acb-chip-wrap">
-              <button type="button" role="tab" aria-selected={kind === k} className={`acb-filter${kind === k ? " on" : ""}`} onClick={() => setKind(k)}>{label}</button>
+              <button type="button" role="tab" aria-selected={kind === k} className={`acb-filter ${k === "rival" ? "red" : "blue"}${kind === k ? " on" : ""}`} onClick={() => setKind(k)}>{label}</button>
               {i === chips.length - 1 && running.length > 0 && (
                 <button type="button" className="acb-live-btn" onClick={() => navigate(countryBattlePath(running[0].day_id!, { live: true }))}>Live</button>
               )}

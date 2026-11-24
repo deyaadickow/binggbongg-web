@@ -93,12 +93,15 @@ function InfoBanner() {
 
 export function InformationCenterPage() {
   const { t } = useT();
-  const items: { to: string; key: StringKey }[] = [
+  // Steve, 2026-11-24: "Make the 2 buttons on top same color as the lines Red and Blue, i want the to be more
+  // noticable. and make the country vs country the same please." — All Country Battles blue, Country VS Country red,
+  // the Country VS Country score bar's own two colours.
+  const items: { to: string; key: StringKey; tone?: "red" | "blue" }[] = [
     // The $1,000,000 referral video ad sits at the top of Ads for Referrals.
     { to: "/ads-for-referrals?video=en", key: "ic_million" },
-    { to: "/country-battles", key: "acb_tab" },
+    { to: "/country-battles", key: "acb_tab", tone: "blue" },
     // Steve, 2026-11-23: "Add "Country VS Country" button here." — the same page, on its Country VS Country chip.
-    { to: "/country-vs-country", key: "acb_filter_vs" },
+    { to: "/country-vs-country", key: "acb_filter_vs", tone: "red" },
     { to: "/features", key: "tab_70_features" },
     { to: "/feature-videos", key: "tab_70_videos" },
     { to: "/one-video", key: "ic_one_video" },
@@ -113,7 +116,7 @@ export function InformationCenterPage() {
       <nav className="ic-list" aria-label={t("information_center")}>
         {items.map((it) => (
           // Steve, 2026-11-23: "add 2 red stars in each box one on each side."
-          <Link key={it.key} to={it.to} className="ic-btn">
+          <Link key={it.key} to={it.to} className={`ic-btn${it.tone ? ` ${it.tone}` : ""}`}>
             <span className="ic-star" aria-hidden>★</span>
             <span className="ic-label">{t(it.key)}</span>
             <span className="ic-star" aria-hidden>★</span>
