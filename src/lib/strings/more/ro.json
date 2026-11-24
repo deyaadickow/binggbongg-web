@@ -2054,5 +2054,8 @@
  "fwhere_banger": "Intră live, apoi Bătălii și jocuri",
  "banger_is_running": "Bingg Bongg Banger rulează deja",
  "banger_host_starts_it": "Doar gazda poate porni Bingg Bongg Banger",
- "banger_boost_failed": "Boosterul nu a ajuns. Încearcă din nou."
+ "banger_boost_failed": "Boosterul nu a ajuns. Încearcă din nou.",
+ "vcb_show_me": "Arată-mă în bătăliile virtuale",
+ "vcb_show_me_sub": "Fotografia ta de profil poate apărea în Country Battles cât timp nu ești live. BBs reali primiți în dar sunt ai tăi.",
+ "vcb_virtual": "Virtual"
 }

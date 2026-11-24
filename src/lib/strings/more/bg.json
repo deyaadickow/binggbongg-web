@@ -2059,5 +2059,8 @@
  "fwhere_banger": "Излез на живо, после Битки и игри",
  "banger_is_running": "Bingg Bongg Banger вече върви",
  "banger_host_starts_it": "Само водещият може да стартира Bingg Bongg Banger",
- "banger_boost_failed": "Бустерът не беше изпратен. Опитай отново."
+ "banger_boost_failed": "Бустерът не беше изпратен. Опитай отново.",
+ "vcb_show_me": "Показвай ме във виртуални битки",
+ "vcb_show_me_sub": "Профилната ви снимка може да се появява в Country Battles, докато не сте на живо. Истинските BBs, подарени на вас, са ваши.",
+ "vcb_virtual": "Виртуален"
 }

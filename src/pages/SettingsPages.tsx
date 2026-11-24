@@ -146,7 +146,7 @@ function SettingsSwitches() {
             <div style={{ fontWeight: 700 }}>{t(tog.label)}</div>
             <div className="muted" style={{ fontSize: 12 }}>{t(tog.hint)}</div>
           </div>
-          <input type="checkbox" className="switch" disabled={busy} checked={on(me[tog.key])} onChange={(e) => save({ [tog.key]: e.target.checked ? 1 : 0 })} />
+          <input type="checkbox" className="switch" disabled={busy} checked={toggleOn(me[tog.key], tog.defaultOn)} onChange={(e) => save({ [tog.key]: e.target.checked ? 1 : 0 })} />
         </label>
       ))}
       <CountryBattleReminderToggle row initial={me.country_battle_reminders == null ? null : on(me.country_battle_reminders)} />
@@ -187,18 +187,27 @@ interface MyUser extends UserSummary {
   show_following_list?: number | string | null;
   allow_virtual_games?: number | string | null;
   wants_to_battle?: number | string | null;
+  show_in_virtual_battles?: number | string | null;
   city?: string | null;
   state?: string | null;
 }
 // label/hint are translation KEYS: module-level data, translated where it is rendered.
-const TOGGLES: { key: keyof MyUser; label: StringKey; hint: StringKey }[] = [
+// `defaultOn`: a missing value reads as ON (the server has not stored a choice yet).
+const TOGGLES: { key: keyof MyUser; label: StringKey; hint: StringKey; defaultOn?: boolean }[] = [
   { key: "is_notification", label: "notify_me", hint: "push_notifications_from_the_app" },
   { key: "show_liked_videos", label: "show_your_liked_videos_to_users", hint: "others_can_see_the_videos_you_liked_on_y" },
   { key: "show_following_list", label: "show_your_following_list_to_users", hint: "others_can_see_who_you_follow" },
   { key: "allow_virtual_games", label: "allow_virtual_games", hint: "let_hosts_invite_you_to_virtual_games" },
   { key: "wants_to_battle", label: "i_want_someone_to_battle_with", hint: "show_you_in_find_a_battle_so_hosts_can_c" },
+  // Virtual Country Battles (Steve, 2026-11-24: "All country battles and country VS country battles with all
+  // virtual members... This is only temporary, once real members start coming in we will stop the virtual
+  // battles."): ON by default, saved like show_liked_videos.
+  { key: "show_in_virtual_battles", label: "vcb_show_me", hint: "vcb_show_me_sub", defaultOn: true },
 ];
 const on = (v: unknown) => v === 1 || v === "1" || v === true;
+const toggleOn = (v: unknown, defaultOn?: boolean) => (v == null || v === "" ? !!defaultOn : on(v));
+/** DEV ONLY (never in a production build): /settings/account?vcbdemo=1 shows the toggles signed out, saving nowhere. */
+const settingsDemo = () => import.meta.env.DEV && new URLSearchParams(window.location.search).has("vcbdemo");
 
 export function AccountSettingsPage() {
   const { t } = useT();
@@ -214,6 +223,7 @@ export function AccountSettingsPage() {
   const [busy, setBusy] = useState(false);
   const { setToast, el } = useToast();
   useEffect(() => {
+    if (!user && settingsDemo()) { setMe({ id: 1, username: "demo", fullname: "Demo Member" } as MyUser); return; }
     if (!user) return;
     post<MyUser>("fetchMyUserDetails", { my_user_id: user.id }).then((r) => {
       if (r.status && r.data) {
@@ -233,8 +243,10 @@ export function AccountSettingsPage() {
       .then((r) => setCountryRows(r.data?.countryStates?.data ?? []))
       .catch(() => undefined);
   }, []);
-  if (!isLoggedIn || !user) return <NeedLogin />;
+  const demo = !user && settingsDemo();
+  if ((!isLoggedIn || !user) && !demo) return <NeedLogin />;
   async function save(fields: Record<string, unknown>) {
+    if (demo) { setMe((m) => ({ ...(m ?? {} as MyUser), ...fields } as MyUser)); return; }
     if (!user) return;
     setBusy(true);
     try {
@@ -258,12 +270,12 @@ export function AccountSettingsPage() {
                   <div style={{ fontWeight: 700 }}>{t(tog.label)}</div>
                   <div className="muted" style={{ fontSize: 12 }}>{t(tog.hint)}</div>
                 </div>
-                <input type="checkbox" className="switch" disabled={busy} checked={on(me[tog.key])} onChange={(e) => save({ [tog.key]: e.target.checked ? 1 : 0 })} />
+                <input type="checkbox" className="switch" disabled={busy} checked={toggleOn(me[tog.key], tog.defaultOn)} onChange={(e) => save({ [tog.key]: e.target.checked ? 1 : 0 })} />
               </label>
             ))}
             {/* Country Battle v2 (Steve, 2026-11-03): "a push at 7:55 PM daily that members can turn
                 off". The push is phone-only, but the setting is the member's, so it is here too. */}
-            <CountryBattleReminderToggle row initial={me.country_battle_reminders == null ? null : on(me.country_battle_reminders)} />
+            {!demo && <CountryBattleReminderToggle row initial={me.country_battle_reminders == null ? null : on(me.country_battle_reminders)} />}
           </div>
           <div className="card pad">
             <div className="row" style={{ marginBottom: 12 }}><Avatar user={me} size="lg" /><div><div style={{ fontWeight: 800 }}>{displayName(me)}</div><div className="muted">@{me.username}</div></div></div>

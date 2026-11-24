@@ -2057,5 +2057,8 @@
  "fwhere_banger": "ไลฟ์สด แล้วไปที่ แบทเทิลและเกม",
  "banger_is_running": "Bingg Bongg Banger เริ่มอยู่แล้ว",
  "banger_host_starts_it": "เฉพาะโฮสต์เท่านั้นที่เริ่ม Bingg Bongg Banger ได้",
- "banger_boost_failed": "ส่งบูสเตอร์ไม่สำเร็จ ลองอีกครั้ง"
+ "banger_boost_failed": "ส่งบูสเตอร์ไม่สำเร็จ ลองอีกครั้ง",
+ "vcb_show_me": "แสดงฉันในแบทเทิลเสมือน",
+ "vcb_show_me_sub": "รูปโปรไฟล์ของคุณอาจแสดงใน Country Battles ขณะที่คุณไม่ได้ไลฟ์ BBs จริงที่มีคนมอบให้คุณเป็นของคุณ",
+ "vcb_virtual": "เสมือน"
 }

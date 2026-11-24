@@ -2056,5 +2056,8 @@
  "fwhere_banger": "Mine otse-eetrisse, siis Lahingud ja mängud",
  "banger_is_running": "Bingg Bongg Banger juba käib",
  "banger_host_starts_it": "Ainult saatejuht saab Bingg Bongg Banger käivitada",
- "banger_boost_failed": "Võimendi ei läinud läbi. Proovi uuesti."
+ "banger_boost_failed": "Võimendi ei läinud läbi. Proovi uuesti.",
+ "vcb_show_me": "Näita mind virtuaalsetes lahingutes",
+ "vcb_show_me_sub": "Sinu profiilipilt võib ilmuda Country Battles'is, kui sa pole otseülekandes. Sulle kingitud päris BBs on sinu omad.",
+ "vcb_virtual": "Virtuaalne"
 }

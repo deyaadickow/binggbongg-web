@@ -2357,5 +2357,8 @@
  "fwhere_banger": "ابدأ بثًا مباشرًا، ثم المعارك والألعاب",
  "banger_is_running": "Bingg Bongg Banger قيد التشغيل بالفعل",
  "banger_host_starts_it": "المضيف وحده يمكنه بدء Bingg Bongg Banger",
- "banger_boost_failed": "لم يُرسل المعزز. حاول مرة أخرى."
+ "banger_boost_failed": "لم يُرسل المعزز. حاول مرة أخرى.",
+ "vcb_show_me": "أظهرني في المعارك الافتراضية",
+ "vcb_show_me_sub": "يمكن أن تظهر صورة ملفك الشخصي في Country Battles عندما لا تكون في بث مباشر. الـ BBs الحقيقية المهداة إليك هي لك.",
+ "vcb_virtual": "افتراضي"
 }

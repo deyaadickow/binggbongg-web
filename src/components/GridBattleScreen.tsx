@@ -21,9 +21,10 @@ import { Loading, Notice } from "./Common";
 import { showGoldAlert } from "./GoldToast";
 import { Confetti, Podium } from "./GameShow";
 import { SoloBattleStandingsSheet } from "./SoloBattle";
-import { CbHeader, CountryBattleGrid, StarredYouBar, heardIds, useRotation, useStarPins, useStarSignals, type CbTileData } from "./BattleGrid";
+import { CbHeader, CountryBattleGrid, StarredYouBar, heardIds, useRotation, useStarPins, useStarSignals, useVirtualWindow, type CbTileData } from "./BattleGrid";
 import { useCountryBattleRoom } from "../lib/countryBattleRoom";
 import { cbText, countShape, gridShape, serverNow, useTick } from "../lib/countryBattle";
+import { countryFlag } from "../lib/allCountryBattles";
 import { chatChannel, ensureFirebaseSignIn, observeChat, observeLiveCaption, sendChat, type ChatMessage } from "../lib/firebase";
 import { haptic, sfx, stopGameSounds } from "../lib/gameSounds";
 import {
@@ -188,9 +189,21 @@ function mergeLines(messages: ChatMessage[], local: ChatMessage[]): ChatMessage[
 
 // ---- the pieces both the live screen and the demos use ----------------------------------------
 
+/** Virtual Country Battles: a whole-country screen is filled up to 24 tiles, each Country VS Country half up to 12. */
+export const VIRTUAL_FILL = 24;
+export const VIRTUAL_HALF_FILL = 12;
+
 /** Which tiles are on screen: the pinned one (your own tile as a battler, the home battler as a
  *  viewer) top-left, then up to 23 others from the live list, rotating every 15–25 s. Starred
- *  tiles, the gift target and the spotlit battler never rotate out. */
+ *  tiles, the gift target and the spotlit battler never rotate out.
+ *
+ *  Virtual Country Battles (Steve, 2026-11-24: "All country battles and country VS country battles
+ *  with all virtual members... This is only temporary, once real members start coming in we will
+ *  stop the virtual battles."): after the live tiles, the server's `virtual` members fill the free
+ *  spaces up to 24, moving on every ~4 s when there are more (useVirtualWindow). A Country VS
+ *  Country battle (`split`) is two halves, one per country (battlers[].side), each its own live
+ *  tiles first, then its virtual ones, up to 12. A member who goes live for real is in `live` and
+ *  out of `virtual`, so their virtual tile goes and the real one takes its place by itself. */
 export function useGridBattleTiles(input: {
   battlers: ChbBattler[];
   live: number[];
@@ -205,6 +218,10 @@ export function useGridBattleTiles(input: {
   extraHold?: number[];
   /** Country Battle: the grid's shape follows the tile count, 2 to 24 (countShape). */
   byCount?: boolean;
+  /** Virtual Country Battles: the virtual tiles' user ids (ChbState.virtual). */
+  virtual?: number[];
+  /** Country VS Country: the two countries — the screen splits into a half for each. */
+  split?: { a: string; b: string } | null;
 }) {
   const { battlers, live, publishers, myId, isBattler, home, giftTarget, spot } = input;
   const byId = useMemo(() => new Map(battlers.map((b) => [b.user_id, b])), [battlers]);
@@ -219,8 +236,7 @@ export function useGridBattleTiles(input: {
   const pinnedId = isBattler ? myId : homeRow && !homeRow.left ? homeRow.user_id : null;
   const total = liveIds.size + (pinnedId != null && !liveIds.has(pinnedId) ? 1 : 0);
   const stage = chatBattleStage(total);
-  const shape = input.byCount ? countShape(total) : gridShape(stage);
-  const { cap } = shape;
+  const liveShape = input.byCount ? countShape(total) : gridShape(stage);
   const pool = useMemo(
     () => [...liveIds].filter((id) => id !== pinnedId && id !== myId).sort((a, b) => a - b),
     [liveIds, pinnedId, myId],
@@ -231,19 +247,54 @@ export function useGridBattleTiles(input: {
     () => [...star.pins, ...(input.extraHold ?? []), ...(giftTarget != null ? [giftTarget] : [])],
     [star.pins, extraKey, giftTarget], // eslint-disable-line react-hooks/exhaustive-deps
   );
-  const spotInPool = spot != null && pool.includes(spot) ? spot : null;
-  const shown = useRotation(cap - (pinnedId != null ? 1 : 0), pool, hold, spotInPool);
-  const tiles: CbTileData[] = [
-    ...(pinnedId != null ? [{
-      userId: pinnedId, name: nameOf(byId.get(pinnedId)), photo: byId.get(pinnedId)?.profile_image ?? null,
-      own: isBattler, home: !isBattler, spot: spot === pinnedId,
-    }] : []),
-    ...shown.map((id) => {
-      const b = byId.get(id);
-      return { userId: id, name: nameOf(b), photo: b?.profile_image ?? null, spot: spot === id, starred: star.pins.includes(id) };
-    }),
-  ];
-  return { tiles, stage, shape, shown, pinnedId, star, byId, pool };
+  // Country VS Country: only once the server says who is on which side (an older server does not).
+  const split = input.split && battlers.some((b) => b.side) ? input.split : null;
+  const inA = (id: number) => byId.get(id)?.side === split?.a;
+  const pinA = pinnedId != null && split ? inA(pinnedId) : false;
+  const poolA = useMemo(() => (split ? pool.filter(inA) : []), [split, pool, byId]); // eslint-disable-line react-hooks/exhaustive-deps
+  const poolB = useMemo(() => (split ? pool.filter((id) => !inA(id)) : []), [split, pool, byId]); // eslint-disable-line react-hooks/exhaustive-deps
+  const spotIn = (p: number[]) => (spot != null && p.includes(spot) ? spot : null);
+  const pinnedSlot = pinnedId != null ? 1 : 0;
+  const shownAll = useRotation(split ? 0 : liveShape.cap - pinnedSlot, split ? [] : pool, hold, split ? null : spotIn(pool));
+  const shownA = useRotation(split ? VIRTUAL_HALF_FILL - (pinA ? 1 : 0) : 0, poolA, hold, spotIn(poolA));
+  const shownB = useRotation(split ? VIRTUAL_HALF_FILL - (pinnedId != null && !pinA ? 1 : 0) : 0, poolB, hold, spotIn(poolB));
+  // The virtual members not live right now (a real tile always wins), in the server's order.
+  const vKey = (input.virtual ?? []).join(",");
+  const vIds = useMemo(
+    () => (input.virtual ?? []).filter((id) => byId.has(id) && !liveIds.has(id) && id !== pinnedId),
+    [vKey, byId, liveIds, pinnedId], // eslint-disable-line react-hooks/exhaustive-deps
+  );
+  const vA = useMemo(() => (split ? vIds.filter(inA) : []), [split, vIds]); // eslint-disable-line react-hooks/exhaustive-deps
+  const vB = useMemo(() => (split ? vIds.filter((id) => !inA(id)) : []), [split, vIds]); // eslint-disable-line react-hooks/exhaustive-deps
+  // A gift sheet open on a tile holds the virtual tiles still.
+  const paused = giftTarget != null;
+  const liveCountAll = shownAll.length + pinnedSlot;
+  const liveCountA = shownA.length + (pinA ? 1 : 0);
+  const liveCountB = shownB.length + (pinnedId != null && !pinA ? 1 : 0);
+  const vShownAll = useVirtualWindow(split ? [] : vIds, input.byCount && vIds.length ? VIRTUAL_FILL - liveCountAll : 0, paused);
+  const vShownA = useVirtualWindow(vA, VIRTUAL_HALF_FILL - liveCountA, paused);
+  const vShownB = useVirtualWindow(vB, VIRTUAL_HALF_FILL - liveCountB, paused);
+
+  const pinnedTile: CbTileData[] = pinnedId != null ? [{
+    userId: pinnedId, name: nameOf(byId.get(pinnedId)), photo: byId.get(pinnedId)?.profile_image ?? null,
+    own: isBattler, home: !isBattler, spot: spot === pinnedId,
+  }] : [];
+  const liveTile = (id: number): CbTileData => {
+    const b = byId.get(id);
+    return { userId: id, name: nameOf(b), photo: b?.profile_image ?? null, spot: spot === id, starred: star.pins.includes(id) };
+  };
+  const virtualTile = (id: number): CbTileData => {
+    const b = byId.get(id);
+    return { userId: id, name: nameOf(b), photo: b?.profile_image ?? null, virtual: true, score: b?.score ?? 0, muted: false };
+  };
+  const halves = split ? {
+    a: [...(pinA ? pinnedTile : []), ...shownA.map(liveTile), ...vShownA.map(virtualTile)],
+    b: [...(pinnedId != null && !pinA ? pinnedTile : []), ...shownB.map(liveTile), ...vShownB.map(virtualTile)],
+  } : null;
+  const tiles: CbTileData[] = halves ? [...halves.a, ...halves.b] : [...pinnedTile, ...shownAll.map(liveTile), ...vShownAll.map(virtualTile)];
+  const shown = split ? [...shownA, ...shownB] : shownAll;
+  const shape = input.byCount ? countShape(tiles.length) : liveShape;
+  return { tiles, halves, split, stage, shape, shown, pinnedId, star, byId, pool };
 }
 
 /** The live chat of one room, read from Firestore like the live room's. */
@@ -487,6 +538,8 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
     home: isBattler ? null : home, giftTarget, spot, onPinFull: () => showGoldAlert(t("chb_pin_max")),
     extraHold: isBattler ? [] : homeHold,
     byCount: source.kind === "country",
+    virtual: source.kind === "country" ? st?.virtual ?? [] : [],
+    split: source.kind === "country" && st?.rival ? { a: st.rival.a.country, b: st.rival.b.country } : null,
   });
   const { shown, pinnedId } = grid;
   // Sound follows the star: who this screen hears, and who starred me.
@@ -904,17 +957,41 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
             </div>
           ) : null)
         : (
-          <CountryBattleGrid stage={grid.stage} shape={source.kind === "country" ? grid.shape : undefined} tiles={giftShow.withGift(tiles)} listen={heardNow} reserve={CHAT_RESERVE + ACTION_BAR_RESERVE} phoneFullWidth
-            onTap={(id) => {
+          (() => {
+            const onTap = (id: number) => {
+              // A virtual tile has no camera or sound: nothing to star or listen to.
+              if (grid.byId.get(id)?.is_virtual && !st.live.includes(id)) return;
               // A battler's tap stars the tile — they hear only who they starred; a viewer's tap listens.
               if (isBattler) grid.star.toggle(id);
               else if (id !== home) setListen((cur) => (cur === id ? null : id));
-            }}
-            onGift={(id) => {
+            };
+            const onGift = (id: number) => {
               if (!isLoggedIn) { navigate("/login", { state: { from: location.pathname + location.search } }); return; }
               if (id !== myId) setGiftTarget(id);
-            }}
-            attach={roomHook.attachVideo} hasVideo={roomHook.hasVideo} version={roomHook.version} />
+            };
+            // A virtual tile's double arrow: that member's own profile (they are not live).
+            const onOpen = (id: number) => leaveTo(`/profile/${id}`);
+            const marked = (list: CbTileData[]) => giftShow.withGift(awaitingBack.length ? list.map((x) => (awaitingBack.includes(x.userId) ? { ...x, starredMe: true } : x)) : list);
+            if (grid.halves && grid.split && st.rival) {
+              // Country VS Country (Steve, 2026-11-24): the tile area split in half, one country each.
+              const half = (list: CbTileData[], side: { country: string; flag: string }, key: string) => (
+                <div className="vcb-half" key={key}>
+                  <div className="vcb-half-head">{side.flag || countryFlag(side.country) || "🌍"} {side.country}</div>
+                  {list.length
+                    ? <CountryBattleGrid stage={grid.stage} shape={countShape(list.length)} tiles={marked(list)} listen={heardNow}
+                        reserve={CHAT_RESERVE + ACTION_BAR_RESERVE + 22} onTap={onTap} onGift={onGift} onOpen={onOpen}
+                        attach={roomHook.attachVideo} hasVideo={roomHook.hasVideo} version={roomHook.version} />
+                    : <div className="card cb-empty vcb-half-empty">—</div>}
+                </div>
+              );
+              return <div className="vcb-halves">{half(grid.halves.a, st.rival.a, "a")}{half(grid.halves.b, st.rival.b, "b")}</div>;
+            }
+            return (
+              <CountryBattleGrid stage={grid.stage} shape={source.kind === "country" ? grid.shape : undefined} tiles={marked(grid.tiles)} listen={heardNow} reserve={CHAT_RESERVE + ACTION_BAR_RESERVE} phoneFullWidth
+                onTap={onTap} onGift={onGift} onOpen={onOpen}
+                attach={roomHook.attachVideo} hasVideo={roomHook.hasVideo} version={roomHook.version} />
+            );
+          })()
         )}
       <ChatStrip messages={messages} onSend={onSend} inputRef={chatInputRef} translations={mt.mtLang ? mt.translations : undefined} dictated={dictated}
         note={giftShow.note && <GiftNote key={giftShow.note.key} note={giftShow.note} onThank={onThank} onClose={giftShow.closeNote} />} />

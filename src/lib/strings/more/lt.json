@@ -2056,5 +2056,8 @@
  "fwhere_banger": "Pradėk tiesioginę transliaciją, tada Kovos ir žaidimai",
  "banger_is_running": "Bingg Bongg Banger jau vyksta",
  "banger_host_starts_it": "Tik vedėjas gali pradėti Bingg Bongg Banger",
- "banger_boost_failed": "Stiprintuvas neišsiųstas. Bandyk dar kartą."
+ "banger_boost_failed": "Stiprintuvas neišsiųstas. Bandyk dar kartą.",
+ "vcb_show_me": "Rodyti mane virtualiose kovose",
+ "vcb_show_me_sub": "Jūsų profilio nuotrauka gali būti rodoma Country Battles, kai nesate tiesioginiame eteryje. Jums padovanoti tikri BBs yra jūsų.",
+ "vcb_virtual": "Virtualus"
 }

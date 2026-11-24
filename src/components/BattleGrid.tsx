@@ -43,6 +43,11 @@ export interface CbTileData {
   /** Chat Battle round 2: a gift just landed on this tile — its icon pops up over the tile.
    *  `key` restarts the animation when a second gift lands before the first one has faded. */
   gift?: { icon: string | null; key: number } | null;
+  /** Virtual Country Battles (Steve, 2026-11-24): a member who is NOT live, shown by their profile
+   *  photo (no video) with a small gold "Virtual" badge. Gifts reach them like any tile's. */
+  virtual?: boolean;
+  /** Shown on a virtual tile's name strip: their battle score (BBs). */
+  score?: number | null;
 }
 
 /** Height the grid may use: from its own top edge (below the site's header and the battle
@@ -71,8 +76,10 @@ function useAvailableHeight(ref: React.RefObject<HTMLDivElement | null>, reserve
   return h;
 }
 
-function CbTile({ tile, listening, onTap, onGift, attach, hasVideo, version, span }: {
+function CbTile({ tile, listening, onTap, onGift, onOpen, attach, hasVideo, version, span }: {
   tile: CbTileData;
+  /** The double arrow: open this member (a virtual tile: their profile page). */
+  onOpen?: () => void;
   /** Country Battle's host tile over the spots the last row would leave empty: columns, rows,
    *  and whether it fills its rows alone (then its 3:4-per-cell shape sets the rows' height). */
   span?: { cols: number; rows: number; alone: boolean };
@@ -99,6 +106,39 @@ function CbTile({ tile, listening, onTap, onGift, attach, hasVideo, version, spa
   }, [tile.userId, canAttach, hasVideo, version]);
   const photo = tile.photo ? mediaUrl(tile.photo) : "";
   const realPhoto = photo && !/\/$/.test(photo);
+  const [photoBroken, setPhotoBroken] = useState(false);
+  if (tile.virtual) {
+    // Steve, 2026-11-24 (design): a photo-less member = gold initials centred on a black tile; the
+    // "Virtual" badge SMALL in the top-left so it never covers the face; the name inside the tile
+    // along its bottom edge, white on a thin dark gradient, cut short with "…".
+    return (
+      <div className="cb-tile virtual" role="button" tabIndex={0} onClick={onTap}
+        style={span && (span.cols > 1 || span.rows > 1) ? {
+          gridColumn: `span ${span.cols}`, gridRow: `span ${span.rows}`,
+          ...(span.alone ? { aspectRatio: `${span.cols * 3} / ${span.rows * 4}` } : { aspectRatio: "auto", alignSelf: "stretch" }),
+        } : undefined}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onTap?.(); } }}>
+        {realPhoto && !photoBroken
+          ? <img className="cb-photo" src={photo} alt="" loading="lazy" onError={() => setPhotoBroken(true)} />
+          : <div className="cb-vph"><i>{initials(tile.name || "?")}</i></div>}
+        <TileGiftLayer uid={tile.userId} />
+        <span className="cb-vbadge">{t("vcb_virtual")}</span>
+        {tile.gift && <TileGift key={tile.gift.key} icon={tile.gift.icon} />}
+        {onGift && (
+          <button type="button" className="cb-gift" aria-label="🎁"
+            onClick={(e) => { e.stopPropagation(); onGift(); }}>🎁</button>
+        )}
+        {onOpen && (
+          <button type="button" className="cb-vopen" aria-label={tile.name} title={tile.name}
+            onClick={(e) => { e.stopPropagation(); onOpen(); }}>»</button>
+        )}
+        <span className="cb-vname">
+          <span className="cb-vname-n">{tile.name}</span>
+          {tile.score != null && <b>{tile.score.toLocaleString()}</b>}
+        </span>
+      </div>
+    );
+  }
   return (
     <div className={`cb-tile${tile.own ? " own" : ""}${tile.home ? " home" : ""}${tile.spot ? " spot" : ""}${tile.starred ? " starred" : ""}${tile.starredMe ? " starred-me" : ""}${listening ? " listening" : ""}`}
       role={tile.own ? undefined : "button"} tabIndex={tile.own ? undefined : 0}
@@ -145,13 +185,15 @@ function tileBackdrop(id: number): string {
   return `linear-gradient(160deg, hsl(${hue} 35% 22%), hsl(${(hue + 40) % 360} 30% 9%))`;
 }
 
-export function CountryBattleGrid({ stage, shape, tiles, listen, onTap, onGift, attach, hasVideo, version = 0, flash, onFlashDone, reserve, phoneFullWidth }: {
+export function CountryBattleGrid({ stage, shape, tiles, listen, onTap, onGift, onOpen, attach, hasVideo, version = 0, flash, onFlashDone, reserve, phoneFullWidth }: {
   stage: CbStage;
   tiles: CbTileData[];
   /** Who is heard on this screen (one tapped tile, or the starred members). */
   listen: number | null | number[];
   onTap?: (userId: number) => void;
   onGift?: (userId: number) => void;
+  /** A virtual tile's double arrow (Virtual Country Battles): open that member. */
+  onOpen?: (userId: number) => void;
   attach?: (userId: number, el: HTMLVideoElement) => () => void;
   hasVideo?: (userId: number) => boolean;
   version?: number;
@@ -179,9 +221,10 @@ export function CountryBattleGrid({ stage, shape, tiles, listen, onTap, onGift, 
     <div ref={stageRef} className="cb-stage" style={{ width: avail ? `min(100%, ${Math.round(avail * ratio)}px)` : "100%", minWidth: Math.min(240, cols * 70) }}>
       <div className={`cb-grid cols-${cols}`} style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
         {tiles.map((tile) => (
-          <CbTile key={`${tile.own ? "own" : tile.home ? "home" : "m"}-${tile.userId}`} tile={tile.muted == null && !tile.own ? { ...tile, muted: !heard.has(tile.userId) } : tile} listening={heard.has(tile.userId)}
+          <CbTile key={`${tile.own ? "own" : tile.home ? "home" : tile.virtual ? "v" : "m"}-${tile.userId}`} tile={tile.muted == null && !tile.own ? { ...tile, muted: !heard.has(tile.userId) } : tile} listening={heard.has(tile.userId)}
             onTap={onTap ? () => onTap(tile.userId) : undefined}
             onGift={onGift ? () => onGift(tile.userId) : undefined}
+            onOpen={onOpen && tile.virtual ? () => onOpen(tile.userId) : undefined}
             attach={attach ? (el) => attach(tile.userId, el) : undefined}
             hasVideo={hasVideo ? hasVideo(tile.userId) : false}
             version={version} span={span && tile === tiles[0] ? span : undefined} />
@@ -270,6 +313,30 @@ export function useRotation(slots: number, pool: number[], hold: number | null |
   }, []);
 
   return shown;
+}
+
+/** How often the virtual tiles move on when there are more than the free spaces. */
+export const VIRTUAL_ROTATE_MS = 4000;
+
+/**
+ * Virtual Country Battles (Steve, 2026-11-24): which virtual members fill the free spaces. The
+ * server's `virtual` list is in a fixed order for the day; with more of them than spaces, the window
+ * moves on by a whole screenful every ~4 s and wraps around, so everyone gets the same time on
+ * screen. `paused` (a gift sheet open) holds the window still.
+ */
+export function useVirtualWindow(ids: number[], slots: number, paused = false): number[] {
+  const [offset, setOffset] = useState(0);
+  const n = ids.length;
+  const rotates = slots > 0 && n > slots;
+  useEffect(() => {
+    if (!rotates || paused) return;
+    const timer = setInterval(() => setOffset((o) => (o + slots) % n), VIRTUAL_ROTATE_MS);
+    return () => clearInterval(timer);
+  }, [rotates, paused, slots, n]);
+  if (slots <= 0 || n === 0) return [];
+  if (!rotates) return ids;
+  const start = offset % n;
+  return Array.from({ length: slots }, (_, i) => ids[(start + i) % n]);
 }
 
 function shuffle<T>(a: T[]): T[] {

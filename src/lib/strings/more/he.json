@@ -2055,5 +2055,8 @@
  "fwhere_banger": "עלו לשידור חי, ואז קרבות ומשחקים",
  "banger_is_running": "Bingg Bongg Banger כבר פועל",
  "banger_host_starts_it": "רק המנחה יכול להפעיל את Bingg Bongg Banger",
- "banger_boost_failed": "הבוסטר לא נשלח. נסו שוב."
+ "banger_boost_failed": "הבוסטר לא נשלח. נסו שוב.",
+ "vcb_show_me": "הצג אותי בקרבות וירטואליים",
+ "vcb_show_me_sub": "תמונת הפרופיל שלך יכולה להופיע ב-Country Battles כשאתה לא בשידור חי. ה-BBs האמיתיים שמעניקים לך שייכים לך.",
+ "vcb_virtual": "וירטואלי"
 }

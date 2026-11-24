@@ -2058,5 +2058,8 @@
  "fwhere_banger": "Почати ефір, потім Битви та ігри",
  "banger_is_running": "Bingg Bongg Banger уже триває",
  "banger_host_starts_it": "Лише ведучий може запустити Bingg Bongg Banger",
- "banger_boost_failed": "Бустер не надіслано. Спробуй ще раз."
+ "banger_boost_failed": "Бустер не надіслано. Спробуй ще раз.",
+ "vcb_show_me": "Показувати мене у віртуальних батлах",
+ "vcb_show_me_sub": "Ваше фото профілю може з'являтися в Country Battles, поки ви не в ефірі. Справжні BBs, подаровані вам, — ваші.",
+ "vcb_virtual": "Віртуально"
 }

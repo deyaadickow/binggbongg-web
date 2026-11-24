@@ -2059,5 +2059,8 @@
  "fwhere_banger": "Fazer live e depois Batalhas e jogos",
  "banger_is_running": "Bingg Bongg Banger já está rolando",
  "banger_host_starts_it": "Só o anfitrião pode iniciar o Bingg Bongg Banger",
- "banger_boost_failed": "O reforço não foi enviado. Tente de novo."
+ "banger_boost_failed": "O reforço não foi enviado. Tente de novo.",
+ "vcb_show_me": "Mostrar-me em batalhas virtuais",
+ "vcb_show_me_sub": "Sua foto de perfil pode aparecer nas Country Battles enquanto você não está ao vivo. Os BBs reais que te derem são seus.",
+ "vcb_virtual": "Virtual"
 }

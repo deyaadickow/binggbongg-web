@@ -2059,5 +2059,8 @@
  "fwhere_banger": "లైవ్‌కి వెళ్లండి, తర్వాత బ్యాటిల్స్ & గేమ్స్",
  "banger_is_running": "Bingg Bongg Banger ఇప్పటికే నడుస్తోంది",
  "banger_host_starts_it": "హోస్ట్ మాత్రమే Bingg Bongg Banger ప్రారంభించగలరు",
- "banger_boost_failed": "బూస్టర్ వెళ్లలేదు. మళ్లీ ప్రయత్నించండి."
+ "banger_boost_failed": "బూస్టర్ వెళ్లలేదు. మళ్లీ ప్రయత్నించండి.",
+ "vcb_show_me": "వర్చువల్ బ్యాటిల్స్‌లో నన్ను చూపించు",
+ "vcb_show_me_sub": "మీరు లైవ్‌లో లేనప్పుడు మీ ప్రొఫైల్ ఫోటో Country Battles లో కనిపించవచ్చు. మీకు బహుమతిగా వచ్చిన నిజమైన BBs మీవే.",
+ "vcb_virtual": "వర్చువల్"
 }

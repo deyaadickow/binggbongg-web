@@ -2059,5 +2059,8 @@
  "fwhere_banger": "በቀጥታ ይግቡ፣ ከዚያ ውጊያዎች እና ጨዋታዎች",
  "banger_is_running": "Bingg Bongg Banger አስቀድሞ በመካሄድ ላይ ነው",
  "banger_host_starts_it": "Bingg Bongg Bangerን መጀመር የሚችለው አስተናጋጁ ብቻ ነው",
- "banger_boost_failed": "ማበረታቻው አልደረሰም። እንደገና ይሞክሩ።"
+ "banger_boost_failed": "ማበረታቻው አልደረሰም። እንደገና ይሞክሩ።",
+ "vcb_show_me": "በምናባዊ ውድድሮች ውስጥ አሳየኝ",
+ "vcb_show_me_sub": "በቀጥታ ስርጭት ላይ ሳትሆኑ የመገለጫ ፎቶዎ በCountry Battles ውስጥ ሊታይ ይችላል። ለእርስዎ የተሰጡ እውነተኛ BBs የእርስዎ ናቸው።",
+ "vcb_virtual": "ምናባዊ"
 }

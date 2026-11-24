@@ -2059,5 +2059,8 @@
  "fwhere_banger": "लाइव जाएँ, फिर बैटल्स और गेम्स",
  "banger_is_running": "Bingg Bongg Banger पहले से चल रहा है",
  "banger_host_starts_it": "सिर्फ़ होस्ट Bingg Bongg Banger शुरू कर सकता है",
- "banger_boost_failed": "बूस्टर नहीं पहुँचा। फिर से कोशिश करें।"
+ "banger_boost_failed": "बूस्टर नहीं पहुँचा। फिर से कोशिश करें।",
+ "vcb_show_me": "मुझे वर्चुअल बैटल में दिखाएँ",
+ "vcb_show_me_sub": "जब आप लाइव नहीं हैं, तब भी आपकी प्रोफ़ाइल फ़ोटो Country Battles में दिख सकती है। आपको उपहार में मिले असली BBs आपके हैं।",
+ "vcb_virtual": "वर्चुअल"
 }

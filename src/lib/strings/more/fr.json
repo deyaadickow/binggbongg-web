@@ -2059,5 +2059,8 @@
  "fwhere_banger": "Passer en direct, puis Batailles et jeux",
  "banger_is_running": "Bingg Bongg Banger est déjà lancé",
  "banger_host_starts_it": "Seul l’hôte peut lancer Bingg Bongg Banger",
- "banger_boost_failed": "Le bonus n’est pas passé. Réessayez."
+ "banger_boost_failed": "Le bonus n’est pas passé. Réessayez.",
+ "vcb_show_me": "M'afficher dans les combats virtuels",
+ "vcb_show_me_sub": "Ta photo de profil peut apparaître dans les Country Battles quand tu n'es pas en direct. Les vrais BBs qu'on t'offre sont à toi.",
+ "vcb_virtual": "Virtuel"
 }

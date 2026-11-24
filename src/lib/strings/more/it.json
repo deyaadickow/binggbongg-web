@@ -2058,5 +2058,8 @@
  "fwhere_banger": "Vai in diretta, poi Sfide e giochi",
  "banger_is_running": "Bingg Bongg Banger è già in corso",
  "banger_host_starts_it": "Solo l’host può avviare Bingg Bongg Banger",
- "banger_boost_failed": "Il potenziamento non è arrivato. Riprova."
+ "banger_boost_failed": "Il potenziamento non è arrivato. Riprova.",
+ "vcb_show_me": "Mostrami nelle battaglie virtuali",
+ "vcb_show_me_sub": "La tua foto profilo può comparire nelle Country Battles quando non sei in diretta. I BBs veri che ti regalano sono tuoi.",
+ "vcb_virtual": "Virtuale"
 }

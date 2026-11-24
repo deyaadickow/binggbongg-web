@@ -2059,5 +2059,8 @@
  "fwhere_banger": "Vysielať naživo, potom Bitky a hry",
  "banger_is_running": "Bingg Bongg Banger už beží",
  "banger_host_starts_it": "Iba hostiteľ môže spustiť Bingg Bongg Banger",
- "banger_boost_failed": "Booster sa nepodarilo poslať. Skús to znova."
+ "banger_boost_failed": "Booster sa nepodarilo poslať. Skús to znova.",
+ "vcb_show_me": "Zobrazovať ma vo virtuálnych bitkách",
+ "vcb_show_me_sub": "Vaša profilová fotka sa môže zobraziť v Country Battles, keď nie ste naživo. Skutočné BBs, ktoré dostanete, sú vaše.",
+ "vcb_virtual": "Virtuálne"
 }

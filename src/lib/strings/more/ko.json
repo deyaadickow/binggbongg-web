@@ -2059,5 +2059,8 @@
  "fwhere_banger": "라이브 시작 → 배틀 및 게임",
  "banger_is_running": "Bingg Bongg Banger이(가) 이미 진행 중이에요",
  "banger_host_starts_it": "Bingg Bongg Banger은(는) 호스트만 시작할 수 있어요",
- "banger_boost_failed": "부스터가 전송되지 않았어요. 다시 시도하세요."
+ "banger_boost_failed": "부스터가 전송되지 않았어요. 다시 시도하세요.",
+ "vcb_show_me": "가상 배틀에 나를 표시",
+ "vcb_show_me_sub": "라이브 중이 아닐 때도 프로필 사진이 Country Battles에 나타날 수 있어요. 나에게 선물된 실제 BBs는 내 것이에요.",
+ "vcb_virtual": "가상"
 }

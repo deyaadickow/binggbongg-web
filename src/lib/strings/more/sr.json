@@ -2059,5 +2059,8 @@
  "fwhere_banger": "Укључи се уживо, затим Битке и игре",
  "banger_is_running": "Bingg Bongg Banger је већ у току",
  "banger_host_starts_it": "Само домаћин може да покрене Bingg Bongg Banger",
- "banger_boost_failed": "Бустер није послат. Покушај поново."
+ "banger_boost_failed": "Бустер није послат. Покушај поново.",
+ "vcb_show_me": "Прикажи ме у виртуелним биткама",
+ "vcb_show_me_sub": "Ваша профилна слика може да се појави у Country Battles док нисте уживо. Прави BBs које добијете на поклон су ваши.",
+ "vcb_virtual": "Виртуелно"
 }

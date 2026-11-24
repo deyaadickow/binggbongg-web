@@ -2059,5 +2059,8 @@
  "fwhere_banger": "Phát trực tiếp, rồi Đấu và Trò chơi",
  "banger_is_running": "Bingg Bongg Banger đang diễn ra",
  "banger_host_starts_it": "Chỉ chủ phòng mới có thể bắt đầu Bingg Bongg Banger",
- "banger_boost_failed": "Gửi vật phẩm hỗ trợ không thành công. Thử lại."
+ "banger_boost_failed": "Gửi vật phẩm hỗ trợ không thành công. Thử lại.",
+ "vcb_show_me": "Hiển thị tôi trong trận đấu ảo",
+ "vcb_show_me_sub": "Ảnh hồ sơ của bạn có thể xuất hiện trong Country Battles khi bạn không phát trực tiếp. BBs thật được tặng cho bạn là của bạn.",
+ "vcb_virtual": "Ảo"
 }

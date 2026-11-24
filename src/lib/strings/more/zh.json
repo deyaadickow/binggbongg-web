@@ -2059,5 +2059,8 @@
  "fwhere_banger": "开始直播，然后进入对战和游戏",
  "banger_is_running": "Bingg Bongg Banger 已在进行中",
  "banger_host_starts_it": "只有主播可以开始 Bingg Bongg Banger",
- "banger_boost_failed": "道具没有送出。请重试。"
+ "banger_boost_failed": "道具没有送出。请重试。",
+ "vcb_show_me": "在虚拟对战中显示我",
+ "vcb_show_me_sub": "你不在直播时,你的头像也可能出现在 Country Battles 中。别人送给你的真实 BBs 归你所有。",
+ "vcb_virtual": "虚拟"
 }

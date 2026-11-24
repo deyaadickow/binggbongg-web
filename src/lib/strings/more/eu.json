@@ -2059,5 +2059,8 @@
  "fwhere_banger": "Zuzenean jarri, gero Borrokak eta jokoak",
  "banger_is_running": "Bingg Bongg Banger martxan dago jada",
  "banger_host_starts_it": "Anfitrioiak bakarrik has dezake Bingg Bongg Banger",
- "banger_boost_failed": "Indargarria ez da bidali. Saiatu berriro."
+ "banger_boost_failed": "Indargarria ez da bidali. Saiatu berriro.",
+ "vcb_show_me": "Erakutsi nazazu borroka birtualetan",
+ "vcb_show_me_sub": "Zure profileko argazkia Country Battles-en ager daiteke zuzenean ez zaudenean. Oparitzen dizkizuten benetako BBs zureak dira.",
+ "vcb_virtual": "Birtuala"
 }

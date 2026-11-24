@@ -2056,5 +2056,8 @@
  "fwhere_banger": "Fara í beina, svo Bardagar og leikir",
  "banger_is_running": "Bingg Bongg Banger er þegar í gangi",
  "banger_host_starts_it": "Aðeins gestgjafinn getur ræst Bingg Bongg Banger",
- "banger_boost_failed": "Örvunin fór ekki í gegn. Reyndu aftur."
+ "banger_boost_failed": "Örvunin fór ekki í gegn. Reyndu aftur.",
+ "vcb_show_me": "Sýna mig í sýndarbardögum",
+ "vcb_show_me_sub": "Prófílmyndin þín getur birst í Country Battles þegar þú ert ekki í beinni. Raunverulegir BBs sem þér eru gefnir eru þínir.",
+ "vcb_virtual": "Sýndar"
 }

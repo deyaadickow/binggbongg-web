@@ -2059,5 +2059,8 @@
  "fwhere_banger": "Canlı yayın aç, sonra Savaşlar ve Oyunlar",
  "banger_is_running": "Bingg Bongg Banger zaten açık",
  "banger_host_starts_it": "Bingg Bongg Banger oyununu yalnızca sunucu başlatabilir",
- "banger_boost_failed": "Güçlendirici gönderilemedi. Tekrar dene."
+ "banger_boost_failed": "Güçlendirici gönderilemedi. Tekrar dene.",
+ "vcb_show_me": "Beni sanal savaşlarda göster",
+ "vcb_show_me_sub": "Canlı yayında değilken profil fotoğrafın Country Battles'ta görünebilir. Sana hediye edilen gerçek BBs senindir.",
+ "vcb_virtual": "Sanal"
 }

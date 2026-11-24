@@ -2058,5 +2058,8 @@
  "fwhere_banger": "ライブ配信 → バトル＆ゲーム",
  "banger_is_running": "Bingg Bongg Bangerはすでに開始しています",
  "banger_host_starts_it": "Bingg Bongg Bangerを開始できるのはホストだけです",
- "banger_boost_failed": "ブースターを送れませんでした。もう一度お試しください。"
+ "banger_boost_failed": "ブースターを送れませんでした。もう一度お試しください。",
+ "vcb_show_me": "バーチャルバトルに自分を表示する",
+ "vcb_show_me_sub": "ライブ配信していない間も、あなたのプロフィール写真がCountry Battlesに表示されることがあります。あなたに贈られた本物のBBsはあなたのものです。",
+ "vcb_virtual": "バーチャル"
 }

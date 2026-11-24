@@ -2790,4 +2790,8 @@ export const id = {
   banger_is_running: "Bingg Bongg Banger sudah berjalan",
   banger_host_starts_it: "Hanya host yang bisa memulai Bingg Bongg Banger",
   banger_boost_failed: "Booster gagal terkirim. Coba lagi.",
+  // Virtual Country Battles (Steve, 2026-11-24).
+  vcb_show_me: "Tampilkan saya di battle virtual",
+  vcb_show_me_sub: "Foto profilmu bisa muncul di Country Battle saat kamu tidak live. BBs asli yang dihadiahkan untukmu adalah milikmu.",
+  vcb_virtual: "Virtual",
 };

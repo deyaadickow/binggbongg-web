@@ -2754,4 +2754,8 @@ export const es = {
   banger_is_running: "Bingg Bongg Banger ya está en marcha",
   banger_host_starts_it: "Solo el anfitrión puede iniciar Bingg Bongg Banger",
   banger_boost_failed: "El potenciador no se envió. Inténtalo de nuevo.",
+  // Virtual Country Battles (Steve, 2026-11-24).
+  vcb_show_me: "Mostrarme en batallas virtuales",
+  vcb_show_me_sub: "Tu foto de perfil puede aparecer en las Country Battles cuando no estás en vivo. Los BBs reales que te regalen son tuyos.",
+  vcb_virtual: "Virtual",
 };

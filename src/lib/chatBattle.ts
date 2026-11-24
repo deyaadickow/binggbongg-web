@@ -28,6 +28,12 @@ export interface ChbBattler extends ChbPerson {
   home_room_name: string | null;
   /** The chat thread for this battler's strip: their home room, else the shared room. */
   chat_room_name: string | null;
+  /** Virtual Country Battles (Steve, 2026-11-24): a member shown by their photo while not live. */
+  is_virtual?: boolean;
+  /** Real gift BBs only (`score` also holds a virtual tile's free BBs). */
+  real_score?: number;
+  /** Country VS Country: the country this battler fights for (rival.a / rival.b's country). */
+  side?: string | null;
 }
 
 /** "upcoming" is Country Battle's only (the room is not open yet); a Chat Battle never sends it. */
@@ -43,6 +49,8 @@ export interface ChbMe {
   home_room_name: string | null;
   can_join: boolean;
   join_reason: string | null;
+  /** Virtual Country Battles: I am on the screen as a virtual tile (is_battler stays false). */
+  is_virtual?: boolean;
   /** Round 2: null unless I am the STARTER of a battle with bonus terms. `amount` is dollars —
    *  the running figure while it runs, the paid amount once `paid`. Never shown to anyone else. */
   starter_bonus?: ChbStarterBonus | null;
@@ -94,6 +102,9 @@ export interface ChbState {
   top3?: (ChbPerson & { place: number; score: number })[];
   /** Country Battle: the lobby opens (room opens, joining opens). */
   opens_at?: string | null;
+  /** Virtual Country Battles (Steve, 2026-11-24): the virtual tiles (never live), in the day's fixed order. */
+  virtual?: number[];
+  virtual_battle?: boolean;
 }
 
 /** What start/join answer: the contest summary plus, for a Chat Battle, where to go. */

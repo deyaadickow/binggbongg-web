@@ -2053,5 +2053,8 @@
  "fwhere_banger": "लाइव्ह जा, मग बॅटल्स आणि गेम्स",
  "banger_is_running": "Bingg Bongg Banger आधीच सुरू आहे",
  "banger_host_starts_it": "फक्त होस्ट Bingg Bongg Banger सुरू करू शकतो",
- "banger_boost_failed": "बूस्टर पोहोचला नाही. पुन्हा प्रयत्न करा."
+ "banger_boost_failed": "बूस्टर पोहोचला नाही. पुन्हा प्रयत्न करा.",
+ "vcb_show_me": "मला व्हर्च्युअल बॅटलमध्ये दाखवा",
+ "vcb_show_me_sub": "तुम्ही लाइव्ह नसताना तुमचा प्रोफाइल फोटो Country Battles मध्ये दिसू शकतो. तुम्हाला भेट मिळालेले खरे BBs तुमचेच आहेत.",
+ "vcb_virtual": "व्हर्च्युअल"
 }

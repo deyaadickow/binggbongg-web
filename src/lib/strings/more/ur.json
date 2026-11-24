@@ -2059,5 +2059,8 @@
  "fwhere_banger": "لائیو جائیں، پھر بیٹلز اور گیمز",
  "banger_is_running": "Bingg Bongg Banger پہلے سے جاری ہے",
  "banger_host_starts_it": "صرف ہوسٹ Bingg Bongg Banger شروع کر سکتا ہے",
- "banger_boost_failed": "بوسٹر نہیں پہنچا۔ دوبارہ کوشش کریں۔"
+ "banger_boost_failed": "بوسٹر نہیں پہنچا۔ دوبارہ کوشش کریں۔",
+ "vcb_show_me": "مجھے ورچوئل بیٹلز میں دکھائیں",
+ "vcb_show_me_sub": "جب آپ لائیو نہیں ہوتے تو آپ کی پروفائل تصویر Country Battles میں نظر آ سکتی ہے۔ آپ کو تحفے میں ملنے والے اصلی BBs آپ کے ہیں۔",
+ "vcb_virtual": "ورچوئل"
 }

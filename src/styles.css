@@ -2093,3 +2093,29 @@ body:has(.story-viewer) .get-app-bar { display: none; }
 .acb-filter { flex: 1 1 0; min-width: 0; padding: 9px 8px; border-radius: 999px; border: 1.5px solid var(--gold-border); background: #000; color: var(--gold); font-weight: 700; font-size: 14px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; }
 .acb-filter.on { background: var(--gold); color: #000; }
 .acb-section { margin: 6px 0 -4px; font-size: 16px; color: var(--gold); font-weight: 800; }
+/* Virtual Country Battles (Steve, 2026-11-24): a member who is not live, by their profile photo, no video.
+   Design (Steve): no photo = gold initials centred on a black tile; the "Virtual" badge SMALL, a gold pill
+   top-left, clear of the face; the name inside the tile along its bottom edge, white on a thin dark gradient. */
+.cb-tile.virtual { background: #000; }
+.cb-tile .cb-vph { position: absolute; inset: 0; display: grid; place-items: center; background: #000; }
+.cb-tile .cb-vph i { font-style: normal; color: var(--gold); font-weight: 800; font-size: 24cqw; letter-spacing: .02em; line-height: 1; }
+.cb-vbadge { position: absolute; top: 3px; left: 3px; z-index: 2; padding: 1px 5px; border-radius: 999px; background: rgba(0,0,0,.82); border: 1px solid var(--gold); color: var(--gold); font-size: 9px; line-height: 1.25; font-weight: 800; letter-spacing: .02em; pointer-events: none; white-space: nowrap; }
+.cb-vopen { position: absolute; bottom: 17px; right: 3px; z-index: 2; width: 22px; height: 22px; padding: 0; border-radius: 50%; background: #000; border: 1.5px solid var(--gold); color: var(--gold); display: grid; place-items: center; font-size: 13px; font-weight: 900; line-height: 1; cursor: pointer; }
+.cb-vopen:hover { border-color: var(--gold-bright); }
+.cb-vname { position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; display: flex; align-items: baseline; gap: 4px; padding: 10px 5px 3px; background: linear-gradient(to top, rgba(0,0,0,.85), rgba(0,0,0,0)); color: #fff; font-size: 9px; line-height: 1.25; font-weight: 600; pointer-events: none; }
+.cb-vname-n { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cb-vname b { flex: none; color: var(--gold); font-weight: 800; font-variant-numeric: tabular-nums; }
+.cb-grid.cols-2 .cb-vname { font-size: 12px; padding: 14px 7px 4px; }
+.cb-grid.cols-2 .cb-vbadge { font-size: 10px; top: 6px; left: 6px; }
+.cb-grid.cols-2 .cb-vopen { width: 32px; height: 32px; font-size: 17px; bottom: 26px; right: 6px; }
+@media (min-width: 700px) {
+  .cb-vname { font-size: 11px; }
+  .cb-vbadge { font-size: 10px; }
+  .cb-vopen { width: 26px; height: 26px; bottom: 20px; }
+}
+/* Country VS Country: the tile area in half, one country each, side by side. */
+.vcb-halves { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; max-width: 980px; margin: 0 auto; }
+.vcb-half { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.vcb-half-head { text-align: center; color: var(--gold); font-weight: 800; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vcb-half .cb-stage { min-width: 0 !important; }
+.vcb-half-empty { min-height: 120px; }

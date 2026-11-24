@@ -2055,5 +2055,8 @@
  "fwhere_banger": "Emitir en directo e despois Batallas e xogos",
  "banger_is_running": "Bingg Bongg Banger xa está en marcha",
  "banger_host_starts_it": "Só o anfitrión pode iniciar Bingg Bongg Banger",
- "banger_boost_failed": "O potenciador non se enviou. Téntao de novo."
+ "banger_boost_failed": "O potenciador non se enviou. Téntao de novo.",
+ "vcb_show_me": "Amosarme nas batallas virtuais",
+ "vcb_show_me_sub": "A túa foto de perfil pode aparecer nas Country Battles mentres non estás en directo. Os BBs reais que che regalen son teus.",
+ "vcb_virtual": "Virtual"
 }

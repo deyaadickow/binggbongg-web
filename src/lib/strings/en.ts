@@ -3737,4 +3737,8 @@ export const en = {
   banger_is_running: "Bingg Bongg Banger is already on",
   banger_host_starts_it: "Only the host can start Bingg Bongg Banger",
   banger_boost_failed: "That booster didn't go through. Try again.",
+  // Virtual Country Battles (Steve, 2026-11-24).
+  vcb_show_me: "Show me in virtual battles",
+  vcb_show_me_sub: "Your profile photo can appear in Country Battles while you're not live. Real BBs gifted to you are yours.",
+  vcb_virtual: "Virtual",
 } as const;

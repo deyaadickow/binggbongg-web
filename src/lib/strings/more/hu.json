@@ -2052,5 +2052,8 @@
  "fwhere_banger": "Élő adás indítása, majd Csaták és játékok",
  "banger_is_running": "A(z) Bingg Bongg Banger már megy",
  "banger_host_starts_it": "Csak a házigazda indíthatja el: Bingg Bongg Banger",
- "banger_boost_failed": "A booster nem ment át. Próbáld újra."
+ "banger_boost_failed": "A booster nem ment át. Próbáld újra.",
+ "vcb_show_me": "Mutass engem a virtuális csatákban",
+ "vcb_show_me_sub": "A profilképed megjelenhet a Country Battles-ben, amikor nem vagy élőben. A neked ajándékozott valódi BBs a tieid.",
+ "vcb_virtual": "Virtuális"
 }

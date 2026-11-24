@@ -2050,5 +2050,8 @@
  "fwhere_banger": "Aloita live, sitten Taistelut ja pelit",
  "banger_is_running": "Bingg Bongg Banger on jo käynnissä",
  "banger_host_starts_it": "Vain isäntä voi aloittaa pelin Bingg Bongg Banger",
- "banger_boost_failed": "Tehoste ei mennyt perille. Yritä uudelleen."
+ "banger_boost_failed": "Tehoste ei mennyt perille. Yritä uudelleen.",
+ "vcb_show_me": "Näytä minut virtuaalitaisteluissa",
+ "vcb_show_me_sub": "Profiilikuvasi voi näkyä Country Battlesissa, kun et ole livenä. Sinulle lahjoitetut oikeat BBs ovat sinun.",
+ "vcb_virtual": "Virtuaalinen"
 }

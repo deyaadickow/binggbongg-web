@@ -127,10 +127,12 @@ export interface CbDayMe {
   home_room_name: string | null;
   can_join: boolean;
   join_reason: string | null;
+  /** Virtual Country Battles: I am a virtual tile in this battle (is_battler stays false, so Join, not Rejoin). */
+  is_virtual?: boolean;
 }
 
-/** One side of a Rival Battle. */
-export interface CbRivalSide { country: string; flag: string; score: number; battlers: number }
+/** One side of a Rival Battle. `real_score` = real gift BBs only (the winner is decided on it). */
+export interface CbRivalSide { country: string; flag: string; score: number; battlers: number; real_score?: number }
 
 /** A Rival Battle (Steve, 2026-11-23: "Find ever country's rival and let's set up a 10 minutes battle in between
  *  their own whole country battle"): two countries in one room; a side's score = what its battlers got. */
@@ -143,7 +145,10 @@ export function rivalOf(v: unknown): CbRival | null {
     if (!x || typeof x !== "object") return null;
     const s = x as Record<string, unknown>;
     const country = String(s.country ?? "");
-    return country ? { country, flag: String(s.flag ?? ""), score: Number(s.score) || 0, battlers: Number(s.battlers) || 0 } : null;
+    return country ? {
+      country, flag: String(s.flag ?? ""), score: Number(s.score) || 0, battlers: Number(s.battlers) || 0,
+      ...(s.real_score != null ? { real_score: Number(s.real_score) || 0 } : {}),
+    } : null;
   };
   const a = side(r.a);
   const b = side(r.b);
@@ -183,8 +188,21 @@ export interface CbDayState {
   spaces_left: number | null;
   unlimited?: boolean;
   can_join_now: boolean;
-  battlers: (ChbPerson & { score: number; rank: number; is_live: boolean; left: boolean; home_room_name: string | null; chat_room_name: string | null })[];
+  battlers: (ChbPerson & {
+    score: number; rank: number; is_live: boolean; left: boolean; home_room_name: string | null; chat_room_name: string | null;
+    /** Virtual Country Battles (2026-11-24): shown by photo while not live; `real_score` = real gift BBs only. */
+    is_virtual?: boolean; real_score?: number;
+    /** Country VS Country: which country this battler fights for. */
+    side?: string | null;
+  })[];
   live: number[];
+  /**
+   * Virtual Country Battles (Steve, 2026-11-24: "All country battles and country VS country battles with all
+   * virtual members... This is only temporary, once real members start coming in we will stop the virtual
+   * battles."): the virtual tiles' user ids, never live, in a fixed order for the day. [] when off.
+   */
+  virtual?: number[];
+  virtual_battle?: boolean;
   finished: boolean;
   top3: CbTopRow[];
   winner: CbTopRow | null;
@@ -320,6 +338,8 @@ function cleanDay(d: CbDayState): CbDayState {
     rival: rivalOf(d.rival),
     battlers: Array.isArray(d.battlers) ? d.battlers : [],
     live: numList(d.live),
+    virtual: numList(d.virtual),
+    virtual_battle: flag(d.virtual_battle),
     top3: Array.isArray(d.top3) ? d.top3 : [],
     me: d.me ?? { user_id: 0, is_battler: false, is_live: false, left: false, score: null, rank: null, home_room_name: null, can_join: false, join_reason: null },
   };
@@ -348,12 +368,14 @@ export function dayAsBattleState(d: CbDayState): ChbState {
     spaces_left: d.spaces_left,
     unlimited: d.unlimited,
     can_join_now: d.can_join_now,
-    battlers: d.battlers.map((b): ChbBattler => ({ ...b, is_starter: false })),
+    battlers: d.battlers.map((b): ChbBattler => ({ ...b, is_starter: false, is_virtual: flag(b.is_virtual) })),
     live: d.live,
+    virtual: d.virtual ?? [],
+    virtual_battle: !!d.virtual_battle,
     winner: d.winner,
     tie: false,
     finished: d.finished,
-    me: { ...d.me, starter_bonus: null },
+    me: { ...d.me, is_virtual: flag(d.me.is_virtual), starter_bonus: null },
     rival: d.rival ?? null,
     is_test: d.is_test,
     top3: d.top3,

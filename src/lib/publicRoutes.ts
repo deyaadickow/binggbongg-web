@@ -43,6 +43,8 @@ function clean(pathname: string): string {
 /** True for a page anyone may open without an account. */
 export function isPublicPath(pathname: string): boolean {
   const p = clean(pathname);
+  // DEV ONLY: the Virtual Country Battles demos (?vcbdemo=, 2026-11-24) open signed out. Never in a production build.
+  if (import.meta.env.DEV && typeof window !== "undefined" && new URLSearchParams(window.location.search).has("vcbdemo")) return true;
   return EXACT.has(p) || PREFIXES.some((x) => p.startsWith(x));
 }
 

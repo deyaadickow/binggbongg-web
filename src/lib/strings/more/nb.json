@@ -2056,5 +2056,8 @@
  "fwhere_banger": "Gå live, deretter Kamper og spill",
  "banger_is_running": "Bingg Bongg Banger er allerede i gang",
  "banger_host_starts_it": "Bare verten kan starte Bingg Bongg Banger",
- "banger_boost_failed": "Boosteren gikk ikke gjennom. Prøv igjen."
+ "banger_boost_failed": "Boosteren gikk ikke gjennom. Prøv igjen.",
+ "vcb_show_me": "Vis meg i virtuelle kamper",
+ "vcb_show_me_sub": "Profilbildet ditt kan vises i Country Battles mens du ikke er live. Ekte BBs du får i gave, er dine.",
+ "vcb_virtual": "Virtuell"
 }

@@ -2058,5 +2058,8 @@
  "fwhere_banger": "Κάνε live, μετά Μάχες και παιχνίδια",
  "banger_is_running": "Το Bingg Bongg Banger είναι ήδη σε εξέλιξη",
  "banger_host_starts_it": "Μόνο ο οικοδεσπότης μπορεί να ξεκινήσει το Bingg Bongg Banger",
- "banger_boost_failed": "Η ενίσχυση δεν στάλθηκε. Δοκίμασε ξανά."
+ "banger_boost_failed": "Η ενίσχυση δεν στάλθηκε. Δοκίμασε ξανά.",
+ "vcb_show_me": "Εμφάνισέ με σε εικονικές μάχες",
+ "vcb_show_me_sub": "Η φωτογραφία προφίλ σου μπορεί να εμφανίζεται στα Country Battles όταν δεν είσαι live. Τα πραγματικά BBs που σου δωρίζονται είναι δικά σου.",
+ "vcb_virtual": "Εικονικό"
 }
