@@ -76,9 +76,7 @@ export function GoLivePage() {
         <Link to="/country-battles" className="ic-btn blue">
           <span className="ic-star" aria-hidden>★</span><span className="ic-label">{t("acb_tab")}</span><span className="ic-star" aria-hidden>★</span>
         </Link>
-        <Link to="/country-vs-country" className="ic-btn red">
-          <span className="ic-star" aria-hidden>★</span><span className="ic-label">{t("acb_filter_vs")}</span><span className="ic-star" aria-hidden>★</span>
-        </Link>
+        {/* Country VS Country button removed with the battles turned off (Steve, 2026-11-24). */}
       </nav>
       {/* Bingg Bongg Podcast (Steve, 2026-11-10) — right under Go Live, only while switched on. */}
       <StartPodcastLink />

@@ -29,7 +29,8 @@ export function sidebarSections(userId: number | null, contestOn = false, podcas
       // Steve, 2026-11-23: "one button for all country battles and one button for Country VS Country" —
       // these two replace the old "Country Battle" link and the "Join the … whole country battle Now" box.
       { to: "/country-battles", label: "acb_tab", icon: "🌏" },
-      { to: "/country-vs-country", label: "acb_filter_vs", icon: "⚔️" },
+      // Country VS Country turned off for now (Steve, 2026-11-24: "Please Turn Off Country VS Country Battles for
+      // now and remove the buttons"). /country-vs-country now opens the whole country list.
       // Your own live Bingg Bongg show (Steve, 2026-10-17).
       { to: "/shows", label: "shows", icon: "📺" },
       // Video Ad Gig (Steve, 2026-10-17) RETIRED 2026-11-17 (Steve: "we can eliminate our influencers

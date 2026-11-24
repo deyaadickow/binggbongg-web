@@ -27,9 +27,12 @@ export function AllCountryBattlesPage({ startKind }: { startKind?: AcbKind } = {
   // Opens on Whole Country Battle; ?kind=rival (the Information Center's Country VS Country button)
   // opens on Country VS Country.
   const [params] = useSearchParams();
-  const [kind, setKind] = useState<AcbKind>(startKind === "rival" || params.get("kind") === "rival" ? "rival" : "country");
+  // Country VS Country turned off for now (Steve, 2026-11-24: "Please Turn Off Country VS Country Battles for now
+  // and remove the buttons"): always the whole country list, and only its chip (so the Live button still has a home).
+  const vsOff = true;
+  const [kind, setKind] = useState<AcbKind>(!vsOff && (startKind === "rival" || params.get("kind") === "rival") ? "rival" : "country");
   const { battles, error, search } = useAllCountryBattles(query, kind, user?.id, t("acb_empty"));
-  const chips: [AcbKind, string][] = [["rival", t("acb_filter_vs")], ["country", t("acb_tab")]];
+  const chips: [AcbKind, string][] = vsOff ? [["country", t("acb_tab")]] : [["rival", t("acb_filter_vs")], ["country", t("acb_tab")]];
   // The red Live button (Steve, 2026-11-24) sits on the top-right corner of the right chip while any battle is
   // under way; a tap opens the first one, and that screen's bar steps through the rest.
   const running = useRunningBattles();
