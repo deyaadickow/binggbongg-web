@@ -12,6 +12,7 @@
 // own viewers' chat under the tiles, the cb_gift "say thanks!", and the end podium with the way
 // back to a normal live.
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { PopNumber } from "./PopNumber";
 import { useLocation, useNavigate } from "react-router-dom";
 import { displayName, giftPrice, mediaUrl, post, type ApiResponse, type Gift } from "../lib/api";
 import { useSession } from "../lib/session";
@@ -1054,7 +1055,7 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
                         <TileGiftLayer uid={freeSideUid(key as "a" | "b")} />
                         <div className="vcb-empty-flag" aria-hidden>{side.flag || countryFlag(side.country) || "🌍"}</div>
                         <div className="vcb-empty-text">{cbText(t("vcb_no_members"), { country: side.country })}</div>
-                        <div className="vcb-empty-score">{side.score.toLocaleString()}</div>
+                        <div className="vcb-empty-score"><PopNumber value={side.score} /></div>
                         {source.rivalJoin && !me.is_battler && me.can_join && !ended && (
                           <button type="button" className="btn gold small" onClick={() => source.rivalJoin?.(side.country)}>
                             {side.flag || countryFlag(side.country) || "🌍"} {cbText(t("rival_join_for"), { country: side.country })}

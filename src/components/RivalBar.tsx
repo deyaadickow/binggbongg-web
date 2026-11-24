@@ -4,6 +4,7 @@
 import { useT } from "../lib/i18n";
 import { cbText, type CbRival } from "../lib/countryBattle";
 import { countryFlag } from "../lib/allCountryBattles";
+import { PopNumber } from "./PopNumber";
 
 export function RivalBar({ rival, finished, onJoin, bordered = true }: { rival: CbRival; finished: boolean; onJoin?: (country: string) => void; bordered?: boolean }) {
   const { t } = useT();
@@ -15,7 +16,7 @@ export function RivalBar({ rival, finished, onJoin, bordered = true }: { rival: 
     <div className="rival-side" style={{ textAlign: align }}>
       <div className="rival-flag" aria-hidden>{flagOf(s)}</div>
       <div className="rival-name">{s.country}</div>
-      <div className="rival-score">{s.score.toLocaleString()}</div>
+      <div className="rival-score"><PopNumber value={s.score} /></div>
     </div>
   );
   return (

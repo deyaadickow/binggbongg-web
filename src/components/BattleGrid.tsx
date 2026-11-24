@@ -9,6 +9,7 @@
 // the account owner/the host. and even the host can show on some one else's screen."
 // "add a small gift box to fit each tile for sending gifts."
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { PopNumber } from "./PopNumber";
 import { TileGiftLayer } from "./TileGiftLayer";
 import { initials, mediaUrl, type Gift } from "../lib/api";
 import { useT } from "../lib/i18n";
@@ -156,7 +157,7 @@ function CbTile({ tile, listening, onTap, onGift, onOpen, attach, hasVideo, vers
         )}
         <span className="cb-vname">
           <span className="cb-vname-n">{tile.name}</span>
-          {tile.score != null && <b>{tile.score.toLocaleString()}</b>}
+          {tile.score != null && <b><PopNumber value={tile.score} /></b>}
         </span>
       </div>
     );
