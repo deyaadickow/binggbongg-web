@@ -2637,7 +2637,7 @@ export const fil = {
   fname_nearby: "Malapit",
   fblurb_nearby: "Mga video mula sa mga miyembro sa lungsod, probinsya o bansa mo.",
   information_center: "Information Center",
-  ic_million: "Hanggang Isang Milyong dolyar $1,000,000 na Referral Bonus Commission. Kahit sino ay pwedeng maging Milyonaryo sa Bingg Bongg",
+  ic_million: "Ang Referral Program na Ito ay Puwedeng\nMagbigay sa Iyo ng Hanggang Isang Milyong Dolyar",
   ic_one_video: "Isang video na may 100+ features",
   ic_algorithm: "Alamin kung paano gumagana ang algorithm ng Bingg Bongg",
   ic_exciting_news: "Pindutin dito para makita ang pinakabagong exciting news namin",

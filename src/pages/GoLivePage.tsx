@@ -69,7 +69,17 @@ export function GoLivePage() {
         {busy ? "Starting…" : "Go Live"}
       </button>
       {/* The "Join the … whole country battle Now" button under Go Live was removed (Steve,
-          2026-11-24: "Remove the join the american whole country from this page"). */}
+          2026-11-24: "Remove the join the american whole country from this page"); in its place
+          the Information Center's blue All Country Battles and red Country VS Country buttons
+          ("Remove [them] from here and add them to Bingg Bongg Go Live page"). */}
+      <nav className="ic-list" style={{ marginTop: 10 }}>
+        <Link to="/country-battles" className="ic-btn blue">
+          <span className="ic-star" aria-hidden>★</span><span className="ic-label">{t("acb_tab")}</span><span className="ic-star" aria-hidden>★</span>
+        </Link>
+        <Link to="/country-vs-country" className="ic-btn red">
+          <span className="ic-star" aria-hidden>★</span><span className="ic-label">{t("acb_filter_vs")}</span><span className="ic-star" aria-hidden>★</span>
+        </Link>
+      </nav>
       {/* Bingg Bongg Podcast (Steve, 2026-11-10) — right under Go Live, only while switched on. */}
       <StartPodcastLink />
       {previewError && <p className="muted center" style={{ fontSize: 13, marginTop: 8 }}>{t("you_can_still_go_live_and_turn_the_camer")}</p>}

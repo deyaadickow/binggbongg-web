@@ -3420,7 +3420,7 @@ export const en = {
   fname_nearby: "Nearby",
   fblurb_nearby: "Videos from members in your city, state or country.",
   information_center: "Information Center",
-  ic_million: "Up to One Million dollars $1,000,000 in Referral Bonus Commission. Anyone can become a Millionaire on Bingg Bongg",
+  ic_million: "This Referral Program Can\nMake You Up to a Million Dollars",
   ic_one_video: "One video with 100+ features",
   ic_algorithm: "Learn how Bingg Bongg's algorithm works",
   ic_exciting_news: "Click here to see our latest exciting news",

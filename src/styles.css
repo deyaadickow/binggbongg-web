@@ -2210,3 +2210,6 @@ body:has(.story-viewer) .get-app-bar { display: none; }
    "no mater how many tiles there is just make sure it covers the phone screen leaving room for chat"). */
 .cb-grid.fill .cb-tile { aspect-ratio: auto !important; height: 100%; min-height: 0; align-self: stretch; }
 .vcb-halves .vcb-half-empty { height: 100%; }
+
+/* Steve, 2026-11-24: the referral box in two lines ("This Referral Program Can / Make You Up to a Million Dollars"). */
+.ic-label { white-space: pre-line; }
