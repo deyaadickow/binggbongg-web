@@ -2177,3 +2177,17 @@ body:has(.story-viewer) .get-app-bar { display: none; }
 .ic-btn.red, .ic-btn.red:hover { background: #E53935; border-color: #fff; color: #fff; box-shadow: 0 0 12px rgba(229,57,53,.35); }
 .ic-btn.blue, .ic-btn.blue:hover { background: #1565C0; border-color: #fff; color: #fff; box-shadow: 0 0 12px rgba(21,101,192,.35); }
 .ic-btn.red .ic-star, .ic-btn.blue .ic-star { color: #fff; text-shadow: none; }
+
+/* Moving country scenery on virtual tiles (Steve 2026-11-24: "find gif, animating images, they would look 100 times
+   better"): a slow Ken Burns zoom + drift and a faint light sweep; timing per tile comes inline (BattleGrid). */
+.cb-scenery-wrap { position: absolute; inset: 0; overflow: hidden; }
+.cb-scenery-wrap .cb-scenery { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: 50% 50%;
+  animation: kbMove var(--kb-dur, 11s) ease-in-out var(--kb-delay, 0s) infinite alternate; will-change: transform; }
+@keyframes kbMove { from { transform: scale(1.08) translate(0, 0); } to { transform: scale(1.22) translate(var(--kb-x, -3%), var(--kb-y, -2%)); } }
+.cb-scenery-shine { position: absolute; inset: -20%; pointer-events: none;
+  background: linear-gradient(115deg, transparent 40%, rgba(255,255,255,.10) 50%, transparent 60%);
+  animation: kbShine var(--kb-shine, 7s) linear var(--kb-shine-delay, 0s) infinite; }
+@keyframes kbShine { from { transform: translateX(-60%); } to { transform: translateX(60%); } }
+.vcb-half-empty.kb-bg { background-size: 125%; animation: kbBg 13s ease-in-out infinite alternate; }
+@keyframes kbBg { from { background-size: 112%; background-position: 40% 45%; } to { background-size: 130%; background-position: 60% 55%; } }
+@media (prefers-reduced-motion: reduce) { .cb-scenery-wrap .cb-scenery, .cb-scenery-shine, .vcb-half-empty.kb-bg { animation: none; } }

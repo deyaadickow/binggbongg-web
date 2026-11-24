@@ -1049,7 +1049,7 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
                       // Steve, 2026-11-24 (round 2): "What is the big box under the 3 players with the
                       // world globe in it?" — a side with nobody on it says so, with its score and a
                       // way to join for it. Its free BBs from Bingg Bongg play here.
-                      <div className={`card cb-empty vcb-half-empty${side.scenery_image ? " scenic" : ""}`}
+                      <div className={`card cb-empty vcb-half-empty${side.scenery_image ? " scenic kb-bg" : ""}`}
                         style={side.scenery_image ? { backgroundImage: `linear-gradient(rgba(0,0,0,.62), rgba(0,0,0,.78)), url("${mediaUrl(side.scenery_image)}")` } : undefined}>
                         <TileGiftLayer uid={freeSideUid(key as "a" | "b")} />
                         <div className="vcb-empty-flag" aria-hidden>{side.flag || countryFlag(side.country) || "🌍"}</div>

@@ -117,7 +117,14 @@ function CbTile({ tile, listening, onTap, onGift, onOpen, attach, hasVideo, vers
   const scenery = tile.scenery ? mediaUrl(tile.scenery) : "";
   const [sceneryBroken, setSceneryBroken] = useState(false);
   const sceneryImg = scenery && !sceneryBroken
-    ? <img className="cb-photo cb-scenery" src={scenery} alt="" loading="lazy" onError={() => setSceneryBroken(true)} />
+    ? (
+      // Moving scenery (Steve 2026-11-24: "find gif, animating images, they would look 100 times better"): a slow
+      // zoom-and-drift with a soft light sweep, each tile on its own timing from the member's id so none move together.
+      <div className="cb-scenery-wrap" style={sceneryMotion(tile.userId)}>
+        <img className="cb-photo cb-scenery" src={scenery} alt="" loading="lazy" onError={() => setSceneryBroken(true)} />
+        <span className="cb-scenery-shine" />
+      </div>
+    )
     : null;
   if (tile.virtual) {
     // Steve, 2026-11-24 (design): a photo-less member = gold initials centred on a black tile; the
@@ -553,4 +560,21 @@ export function CbHeader({ stage, sub, line, liveCount, myScore, onBack, isTest,
       </div>
     </>
   );
+}
+
+/** Per-tile timing for the moving scenery: 9–14 s zoom/drift, 6–8 s light sweep, a start offset and a direction. */
+function sceneryMotion(userId: number): React.CSSProperties {
+  const h = (n: number) => Math.abs(Math.imul(userId ^ n, 2654435761) >>> 0);
+  const dur = 9 + (h(1) % 51) / 10;
+  const shine = 6 + (h(2) % 21) / 10;
+  const dirs = [[-6, -4], [6, -4], [-6, 4], [6, 4], [0, -6], [-6, 0]];
+  const [dx, dy] = dirs[h(3) % dirs.length];
+  return {
+    ["--kb-dur" as string]: `${dur}s`,
+    ["--kb-delay" as string]: `-${(h(4) % 100) / 10}s`,
+    ["--kb-x" as string]: `${dx}%`,
+    ["--kb-y" as string]: `${dy}%`,
+    ["--kb-shine" as string]: `${shine}s`,
+    ["--kb-shine-delay" as string]: `-${(h(5) % 80) / 10}s`,
+  };
 }
