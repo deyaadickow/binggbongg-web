@@ -4,6 +4,7 @@
 // Pages not listed get the home page's description with their own canonical address.
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { COUNTRY_PAGES, countryPageBySlug, countryPageDescription, countryPageTitle } from "./countryPages";
 
 const SITE = "https://www.binggbongg.com";
 const HOME_TITLE = "Bingg Bongg – The New Social Media App: Live Video, Chat & Friends";
@@ -21,6 +22,8 @@ const PAGES: Record<string, [string, string]> = {
   "/referral-program": ["Referral Program – Earn 5% for Every Member You Bring | Bingg Bongg", "Share your Bingg Bongg referral code and earn 5% of what every new member earns."],
   "/help": ["Help – Members Helping Members on Bingg Bongg", "Help campaigns on Bingg Bongg: members supporting members who are going through a hard time."],
   "/shows": ["Your Own Live Show – Bingg Bongg Shows", "Run your own live show on Bingg Bongg, with your own advertisers."],
+  "/country-battles": [`Country Battle in ${COUNTRY_PAGES.length} Countries – Every Hour | Bingg Bongg`, `A 10-minute live Country Battle every hour in ${COUNTRY_PAGES.length} countries on Bingg Bongg. Find your country, go live with everyone from home, or watch any country and send gifts.`],
+  "/country-vs-country": ["Country VS Country – Live Battles Between Countries | Bingg Bongg", "Watch two countries battle live on Bingg Bongg, every hour, and help your country with gifts."],
   "/cvc": ["Country VS Country Challenges – Bingg Bongg", "Help your country win live Country VS Country battles on Bingg Bongg."],
   "/gigs": ["Video Ad Gig – Get a Video Ad Made by an Influencer | Bingg Bongg", "Get a video ad made for your business by a Bingg Bongg influencer, or earn by making ads."],
   "/business": ["Bingg Bongg Business – Business Pages", "Find businesses on Bingg Bongg, or give your business its own page."],
@@ -43,7 +46,11 @@ export function RouteMeta() {
   const { pathname } = useLocation();
   useEffect(() => {
     const path = pathname.replace(/\/+$/, "") || "/";
-    const [title, desc] = PAGES[path] ?? (path === "/" ? [HOME_TITLE, HOME_DESC] : ["Bingg Bongg", HOME_DESC]);
+    // A country's Country Battle page (/country-battle/philippines) — words shared with the build.
+    const cp = /^\/country-battle\/([a-z0-9-]+)$/.exec(path);
+    const country = cp ? countryPageBySlug(cp[1]) : undefined;
+    const [title, desc] = country ? [countryPageTitle(country), countryPageDescription(country)]
+      : PAGES[path] ?? (path === "/" ? [HOME_TITLE, HOME_DESC] : ["Bingg Bongg", HOME_DESC]);
     document.title = title;
     setMeta('meta[name="description"]', "content", desc);
     setMeta('link[rel="canonical"]', "href", SITE + (path === "/" ? "/" : path));

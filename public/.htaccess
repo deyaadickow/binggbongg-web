@@ -5,13 +5,20 @@ RewriteRule ^index\.html$ - [L]
 # house renderer lives in houses/). Without this, Apache treats /houses as the folder (redirect to
 # /houses/, then no index -> 403) instead of serving the app.
 RewriteRule ^houses/?$ /index.html [L]
+# Country pages for search (2026-11-23): the build writes a crawlable page per country to
+# _cb/<slug>.html and the list of all of them to _cb/index.html (seo.config.ts). The pretty
+# address is served from that file; the app then takes over as usual. /country-battle/live/...
+# and /country-battle/board/... have no _cb file, so they fall through to the app.
+RewriteCond %{DOCUMENT_ROOT}/_cb/$1.html -f
+RewriteRule ^country-battle/([a-z0-9-]+)/?$ /_cb/$1.html [L]
+RewriteRule ^country-battles/?$ /_cb/index.html [L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule . /index.html [L]
 
 # The page shell must never be cached: every deploy ships a new hashed bundle name inside it.
 <IfModule mod_headers.c>
-  <FilesMatch "^index\.html$">
+  <FilesMatch "\.html$">
     Header set Cache-Control "no-cache, no-store, must-revalidate"
     Header set Pragma "no-cache"
     Header set Expires "0"

@@ -9,6 +9,10 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { Plugin } from "vite";
+import {
+  COUNTRY_PAGES, countryPageDescription, countryPagePath, countryPageText, countryPageTitle, flagEmoji,
+  relatedCountries, zoneNames, type CountryPage,
+} from "./src/lib/countryPages.ts";
 
 const SITE = "https://www.binggbongg.com";
 const PLAY = "https://play.google.com/store/apps/details?id=com.apps.binggbongg";
@@ -128,8 +132,100 @@ export function seoStaticContent(): Plugin {
         .replace(/<div id="root">[\s\S]*?<\/div>\s*(<script|<\/body>)/, `<div id="root"><main><h1>${esc(title)}</h1><p>${esc(desc)}</p><p><a href="${PLAY}">Get it on Google Play</a> · <a href="${APPSTORE}">Download on the App Store</a></p></main></div>\n$1`);
       fs.mkdirSync(path.join(out, "ph"), { recursive: true });
       fs.writeFileSync(path.join(out, "ph", "index.html"), html);
+      writeCountryPages(out, fs.readFileSync(home, "utf8"));
     },
   };
+}
+
+// ---- Country pages (Steve, 2026-11-23, free marketing #3: search installs) -------------------
+// One crawlable page per Country Battle country at /country-battle/<slug>, plus the list of all of
+// them at /country-battles. Each is written to dist/_cb/<slug>.html (and dist/_cb/index.html for
+// the list); public/.htaccess rewrites the pretty address onto it. NOT a dist/country-battle/
+// folder: /country-battle is also a page of the app, and a real folder of the same name would
+// make Apache answer it with a redirect and a 403 (the /houses problem). The React app takes over
+// the page on load (CountryLandingPage), using the same words from src/lib/countryPages.ts.
+
+const CB_STYLE = `<style>.seo-cb{background:#000;color:#f4e3a1;font-family:system-ui,-apple-system,sans-serif;max-width:760px;margin:0 auto;padding:24px 16px;line-height:1.5}.seo-cb h1,.seo-cb h2{color:#FFD84D}.seo-cb a{color:#FFD84D}.seo-cb .btns a{display:inline-block;margin:4px 8px 4px 0;padding:10px 16px;border:1px solid #d4a017;border-radius:10px;text-decoration:none}</style>`;
+
+function pageShell(home: string, o: { title: string; desc: string; url: string; body: string; ld: unknown }): string {
+  return home
+    .replace(/<title>[^<]*<\/title>/, `<title>${esc(o.title)}</title>`)
+    .replace(/(<meta name="description" content=")[^"]*(")/, `$1${esc(o.desc)}$2`)
+    .replace(/(<link rel="canonical" href=")[^"]*(")/, `$1${o.url}$2`)
+    .replace(/(<meta property="og:url" content=")[^"]*(")/, `$1${o.url}$2`)
+    .replace(/(<meta property="og:title" content=")[^"]*(")/, `$1${esc(o.title)}$2`)
+    .replace(/(<meta property="og:description" content=")[^"]*(")/, `$1${esc(o.desc)}$2`)
+    .replace(/(<meta name="twitter:title" content=")[^"]*(")/, `$1${esc(o.title)}$2`)
+    .replace(/(<meta name="twitter:description" content=")[^"]*(")/, `$1${esc(o.desc)}$2`)
+    .replace(/(<meta property="og:image:alt" content=")[^"]*(")/, `$1${esc(o.title)}$2`)
+    // The site-wide structured data talks about the whole app (getting paid); these pages carry
+    // only a breadcrumb trail.
+    .replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/, `<script type="application/ld+json">${JSON.stringify(o.ld).replace(/</g, "\\u003c")}</script>`)
+    .replace(/<div id="root">[\s\S]*?<\/div>\s*(<script|<\/body>)/, (_m, tag: string) => `<div id="root">${CB_STYLE}<main class="seo-cb">${o.body}</main></div>\n${tag}`)
+}
+
+function crumbs(items: [string, string][]): unknown {
+  return {
+    "@context": "https://schema.org", "@type": "BreadcrumbList",
+    itemListElement: items.map(([name, url], i) => ({ "@type": "ListItem", position: i + 1, name, item: url })),
+  };
+}
+
+function countryBody(c: CountryPage): string {
+  const t = countryPageText(c, zoneNames(c.tz));
+  const li = (xs: string[]) => `<ul>${xs.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`;
+  const related = relatedCountries(c).map((r) => `<a href="${countryPagePath(r)}">${flagEmoji(r.code)} ${esc(r.display)} Country Battle</a>`).join(" · ");
+  return `<h1>${flagEmoji(c.code)} ${esc(t.h1)}</h1>
+<p>${esc(t.intro)}</p>
+<p class="btns"><a href="/country-battles">Watch or join the ${esc(c.display)} Country Battle</a><a href="${PLAY}">Get it on Google Play</a><a href="${APPSTORE}">Download on the App Store</a></p>
+<h2>When the ${esc(c.display)} Country Battle runs</h2>${li(t.when)}
+<h2>How to join</h2>${li(t.how)}
+<h2>Who can battle</h2><p>${esc(t.who)} <a href="/country-vs-country">See Country VS Country</a>.</p>
+${t.local ? `<h2 lang="${t.local.lang}">${esc(t.local.title)}</h2><p lang="${t.local.lang}">${esc(t.local.text)}</p>` : ""}
+<h2>More Country Battles</h2><p>${related} · <a href="/country-battles">All ${COUNTRY_PAGES.length} Country Battles</a></p>
+<p><a href="/">Bingg Bongg</a> · <a href="/features">Features</a> · <a href="/live">Live now</a> · <a href="/settings/about">About us</a> · <a href="/settings/contact">Contact us</a></p>
+<p>© Bingg Bongg Inc.</p>`;
+}
+
+export const HUB_TITLE = `Country Battle in ${COUNTRY_PAGES.length} Countries – Every Hour | Bingg Bongg`;
+export const HUB_DESC = `A 10-minute live Country Battle every hour in ${COUNTRY_PAGES.length} countries on Bingg Bongg. Find your country, go live with everyone from home, or watch any country and send gifts.`;
+
+function hubBody(): string {
+  const list = COUNTRY_PAGES.map((c) => `<li><a href="${countryPagePath(c)}">${flagEmoji(c.code)} ${esc(c.display)} Country Battle</a></li>`).join("");
+  return `<h1>Country Battle — every hour in ${COUNTRY_PAGES.length} countries</h1>
+<p>${esc(HUB_DESC)}</p>
+<p class="btns"><a href="${PLAY}">Get it on Google Play</a><a href="${APPSTORE}">Download on the App Store</a><a href="/country-vs-country">Country VS Country</a></p>
+<ul>${list}</ul>
+<p>© Bingg Bongg Inc.</p>`;
+}
+
+function writeCountryPages(out: string, home: string) {
+  const dir = path.join(out, "_cb");
+  fs.mkdirSync(dir, { recursive: true });
+  const hubUrl = `${SITE}/country-battles`;
+  fs.writeFileSync(path.join(dir, "index.html"), pageShell(home, {
+    title: HUB_TITLE, desc: HUB_DESC, url: hubUrl, body: hubBody(),
+    ld: crumbs([["Bingg Bongg", `${SITE}/`], ["Country Battles", hubUrl]]),
+  }));
+  for (const c of COUNTRY_PAGES) {
+    const url = SITE + countryPagePath(c);
+    fs.writeFileSync(path.join(dir, `${c.slug}.html`), pageShell(home, {
+      title: countryPageTitle(c), desc: countryPageDescription(c), url, body: countryBody(c),
+      ld: crumbs([["Bingg Bongg", `${SITE}/`], ["Country Battles", hubUrl], [`${c.display} Country Battle`, url]]),
+    }));
+  }
+  // The sitemap (copied from public/) gets the list page, Country VS Country and every country.
+  const sm = path.join(out, "sitemap.xml");
+  if (fs.existsSync(sm)) {
+    const day = new Date().toISOString().slice(0, 10);
+    const have = fs.readFileSync(sm, "utf8");
+    // Only the country pages: /country-battles and /country-vs-country are behind the sign-up wall
+    // (lib/publicRoutes.ts), so a search engine running the app would index the wall there.
+    const urls = COUNTRY_PAGES.map((c) => SITE + countryPagePath(c))
+      .filter((u) => !have.includes(`<loc>${u}</loc>`));
+    const rows = urls.map((u) => `  <url><loc>${u}</loc><lastmod>${day}</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>`).join("\n");
+    fs.writeFileSync(sm, have.replace("</urlset>", `${rows}\n</urlset>`));
+  }
 }
 
 export { SITE, PLAY, APPSTORE };

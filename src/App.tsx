@@ -93,6 +93,7 @@ import { PkContestsPage } from "./pages/PkContestsPage";
 import { CountryBattleBoardPage, CountryBattleDayPage, CountryBattlePage } from "./pages/CountryBattlePages";
 import { CountryBattleLivePage } from "./pages/CountryBattleLivePage";
 import { AllCountryBattlesPage } from "./pages/AllCountryBattlesPage";
+import { CountryLandingPage } from "./pages/CountryLandingPage";
 import { CountryBoardPage } from "./pages/CountryBoardPage";
 import { AdsForReferralsPage } from "./pages/AdsForReferralsPage";
 import { InvitePage } from "./pages/InvitePage";
@@ -242,6 +243,8 @@ export default function App() {
           <Route path="/country-battle/live/:dayId" element={<CountryBattleLivePage />} />
           <Route path="/country-battle/board" element={<CountryBattleBoardPage />} />
           <Route path="/country-battle/board/:id" element={<CountryBattleDayPage />} />
+          {/* A country's page for search (2026-11-23): /country-battle/philippines. The fixed paths above win. */}
+          <Route path="/country-battle/:slug" element={<CountryLandingPage />} />
           {/* Country Board (Steve, 2026-11-11): every country's points, "your country is losing to X". */}
           <Route path="/country-board" element={<CountryBoardPage />} />
           {/* Chat Battle (#9, Steve 2026-11-03) — the shared 24-tile battle screen. */}

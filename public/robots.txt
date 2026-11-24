@@ -22,5 +22,7 @@ Disallow: /shop/earnings
 Disallow: /shop/seller
 Disallow: /shop/agent
 Disallow: /support
+# The country pages' files; their real addresses are /country-battle/<country> (in the sitemap).
+Disallow: /_cb/
 
 Sitemap: https://www.binggbongg.com/sitemap.xml

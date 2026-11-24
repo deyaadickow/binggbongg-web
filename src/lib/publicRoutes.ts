@@ -6,6 +6,8 @@
 // Add a page here only if strangers have to see it without an account. The feed, live rooms,
 // games, battles, profiles and everything a member does stay behind the wall.
 
+import { countryPageBySlug } from "./countryPages";
+
 const EXACT = new Set<string>([
   // The ads' landing page (LandingSwitch in App.tsx). Meta reviews it.
   "/ph",
@@ -43,7 +45,12 @@ function clean(pathname: string): string {
 /** True for a page anyone may open without an account. */
 export function isPublicPath(pathname: string): boolean {
   const p = clean(pathname);
-  return EXACT.has(p) || PREFIXES.some((x) => p.startsWith(x));
+  if (EXACT.has(p) || PREFIXES.some((x) => p.startsWith(x))) return true;
+  // A country's Country Battle page for search (2026-11-23): /country-battle/philippines. Only
+  // the 197 country addresses — the battle screens (/country-battle/live/…, /board) stay walled,
+  // so Watch / Join on the page leads a stranger to sign up.
+  const cp = /^\/country-battle\/([a-z0-9-]+)$/.exec(p);
+  return !!cp && !!countryPageBySlug(cp[1]);
 }
 
 /** A signed-in member who still has to verify their email sees "Check your email" everywhere
