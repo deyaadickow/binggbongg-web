@@ -358,28 +358,68 @@ export function useRotation(slots: number, pool: number[], hold: number | null |
   return shown;
 }
 
-/** How often the virtual tiles move on when there are more than the free spaces. */
-export const VIRTUAL_ROTATE_MS = 4000;
+/** How often a few virtual tiles change: a random 15–20 s each time. */
+export const VIRTUAL_ROTATE_MIN_MS = 15000;
+export const VIRTUAL_ROTATE_MAX_MS = 20000;
 
 /**
  * Virtual Country Battles (Steve, 2026-11-24): which virtual members fill the free spaces. The
- * server's `virtual` list is in a fixed order for the day; with more of them than spaces, the window
- * moves on by a whole screenful every ~4 s and wraps around, so everyone gets the same time on
- * screen. `paused` (a gift sheet open) holds the window still.
+ * server's `virtual` list is in a fixed order for the day. With more of them than spaces, every
+ * 15–20 s only 20–30% of the tiles change ("please rotate the members on the tile once every 15 to
+ * 20 seconds and not every 3 to 5 seconds. and only rotate like 20 to 30% at a time"): random slots
+ * take the next members in the day's order who are not on screen; the rest stay put. `paused` (a
+ * gift sheet open) holds them still.
  */
 export function useVirtualWindow(ids: number[], slots: number, paused = false): number[] {
-  const [offset, setOffset] = useState(0);
+  const key = ids.join(",");
+  const [shown, setShown] = useState<number[]>([]);
+  const cursor = useRef(0);
   const n = ids.length;
-  const rotates = slots > 0 && n > slots;
+  const want = Math.max(0, Math.min(slots, n));
+  // Keep who is still there, fill the gaps in the day's order.
+  useEffect(() => {
+    setShown((prev) => {
+      const inList = new Set(ids);
+      const kept = prev.filter((id) => inList.has(id)).slice(0, want);
+      const on = new Set(kept);
+      const out = [...kept];
+      for (let i = 0; out.length < want && i < n; i++) {
+        const id = ids[(cursor.current + i) % n];
+        if (!on.has(id)) { out.push(id); on.add(id); cursor.current = (cursor.current + i + 1) % n; i = -1; }
+      }
+      return sameList(out, prev) ? prev : out;
+    });
+  }, [key, want]); // eslint-disable-line react-hooks/exhaustive-deps
+  const rotates = want > 0 && n > want;
   useEffect(() => {
     if (!rotates || paused) return;
-    const timer = setInterval(() => setOffset((o) => (o + slots) % n), VIRTUAL_ROTATE_MS);
-    return () => clearInterval(timer);
-  }, [rotates, paused, slots, n]);
-  if (slots <= 0 || n === 0) return [];
-  if (!rotates) return ids;
-  const start = offset % n;
-  return Array.from({ length: slots }, (_, i) => ids[(start + i) % n]);
+    let timer = 0;
+    const next = () => {
+      timer = window.setTimeout(() => {
+        setShown((prev) => {
+          if (prev.length === 0) return prev;
+          const share = 0.2 + Math.random() * 0.1;
+          const count = Math.max(1, Math.ceil(prev.length * share));
+          const slotsToSwap = shuffle(prev.map((_, i) => i)).slice(0, count);
+          const on = new Set(prev);
+          const out = [...prev];
+          for (const slot of slotsToSwap) {
+            for (let i = 0; i < n; i++) {
+              const id = ids[(cursor.current + i) % n];
+              if (!on.has(id)) { on.delete(out[slot]); out[slot] = id; on.add(id); cursor.current = (cursor.current + i + 1) % n; break; }
+            }
+          }
+          return out;
+        });
+        next();
+      }, VIRTUAL_ROTATE_MIN_MS + Math.random() * (VIRTUAL_ROTATE_MAX_MS - VIRTUAL_ROTATE_MIN_MS));
+    };
+    next();
+    return () => clearTimeout(timer);
+  }, [rotates, paused, key]); // eslint-disable-line react-hooks/exhaustive-deps
+  if (want <= 0) return [];
+  if (!rotates) return ids.slice(0, want);
+  return shown.length ? shown : ids.slice(0, want);
 }
 
 function shuffle<T>(a: T[]): T[] {

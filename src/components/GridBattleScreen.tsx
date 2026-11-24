@@ -205,7 +205,7 @@ export const VIRTUAL_HALF_FILL = 12;
  *  Virtual Country Battles (Steve, 2026-11-24: "All country battles and country VS country battles
  *  with all virtual members... This is only temporary, once real members start coming in we will
  *  stop the virtual battles."): after the live tiles, the server's `virtual` members fill the free
- *  spaces up to 24, moving on every ~4 s when there are more (useVirtualWindow). A Country VS
+ *  spaces up to 24, 20–30% of them changing every 15–20 s when there are more (useVirtualWindow). A Country VS
  *  Country battle (`split`) is two halves, one per country (battlers[].side), each its own live
  *  tiles first, then its virtual ones, up to 12. A member who goes live for real is in `live` and
  *  out of `virtual`, so their virtual tile goes and the real one takes its place by itself. */
