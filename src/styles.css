@@ -2201,3 +2201,7 @@ body:has(.story-viewer) .get-app-bar { display: none; }
   100% { transform: scale(1); text-shadow: none; }
 }
 @media (prefers-reduced-motion: reduce) { .pop-num.popping { animation: none; } }
+/* Steve 2026-11-24: "on the tile i only want the score to pop up not the entire tile" — virtual tiles rotate every few
+   seconds, so the tile's own entrance flash (cb-pop) made the whole tile pop; only the score pops now. */
+.cb-tile.virtual, .cb-tile.virtual.spot { animation: none; }
+.cb-tile.virtual.spot { animation: cb-spot 1s ease-in-out infinite; }
