@@ -44,7 +44,7 @@ export function CountryBattleLivePage() {
   const demo = sp.get("demo");
   // Virtual Country Battles demo: compiled out of the production build (import.meta.env.DEV is false there).
   const vcbDemo = import.meta.env.DEV ? sp.get("vcbdemo") : null;
-  if (vcbDemo) return <VirtualCbDemo key={vcbDemo} rival={vcbDemo === "rival" || vcbDemo === "empty"} emptySide={vcbDemo === "empty"} country={sp.get("country") || undefined} />;
+  if (vcbDemo) return <VirtualCbDemo key={vcbDemo + (sp.get("n") ?? "")} rival={vcbDemo === "rival" || vcbDemo === "empty"} emptySide={vcbDemo === "empty"} country={sp.get("country") || undefined} tiles={Number(sp.get("n")) || 0} />;
   if (demo) {
     return <CountryBattleDemo key={sp.toString()} n={demo === "0" ? 0 : Number(demo) || 24} withOwn={sp.get("own") !== "0"}
       phase={(sp.get("phase") as ChbState["phase"]) || "battle"} imgBase={sp.get("img")} recapDemo={sp.get("reason") ?? ""} />;
@@ -242,7 +242,7 @@ const VCB_ID_NAMES = [
   "indah permata", "yoga saputra", "ratna sari", "hendra wijaya", "maya anggraini", "dimas prakoso", "lina marlina",
 ];
 
-function VirtualCbDemo({ rival, emptySide = false, country = "Philippines" }: { rival: boolean; emptySide?: boolean; country?: string }) {
+function VirtualCbDemo({ rival, emptySide = false, country = "Philippines", tiles = 0 }: { rival: boolean; emptySide?: boolean; country?: string; tiles?: number }) {
   const { t } = useT();
   // =empty is Nepal vs Bhutan, the battle Steve was watching (Bhutan has no members).
   const sideA = emptySide ? "Nepal" : country;
@@ -265,7 +265,14 @@ function VirtualCbDemo({ rival, emptySide = false, country = "Philippines" }: { 
     // Every other virtual member has a photo; the rest show gold initials.
     const photoOf = (i: number) => (i % 2 === 0 ? VCB_PHOTOS[(i / 2) % VCB_PHOTOS.length] : null);
     let rows: Row[];
-    if (!rival) {
+    if (!rival && tiles > 0) {
+      // &n=2..24: exactly that many virtual tiles, no photos, each on its own scenery picture, no gift bursts (the
+      // tile-layout sample sheet, Steve 2026-11-24).
+      rows = DEMO_NAMES.concat(VCB_ID_NAMES).slice(0, Math.min(24, tiles)).map((n, i) => ({
+        ...row(2101 + i, n, { live: false, photo: null, score: 2400 - i * 83 }),
+        scenery_image: `uploads/scenery/${sideA.toLowerCase().replace(/\s+/g, "-")}_${i + 1}.webp`,
+      }));
+    } else if (!rival) {
       // Whole country: ONE live member, 30 virtual — 23 of them fill the 24 tiles, moving on every ~4 s.
       rows = [
         row(2001, DEMO_NAMES[0], { live: true, photo: vcbPhoto("/lp/live.jpg"), score: 4200 }),
@@ -288,7 +295,7 @@ function VirtualCbDemo({ rival, emptySide = false, country = "Philippines" }: { 
       // Free BBs from Bingg Bongg arrive in bursts on the virtual tiles: each beat (5 s) about a
       // quarter of them get 50–250 more, so free_score rises and their tiles play the gift.
       const beat = Math.floor((serverNow() - t0) / 5000);
-      const freeOf = (id: number) => Math.floor((beat + (id % 4)) / 4) * ((id % 5) + 1) * 50;
+      const freeOf = (id: number) => (tiles > 0 ? 0 : Math.floor((beat + (id % 4)) / 4) * ((id % 5) + 1) * 50);
       const battlers = rows.map((r) => (r.is_virtual
         ? { ...r, score: r.score + freeOf(r.user_id), free_score: r.score + freeOf(r.user_id) }
         : { ...r, free_score: 0 }))

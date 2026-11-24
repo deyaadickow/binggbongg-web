@@ -1039,12 +1039,12 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
             const marked = (list: CbTileData[]) => giftShow.withGift(awaitingBack.length ? list.map((x) => (awaitingBack.includes(x.userId) ? { ...x, starredMe: true } : x)) : list);
             if (grid.halves && grid.split && st.rival) {
               // Country VS Country (Steve, 2026-11-24): the tile area split in half, one country each.
-              const half = (list: CbTileData[], side: { country: string; flag: string; score: number; scenery_image?: string | null }, key: string) => (
+              const half = (list: CbTileData[], side: { country: string; flag: string; score: number; scenery_image?: string | null }, key: string, share: number) => (
                 <div className="vcb-half" key={key}>
                   <div className="vcb-half-head">{side.flag || countryFlag(side.country) || "🌍"} {side.country}</div>
                   {list.length
                     ? <CountryBattleGrid stage={grid.stage} shape={countShape(list.length)} tiles={marked(list)} listen={heardNow}
-                        reserve={CHAT_RESERVE + ACTION_BAR_RESERVE + 22} onTap={onTap} onGift={onGift} onOpen={onOpen}
+                        reserve={CHAT_RESERVE + ACTION_BAR_RESERVE + 22} fillShare={share} onTap={onTap} onGift={onGift} onOpen={onOpen}
                         attach={roomHook.attachVideo} hasVideo={roomHook.hasVideo} version={roomHook.version} />
                     : (
                       // Steve, 2026-11-24 (round 2): "What is the big box under the 3 players with the
@@ -1065,7 +1065,7 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
                     )}
                 </div>
               );
-              return <div className="vcb-halves">{half(grid.halves.a, st.rival.a, "a")}{half(grid.halves.b, st.rival.b, "b")}</div>;
+              return <div className="vcb-halves">{half(grid.halves.a, st.rival.a, "a", 1)}{half(grid.halves.b, st.rival.b, "b", 1)}</div>;
             }
             return (
               <CountryBattleGrid stage={grid.stage} shape={source.kind === "country" ? grid.shape : undefined} tiles={marked(grid.tiles)} listen={heardNow} reserve={CHAT_RESERVE + ACTION_BAR_RESERVE} phoneFullWidth

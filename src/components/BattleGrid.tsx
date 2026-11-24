@@ -59,6 +59,37 @@ export interface CbTileData {
  *  header, whatever they measure on this screen) down to the bottom of the window, less the
  *  phones' fixed "get the app" bar and the hint line. Measured, not guessed — the site header is
  *  one row on a desktop and two on a phone. */
+/**
+ * Country Battle on a phone (Steve, 2026-11-24: "no mater how many tiles there is just make sure it covers the phone
+ * screen leaving room for chat"): the height the tiles may fill — from the grid's top to the bottom of the screen,
+ * less the get-app bar and `reserve` (the chat strip and the icon bar). `share` < 1 for the first Country VS Country
+ * half (the second half takes what is left). Null on a wider screen, where tiles keep their shape.
+ */
+function useFillHeight(ref: React.RefObject<HTMLDivElement | null>, enabled: boolean, reserve = 34, share = 1, cols = 1, rows = 1): number | null {
+  const [h, setH] = useState<number | null>(null);
+  useLayoutEffect(() => {
+    if (!enabled) { setH(null); return; }
+    const measure = () => {
+      const el = ref.current;
+      if (!el) return;
+      if (window.innerWidth >= 700) { setH(null); return; }
+      const top = el.getBoundingClientRect().top + window.scrollY;
+      const bar = document.querySelector(".get-app-bar");
+      const barH = bar && getComputedStyle(bar).display !== "none" ? bar.getBoundingClientRect().height : 0;
+      const room = window.innerHeight - top - barH - reserve;
+      // Never squash a tile flatter than about 1.1 tall per 1 wide: a big battle scrolls a little instead.
+      const minRows = rows * Math.round((el.getBoundingClientRect().width / Math.max(1, cols)) * 1.1);
+      setH(Math.max(share < 1 ? 140 : 220, minRows, Math.floor(room * share)));
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    const t1 = setTimeout(measure, 300);
+    const t2 = setTimeout(measure, 900);
+    return () => { window.removeEventListener("resize", measure); clearTimeout(t1); clearTimeout(t2); };
+  }, [ref, enabled, reserve, share, cols, rows]);
+  return h;
+}
+
 function useAvailableHeight(ref: React.RefObject<HTMLDivElement | null>, reserve = 34, phoneFullWidth = false): number | null {
   const [h, setH] = useState<number | null>(null);
   useLayoutEffect(() => {
@@ -227,7 +258,7 @@ function tileBackdrop(id: number): string {
   return `linear-gradient(160deg, hsl(${hue} 35% 22%), hsl(${(hue + 40) % 360} 30% 9%))`;
 }
 
-export function CountryBattleGrid({ stage, shape, tiles, listen, onTap, onGift, onOpen, attach, hasVideo, version = 0, flash, onFlashDone, reserve, phoneFullWidth }: {
+export function CountryBattleGrid({ stage, shape, tiles, listen, onTap, onGift, onOpen, attach, hasVideo, version = 0, flash, onFlashDone, reserve, phoneFullWidth, fillShare = 1 }: {
   stage: CbStage;
   tiles: CbTileData[];
   /** Who is heard on this screen (one tapped tile, or the starred members). */
@@ -247,6 +278,8 @@ export function CountryBattleGrid({ stage, shape, tiles, listen, onTap, onGift, 
   phoneFullWidth?: boolean;
   /** Country Battle: the shape for the tile count (countShape); else the stage's. */
   shape?: { cap: number; cols: number };
+  /** Country VS Country: the first half fills this share of the phone screen's room, the second the rest. */
+  fillShare?: number;
 }) {
   const { cols } = shape ?? gridShape(stage);
   const rows = Math.max(1, Math.ceil(tiles.length / cols));
@@ -259,9 +292,13 @@ export function CountryBattleGrid({ stage, shape, tiles, listen, onTap, onGift, 
   // Full phone width is for 4 across; fewer columns fit the screen's height instead.
   const avail = useAvailableHeight(stageRef, reserve, phoneFullWidth && (!shape || cols >= 4));
   const heard = new Set(Array.isArray(listen) ? listen : listen != null ? [listen] : []);
+  // Country Battle on a phone: the tiles stretch to fill the screen down to the chat, whatever their number.
+  const fillH = useFillHeight(stageRef, !!shape, reserve, fillShare, cols, rows);
   return (
-    <div ref={stageRef} className="cb-stage" style={{ width: avail ? `min(100%, ${Math.round(avail * ratio)}px)` : "100%", minWidth: Math.min(240, cols * 70) }}>
-      <div className={`cb-grid cols-${cols}`} style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
+    <div ref={stageRef} className="cb-stage" style={fillH ? { width: "100%" } : { width: avail ? `min(100%, ${Math.round(avail * ratio)}px)` : "100%", minWidth: Math.min(240, cols * 70) }}>
+      <div className={`cb-grid cols-${cols}${fillH ? " fill" : ""}`}
+        style={fillH ? { gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`, height: fillH }
+          : { gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
         {tiles.map((tile) => (
           <CbTile key={`${tile.own ? "own" : tile.home ? "home" : tile.virtual ? "v" : "m"}-${tile.userId}`}
             tile={withHost(tile.muted == null && !tile.own ? { ...tile, muted: !heard.has(tile.userId) } : tile, !!shape && tile === tiles[0])} listening={heard.has(tile.userId)}
