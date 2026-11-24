@@ -35,6 +35,9 @@ export interface ChbBattler extends ChbPerson {
   /** Admin free BBs on this tile so far (= score - real_score). Rising = a gift from Bingg Bongg
    *  plays on the tile (2026-11-24 round 2). Older servers: missing. */
   free_score?: number;
+  /** Round 2c: a scenery picture from the member's country (a storage path like profile_image), shown
+   *  on their tile when they have no profile photo. */
+  scenery_image?: string | null;
   /** Country VS Country: the country this battler fights for (rival.a / rival.b's country). */
   side?: string | null;
 }

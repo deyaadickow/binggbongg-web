@@ -48,6 +48,8 @@ export interface CbTileData {
   virtual?: boolean;
   /** Shown on a virtual tile's name strip: their battle score (BBs). */
   score?: number | null;
+  /** Round 2c: their country's scenery (storage path), shown full-bleed when there is no profile photo. */
+  scenery?: string | null;
   /** Round 2b: the host tile (the first, bigger one) — a small gold "Host" pill top-left. */
   host?: boolean;
 }
@@ -109,6 +111,14 @@ function CbTile({ tile, listening, onTap, onGift, onOpen, attach, hasVideo, vers
   const photo = tile.photo ? mediaUrl(tile.photo) : "";
   const realPhoto = photo && !/\/$/.test(photo);
   const [photoBroken, setPhotoBroken] = useState(false);
+  // Steve, 2026-11-24 (round 2c): "The initials and a black background on each tile is too boring.
+  // Please remove the initials and add a nice scenery from their own country on their tile." No
+  // profile photo = their country's scenery, full-bleed; none (or it fails) = plain black.
+  const scenery = tile.scenery ? mediaUrl(tile.scenery) : "";
+  const [sceneryBroken, setSceneryBroken] = useState(false);
+  const sceneryImg = scenery && !sceneryBroken
+    ? <img className="cb-photo cb-scenery" src={scenery} alt="" loading="lazy" onError={() => setSceneryBroken(true)} />
+    : null;
   if (tile.virtual) {
     // Steve, 2026-11-24 (design): a photo-less member = gold initials centred on a black tile; the
     // "Virtual" badge SMALL in the top-left so it never covers the face; the name inside the tile
@@ -122,7 +132,7 @@ function CbTile({ tile, listening, onTap, onGift, onOpen, attach, hasVideo, vers
         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onTap?.(); } }}>
         {realPhoto && !photoBroken
           ? <img className="cb-photo" src={photo} alt="" loading="lazy" onError={() => setPhotoBroken(true)} />
-          : <div className="cb-vph"><i>{initials(tile.name || "?")}</i></div>}
+          : sceneryImg ?? <div className="cb-vph" />}
         <TileGiftLayer uid={tile.userId} />
         <span className="cb-pills">
           {tile.host && <span className="cb-vbadge">{t("vcb_host")}</span>}
@@ -156,7 +166,7 @@ function CbTile({ tile, listening, onTap, onGift, onOpen, attach, hasVideo, vers
       {/* The member's photo while their video connects (and for good, if it never does). */}
       {realPhoto
         ? <img className="cb-photo" src={photo} alt="" loading="lazy" onError={(e) => ((e.target as HTMLImageElement).style.display = "none")} />
-        : <div className="cb-ph" style={{ background: tileBackdrop(tile.userId) }}><i>{initials(tile.name || "?")}</i></div>}
+        : sceneryImg ?? <div className="cb-ph" style={{ background: tileBackdrop(tile.userId) }}><i>{initials(tile.name || "?")}</i></div>}
       {hasVideo && <video ref={videoRef} autoPlay playsInline muted />}
       {/* Steve, 2026-11-23: a gift plays only in the giver's and the receiver's tiles. */}
       <TileGiftLayer uid={tile.userId} />

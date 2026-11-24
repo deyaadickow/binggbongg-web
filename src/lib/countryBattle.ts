@@ -139,6 +139,8 @@ export interface CbRivalSide {
   /** Free BBs given to the SIDE ITSELF because it has no members (included in `score`). Rising = a
    *  gift from Bingg Bongg plays on the empty side's box. */
   country_free?: number;
+  /** Round 2c: the country's scenery picture (storage path), the empty side box's background. */
+  scenery_image?: string | null;
 }
 
 /** A Rival Battle (Steve, 2026-11-23: "Find ever country's rival and let's set up a 10 minutes battle in between
@@ -157,6 +159,7 @@ export function rivalOf(v: unknown): CbRival | null {
       ...(s.real_score != null ? { real_score: Number(s.real_score) || 0 } : {}),
       ...(s.free_score != null ? { free_score: Number(s.free_score) || 0 } : {}),
       ...(s.country_free != null ? { country_free: Number(s.country_free) || 0 } : {}),
+      ...(typeof s.scenery_image === "string" && s.scenery_image ? { scenery_image: s.scenery_image } : {}),
     } : null;
   };
   const a = side(r.a);
@@ -203,6 +206,8 @@ export interface CbDayState {
     is_virtual?: boolean; real_score?: number;
     /** Admin free BBs on this tile so far (2026-11-24 round 2; = score - real_score). */
     free_score?: number;
+    /** Round 2c: their country's scenery (storage path) for a tile with no profile photo. */
+    scenery_image?: string | null;
     /** Country VS Country: which country this battler fights for. */
     side?: string | null;
   })[];

@@ -290,15 +290,16 @@ export function useGridBattleTiles(input: {
     ? [liveIds.has(pinnedId) ? liveTileOf(pinnedId) : virtualTileOf(pinnedId)]
     : [{
       userId: pinnedId, name: nameOf(byId.get(pinnedId)), photo: byId.get(pinnedId)?.profile_image ?? null,
+      scenery: byId.get(pinnedId)?.scenery_image ?? null,
       own: isBattler, home: !isBattler, spot: spot === pinnedId,
     }];
   function liveTileOf(id: number): CbTileData {
     const b = byId.get(id);
-    return { userId: id, name: nameOf(b), photo: b?.profile_image ?? null, spot: spot === id, starred: star.pins.includes(id) };
+    return { userId: id, name: nameOf(b), photo: b?.profile_image ?? null, scenery: b?.scenery_image ?? null, spot: spot === id, starred: star.pins.includes(id) };
   }
   function virtualTileOf(id: number): CbTileData {
     const b = byId.get(id);
-    return { userId: id, name: nameOf(b), photo: b?.profile_image ?? null, virtual: true, score: b?.score ?? 0, muted: false };
+    return { userId: id, name: nameOf(b), photo: b?.profile_image ?? null, scenery: b?.scenery_image ?? null, virtual: true, score: b?.score ?? 0, muted: false };
   }
   const liveTile = liveTileOf;
   const virtualTile = virtualTileOf;
@@ -1037,7 +1038,7 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
             const marked = (list: CbTileData[]) => giftShow.withGift(awaitingBack.length ? list.map((x) => (awaitingBack.includes(x.userId) ? { ...x, starredMe: true } : x)) : list);
             if (grid.halves && grid.split && st.rival) {
               // Country VS Country (Steve, 2026-11-24): the tile area split in half, one country each.
-              const half = (list: CbTileData[], side: { country: string; flag: string; score: number }, key: string) => (
+              const half = (list: CbTileData[], side: { country: string; flag: string; score: number; scenery_image?: string | null }, key: string) => (
                 <div className="vcb-half" key={key}>
                   <div className="vcb-half-head">{side.flag || countryFlag(side.country) || "🌍"} {side.country}</div>
                   {list.length
@@ -1048,7 +1049,8 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
                       // Steve, 2026-11-24 (round 2): "What is the big box under the 3 players with the
                       // world globe in it?" — a side with nobody on it says so, with its score and a
                       // way to join for it. Its free BBs from Bingg Bongg play here.
-                      <div className="card cb-empty vcb-half-empty">
+                      <div className={`card cb-empty vcb-half-empty${side.scenery_image ? " scenic" : ""}`}
+                        style={side.scenery_image ? { backgroundImage: `linear-gradient(rgba(0,0,0,.62), rgba(0,0,0,.78)), url("${mediaUrl(side.scenery_image)}")` } : undefined}>
                         <TileGiftLayer uid={freeSideUid(key as "a" | "b")} />
                         <div className="vcb-empty-flag" aria-hidden>{side.flag || countryFlag(side.country) || "🌍"}</div>
                         <div className="vcb-empty-text">{cbText(t("vcb_no_members"), { country: side.country })}</div>

@@ -2129,6 +2129,9 @@ body:has(.story-viewer) .get-app-bar { display: none; }
 .vcb-half .cb-stage { min-width: 0 !important; }
 .vcb-half-empty { min-height: 120px; position: relative; overflow: hidden; flex-direction: column; gap: 6px; padding: 16px 12px; }
 /* The empty Country VS Country side (round 2): flag, "No members from {country} yet", score, Join. */
+/* Round 2c: the empty side's box on its country's scenery, darkened (the gradient is inline). */
+.vcb-half-empty.scenic { background-size: cover; background-position: center; }
+.vcb-half-empty.scenic .vcb-empty-text, .vcb-half-empty.scenic .vcb-empty-score { text-shadow: 0 1px 4px rgba(0,0,0,.9); }
 .vcb-empty-flag { font-size: 40px; line-height: 1; }
 .vcb-empty-text { color: var(--gold); font-weight: 700; font-size: 14px; }
 .vcb-empty-score { color: #fff; font-weight: 800; font-size: 20px; font-variant-numeric: tabular-nums; }
