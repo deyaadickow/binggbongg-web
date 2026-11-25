@@ -2638,6 +2638,7 @@ export const fil = {
   fblurb_nearby: "Mga video mula sa mga miyembro sa lungsod, probinsya o bansa mo.",
   information_center: "Information Center",
   ic_million: "Ang Referral Program na Ito ay Puwedeng\nMagbigay sa Iyo ng Hanggang Isang Milyong Dolyar",
+  ic_id_vs_ph: "Indonesia VS Pilipinas\nBattle araw-araw, 8pm",
   ic_one_video: "Isang video na may 100+ features",
   ic_algorithm: "Alamin kung paano gumagana ang algorithm ng Bingg Bongg",
   ic_exciting_news: "Pindutin dito para makita ang pinakabagong exciting news namin",

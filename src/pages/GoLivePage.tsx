@@ -17,6 +17,9 @@ import { InfoBanner } from "./InformationCenterPage";
 const BB_LINKS: { to: string; key: StringKey }[] = [
   { to: "/ads-for-referrals?video=en", key: "ic_million" },
   { to: "/country-battles", key: "acb_tab" },
+  // Steve, 2026-11-25: "Add to the BINGG BONGG popup: 'Indonesia VS Philippines' 'Battle every day at 8pm'".
+  // Opens the same place as All Country Battles until the PH-vs-ID screen exists.
+  { to: "/country-battles", key: "ic_id_vs_ph" },
   { to: "/settings#features", key: "set_box_features" },
   { to: "/features", key: "tab_70_features" },
   { to: "/feature-videos", key: "tab_70_videos" },
