@@ -65,7 +65,7 @@ export interface CbTileData {
  * less the get-app bar and `reserve` (the chat strip and the icon bar). `share` < 1 for the first Country VS Country
  * half (the second half takes what is left). Null on a wider screen, where tiles keep their shape.
  */
-function useFillHeight(ref: React.RefObject<HTMLDivElement | null>, enabled: boolean, reserve = 34, share = 1, cols = 1, rows = 1): number | null {
+function useFillHeight(ref: React.RefObject<HTMLDivElement | null>, enabled: boolean, reserve = 34, share = 1, cols = 1, rows = 1, strict = false): number | null {
   const [h, setH] = useState<number | null>(null);
   useLayoutEffect(() => {
     if (!enabled) { setH(null); return; }
@@ -79,6 +79,18 @@ function useFillHeight(ref: React.RefObject<HTMLDivElement | null>, enabled: boo
       const room = window.innerHeight - top - barH - reserve;
       // Never squash a tile flatter than about 1.1 tall per 1 wide: a big battle scrolls a little instead.
       const minRows = rows * Math.round((el.getBoundingClientRect().width / Math.max(1, cols)) * 1.1);
+      // Country Battle rooms (`strict`, Steve: 5 chat lines + the icon bar on screen WITHOUT scrolling): exactly the
+      // room left, however flat that makes the tiles — measured off the real chat strip and icon bar under the grid and
+      // the top of the fixed get-app bar, so nothing is guessed.
+      if (strict) {
+        const r = el.getBoundingClientRect();
+        const page = el.closest(".cb-page");
+        const last = page?.querySelector(".cb-bar") ?? page?.querySelector(".chb-chat");
+        const below = last ? last.getBoundingClientRect().bottom - r.bottom + 4 : reserve;
+        const floor = bar && getComputedStyle(bar).display !== "none" ? bar.getBoundingClientRect().top : window.innerHeight;
+        setH(Math.max(80, Math.floor(floor - (r.top + window.scrollY) - below)));
+        return;
+      }
       setH(Math.max(share < 1 ? 140 : 220, minRows, Math.floor(room * share)));
     };
     measure();
@@ -86,7 +98,7 @@ function useFillHeight(ref: React.RefObject<HTMLDivElement | null>, enabled: boo
     const t1 = setTimeout(measure, 300);
     const t2 = setTimeout(measure, 900);
     return () => { window.removeEventListener("resize", measure); clearTimeout(t1); clearTimeout(t2); };
-  }, [ref, enabled, reserve, share, cols, rows]);
+  }, [ref, enabled, reserve, share, cols, rows, strict]);
   return h;
 }
 
@@ -305,7 +317,9 @@ function tileBackdrop(id: number): string {
   return `linear-gradient(160deg, hsl(${hue} 35% 22%), hsl(${(hue + 40) % 360} 30% 9%))`;
 }
 
-export function CountryBattleGrid({ stage, shape, tiles, listen, onTap, onGift, onOpen, attach, hasVideo, version = 0, flash, onFlashDone, reserve, phoneFullWidth, fillShare = 1, giftBox = true, hostId }: {
+export function CountryBattleGrid({ stage, shape, tiles, listen, onTap, onGift, onOpen, attach, hasVideo, version = 0, flash, onFlashDone, reserve, phoneFullWidth, fillShare = 1, giftBox = true, hostId, strictFill = false }: {
+  /** Country Battle rooms: fill exactly the height left above the chat and icon bar (no minimum tile shape). */
+  strictFill?: boolean;
   /** Design B: false = tiny tiles, no gift box on them. */
   giftBox?: boolean;
   /** Country Battle rooms: whose tile carries the Host pill (null = nobody's). Undefined = the first tile's. */
@@ -344,10 +358,10 @@ export function CountryBattleGrid({ stage, shape, tiles, listen, onTap, onGift, 
   const avail = useAvailableHeight(stageRef, reserve, phoneFullWidth && (!shape || cols >= 4));
   const heard = new Set(Array.isArray(listen) ? listen : listen != null ? [listen] : []);
   // Country Battle on a phone: the tiles stretch to fill the screen down to the chat, whatever their number.
-  const fillH = useFillHeight(stageRef, !!shape, reserve, fillShare, cols, rows);
+  const fillH = useFillHeight(stageRef, !!shape, reserve, fillShare, cols, rows, strictFill);
   return (
     <div ref={stageRef} className="cb-stage" style={fillH ? { width: "100%" } : { width: avail ? `min(100%, ${Math.round(avail * ratio)}px)` : "100%", minWidth: Math.min(240, cols * 70) }}>
-      <div className={`cb-grid cols-${cols}${fillH ? " fill" : ""}`}
+      <div className={`cb-grid cols-${cols}${fillH ? " fill" : ""}${fillH && strictFill ? " strict" : ""}`}
         style={fillH ? { gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`, height: fillH }
           : { gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
         {tiles.map((tile) => (

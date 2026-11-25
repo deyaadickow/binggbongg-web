@@ -1165,6 +1165,7 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
               <CountryBattleGrid stage={grid.stage} shape={source.kind === "country" ? grid.shape : undefined} tiles={marked(grid.tiles)} listen={heardNow} reserve={CHAT_RESERVE + ACTION_BAR_RESERVE} phoneFullWidth
                 onTap={tiny ? tinyTap : onTap} onGift={onGift} onOpen={onOpen} giftBox={!tiny}
                 hostId={room ? room.host_user_id : undefined}
+                strictFill={!!room}
                 attach={roomHook.attachVideo} hasVideo={roomHook.hasVideo} version={roomHook.version} />
             );
           })()

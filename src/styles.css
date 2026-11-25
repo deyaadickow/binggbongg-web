@@ -2294,3 +2294,11 @@ body:has(.story-viewer) .get-app-bar { display: none; }
 .ml-tile .cb-foot-r .ml-spk { position: static; }
 /* Go Live with 2 guests (3 on camera): no empty seat — the host's tile (first) takes the whole top row. */
 .video-grid.count-3 > .tile:not(.tile ~ .tile) { grid-column: span 2; }
+/* Country Battle rooms on a phone: the tiles take exactly the height left above the 5-line chat and the icon bar, so a
+   big room makes them flat — size the BBs, pills, gift box and name by the tile's height as well as its width. */
+.cb-grid.fill.strict .cb-tile { container-type: size; }
+.cb-grid.fill.strict .cb-tile .cb-bbs { font-size: clamp(11px, min(15cqw, 24cqh), 34px); top: 2px; }
+.cb-grid.fill.strict .cb-tile .cb-foot { padding: min(14px, 10cqh) 3px 2px; gap: 1px; }
+.cb-grid.fill.strict .cb-tile .cb-foot .cb-vbadge { font-size: clamp(8px, min(7.5cqw, 13cqh), 13px); padding: 0 5px; }
+.cb-grid.fill.strict .cb-tile .cb-foot .cb-gift { width: clamp(16px, min(19cqw, 30cqh), 36px); height: clamp(16px, min(19cqw, 30cqh), 36px); }
+.cb-grid.fill.strict .cb-tile .cb-fname { font-size: clamp(8px, min(8.5cqw, 15cqh), 15px); line-height: 1.1; }
