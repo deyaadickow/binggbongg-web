@@ -12,14 +12,16 @@ import { InfoBanner } from "./InformationCenterPage";
 /** Steve, 2026-11-25: the Bingg Bongg button's page IS the Information Center now — "add all the links
  *  from the information center on this page and delete the information center link". Every box is the
  *  Information Center's gold box with a red star each side, All Country Battles included (no longer
- *  blue), plus a new "Features" box that opens Settings at its Features list. Country VS Country stays
- *  off while the battles are turned off (2026-11-24). */
+ *  blue), plus a new "Features" box that opens Settings at its Features list. Country VS Country is back
+ *  (2026-11-25, Philippines vs Indonesia only): the "Indonesia VS Philippines" box is its entry here. */
 const BB_LINKS: { to: string; key: StringKey }[] = [
   { to: "/ads-for-referrals?video=en", key: "ic_million" },
   { to: "/country-battles", key: "acb_tab" },
   // Steve, 2026-11-25: "Add to the BINGG BONGG popup: 'Indonesia VS Philippines' 'Battle every day at 8pm'".
-  // Opens the same place as All Country Battles until the PH-vs-ID screen exists.
-  { to: "/country-battles", key: "ic_id_vs_ph" },
+  // Steve, 2026-11-25: it opens the Philippines vs Indonesia Country VS Country battle itself (the only
+  // CvC pair for now, 8 PM Manila) — the rival card's own route: the battle page for that pair, straight
+  // into the room once it is open (?watch=1), its countdown until then. This box IS the popup's CvC entry.
+  { to: `/country-battle?country=${encodeURIComponent("Philippines vs Indonesia")}&watch=1`, key: "ic_id_vs_ph" },
   { to: "/settings#features", key: "set_box_features" },
   { to: "/features", key: "tab_70_features" },
   { to: "/feature-videos", key: "tab_70_videos" },

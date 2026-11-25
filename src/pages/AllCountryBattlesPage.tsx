@@ -27,9 +27,8 @@ export function AllCountryBattlesPage({ startKind }: { startKind?: AcbKind } = {
   // Opens on Whole Country Battle; ?kind=rival (the Information Center's Country VS Country button)
   // opens on Country VS Country.
   const [params] = useSearchParams();
-  // Country VS Country turned off for now (Steve, 2026-11-24: "Please Turn Off Country VS Country Battles for now
-  // and remove the buttons"): always the whole country list, and only its chip (so the Live button still has a home).
-  const vsOff = true;
+  // Country VS Country was off 2026-11-24 (only the whole country chip). Back on 2026-11-25 (Steve: "these two countries will be the only CvC for now") — Philippines vs Indonesia.
+  const vsOff = false;
   const [kind, setKind] = useState<AcbKind>(!vsOff && (startKind === "rival" || params.get("kind") === "rival") ? "rival" : "country");
   const { battles, error, search } = useAllCountryBattles(query, kind, user?.id, t("acb_empty"));
   const chips: [AcbKind, string][] = vsOff ? [["country", t("acb_tab")]] : [["rival", t("acb_filter_vs")], ["country", t("acb_tab")]];
