@@ -175,20 +175,24 @@ function CbTile({ tile, listening, onTap, onGift, onOpen, attach, hasVideo, vers
         <TileGiftLayer uid={tile.userId} />
         <span className="cb-pills">
           {tile.host && <span className="cb-vbadge">{t("vcb_host")}</span>}
-          <span className="cb-vbadge">{t("vcb_virtual")}</span>
+          <VBadge label={t("vcb_virtual")} />
         </span>
         {tile.gift && <TileGift key={tile.gift.key} icon={tile.gift.icon} />}
         {onGift && (
           <button type="button" className="cb-gift cb-gift-red" aria-label="🎁"
             onClick={(e) => { e.stopPropagation(); onGift(); }}><GiftIcon /></button>
         )}
-        {onOpen && (
+        {/* The » "be the host" arrows are gone (Steve, 2026-11-24: "I don't think the 2 arrows on the screen is
+            needed, when the first real member joins the room he will be the host"). HOST_SWAP brings them back. */}
+        {HOST_SWAP && onOpen && (
           <button type="button" className="cb-vopen" aria-label={tile.name} title={tile.name}
             onClick={(e) => { e.stopPropagation(); onOpen(); }}>»</button>
         )}
-        <span className="cb-vname">
-          <span className="cb-vname-n">{tile.name}</span>
+        {/* The whole name, side to side, with the BBs a line above it (Steve, 2026-11-24: "Also please show the entire
+            members name from side to side, the BBs can move up a touch."). */}
+        <span className="cb-vname stacked">
           {tile.score != null && <b><PopNumber value={tile.score} /></b>}
+          <span className="cb-vname-n">{tile.name}</span>
         </span>
       </div>
     );
@@ -221,6 +225,26 @@ function CbTile({ tile, listening, onTap, onGift, onOpen, attach, hasVideo, vers
       )}
       <span className="cb-name">{tile.name}</span>
     </div>
+  );
+}
+
+const HOST_SWAP = false;
+
+/** The virtual pill as just "V" (Steve, 2026-11-24: "Virtual is too long of a word to be on the screen, we can shorten
+ *  that to a "V" when anyone click the V it will show them entire word"): a tap opens it to the whole word for a
+ *  few seconds, then it folds back to V. */
+function VBadge({ label }: { label: string }) {
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (!open) return;
+    const id = window.setTimeout(() => setOpen(false), 3000);
+    return () => window.clearTimeout(id);
+  }, [open]);
+  return (
+    <button type="button" className={`cb-vbadge cb-vshort${open ? " open" : ""}`} aria-label={label} title={label}
+      onClick={(e) => { e.stopPropagation(); setOpen((o) => !o); }}>
+      {open ? label : label.trim().charAt(0).toUpperCase()}
+    </button>
   );
 }
 

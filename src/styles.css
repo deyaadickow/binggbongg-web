@@ -2237,3 +2237,10 @@ body:has(.story-viewer) .get-app-bar { display: none; }
 .cb-vname b { font-size: 1.75em; line-height: 1; text-shadow: 0 1px 3px rgba(0,0,0,.95), 0 0 6px rgba(0,0,0,.6); }
 .rival-score { font-size: 26px; }
 .vcb-empty-score { font-size: 24px; }
+/* V pill (Steve, 2026-11-24): tappable, opens to the whole word. */
+.cb-vbadge.cb-vshort { pointer-events: auto; cursor: pointer; font: inherit; font-size: 9px; font-weight: 900; min-width: 16px; text-align: center; padding: 1px 4px; }
+.cb-grid.cols-2 .cb-vbadge.cb-vshort { font-size: 11px; }
+/* Name side to side, BBs a line above it on the right. */
+.cb-vname.stacked { flex-direction: column; align-items: stretch; gap: 0; }
+.cb-vname.stacked b { align-self: flex-end; margin-bottom: 1px; }
+.cb-vname.stacked .cb-vname-n { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; text-align: center; }
