@@ -29,7 +29,8 @@ import { useT } from "../lib/i18n";
 import { GridBattleLive, type GridBattleSource } from "../components/GridBattleScreen";
 import {
   cbReasonText, cbText, clock, countryBattleDayHeartbeat, countryBattlePath, countryGiftInfo, dayAsBattleState, joinCountryBattleDay,
-  leaveCountryBattleDay, localTime, sendCountryBattleDayGift, serverNow,
+  leaveCountryBattleDay, localTime, sendCountryBattleDayGift, serverNow, setCountryBattleRoomTiles,
+  type CbRoom, type CbRoomBrief,
 } from "../lib/countryBattle";
 import type { ChbBattler, ChbState } from "../lib/chatBattle";
 import { ShareResultButton } from "../components/CountryBoardBits";
@@ -115,7 +116,7 @@ function joinNote(t: T, st: ChbState, country: string): string | null {
 }
 
 /** Country Battle's side of the shared screen: its calls and its texts. */
-function makeSource(t: T, dayId: number, countryRef: { current: string }, calls: Pick<GridBattleSource, "heartbeat" | "join" | "leave" | "sendGift">, recapDemo?: string, onRivalJoin?: (country: string) => void): GridBattleSource {
+function makeSource(t: T, dayId: number, countryRef: { current: string }, calls: Pick<GridBattleSource, "heartbeat" | "join" | "leave" | "sendGift"> & Partial<Pick<GridBattleSource, "rooms">>, recapDemo?: string, onRivalJoin?: (country: string) => void): GridBattleSource {
   return {
     kind: "country",
     id: dayId,
@@ -155,20 +156,40 @@ function CountryBattleLive({ dayId, home, battlerHint, autoJoin, side }: { dayId
   const navigate = useNavigate();
   // The battle's country, for "This battle is for members in {country}." — off the last heartbeat.
   const countryRef = useRef("");
+  // Country Battle rooms: the room this screen shows, sent as room_no on every heartbeat/join (null until the server has
+  // said which — it picks the viewer's own room, else the lowest one not full). An answer for a room the screen has
+  // since moved away from is dropped (the next beat brings the right one).
+  const roomRef = useRef<number | null>(null);
   const source = useMemo(() => makeSource(t, dayId, countryRef, {
     heartbeat: async (userId, live) => {
-      const r = await countryBattleDayHeartbeat(userId, dayId, live);
+      const asked = roomRef.current;
+      const r = await countryBattleDayHeartbeat(userId, dayId, live, asked);
       if (!r.ok) return r;
+      if (roomRef.current !== asked) return { ok: false, reason: "stale_room", message: "", full: false };
       countryRef.current = r.data.country;
+      if (r.data.room) roomRef.current = r.data.room.no;
       return { ok: true, data: dayAsBattleState(r.data) };
     },
     join: async (userId) => {
-      const r = await joinCountryBattleDay(userId, dayId, side);
+      const r = await joinCountryBattleDay(userId, dayId, side, roomRef.current);
       if (!r.ok) return r;
+      // The room the server seated me in (the one watched may have filled): the screen switches to it.
+      if (r.data.room_no) roomRef.current = r.data.room_no;
       return { ok: true, data: { state: r.data.state ? dayAsBattleState(r.data.state) : null } };
     },
     leave: (userId) => leaveCountryBattleDay(userId, dayId),
     sendGift: (i) => sendCountryBattleDayGift({ ...i, dayId }),
+    rooms: {
+      pick: (no) => { roomRef.current = no; },
+      setTiles: async (myId, tiles) => {
+        const no = roomRef.current;
+        if (!no) return { ok: false, reason: "", message: "", full: false };
+        const r = await setCountryBattleRoomTiles(myId, dayId, no, tiles);
+        if (!r.ok) return r;
+        if (r.data.room) roomRef.current = r.data.room.no;
+        return { ok: true, data: dayAsBattleState(r.data) };
+      },
+    },
   }, undefined, (country) => navigate(countryBattlePath(dayId, { join: true, side: country }), { replace: true })), [t, dayId, side, navigate]);
   return <GridBattleLive source={source} home={home} battlerHint={battlerHint} autoJoin={autoJoin} />;
 }
@@ -265,13 +286,21 @@ function VirtualCbDemo({ rival, emptySide = false, country = "Philippines", tile
     // Every other virtual member has a photo; the rest show gold initials.
     const photoOf = (i: number) => (i % 2 === 0 ? VCB_PHOTOS[(i / 2) % VCB_PHOTOS.length] : null);
     let rows: Row[];
+    // &n=2..24 (Country Battle ROOMS, 2026-11-24): a fake `room` so the rooms screen can be checked without the server —
+    // room 1 has ONE live member (its host, with a photo) and starts at n tiles, the rest its fixed virtual players
+    // (no photos, each on its own scenery picture, no gift bursts); room 2 is all virtual, 4 tiles, no host. The viewer
+    // is room 1's host (is_host), so the "Tiles n ▾" picker works: it changes the tile count right here.
+    const demoRooms = { cur: 1, tiles: { 1: Math.max(2, Math.min(24, tiles)), 2: 4 } as Record<number, number> };
+    const roomPool = DEMO_NAMES.concat(VCB_ID_NAMES).slice(1, 1 + 23 + 4);
     if (!rival && tiles > 0) {
-      // &n=2..24: exactly that many virtual tiles, no photos, each on its own scenery picture, no gift bursts (the
-      // tile-layout sample sheet, Steve 2026-11-24).
-      rows = DEMO_NAMES.concat(VCB_ID_NAMES).slice(0, Math.min(24, tiles)).map((n, i) => ({
-        ...row(2101 + i, n, { live: false, photo: null, score: 2400 - i * 83 }),
-        scenery_image: `uploads/scenery/${sideA.toLowerCase().replace(/\s+/g, "-")}_${i + 1}.webp`,
-      }));
+      rows = [
+        { ...row(2100, DEMO_NAMES[0], { live: true, photo: vcbPhoto("/lp/live.jpg"), score: 4200 }), room_no: 1 },
+        ...roomPool.map((n, i) => ({
+          ...row(2101 + i, n, { live: false, photo: null, score: 2400 - i * 83 }),
+          scenery_image: `uploads/scenery/${sideA.toLowerCase().replace(/\s+/g, "-")}_${(i % 24) + 1}.webp`,
+          room_no: null,
+        })),
+      ];
     } else if (!rival) {
       // Whole country: ONE live member, 30 virtual — 23 of them fill the 24 tiles, moving on every ~4 s.
       rows = [
@@ -301,14 +330,25 @@ function VirtualCbDemo({ rival, emptySide = false, country = "Philippines", tile
         : { ...r, free_score: 0 }))
         .sort((x, y) => (y.real_score ?? 0) - (x.real_score ?? 0) || y.score - x.score)
         .map((r, i) => ({ ...r, rank: i + 1 }));
-      const live = battlers.filter((r) => !r.is_virtual).map((r) => r.user_id);
+      const roomMode = !rival && tiles > 0;
+      const live = roomMode ? (demoRooms.cur === 1 ? [2100] : []) : battlers.filter((r) => !r.is_virtual).map((r) => r.user_id);
+      // Room 1: the first (tiles - 1) of the pool; room 2: the last 4 — fixed, never rotating.
+      const roomVirtual = !roomMode ? [] : demoRooms.cur === 1
+        ? rows.slice(1, demoRooms.tiles[1]).map((r) => r.user_id)
+        : rows.slice(rows.length - demoRooms.tiles[2]).map((r) => r.user_id);
+      const room: CbRoom | null = roomMode ? {
+        no: demoRooms.cur, tiles: demoRooms.tiles[demoRooms.cur], host_user_id: demoRooms.cur === 1 ? 2100 : null,
+        real_count: demoRooms.cur === 1 ? 1 : 0, full: false, is_host: demoRooms.cur === 1, min_tiles: 2, max_tiles: 24,
+      } : null;
+      const roomsList: CbRoomBrief[] = roomMode ? [1, 2].map((no) => ({ no, tiles: demoRooms.tiles[no], real_count: no === 1 ? 1 : 0, full: false })) : [];
       const sideSum = (c: string, real: boolean) => battlers.filter((r) => r.side === c).reduce((n, r) => n + (real ? r.real_score ?? 0 : r.score), 0);
       return {
         contest_id: 0, name: rival ? `${sideA} vs ${sideB} · Tue, Nov 24` : `${sideA} · Tue, Nov 24`, shared: true, phase: "battle",
         server_now: new Date().toISOString(), created_at: opens, starts_at: starts, ends_at: ends, opens_at: opens, phase_ends_at: ends,
         room_name: null, room_open: true, starter: null, max_battlers: null, battler_count: live.length, live_count: live.length,
         spaces_left: null, unlimited: true, can_join_now: true, battlers, live,
-        virtual: rows.filter((r) => r.is_virtual).map((r) => r.user_id), virtual_battle: true,
+        virtual: roomMode ? roomVirtual : rows.filter((r) => r.is_virtual).map((r) => r.user_id), virtual_battle: true,
+        room, rooms: roomsList,
         finished: false, tie: false, top3: [], winner: null,
         rival: rival ? {
           a: { country: sideA, flag: emptySide ? "🇳🇵" : "🇵🇭", scenery_image: `uploads/scenery/${sideA.toLowerCase()}_1.webp`, score: sideSum(sideA, false), battlers: 17, real_score: sideSum(sideA, true) },
@@ -326,7 +366,16 @@ function VirtualCbDemo({ rival, emptySide = false, country = "Philippines", tile
       join: async () => ({ ok: false, reason: "demo", message: t("cb2_go_live_join"), full: false }),
       leave: async () => undefined,
       sendGift: async () => ({ status: false, message: t("cb_off") }),
+      ...(!rival && tiles > 0 ? {
+        rooms: {
+          pick: (no: number) => { demoRooms.cur = no; },
+          setTiles: async (_myId: number, n: number) => {
+            demoRooms.tiles[demoRooms.cur] = Math.max(2, Math.min(24, n));
+            return { ok: true as const, data: state() };
+          },
+        },
+      } : {}),
     }, undefined, () => undefined);
-  }, [t, rival, emptySide, sideA, sideB]);
+  }, [t, rival, emptySide, sideA, sideB, tiles]);
   return <GridBattleLive source={source} home={null} battlerHint={false} />;
 }

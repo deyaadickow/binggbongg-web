@@ -24,7 +24,7 @@ import { Confetti, Podium } from "./GameShow";
 import { SoloBattleStandingsSheet } from "./SoloBattle";
 import { CbHeader, CountryBattleGrid, StarredYouBar, heardIds, useRotation, useStarPins, useStarSignals, useVirtualWindow, type CbTileData } from "./BattleGrid";
 import { useCountryBattleRoom } from "../lib/countryBattleRoom";
-import { cbText, countShape, gridShape, serverNow, useTick } from "../lib/countryBattle";
+import { cbText, countShape, gridShape, serverNow, useTick, type CbRoom } from "../lib/countryBattle";
 import { countryFlag } from "../lib/allCountryBattles";
 import { chatChannel, ensureFirebaseSignIn, observeChat, observeLiveCaption, sendChat, type ChatMessage } from "../lib/firebase";
 import { haptic, sfx, stopGameSounds } from "../lib/gameSounds";
@@ -54,7 +54,7 @@ const SENT_NOTE_MS = 5000;
 /** The receiver's "say thanks!" waits longer — it has a button. */
 const GOT_NOTE_MS = 15000;
 /** Room kept free under the grid for the chat strip. */
-export const CHAT_RESERVE = 116;
+export const CHAT_RESERVE = 136;
 
 export const nameOf = (p: ChbPerson | null | undefined) => p?.name || p?.username || "";
 /** "@jimmy" where there is a username, else the name. */
@@ -104,6 +104,12 @@ export interface GridBattleSource {
   /** Country VS Country: join for one side — what the score bar's "Join for {country}" does. The
    *  empty side's box (no members from that country yet) offers the same button. */
   rivalJoin?: (country: string) => void;
+  /** Country Battle ROOMS (2026-11-24): the source keeps the room_no it sends on every heartbeat/join. `pick` switches
+   *  the room shown (the next heartbeat brings it); `setTiles` is the room host's tile count (setCountryBattleRoomTiles). */
+  rooms?: {
+    pick: (no: number) => void;
+    setTiles: (myId: number, tiles: number) => Promise<ChbResult<ChbState>>;
+  };
 }
 
 // ---- gift visibility (Steve, 2026-11-03: "Who ever is gifing a gift they will be able to see the
@@ -231,6 +237,9 @@ export function useGridBattleTiles(input: {
    *  as the HOST — the big top-left tile (their half's first in Country VS Country). Not in the state
    *  any more = the normal order. Your own tile (battler) and a followed-in home battler come first. */
   host?: number | null;
+  /** Country Battle ROOMS (2026-11-24): exactly `room.tiles` tiles — this room's live members in the server's order
+   *  (host first, then join order), then its fixed virtual players. No rotation, no pinning. Null = the old behaviour. */
+  room?: CbRoom | null;
 }) {
   const { battlers, live, publishers, myId, isBattler, home, giftTarget, spot } = input;
   const byId = useMemo(() => new Map(battlers.map((b) => [b.user_id, b])), [battlers]);
@@ -260,13 +269,14 @@ export function useGridBattleTiles(input: {
   );
   // Country VS Country: only once the server says who is on which side (an older server does not).
   const split = input.split && battlers.some((b) => b.side) ? input.split : null;
+  const room = input.room && !split ? input.room : null;
   const inA = (id: number) => byId.get(id)?.side === split?.a;
   const pinA = pinnedId != null && split ? inA(pinnedId) : false;
   const poolA = useMemo(() => (split ? pool.filter(inA) : []), [split, pool, byId]); // eslint-disable-line react-hooks/exhaustive-deps
   const poolB = useMemo(() => (split ? pool.filter((id) => !inA(id)) : []), [split, pool, byId]); // eslint-disable-line react-hooks/exhaustive-deps
   const spotIn = (p: number[]) => (spot != null && p.includes(spot) ? spot : null);
   const pinnedSlot = pinnedId != null ? 1 : 0;
-  const shownAll = useRotation(split ? 0 : liveShape.cap - pinnedSlot, split ? [] : pool, hold, split ? null : spotIn(pool));
+  const shownAll = useRotation(split || room ? 0 : liveShape.cap - pinnedSlot, split || room ? [] : pool, hold, split || room ? null : spotIn(pool));
   const shownA = useRotation(split ? VIRTUAL_HALF_FILL - (pinA ? 1 : 0) : 0, poolA, hold, spotIn(poolA));
   const shownB = useRotation(split ? VIRTUAL_HALF_FILL - (pinnedId != null && !pinA ? 1 : 0) : 0, poolB, hold, spotIn(poolB));
   // The virtual members not live right now (a real tile always wins), in the server's order.
@@ -282,7 +292,7 @@ export function useGridBattleTiles(input: {
   const liveCountAll = shownAll.length + pinnedSlot;
   const liveCountA = shownA.length + (pinA ? 1 : 0);
   const liveCountB = shownB.length + (pinnedId != null && !pinA ? 1 : 0);
-  const vShownAll = useVirtualWindow(split ? [] : vIds, input.byCount && vIds.length ? VIRTUAL_FILL - liveCountAll : 0, paused);
+  const vShownAll = useVirtualWindow(split || room ? [] : vIds, !room && input.byCount && vIds.length ? VIRTUAL_FILL - liveCountAll : 0, paused);
   const vShownA = useVirtualWindow(vA, VIRTUAL_HALF_FILL - liveCountA, paused);
   const vShownB = useVirtualWindow(vB, VIRTUAL_HALF_FILL - liveCountB, paused);
 
@@ -293,10 +303,15 @@ export function useGridBattleTiles(input: {
       userId: pinnedId, name: nameOf(byId.get(pinnedId)), photo: byId.get(pinnedId)?.profile_image ?? null,
       scenery: byId.get(pinnedId)?.scenery_image ?? null,
       own: isBattler, home: !isBattler, spot: spot === pinnedId,
+      ...(input.byCount ? { score: byId.get(pinnedId)?.score ?? 0 } : {}),
     }];
   function liveTileOf(id: number): CbTileData {
     const b = byId.get(id);
-    return { userId: id, name: nameOf(b), photo: b?.profile_image ?? null, scenery: b?.scenery_image ?? null, spot: spot === id, starred: star.pins.includes(id) };
+    return {
+      userId: id, name: nameOf(b), photo: b?.profile_image ?? null, scenery: b?.scenery_image ?? null, spot: spot === id, starred: star.pins.includes(id),
+      // Design B (2026-11-24): every Country Battle tile shows its BBs, big and gold, top centre.
+      ...(input.byCount ? { score: b?.score ?? 0 } : {}),
+    };
   }
   function virtualTileOf(id: number): CbTileData {
     const b = byId.get(id);
@@ -308,10 +323,28 @@ export function useGridBattleTiles(input: {
     a: [...(pinA ? pinnedTile : []), ...shownA.map(liveTile), ...vShownA.map(virtualTile)],
     b: [...(pinnedId != null && !pinA ? pinnedTile : []), ...shownB.map(liveTile), ...vShownB.map(virtualTile)],
   } : null;
+  if (room) {
+    // Live first in the server's order (anyone already publishing whom the heartbeat has not caught up with after them),
+    // then the room's virtual players in their fixed order, filling up to exactly room.tiles.
+    const order: number[] = [];
+    const seen = new Set<number>();
+    for (const id of live) if (byId.has(id) && !seen.has(id)) { order.push(id); seen.add(id); }
+    for (const id of publishers) { const b = byId.get(id); if (b && !b.left && !seen.has(id)) { order.push(id); seen.add(id); } }
+    const vRoom = (input.virtual ?? []).filter((id) => byId.has(id) && !seen.has(id));
+    const free = Math.max(0, room.tiles - order.length);
+    const roomTiles: CbTileData[] = [
+      ...order.map((id): CbTileData => ({
+        ...liveTileOf(id), own: isBattler && id === myId, home: !isBattler && id === home, host: id === room.host_user_id,
+      })),
+      ...vRoom.slice(0, free).map(virtualTileOf),
+    ];
+    const roomShown = order.filter((id) => id !== myId);
+    return { tiles: roomTiles, halves: null, split: null, stage, shape: countShape(roomTiles.length), shown: roomShown, pinnedId: null as number | null, star, byId, pool, room };
+  }
   const tiles: CbTileData[] = halves ? [...halves.a, ...halves.b] : [...pinnedTile, ...shownAll.map(liveTile), ...vShownAll.map(virtualTile)];
   const shown = split ? [...shownA, ...shownB] : shownAll;
   const shape = input.byCount ? countShape(tiles.length) : liveShape;
-  return { tiles, halves, split, stage, shape, shown, pinnedId, star, byId, pool };
+  return { tiles, halves, split, stage, shape, shown, pinnedId, star, byId, pool, room: null as CbRoom | null };
 }
 
 /** The live chat of one room, read from Firestore like the live room's. */
@@ -488,6 +521,9 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
   const [spot, setSpot] = useState<number | null>(null);
   const [endNote, setEndNote] = useState<string | null>(null);
   const [endShown, setEndShown] = useState(false);
+  /** Country Battle rooms: the host's Tiles picker is open. */
+  const [tilesOpen, setTilesOpen] = useState(false);
+  const [tilesBusy, setTilesBusy] = useState(false);
 
   const roleRef = useRef(role);
   roleRef.current = role;
@@ -529,6 +565,9 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
   const ended = st?.phase === "ended";
   const roomName = st?.room_open ? st.room_name : null;
   const isBattler = role === "guest";
+  // Country Battle rooms: the room this screen shows (null = an older server, or Country VS Country — the old screen).
+  const room = source.kind === "country" && !st?.rival ? st?.room ?? null : null;
+  const rooms = room ? st?.rooms ?? [] : [];
 
   const [visibleIds, setVisibleIds] = useState<number[]>([]);
   const [heard, setHeard] = useState<number[]>([]);
@@ -560,6 +599,7 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
     virtual: source.kind === "country" ? st?.virtual ?? [] : [],
     split: source.kind === "country" && st?.rival ? { a: st.rival.a.country, b: st.rival.b.country } : null,
     host: source.kind === "country" ? hostParam : null,
+    room: source.kind === "country" ? st?.room ?? null : null,
   });
   const { shown, pinnedId } = grid;
   // Sound follows the star: who this screen hears, and who starred me.
@@ -717,6 +757,30 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
     } else navigate(`/profile/${id}`);
   }, [st, publisherIds, myId, navigate]);
   useEffect(() => () => window.clearTimeout(spotTimer.current), []);
+
+  // ---- Country Battle rooms: switch room (viewers), the host's tile count ----
+  const pickRoom = (no: number) => {
+    if (!srcRef.current.rooms || isBattler || no === room?.no) return;
+    srcRef.current.rooms.pick(no);
+    setListen(null);
+    setSpot(null);
+    setGiftTarget(null);
+    beat();
+  };
+  const setRoomTiles = async (n: number) => {
+    const rs = srcRef.current.rooms;
+    if (!rs || !room?.is_host || tilesBusy) return;
+    setTilesBusy(true);
+    try {
+      const r = await rs.setTiles(myIdRef.current, n);
+      if (r.ok) { setSt(r.data); setTilesOpen(false); }
+      else showGoldAlert(srcRef.current.reasonText(r.reason, r.message));
+    } catch (e) {
+      showGoldAlert((e as Error).message);
+    } finally {
+      setTilesBusy(false);
+    }
+  };
 
   // ---- join / rejoin ----
   async function join() {
@@ -1001,6 +1065,27 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
       {source.topExtra?.(st)}
       {roomHook.error && <Notice error>{roomHook.error}</Notice>}
       <StarredYouBar ids={awaitingBack} nameOf={(id) => nameOf(grid.byId.get(id))} onStarBack={(id) => grid.star.toggle(id)} />
+      {room && (rooms.length > 1 || room.is_host) && (
+        // Country Battle rooms: the Room chips (when there is more than one; a battler stays in their own) and, for the
+        // room's host only, the small "Tiles 4 ▾" pill on the right.
+        <div className="cbr-bar">
+          <div className="cbr-rooms" role="tablist" aria-label={t("cbr_rooms")}>
+            {rooms.length > 1 && rooms.map((r) => (
+              <button key={r.no} type="button" role="tab" aria-selected={r.no === room.no}
+                className={`cbr-chip${r.no === room.no ? " on" : ""}${r.full ? " full" : ""}`}
+                disabled={isBattler && r.no !== room.no} onClick={() => pickRoom(r.no)}
+                title={r.full ? t("cbr_full") : undefined}>
+                {cbText(t("cbr_room"), { n: r.no })}
+              </button>
+            ))}
+          </div>
+          {room.is_host && srcRef.current.rooms && (
+            <button type="button" className="cbr-tiles" onClick={() => setTilesOpen(true)} aria-haspopup="dialog">
+              {cbText(t("cbr_tiles"), { n: room.tiles })} ▾
+            </button>
+          )}
+        </div>
+      )}
       {/* No "Waiting for members to go live" box over a battler's camera (Steve, 2026-11-21: "please
           remove this banner"). With no tiles at all — nobody live yet — a card says so instead of a
           blank black page (Steve, 2026-11-22), with a way to the other countries' battles. */}
@@ -1067,9 +1152,19 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
               );
               return <div className="vcb-halves">{half(grid.halves.a, st.rival.a, "a", 1)}{half(grid.halves.b, st.rival.b, "b", 1)}</div>;
             }
+            // Design B: tiny tiles (more than 12) drop the gift box — a tap on the tile opens the gift sheet instead (a
+            // battler's tap on a live tile still stars it, which is how they hear someone).
+            const tiny = source.kind === "country" && grid.tiles.length > 12;
+            const tinyTap = (id: number) => {
+              if (id === myId) return;
+              const liveNow = st.live.includes(id) || publisherIds.includes(id);
+              if (isBattler && liveNow) { grid.star.toggle(id); return; }
+              onGift(id);
+            };
             return (
               <CountryBattleGrid stage={grid.stage} shape={source.kind === "country" ? grid.shape : undefined} tiles={marked(grid.tiles)} listen={heardNow} reserve={CHAT_RESERVE + ACTION_BAR_RESERVE} phoneFullWidth
-                onTap={onTap} onGift={onGift} onOpen={onOpen}
+                onTap={tiny ? tinyTap : onTap} onGift={onGift} onOpen={onOpen} giftBox={!tiny}
+                hostId={room ? room.host_user_id : undefined}
                 attach={roomHook.attachVideo} hasVideo={roomHook.hasVideo} version={roomHook.version} />
             );
           })()
@@ -1114,6 +1209,10 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
           </div>
         </div>
       )}
+      {tilesOpen && room?.is_host && (
+        <RoomTilesSheet current={room.tiles} live={room.real_count} min={Math.max(2, room.min_tiles, room.real_count)} max={Math.min(24, room.max_tiles)}
+          busy={tilesBusy} onPick={(n) => { if (n === room.tiles) setTilesOpen(false); else void setRoomTiles(n); }} onClose={() => setTilesOpen(false)} />
+      )}
       {battlesOpen && (
         <BattlesMenu showLeaderboard={st.phase !== "upcoming"} onClose={() => setBattlesOpen(false)}
           onLeaderboard={() => { setBattlesOpen(false); setBoardOpen(true); }}
@@ -1149,6 +1248,28 @@ export function GridBattleLive({ source, home, battlerHint, autoJoin, demoUserId
           finished={st.finished} onPick={spotlight} footer={`${t("chb_tap_spotlight")} · ${t("scored_by_the_gift_coins_each_person_rec")}`} />
       )}
       {endShown && <GridBattleEnd st={st} note={endNote} extra={source.endExtra?.(st, () => { holdEnd.current = true; })} onClose={() => { afterPodium.current = true; mountedRef.current = false; leftRef.current = true; goBack(); }} />}
+    </div>
+  );
+}
+
+/** Country Battle rooms: the host's tile count, 2..24 — gold on black, like the rest of the battle's menus. Counts under
+ *  the members already live in the room are greyed out. */
+function RoomTilesSheet({ current, live, min, max, busy, onPick, onClose }: { current: number; live: number; min: number; max: number; busy: boolean; onPick: (n: number) => void; onClose: () => void }) {
+  const { t } = useT();
+  const counts = Array.from({ length: 23 }, (_, i) => i + 2);
+  return (
+    <div className="cb-menu-backdrop" onClick={onClose} role="dialog" aria-modal="true" aria-label={t("cbr_tiles_title")}>
+      <div className="cb-menu cbr-sheet" onClick={(e) => e.stopPropagation()}>
+        <div className="cb-menu-title">{t("cbr_tiles_title")}</div>
+        <div className="cbr-grid">
+          {counts.map((n) => (
+            <button key={n} type="button" className={`cbr-n${n === current ? " on" : ""}`} disabled={busy || n < min || n > max}
+              aria-pressed={n === current} onClick={() => onPick(n)}>{n}</button>
+          ))}
+        </div>
+        <p className="cbr-hint">{cbText(t("cbr_tiles_hint"), { n: live })}</p>
+        <button type="button" className="btn ghost" style={{ width: "100%", marginTop: 4 }} onClick={onClose}>{t("close")}</button>
+      </div>
     </div>
   );
 }

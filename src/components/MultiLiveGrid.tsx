@@ -1,10 +1,11 @@
 // Multi-live 24 (Steve, 2026-11-05) — the live room's grid for rooms over 4, plus the room battle.
 //
 // The room's own 4-tile grid stays exactly as it is for rooms of 2–4. A room the host made bigger
-// swaps it for this: the speakers side by side on the top row (host first), everyone else below in
-// the server's order, and on every tile the Chat Battle tile chrome (name on a thin dark strip,
-// gold-ringed gift box top-right on every tile but your own — components/BattleGrid's cb-tile
-// classes) plus the speaker icon: sound on, muted, or the yellow raised hand.
+// swaps it for this: since 2026-11-24 (design B) ONE grid in the server's order (host first) that
+// grows a tile per guest up to 24, the host tile spanning any spot the last row would leave empty,
+// and on every tile the Country Battle tile chrome (components/BattleGrid's TileChrome: BBs top
+// centre during a room battle, Host pill bottom-left, speaker + red gift box bottom-right, the full
+// name along the bottom). The speaker icon: sound on, muted, or the yellow raised hand.
 //
 // Mirrors Android's view/livestream/MultiLiveRoom.kt (same words, same taps).
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -14,7 +15,8 @@ import { useT } from "../lib/i18n";
 import type { LiveTile } from "../lib/live";
 import { mlName, mmss, type MlMember, type MlState, type RoomBattle } from "../lib/multiLive";
 import { Confetti, Podium } from "./GameShow";
-import { cbText } from "../lib/countryBattle";
+import { cbText, countShape, hostSpan } from "../lib/countryBattle";
+import { HostPill, TileChrome } from "./BattleGrid";
 
 /** A dark tint per member, so photo-less tiles are told apart at a glance (BattleGrid's). */
 function tileBackdrop(id: number): string {
@@ -22,7 +24,9 @@ function tileBackdrop(id: number): string {
   return `linear-gradient(160deg, hsl(${hue} 35% 22%), hsl(${(hue + 40) % 360} 30% 9%))`;
 }
 
-function MlTile({ m, me, tile, onSpeaker, onTap, onGift, pulse, score, bombed }: {
+function MlTile({ m, me, tile, onSpeaker, onTap, onGift, pulse, score, bombed, span }: {
+  /** Design B: the host tile over the spots the last row would leave empty (hostSpan). */
+  span?: { cols: number; rows: number; alone: boolean };
   m: MlMember;
   me: boolean;
   tile: LiveTile | undefined;
@@ -49,6 +53,10 @@ function MlTile({ m, me, tile, onSpeaker, onTap, onGift, pulse, score, bombed }:
   return (
     <div className={`cb-tile ml-tile${me ? " own" : ""}${m.is_host ? " host" : ""}${pulse && m.is_speaker ? " ml-pulse" : ""}${tile?.speaking && m.is_speaker ? " listening" : ""}`}
       role="button" tabIndex={0} onClick={onTap} data-uid={m.user_id}
+      style={span && (span.cols > 1 || span.rows > 1) ? {
+        gridColumn: `span ${span.cols}`, gridRow: `span ${span.rows}`,
+        ...(span.alone ? { aspectRatio: `${span.cols * 3} / ${span.rows * 4}` } : { aspectRatio: "auto", alignSelf: "stretch" }),
+      } : undefined}
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onTap(); } }}>
       {realPhoto
         ? <img className="cb-photo" src={photo} alt="" loading="lazy" onError={(e) => ((e.target as HTMLImageElement).style.display = "none")} />
@@ -59,20 +67,16 @@ function MlTile({ m, me, tile, onSpeaker, onTap, onGift, pulse, score, bombed }:
       {/* Steve, 2026-11-06: "A small bomb will show in a corner of the tile for anyone that
           receives it for 40 seconds." Top-left; the score moves over beside it. */}
       {bombed && <span className="ml-bomb" aria-label="💣">💣</span>}
-      {score !== null && <span className={`ml-score${bombed ? " bombed" : ""}`}>🪙 {score.toLocaleString()}</span>}
-      {/* Steve, 2026-11-06: "Gift box, speaker and watchers/eye should be next to each other on
-          the bottom right of the tile" — speaker then gift, side by side above the name strip. */}
-      <div className="ml-acts">
-        <button type="button" className={`ml-spk ${cls}`} aria-label={icon}
-          onClick={(e) => { e.stopPropagation(); onSpeaker(); }}>
-          {icon}{m.hand_raised && !m.is_speaker && m.hand_order ? <small>{m.hand_order}</small> : null}
-        </button>
-        {onGift && (
-          <button type="button" className="cb-gift" aria-label="🎁"
-            onClick={(e) => { e.stopPropagation(); onGift(); }}>🎁</button>
-        )}
-      </div>
-      <span className="cb-name">{m.is_host ? "👑 " : ""}{name}</span>
+      {/* Design B (2026-11-24): the room battle's BBs big and gold at the top centre (only while one runs — the only
+          per-member BB figure the live has); bottom-left the gold Host pill; bottom-right the speaker and the red gift
+          box; the full name along the bottom. No V here — a live room has no virtual members. */}
+      <TileChrome score={score} pill={m.is_host ? <HostPill /> : null} onGift={onGift} name={name}
+        extra={(
+          <button type="button" className={`ml-spk ${cls}`} aria-label={icon}
+            onClick={(e) => { e.stopPropagation(); onSpeaker(); }}>
+            {icon}{m.hand_raised && !m.is_speaker && m.hand_order ? <small>{m.hand_order}</small> : null}
+          </button>
+        )} />
     </div>
   );
 }
@@ -96,26 +100,29 @@ export function MultiLiveGrid({ state, myId, tiles, pulse, battle, bombed, onSpe
   isHost: boolean;
 }) {
   const byUser = useMemo(() => new Map(tiles.filter((x) => x.userId != null).map((x) => [x.userId as number, x])), [tiles]);
-  const top = state.members.filter((m) => m.row === "top");
-  const rest = state.members.filter((m) => m.row !== "top");
   const scores = useMemo(() => {
     if (!battle || battle.finished) return null;
     return new Map(battle.leaderboard.map((r) => [r.user_id, r.score]));
   }, [battle]);
-  // 4 across; the whole grid is (4*3):(rows*4), as wide as the page allows but never so wide
-  // that the last row falls under the bottom of a desktop window (a phone uses the full width).
-  const rows = 1 + Math.ceil(rest.length / 4);
-  const ratio = 12 / (rows * 4);
-  const tileFor = (m: MlMember) => (
+  // Design B (Steve, 2026-11-24): the live starts SOLO — one full tile — and every guest adds a tile, up to 24, with no
+  // empty seats: one grid in the server's order (host first), shaped by how many are on camera (the Country Battle
+  // shapes), the host's tile spanning whatever the last row would leave empty. No tile picker.
+  const members = state.members;
+  const shape = countShape(members.length);
+  const cols = shape.cols;
+  const rows = Math.max(1, Math.ceil(members.length / cols));
+  const span = hostSpan(members.length, cols);
+  const ratio = (cols * 3) / (rows * 4);
+  const tileFor = (m: MlMember, i: number) => (
     <MlTile key={m.user_id} m={m} me={m.user_id === myId} tile={byUser.get(m.user_id)}
       onSpeaker={() => onSpeaker(m)} onTap={() => onTap(m)}
       onGift={m.user_id === myId ? null : () => onGift(m.user_id)}
-      pulse={pulse} score={scores ? scores.get(m.user_id) ?? 0 : null} bombed={bombed.has(m.user_id)} />
+      pulse={pulse} score={scores ? scores.get(m.user_id) ?? 0 : null} bombed={bombed.has(m.user_id)}
+      span={i === 0 ? span : undefined} />
   );
   return (
     <div className="ml-stage" style={{ width: `min(100%, max(320px, calc((100vh - 230px) * ${ratio.toFixed(4)})))` }}>
-      <div className="cb-grid ml-top" style={{ gridTemplateColumns: "repeat(4, minmax(0, 1fr))" }}>{top.map(tileFor)}</div>
-      {rest.length > 0 && <div className="cb-grid ml-rest" style={{ gridTemplateColumns: "repeat(4, minmax(0, 1fr))" }}>{rest.map(tileFor)}</div>}
+      <div className={`cb-grid ml-grid cols-${cols}`} style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>{members.map(tileFor)}</div>
       {isHost && state.hands.length > 0 && (
         <button type="button" className="ml-hands-pill" onClick={(e) => { e.stopPropagation(); onHands(); }}>✋ {state.hands.length}</button>
       )}

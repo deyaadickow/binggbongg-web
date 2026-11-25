@@ -2962,4 +2962,11 @@ export const fil = {
   // Live button bar (Steve, 2026-11-24).
   lbq_next: "Susunod na laban",
   lbq_prev: "Nakaraang laban",
+  // Country Battle rooms (Steve, 2026-11-24).
+  cbr_tiles: "Tiles {n}",
+  cbr_tiles_title: "Mga tile sa room na ito",
+  cbr_tiles_hint: "Ang host lang ng room ang puwedeng magpalit nito. Hindi bababa sa mga miyembrong naka-live sa room ({n}).",
+  cbr_room: "Room {n}",
+  cbr_rooms: "Mga Room",
+  cbr_full: "Puno",
 };

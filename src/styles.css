@@ -2244,3 +2244,53 @@ body:has(.story-viewer) .get-app-bar { display: none; }
 .cb-vname.stacked { flex-direction: column; align-items: stretch; gap: 0; }
 .cb-vname.stacked b { align-self: flex-end; margin-bottom: 1px; }
 .cb-vname.stacked .cb-vname-n { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; text-align: center; }
+
+/* ---- Design B tiles (Steve approved the mockup, 2026-11-24): Country Battle rooms + Go Live multi-guest ----------
+   BBs big and gold at the TOP CENTRE; along the bottom, just above the full name, the Host / V pill on the left and the
+   red gift box on the right. Sizes follow the tile's own width (cb-tile is an inline-size container). */
+.cb-tile .cb-bbs { position: absolute; top: 3px; left: 0; right: 0; z-index: 2; text-align: center; pointer-events: none;
+  color: var(--gold); font-weight: 900; line-height: 1; font-size: clamp(13px, 15cqw, 34px); font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 3px rgba(0,0,0,.95), 0 0 6px rgba(0,0,0,.7); }
+.cb-tile .cb-bbs .pop-num.rolling.popping { transform-origin: center top; }
+.cb-tile .cb-foot { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; display: flex; flex-direction: column; gap: 2px;
+  padding: 14px 4px 3px; background: linear-gradient(to top, rgba(0,0,0,.88) 30%, rgba(0,0,0,0)); pointer-events: none; }
+.cb-tile .cb-foot-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 3px; min-height: 0; }
+.cb-tile .cb-foot-l, .cb-tile .cb-foot-r { display: flex; align-items: flex-end; gap: 3px; min-width: 0; }
+.cb-tile .cb-foot-l > *, .cb-tile .cb-foot-r > * { pointer-events: auto; }
+.cb-tile .cb-foot .cb-vbadge { position: static; font-size: clamp(9px, 7.5cqw, 13px); padding: 1px 6px; }
+.cb-tile .cb-foot .cb-hostpill { background: var(--gold); color: #000; border-color: var(--gold); pointer-events: none; }
+.cb-grid .cb-tile .cb-foot .cb-gift { position: static; top: auto; right: auto; width: clamp(20px, 19cqw, 36px); height: clamp(20px, 19cqw, 36px); flex: none; }
+.cb-tile .cb-fname { display: block; color: #fff; font-size: clamp(9px, 8.5cqw, 15px); line-height: 1.2; font-weight: 600; text-align: center;
+  overflow-wrap: anywhere; text-shadow: 0 1px 2px rgba(0,0,0,.9); }
+.cb-tile.own .cb-fname { color: var(--gold); font-weight: 800; }
+/* The gift box left the top-right corner: the 🔇 goes there; the star and the ear stay top-left under nothing. */
+.cb-grid .cb-tile .cb-muted { top: 3px; right: 3px; bottom: auto; }
+.cb-tile.host .cb-star, .cb-tile.host .cb-ear { top: 3px; }
+.cb-tile .cb-starme { top: calc(clamp(13px, 15cqw, 34px) + 6px); }
+
+/* Country Battle rooms: the Room chips and the host's "Tiles 4 ▾" pill, one small row above the tiles. */
+.cbr-bar { display: flex; align-items: center; gap: 6px; max-width: 980px; margin: 0 auto 4px; min-height: 26px; }
+.cbr-rooms { flex: 1; min-width: 0; display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+.cbr-rooms::-webkit-scrollbar { display: none; }
+.cbr-chip, .cbr-tiles { flex: none; height: 24px; padding: 0 10px; border-radius: 999px; background: #000; border: 1.5px solid var(--gold);
+  color: var(--gold); font: inherit; font-size: 12px; font-weight: 800; line-height: 1; cursor: pointer; white-space: nowrap; }
+.cbr-chip.on { background: var(--gold); color: #000; }
+.cbr-chip.full:not(.on) { opacity: .7; }
+.cbr-chip:disabled { cursor: default; opacity: .45; }
+.cbr-tiles { margin-left: auto; }
+.cbr-tiles:hover, .cbr-chip:not(:disabled):not(.on):hover { border-color: var(--gold-bright, #FFD84A); color: var(--gold-bright, #FFD84A); }
+.cbr-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; margin: 6px 0 8px; }
+.cbr-n { height: 38px; border-radius: 10px; background: #000; border: 1.5px solid var(--gold); color: var(--gold); font: inherit; font-size: 15px; font-weight: 800; cursor: pointer; }
+.cbr-n.on { background: var(--gold); color: #000; }
+.cbr-n:disabled { opacity: .3; cursor: default; }
+.cbr-n:not(:disabled):not(.on):hover { border-color: var(--gold-bright, #FFD84A); }
+.cbr-hint { margin: 0 0 8px; color: var(--gold-bright, #FFD84A); font-size: 12px; text-align: center; opacity: .85; }
+
+/* Chat keeps room for 5 lines under the tiles. */
+.chb-chat-log { height: 90px; }
+
+/* Go Live multi-guest (design B): one grid that grows a tile per guest, the host tile over any spot left empty. */
+.ml-grid { gap: 3px; }
+.ml-tile .cb-foot-r .ml-spk { position: static; }
+/* Go Live with 2 guests (3 on camera): no empty seat — the host's tile (first) takes the whole top row. */
+.video-grid.count-3 > .tile:not(.tile ~ .tile) { grid-column: span 2; }

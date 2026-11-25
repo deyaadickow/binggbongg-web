@@ -168,8 +168,29 @@ export function rivalOf(v: unknown): CbRival | null {
   return { a, b, winner: typeof r.winner === "string" && r.winner ? r.winner : null, label: String(r.label ?? `${a.country} vs ${b.country}`) };
 }
 
+/**
+ * Country Battle ROOMS (Steve, 2026-11-24): a battle day is split into rooms of 2..24 tiles — real live members of that
+ * room first, then fixed virtual players (no rotation). The first real member is the room's host; only the host can
+ * change the tile count. `room` is the room this screen shows; older servers send none (the old behaviour).
+ */
+export interface CbRoom {
+  no: number;
+  tiles: number;
+  host_user_id: number | null;
+  real_count: number;
+  full: boolean;
+  /** The viewer is this room's host — the only one who may change `tiles`. */
+  is_host: boolean;
+  min_tiles: number;
+  max_tiles: number;
+}
+export interface CbRoomBrief { no: number; tiles: number; real_count: number; full: boolean }
+
 /** countryBattleDayHeartbeat's `data` (§5) — the Chat Battle state shape plus the day. */
 export interface CbDayState {
+  /** Country Battle rooms: the room shown (null/absent = an older server) and every room of the day, by no. */
+  room?: CbRoom | null;
+  rooms?: CbRoomBrief[];
   /** "rival" = a Rival Battle, with `rival`. */
   kind?: "country" | "rival";
   rival?: CbRival | null;
@@ -210,6 +231,8 @@ export interface CbDayState {
     scenery_image?: string | null;
     /** Country VS Country: which country this battler fights for. */
     side?: string | null;
+    /** Country Battle rooms: the room this battler is in (null = none). */
+    room_no?: number | null;
   })[];
   live: number[];
   /**
@@ -346,6 +369,34 @@ function fail(res: ApiResponse<unknown> | null): Fail {
 
 const numList = (v: unknown): number[] => (Array.isArray(v) ? v.map(Number).filter((x) => x > 0) : []);
 
+/** The room off the wire, or null when the server sends none (older server) or it is malformed. */
+export function roomOf(v: unknown): CbRoom | null {
+  if (!v || typeof v !== "object") return null;
+  const r = v as Record<string, unknown>;
+  const no = Number(r.no);
+  const tiles = Number(r.tiles);
+  if (!(no >= 1) || !(tiles >= 1)) return null;
+  const host = Number(r.host_user_id);
+  const min = Number(r.min_tiles);
+  const max = Number(r.max_tiles);
+  return {
+    no, tiles,
+    host_user_id: host > 0 ? host : null,
+    real_count: Math.max(0, Number(r.real_count) || 0),
+    full: flag(r.full),
+    is_host: flag(r.is_host),
+    min_tiles: min >= 1 ? min : 2,
+    max_tiles: max >= 1 ? max : 24,
+  };
+}
+function roomsOf(v: unknown): CbRoomBrief[] {
+  if (!Array.isArray(v)) return [];
+  return v.map((x) => {
+    const r = (x ?? {}) as Record<string, unknown>;
+    return { no: Number(r.no), tiles: Number(r.tiles) || 0, real_count: Math.max(0, Number(r.real_count) || 0), full: flag(r.full) };
+  }).filter((r) => r.no >= 1).sort((a, b) => a.no - b.no);
+}
+
 /** Tidy one heartbeat/join state: arrays present, ids numbers. */
 function cleanDay(d: CbDayState): CbDayState {
   return {
@@ -356,6 +407,8 @@ function cleanDay(d: CbDayState): CbDayState {
     live: numList(d.live),
     virtual: numList(d.virtual),
     virtual_battle: flag(d.virtual_battle),
+    room: roomOf(d.room),
+    rooms: roomsOf(d.rooms),
     top3: Array.isArray(d.top3) ? d.top3 : [],
     me: d.me ?? { user_id: 0, is_battler: false, is_live: false, left: false, score: null, rank: null, home_room_name: null, can_join: false, join_reason: null },
   };
@@ -388,6 +441,8 @@ export function dayAsBattleState(d: CbDayState): ChbState {
     live: d.live,
     virtual: d.virtual ?? [],
     virtual_battle: !!d.virtual_battle,
+    room: d.room ?? null,
+    rooms: d.rooms ?? [],
     winner: d.winner,
     tie: false,
     finished: d.finished,
@@ -400,8 +455,8 @@ export function dayAsBattleState(d: CbDayState): ChbState {
 }
 
 /** The Country Battle page: switch, countries, today's (or the next) battle, yesterday's top 3. */
-export async function fetchCountryBattleDaily(userId: number, country?: string): Promise<CbDaily> {
-  const res = await post<CbDaily>("fetchCountryBattleDaily", { user_id: userId, ...(country ? { country } : {}) });
+export async function fetchCountryBattleDaily(userId: number, country?: string, roomNo?: number | null): Promise<CbDaily> {
+  const res = await post<CbDaily>("fetchCountryBattleDaily", { user_id: userId, ...(country ? { country } : {}), ...(roomNo && roomNo >= 1 ? { room_no: roomNo } : {}) });
   const d = res.status && res.data ? res.data : null;
   noteServerNow(d?.server_now);
   if (!d) return { enabled: false, country: null, countries: [], battle: null, next_starts_at: null, last: null, server_now: "", me: null, rival_battles: [] };
@@ -416,19 +471,33 @@ export async function fetchCountryBattleDaily(userId: number, country?: string):
 }
 
 /** The 5-second poll (§5). `live` = 1 while this browser is a BATTLER on the battle screen. */
-export async function countryBattleDayHeartbeat(userId: number, dayId: number, live: boolean): Promise<ChbResult<CbDayState>> {
-  const res = await post<CbDayState>("countryBattleDayHeartbeat", { user_id: userId, day_id: dayId, live: live ? 1 : 0 });
+export async function countryBattleDayHeartbeat(userId: number, dayId: number, live: boolean, roomNo?: number | null): Promise<ChbResult<CbDayState>> {
+  // `room_no`: the room this screen shows (Country Battle rooms); without it the server picks.
+  const res = await post<CbDayState>("countryBattleDayHeartbeat", { user_id: userId, day_id: dayId, live: live ? 1 : 0, ...(roomNo && roomNo >= 1 ? { room_no: roomNo } : {}) });
   if (!res.status || !res.data) return fail(res);
   noteServerNow(res.data.server_now);
   return { ok: true, data: cleanDay(res.data) };
 }
 
 /** Join, or rejoin, from the lobby until the end (§4). Over the cap: reason "full". */
-export async function joinCountryBattleDay(userId: number, dayId: number, side?: string | null): Promise<ChbResult<{ room_name: string; rejoined: boolean; state: CbDayState | null }>> {
-  // `side`: a Rival Battle's country to fight for (only the first join counts).
-  const res = await post<{ room_name: string; role?: string; rejoined?: boolean; country_battle?: CbDayState }>("joinCountryBattleDay", { user_id: userId, day_id: dayId, ...(side ? { side } : {}) });
+export async function joinCountryBattleDay(userId: number, dayId: number, side?: string | null, roomNo?: number | null): Promise<ChbResult<{ room_name: string; rejoined: boolean; room_no: number | null; state: CbDayState | null }>> {
+  // `side`: a Rival Battle's country to fight for (only the first join counts). `room_no`: the room the screen shows —
+  // the answer's room_no may differ (that room filled): the screen switches to it.
+  const res = await post<{ room_name: string; role?: string; rejoined?: boolean; room_no?: number; country_battle?: CbDayState }>("joinCountryBattleDay", {
+    user_id: userId, day_id: dayId, ...(side ? { side } : {}), ...(roomNo && roomNo >= 1 ? { room_no: roomNo } : {}),
+  });
   if (!res.status || !res.data?.room_name) return fail(res);
-  return { ok: true, data: { room_name: res.data.room_name, rejoined: !!res.data.rejoined, state: res.data.country_battle ? cleanDay(res.data.country_battle) : null } };
+  const state = res.data.country_battle ? cleanDay(res.data.country_battle) : null;
+  const roomNoBack = Number(res.data.room_no) >= 1 ? Number(res.data.room_no) : state?.room?.no ?? null;
+  return { ok: true, data: { room_name: res.data.room_name, rejoined: !!res.data.rejoined, room_no: roomNoBack, state } };
+}
+
+/** Country Battle rooms: the room HOST sets its tile count, 2..24 (never below the real members in it). */
+export async function setCountryBattleRoomTiles(myUserId: number, dayId: number, roomNo: number, tiles: number): Promise<ChbResult<CbDayState>> {
+  const res = await post<CbDayState>("setCountryBattleRoomTiles", { my_user_id: myUserId, day_id: dayId, room_no: roomNo, tiles });
+  if (!res.status || !res.data) return fail(res);
+  noteServerNow(res.data.server_now);
+  return { ok: true, data: cleanDay(res.data) };
 }
 
 /** Idempotent. Your tile and place go, your score stays (§6). */

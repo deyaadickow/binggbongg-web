@@ -3746,4 +3746,11 @@ export const en = {
   // Live button bar (Steve, 2026-11-24).
   lbq_next: "Next battle",
   lbq_prev: "Previous battle",
+  // Country Battle rooms (Steve, 2026-11-24).
+  cbr_tiles: "Tiles {n}",
+  cbr_tiles_title: "Tiles in this room",
+  cbr_tiles_hint: "Only the room host can change this. Never fewer than the members live in the room ({n}).",
+  cbr_room: "Room {n}",
+  cbr_rooms: "Rooms",
+  cbr_full: "Full",
 } as const;

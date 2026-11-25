@@ -40,6 +40,8 @@ export interface ChbBattler extends ChbPerson {
   scenery_image?: string | null;
   /** Country VS Country: the country this battler fights for (rival.a / rival.b's country). */
   side?: string | null;
+  /** Country Battle rooms (2026-11-24): the room this battler is in (null = none). */
+  room_no?: number | null;
 }
 
 /** "upcoming" is Country Battle's only (the room is not open yet); a Chat Battle never sends it. */
@@ -111,6 +113,9 @@ export interface ChbState {
   /** Virtual Country Battles (Steve, 2026-11-24): the virtual tiles (never live), in the day's fixed order. */
   virtual?: number[];
   virtual_battle?: boolean;
+  /** Country Battle rooms (2026-11-24): the room this screen shows (null = an older server) and every room of the day. */
+  room?: import("./countryBattle").CbRoom | null;
+  rooms?: import("./countryBattle").CbRoomBrief[];
 }
 
 /** What start/join answer: the contest summary plus, for a Chat Battle, where to go. */

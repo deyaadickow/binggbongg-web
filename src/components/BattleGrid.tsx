@@ -112,8 +112,10 @@ function useAvailableHeight(ref: React.RefObject<HTMLDivElement | null>, reserve
   return h;
 }
 
-function CbTile({ tile, listening, onTap, onGift, onOpen, attach, hasVideo, version, span }: {
+function CbTile({ tile, listening, onTap, onGift, onOpen, attach, hasVideo, version, span, giftBox = true }: {
   tile: CbTileData;
+  /** Design B: false on tiny tiles (more than 12) — no gift box; the screen's tap opens the gift sheet. */
+  giftBox?: boolean;
   /** The double arrow: open this member (a virtual tile: their profile page). */
   onOpen?: () => void;
   /** Country Battle's host tile over the spots the last row would leave empty: columns, rows,
@@ -158,42 +160,33 @@ function CbTile({ tile, listening, onTap, onGift, onOpen, attach, hasVideo, vers
       </div>
     )
     : null;
+  // Design B (Steve approved the mockup, 2026-11-24) — the same on a virtual tile and a live one: the BBs big and gold
+  // at the TOP CENTRE (the rolling number); just above the name, bottom-left the "Host" pill (the room's host) or the "V"
+  // pill (a virtual tile; tap = "Virtual" for 3 s) — never both — and bottom-right the red gift box; the full name side
+  // to side along the bottom. Tiny tiles (`giftBox` false) drop the gift box: a tap on the tile opens the gift sheet.
+  const spanStyle: React.CSSProperties | undefined = span && (span.cols > 1 || span.rows > 1) ? {
+    gridColumn: `span ${span.cols}`, gridRow: `span ${span.rows}`,
+    ...(span.alone ? { aspectRatio: `${span.cols * 3} / ${span.rows * 4}` } : { aspectRatio: "auto", alignSelf: "stretch" }),
+  } : undefined;
+  const pill = tile.host ? <HostPill /> : tile.virtual ? <VBadge label={t("vcb_virtual")} /> : null;
+  const gift = onGift && giftBox && !tile.own ? onGift : null;
   if (tile.virtual) {
-    // Steve, 2026-11-24 (design): a photo-less member = gold initials centred on a black tile; the
-    // "Virtual" badge SMALL in the top-left so it never covers the face; the name inside the tile
-    // along its bottom edge, white on a thin dark gradient, cut short with "…".
     return (
-      <div className="cb-tile virtual" role="button" tabIndex={0} onClick={onTap}
-        style={span && (span.cols > 1 || span.rows > 1) ? {
-          gridColumn: `span ${span.cols}`, gridRow: `span ${span.rows}`,
-          ...(span.alone ? { aspectRatio: `${span.cols * 3} / ${span.rows * 4}` } : { aspectRatio: "auto", alignSelf: "stretch" }),
-        } : undefined}
+      <div className={`cb-tile virtual${tile.host ? " host" : ""}${tile.spot ? " spot" : ""}`} role="button" tabIndex={0} onClick={onTap}
+        style={spanStyle}
         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onTap?.(); } }}>
         {realPhoto && !photoBroken
           ? <img className="cb-photo" src={photo} alt="" loading="lazy" onError={() => setPhotoBroken(true)} />
           : sceneryImg ?? <div className="cb-vph" />}
         <TileGiftLayer uid={tile.userId} />
-        <span className="cb-pills">
-          {tile.host && <span className="cb-vbadge">{t("vcb_host")}</span>}
-          <VBadge label={t("vcb_virtual")} />
-        </span>
         {tile.gift && <TileGift key={tile.gift.key} icon={tile.gift.icon} />}
-        {onGift && (
-          <button type="button" className="cb-gift cb-gift-red" aria-label="🎁"
-            onClick={(e) => { e.stopPropagation(); onGift(); }}><GiftIcon /></button>
-        )}
         {/* The » "be the host" arrows are gone (Steve, 2026-11-24: "I don't think the 2 arrows on the screen is
             needed, when the first real member joins the room he will be the host"). HOST_SWAP brings them back. */}
         {HOST_SWAP && onOpen && (
           <button type="button" className="cb-vopen" aria-label={tile.name} title={tile.name}
             onClick={(e) => { e.stopPropagation(); onOpen(); }}>»</button>
         )}
-        {/* The whole name, side to side, with the BBs a line above it (Steve, 2026-11-24: "Also please show the entire
-            members name from side to side, the BBs can move up a touch."). */}
-        <span className="cb-vname stacked">
-          {tile.score != null && <b><PopNumber value={tile.score} /></b>}
-          <span className="cb-vname-n">{tile.name}</span>
-        </span>
+        <TileChrome score={tile.score} pill={pill} onGift={gift} name={tile.name} />
       </div>
     );
   }
@@ -201,10 +194,7 @@ function CbTile({ tile, listening, onTap, onGift, onOpen, attach, hasVideo, vers
     <div className={`cb-tile${tile.host ? " host" : ""}${tile.own ? " own" : ""}${tile.home ? " home" : ""}${tile.spot ? " spot" : ""}${tile.starred ? " starred" : ""}${tile.starredMe ? " starred-me" : ""}${listening ? " listening" : ""}`}
       role={tile.own ? undefined : "button"} tabIndex={tile.own ? undefined : 0}
       onClick={tile.own ? undefined : onTap}
-      style={span && (span.cols > 1 || span.rows > 1) ? {
-        gridColumn: `span ${span.cols}`, gridRow: `span ${span.rows}`,
-        ...(span.alone ? { aspectRatio: `${span.cols * 3} / ${span.rows * 4}` } : { aspectRatio: "auto", alignSelf: "stretch" }),
-      } : undefined}
+      style={spanStyle}
       onKeyDown={(e) => { if (!tile.own && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); onTap?.(); } }}>
       {/* The member's photo while their video connects (and for good, if it never does). */}
       {realPhoto
@@ -213,18 +203,49 @@ function CbTile({ tile, listening, onTap, onGift, onOpen, attach, hasVideo, vers
       {hasVideo && <video ref={videoRef} autoPlay playsInline muted />}
       {/* Steve, 2026-11-23: a gift plays only in the giver's and the receiver's tiles. */}
       <TileGiftLayer uid={tile.userId} />
-      {tile.host && <span className="cb-pills"><span className="cb-vbadge">{t("vcb_host")}</span></span>}
       {tile.starred && <span className="cb-star" aria-hidden>★</span>}
       {listening && <span className="cb-ear" aria-hidden>🔊</span>}
       {tile.muted && !tile.own && <span className="cb-muted" aria-hidden>🔇</span>}
       {tile.starredMe && <span className="cb-starme">{t("chb_starred_you_tile")}</span>}
       {tile.gift && <TileGift key={tile.gift.key} icon={tile.gift.icon} />}
-      {!tile.own && onGift && (
-        <button type="button" className="cb-gift cb-gift-red" aria-label="🎁"
-          onClick={(e) => { e.stopPropagation(); onGift(); }}><GiftIcon /></button>
-      )}
-      <span className="cb-name">{tile.name}</span>
+      <TileChrome score={tile.score} pill={pill} onGift={gift} name={tile.name} />
     </div>
+  );
+}
+
+/** The gold "Host" pill (black text) — bottom-left above the name. */
+export function HostPill() {
+  const { t } = useT();
+  return <span className="cb-vbadge cb-hostpill">{t("vcb_host")}</span>;
+}
+
+/**
+ * Design B's tile chrome, shared by the Country Battle room and the Go Live multi-guest grid: the BBs top centre (only
+ * when there is a figure), then along the bottom a row with `pill` on the left and the red gift box (plus `extra`, e.g.
+ * the speaker icon) on the right, just above the full name.
+ */
+export function TileChrome({ score, pill, onGift, name, extra }: {
+  score?: number | null; pill?: React.ReactNode; onGift?: (() => void) | null; name: React.ReactNode; extra?: React.ReactNode;
+}) {
+  return (
+    <>
+      {score != null && <span className="cb-bbs"><PopNumber value={score} /></span>}
+      <span className="cb-foot">
+        {(pill || onGift || extra) && (
+          <span className="cb-foot-row">
+            <span className="cb-foot-l">{pill}</span>
+            <span className="cb-foot-r">
+              {extra}
+              {onGift && (
+                <button type="button" className="cb-gift cb-gift-red" aria-label="🎁"
+                  onClick={(e) => { e.stopPropagation(); onGift(); }}><GiftIcon /></button>
+              )}
+            </span>
+          </span>
+        )}
+        <span className="cb-fname">{name}</span>
+      </span>
+    </>
   );
 }
 
@@ -271,9 +292,11 @@ function TileGift({ icon }: { icon: string | null }) {
   );
 }
 
-/** Country Battle: the first (bigger, top-left) tile of a grid is the host tile (round 2b). */
-function withHost(tile: CbTileData, host: boolean): CbTileData {
-  return host ? { ...tile, host: true } : tile;
+/** Country Battle: the first (bigger, top-left) tile of a grid is the host tile (round 2b) — or, with rooms, the room's
+ *  host's tile (`hostId`; null = no real member in the room, so no Host pill at all). */
+function withHost(tile: CbTileData, host: boolean | null): CbTileData {
+  if (host === null) return tile;
+  return host ? (tile.host ? tile : { ...tile, host: true }) : tile.host ? { ...tile, host: false } : tile;
 }
 
 /** A dark tint per member, so photo-less tiles are told apart at a glance. */
@@ -282,7 +305,11 @@ function tileBackdrop(id: number): string {
   return `linear-gradient(160deg, hsl(${hue} 35% 22%), hsl(${(hue + 40) % 360} 30% 9%))`;
 }
 
-export function CountryBattleGrid({ stage, shape, tiles, listen, onTap, onGift, onOpen, attach, hasVideo, version = 0, flash, onFlashDone, reserve, phoneFullWidth, fillShare = 1 }: {
+export function CountryBattleGrid({ stage, shape, tiles, listen, onTap, onGift, onOpen, attach, hasVideo, version = 0, flash, onFlashDone, reserve, phoneFullWidth, fillShare = 1, giftBox = true, hostId }: {
+  /** Design B: false = tiny tiles, no gift box on them. */
+  giftBox?: boolean;
+  /** Country Battle rooms: whose tile carries the Host pill (null = nobody's). Undefined = the first tile's. */
+  hostId?: number | null;
   stage: CbStage;
   tiles: CbTileData[];
   /** Who is heard on this screen (one tapped tile, or the starred members). */
@@ -325,7 +352,9 @@ export function CountryBattleGrid({ stage, shape, tiles, listen, onTap, onGift, 
           : { gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
         {tiles.map((tile) => (
           <CbTile key={`${tile.own ? "own" : tile.home ? "home" : tile.virtual ? "v" : "m"}-${tile.userId}`}
-            tile={withHost(tile.muted == null && !tile.own ? { ...tile, muted: !heard.has(tile.userId) } : tile, !!shape && tile === tiles[0])} listening={heard.has(tile.userId)}
+            tile={withHost(tile.muted == null && !tile.own ? { ...tile, muted: !heard.has(tile.userId) } : tile,
+              hostId !== undefined ? hostId != null && tile.userId === hostId : !!shape && tile === tiles[0] ? true : null)} listening={heard.has(tile.userId)}
+            giftBox={giftBox}
             onTap={onTap ? () => onTap(tile.userId) : undefined}
             onGift={onGift ? () => onGift(tile.userId) : undefined}
             onOpen={onOpen && tile.virtual ? () => onOpen(tile.userId) : undefined}
