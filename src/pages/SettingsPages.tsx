@@ -5,7 +5,7 @@ import { BEA_LANGUAGES, BeaCard, BeaRepeatButton, beaLanguage, setBeaLanguage, u
 import { useContestOn } from "../lib/contests";
 import { usePodcastEnabled } from "../lib/podcast";
 import { useCallback, useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { API_BASE, currentAuthHeaders, displayName, mediaUrl, post, type UserSummary } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice, UserRow } from "../components/Common";
@@ -56,9 +56,9 @@ const BOX_GENERAL = ["/settings/support", "/settings/terms", "/settings/privacy"
   "/settings/safety", "/settings/app-features", "/settings/faq"];
 const BOX_LAST = ["#signout", "/settings/delete-account"];
 
-function SettingsBox({ title, children }: { title?: string; children: React.ReactNode }) {
+function SettingsBox({ title, id, children }: { title?: string; id?: string; children: React.ReactNode }) {
   return (
-    <div className="card settings-box" style={{ marginBottom: 12, overflow: "hidden" }}>
+    <div id={id} className="card settings-box" style={{ marginBottom: 12, overflow: "hidden" }}>
       {title && <div style={{ padding: "10px 14px" }}><b style={{ color: "var(--gold)" }}>{title}</b></div>}
       {children}
     </div>
@@ -100,11 +100,27 @@ export function SettingsHubPage() {
   const row = (l: SideLink) => <SideLinkItem key={l.to + l.label} link={l} onSignOut={signOut} big />;
   const box2 = pick(BOX_SETTINGS);
   const box5 = pick(BOX_LAST);
+  // /settings#features (the Bingg Bongg page's "Features" box, Steve 2026-11-25) opens at the Features
+  // list. Run after paint; again once the switches box above has loaded and pushed it down.
+  const { hash } = useLocation();
+  useEffect(() => {
+    if (hash !== "#features") return;
+    // Below the sticky top bar, not under it.
+    const go = () => {
+      const box = document.getElementById("features");
+      if (!box) return;
+      const bar = document.querySelector("header.nav")?.getBoundingClientRect().height ?? 0;
+      window.scrollTo({ top: Math.max(0, box.getBoundingClientRect().top + window.scrollY - bar - 8) });
+    };
+    const a = window.setTimeout(go, 50);
+    const b = window.setTimeout(go, 700);
+    return () => { window.clearTimeout(a); window.clearTimeout(b); };
+  }, [hash]);
   return (
     <Page title={t("settings")}>
       {isLoggedIn && <SettingsBox title={t("set_box_switches")}><SettingsSwitches /></SettingsBox>}
       {box2.length > 0 && <SettingsBox title={t("set_box_settings")}>{box2.map(row)}</SettingsBox>}
-      <SettingsBox title={t("set_box_features")}>{features.map(row)}{tiles.map(row)}</SettingsBox>
+      <SettingsBox id="features" title={t("set_box_features")}>{features.map(row)}{tiles.map(row)}</SettingsBox>
       <SettingsBox title={t("general")}>{pick(BOX_GENERAL).map(row)}{store.map(row)}</SettingsBox>
       {box5.length > 0 && <SettingsBox>{box5.map(row)}</SettingsBox>}
       {/* The sidebar that normally carries this is hidden under 900px, and a phone is how most

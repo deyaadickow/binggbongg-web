@@ -3,10 +3,40 @@ import { Link, useNavigate } from "react-router-dom";
 import { post } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Notice } from "../components/Common";
-import { tt, useT  } from "../lib/i18n";
+import { tt, useT, type StringKey } from "../lib/i18n";
 import { PageTitle } from "../components/PageTitle";
 import { requireVerified } from "../lib/verifyEmail";
 import { StartPodcastLink } from "./PodcastPages";
+import { InfoBanner } from "./InformationCenterPage";
+
+/** Steve, 2026-11-25: the Bingg Bongg button's page IS the Information Center now — "add all the links
+ *  from the information center on this page and delete the information center link". Every box is the
+ *  Information Center's gold box with a red star each side, All Country Battles included (no longer
+ *  blue), plus a new "Features" box that opens Settings at its Features list. Country VS Country stays
+ *  off while the battles are turned off (2026-11-24). */
+const BB_LINKS: { to: string; key: StringKey }[] = [
+  { to: "/ads-for-referrals?video=en", key: "ic_million" },
+  { to: "/country-battles", key: "acb_tab" },
+  { to: "/settings#features", key: "set_box_features" },
+  { to: "/features", key: "tab_70_features" },
+  { to: "/feature-videos", key: "tab_70_videos" },
+  { to: "/one-video", key: "ic_one_video" },
+];
+
+function BinggBonggLinks() {
+  const { t } = useT();
+  return (
+    <nav className="ic-list" style={{ marginTop: 12 }} aria-label={t("information_center")}>
+      {BB_LINKS.map((it) => (
+        <Link key={it.key} to={it.to} className="ic-btn">
+          <span className="ic-star" aria-hidden>★</span>
+          <span className="ic-label">{t(it.key)}</span>
+          <span className="ic-star" aria-hidden>★</span>
+        </Link>
+      ))}
+    </nav>
+  );
+}
 
 /** Camera preview + one button — same startLive endpoint the phones call, then the room page as host. */
 export function GoLivePage() {
@@ -56,11 +86,22 @@ export function GoLivePage() {
     }
   }
 
-  if (!isLoggedIn) return <div className="page"><Notice>{tn("sign_in_to_go_live", <Link to="/login">{t("sign_in")}</Link>)}</Notice></div>;
+  // Signed out: the banner and the links still show (the main page no longer has an Information
+  // Center button), with the sign-in note where the camera would be.
+  if (!isLoggedIn) return (
+    <div className="page" style={{ maxWidth: 560 }}>
+      <PageTitle>{t("go_live")}</PageTitle>
+      <InfoBanner />
+      <Notice>{tn("sign_in_to_go_live", <Link to="/login">{t("sign_in")}</Link>)}</Notice>
+      <BinggBonggLinks />
+    </div>
+  );
 
   return (
     <div className="page" style={{ maxWidth: 560 }}>
       <PageTitle>{t("go_live")}</PageTitle>
+      {/* The Information Center's video banner on top (Steve, 2026-11-25): swipe for the next, tap plays it. */}
+      <InfoBanner />
       <div className="card" style={{ aspectRatio: "9 / 12", background: "#000", display: "grid", placeItems: "center" }}>
         {previewError ? <p className="muted center" style={{ padding: 20 }}>{previewError}</p> : <video ref={videoRef} autoPlay muted playsInline style={{ width: "100%", height: "100%", objectFit: "cover" }} />}
       </div>
@@ -70,14 +111,8 @@ export function GoLivePage() {
       </button>
       {/* The "Join the … whole country battle Now" button under Go Live was removed (Steve,
           2026-11-24: "Remove the join the american whole country from this page"); in its place
-          the Information Center's blue All Country Battles and red Country VS Country buttons
-          ("Remove [them] from here and add them to Bingg Bongg Go Live page"). */}
-      <nav className="ic-list" style={{ marginTop: 10 }}>
-        <Link to="/country-battles" className="ic-btn blue">
-          <span className="ic-star" aria-hidden>★</span><span className="ic-label">{t("acb_tab")}</span><span className="ic-star" aria-hidden>★</span>
-        </Link>
-        {/* Country VS Country button removed with the battles turned off (Steve, 2026-11-24). */}
-      </nav>
+          the Information Center's buttons — since 2026-11-25 all of them, gold with red stars. */}
+      <BinggBonggLinks />
       {/* Bingg Bongg Podcast (Steve, 2026-11-10) — right under Go Live, only while switched on. */}
       <StartPodcastLink />
       {previewError && <p className="muted center" style={{ fontSize: 13, marginTop: 8 }}>{t("you_can_still_go_live_and_turn_the_camer")}</p>}

@@ -3,7 +3,6 @@ import { useSession } from "../lib/session";
 import { Avatar } from "./Common";
 import { useT } from "../lib/i18n";
 import { useSyncExternalStore } from "react";
-import { useAnyCountryBattleLive } from "../lib/allCountryBattles";
 import { countSuffix, inboxCountsSnapshot, inboxTotal, subscribeInboxCounts } from "../lib/inboxCounts";
 
 export function Nav() {
@@ -12,8 +11,6 @@ export function Nav() {
   // moved into the directory, which does its own gating, so these were two API calls firing on
   // every page load to decide nothing. Removed with them.
   const { user, isLoggedIn, signOut } = useSession();
-  // Steve, 2026-11-16: a red dot on the chip while at least one Country Battle is live.
-  const battleLive = useAnyCountryBattleLive();
   const inboxSuffix = countSuffix(inboxTotal(useSyncExternalStore(subscribeInboxCounts, inboxCountsSnapshot)));
   return (
     <header className="nav">
@@ -43,10 +40,9 @@ export function Nav() {
             one button that says, 'Information Center'." All Country Battles, 70+ Features, 70+ Videos,
             1 Video 70+ Features and Our Ads moved onto /information-center. The red live dot that
             sat on All Country Battles (2026-11-16) rides on this button now. */}
-        <NavLink to="/information-center" className="acb-chip info-center-chip">
-          {t("information_center")}
-          {battleLive && <span className="live-dot" aria-hidden />}
-        </NavLink>
+        {/* Steve, 2026-11-25: "delete the information center link. I want the main page as clean as
+            possible." Its links (and its video banner) are on the Bingg Bongg page, /go-live; the
+            /information-center page itself stays for anything still linking to it. */}
         <NavLink to="/settings" className="only-narrow">{t("settings")}</NavLink>
       </nav>
       <div className="me">

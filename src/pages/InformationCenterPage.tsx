@@ -20,7 +20,7 @@ interface Banner { id: number; title: string; poster: string }
 
 const ROTATE_MS = 12_000;
 
-function InfoBanner() {
+export function InfoBanner() {
   const { t } = useT();
   const navigate = useNavigate();
   const [banners, setBanners] = useState<Banner[] | null>(null);
