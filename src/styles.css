@@ -2213,3 +2213,27 @@ body:has(.story-viewer) .get-app-bar { display: none; }
 
 /* Steve, 2026-11-24: the referral box in two lines ("This Referral Program Can / Make You Up to a Million Dollars"). */
 .ic-label { white-space: pre-line; }
+
+/* Rolling score (Steve, 2026-11-24: "We need to make the BBs # Bigger … make the number turn and TikTikTik…"): each
+   digit is its own reel, a column of digits that slides up and lands on the new digit. The ghost digit gives the reel
+   its width; the strip rides over it. */
+.pop-num.rolling { white-space: nowrap; }
+.roll-col { display: inline-block; position: relative; height: 1.15em; line-height: 1.15em; overflow: hidden; vertical-align: bottom; }
+.roll-col.still { overflow: visible; }
+.roll-ghost { visibility: hidden; }
+.roll-strip { position: absolute; left: 0; right: 0; top: 0; display: flex; flex-direction: column; align-items: center;
+  transform: translateY(calc(var(--steps) * -1.15em)); animation-name: rollReel; animation-timing-function: cubic-bezier(.33, 1, .68, 1); animation-fill-mode: both; }
+.roll-strip > span { height: 1.15em; line-height: 1.15em; }
+@keyframes rollReel { from { transform: translateY(0); } to { transform: translateY(calc(var(--steps) * -1.15em)); } }
+.pop-num.rolling.popping { animation: popRoll 1.4s ease-out; transform-origin: right bottom; }
+@keyframes popRoll {
+  0% { transform: scale(1); }
+  15% { transform: scale(1.4); color: var(--gold-bright, #ffd54a); text-shadow: 0 0 12px rgba(255, 213, 74, .95), 0 0 2px #000; }
+  80% { transform: scale(1.4); color: var(--gold-bright, #ffd54a); text-shadow: 0 0 12px rgba(255, 213, 74, .95), 0 0 2px #000; }
+  100% { transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) { .roll-strip { animation: none; } }
+/* Bigger BBs on the virtual tiles. */
+.cb-vname b { font-size: 1.75em; line-height: 1; text-shadow: 0 1px 3px rgba(0,0,0,.95), 0 0 6px rgba(0,0,0,.6); }
+.rival-score { font-size: 26px; }
+.vcb-empty-score { font-size: 24px; }
