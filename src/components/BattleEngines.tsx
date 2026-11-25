@@ -174,7 +174,9 @@ export const BATTLE_KINDS: {
 /** Step 1 of the Battle button: which kind of battle. Numbered and with an (i) per row,
  *  matching the phones (Steve, 2026-09-08: "Please add the (i) for information for every
  *  game" — the same treatment the Battle menu carries there). */
-export function BattleMenu({ peopleOnScreen, onPick, onClose, onNotice }: { peopleOnScreen: number; onPick: (k: BattleKind) => void; onClose: () => void; onNotice: (msg: string) => void }) {
+export function BattleMenu({ peopleOnScreen, onPick, onClose, onNotice, onStarShow }: { peopleOnScreen: number; onPick: (k: BattleKind) => void; onClose: () => void; onNotice: (msg: string) => void;
+  /** Star shows (Steve, 2026-11-25): the two gold show buttons on top — the host's OWN live only. */
+  onStarShow?: ((kind: "woman" | "man") => void) | null }) {
   const { t } = useT();
   const [info, setInfo] = useState<(typeof BATTLE_KINDS)[number] | null>(null);
 
@@ -190,6 +192,13 @@ export function BattleMenu({ peopleOnScreen, onPick, onClose, onNotice }: { peop
 
   return (
     <Overlay title={t("start_a_battle")} onClose={onClose} width={560}>
+      {onStarShow && (
+        <div style={{ display: "grid", gap: 8, marginBottom: 12 }}>
+          <button type="button" className="sts-gold-btn" style={{ marginTop: 0, fontSize: 15 }} onClick={() => onStarShow("woman")}>{t("sts_menu_woman")}</button>
+          <button type="button" className="sts-gold-btn" style={{ marginTop: 0, fontSize: 15 }} onClick={() => onStarShow("man")}>{t("sts_menu_man")}</button>
+          <div className="muted" style={{ fontSize: 12, textAlign: "center" }}>{t("sts_menu_note")}</div>
+        </div>
+      )}
       {peopleOnScreen < 2 && <p className="muted" style={{ fontSize: 13, marginTop: 0 }}>{t("you_re_the_only_one_on_screen_accept_a_v")}</p>}
       {BATTLE_KINDS.filter((k) => !k.hidden).map((k) => {
         // A reference row opens a screen or an explanation, so who's on screen is irrelevant to

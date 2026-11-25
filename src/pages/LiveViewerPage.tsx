@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { stopGameSounds } from "../lib/gameSounds";
 import { HostBonusIntro } from "../components/HostBonus";
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
@@ -66,6 +66,8 @@ import { requireVerified } from "../lib/verifyEmail";
 import { ML_MIN_SIZE, dropRoomBattleBomb, mlIsBig, mlName, mlReasonText, mlWrite, normalizeMl, saveRoomSize, type MlMember, type MlState, type MlWriteResult, type RoomBattle } from "../lib/multiLive";
 import { BattleTopStrip, MlMenu, MlSizeSheet, MultiLiveGrid, RoomBattleBoard, RoomBattleEnd, useBattleClock, useRoomBattleExtras } from "../components/MultiLiveGrid";
 import { showGoldAlert } from "../components/GoldToast";
+import { StarBirthdaySheet, StarSetupCard, StarShowRoom, StarVoteSheet, type StarActions } from "../components/StarShow";
+import { endStarShow, fetchMyStarShow, fetchStarShow, isStarRefusal, nextStarShowRound, removeStarShowGuest, reportStarGuest, startStarShow, starReasonText, updateStarShow, confirmStarShowGuest, type StarKind, type StarResult, type StarShow } from "../lib/starShow";
 import { endPodcast } from "../lib/podcast";
 import { BinggBonusOverlay } from "../components/BinggBonusOverlay";
 import { makeBinggBonusWatcher } from "../lib/binggBonus";
@@ -88,9 +90,14 @@ const MEMBERS_POLL_MS = 5000;
  *  next/previous, or any in-app jump to a different room) unmounts this one first — its own
  *  cleanup leaves LiveKit, stops the heartbeat and the chat listener — instead of carrying the
  *  last room's members, chat and battle state into the next one. */
+// DEV ONLY (never in a production build — the import is dead code there): ?ssdemo=1|host draws the
+// star show from fake data (components/StarShowDemo), no server, no sign-in.
+const StarShowDemo = import.meta.env.DEV ? lazy(() => import("../components/StarShowDemo")) : null;
+
 export function LiveViewerRoute() {
   const { room } = useParams();
   const [search] = useSearchParams();
+  if (StarShowDemo && search.has("ssdemo")) return <Suspense fallback={null}><StarShowDemo /></Suspense>;
   // Creators and money (2026-11-17): a viewer checks checkLiveAccess first; a subscribers-only
   // live shows the Subscribe sheet instead of joining. The host (?host=1) goes straight in.
   return (
@@ -394,6 +401,16 @@ export function LiveViewerPage() {
   // Live Vote (2026-11-22): the open vote (or its results), the host's setup sheet, a closed card's id.
   const [liveVote, setLiveVote] = useState<LiveVote | null>(null);
   const [liveVoteStartOpen, setLiveVoteStartOpen] = useState(false);
+  // Star shows (Steve, 2026-11-25): "Bingg Bongg's Most Beautiful Woman" / "The Best Looking Guy On
+  // Bingg Bongg". The show as this member sees it (fetchMyStarShow; null = none running), the host's
+  // setup card, a pending start waiting on the host's birthday, whether the open gift page is a VOTE,
+  // and a bump that opens the join card when Ask to join answered need_confirm.
+  const [starShow, setStarShow] = useState<StarShow | null>(null);
+  const [starPolling, setStarPolling] = useState(false);
+  const [starSetup, setStarSetup] = useState<StarKind | null>(null);
+  const [starBirthday, setStarBirthday] = useState<{ kind: StarKind; lowest: boolean } | null>(null);
+  const [starVote, setStarVote] = useState(false);
+  const [starJoinSignal, setStarJoinSignal] = useState(0);
   const liveVoteClosedId = useRef<number | null>(null);
   const liveVoteBusy = useRef(false);
   // Bingg Bongg Banger (2026-11-23): the host's board (or its results), the setup sheet, a closed card's id.
@@ -1005,6 +1022,34 @@ export function LiveViewerPage() {
     return () => { alive = false; clearInterval(t); };
   }, [roomName, user, role]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Star shows: the room state (multi_live.star_show) says a show is on — read it every 1.5 s while it
+  // is (fetchMyStarShow signed in: my_refusal, and the host's pay line; fetchStarShow signed out).
+  const mlStarId = ml?.star_show?.show_id ?? 0;
+  // Only ever switched ON from here: the poll itself stops when the server says no show is running
+  // (a room read already in flight when the host pressed START must not tear the stage down).
+  useEffect(() => { if (mlStarId) setStarPolling(true); }, [mlStarId]);
+  useEffect(() => {
+    // The public shape from the room state draws the stage at once; our own read replaces it.
+    if (ml?.star_show && (!starShow || starShow.show_id !== ml.star_show.show_id)) setStarShow(ml.star_show);
+  }, [mlStarId]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!starPolling || roomClosed) return;
+    let alive = true;
+    const read = async () => {
+      try {
+        const r = user ? await fetchMyStarShow(user.id, roomName) : await fetchStarShow(roomName);
+        if (!alive) return;
+        if (r.ok || r.reason === "no_show") {
+          setStarShow(r.show);
+          if (!r.show) setStarPolling(false);
+        }
+      } catch { /* the next tick tries again */ }
+    };
+    void read();
+    const iv = setInterval(read, 1500);
+    return () => { alive = false; clearInterval(iv); };
+  }, [starPolling, roomName, user?.id, roomClosed, live.mlSignal.seq]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // The server's "ml_state" poke (or our own LiveKit permissions changing): refetch, debounced.
   useEffect(() => {
     if (live.mlSignal.seq === 0) return;
@@ -1181,6 +1226,7 @@ export function LiveViewerPage() {
       setToast(`Sent ${gift.name ?? "a gift"} (${giftPrice(gift)} BBs) to ${nameOfId(giftTarget) || (virtualGiftTarget ? personName(virtualGiftTarget) : "")}${kind ? ` · ${tt(kind)}` : ""}`);
       setGiftTarget(null);
       setVirtualGiftTarget(null);
+      setStarVote(false);
       refresh();
     } catch (err) { setToast((err as Error).message); }
   }
@@ -1194,7 +1240,8 @@ export function LiveViewerPage() {
     const b = next.room_battle;
     if (b && b.finished && b.battle_id !== mlEndShownFor.current) {
       mlEndShownFor.current = b.battle_id;
-      setMlEnd(b);
+      // A star show's rounds are room battles too: the show draws its own round-end card.
+      if (!next.star_show) setMlEnd(b);
     }
     // This browser's own seat and sound, as a guest on camera.
     if (!user || roleRef.current !== "guest") { mlSeenSelf.current = false; mlAmSpeaker.current = null; return; }
@@ -1297,22 +1344,47 @@ export function LiveViewerPage() {
     } catch (e) { setToast((e as Error).message || tt("something_went_wrong")); }
   }
 
-  async function requestToJoin() {
-    if (!user) return;
+  /** `fromStage`: the star show's "+ Request" tile, which handles a show refusal itself. */
+  async function requestToJoin(fromStage = false): Promise<{ reason: string | null; message: string | null } | null> {
+    if (!user) return null;
     try {
       // multi_live=1: this client can join a big room muted (Multi-live 24).
       const res = await post<unknown>("requestToJoinLive", { user_id: user.id, room_name: roomName, multi_live: 1 });
+      const reason = (res as unknown as { reason?: string }).reason ?? null;
+      // Star shows: need_confirm = the once-only gender + birthday card; under_18 / wrong_show /
+      // banned = the message, no request.
+      if (!res.status && isStarRefusal(reason)) {
+        if (!fromStage) {
+          if (reason === "need_confirm") setStarJoinSignal((n) => n + 1);
+          else showGoldAlert(starReasonText(reason, res.message ?? null, starShow?.kind));
+        }
+        return { reason, message: res.message ?? null };
+      }
       if (!res.status) throw new Error(res.message ?? tt("couldn_t_send_the_request"));
       const st = (res as { member_status?: string }).member_status;
       setJoinState(st === "approved" ? "approved" : "requested");
       setToast(st === "approved" ? "You're in — joining as a guest." : "Request sent. The host will see it in a moment.");
     } catch (err) { setToast((err as Error).message); }
+    return null;
   }
 
   async function answerRequest(r: JoinRequest, approve: boolean) {
     if (!user) return;
     try {
       const res = await post("respondToJoinRequest", { user_id: user.id, request_id: r.request_id, approve });
+      // Star shows: a full stage puts them in the waiting line ({queued:true}); a guest the show
+      // refuses (need_confirm / under_18 / wrong_show / banned) is declined by the server.
+      const starReason = (res as unknown as { reason?: string }).reason ?? null;
+      if (res.status && (res as unknown as { queued?: unknown }).queued) {
+        setJoinRequests((prev) => prev.filter((x) => x.request_id !== r.request_id));
+        showGoldAlert(starReasonText("queued", res.message ?? null));
+        return;
+      }
+      if (!res.status && isStarRefusal(starReason)) {
+        setJoinRequests((prev) => prev.filter((x) => x.request_id !== r.request_id));
+        showGoldAlert(starReasonText(starReason, res.message ?? null, starShow?.kind));
+        return;
+      }
       if (!res.status) {
         // full / old_app: a gold popup; an old_app request stays pending (mute a speaker, approve again).
         const reason = (res as unknown as { reason?: string }).reason ?? null;
@@ -1324,6 +1396,89 @@ export function LiveViewerPage() {
       setToast(approve ? `${displayName(r as Partial<UserSummary>)} is joining.` : "Declined.");
     } catch (err) { setToast((err as Error).message); }
   }
+
+  // ---- Star shows (Steve, 2026-11-25) -----------------------------------------------------------
+  async function beginStarShow(kind: StarKind, lowest: boolean) {
+    if (!user) return;
+    if (!requireVerified()) return;
+    try {
+      const r = await startStarShow(user.id, roomName, kind, lowest);
+      if (!r.ok) {
+        // A host with no birthday on file: the birthday box, saved, then START again.
+        if (r.reason === "host_need_birthday") { setStarSetup(null); setStarBirthday({ kind, lowest }); return; }
+        showGoldAlert(starReasonText(r.reason, r.message, kind));
+        return;
+      }
+      setStarSetup(null);
+      setStarBirthday(null);
+      if (r.show) setStarShow(r.show);
+      setStarPolling(true);
+      loadMembersRef.current();
+      setToast(tt("sts_started"));
+      if (r.removed.length > 0) showGoldAlert(tt(kind === "man" ? "sts_removed_n_man" : "sts_removed_n_woman", r.removed.length));
+    } catch (e) { setToast((e as Error).message || tt("something_went_wrong")); }
+  }
+  async function saveHostBirthday(dob: string) {
+    if (!user) return;
+    try {
+      const r = await post("updateUserDetails", { user_id: user.id, date_of_birth: dob });
+      if (!r.status) { showGoldAlert(r.message ?? tt("something_went_wrong")); return; }
+      refresh();
+      const pending = starBirthday;
+      setStarBirthday(null);
+      if (pending) await beginStarShow(pending.kind, pending.lowest);
+    } catch (e) { setToast((e as Error).message || tt("something_went_wrong")); }
+  }
+  /** One host write: the fresh show on success, the reason as a gold popup otherwise. */
+  async function starHostDo(write: Promise<StarResult>, okToast = false) {
+    try {
+      const r = await write;
+      if (!r.ok) { showGoldAlert(starReasonText(r.reason, r.message, starShow?.kind)); return; }
+      if (r.show) setStarShow(r.show);
+      if (okToast && r.message) setToast(r.message);
+      loadMembersRef.current();
+    } catch (e) { setToast((e as Error).message || tt("something_went_wrong")); }
+  }
+  const starActions: StarActions = {
+    vote: (p) => { setVirtualGiftTarget(null); setStarVote(true); setGiftTarget(p.user_id); },
+    hostGift: () => { setVirtualGiftTarget(null); setStarVote(false); setGiftTarget(hostUserId); },
+    // A new tab, so looking at a profile never ends the live for a host or a guest.
+    viewProfile: (p) => { window.open(`/profile/${p.user_id}`, "_blank", "noopener"); },
+    report: async (p, reasonEn) => {
+      try {
+        const r = await reportStarGuest(p.user_id, reasonEn, roomName);
+        if (!r.status) { showGoldAlert(r.message ?? tt("something_went_wrong")); return; }
+        setToast(tt("sts_reported"));
+        loadMembersRef.current();
+      } catch (e) { setToast((e as Error).message || tt("something_went_wrong")); }
+    },
+    request: () => requestToJoin(true),
+    confirm: async (dob) => {
+      if (!user || !starShow) return { ok: false, reason: null, message: tt("something_went_wrong") };
+      try {
+        const r = await confirmStarShowGuest(user.id, starShow.kind, dob);
+        return { ok: r.ok, reason: r.reason, message: r.message };
+      } catch (e) { return { ok: false, reason: null, message: (e as Error).message }; }
+    },
+    next: () => { if (user) void starHostDo(nextStarShowRound(user.id, roomName)); },
+    setLowest: (on) => {
+      if (!user || !starShow) return;
+      setStarShow({ ...starShow, lowest_leaves: on });
+      void starHostDo(updateStarShow(user.id, roomName, on));
+    },
+    end: () => {
+      if (!user) return;
+      void endStarShow(user.id, roomName).then((r) => {
+        if (!r.ok) { showGoldAlert(starReasonText(r.reason, r.message, starShow?.kind)); return; }
+        setStarShow(null);
+        setStarPolling(false);
+        setToast(tt("sts_ended"));
+        loadMembersRef.current();
+      }).catch((e) => setToast((e as Error).message || tt("something_went_wrong")));
+    },
+    remove: (p, ban) => { if (user) void starHostDo(removeStarShowGuest(user.id, roomName, p.user_id, ban), true); },
+    needSignIn: () => navigate("/login", { state: { from: window.location.pathname + window.location.search } }),
+  };
 
   async function endLive() {
     if (!user) return;
@@ -1377,7 +1532,8 @@ export function LiveViewerPage() {
     : two.data?.status === "active" ? secondsUntil(two.data.ends_at, two.now)
     : virtual.data?.status === "active" ? secondsUntil(virtual.data.ends_at, virtual.now)
     : null;
-  const showTopStrip = mlRunning || otherBattleSecs !== null || !!boxing;
+  // While a star show runs it draws its own banner and clock instead of the room battle's strip.
+  const showTopStrip = (mlRunning && !starShow) || otherBattleSecs !== null || !!boxing;
   const orderedTiles = [...live.tiles].sort((a, b) => (a.userId === hostUserId ? -1 : b.userId === hostUserId ? 1 : 0));
   // How many people are on camera: the 24-member grid's seats, else the 2–4 tiles. A solo live
   // (one) keeps its full-screen gifts exactly as before.
@@ -1674,7 +1830,7 @@ export function LiveViewerPage() {
           everyone to see." The web has no scrolling-text strip under the header, so the battle
           strip simply sits there while a battle runs and goes away after it; it replaces the old
           room-battle bar over the tiles and the boxing-gloves badge on the video. */}
-      {showTopStrip && (mlRunning ? (
+      {showTopStrip && (mlRunning && !starShow ? (
         <BattleTopStrip secondsLeft={mlSecondsLeft} boost={mlExtras.boost} onOpen={() => setMlBoardOpen(true)}
           bombs={user ? myBombs : null} bombArmed={bombArmed}
           onBomb={() => { const next = !bombArmed; setBombArmed(next); if (next) setToast(tt("bbb_pick_tile")); }} />
@@ -1708,7 +1864,7 @@ export function LiveViewerPage() {
           {dogRace?.status === "lobby" && (
             <DogRaceLobbyCard race={dogRace} myId={myId} onChanged={dog.apply} onRefresh={() => { void dog.refresh(); }} onToast={setToast} />
           )}
-          <div className={(mlBig ? "video-grid ml-on" : `video-grid count-${Math.min(4, Math.max(1, orderedTiles.length))}`) + (dogOnGrid ? " dr-on" : "")} onDoubleClick={dropHeart}
+          <div className={(starShow ? "video-grid sts-on" : mlBig ? "video-grid ml-on" : `video-grid count-${Math.min(4, Math.max(1, orderedTiles.length))}`) + (dogOnGrid ? " dr-on" : "")} onDoubleClick={dropHeart}
             onPointerDown={startRoomHold} onPointerUp={cancelRoomHold} onPointerLeave={cancelRoomHold} onPointerCancel={cancelRoomHold}
             onContextMenu={(e) => { if (roomHoldFired.current) e.preventDefault(); }}
             onClickCapture={(e) => { if (roomHoldFired.current) { e.stopPropagation(); roomHoldFired.current = false; } }}>
@@ -1761,16 +1917,23 @@ export function LiveViewerPage() {
             ))}
             {/* Steve, 2026-11-06: "the rest of the icons should be inside the tile, when you hold
                 the tile" — the free-taps count moved off the video into the hold menu. */}
-            {mlBig && ml && (
+            {/* Star shows (2026-11-25): the show's stage INSTEAD of the room battle grid. */}
+            {starShow && (
+              <StarShowRoom show={starShow} myId={myId} isHost={role === "host"} signedIn={isLoggedIn}
+                host={{ user_id: hostUserId, name: hostCard ? displayName(hostCard) : t("the_host"), username: members?.host_username ?? null, profile_image: members?.host_profile_image ?? null }}
+                hasBirthday={!!(user as unknown as { date_of_birth?: string | null } | null)?.date_of_birth}
+                tiles={live.tiles} actions={starActions} joinSignal={starJoinSignal} />
+            )}
+            {!starShow && mlBig && ml && (
               <MultiLiveGrid state={ml} myId={myId} tiles={live.tiles} pulse={mlPulse} battle={mlBattle} bombed={mlExtras.bombed} isHost={role === "host"}
                 onSpeaker={mlSpeakerTap} onTap={mlTileTap} onGift={(id) => setGiftTarget(id)} onHands={mlShowHands} />
             )}
-            {!mlBig && orderedTiles.length === 0 && (
+            {!starShow && !mlBig && orderedTiles.length === 0 && (
               <div className="tile" style={{ display: "grid", placeItems: "center" }}>
                 <span className="muted">{live.status === "live" ? "Waiting for video…" : "Connecting…"}</span>
               </div>
             )}
-            {!mlBig && orderedTiles.map((tl) => (
+            {!starShow && !mlBig && orderedTiles.map((tl) => (
               <VideoTile key={tl.identity} tile={tl}
                 user={tl.isLocal ? user : (nameOf(tl.userId) as Partial<UserSummary> | undefined) ?? { fullname: tl.name }}
                 label={tl.isLocal ? `${displayName(user)} (you)` : displayName(nameOf(tl.userId) as Partial<UserSummary> ?? { fullname: tl.name })}
@@ -2101,7 +2264,7 @@ export function LiveViewerPage() {
             {role === "viewer" && live.status === "live" && (
               joinState === "requested"
                 ? <span className="pill">{t("waiting_for_the_host_to_accept")}</span>
-                : <button className="btn small" onClick={requestToJoin}>{t("ask_to_join")}</button>
+                : <button className="btn small" onClick={() => { void requestToJoin(); }}>{t("ask_to_join")}</button>
             )}
             {broadcasters.filter((b) => b.user_id !== user?.id).map((b) => (
               <button key={b.user_id} className="btn small" onClick={() => setGiftTarget(b.user_id)}>{t("gift_someone", displayName(b as Partial<UserSummary>))}</button>
@@ -2110,7 +2273,7 @@ export function LiveViewerPage() {
             <span className="muted" style={{ fontSize: 13 }}>{tn("your_coins_and_buy_more", <b style={{ color: "var(--gold)" }}>{user?.no_redeem_wallet ?? 0}</b>, <Link to="/wallet">{t("buy_more")}</Link>)}</span>
           </div>
 
-          {giftTarget && (
+          {giftTarget && !starVote && (
             <div className="card" style={{ marginTop: 12 }}>
               <div className="row" style={{ padding: "10px 12px", borderBottom: "1px solid var(--line)" }}>
                 <b style={{ color: "var(--gold)" }}>{t("send_a_gift_to", nameOfId(giftTarget) || (virtualGiftTarget ? personName(virtualGiftTarget) : ""))}</b>
@@ -2162,7 +2325,15 @@ export function LiveViewerPage() {
       {mlBoardOpen && mlBattle && (
         <RoomBattleBoard b={mlBattle} secondsLeft={mlSecondsLeft} isHost={role === "host"} onEnd={() => { void mlDo("endRoomBattle"); }} onClose={() => setMlBoardOpen(false)} />
       )}
-      {mlEnd && <RoomBattleEnd b={mlEnd} onClose={() => setMlEnd(null)} />}
+      {mlEnd && !starShow && <RoomBattleEnd b={mlEnd} onClose={() => setMlEnd(null)} />}
+      {/* Star shows: VOTE opens the normal Gifts page aimed at that guest; the send carries room_name. */}
+      {giftTarget && starVote && (
+        <StarVoteSheet name={starShow?.stage.find((r) => r.user_id === giftTarget)?.name || nameOfId(giftTarget)}
+          gifts={gifts} balance={user?.no_redeem_wallet ?? null}
+          onSend={(g) => { void sendGift(g); }} onClose={() => { setGiftTarget(null); setStarVote(false); }} />
+      )}
+      {starSetup && <StarSetupCard kind={starSetup} onCancel={() => setStarSetup(null)} onStart={(lowest) => beginStarShow(starSetup, lowest)} />}
+      {starBirthday && <StarBirthdaySheet onClose={() => setStarBirthday(null)} onSave={saveHostBirthday} />}
       <BinggBonusOverlay />
       {/* Catch the Fish (Steve, 2026-11-07): everyone watching but the streamer; the gift goes to the room's host. */}
       <LiveFishOverlay streamerId={hostUserId} roomName={roomName}
@@ -2655,7 +2826,14 @@ export function LiveViewerPage() {
         <DogRaceResults race={dogRace} myId={myId} onClose={() => setDogResultsClosedFor(dogRace.id)} />
       )}
       {menuOpen && (
-        <BattleMenu peopleOnScreen={broadcasters.length} onClose={() => setMenuOpen(false)} onNotice={setToast} onPick={(k) => {
+        <BattleMenu peopleOnScreen={broadcasters.length} onClose={() => setMenuOpen(false)} onNotice={setToast}
+          // Star shows: only in the host's OWN live (never a Country / Chat Battle room).
+          onStarShow={role === "host" && /^bb-live-/.test(roomName) ? (k) => {
+            setMenuOpen(false);
+            if (starShow) { showGoldAlert(tt("sts_menu_note")); return; }
+            setStarSetup(k);
+          } : null}
+          onPick={(k) => {
           setMenuOpen(false);
           if (k === "virtual") { if (role === "host") setPicker("virtual"); else setToast(tt("only_the_live_host_can_start_a_virtual_b")); return; }
           // Steve, 2026-11-06: one game named "Bingg Bongg Battle", 2 to 24 members — #1 starts the

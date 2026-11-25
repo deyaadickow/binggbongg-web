@@ -11,6 +11,7 @@
 // write answers the whole room state and the screen is drawn from that.
 import { post } from "./api";
 import { tt, type StringKey } from "./i18n";
+import { normStarShow, type StarShow } from "./starShow";
 
 /** Today's room. Rooms of this size or smaller keep today's 4-tile layout. */
 export const ML_DEFAULT_SIZE = 4;
@@ -74,6 +75,9 @@ export interface MlState {
   order: number[];
   members: MlMember[];
   room_battle: RoomBattle | null;
+  /** Star shows (2026-11-25): the public show while one runs here — draw it INSTEAD of the room
+   *  battle (every show round is also a room_battle for older apps; ignored while this is set). */
+  star_show: StarShow | null;
 }
 
 const truthy = (v: unknown) => v === true || v === 1 || v === "1" || v === "true";
@@ -114,6 +118,7 @@ export function normalizeMl(raw: unknown): MlState | null {
     order: ids(r.order),
     members,
     room_battle: normalizeBattle(r.room_battle),
+    star_show: normStarShow(r.star_show),
   };
 }
 
