@@ -8,6 +8,7 @@ import { openRandomLive } from "../lib/liveSwipe";
 import { useSession } from "../lib/session";
 import { PostCard } from "../components/PostCard";
 import { FeedAvatarRow } from "../components/FeedAvatarRow";
+import { MoneyVideoPill } from "../components/MoneyVideoPill";
 import { Loading, Notice, StoreBadges } from "../components/Common";
 import { getFeedSource, setFeed, setFeedSource } from "../lib/feed";
 import { FeedPhotoCard } from "../components/FeedPhotoCard";
@@ -161,6 +162,7 @@ export function HomePage() {
           this main screen"); it stays in the sidebar, Go Live and the Information Center. */}
       <div className="feed-top-row">
         <span />
+        <div className="feed-top-mid">
         <div className="feed-top-buttons">
         {/* Steve, 2026-11-17: "Set all the buttons together, make them uniform including the live" —
             Live first, then the three feeds, all the same black and gold button. */}
@@ -176,6 +178,10 @@ export function HomePage() {
             </button>
           ))}
         </div>
+        </div>
+        {/* "How to make money on Bingg Bongg" (Steve, 2026-11-26): right under the tabs, on every feed tab;
+            hidden until the server says show. In the middle column, so on a phone it stays above the store badges. */}
+        <MoneyVideoPill />
         </div>
         <div className="feed-top-badges"><StoreBadges compact /></div>
       </div>

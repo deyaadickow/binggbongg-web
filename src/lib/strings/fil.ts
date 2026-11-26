@@ -2770,6 +2770,8 @@ export const fil = {
   fav_create: "Gumawa",
   fav_live: "LIVE",
   fav_follow: "I-follow",
+  // "How to make money on Bingg Bongg" pill under the Home feed tabs (Steve, 2026-11-26). Never translate "Bingg Bongg".
+  how_to_make_money: "Paano kumita ng pera sa Bingg Bongg",
   // My Analytics "Since day one" (2026-11-20)
   ma_since_day_one: "Mula unang araw",
   // Bullseye badges page (2026-11-20)

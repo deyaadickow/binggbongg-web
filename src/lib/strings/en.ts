@@ -3555,6 +3555,8 @@ export const en = {
   fav_create: "Create",
   fav_live: "LIVE",
   fav_follow: "Follow",
+  // "How to make money on Bingg Bongg" pill under the Home feed tabs (Steve, 2026-11-26). Never translate "Bingg Bongg".
+  how_to_make_money: "How to make money on Bingg Bongg",
   // My Analytics "Since day one" (2026-11-20)
   ma_since_day_one: "Since day one",
   // Bullseye badges page (2026-11-20)

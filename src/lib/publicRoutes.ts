@@ -47,6 +47,8 @@ export function isPublicPath(pathname: string): boolean {
   if (import.meta.env.DEV && typeof window !== "undefined" && new URLSearchParams(window.location.search).has("vcbdemo")) return true;
   // DEV ONLY: the star show demo (?ssdemo=, 2026-11-25) opens signed out. Never in a production build.
   if (import.meta.env.DEV && typeof window !== "undefined" && new URLSearchParams(window.location.search).has("ssdemo")) return true;
+  // DEV ONLY: the "How to make money" pill demo (?mmdemo=en|fil|id, 2026-11-26) opens signed out. Never in a production build.
+  if (import.meta.env.DEV && typeof window !== "undefined" && new URLSearchParams(window.location.search).has("mmdemo")) return true;
   // DEV ONLY: ?lbdemo=1 (the red Live button, 2026-11-24) — the chips and the battles it steps through, signed out,
   // for the whole tab (the battle screens it opens have no ?lbdemo). Never in a production build.
   if (import.meta.env.DEV && typeof window !== "undefined") {
