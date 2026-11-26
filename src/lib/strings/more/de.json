@@ -2066,5 +2066,8 @@
  "vcb_no_members": "Noch keine Mitglieder aus {country}",
  "vcb_host": "Host",
  "lbq_next": "Nächster Battle",
- "lbq_prev": "Vorheriger Battle"
+ "lbq_prev": "Vorheriger Battle",
+ "fnd_not_interested": "Kein Interesse",
+ "fnd_interested": "Interessiert",
+ "fnd_interested_done": "Wir zeigen dir mehr Videos wie dieses"
 }

@@ -3052,4 +3052,8 @@ export const fil = {
   sts_r_already_confirmed: "Nakapagkumpirma ka na para sa kabilang show.",
   sts_r_not_a_guest: "Wala sa stage ang miyembrong iyon.",
   sts_r_host_only: "Ang host lang ang puwedeng gumawa niyan.",
+  // Feed hold menu (Steve, 2026-11-25).
+  fnd_not_interested: "Hindi interesado",
+  fnd_interested: "Interesado",
+  fnd_interested_done: "Magpapakita kami ng mas marami pang ganito",
 };

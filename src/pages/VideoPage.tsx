@@ -11,7 +11,7 @@ import { GiftFlash, PostGiftButton } from "../components/GiftSheet";
 import { appendToFeed, fetchMoreFeed, getFeed, insertIntoFeed, removeFromFeed } from "../lib/feed";
 import { HashtagList, HashtagText } from "../components/HashtagText";
 import { SearchTopicBar } from "../components/SearchTopicBar";
-import { findingUserId, notInterested, postHashtags, splitHashtags, undoNotInterested } from "../lib/finding";
+import { findingUserId, interested, notInterested, postHashtags, splitHashtags, undoNotInterested } from "../lib/finding";
 import { tt, useT  } from "../lib/i18n";
 import { showGoldAlert } from "../components/GoldToast";
 import { AutoCaptionOverlay, CcButton, EditCaptionsDialog } from "../components/AutoCaptions";
@@ -449,6 +449,16 @@ export function VideoPage() {
     });
   }
 
+  // "Interested" (Steve, 2026-11-25): the opposite — the server brings more of this creator's
+  // videos. The video carries on playing.
+  function markInterested() {
+    if (!item) return;
+    closeMenu();
+    if (!meId) { goSignIn(); return; }
+    showGoldAlert(tt("fnd_interested_done"));
+    interested(meId, item.id).catch((e) => showGoldAlert((e as Error).message || tt("something_went_wrong")));
+  }
+
   function undoGotIt() {
     if (!gotIt || !meId) return;
     const { post: back, at } = gotIt;
@@ -475,7 +485,9 @@ export function VideoPage() {
   // The rows of the hold-to-open menu, in the order Steve listed them. Each one does what the
   // control it replaced did; Auto Scroll is a switch, so it keeps the card up and its word
   // changes in place.
-  const menuRows: { label: string; trailing?: string; onPick: () => void }[] = [
+  // Steve, 2026-11-25: "Please put these tabs next to each other" — rows sharing a `pair` sit
+  // side by side: Duet | Stitch, Analytics | Repost, Interested | Not interested, Report | Support.
+  const menuRows: { label: string; trailing?: string; pair?: string; onPick: () => void }[] = [
     {
       label: t("auto_scroll"),
       trailing: auto ? t("switch_on") : t("switch_off"),
@@ -490,12 +502,14 @@ export function VideoPage() {
     // Duet / Stitch (Steve, 2026-11-16). Hidden when the creator turned it off.
     ...(["duet", "stitch"] as const).filter((k) => remixAllowed(item, k)).map((k) => ({
       label: k === "duet" ? "Duet" : "Stitch",
+      pair: "remix",
       onPick: () => {
         closeMenu(false);
         if (!isLoggedIn || !user) { navigate("/login", { state: { from: location.pathname } }); return; }
         navigate(`/record/${k}/${item.id}`);
       },
     })),
+    { label: t("copy_this_video"), onPick: () => { void copyLink(); closeMenu(); } },
     // The creator's own video: fix the automatic captions, or switch them off. Only once the
     // server sends the fields (a post from before the deploy has none) and only on real videos.
     ...(user && Number(item.user_id) === Number(user.id) && item.auto_captions_status !== undefined && (item.post_kind ?? "video") === "video" ? [
@@ -527,16 +541,14 @@ export function VideoPage() {
         },
       },
     ] : []),
-    // Not interested (Steve, 2026-11-16) — never on your own video.
-    ...(!meId || Number(item.user_id) !== Number(meId) ? [{ label: t("fnd_not_interested"), onPick: markNotInterested }] : []),
-    { label: t("copy_this_video"), onPick: () => { void copyLink(); closeMenu(); } },
     // Steve, 2026-11-13: "please add a analytics button, when they click it they will see all
     // the analytics for this video."
-    { label: t("va_menu_row"), onPick: () => { closeMenu(false); navigate(`/video/${item.id}/analytics`); } },
+    { label: t("va_menu_row"), pair: "stats", onPick: () => { closeMenu(false); navigate(`/video/${item.id}/analytics`); } },
     // Repost (Steve, 2026-11-17): hidden when the creator turned reposting off, and on your own
     // video (the server refuses both). On the dev server it goes to the mock, never the live server.
     ...(Number(item.allow_repost ?? 1) !== 0 && (!socialMe || Number(item.user_id) !== Number(socialMe.id)) ? [{
       label: t("repost"),
+      pair: "stats",
       onPick: () => {
         closeMenu(false);
         if (!socialMe) { navigate("/login", { state: { from: location.pathname } }); return; }
@@ -545,15 +557,21 @@ export function VideoPage() {
           .catch((e) => showGoldAlert((e as Error).message || tt("something_went_wrong")));
       },
     }] : []),
+    // Interested | Not interested (Steve, 2026-11-16 / 2026-11-25) — never on your own video.
+    ...(!meId || Number(item.user_id) !== Number(meId) ? [
+      { label: t("fnd_interested"), pair: "interest", onPick: markInterested },
+      { label: t("fnd_not_interested"), pair: "interest", onPick: markNotInterested },
+    ] : []),
     {
       label: t("report"),
+      pair: "help",
       onPick: () => {
         closeMenu(false);
         if (!isLoggedIn || !user) { navigate("/login", { state: { from: location.pathname } }); return; }
         navigate(`/settings/support?reason=${encodeURIComponent(tt("report"))}&about=${encodeURIComponent(videoShareUrl(item))}`);
       },
     },
-    { label: t("support"), onPick: () => { closeMenu(false); navigate("/settings/support"); } },
+    { label: t("support"), pair: "help", onPick: () => { closeMenu(false); navigate("/settings/support"); } },
   ];
   const likes = (item.likes ?? 0) + (liked && !item.is_post_liked ? 1 : 0) - (!liked && item.is_post_liked ? 1 : 0);
 
@@ -623,17 +641,37 @@ export function VideoPage() {
                   </div>
                 ) : null;
               })()}
-              {menuRows.map((r) => (
-                <button
-                  key={r.label}
-                  onClick={r.onPick}
-                  style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", cursor: "pointer",
-                           padding: "13px 14px", marginBottom: 8, borderRadius: 10, background: "#101010",
-                           color: "var(--gold)", border: "1.5px solid var(--gold-border)", fontSize: 15 }}>
-                  <span style={{ flex: 1, textAlign: "center" }}>{r.label}</span>
-                  <span style={{ fontWeight: 800 }}>{r.trailing ?? "\u203A"}</span>
-                </button>
-              ))}
+              {(() => {
+                // Consecutive rows with the same `pair` share a line; a pair with one row left
+                // (Repost hidden on your own video) stays full width.
+                const lines: (typeof menuRows)[] = [];
+                for (let i = 0; i < menuRows.length; i++) {
+                  const r = menuRows[i], n = menuRows[i + 1];
+                  if (r.pair && n && n.pair === r.pair) { lines.push([r, n]); i++; } else lines.push([r]);
+                }
+                return lines.map((line) => (
+                  <div key={line.map((r) => r.label).join("|")} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+                    {line.map((r) => {
+                      const half = line.length === 2;
+                      // Long words (German "veröffentlichen") get smaller; the rest wraps to 2 lines.
+                      const longest = Math.max(...r.label.split(" ").map((w) => w.length));
+                      const size = !half ? 15 : longest > 17 ? 12 : longest > 13 ? 13.5 : 15;
+                      return (
+                        <button
+                          key={r.label}
+                          onClick={r.onPick}
+                          style={{ display: "flex", alignItems: "center", gap: half ? 4 : 10, flex: 1, minWidth: 0, cursor: "pointer",
+                                   padding: half ? "11px 8px" : "13px 14px", borderRadius: 10, background: "#101010",
+                                   color: "var(--gold)", border: "1.5px solid var(--gold-border)", fontSize: size }}>
+                          <span style={{ flex: 1, minWidth: 0, textAlign: "center", lineHeight: 1.2, overflowWrap: "break-word",
+                                         display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{r.label}</span>
+                          <span style={{ fontWeight: 800 }}>{r.trailing ?? "\u203A"}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                ));
+              })()}
               <button className="btn ghost" style={{ width: "100%", marginTop: 4 }} onClick={() => closeMenu()}>
                 {t("close")}
               </button>

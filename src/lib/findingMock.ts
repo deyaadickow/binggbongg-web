@@ -119,6 +119,9 @@ export async function mockFindingCall<T>(endpoint: string, params: Record<string
       save(s);
       return { status: true, message: "Got it. You'll see fewer videos like this." };
     }
+    case "interestedPost":
+      // Feed hold menu (Steve, 2026-11-25): nothing to keep in the mock.
+      return { status: true, message: "We'll show you more like this." };
     case "undoNotInterested": {
       s.notInterested = s.notInterested.filter((x) => x !== Number(params.post_id));
       save(s);

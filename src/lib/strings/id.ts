@@ -2799,4 +2799,8 @@ export const id = {
   // Live button bar (Steve, 2026-11-24).
   lbq_next: "Battle berikutnya",
   lbq_prev: "Battle sebelumnya",
+  // Feed hold menu (Steve, 2026-11-25).
+  fnd_not_interested: "Tidak tertarik",
+  fnd_interested: "Tertarik",
+  fnd_interested_done: "Kami akan menampilkan lebih banyak video seperti ini",
 };

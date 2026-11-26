@@ -13,7 +13,7 @@ import { post, type ApiResponse, type Post, type Sound, type UserSummary } from 
 
 /** The endpoints this feature added on the server. In dev they are ALWAYS mocked. */
 const NEW_ENDPOINTS = new Set([
-  "fetchDiscover", "searchAll", "fetchFriendsPosts", "notInterestedPost", "undoNotInterested",
+  "fetchDiscover", "searchAll", "fetchFriendsPosts", "notInterestedPost", "undoNotInterested", "interestedPost",
   "fetchKeywordFilters", "addKeywordFilter", "removeKeywordFilter",
 ]);
 
@@ -140,6 +140,12 @@ export async function fetchFeedBatch(tab: FeedTab, myUserId: number | null, star
 
 export async function notInterested(myUserId: number, postId: number): Promise<void> {
   const r = await findCall("notInterestedPost", { my_user_id: myUserId, post_id: postId });
+  if (!r.status) throw new Error(r.message || "");
+}
+
+/** "Interested" (Steve, 2026-11-25): more of this creator's videos in the member's feeds. */
+export async function interested(myUserId: number, postId: number): Promise<void> {
+  const r = await findCall("interestedPost", { my_user_id: myUserId, post_id: postId });
   if (!r.status) throw new Error(r.message || "");
 }
 

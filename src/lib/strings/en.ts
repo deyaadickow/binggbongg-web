@@ -3051,6 +3051,8 @@ export const en = {
   fnd_no_results: "No results for \"%1$s\".",
   fnd_type_to_search: "Type to search videos, people, sounds and hashtags.",
   fnd_not_interested: "Not interested",
+  fnd_interested: "Interested",
+  fnd_interested_done: "We'll show you more like this",
   fnd_got_it: "Got it — you'll see fewer videos like this",
   fnd_undo: "Undo",
   fnd_filter_keywords: "Filter keywords",
