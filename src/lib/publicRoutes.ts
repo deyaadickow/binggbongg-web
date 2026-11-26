@@ -49,6 +49,15 @@ export function isPublicPath(pathname: string): boolean {
   if (import.meta.env.DEV && typeof window !== "undefined" && new URLSearchParams(window.location.search).has("ssdemo")) return true;
   // DEV ONLY: the "How to make money" pill demo (?mmdemo=en|fil|id, 2026-11-26) opens signed out. Never in a production build.
   if (import.meta.env.DEV && typeof window !== "undefined" && new URLSearchParams(window.location.search).has("mmdemo")) return true;
+  // DEV ONLY: the Singing Contest demo (?scdemo=1|upcoming|processing|rec, 2026-11-26) opens signed out, for the
+  // whole tab (it is carried in sessionStorage). Never in a production build.
+  if (import.meta.env.DEV && typeof window !== "undefined") {
+    try {
+      const v = new URLSearchParams(window.location.search).get("scdemo");
+      if (v !== null) sessionStorage.setItem("scdemo", v || "1");
+      if (sessionStorage.getItem("scdemo")) return true;
+    } catch { /* no storage */ }
+  }
   // Dev-only: the Badges page (Bingg + Bongg on every box) without signing in, for screenshots.
   if (import.meta.env.DEV && typeof window !== "undefined" && new URLSearchParams(window.location.search).has("mbdemo")) return true;
   // DEV ONLY: ?lbdemo=1 (the red Live button, 2026-11-24) — the chips and the battles it steps through, signed out,

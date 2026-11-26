@@ -50,6 +50,8 @@ function featureSections(root: string, en: Record<string, string>): Section[] {
       // A contest tile only shows while a contest is switched on (Steve, 2026-11-01: "remove all
       // singing contest from the app for now"), so the crawled copy never lists it.
       if (/contestOnly:\s*true/.test(obj)) continue;
+      // The monthly Singing Contest tile likewise shows only while its switch is on.
+      if (/singingOnly:\s*true/.test(obj)) continue;
       if (name) tiles.push({ name, blurb: blurb ? en[blurb] ?? "" : "", to });
     }
     if (tiles.length) sections.push({ key: titleKey, title: en[titleKey] ?? titleKey, tiles });

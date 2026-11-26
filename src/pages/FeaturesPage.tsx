@@ -37,6 +37,7 @@ import { FeatureVideoPlayer, type PlayerItem } from "../components/FeatureVideoP
 import { useContestOn } from "../lib/contests";
 import { usePodcastEnabled } from "../lib/podcast";
 import { useFreeCoinsListed } from "../lib/freeCoins";
+import { useSingingContestEnabled } from "../lib/singingContest";
 
 export interface Feature {
   icon: string;
@@ -64,6 +65,8 @@ export interface Feature {
   videoKey?: string;
   /** Shown only while the Bingg Bongg Podcast is switched on (podcast_enabled). */
   podcastOnly?: true;
+  /** Shown only while the monthly Singing Contest is switched on (fetchSingingContest enabled:true). */
+  singingOnly?: true;
   /** Hidden when fetchFreeCoins answers with nothing to list (every reward set to 0). */
   freeCoinsOnly?: true;
 }
@@ -89,6 +92,8 @@ export const FEATURES: Section[] = [
       // Pre-Launch Special (Steve, 2026-11-10; changed 2026-11-11 to 100 FBBs each: "1000 free BBs is too much, make it 100 Free BBs" — "We will give everyone 1000 FBBs
       // from day one, and every new member" — no refill, no wipe).
       { icon: "🎉", nameKey: "fname_prelaunch", blurbKey: "fblurb_prelaunch", to: "/pre-launch" },
+      // Monthly Singing Contest (Steve, 2026-11-26). Hidden until singing_contest_enabled is on.
+      { icon: "🎙️", nameKey: "fname_singing_contest", blurbKey: "fblurb_singing_contest", to: "/singing-contest", singingOnly: true },
       { icon: "🎤", nameKey: "fname_philippine_singing_contest", blurbKey: "fblurb_philippine_singing_contest", to: "/featured-contest", contestOnly: true },
       { icon: "📣", nameKey: "fname_exciting_news", blurbKey: "fblurb_exciting_news", to: "/exciting-news" },
       // Steve, 2026-10-29: "make another page that's called 'Bingg Bongg Features Videos' and add
@@ -440,9 +445,10 @@ export function FeaturesPage() {
   const hasContest = useContestOn();
   const hasPodcast = usePodcastEnabled();
   const hasFreeCoins = useFreeCoinsListed();
+  const hasSinging = useSingingContestEnabled(user?.id);
   const shown = FEATURES.map((s) => ({
     ...s,
-    features: s.features.filter((f) => (hasContest || !f.contestOnly) && (hasPodcast || !f.podcastOnly) && (hasFreeCoins || !f.freeCoinsOnly)),
+    features: s.features.filter((f) => (hasContest || !f.contestOnly) && (hasPodcast || !f.podcastOnly) && (hasFreeCoins || !f.freeCoinsOnly) && (hasSinging || !f.singingOnly)),
   }));
   const numbers = featureNumbers(shown);
   // Every tile's own video, in the directory's order, so the player can scroll from one feature's

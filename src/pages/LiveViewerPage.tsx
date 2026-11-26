@@ -74,6 +74,7 @@ import { makeBinggBonusWatcher } from "../lib/binggBonus";
 import { FishHostControls, LiveFishOverlay } from "../components/LiveFishOverlay";
 import { CountryTranslatePopup } from "../components/CountryTranslatePopup";
 import { LiveAccessGate, SubscribersOnlyLiveToggle } from "../components/Creators";
+import { SingingRecorder } from "../components/SingingRecorder";
 
 interface Member { user_id: number; fullname?: string; username?: string; profile_image?: string; country?: string; local_timezone?: string }
 interface RoomMembers { host_user_id: number; host_fullname?: string; host_username?: string; host_profile_image?: string; host_country?: string; host_local_timezone?: string; live_seconds?: number; guests: Member[]; multi_live?: unknown;
@@ -254,6 +255,11 @@ export function LiveViewerPage() {
   const podcastAudio = podcast?.kind === "audio";
   const live = useLiveRoom(roomName, role, isLoggedIn && !roomClosed, { micAllowed: mlMe && !mlMe.is_host ? mlMe.is_speaker : null, audioOnly: podcastAudio });
   const isPublisher = role !== "viewer" && live.status === "live";
+  // Singing Contest (2026-11-26): the host came from the contest page (/go-live?singing=1). The room records up to
+  // 5 minutes; while that recording is pending/recording it is a SOLO live — no invite, no hands, join requests
+  // declined (scBlocking).
+  const singing = wantsHost && search.get("singing") === "1";
+  const [scBlocking, setScBlocking] = useState(false);
 
   // Bingg Bongg Battle (1v1). Result overlay for the two battlers, a toast for everyone else.
   const [battleResult, setBattleResult] = useState<BattleData | null>(null);
@@ -1368,6 +1374,18 @@ export function LiveViewerPage() {
     return null;
   }
 
+  // Singing Contest: nobody joins while the singing video records — every join request is declined.
+  const scDeclined = useRef(new Set<number>());
+  useEffect(() => {
+    if (!scBlocking) return;
+    for (const r of joinRequests) {
+      if (scDeclined.current.has(r.request_id)) continue;
+      scDeclined.current.add(r.request_id);
+      void answerRequest(r, false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scBlocking, joinRequests]);
+
   async function answerRequest(r: JoinRequest, approve: boolean) {
     if (!user) return;
     try {
@@ -1821,6 +1839,9 @@ export function LiveViewerPage() {
         </div>
         <span className={`pill ${statusLabel === "● LIVE" ? "live" : ""}`}>{statusLabel}</span>
       </div>
+      {singing && role === "host" && user && (
+        <SingingRecorder myId={user.id} roomName={roomName} ready={isPublisher} onBlocking={setScBlocking} />
+      )}
       {live.error && <Notice error>{live.error}</Notice>}
       {live.publishError && <Notice error>{live.publishError}</Notice>}
       {(roomClosed || live.status === "ended") && <Notice>{tn("this_live_has_ended", <Link to="/live">{t("see_who_else_is_live")}</Link>)}</Notice>}
@@ -2181,7 +2202,7 @@ export function LiveViewerPage() {
                 <button className="btn small" onClick={mlStartBattle}>⚔️ {t("bingg_bongg_battle")}</button>
               )}
               {/* "Members on camera" removed (Steve, 2026-11-11: "We don't need this page"). */}
-              {role === "host" && mlBig && ml && (
+              {role === "host" && mlBig && ml && !scBlocking && (
                 <button className="btn small" onClick={mlShowHands}>{t("ml_menu_hands", ml.hands.length)}</button>
               )}
               {/* The phones' (G) menu — anyone broadcasting in the room can set its game,
@@ -2204,7 +2225,7 @@ export function LiveViewerPage() {
               {role === "host" && (
                 <button className="btn small" title={t("who_is_playing_a_game_in_your_room_right")} onClick={() => setWhosPlayingOpen(true)}>{t("who_s_playing")}</button>
               )}
-              {role === "host" && (
+              {role === "host" && !scBlocking && (
                 <button className="btn small" title={t("invite_someone_you_follow_into_an_open_s")}
                   onClick={() => { if (ml ? ml.seats_left <= 0 : live.tiles.length >= 4) setToast(tt(ml ? "ml_room_full" : "the_room_is_full")); else setInviteOpen(true); }}>{t("invite_2")}</button>
               )}
@@ -2226,7 +2247,7 @@ export function LiveViewerPage() {
             </div>
           )}
 
-          {role === "host" && joinRequests.length > 0 && (
+          {role === "host" && joinRequests.length > 0 && !scBlocking && (
             <div className="card" style={{ marginTop: 12 }}>
               <div style={{ padding: "10px 12px", borderBottom: "1px solid var(--line)" }}><b style={{ color: "var(--gold)" }}>{t("wants_to_join_your_live")}</b></div>
               {joinRequests.map((r) => (

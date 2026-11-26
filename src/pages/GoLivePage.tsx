@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { post } from "../lib/api";
 import { useSession } from "../lib/session";
 import { Notice } from "../components/Common";
@@ -8,6 +8,8 @@ import { PageTitle } from "../components/PageTitle";
 import { requireVerified } from "../lib/verifyEmail";
 import { StartPodcastLink } from "./PodcastPages";
 import { InfoBanner } from "./InformationCenterPage";
+import { SingingRecorder } from "../components/SingingRecorder";
+import { scDemo } from "../lib/singingContest";
 
 /** Steve, 2026-11-25: the Bingg Bongg button's page IS the Information Center now — "add all the links
  *  from the information center on this page and delete the information center link". Every box is the
@@ -53,10 +55,15 @@ export function GoLivePage() {
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  // Singing Contest (2026-11-26): /go-live?singing=1 from the contest page = a SOLO live titled "🎤 Singing Contest";
+  // the live room records it (?singing=1 carried on). DEV ONLY ?scdemo=rec shows the REC pill right here.
+  const [search] = useSearchParams();
+  const singing = search.get("singing") === "1";
+  const recDemo = import.meta.env.DEV && singing && scDemo() === "rec";
   // Multi-live 24 (2026-11-05): the host picks how many are on camera, him included (4 = today).
 
   useEffect(() => {
-    if (!isLoggedIn) return;
+    if (!isLoggedIn && !recDemo) return;
     let cancelled = false;
     navigator.mediaDevices?.getUserMedia({ video: { facingMode: "user" }, audio: true })
       .then((stream) => {
@@ -70,7 +77,7 @@ export function GoLivePage() {
       streamRef.current?.getTracks().forEach((t) => t.stop());
       streamRef.current = null;
     };
-  }, [isLoggedIn]);
+  }, [isLoggedIn, recDemo]);
 
   async function goLive() {
     if (!user) return;
@@ -80,11 +87,13 @@ export function GoLivePage() {
     try {
       // Steve, 2026-11-11: no room size any more — every room holds 24 and the server switches it
       // to the big grid when a 5th person comes in.
-      const res = await post<unknown>("startLive", { user_id: user.id });
+      // startLive takes no title today; the Singing Contest title rides along (ignored by an older server) and
+      // the room shows it from ?singing=1.
+      const res = await post<unknown>("startLive", singing ? { user_id: user.id, title: tt("sc_live_tag") } : { user_id: user.id });
       const roomName = (res as { room_name?: string }).room_name;
       if (!res.status || !roomName) throw new Error(res.message ?? tt("couldn_t_start_the_stream"));
       streamRef.current?.getTracks().forEach((t) => t.stop()); // the room takes the camera over
-      navigate(`/live/${encodeURIComponent(roomName)}?host=1`, { replace: true });
+      navigate(`/live/${encodeURIComponent(roomName)}?host=1${singing ? "&singing=1" : ""}`, { replace: true });
     } catch (e) {
       setError((e as Error).message);
       setBusy(false);
@@ -93,6 +102,16 @@ export function GoLivePage() {
 
   // Signed out: the banner and the links still show (the main page no longer has an Information
   // Center button), with the sign-in note where the camera would be.
+  if (recDemo) return (
+    <div className="page" style={{ maxWidth: 560 }}>
+      <PageTitle>{t("sc_live_tag")}</PageTitle>
+      <div className="card" style={{ aspectRatio: "9 / 12", background: "#000", display: "grid", placeItems: "center", position: "relative" }}>
+        {previewError ? <p className="muted center" style={{ padding: 20 }}>{previewError}</p> : <video ref={videoRef} autoPlay muted playsInline style={{ width: "100%", height: "100%", objectFit: "cover" }} />}
+      </div>
+      <SingingRecorder myId={99001} roomName="bb-live-99001-1" ready />
+    </div>
+  );
+
   if (!isLoggedIn) return (
     <div className="page" style={{ maxWidth: 560 }}>
       <PageTitle>{t("go_live")}</PageTitle>
@@ -106,7 +125,12 @@ export function GoLivePage() {
     <div className="page" style={{ maxWidth: 560 }}>
       <PageTitle>{t("go_live")}</PageTitle>
       {/* The Information Center's video banner on top (Steve, 2026-11-25): swipe for the next, tap plays it. */}
-      <InfoBanner />
+      {singing ? (
+        <div style={{ margin: "10px 0", padding: "12px 14px", border: "2px solid #F0C420", borderRadius: 14, background: "#000", color: "#F0C420", fontWeight: 700, textAlign: "center" }}>
+          <div style={{ fontSize: 18, fontWeight: 900 }}>{t("sc_live_tag")}</div>
+          <div style={{ fontSize: 14, marginTop: 4 }}>{t("sc_golive_note")}</div>
+        </div>
+      ) : <InfoBanner />}
       <div className="card" style={{ aspectRatio: "9 / 12", background: "#000", display: "grid", placeItems: "center" }}>
         {previewError ? <p className="muted center" style={{ padding: 20 }}>{previewError}</p> : <video ref={videoRef} autoPlay muted playsInline style={{ width: "100%", height: "100%", objectFit: "cover" }} />}
       </div>
@@ -117,9 +141,9 @@ export function GoLivePage() {
       {/* The "Join the … whole country battle Now" button under Go Live was removed (Steve,
           2026-11-24: "Remove the join the american whole country from this page"); in its place
           the Information Center's buttons — since 2026-11-25 all of them, gold with red stars. */}
-      <BinggBonggLinks />
+      {!singing && <BinggBonggLinks />}
       {/* Bingg Bongg Podcast (Steve, 2026-11-10) — right under Go Live, only while switched on. */}
-      <StartPodcastLink />
+      {!singing && <StartPodcastLink />}
       {previewError && <p className="muted center" style={{ fontSize: 13, marginTop: 8 }}>{t("you_can_still_go_live_and_turn_the_camer")}</p>}
       <p className="muted center" style={{ fontSize: 13, marginTop: 8 }}>{t("your_followers_see_you_in_live_now_the_m")}</p>
       {/* Steve, 2026-10-03 — the gamers' route in. Someone with a capture card and OBS is not
