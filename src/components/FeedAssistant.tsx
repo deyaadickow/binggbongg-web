@@ -102,7 +102,10 @@ export function FeedAssistantHost() {
 
   const yes = async (q: FaQuestion) => {
     close();
-    if (q.action === "video") {
+    // A key with no tile of its own (e.g. chat_battle, "Do you want to know how Chat Battle works?")
+    // plays that feature's video; the directory is only the last resort (Steve, 2026-11-26).
+    const noTile = q.tile !== DIRECTORY && !findTile(q.tile);
+    if (q.action === "video" || noTile) {
       const videos = await fetchFeatureVideos(lang);
       const url = videos[q.tile];
       if (url) {
