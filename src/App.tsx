@@ -110,6 +110,7 @@ import { GoldDiggerManager } from "./components/GoldDigger";
 import { FeedAssistantHost } from "./components/FeedAssistant";
 import { GoldDiggerPage } from "./pages/GoldDiggerPage";
 import { SingingContestPage } from "./pages/SingingContestPage";
+import { BraggingRightsPage } from "./pages/BraggingRightsPage";
 
 /** The ads' landing page (/ph) stands alone — no menu, no sidebar, nothing but the contest and the
  *  download button (Steve, 2026-10-31). Everything else gets the normal site. */
@@ -376,6 +377,7 @@ export default function App() {
           <Route path="/gold-digger" element={<GoldDiggerPage />} />
           {/* Monthly Singing Contest (Steve, 2026-11-26). */}
           <Route path="/singing-contest" element={<SingingContestPage />} />
+          <Route path="/singing-contest/bragging-rights" element={<BraggingRightsPage />} />
           <Route path="/free-coins" element={<FreeCoinsPage />} />
           {/* Pre-Launch Special (Steve, 2026-11-10; 2026-11-11: 100 FBBs for every member, no refill). */}
           <Route path="/pre-launch" element={<PrelaunchPage />} />

@@ -4,9 +4,11 @@
 //   /singing-contest?scdemo=upcoming    the round before it starts (no entries yet, "Starts in")
 //   /singing-contest?scdemo=processing  my recording is still being made
 //   /go-live?singing=1&scdemo=rec       the go-live page with the red REC pill counting down
+//   /singing-contest/bragging-rights?scdemo=1      Lifetime Bragging Rights: 3 past months + Legends
+//   /singing-contest/bragging-rights?scdemo=empty  the board before the first month ends
 // Demo singers are adults with initials only (no faces).
 import { UPLOAD_BASE } from "./api";
-import type { ScContest, ScEntry, ScRecording } from "./singingContest";
+import type { ScBragging, ScContest, ScEntry, ScRecording } from "./singingContest";
 
 const SINGERS: [string, string, string, number][] = [
   ["maria.santos", "Maria Santos", "Philippines", 1840],
@@ -62,6 +64,37 @@ function contest(mode: string): ScContest {
   };
 }
 
+// Lifetime Bragging Rights: three past months, newest first, and the Legends they add up to.
+const PEOPLE: [string, string, string][] = [
+  ["maria.santos", "Maria Santos", "Philippines"], ["budi.prasetyo", "Budi Prasetyo", "Indonesia"], ["jake.miller", "Jake Miller", "United States"],
+  ["ana.reyes", "Ana Reyes", "Philippines"], ["siti.rahma", "Siti Rahma", "Indonesia"], ["tom.harris", "Tom Harris", "United Kingdom"],
+  ["carlos.diaz", "Carlos Díaz", "Mexico"],
+];
+const person = (i: number) => ({ user_id: 6000 + i, username: PEOPLE[i][0], fullname: PEOPLE[i][1], profile_image: null, is_verified: i === 0 ? 1 : 0, country: PEOPLE[i][2] });
+function bragging(mode: string): ScBragging {
+  if (mode === "empty") return { status: true, enabled: true, months: [], has_more: false, legends: [] };
+  const months: [string, string, number[], number[]][] = [
+    ["2027-03", "March 2027", [0, 1, 3], [4120, 3380, 2210]],
+    ["2027-02", "February 2027", [1, 0, 5], [3650, 2990, 1740]],
+    ["2027-01", "January 2027", [0, 2, 4], [3000, 2480, 1325]],
+  ];
+  const tally = new Map<number, { first: number; second: number; third: number }>();
+  const out = months.map(([month, label, who, votes], m) => ({
+    round_id: 3 - m, month, label,
+    winners: who.map((i, p) => {
+      const t = tally.get(i) ?? { first: 0, second: 0, third: 0 };
+      if (p === 0) t.first++; else if (p === 1) t.second++; else t.third++;
+      tally.set(i, t);
+      return { place: p + 1, votes: votes[p], user: person(i), entry_id: 200 + m * 3 + p, post_id: m === 2 && p === 2 ? null : 3800 + m * 3 + p, thumbnail_url: null };
+    }),
+  }));
+  const legends = [...tally.entries()]
+    .map(([i, t]) => ({ user: person(i), wins: t.first + t.second + t.third, ...t }))
+    .sort((a, b) => b.first - a.first || b.second - a.second || b.third - a.third)
+    .map((l, k) => ({ rank: k + 1, ...l }));
+  return { status: true, enabled: true, months: out, has_more: false, legends };
+}
+
 let startedAt = 0;
 let stopped: ScRecording | null = null;
 function rec(): ScRecording {
@@ -86,6 +119,7 @@ export async function demoCall(endpoint: string, _params: Record<string, unknown
     case "stopSingingContestRecording":
       stopped = { ...rec(), status: "processing" };
       return { status: true, recording: stopped };
+    case "fetchSingingContestBraggingRights": return bragging(mode);
     case "deleteSingingContestEntry": return { status: true, message: "Deleted." };
     default: return { status: false, message: "demo" };
   }

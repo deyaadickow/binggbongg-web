@@ -113,7 +113,7 @@ export function SingingContestPage() {
       <div style={box}>
         <div style={{ fontWeight: 900, fontSize: 17, marginBottom: 6 }}>{t("sc_rules")}</div>
         <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.5 }}>
-          {(["sc_rule_1", "sc_rule_2", "sc_rule_3", "sc_rule_4", "sc_rule_5", "sc_rule_6"] as const).map((k) => <li key={k}>{t(k)}</li>)}
+          {(["sc_rule_1", "sc_rule_2", "sc_rule_3", "sc_rule_4", "sc_rule_5", "sc_brag_rule", "sc_rule_6"] as const).map((k) => <li key={k}>{t(k)}</li>)}
         </ul>
       </div>
 
@@ -192,6 +192,12 @@ export function SingingContestPage() {
           ))}
         </div>
       )}
+
+      {/* Lifetime Bragging Rights (Steve, 2026-11-26): every winner, forever. */}
+      <Link to="/singing-contest/bragging-rights" style={{ ...box, display: "block", textAlign: "center", fontSize: 18, fontWeight: 900, textDecoration: "none",
+        background: "linear-gradient(180deg, #2a1a00 0%, #120b00 60%, #000 100%)", boxShadow: "0 0 14px rgba(240,196,32,.25)" }}>
+        {t("sc_brag_button")}
+      </Link>
 
       {confirmOpen && (
         <div className="modal-backdrop" onClick={() => setConfirmOpen(false)}>

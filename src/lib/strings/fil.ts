@@ -3097,4 +3097,12 @@ export const fil = {
   sc_off: "Hindi bukas ang Singing Contest ngayon.",
   sc_golive_note: "Magla-live ka para sa Singing Contest. Ire-record ng Bingg Bongg hanggang 5 minuto. Walang guest habang nagre-record.",
   sc_no_guests: "Walang guest habang nire-record ang singing video mo.",
+  sc_brag_rule: "Mapupunta ang mga nanalo sa aming Lifetime Bragging Rights board, habambuhay!",
+  sc_brag_button: "🏆 Lifetime Bragging Rights",
+  sc_brag_title: "Lifetime Bragging Rights",
+  sc_brag_sub: "Bawat nanalo, habambuhay.",
+  sc_brag_legends: "Mga Alamat",
+  sc_brag_empty: "Mapupunta ang mga unang nanalo sa board na ito sa Enero 1.",
+  sc_brag_wins: "%1$s panalo",
+  sc_brag_more: "Ipakita pa",
 };

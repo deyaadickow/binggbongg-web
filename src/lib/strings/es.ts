@@ -2804,4 +2804,12 @@ export const es = {
   sc_off: "El Concurso de Canto no está activo ahora.",
   sc_golive_note: "Vas a transmitir en vivo para el Concurso de Canto. Bingg Bongg graba hasta 5 minutos. Sin invitados mientras se graba.",
   sc_no_guests: "Sin invitados mientras se graba tu video cantando.",
+  sc_brag_rule: "¡Los ganadores entran en nuestro tablero de Orgullo de por Vida, para siempre!",
+  sc_brag_button: "🏆 Orgullo de por Vida",
+  sc_brag_title: "Orgullo de por Vida",
+  sc_brag_sub: "Cada ganador, para siempre.",
+  sc_brag_legends: "Leyendas",
+  sc_brag_empty: "Los primeros ganadores entran en este tablero el 1 de enero.",
+  sc_brag_wins: "%1$s victorias",
+  sc_brag_more: "Ver más",
 };

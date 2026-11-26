@@ -3887,4 +3887,12 @@ export const en = {
   sc_off: "The Singing Contest isn't on right now.",
   sc_golive_note: "You are going live for the Singing Contest. Bingg Bongg records up to 5 minutes. No guests while recording.",
   sc_no_guests: "No guests while your singing video is recording.",
+  sc_brag_rule: "Winners go on our Lifetime Bragging Rights board, forever!",
+  sc_brag_button: "🏆 Lifetime Bragging Rights",
+  sc_brag_title: "Lifetime Bragging Rights",
+  sc_brag_sub: "Every winner, forever.",
+  sc_brag_legends: "Legends",
+  sc_brag_empty: "The first winners go on this board on January 1.",
+  sc_brag_wins: "%1$s wins",
+  sc_brag_more: "Show more",
 } as const;

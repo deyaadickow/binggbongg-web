@@ -84,6 +84,16 @@ export function deleteSingingContestEntry(myUserId: number, entryId: number) {
   return call<Record<string, never>>("deleteSingingContestEntry", { my_user_id: myUserId, entry_id: entryId });
 }
 
+// Lifetime Bragging Rights (Steve, 2026-11-26: "The winners will have a lifetime bragging rights board that their
+// name will be on there forever."). Newest month first; a winner stays even after deleting the video (post_id null).
+export interface ScBragWinner { place: number; votes: number; user: ScUser; entry_id: number; post_id: number | null; thumbnail_url?: string | null }
+export interface ScBragMonth { round_id: number; month: string; label: string; winners: ScBragWinner[] }
+export interface ScLegend { rank: number; user: ScUser; wins: number; first: number; second: number; third: number }
+export interface ScBragging { status: boolean; enabled: boolean; message?: string; months?: ScBragMonth[]; has_more?: boolean; legends?: ScLegend[] }
+export function fetchSingingContestBraggingRights(myUserId: number, start = 0, count = 12) {
+  return call<ScBragging>("fetchSingingContestBraggingRights", { my_user_id: myUserId, start, count }) as Promise<ScBragging>;
+}
+
 let enabledRequest: Promise<boolean> | null = null;
 /** enabled off fetchSingingContest, once per page load; a failure is "off" (retried next time). */
 export function singingContestEnabled(myUserId: number | null | undefined): Promise<boolean> {

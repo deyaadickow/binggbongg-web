@@ -2844,4 +2844,12 @@ export const id = {
   sc_off: "Kontes Menyanyi sedang tidak aktif.",
   sc_golive_note: "Kamu akan live untuk Kontes Menyanyi. Bingg Bongg merekam hingga 5 menit. Tidak ada tamu selama merekam.",
   sc_no_guests: "Tidak ada tamu selama video menyanyimu direkam.",
+  sc_brag_rule: "Pemenang masuk ke papan Kebanggaan Seumur Hidup kami, selamanya!",
+  sc_brag_button: "🏆 Kebanggaan Seumur Hidup",
+  sc_brag_title: "Kebanggaan Seumur Hidup",
+  sc_brag_sub: "Setiap pemenang, selamanya.",
+  sc_brag_legends: "Legenda",
+  sc_brag_empty: "Pemenang pertama masuk ke papan ini pada 1 Januari.",
+  sc_brag_wins: "%1$s kemenangan",
+  sc_brag_more: "Lihat lebih banyak",
 };
