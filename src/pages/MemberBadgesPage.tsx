@@ -26,14 +26,31 @@ interface MemberBadges {
 
 const gold = "var(--gold)";
 
+/** Bingg or Bongg in a gold ring with the name under the face. */
+function Mascot({ src, name }: { src: string; name: string }) {
+  return (
+    <div style={{ width: 60, flex: "0 0 60px", display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+      <img src={src} alt={name} width={50} height={50}
+        style={{ width: 50, height: 50, borderRadius: "50%", objectFit: "cover", padding: 2, border: "2px solid var(--gold-border, #F0C420)", background: "#000", boxSizing: "content-box" }} />
+      <div style={{ color: gold, fontWeight: 800, fontSize: 13, lineHeight: 1 }}>{name}</div>
+    </div>
+  );
+}
+
 function Card({ icon, title, value, body, extra }: { icon: React.ReactNode; title: string; value?: React.ReactNode; body: string; extra?: React.ReactNode }) {
   return (
     <section className="card" style={{ padding: "14px 16px", background: "#000", border: "1.5px solid var(--gold-border, #F0C420)", display: "grid", gap: 8 }}>
       {/* Steve, 2026-11-20: the heading of every box bigger and centred. */}
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, textAlign: "center" }}>
-        <div style={{ minHeight: 52, display: "flex", alignItems: "center", justifyContent: "center" }}>{icon}</div>
-        <div style={{ color: gold, fontWeight: 800, fontSize: 24, lineHeight: 1.15 }}>{title}</div>
-        {value !== undefined && <div style={{ color: gold, fontWeight: 800, fontSize: 22, fontVariantNumeric: "tabular-nums" }}>{value}</div>}
+      {/* Steve, 2026-11-26: "Please add Bingg and Bongg, one on each side of each box with their name
+          bellow them." Bingg left, Bongg right, the heading stays centred between them. */}
+      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+        <Mascot src="/img/assistant_bingg.jpg" name="Bingg" />
+        <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 6, textAlign: "center" }}>
+          <div style={{ minHeight: 52, display: "flex", alignItems: "center", justifyContent: "center" }}>{icon}</div>
+          <div style={{ color: gold, fontWeight: 800, fontSize: 24, lineHeight: 1.15 }}>{title}</div>
+          {value !== undefined && <div style={{ color: gold, fontWeight: 800, fontSize: 22, fontVariantNumeric: "tabular-nums" }}>{value}</div>}
+        </div>
+        <Mascot src="/img/assistant_bongg.jpg" name="Bongg" />
       </div>
       <div style={{ height: 1, background: gold, opacity: 0.35 }} />
       <div style={{ color: gold, opacity: 0.9, lineHeight: 1.45 }}>{body}</div>
