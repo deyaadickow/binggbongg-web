@@ -32,6 +32,22 @@ export function MoneyVideoPill() {
     paused.current = [];
   };
 
+  // Steve, 2026-11-26, again: "I still hear two sound". Pausing once on open isn't enough when a
+  // feed card starts on its own afterwards (a card finishing loading, the next ad), so while the
+  // money video is up anything else on the page that starts playing is paused straight away.
+  useEffect(() => {
+    if (!playing || !video?.video) return;
+    const file = video.video.split("/").pop() ?? video.video;
+    const onPlay = (e: Event) => {
+      const m = e.target as HTMLMediaElement;
+      if (!(m instanceof HTMLMediaElement)) return;
+      if ((m.currentSrc || m.src || "").includes(file)) return;
+      m.pause();
+    };
+    document.addEventListener("play", onPlay, true);
+    return () => document.removeEventListener("play", onPlay, true);
+  }, [playing, video?.video]);
+
   useEffect(() => {
     let live = true;
     fetchMoneyVideo(user?.id).then((v) => { if (live) setVideo(v); });
