@@ -2385,3 +2385,11 @@ body:has(.story-viewer) .get-app-bar { display: none; }
 .sts-gifts { grid-template-columns: repeat(4, minmax(0, 1fr)); max-height: none; }
 .sts-gifts button b { color: var(--gold); }
 .sts-vote-bal { text-align: center; color: var(--gold); font-weight: 800; font-size: 13px; }
+
+/* Steve, 2026-11-26: the black-and-gold Follow pill beside the feed's gold bullseye (FollowPill). */
+.follow-pill {
+  flex: 0 0 auto; padding: 3px 10px; border-radius: 999px; background: #000;
+  border: 1.5px solid var(--gold); color: var(--gold); font-family: inherit; font-size: 12px; font-weight: 700; line-height: 1.2;
+  cursor: pointer; white-space: nowrap;
+}
+.follow-pill:hover { background: #111; }

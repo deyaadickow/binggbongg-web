@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { displayName, mediaUrl, type Gift, type Post } from "../lib/api";
 import { Avatar } from "./Common";
 import { MemberBullseye } from "./MemberBullseye";
+import { FollowPill } from "./FollowPill";
 import { GiftFlash, PostGiftButton } from "./GiftSheet";
 import { HashtagText } from "./HashtagText";
 import { SearchTopicBar } from "./SearchTopicBar";
@@ -41,6 +42,7 @@ export function PostCard({ post }: { post: Post }) {
             <div className="row" style={{ gap: 6, minWidth: 0 }}>
               <span style={{ fontWeight: 800, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{displayName(post.user)}</span>
               <MemberBullseye userId={post.user_id ?? post.user?.id} />
+              <FollowPill userId={post.user_id ?? post.user?.id} isFollowing={post.user?.is_following} />
             </div>
             <div className="muted" style={{ fontSize: 12, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}><HashtagText inLink text={post.description || (post.hashtags ? post.hashtags.split(",").filter(Boolean).map((h) => "#" + h.replace(/^#/, "")).join(" ") : "")} /></div>
           </div>
