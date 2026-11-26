@@ -1557,7 +1557,7 @@ body.signup-black { background: radial-gradient(120% 55% at 50% 0%, #2a2108 0%, 
 /* "How to make money on Bingg Bongg" (Steve, 2026-11-26): a small black-and-gold pill centred under the tab row,
    the tab pills' gold and border, a little smaller. */
 .feed-top-mid { display: flex; flex-direction: column; align-items: center; min-width: 0; }
-.money-pill-row { display: flex; justify-content: center; margin-top: 6px; }
+.money-pill-row { display: flex; justify-content: center; margin-top: 4px; } /* Steve 11-26: "almost touch the tabs above" */
 .money-pill { box-sizing: border-box; height: 26px; display: inline-flex; align-items: center; max-width: calc(100vw - 32px); overflow: hidden; text-overflow: ellipsis; background: #000; border: 2px solid var(--gold-border); border-radius: 999px; color: var(--gold-border); font-family: inherit; font-weight: 800; font-size: 12px; padding: 0 12px; cursor: pointer; white-space: nowrap; }
 .money-pill:hover { background: #1a1408; }
 .fnd-gotit { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 65; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 8px; width: max-content; max-width: calc(100vw - 32px); padding: 10px 16px; border-radius: 12px; background: #000; border: 1.5px solid var(--gold-border); color: var(--gold); font-weight: 700; font-size: 14px; box-shadow: 0 6px 24px rgba(0,0,0,.6); }
