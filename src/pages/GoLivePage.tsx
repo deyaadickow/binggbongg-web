@@ -45,6 +45,27 @@ function BinggBonggLinks() {
   );
 }
 
+/** Steve, 2026-11-26: "We forgot the buttons for uploading videos and photos on the bingg bongg information
+ *  button." Upload Video, right under it Upload Photos (his 09-17 order), above Go Live — the same pages the
+ *  sidebar's Upload Video / Upload Photos open. Same gold box with red stars as the links below. */
+function UploadButtons() {
+  const { t } = useT();
+  return (
+    <div className="ic-list" style={{ margin: "12px 0" }}>
+      <Link to="/upload" className="ic-btn">
+        <span className="ic-star" aria-hidden>★</span>
+        <span className="ic-label">🎬 {t("upload_video")}</span>
+        <span className="ic-star" aria-hidden>★</span>
+      </Link>
+      <Link to="/upload-photos" className="ic-btn">
+        <span className="ic-star" aria-hidden>★</span>
+        <span className="ic-label">📷 {t("upload_photos_2")}</span>
+        <span className="ic-star" aria-hidden>★</span>
+      </Link>
+    </div>
+  );
+}
+
 /** Camera preview + one button — same startLive endpoint the phones call, then the room page as host. */
 export function GoLivePage() {
   const { t, tn } = useT();
@@ -116,6 +137,7 @@ export function GoLivePage() {
     <div className="page" style={{ maxWidth: 560 }}>
       <PageTitle>{t("go_live")}</PageTitle>
       <InfoBanner />
+      <UploadButtons />
       <Notice>{tn("sign_in_to_go_live", <Link to="/login">{t("sign_in")}</Link>)}</Notice>
       <BinggBonggLinks />
     </div>
@@ -130,7 +152,7 @@ export function GoLivePage() {
           <div style={{ fontSize: 18, fontWeight: 900 }}>{t("sc_live_tag")}</div>
           <div style={{ fontSize: 14, marginTop: 4 }}>{t("sc_golive_note")}</div>
         </div>
-      ) : <InfoBanner />}
+      ) : <><InfoBanner /><UploadButtons /></>}
       <div className="card" style={{ aspectRatio: "9 / 12", background: "#000", display: "grid", placeItems: "center" }}>
         {previewError ? <p className="muted center" style={{ padding: 20 }}>{previewError}</p> : <video ref={videoRef} autoPlay muted playsInline style={{ width: "100%", height: "100%", objectFit: "cover" }} />}
       </div>
