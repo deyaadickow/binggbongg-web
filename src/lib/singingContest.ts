@@ -132,3 +132,21 @@ export function dhm(sec: number): string {
   if (h > 0) return `${h}h ${m}m`;
   return `${m}m ${s % 60}s`;
 }
+
+// ---- the feed's "Singing Contest" pill (Steve, 2026-11-26: "everyone can see all videos one after another ... All votes
+// will be hidden, random videos will show for every member that clicks the contest button.") --------------------------
+// checkHeader only on the server, so visitors get it too; a new random order on every call; no vote counts in it.
+export interface ScPlaylist { status: boolean; enabled: boolean; count: number; posts?: import("./api").Post[] }
+let pillRequest: Promise<boolean> | null = null;
+/** Show the pill? Asked once per page load (peek=1, no posts); a failure hides it and is tried again next time. */
+export function singingPillEnabled(): Promise<boolean> {
+  if (import.meta.env.DEV && scDemo()) return Promise.resolve(true);
+  pillRequest ??= post<unknown>("fetchSingingContestPlaylist", { platform: "web", peek: 1 })
+    .then((r) => !!(r as unknown as ScPlaylist).status && (r as unknown as ScPlaylist).enabled === true)
+    .catch(() => { pillRequest = null; return false; });
+  return pillRequest;
+}
+export async function fetchSingingPlaylist(): Promise<ScPlaylist> {
+  const r = await post<unknown>("fetchSingingContestPlaylist", { platform: "web" });
+  return r as unknown as ScPlaylist;
+}

@@ -2812,4 +2812,8 @@ export const es = {
   sc_brag_empty: "Los primeros ganadores entran en este tablero el 1 de enero.",
   sc_brag_wins: "%1$s victorias",
   sc_brag_more: "Ver más",
+  sc_pill: "🎤 Concurso de Canto",
+  sc_pill_empty: "Aún no hay videos. ¡Sé el primero! Transmite en vivo desde la página del Concurso de Canto y canta tu mejor canción. Todos los videos se ven aquí.",
+  sc_pill_open: "Abrir Concurso de Canto",
+  sc_pill_close: "Cerrar",
 };

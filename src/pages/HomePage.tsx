@@ -9,6 +9,7 @@ import { useSession } from "../lib/session";
 import { PostCard } from "../components/PostCard";
 import { FeedAvatarRow } from "../components/FeedAvatarRow";
 import { MoneyVideoPill } from "../components/MoneyVideoPill";
+import { SingingContestPill } from "../components/SingingContestPill";
 import { Loading, Notice, StoreBadges } from "../components/Common";
 import { getFeedSource, setFeed, setFeedSource } from "../lib/feed";
 import { FeedPhotoCard } from "../components/FeedPhotoCard";
@@ -181,7 +182,12 @@ export function HomePage() {
         </div>
         {/* "How to make money on Bingg Bongg" (Steve, 2026-11-26): right under the tabs, on every feed tab;
             hidden until the server says show. In the middle column, so on a phone it stays above the store badges. */}
-        <MoneyVideoPill />
+        {/* Steve, 2026-11-26: "Move the how to make money on bingg bongg to the left of the screen and add the
+            "Singing Contest" button right next to it on the right." */}
+        <div className="money-pill-row">
+          <MoneyVideoPill />
+          <SingingContestPill />
+        </div>
         </div>
         <div className="feed-top-badges"><StoreBadges compact /></div>
       </div>

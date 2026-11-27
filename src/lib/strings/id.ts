@@ -2852,4 +2852,8 @@ export const id = {
   sc_brag_empty: "Pemenang pertama masuk ke papan ini pada 1 Januari.",
   sc_brag_wins: "%1$s kemenangan",
   sc_brag_more: "Lihat lebih banyak",
+  sc_pill: "🎤 Kontes Menyanyi",
+  sc_pill_empty: "Belum ada video menyanyi. Jadilah yang pertama! Live dari halaman Kontes Menyanyi dan nyanyikan lagu terbaikmu. Semua video menyanyi diputar di sini.",
+  sc_pill_open: "Buka Kontes Menyanyi",
+  sc_pill_close: "Tutup",
 };

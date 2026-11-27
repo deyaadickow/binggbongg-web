@@ -44,7 +44,23 @@ export function insertIntoFeed(p: Post, at: number): Post[] {
   setFeed(cur);
   return cur;
 }
+/** A fixed queue that is never topped up from a feed: the Singing Contest pill's videos (Steve, 2026-11-26: "everyone
+ *  can see all videos one after another"). Remembered by its post ids, so as soon as any other page puts its own videos
+ *  in the queue, topping up works as before without anybody having to clear anything. */
+const FIXED_KEY = "bb.feedFixed";
+export function playFixedQueue(posts: Post[]) {
+  setFeed(posts);
+  try { sessionStorage.setItem(FIXED_KEY, JSON.stringify(posts.map((p) => p.id))); } catch { /* private mode etc. */ }
+}
+function queueIsFixed(): boolean {
+  try {
+    const ids = new Set(JSON.parse(sessionStorage.getItem(FIXED_KEY) ?? "[]") as number[]);
+    const cur = getFeed();
+    return ids.size > 0 && cur.length > 0 && cur.every((p) => ids.has(p.id));
+  } catch { return false; }
+}
 export async function fetchMoreFeed(userId: number | null): Promise<Post[]> {
+  if (queueIsFixed()) return getFeed();
   const source = getFeedSource();
   try {
     const { posts } = await fetchFeedBatch(userId || source === "foryou" ? source : "foryou", userId, getFeed().length);

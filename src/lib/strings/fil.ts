@@ -3105,4 +3105,8 @@ export const fil = {
   sc_brag_empty: "Mapupunta ang mga unang nanalo sa board na ito sa Enero 1.",
   sc_brag_wins: "%1$s panalo",
   sc_brag_more: "Ipakita pa",
+  sc_pill: "🎤 Singing Contest",
+  sc_pill_empty: "Wala pang singing video. Ikaw na ang mauna! Mag-live mula sa Singing Contest page at kantahin ang pinakamagaling mong kanta. Dito mapapanood ang lahat ng singing video.",
+  sc_pill_open: "Buksan ang Singing Contest",
+  sc_pill_close: "Isara",
 };

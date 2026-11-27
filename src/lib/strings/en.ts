@@ -3895,4 +3895,8 @@ export const en = {
   sc_brag_empty: "The first winners go on this board on January 1.",
   sc_brag_wins: "%1$s wins",
   sc_brag_more: "Show more",
+  sc_pill: "🎤 Singing Contest",
+  sc_pill_empty: "No singing videos yet. Be the first! Go live from the Singing Contest page and sing your best song. Every singing video plays here.",
+  sc_pill_open: "Open Singing Contest",
+  sc_pill_close: "Close",
 } as const;

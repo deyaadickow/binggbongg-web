@@ -58,9 +58,8 @@ export function MoneyVideoPill() {
   const title = t("how_to_make_money");
   return (
     <>
-      <div className="money-pill-row">
-        <button type="button" className="money-pill" onClick={openVideo}>{title}</button>
-      </div>
+      {/* In HomePage's .money-pill-row, left of the Singing Contest pill (Steve, 2026-11-26). */}
+      <button type="button" className="money-pill" onClick={openVideo}>{title}</button>
       {playing && (
         <FeatureVideoPlayer
           items={[{ url: video.video, title, trackKey: "how_to_make_money", trackLabel: "How to make money on Bingg Bongg" }]}
