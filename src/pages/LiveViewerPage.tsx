@@ -7,6 +7,7 @@ import { swipeStateOf } from "../lib/liveSwipe";
 import { displayName, giftPrice, mediaUrl, post, type Gift, type UserSummary } from "../lib/api";
 import { TapTapBurst, isTapTapGift, tapTapBurstDuration } from "../components/TapTapBurst";
 import { TileGiftLayer } from "../components/TileGiftLayer";
+import { TopSupportersStrip, useTopSupporters } from "../components/TopSupporters";
 import { playGiftInTiles, playedRecently } from "../lib/tileGiftFx";
 import { useSession } from "../lib/session";
 import { memberLabel, trackPage } from "../lib/pageTracker";
@@ -1746,6 +1747,10 @@ export function LiveViewerPage() {
     if (!zone?.trim()) return "";
     try { return new Intl.DateTimeFormat(navigator.language, { weekday: "short", hour: "numeric", minute: "2-digit", timeZone: zone.trim() }).format(new Date(menuNow)); } catch { return ""; }
   };
+  // Top Supporters board: re-read whenever a gift line lands in the chat, and every 10 s for gifts
+  // that went to guests or battlers (their gift lines are not on this channel).
+  const giftLineCount = messages.reduce((n, m) => n + (m.senderUserId < 0 ? 1 : 0), 0);
+  const topSupporters = useTopSupporters(roomName, giftLineCount);
   const roomLines: string[] = [];
   if (members) {
     const hostName = members.host_username ? "@" + members.host_username : (members.host_fullname ?? "");
@@ -1776,6 +1781,13 @@ export function LiveViewerPage() {
     } catch { /* cancelled */ }
   }
   const roomMenuRows: { label: string; trailing?: string; onPick: () => void }[] = [];
+  // Top Supporters board (Steve, 2026-11-26): only the host of the room switches it, for this stream.
+  if (role === "host" && myId) {
+    roomMenuRows.push({ label: t("ts_menu"), trailing: t(topSupporters.on ? "switch_on" : "switch_off"), onPick: () => {
+      const next = !topSupporters.on;
+      void topSupporters.setBoard(next, myId).then((ok) => { if (ok) setToast(t(next ? "ts_on_note" : "ts_off_note")); });
+    } });
+  }
   // Steve, 2026-11-06: bombs to "any member of their choice" — from the held battler's hold menu too.
   if (user && myBombs && myBombs > 0 && heldUserId !== null && mlInBattle(heldUserId)) {
     const who = nameOfId(heldUserId) || mlName(ml?.members.find((x) => x.user_id === heldUserId));
@@ -2317,6 +2329,7 @@ export function LiveViewerPage() {
 
         <div className="card chat">
           <div className="row" style={{ padding: "10px 12px", borderBottom: "1px solid var(--line)" }}><b style={{ color: "var(--gold)" }}>{t("live_chat")}</b></div>
+          {topSupporters.on && <TopSupportersStrip rows={topSupporters.rows} />}
           <div className="log" ref={logRef}>
             {messages.map((m) => (
               <ChatLine key={m.id} m={m} translation={translations[m.id]} targetLanguage={mtLang} />

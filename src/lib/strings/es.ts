@@ -2816,4 +2816,11 @@ export const es = {
   sc_pill_empty: "Aún no hay videos. ¡Sé el primero! Transmite en vivo desde la página del Concurso de Canto y canta tu mejor canción. Todos los videos se ven aquí.",
   sc_pill_open: "Abrir Concurso de Canto",
   sc_pill_close: "Cerrar",
+  // Top Supporters board (2026-11-26)
+  ts_title: "Top Supporters",
+  ts_menu: "🏆 Tablero de Top Supporters",
+  ts_empty: "¡Envía un regalo para ser el primer Top Supporter!",
+  ts_bbs: "%1$s BBs",
+  ts_on_note: "El tablero de Top Supporters está activado para todos en tu live.",
+  ts_off_note: "El tablero de Top Supporters está desactivado.",
 };

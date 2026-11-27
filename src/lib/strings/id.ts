@@ -2856,4 +2856,11 @@ export const id = {
   sc_pill_empty: "Belum ada video menyanyi. Jadilah yang pertama! Live dari halaman Kontes Menyanyi dan nyanyikan lagu terbaikmu. Semua video menyanyi diputar di sini.",
   sc_pill_open: "Buka Kontes Menyanyi",
   sc_pill_close: "Tutup",
+  // Top Supporters board (2026-11-26)
+  ts_title: "Top Supporters",
+  ts_menu: "🏆 Papan Top Supporters",
+  ts_empty: "Kirim hadiah untuk jadi Top Supporter pertama!",
+  ts_bbs: "%1$s BBs",
+  ts_on_note: "Papan Top Supporters aktif untuk semua orang di live kamu.",
+  ts_off_note: "Papan Top Supporters nonaktif.",
 };

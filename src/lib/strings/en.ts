@@ -3899,4 +3899,11 @@ export const en = {
   sc_pill_empty: "No singing videos yet. Be the first! Go live from the Singing Contest page and sing your best song. Every singing video plays here.",
   sc_pill_open: "Open Singing Contest",
   sc_pill_close: "Close",
+  // Top Supporters board (2026-11-26)
+  ts_title: "Top Supporters",
+  ts_menu: "🏆 Top Supporters board",
+  ts_empty: "Send a gift to be the first Top Supporter!",
+  ts_bbs: "%1$s BBs",
+  ts_on_note: "Top Supporters board is on for everyone in your live.",
+  ts_off_note: "Top Supporters board is off.",
 } as const;

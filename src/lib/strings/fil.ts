@@ -3109,4 +3109,11 @@ export const fil = {
   sc_pill_empty: "Wala pang singing video. Ikaw na ang mauna! Mag-live mula sa Singing Contest page at kantahin ang pinakamagaling mong kanta. Dito mapapanood ang lahat ng singing video.",
   sc_pill_open: "Buksan ang Singing Contest",
   sc_pill_close: "Isara",
+  // Top Supporters board (2026-11-26)
+  ts_title: "Top Supporters",
+  ts_menu: "🏆 Top Supporters board",
+  ts_empty: "Magpadala ng gift para maging unang Top Supporter!",
+  ts_bbs: "%1$s BBs",
+  ts_on_note: "Naka-on ang Top Supporters board para sa lahat sa live mo.",
+  ts_off_note: "Naka-off ang Top Supporters board.",
 };
