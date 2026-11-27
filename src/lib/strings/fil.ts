@@ -3105,4 +3105,11 @@ export const fil = {
   sc_brag_empty: "Mapupunta ang mga unang nanalo sa board na ito sa Enero 1.",
   sc_brag_wins: "%1$s panalo",
   sc_brag_more: "Ipakita pa",
+  // Top Supporters board (2026-11-26)
+  ts_title: "Top Supporters",
+  ts_menu: "🏆 Top Supporters board",
+  ts_empty: "Magpadala ng gift para maging unang Top Supporter!",
+  ts_bbs: "%1$s BBs",
+  ts_on_note: "Naka-on ang Top Supporters board para sa lahat sa live mo.",
+  ts_off_note: "Naka-off ang Top Supporters board.",
 };

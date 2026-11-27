@@ -2812,4 +2812,11 @@ export const es = {
   sc_brag_empty: "Los primeros ganadores entran en este tablero el 1 de enero.",
   sc_brag_wins: "%1$s victorias",
   sc_brag_more: "Ver más",
+  // Top Supporters board (2026-11-26)
+  ts_title: "Top Supporters",
+  ts_menu: "🏆 Tablero de Top Supporters",
+  ts_empty: "¡Envía un regalo para ser el primer Top Supporter!",
+  ts_bbs: "%1$s BBs",
+  ts_on_note: "El tablero de Top Supporters está activado para todos en tu live.",
+  ts_off_note: "El tablero de Top Supporters está desactivado.",
 };

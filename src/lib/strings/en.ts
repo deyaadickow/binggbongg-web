@@ -3895,4 +3895,11 @@ export const en = {
   sc_brag_empty: "The first winners go on this board on January 1.",
   sc_brag_wins: "%1$s wins",
   sc_brag_more: "Show more",
+  // Top Supporters board (2026-11-26)
+  ts_title: "Top Supporters",
+  ts_menu: "🏆 Top Supporters board",
+  ts_empty: "Send a gift to be the first Top Supporter!",
+  ts_bbs: "%1$s BBs",
+  ts_on_note: "Top Supporters board is on for everyone in your live.",
+  ts_off_note: "Top Supporters board is off.",
 } as const;

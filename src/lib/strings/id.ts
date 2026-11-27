@@ -2852,4 +2852,11 @@ export const id = {
   sc_brag_empty: "Pemenang pertama masuk ke papan ini pada 1 Januari.",
   sc_brag_wins: "%1$s kemenangan",
   sc_brag_more: "Lihat lebih banyak",
+  // Top Supporters board (2026-11-26)
+  ts_title: "Top Supporters",
+  ts_menu: "🏆 Papan Top Supporters",
+  ts_empty: "Kirim hadiah untuk jadi Top Supporter pertama!",
+  ts_bbs: "%1$s BBs",
+  ts_on_note: "Papan Top Supporters aktif untuk semua orang di live kamu.",
+  ts_off_note: "Papan Top Supporters nonaktif.",
 };
