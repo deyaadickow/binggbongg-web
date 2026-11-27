@@ -9,7 +9,7 @@ import { requireVerified } from "../lib/verifyEmail";
 import { StartPodcastLink } from "./PodcastPages";
 import { InfoBanner } from "./InformationCenterPage";
 import { SingingRecorder } from "../components/SingingRecorder";
-import { scDemo } from "../lib/singingContest";
+import { scDemo, useSingingContestEnabled } from "../lib/singingContest";
 
 /** Steve, 2026-11-25: the Bingg Bongg button's page IS the Information Center now — "add all the links
  *  from the information center on this page and delete the information center link". Every box is the
@@ -46,10 +46,15 @@ function BinggBonggLinks() {
 }
 
 /** Steve, 2026-11-26: "We forgot the buttons for uploading videos and photos on the bingg bongg information
- *  button." Upload Video, right under it Upload Photos (his 09-17 order), above Go Live — the same pages the
+ *  button." Upload Video, right under it Upload Photos (his 09-17 order), then Singing Contest, above Go Live — the same pages the
  *  sidebar's Upload Video / Upload Photos open. Same gold box with red stars as the links below. */
 function UploadButtons() {
   const { t } = useT();
+  const { user } = useSession();
+  // Same day: "We also need to add another button for Singing Contest" — by the uploads ("Info popup, by
+  // uploads"), only while the contest switch is on. It opens the contest page (go live, Bingg Bongg
+  // records), never the upload flow: contestants can't enter a ready-made video.
+  const singingOn = useSingingContestEnabled(user?.id);
   return (
     <div className="ic-list" style={{ margin: "12px 0" }}>
       <Link to="/upload" className="ic-btn">
@@ -62,6 +67,13 @@ function UploadButtons() {
         <span className="ic-label">📷 {t("upload_photos_2")}</span>
         <span className="ic-star" aria-hidden>★</span>
       </Link>
+      {singingOn && (
+        <Link to="/singing-contest" className="ic-btn">
+          <span className="ic-star" aria-hidden>★</span>
+          <span className="ic-label">🎤 {t("fname_singing_contest")}</span>
+          <span className="ic-star" aria-hidden>★</span>
+        </Link>
+      )}
     </div>
   );
 }
