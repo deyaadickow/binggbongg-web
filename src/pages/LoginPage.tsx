@@ -8,6 +8,7 @@ import { tt, useT, type StringKey } from "../lib/i18n";
 import { chromeUrl, inAppBrowser, phoneOs, storeUrl } from "../lib/getApp";
 import { authErrorCode, createEmailAccount, sendPasswordReset, signInEmail, type EmailProof } from "../lib/emailAuth";
 import { rememberSignupNudges } from "../components/SignupNudges";
+import { rememberPartnerCard } from "../lib/partnership";
 import { showGoldAlert } from "../components/GoldToast";
 import { cleanCode, forgetInviteCode, rememberedInviteCode } from "../lib/invite";
 
@@ -169,6 +170,8 @@ export function LoginPage({ wall = false, from: wallFrom }: { wall?: boolean; fr
   function finish(data: UserSummary & { needs_profile?: boolean }, token: string, extra: { email?: string; emailVerified?: boolean; isNew?: boolean } = {}) {
     const needsProfile = data.needs_profile === true;
     rememberSignupNudges(data.id, { needsProfile, email: extra.emailVerified === false ? extra.email : undefined });
+    // Partnership Program (2026-11-27): a brand-new member gets the Become a Partner card once (PartnerBits).
+    if (extra.isNew === true) rememberPartnerCard(data.id);
     const { needs_profile: _ignored, ...user } = data;
     void _ignored;
     signIn({ ...user, auth_token: undefined }, token);

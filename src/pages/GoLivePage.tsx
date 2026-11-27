@@ -10,6 +10,7 @@ import { StartPodcastLink } from "./PodcastPages";
 import { InfoBanner } from "./InformationCenterPage";
 import { SingingRecorder } from "../components/SingingRecorder";
 import { scDemo, useSingingContestEnabled } from "../lib/singingContest";
+import { partnerEntryVisible, useMyPartnership } from "../lib/partnership";
 
 /** Steve, 2026-11-25: the Bingg Bongg button's page IS the Information Center now — "add all the links
  *  from the information center on this page and delete the information center link". Every box is the
@@ -32,8 +33,20 @@ const BB_LINKS: { to: string; key: StringKey }[] = [
 
 function BinggBonggLinks() {
   const { t } = useT();
+  const { user } = useSession();
+  // Partnership Program (Steve, 2026-11-27): "Become a Bingg Bongg Partner" (or "My Partnership" once they are
+  // in), first in the list, only while the program switch is on.
+  const partner = useMyPartnership(user?.id);
+  const inProgram = partner?.status === "approved" || partner?.status === "member" || partner?.status === "pending";
   return (
     <nav className="ic-list" style={{ marginTop: 12 }} aria-label={t("information_center")}>
+      {partnerEntryVisible(partner) && (
+        <Link to="/partnership" className="ic-btn">
+          <span className="ic-star" aria-hidden>★</span>
+          <span className="ic-label">🤝 {t(inProgram ? "pt_my_title" : "pt_become_title")}</span>
+          <span className="ic-star" aria-hidden>★</span>
+        </Link>
+      )}
       {BB_LINKS.map((it) => (
         <Link key={it.key} to={it.to} className="ic-btn">
           <span className="ic-star" aria-hidden>★</span>

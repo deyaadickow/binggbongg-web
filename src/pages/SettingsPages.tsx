@@ -5,6 +5,7 @@ import { BEA_LANGUAGES, BeaCard, BeaRepeatButton, beaLanguage, setBeaLanguage, u
 import { useContestOn } from "../lib/contests";
 import { usePodcastEnabled } from "../lib/podcast";
 import { useSingingContestEnabled } from "../lib/singingContest";
+import { partnerEntryVisible, useMyPartnership } from "../lib/partnership";
 import { useCallback, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { API_BASE, currentAuthHeaders, displayName, mediaUrl, post, type UserSummary } from "../lib/api";
@@ -73,6 +74,7 @@ export function SettingsHubPage() {
   const contestOn = useContestOn();
   const podcastOn = usePodcastEnabled();
   const singingOn = useSingingContestEnabled(user?.id);
+  const partnerOn = partnerEntryVisible(useMyPartnership(user?.id));
   const all = sidebarSections(user?.id ?? null, contestOn, podcastOn).flatMap((sec) => sec.links)
     .filter((l) => !l.needsLogin || isLoggedIn);
   const byRoute = new Map(all.map((l) => [l.to, l]));
@@ -93,7 +95,7 @@ export function SettingsHubPage() {
   const features = [...first, ...all.filter((l) => !placed.has(l.to) && !l.external)].filter((l) => fresh(l.to, l.label));
   const tiles: SideLink[] = [];
   FEATURES.flatMap((sec) => sec.features)
-    .filter((f) => (!f.contestOnly || contestOn) && (!f.podcastOnly || podcastOn) && (!f.singingOnly || singingOn))
+    .filter((f) => (!f.contestOnly || contestOn) && (!f.podcastOnly || podcastOn) && (!f.singingOnly || singingOn) && (!f.partnerOnly || partnerOn))
     .forEach((f) => {
       const href = featureHref(f, user?.id ?? null);
       if (!href || !fresh(href, f.labelKey ?? f.nameKey)) return;

@@ -4,6 +4,8 @@ import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom"
 import { displayName, mediaUrl, post, type Post, type UserSummary } from "../lib/api";
 import { VipBadge, VipBadgePopup } from "../components/VipBadge";
 import { isVipReferrer } from "../lib/referral";
+import { isBbPartner } from "../lib/partnership";
+import { PartnerBadge } from "../components/PartnerBits";
 import { GoldDiggerBadge } from "../components/GoldDigger";
 import type { GdBadge } from "../lib/goldDigger";
 import { HousesPill } from "./HousesPage";
@@ -747,6 +749,8 @@ export function ProfilePage() {
                 </span>
                 {/* Steve, 2026-10-29: a VIP Referral Member's gold pill; tapping it says what it is. */}
                 {isVipReferrer(profile.is_vip_referrer) && <VipBadge onClick={() => setVipInfo(true)} />}
+                {/* Partnership Program (2026-11-27): the gold "Bingg Bongg Partner" badge while is_bb_partner. */}
+                {isBbPartner(profile.is_bb_partner) && <PartnerBadge />}
                 {/* Build Your Houses (Steve, 2026-11-05): "🏠 N houses" opens their house page. */}
                 <HousesPill userId={profile.id} />
                 {/* Gold Digger (2026-11-17): "⛏️ Gold Digger 🥇 October 2026" — opens the board. */}
@@ -907,6 +911,8 @@ export function ProfilePage() {
             </div>
           )}
         </div>
+        {/* Partnership Program (2026-11-27): the badge shows on the profile itself too, not only on Information. */}
+        {isBbPartner(profile.is_bb_partner) && <div style={{ display: "flex", justifyContent: "center", margin: "10px 0 12px" }}><PartnerBadge /></div>}
         <button className="profile-info-btn" onClick={openInfo}>{t(isMe ? "pi_my_information" : "pi_information")}</button>
       </div>
       )}

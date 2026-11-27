@@ -110,6 +110,8 @@ import { GoldDiggerManager } from "./components/GoldDigger";
 import { FeedAssistantHost } from "./components/FeedAssistant";
 import { GoldDiggerPage } from "./pages/GoldDiggerPage";
 import { SingingContestPage } from "./pages/SingingContestPage";
+import { PartnershipPage } from "./pages/PartnershipPage";
+import { PartnerSignupCard } from "./components/PartnerBits";
 import { BraggingRightsPage } from "./pages/BraggingRightsPage";
 
 /** The ads' landing page (/ph) stands alone — no menu, no sidebar, nothing but the contest and the
@@ -184,6 +186,8 @@ export default function App() {
         {/* Easy sign-up (Steve, 2026-11-03): the later, dismissible "verify your email" and
             "add your name & photo" reminders. The wall itself is SignupWall above. */}
         <SignupNudges />
+        {/* Partnership Program (2026-11-27): the one-time card after a new sign-up, only while the program is on. */}
+        <PartnerSignupCard />
         <VerifyEmailModal />
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -377,6 +381,10 @@ export default function App() {
           <Route path="/gold-digger" element={<GoldDiggerPage />} />
           {/* Monthly Singing Contest (Steve, 2026-11-26). */}
           <Route path="/singing-contest" element={<SingingContestPage />} />
+          {/* Partnership Program (Steve, 2026-11-27): one page that shows Become a Partner or My Partnership. */}
+          <Route path="/partnership" element={<PartnershipPage />} />
+          <Route path="/become-a-partner" element={<PartnershipPage />} />
+          <Route path="/my-partnership" element={<PartnershipPage />} />
           <Route path="/singing-contest/bragging-rights" element={<BraggingRightsPage />} />
           <Route path="/free-coins" element={<FreeCoinsPage />} />
           {/* Pre-Launch Special (Steve, 2026-11-10; 2026-11-11: 100 FBBs for every member, no refill). */}

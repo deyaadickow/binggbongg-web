@@ -174,6 +174,9 @@ export interface UserSummary {
   /** Steve, 2026-10-29: a VIP Referral Member wears the gold "👑 VIP Referrer" pill on their
    *  profile. 0/1, "0"/"1" or a boolean — read it with isVipReferrer() (lib/referral.ts). */
   is_vip_referrer?: number | string | boolean;
+  /** Partnership Program (2026-11-27): an active partner or partner's member, inside their dates, while the
+   *  program is on. fetchUserDetails / fetchMyUserDetails; older servers omit it (= false). isBbPartner(). */
+  is_bb_partner?: boolean | number | string;
   fullname?: string;
   username?: string;
   profile_image?: string;
