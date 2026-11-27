@@ -1557,7 +1557,7 @@ body.signup-black { background: radial-gradient(120% 55% at 50% 0%, #2a2108 0%, 
 /* "How to make money on Bingg Bongg" (Steve, 2026-11-26): a small black-and-gold pill centred under the tab row,
    the tab pills' gold and border, a little smaller. */
 .feed-top-mid { display: flex; flex-direction: column; align-items: center; min-width: 0; }
-.money-pill-row { display: flex; justify-content: flex-start; gap: 6px; margin-top: 4px; min-width: 0; } /* Steve 11-26: "almost touch the tabs above"; money left, Singing Contest right of it */
+.money-pill-row { display: flex; justify-content: center; gap: 6px; margin-top: 4px; min-width: 0; } /* Steve 11-26: "almost touch the tabs above"; money left, Singing Contest right of it; 11-27: "Please center the 2 tabs from side to side." */
 .money-pill-row:empty { display: none; }
 .money-pill-row .money-pill { min-width: 0; flex: 0 1 auto; }
 .money-pill-row .singing-pill { flex: 0 0 auto; }
