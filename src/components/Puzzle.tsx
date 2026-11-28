@@ -1,6 +1,6 @@
 // Bingg Bongg Puzzle (Steve, 2026-11-28): "Pieces pop up at random on ANY page; tap it like the
 // Golden Nugget." Mounted ONCE in App.tsx (next to GoldDiggerManager): the roll timer (visible
-// tab + signed-in, verified member only), the piece drawn over whatever page is on screen, and
+// tab + any signed-in member, verified or not), the piece drawn over whatever page is on screen, and
 // the catch popup — varied lines from the server, "only N left to find", the free FBB milestone,
 // Share ("I found #742!"), Send to a friend (a repeat), Watch the video, My Puzzle, OK.
 //
@@ -98,7 +98,8 @@ export function PuzzleManager() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { user, isLoggedIn } = useSession();
-  const userId = isLoggedIn && user?.needs_email_verification !== true ? user?.id ?? 0 : 0;
+  // Everyone signed in plays, verified email or not (Steve, 2026-11-28: "Let everyone play the Puzzle, verified or not.").
+  const userId = isLoggedIn ? user?.id ?? 0 : 0;
 
   const pathRef = useRef(pathname);
   pathRef.current = pathname;

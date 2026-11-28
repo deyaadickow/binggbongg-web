@@ -2063,5 +2063,6 @@
  "vcb_no_members": "Engir meðlimir frá {country} enn",
  "vcb_host": "Gestgjafi",
  "lbq_next": "Næsti bardagi",
- "lbq_prev": "Fyrri bardagi"
+ "lbq_prev": "Fyrri bardagi",
+ "total_members_on_bb": "Meðlimir alls á Bingg Bongg"
 }

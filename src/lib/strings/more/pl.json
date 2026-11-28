@@ -2066,5 +2066,6 @@
  "vcb_no_members": "Jeszcze brak członków z {country}",
  "vcb_host": "Host",
  "lbq_next": "Następna bitwa",
- "lbq_prev": "Poprzednia bitwa"
+ "lbq_prev": "Poprzednia bitwa",
+ "total_members_on_bb": "Łączna liczba członków Bingg Bongg"
 }

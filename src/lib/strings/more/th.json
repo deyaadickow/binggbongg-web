@@ -2064,5 +2064,6 @@
  "vcb_no_members": "ยังไม่มีสมาชิกจาก {country}",
  "vcb_host": "โฮสต์",
  "lbq_next": "แบทเทิลถัดไป",
- "lbq_prev": "แบทเทิลก่อนหน้า"
+ "lbq_prev": "แบทเทิลก่อนหน้า",
+ "total_members_on_bb": "สมาชิกทั้งหมดบน Bingg Bongg"
 }

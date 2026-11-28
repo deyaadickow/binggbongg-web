@@ -3445,6 +3445,7 @@ export const en = {
   set_box_switches: "Switches",
   set_box_settings: "Settings",
   set_box_features: "Features",
+  total_members_on_bb: "Total Members On Bingg Bongg", // Settings box (Steve, 2026-11-28)
   // Gold Digger (Steve, 2026-11-17)
   fname_gold_digger: "Golden Nuggets",
   fblurb_gold_digger: "Gold appears anywhere in Bingg Bongg — tap it and it's yours. Score by the gram; the top 3 every month win BBs.",

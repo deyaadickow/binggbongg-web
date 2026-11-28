@@ -2066,5 +2066,6 @@
  "vcb_no_members": "Још нема чланова из {country}",
  "vcb_host": "Домаћин",
  "lbq_next": "Следећа битка",
- "lbq_prev": "Претходна битка"
+ "lbq_prev": "Претходна битка",
+ "total_members_on_bb": "Укупно чланова на Bingg Bongg"
 }

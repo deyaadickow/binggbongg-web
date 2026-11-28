@@ -2059,5 +2059,6 @@
  "vcb_no_members": "Még nincsenek tagok innen: {country}",
  "vcb_host": "Házigazda",
  "lbq_next": "Következő csata",
- "lbq_prev": "Előző csata"
+ "lbq_prev": "Előző csata",
+ "total_members_on_bb": "Összes tag a Bingg Bonggon"
 }

@@ -23,6 +23,7 @@ import { IDEA_SUPPORT_REASON } from "../lib/ideas";
 import { CountryBattleReminderToggle } from "../components/CountryBattleBits";
 import { InviteLinkCard } from "../components/InviteLinkCard";
 import { useSpeedDatingEnabled } from "../lib/speedDating";
+import { MemberCountBox } from "../components/MemberCountBox";
 import { fetchDmSettings, setDmBlock, setDmOpen, type DmSettings } from "../lib/dm";
 
 const SITE = "https://www.binggbongg.com";
@@ -133,6 +134,9 @@ export function SettingsHubPage() {
       {/* Steve, 2026-11-27: "In Settings Please start from the top... Delete Account / Features First /
           Switches Second / Settings Third / General Fourth / Log Out / Delete". The same Delete Account
           row (signed in only) first, then the whole boxes in that order. */}
+      {/* Steve, 2026-11-28: "Above "Delete Account" button please add... "Total Members On Bingg Bongg" and keep
+          counting." Everyone sees it; information only, so Delete Account stays the first button. */}
+      <MemberCountBox />
       {boxTop.length > 0 && <SettingsBox>{boxTop.map(row)}</SettingsBox>}
       <SettingsBox id="features" title={t("set_box_features")}>{featuresAZ.map(row)}</SettingsBox>
       {isLoggedIn && <SettingsBox title={t("set_box_switches")}><SettingsSwitches /></SettingsBox>}

@@ -2460,6 +2460,7 @@ export const es = {
   set_box_switches: "Interruptores",
   set_box_settings: "Ajustes",
   set_box_features: "Funciones",
+  total_members_on_bb: "Total de miembros en Bingg Bongg", // Settings box (Steve, 2026-11-28)
   // Gold Digger (Steve, 2026-11-17)
   fname_gold_digger: "Pepitas de Oro",
   fblurb_gold_digger: "El oro aparece en cualquier parte de Bingg Bongg: tócalo y es tuyo. Se puntúa por gramos; los 3 mejores de cada mes ganan BBs.",

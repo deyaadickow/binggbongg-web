@@ -2065,5 +2065,6 @@
  "vcb_no_members": "Пока нет участников из {country}",
  "vcb_host": "Ведущий",
  "lbq_next": "Следующая битва",
- "lbq_prev": "Предыдущая битва"
+ "lbq_prev": "Предыдущая битва",
+ "total_members_on_bb": "Всего участников в Bingg Bongg"
 }

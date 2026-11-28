@@ -2660,6 +2660,7 @@ export const fil = {
   set_box_switches: "Mga Switch",
   set_box_settings: "Mga Setting",
   set_box_features: "Mga Feature",
+  total_members_on_bb: "Kabuuang Miyembro sa Bingg Bongg", // Settings box (Steve, 2026-11-28)
   // Gold Digger (Steve, 2026-11-17)
   fname_gold_digger: "Golden Nuggets",
   fblurb_gold_digger: "Lumalabas ang ginto kahit saan sa Bingg Bongg — pindutin ito at sa iyo na. Gramo ang iskor; ang top 3 bawat buwan ay panalo ng BBs.",

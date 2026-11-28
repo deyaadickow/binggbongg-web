@@ -2066,5 +2066,6 @@
  "vcb_no_members": "Pas encore de membres de {country}",
  "vcb_host": "Hôte",
  "lbq_next": "Bataille suivante",
- "lbq_prev": "Bataille précédente"
+ "lbq_prev": "Bataille précédente",
+ "total_members_on_bb": "Total des membres sur Bingg Bongg"
 }

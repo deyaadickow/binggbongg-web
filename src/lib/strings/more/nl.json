@@ -2066,5 +2066,6 @@
  "vcb_no_members": "Nog geen leden uit {country}",
  "vcb_host": "Host",
  "lbq_next": "Volgende battle",
- "lbq_prev": "Vorige battle"
+ "lbq_prev": "Vorige battle",
+ "total_members_on_bb": "Totaal aantal leden op Bingg Bongg"
 }

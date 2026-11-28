@@ -2496,6 +2496,7 @@ export const id = {
   set_box_switches: "Sakelar",
   set_box_settings: "Pengaturan",
   set_box_features: "Fitur",
+  total_members_on_bb: "Total Anggota di Bingg Bongg", // Settings box (Steve, 2026-11-28)
   // Gold Digger (Steve, 2026-11-17)
   fname_gold_digger: "Bongkahan Emas",
   fblurb_gold_digger: "Emas muncul di mana saja di Bingg Bongg — ketuk dan jadi milikmu. Skor dihitung per gram; 3 teratas setiap bulan menang BBs.",

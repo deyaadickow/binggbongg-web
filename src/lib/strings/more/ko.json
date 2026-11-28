@@ -2066,5 +2066,6 @@
  "vcb_no_members": "아직 {country} 멤버가 없어요",
  "vcb_host": "호스트",
  "lbq_next": "다음 배틀",
- "lbq_prev": "이전 배틀"
+ "lbq_prev": "이전 배틀",
+ "total_members_on_bb": "Bingg Bongg 전체 회원 수"
 }

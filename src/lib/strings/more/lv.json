@@ -2062,5 +2062,6 @@
  "vcb_no_members": "Vēl nav dalībnieku no {country}",
  "vcb_host": "Vadītājs",
  "lbq_next": "Nākamā cīņa",
- "lbq_prev": "Iepriekšējā cīņa"
+ "lbq_prev": "Iepriekšējā cīņa",
+ "total_members_on_bb": "Kopā dalībnieku Bingg Bongg"
 }

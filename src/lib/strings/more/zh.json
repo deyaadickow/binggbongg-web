@@ -2066,5 +2066,6 @@
  "vcb_no_members": "还没有来自{country}的成员",
  "vcb_host": "主播",
  "lbq_next": "下一场对战",
- "lbq_prev": "上一场对战"
+ "lbq_prev": "上一场对战",
+ "total_members_on_bb": "Bingg Bongg 会员总数"
 }

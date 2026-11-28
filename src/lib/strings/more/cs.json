@@ -2065,5 +2065,6 @@
  "vcb_no_members": "Zatím žádní členové z {country}",
  "vcb_host": "Hostitel",
  "lbq_next": "Další bitva",
- "lbq_prev": "Předchozí bitva"
+ "lbq_prev": "Předchozí bitva",
+ "total_members_on_bb": "Celkem členů na Bingg Bongg"
 }

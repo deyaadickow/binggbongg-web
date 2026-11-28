@@ -2057,5 +2057,6 @@
  "vcb_no_members": "Ei vielä jäseniä maasta {country}",
  "vcb_host": "Isäntä",
  "lbq_next": "Seuraava taisto",
- "lbq_prev": "Edellinen taisto"
+ "lbq_prev": "Edellinen taisto",
+ "total_members_on_bb": "Jäseniä yhteensä Bingg Bonggissa"
 }

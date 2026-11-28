@@ -2064,5 +2064,6 @@
  "vcb_no_members": "Inga medlemmar från {country} än",
  "vcb_host": "Värd",
  "lbq_next": "Nästa strid",
- "lbq_prev": "Föregående strid"
+ "lbq_prev": "Föregående strid",
+ "total_members_on_bb": "Totalt antal medlemmar på Bingg Bongg"
 }
