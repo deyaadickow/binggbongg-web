@@ -74,7 +74,8 @@ export function FreeCoinsPage() {
   useEffect(() => load(false), [load]);
 
   const num = (n: number) => n.toLocaleString(lang === "tl" ? "fil" : lang);
-  const coins = (n: number) => (n === 1 ? t("fc_one_coin") : t("fc_n_coins", num(n)));
+  // These rewards are FBBs (Free BBs, never money) since 2026-11-28 (Steve: "make it 1FBB"). "FBB" is a unit name, same in every language.
+  const coins = (n: number) => (n === 1 ? "1 FBB" : `${num(n)} FBBs`);
   const limit = (r: GiveRow) =>
     r.perDay == null ? null : r.key === "follow" ? t("fc_follow_limit", num(r.perDay)) : t("fc_per_day", num(r.perDay));
 
