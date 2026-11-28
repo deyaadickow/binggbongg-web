@@ -9,6 +9,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSession } from "../lib/session";
+import { mediaUrl } from "../lib/api";
 import { useT } from "../lib/i18n";
 import { haptic, sfx } from "../lib/gameSounds";
 import { Confetti } from "./GameShow";
@@ -72,7 +73,8 @@ export function PuzzlePieceArt({ size = 72, color = "gold", mark = "?" }: { size
 /** The item's picture: the photo (thumb or full), else its emoji. */
 export function PuzzleItemPicture({ item, size = 56, full = false, dim = false }: { item: PzItem; size?: number; full?: boolean; dim?: boolean }) {
   const [broken, setBroken] = useState(false);
-  const src = full ? item.image ?? item.thumb : item.thumb ?? item.image;
+  const raw = full ? item.image ?? item.thumb : item.thumb ?? item.image;
+  const src = raw ? mediaUrl(raw) : null;
   return (
     <span style={{
       width: size, height: size, flex: "none", borderRadius: Math.round(size * 0.18), background: "#fff",
