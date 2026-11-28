@@ -40,6 +40,7 @@ import { useFreeCoinsListed } from "../lib/freeCoins";
 import { useSingingContestEnabled } from "../lib/singingContest";
 import { partnerEntryVisible, useMyPartnership } from "../lib/partnership";
 import { useSpeedDatingEnabled } from "../lib/speedDating";
+import { usePuzzleEnabled } from "../lib/puzzle";
 
 export interface Feature {
   icon: string;
@@ -75,6 +76,8 @@ export interface Feature {
   partnerOnly?: true;
   /** Shown only while Bingg Bongg Speed Dating is switched on (fetchSpeedDatingEnabled). */
   speedDatingOnly?: true;
+  /** Shown only while Bingg Bongg Puzzle is on for this member (fetchPuzzleEnabled). */
+  puzzleOnly?: true;
 }
 
 export interface Section {
@@ -163,6 +166,8 @@ export const FEATURES: Section[] = [
     features: [
       // Gold Digger (Steve, 2026-11-17): "World wide Gold diggers. When you see gold click it and it's yours."
       { icon: "gold_nugget", nameKey: "fname_gold_digger", blurbKey: "fblurb_gold_digger", to: "/gold-digger" },
+      // Bingg Bongg Puzzle (Steve, 2026-11-28). Hidden until puzzle_enabled is on.
+      { icon: "🧩", nameKey: "fname_puzzle", blurbKey: "fblurb_puzzle", to: "/puzzle", puzzleOnly: true },
       { icon: "🎮", nameKey: "fname_n99_tap_games", blurbKey: "fblurb_n99_tap_games", to: "/feature/tap-games", whereKey: "fwhere_the_live_room" },
       { icon: "bingo_card", nameKey: "fname_bingg_bongg_bingo", blurbKey: "fblurb_bingg_bongg_bingo", to: "/feature/bingo", whereKey: "fwhere_the_live_room" },
       // Guessing Games is hidden (Steve, 2026-10-27) — its tile comes back with it:
@@ -458,9 +463,10 @@ export function FeaturesPage() {
   const hasSinging = useSingingContestEnabled(user?.id);
   const hasPartner = partnerEntryVisible(useMyPartnership(user?.id));
   const hasSpeedDating = useSpeedDatingEnabled();
+  const hasPuzzle = usePuzzleEnabled();
   const shown = FEATURES.map((s) => ({
     ...s,
-    features: s.features.filter((f) => (hasContest || !f.contestOnly) && (hasPodcast || !f.podcastOnly) && (hasFreeCoins || !f.freeCoinsOnly) && (hasSinging || !f.singingOnly) && (hasPartner || !f.partnerOnly) && (hasSpeedDating || !f.speedDatingOnly)),
+    features: s.features.filter((f) => (hasContest || !f.contestOnly) && (hasPodcast || !f.podcastOnly) && (hasFreeCoins || !f.freeCoinsOnly) && (hasSinging || !f.singingOnly) && (hasPartner || !f.partnerOnly) && (hasSpeedDating || !f.speedDatingOnly) && (hasPuzzle || !f.puzzleOnly)),
   }));
   const numbers = featureNumbers(shown);
   // Every tile's own video, in the directory's order, so the player can scroll from one feature's

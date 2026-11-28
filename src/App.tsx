@@ -107,8 +107,10 @@ import { PodcastMiniBar } from "./components/PodcastBits";
 import SplashIntro from "./components/SplashIntro";
 import { SignupWall } from "./components/SignupWall";
 import { GoldDiggerManager } from "./components/GoldDigger";
+import { PuzzleManager } from "./components/Puzzle";
 import { FeedAssistantHost } from "./components/FeedAssistant";
 import { GoldDiggerPage } from "./pages/GoldDiggerPage";
+import { PuzzlePage } from "./pages/PuzzlePage";
 import { SingingContestPage } from "./pages/SingingContestPage";
 import { PartnershipPage } from "./pages/PartnershipPage";
 import { PartnerSignupCard } from "./components/PartnerBits";
@@ -167,6 +169,8 @@ export default function App() {
         {/* Gold Digger (Steve, 2026-11-17: "Find gold where ever you are on the app. On any page on any
             live stream, on any battle, at any time."): one manager, the nugget over every route. */}
         <GoldDiggerManager />
+        {/* Bingg Bongg Puzzle (Steve, 2026-11-28): pieces pop up on any page; the catch popup. */}
+        <PuzzleManager />
         {/* Bingg Bongg AI Assistant (Steve, 2026-11-18): the Bingg / Bongg icon on the Home feed + its
             popup of questions whose YES opens that feature. */}
         <FeedAssistantHost />
@@ -379,6 +383,7 @@ export default function App() {
           <Route path="/features" element={<FeaturesPage />} />
           {/* Gold Digger (Steve, 2026-11-17): the monthly board + Hall of Fame. Open signed out too. */}
           <Route path="/gold-digger" element={<GoldDiggerPage />} />
+          <Route path="/puzzle" element={<PuzzlePage />} />
           {/* Monthly Singing Contest (Steve, 2026-11-26). */}
           <Route path="/singing-contest" element={<SingingContestPage />} />
           {/* Partnership Program (Steve, 2026-11-27): one page that shows Become a Partner or My Partnership. */}

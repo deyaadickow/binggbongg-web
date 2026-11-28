@@ -1,6 +1,7 @@
 // Bingg Bongg web — API client. Same backend the iOS/Android apps use (admin.binggbongg.com/api),
 // same static apiKey header those apps ship with, plus AUTHTOKEN/USERID once signed in.
-export const API_BASE = "https://admin.binggbongg.com/api/";
+// DEV ONLY: VITE_API_BASE points a local dev server at a local backend (puzzle tests, 2026-11-28). Never set in a build.
+export const API_BASE = (import.meta.env.DEV && import.meta.env.VITE_API_BASE) || "https://admin.binggbongg.com/api/";
 export const WEB_BASE = "https://admin.binggbongg.com/";
 export const UPLOAD_BASE = "https://d32kgcvh9dqf5h.cloudfront.net/";
 export const TOKEN_SERVER = "https://binggbongg-livekit-token.onrender.com/";
