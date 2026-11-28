@@ -2,7 +2,7 @@
 // I think that would look really nice."). The piece now arrives on a small animated carrier — a galloping horse, a
 // parrot, a rocket, a hot-air balloon, a paper plane… — that travels across the screen while it lasts. The server
 // picks the carrier (drop.carrier) and names the NEXT one in every answer (preload) so its picture is usually cached
-// before it is needed. If a carrier's picture won't load in time, the plain floating piece shows instead.
+// before it is needed. If a carrier picture does not load within 2.5 s, the plain floating piece shows instead.
 //
 // The same path maths lives in Android (Puzzle.kt CarrierPath) and iOS (Puzzle.swift CarrierPath) — keep them alike.
 import { useEffect, useRef, useState } from "react";

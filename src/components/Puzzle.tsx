@@ -124,8 +124,11 @@ export function PuzzleManager() {
   const show = useCallback(async (drop: PzDrop) => {
     if (pieceRef.current || caughtRef.current || document.hidden) return;
     // Its carrier (a horse, a parrot, a rocket…) if its picture is ready within a moment, else the plain piece.
-    const carried = !!drop.carrier && await carrierReady(drop.carrier.file, 1500);
+    const asked = Date.now();
+    const carried = !!drop.carrier && await carrierReady(drop.carrier.file, 2500);
     if (pieceRef.current || caughtRef.current || document.hidden) return;
+    // Time spent waiting comes off the trip, so the token never runs out on screen.
+    drop = { ...drop, seconds: Math.max(3, (drop.seconds || 8) - Math.floor((Date.now() - asked) / 1000)) };
     const w = window.innerWidth, h = window.innerHeight;
     const x = 16 + Math.random() * Math.max(0, w - PX - 32);
     const top = h * 0.15, bottom = h * 0.78 - PX - 24;
