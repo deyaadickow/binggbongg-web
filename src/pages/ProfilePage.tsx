@@ -6,6 +6,7 @@ import { VipBadge, VipBadgePopup } from "../components/VipBadge";
 import { isVipReferrer } from "../lib/referral";
 import { isBbPartner } from "../lib/partnership";
 import { PartnerBadge } from "../components/PartnerBits";
+import { InviteLinkCard } from "../components/InviteLinkCard";
 import { GoldDiggerBadge } from "../components/GoldDigger";
 import type { GdBadge } from "../lib/goldDigger";
 import { HousesPill } from "./HousesPage";
@@ -871,6 +872,12 @@ export function ProfilePage() {
           {/* My Analytics (Steve, 2026-11-20): everything the member did since day one. */}
           {isMe && <button className="btn ghost small" onClick={() => navigate("/my-analytics")}>📊 {t("ma_title")}</button>}
         </div>
+
+        {/* Steve, 2026-11-27: "Put this part ... On the bottom of this part" — the same "Your invite link"
+            card as Settings → Account, under the My Analytics button. Own profile, signed in, with a username. */}
+        {isMe && isLoggedIn && me?.username?.trim() && (
+          <div style={{ marginTop: 12 }}><InviteLinkCard code={me.username.trim()} /></div>
+        )}
 
         {!isMe && isLoggedIn && me && <ChatBattleAlertToggle myId={me.id} host={profile} following={following} />}
 

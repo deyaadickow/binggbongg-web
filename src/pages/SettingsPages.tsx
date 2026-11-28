@@ -104,8 +104,9 @@ export function SettingsHubPage() {
   const row = (l: SideLink) => <SideLinkItem key={l.to + l.label} link={l} onSignOut={signOut} big />;
   const box2 = pick(BOX_SETTINGS);
   const box5 = pick(BOX_LAST);
+  const boxTop = pick(["/settings/delete-account"]);
   // /settings#features (the Bingg Bongg page's "Features" box, Steve 2026-11-25) opens at the Features
-  // list. Run after paint; again once the switches box above has loaded and pushed it down.
+  // list. Run after paint; again once anything above has loaded and pushed it down.
   const { hash } = useLocation();
   useEffect(() => {
     if (hash !== "#features") return;
@@ -122,9 +123,13 @@ export function SettingsHubPage() {
   }, [hash]);
   return (
     <Page title={t("settings")}>
+      {/* Steve, 2026-11-27: "In Settings Please start from the top... Delete Account / Features First /
+          Switches Second / Settings Third / General Fourth / Log Out / Delete". The same Delete Account
+          row (signed in only) first, then the whole boxes in that order. */}
+      {boxTop.length > 0 && <SettingsBox>{boxTop.map(row)}</SettingsBox>}
+      <SettingsBox id="features" title={t("set_box_features")}>{features.map(row)}{tiles.map(row)}</SettingsBox>
       {isLoggedIn && <SettingsBox title={t("set_box_switches")}><SettingsSwitches /></SettingsBox>}
       {box2.length > 0 && <SettingsBox title={t("set_box_settings")}>{box2.map(row)}</SettingsBox>}
-      <SettingsBox id="features" title={t("set_box_features")}>{features.map(row)}{tiles.map(row)}</SettingsBox>
       <SettingsBox title={t("general")}>{pick(BOX_GENERAL).map(row)}{store.map(row)}</SettingsBox>
       {box5.length > 0 && <SettingsBox>{box5.map(row)}</SettingsBox>}
       {/* The sidebar that normally carries this is hidden under 900px, and a phone is how most

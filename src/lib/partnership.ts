@@ -33,7 +33,14 @@ export interface PartnerApplication {
   id: number; status: "pending" | "approved" | "declined";
   accounts: { platform: PartnerPlatform; label: string; url: string; followers: number }[];
   note?: string | null; created_at?: string; reviewed_at?: string | null;
+  full_name?: string | null; email?: string | null; phone_number?: string | null;
+  country?: string | null; city?: string | null; date_of_birth?: string | null;
 }
+/** Who the applicant is (Steve, 2026-11-27: "how are we going to know who they are?"). The exact
+ *  applyPartnerProgram params; fetchMyPartnership's data.prefill has the same keys, any of them null. */
+export const PARTNER_IDENTITY = ["full_name", "email", "phone_number", "country", "city", "date_of_birth"] as const;
+export type PartnerIdentityField = (typeof PARTNER_IDENTITY)[number];
+export type PartnerPrefill = Partial<Record<PartnerIdentityField, string | null>>;
 export interface MyPartnership {
   program_enabled: boolean;
   status: PartnerStatus;
@@ -53,9 +60,10 @@ export interface MyPartnership {
   partner: { user_id: number; username?: string; fullname?: string; profile_image?: string | null } | null;
   people: PartnerPerson[];
   can_add_people: boolean;
+  prefill: PartnerPrefill;
   copy?: Record<string, string>;
 }
-export type PartnerFailure = { status: false; code?: string; message?: string; platform?: PartnerPlatform; min_followers?: number };
+export type PartnerFailure = { status: false; code?: string; message?: string; platform?: PartnerPlatform; field?: string; min_followers?: number };
 export type ApplyResult = { status: true; message?: string; application?: PartnerApplication } | PartnerFailure;
 export type PeopleResult = { status: true; message?: string; data?: MyPartnership } | PartnerFailure;
 
@@ -81,6 +89,7 @@ function normalise(d: Partial<MyPartnership> | undefined | null): MyPartnership 
     partner: d.partner ?? null,
     people: Array.isArray(d.people) ? d.people : [],
     can_add_people: d.can_add_people === true,
+    prefill: d.prefill && typeof d.prefill === "object" ? d.prefill : {},
     copy: d.copy,
   };
 }
@@ -185,7 +194,8 @@ export function partnerStatusLine(d: MyPartnership, lang: Lang): string {
   if (d.phase === "upcoming") return t("pt_status_upcoming", pct, start);
   if (d.status === "approved") return t("pt_status_approved", pct, start, end);
   if (d.status === "member") return t("pt_status_member", d.partner?.username ?? "", pct, start, end);
-  if (d.status === "pending") return t("pt_status_pending");
+  // The server's own words after Submit (2026-11-27): the team reviews it, then approves.
+  if (d.status === "pending") return t("pt_sent");
   if (d.status === "declined") return t("pt_status_declined");
   return "";
 }
@@ -217,6 +227,12 @@ export function partnerError(f: PartnerFailure, d: MyPartnership | null, lang: L
     case "self": return t("pt_err_self");
     case "blocked": return t("pt_err_blocked");
     case "in_program": return t("pt_err_in_program");
+    case "missing_name": return t("pt_err_missing_name");
+    case "bad_email": return t("pt_err_bad_email");
+    case "bad_phone": return t("pt_err_bad_phone");
+    case "missing_country": return t("pt_err_missing_country");
+    case "bad_birthdate": return t("pt_err_bad_birthdate");
+    case "too_young": return t("pt_err_too_young");
     default: return f.message || t("try_again");
   }
 }

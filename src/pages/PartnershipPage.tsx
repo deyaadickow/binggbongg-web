@@ -19,8 +19,8 @@ import { requireVerified } from "../lib/verifyEmail";
 import { displayName, post, type UserSummary } from "../lib/api";
 import {
   addPartnerMember, applyPartnerProgram, fetchMyPartnership, forgetMyPartnership, parseFollowers, partnerDate,
-  partnerDaysLeft, partnerError, partnerNumber, partnerStatusLine, removePartnerMember, PARTNER_PLATFORMS,
-  type MyPartnership, type PartnerFailure, type PartnerPerson, type PartnerPlatform,
+  partnerDaysLeft, partnerError, partnerNumber, partnerStatusLine, removePartnerMember, PARTNER_IDENTITY, PARTNER_PLATFORMS,
+  type MyPartnership, type PartnerFailure, type PartnerIdentityField, type PartnerPerson, type PartnerPlatform,
 } from "../lib/partnership";
 
 const GOLD = "#F0C420";
@@ -236,26 +236,47 @@ type Row = { followers: string; url: string };
 const emptyRows = (): Record<PartnerPlatform, Row> =>
   Object.fromEntries(PARTNER_PLATFORMS.map((p) => [p.key, { followers: "", url: "" }])) as Record<PartnerPlatform, Row>;
 
-/** The terms, then TikTok / Instagram / Snapchat / YouTube / Facebook (followers + profile link), a note, Submit. */
+/** "YYYY-MM-DD" for the day someone born on it turns 18 today — the date picker's latest day. */
+function adultMax(): string {
+  const n = new Date();
+  const d = new Date(n.getFullYear() - 18, n.getMonth(), n.getDate());
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+/** The terms, then About you (who they are, Steve 2026-11-27), then TikTok / Instagram / Snapchat / YouTube / Facebook (followers + profile link), a note, Submit. */
 function BecomeForm({ d, myId, onDone }: { d: MyPartnership; myId: number; onDone: () => void }) {
   const { t, lang } = useT();
   const [rows, setRows] = useState(emptyRows);
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState<{ text: string; platform?: PartnerPlatform } | null>(null);
+  const [who, setWho] = useState<Record<PartnerIdentityField, string>>(() =>
+    Object.fromEntries(PARTNER_IDENTITY.map((k) => [k, String(d.prefill?.[k] ?? "").trim()])) as Record<PartnerIdentityField, string>);
+  const [err, setErr] = useState<{ text: string; platform?: PartnerPlatform; field?: PartnerIdentityField } | null>(null);
   const min = partnerNumber(d.min_followers, lang);
+  const maxDob = adultMax();
 
-  // A row's error shows inside that row, scrolled into view; any other error shows above Submit.
-  const showErr = (e: { text: string; platform?: PartnerPlatform }) => {
+  // A row's error shows inside that row (an About you field: under that field), scrolled into view;
+  // any other error shows above Submit.
+  const showErr = (e: { text: string; platform?: PartnerPlatform; field?: PartnerIdentityField }) => {
     setErr(e);
-    window.setTimeout(() => document.getElementById(e.platform ? `pt-row-${e.platform}` : "pt-form-error")?.scrollIntoView({ block: "center", behavior: "smooth" }), 0);
+    const id = e.field ? `pt-field-${e.field}` : e.platform ? `pt-row-${e.platform}` : "pt-form-error";
+    window.setTimeout(() => document.getElementById(id)?.scrollIntoView({ block: "center", behavior: "smooth" }), 0);
   };
+  const asField = (f?: string): PartnerIdentityField | undefined =>
+    (PARTNER_IDENTITY as readonly string[]).includes(f ?? "") ? (f as PartnerIdentityField) : undefined;
   const set = (k: PartnerPlatform, f: keyof Row, v: string) => setRows((r) => ({ ...r, [k]: { ...r[k], [f]: v } }));
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (busy) return;
     // The same checks the server makes first, so the obvious ones answer at once; the server decides the rest.
+    const need: [PartnerIdentityField, string][] = [
+      ["full_name", "missing_name"], ["email", "bad_email"], ["phone_number", "bad_phone"],
+      ["country", "missing_country"], ["date_of_birth", "bad_birthdate"],
+    ];
+    const blank = need.find(([k]) => !who[k].trim());
+    if (blank) { showErr({ text: partnerError({ status: false, code: blank[1] }, d, lang), field: blank[0] }); return; }
+    if (who.date_of_birth > maxDob) { showErr({ text: partnerError({ status: false, code: "too_young" }, d, lang), field: "date_of_birth" }); return; }
     const filled = PARTNER_PLATFORMS.filter((p) => rows[p.key].followers.trim() || rows[p.key].url.trim());
     const noLink = filled.find((p) => rows[p.key].followers.trim() && !rows[p.key].url.trim());
     if (noLink) { showErr({ text: partnerError({ status: false, code: "missing_link", platform: noLink.key }, d, lang), platform: noLink.key }); return; }
@@ -265,6 +286,7 @@ function BecomeForm({ d, myId, onDone }: { d: MyPartnership; myId: number; onDon
     }
     if (!requireVerified()) return;
     const fields: Record<string, string> = {};
+    for (const k of PARTNER_IDENTITY) if (who[k].trim()) fields[k] = who[k].trim();
     for (const p of filled) {
       if (rows[p.key].url.trim()) fields[`${p.key}_url`] = rows[p.key].url.trim();
       if (rows[p.key].followers.trim()) fields[`${p.key}_followers`] = parseFollowers(rows[p.key].followers);
@@ -273,17 +295,43 @@ function BecomeForm({ d, myId, onDone }: { d: MyPartnership; myId: number; onDon
     setBusy(true); setErr(null);
     try {
       const r = await applyPartnerProgram(myId, fields);
-      if (!r.status) { showErr({ text: partnerError(r, d, lang), platform: r.platform }); return; }
+      if (!r.status) { showErr({ text: partnerError(r, d, lang), platform: r.platform, field: asField(r.field) }); return; }
       onDone();
     } catch (ex) { setErr({ text: (ex as Error).message }); } finally { setBusy(false); }
   }
 
   return (
-    <form onSubmit={submit}>
+    <form onSubmit={submit} noValidate>
       <div style={{ ...box, boxShadow: "0 0 16px rgba(240,196,32,.18)" }}>
         <div style={{ fontSize: 34, lineHeight: 1, textAlign: "center" }} aria-hidden>🤝</div>
         <p style={{ margin: "10px 0 0", fontSize: 15, lineHeight: 1.5, fontWeight: 700 }}>{t("pt_become_body", d.payout_percent, d.default_days)}</p>
         <p style={{ margin: "10px 0 0", fontSize: 14, lineHeight: 1.5 }}>{t("pt_become_requirement", min)}</p>
+        {/* Steve, 2026-11-27: "you will have to be approved by the Administration to become a Partner." */}
+        <p style={{ margin: "10px 0 0", fontSize: 14, lineHeight: 1.5, fontWeight: 800 }}>{t("pt_approval")}</p>
+      </div>
+      <div style={{ ...box, padding: 12 }}>
+        <div style={{ fontWeight: 800, marginBottom: 8 }}>{t("pt_about_title")}</div>
+        <div style={{ display: "grid", gap: 10 }}>
+          {([
+            ["full_name", "pt_full_name", { type: "text", autoComplete: "name" }],
+            ["email", "pt_email", { type: "email", inputMode: "email", autoComplete: "email", autoCapitalize: "none", spellCheck: false, dir: "ltr" }],
+            ["phone_number", "pt_phone", { type: "tel", inputMode: "tel", autoComplete: "tel", placeholder: "+63 912 345 6789", dir: "ltr" }],
+            ["country", "pt_country", { type: "text", autoComplete: "country-name" }],
+            ["city", "pt_city", { type: "text", autoComplete: "address-level2" }],
+            ["date_of_birth", "pt_dob", { type: "date", max: maxDob, min: "1900-01-01", autoComplete: "bday" }],
+          ] as [PartnerIdentityField, StringKey, React.InputHTMLAttributes<HTMLInputElement>][]).map(([k, lab, extra]) => {
+            const bad = err?.field === k;
+            return (
+              <label key={k} id={`pt-field-${k}`} style={{ display: "grid", gap: 4 }}>
+                <span style={label}>{t(lab)}{k === "city" ? ` (${t("pt_optional")})` : " *"}</span>
+                <input className="input" style={{ ...goldInput, borderColor: bad ? "#FF6B5B" : GOLD, colorScheme: "dark" }} {...extra}
+                  aria-required={k !== "city"} aria-invalid={bad || undefined}
+                  value={who[k]} onChange={(e) => setWho((w) => ({ ...w, [k]: e.target.value }))} />
+                {bad && <span role="alert" style={{ ...errText, marginTop: 2 }}>{err.text}</span>}
+              </label>
+            );
+          })}
+        </div>
       </div>
       {PARTNER_PLATFORMS.map((p) => {
         const bad = err?.platform === p.key;
@@ -314,7 +362,7 @@ function BecomeForm({ d, myId, onDone }: { d: MyPartnership; myId: number; onDon
           <textarea className="input" style={{ ...goldInput, minHeight: 72, padding: 10, resize: "vertical" }} maxLength={2000} value={note} onChange={(e) => setNote(e.target.value)} />
         </label>
       </div>
-      {err && !err.platform && <p id="pt-form-error" role="alert" style={errText}>{err.text}</p>}
+      {err && !err.platform && !err.field && <p id="pt-form-error" role="alert" style={errText}>{err.text}</p>}
       <button type="submit" className="btn gold block" disabled={busy} style={{ marginTop: 16, minHeight: 50, fontSize: 17 }}>
         {busy ? t("pt_sending") : t("pt_submit")}
       </button>
