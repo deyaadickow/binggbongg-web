@@ -155,6 +155,8 @@ export function PuzzleManager() {
 
   useEffect(() => {
     if (!userId) return;
+    // DEV ONLY (the explainer video kit): ask now instead of waiting for the timer. Never in a build.
+    if (import.meta.env.DEV) (window as unknown as { __pzRoll?: () => void }).__pzRoll = () => { void rollRef.current(false); };
     schedule(20_000);   // a little after the Golden Nuggets' first look, never on top of it
     const onVis = () => {
       if (document.hidden) { window.clearTimeout(timer.current); hide(); }
