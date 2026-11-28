@@ -29,7 +29,7 @@ export function MemberCountBox() {
     };
     const load = () => {
       if (document.visibilityState !== "visible") return;
-      post<unknown>("fetchMemberCount", {}).then((r) => {
+      post<unknown>("fetchMemberCount", { platform: "web" }).then((r) => {
         const total = Number((r as unknown as { total?: number }).total);
         if (!alive || !r.status || !Number.isFinite(total) || total <= 0) return;
         const cur = shownRef.current;
