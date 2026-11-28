@@ -48,8 +48,15 @@ export interface PzPage {
   items: PzItem[];
 }
 
-export interface PzDrop { token: string; seconds: number; color: string }
-export interface PzRoll { enabled: boolean; next_in: number; drop: PzDrop | null; capped?: boolean }
+/** An animated carrier the piece rides on (a horse, a parrot, a rocket…): a transparent WebP strip of `frames`
+ *  frames (fw x fh px each) at `fps`; anchors[i] = [x, y, size, angle] where the piece is held in frame i (fractions
+ *  of the frame); `h` = drawn height in px; `motion` = the path it takes across the screen. */
+export interface PzCarrier {
+  id: string; file: string; frames: number; fps: number; fw: number; fh: number; h: number;
+  motion: "ground" | "fly" | "leap" | "float" | string; anchors: ([number, number, number, number] | null)[];
+}
+export interface PzDrop { token: string; seconds: number; color: string; carrier?: PzCarrier | null }
+export interface PzRoll { enabled: boolean; next_in: number; drop: PzDrop | null; capped?: boolean; preload?: string }
 
 export interface PzCatch {
   item: PzItem;

@@ -17,6 +17,7 @@ import {
   emitPuzzleCatch, puzzleClaim, puzzleContext, puzzleRoll, puzzleVideoPath, PZ_COLORS,
   type PzCatch, type PzDrop, type PzItem,
 } from "../lib/puzzle";
+import { carrierReady, preloadCarrier, PuzzleCarrierPiece } from "./PuzzleCarrier";
 
 const KEYFRAMES = `
 @keyframes pz-pop{0%{transform:scale(0) rotate(-40deg)}60%{transform:scale(1.2) rotate(8deg)}80%{transform:scale(.95)}100%{transform:scale(1) rotate(0)}}
@@ -88,7 +89,7 @@ export function PuzzleItemPicture({ item, size = 56, full = false, dim = false }
   );
 }
 
-type Shown = PzDrop & { x: number; y: number; key: number };
+type Shown = PzDrop & { x: number; y: number; key: number; carried: boolean };
 type Toast = { text: string; key: number };
 const PX = 76;
 
@@ -120,13 +121,16 @@ export function PuzzleManager() {
 
   const hide = useCallback(() => { window.clearTimeout(hideTimer.current); setPiece(null); }, []);
 
-  const show = useCallback((drop: PzDrop) => {
+  const show = useCallback(async (drop: PzDrop) => {
+    if (pieceRef.current || caughtRef.current || document.hidden) return;
+    // Its carrier (a horse, a parrot, a rocket…) if its picture is ready within a moment, else the plain piece.
+    const carried = !!drop.carrier && await carrierReady(drop.carrier.file, 1500);
     if (pieceRef.current || caughtRef.current || document.hidden) return;
     const w = window.innerWidth, h = window.innerHeight;
     const x = 16 + Math.random() * Math.max(0, w - PX - 32);
     const top = h * 0.15, bottom = h * 0.78 - PX - 24;
     const y = top + Math.random() * Math.max(0, bottom - top);
-    const shown = { ...drop, x, y, key: ++k.current };
+    const shown = { ...drop, x, y, key: ++k.current, carried };
     setPiece(shown);
     sfx.reveal();
     window.clearTimeout(hideTimer.current);
@@ -141,7 +145,8 @@ export function PuzzleManager() {
     try {
       const r = await puzzleRoll(userId, puzzleContext(pathRef.current));
       if (fromTimer) schedule(Math.max(10, Number(r?.next_in ?? (r && !r.enabled ? 900 : 75))) * 1000);
-      if (r?.drop?.token) show(r.drop);
+      if (r?.preload) void preloadCarrier(r.preload);
+      if (r?.drop?.token) void show(r.drop);
     } catch {
       if (fromTimer) schedule(120_000);
     } finally {
@@ -204,7 +209,18 @@ export function PuzzleManager() {
   const video = caught ? puzzleVideoPath(caught.video_play_id) : null;
   return (
     <>
-      {piece && (
+      {piece && piece.carried && piece.carrier && (
+        <PuzzleCarrierPiece
+          key={piece.key}
+          carrier={piece.carrier}
+          color={piece.color}
+          seconds={Math.max(2, piece.seconds || 8)}
+          label={t("pz_piece_label")}
+          tapLabel={t("pz_tap")}
+          onTap={() => void tap(piece)}
+        />
+      )}
+      {piece && !piece.carried && (
         <button
           key={piece.key}
           type="button"
