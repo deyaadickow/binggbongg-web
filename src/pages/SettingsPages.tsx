@@ -17,7 +17,7 @@ import { FEATURES, featureHref } from "./FeaturesPage";
 import { fetchMyVirtualBattles, fetchVirtualGiftRecord, sendVirtualThankYou, type VirtualBattleData, type VirtualGiftRecord } from "../lib/battles";
 import { VirtualGiftRecordOverlay, personName } from "../components/BattleEngines";
 import { GoldSelect } from "../components/GoldSelect";
-import { tt, useT, type StringKey  } from "../lib/i18n";
+import { currentLang, tt, useT, type StringKey  } from "../lib/i18n";
 import { PageTitle } from "../components/PageTitle";
 import { IDEA_SUPPORT_REASON } from "../lib/ideas";
 import { CountryBattleReminderToggle } from "../components/CountryBattleBits";
@@ -103,6 +103,11 @@ export function SettingsHubPage() {
       if (!href || !fresh(href, f.labelKey ?? f.nameKey)) return;
       tiles.push({ to: href, label: f.labelKey ?? f.nameKey, icon: f.icon === "bingo_card" ? "🎱" : f.icon === "gold_nugget" ? "⛏️" : f.icon });
     });
+  // Steve, 2026-11-28: "Please make all these features in alphabetical order." A→Z by the label as shown, in the
+  // member's language (locale-aware, case- and accent-insensitive; a leading emoji or symbol is ignored).
+  const collator = new Intl.Collator(currentLang(), { sensitivity: "base", numeric: true });
+  const sortKey = (l: SideLink) => t(l.label as StringKey).replace(/^[^\p{L}\p{N}]+/u, "");
+  const featuresAZ = [...features, ...tiles].sort((a, b) => collator.compare(sortKey(a), sortKey(b)));
   const row = (l: SideLink) => <SideLinkItem key={l.to + l.label} link={l} onSignOut={signOut} big />;
   const box2 = pick(BOX_SETTINGS);
   const box5 = pick(BOX_LAST);
@@ -129,7 +134,7 @@ export function SettingsHubPage() {
           Switches Second / Settings Third / General Fourth / Log Out / Delete". The same Delete Account
           row (signed in only) first, then the whole boxes in that order. */}
       {boxTop.length > 0 && <SettingsBox>{boxTop.map(row)}</SettingsBox>}
-      <SettingsBox id="features" title={t("set_box_features")}>{features.map(row)}{tiles.map(row)}</SettingsBox>
+      <SettingsBox id="features" title={t("set_box_features")}>{featuresAZ.map(row)}</SettingsBox>
       {isLoggedIn && <SettingsBox title={t("set_box_switches")}><SettingsSwitches /></SettingsBox>}
       {box2.length > 0 && <SettingsBox title={t("set_box_settings")}>{box2.map(row)}</SettingsBox>}
       <SettingsBox title={t("general")}>{pick(BOX_GENERAL).map(row)}{store.map(row)}</SettingsBox>

@@ -1271,7 +1271,8 @@ export function LiveViewerPage() {
         mlAmSpeaker.current = null;
         setJoinState("none"); // the role change reconnects this browser as a plain viewer
         setRole("viewer");
-        showGoldAlert(tt("ml_removed_you"));
+        // Speed Dating: the host's Pass gives the seat back — said kindly (2026-11-28).
+        showGoldAlert(tt(next.speed_dating ? "sd_passed_you" : "ml_removed_you"));
       }
       return;
     }
@@ -1537,12 +1538,10 @@ export function LiveViewerPage() {
         add = add ?? {};
         add[e.guest_user_id] = now - Math.min(e.age_ms, BURST_MS - 600);
         add[e.host_user_id] = add[e.guest_user_id];
-      } else if (e.type === "pass" && myId && e.guest_user_id === myId && role !== "host") {
-        setToast(tt("sd_passed_you"));
       }
     }
     if (add) { const a = add; setSdBursts((b) => ({ ...b, ...a })); }
-  }, [sd, myId, role]);
+  }, [sd]);
   useEffect(() => {
     publishSdView(sd ? {
       sd, isHost: role === "host", hostUserId: sd.host_user_id || hostUserId, bursts: sdBursts, localPass: sdLocalPass, busy: sdBusy,
