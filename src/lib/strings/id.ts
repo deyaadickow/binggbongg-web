@@ -628,7 +628,7 @@ export const id = {
   gig_tab_bought: "Iklan yang saya beli",
   gig_tab_working: "Iklan yang saya jual",
   give_your_business_a_name: "Beri nama bisnismu.",
-  go_live: "Hiduplah",
+  go_live: "Mulai Live",
   go_live_from_your_computer: "Live dari Komputermu",
   go_live_from_your_pc_with_obs: "Live dari PC-mu dengan OBS",
   go_live_on_6_platforms: "Live di 6 platform",
