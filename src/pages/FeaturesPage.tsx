@@ -39,6 +39,7 @@ import { usePodcastEnabled } from "../lib/podcast";
 import { useFreeCoinsListed } from "../lib/freeCoins";
 import { useSingingContestEnabled } from "../lib/singingContest";
 import { partnerEntryVisible, useMyPartnership } from "../lib/partnership";
+import { useSpeedDatingEnabled } from "../lib/speedDating";
 
 export interface Feature {
   icon: string;
@@ -72,6 +73,8 @@ export interface Feature {
   freeCoinsOnly?: true;
   /** Shown only while the Partnership Program is switched on (fetchMyPartnership program_enabled). */
   partnerOnly?: true;
+  /** Shown only while Bingg Bongg Speed Dating is switched on (fetchSpeedDatingEnabled). */
+  speedDatingOnly?: true;
 }
 
 export interface Section {
@@ -89,6 +92,8 @@ export const FEATURES: Section[] = [
       { icon: "💸", nameKey: "fname_referral_program", blurbKey: "fblurb_referral_program", to: "/referral-program" },
       // Partnership Program (Steve, 2026-11-27). Hidden until partner_program_enabled is on.
       { icon: "🤝", nameKey: "fname_partnership", blurbKey: "fblurb_partnership", to: "/partnership", partnerOnly: true },
+      // Bingg Bongg Speed Dating (Steve, 2026-11-28): opens Go Live with Speed Dating on. Hidden until speed_dating_enabled is on.
+      { icon: "💛", nameKey: "fname_speed_dating", blurbKey: "fblurb_speed_dating", to: "/go-live?speed_dating=1", speedDatingOnly: true },
       // Steve, 2026-11-23: "Remove BB Algorithm from here [the Information Center] and add it to 100+
       // Features and 120+ videos." The video is 120+ Videos row 86 (English) / 87 (Tagalog).
       { icon: "🧠", nameKey: "fname_bb_algorithm", blurbKey: "fblurb_bb_algorithm", to: "/feature-videos?play=86", toFil: "/feature-videos?play=87" },
@@ -452,9 +457,10 @@ export function FeaturesPage() {
   const hasFreeCoins = useFreeCoinsListed();
   const hasSinging = useSingingContestEnabled(user?.id);
   const hasPartner = partnerEntryVisible(useMyPartnership(user?.id));
+  const hasSpeedDating = useSpeedDatingEnabled();
   const shown = FEATURES.map((s) => ({
     ...s,
-    features: s.features.filter((f) => (hasContest || !f.contestOnly) && (hasPodcast || !f.podcastOnly) && (hasFreeCoins || !f.freeCoinsOnly) && (hasSinging || !f.singingOnly) && (hasPartner || !f.partnerOnly)),
+    features: s.features.filter((f) => (hasContest || !f.contestOnly) && (hasPodcast || !f.podcastOnly) && (hasFreeCoins || !f.freeCoinsOnly) && (hasSinging || !f.singingOnly) && (hasPartner || !f.partnerOnly) && (hasSpeedDating || !f.speedDatingOnly)),
   }));
   const numbers = featureNumbers(shown);
   // Every tile's own video, in the directory's order, so the player can scroll from one feature's

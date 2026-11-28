@@ -47,6 +47,8 @@ export function isPublicPath(pathname: string): boolean {
   if (import.meta.env.DEV && typeof window !== "undefined" && new URLSearchParams(window.location.search).has("vcbdemo")) return true;
   // DEV ONLY: the star show demo (?ssdemo=, 2026-11-25) opens signed out. Never in a production build.
   if (import.meta.env.DEV && typeof window !== "undefined" && new URLSearchParams(window.location.search).has("ssdemo")) return true;
+  // DEV ONLY: the Speed Dating demo (?sddemo=, 2026-11-28) opens signed out. Never in a production build.
+  if (import.meta.env.DEV && typeof window !== "undefined" && new URLSearchParams(window.location.search).has("sddemo")) return true;
   // DEV ONLY: the "How to make money" pill demo (?mmdemo=en|fil|id, 2026-11-26) opens signed out. Never in a production build.
   if (import.meta.env.DEV && typeof window !== "undefined" && new URLSearchParams(window.location.search).has("mmdemo")) return true;
   // DEV ONLY: the Singing Contest demo (?scdemo=1|upcoming|processing|rec, 2026-11-26) opens signed out, for the

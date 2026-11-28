@@ -67,6 +67,8 @@ import { requireVerified } from "../lib/verifyEmail";
 import { ML_MIN_SIZE, dropRoomBattleBomb, mlIsBig, mlName, mlReasonText, mlWrite, normalizeMl, saveRoomSize, type MlMember, type MlState, type MlWriteResult, type RoomBattle } from "../lib/multiLive";
 import { BattleTopStrip, MlMenu, MlSizeSheet, MultiLiveGrid, RoomBattleBoard, RoomBattleEnd, useBattleClock, useRoomBattleExtras } from "../components/MultiLiveGrid";
 import { showGoldAlert } from "../components/GoldToast";
+import { SpeedDatingBirthdaySheet, SpeedDatingHeader, SpeedDatingTileLayer } from "../components/SpeedDating";
+import { BURST_MS, isSdRefusal, publishSdView, saveSpeedDatingBirthday, sdReasonText, speedDatingMatch, speedDatingPass } from "../lib/speedDating";
 import { StarBirthdaySheet, StarSetupCard, StarShowRoom, StarVoteSheet, type StarActions } from "../components/StarShow";
 import { endStarShow, fetchMyStarShow, fetchStarShow, isStarRefusal, nextStarShowRound, removeStarShowGuest, reportStarGuest, startStarShow, starReasonText, updateStarShow, confirmStarShowGuest, type StarKind, type StarResult, type StarShow } from "../lib/starShow";
 import { endPodcast } from "../lib/podcast";
@@ -95,11 +97,14 @@ const MEMBERS_POLL_MS = 5000;
 // DEV ONLY (never in a production build — the import is dead code there): ?ssdemo=1|host draws the
 // star show from fake data (components/StarShowDemo), no server, no sign-in.
 const StarShowDemo = import.meta.env.DEV ? lazy(() => import("../components/StarShowDemo")) : null;
+// DEV ONLY: ?sddemo=1|host draws Bingg Bongg Speed Dating from fake data (components/SpeedDatingDemo).
+const SpeedDatingDemo = import.meta.env.DEV ? lazy(() => import("../components/SpeedDatingDemo")) : null;
 
 export function LiveViewerRoute() {
   const { room } = useParams();
   const [search] = useSearchParams();
   if (StarShowDemo && search.has("ssdemo")) return <Suspense fallback={null}><StarShowDemo /></Suspense>;
+  if (SpeedDatingDemo && search.has("sddemo")) return <Suspense fallback={null}><SpeedDatingDemo /></Suspense>;
   // Creators and money (2026-11-17): a viewer checks checkLiveAccess first; a subscribers-only
   // live shows the Subscribe sheet instead of joining. The host (?host=1) goes straight in.
   return (
@@ -132,6 +137,13 @@ export function LiveViewerPage() {
   // Multi-live 24 (2026-11-05): the server's room state — layout, sound, hands, the room battle.
   // null = an old server (no migration yet): everything behaves exactly like today.
   const [ml, setMl] = useState<MlState | null>(null);
+  // Bingg Bongg Speed Dating (2026-11-28): burst start per member, the host's Pass taps before the answer, busy tiles,
+  // events already shown, and the once-only birthday card ("join" = then ask for a seat again).
+  const [sdBursts, setSdBursts] = useState<Record<number, number>>({});
+  const [sdLocalPass, setSdLocalPass] = useState<number[]>([]);
+  const [sdBusy, setSdBusy] = useState<number[]>([]);
+  const sdSeen = useRef(new Set<string>());
+  const [sdBirthday, setSdBirthday] = useState<"join" | null>(null);
   const mlVersion = useRef(0);
   // Bingg Bongg Battle bombs (Steve, 2026-11-06): "Bombs will be giving out to any member of their
   // choice". The signed-in member's bombs_count (null = not read yet) and whether the bomb control
@@ -1360,6 +1372,12 @@ export function LiveViewerPage() {
       const reason = (res as unknown as { reason?: string }).reason ?? null;
       // Star shows: need_confirm = the once-only gender + birthday card; under_18 / wrong_show /
       // banned = the message, no request.
+      // Speed Dating (2026-11-28): 18+ — need_birthday opens the once-only birthday card, then asks again.
+      if (!res.status && isSdRefusal(reason)) {
+        if (reason === "need_birthday") setSdBirthday("join");
+        else showGoldAlert(sdReasonText(reason, res.message ?? null));
+        return { reason, message: res.message ?? null };
+      }
       if (!res.status && isStarRefusal(reason)) {
         if (!fromStage) {
           if (reason === "need_confirm") setStarJoinSignal((n) => n + 1);
@@ -1397,6 +1415,11 @@ export function LiveViewerPage() {
       if (res.status && (res as unknown as { queued?: unknown }).queued) {
         setJoinRequests((prev) => prev.filter((x) => x.request_id !== r.request_id));
         showGoldAlert(starReasonText("queued", res.message ?? null));
+        return;
+      }
+      if (!res.status && isSdRefusal(starReason)) {
+        setJoinRequests((prev) => prev.filter((x) => x.request_id !== r.request_id));
+        showGoldAlert(sdReasonText(starReason, res.message ?? null));
         return;
       }
       if (!res.status && isStarRefusal(starReason)) {
@@ -1498,6 +1521,73 @@ export function LiveViewerPage() {
     remove: (p, ban) => { if (user) void starHostDo(removeStarShowGuest(user.id, roomName, p.user_id, ban), true); },
     needSignIn: () => navigate("/login", { state: { from: window.location.pathname + window.location.search } }),
   };
+
+  // ---- Bingg Bongg Speed Dating (Steve, 2026-11-28) --------------------------------------------
+  const sd = ml?.speed_dating ?? null;
+  // A burst / "you were passed" note once per event, only while it is fresh (an old one from the first read is skipped).
+  useEffect(() => {
+    if (!sd) return;
+    const now = Date.now();
+    let add: Record<number, number> | null = null;
+    for (const e of sd.events) {
+      if (sdSeen.current.has(e.id)) continue;
+      sdSeen.current.add(e.id);
+      if (e.age_ms > 6000) continue;
+      if (e.type === "match") {
+        add = add ?? {};
+        add[e.guest_user_id] = now - Math.min(e.age_ms, BURST_MS - 600);
+        add[e.host_user_id] = add[e.guest_user_id];
+      } else if (e.type === "pass" && myId && e.guest_user_id === myId && role !== "host") {
+        setToast(tt("sd_passed_you"));
+      }
+    }
+    if (add) { const a = add; setSdBursts((b) => ({ ...b, ...a })); }
+  }, [sd, myId, role]);
+  useEffect(() => {
+    publishSdView(sd ? {
+      sd, isHost: role === "host", hostUserId: sd.host_user_id || hostUserId, bursts: sdBursts, localPass: sdLocalPass, busy: sdBusy,
+      onMatch: (uid) => { void sdMatch(uid); },
+      onPass: (uid) => { void sdPass(uid); },
+    } : null);
+  }); // every render: the handlers close over the latest state
+  useEffect(() => () => publishSdView(null), []);
+
+  async function sdMatch(uid: number) {
+    if (!user || !ml) return;
+    if (!requireVerified()) return;
+    setSdBusy((b) => [...b, uid]);
+    try {
+      const r = await speedDatingMatch(user.id, roomName, uid);
+      if (r.state) setMl((cur) => (cur ? { ...cur, speed_dating: r.state } : cur));
+      if (!r.ok) { if (r.reason !== "already_matched") showGoldAlert(sdReasonText(r.reason, r.message)); return; }
+      const at = Date.now();
+      setSdBursts((b) => ({ ...b, [uid]: at, [user.id]: at }));
+      const ev = r.state?.events.find((e) => e.type === "match" && e.guest_user_id === uid);
+      if (ev) sdSeen.current.add(ev.id);
+      const guestName = ev?.guest_name || nameOfId(uid) || mlName(ml.members.find((m) => m.user_id === uid));
+      // The chat line everyone sees, written by the host's own app (the phones do the same).
+      void sendChat(chatChannel(roomName, hostUserId), user.id, displayName(user), tt("sd_chat_matched", displayName(user), guestName), user.profile_image ?? "").catch(() => {});
+      loadMembersRef.current();
+    } catch (e) { setToast((e as Error).message || tt("something_went_wrong")); }
+    finally { setSdBusy((b) => b.filter((x) => x !== uid)); }
+  }
+
+  async function sdPass(uid: number) {
+    if (!user) return;
+    setSdLocalPass((p) => [...p, uid]);
+    try {
+      const r = await speedDatingPass(user.id, roomName, uid);
+      if (r.state) setMl((cur) => (cur ? { ...cur, speed_dating: r.state } : cur));
+      if (!r.ok) showGoldAlert(sdReasonText(r.reason, r.message));
+      const wait = ((r.state?.pass_seconds ?? 2) * 1000) + 400;
+      // The seat is given back on the server's next room read after the label: ask for it then.
+      window.setTimeout(() => loadMembersRef.current(), wait);
+      window.setTimeout(() => setSdLocalPass((p) => p.filter((x) => x !== uid)), wait + 1500);
+    } catch (e) {
+      setSdLocalPass((p) => p.filter((x) => x !== uid));
+      setToast((e as Error).message || tt("something_went_wrong"));
+    }
+  }
 
   async function endLive() {
     if (!user) return;
@@ -1897,6 +1987,7 @@ export function LiveViewerPage() {
           {dogRace?.status === "lobby" && (
             <DogRaceLobbyCard race={dogRace} myId={myId} onChanged={dog.apply} onRefresh={() => { void dog.refresh(); }} onToast={setToast} />
           )}
+          {sd && <SpeedDatingHeader matches={sd.match_count} />}
           <div className={(starShow ? "video-grid sts-on" : mlBig ? "video-grid ml-on" : `video-grid count-${Math.min(4, Math.max(1, orderedTiles.length))}`) + (dogOnGrid ? " dr-on" : "")} onDoubleClick={dropHeart}
             onPointerDown={startRoomHold} onPointerUp={cancelRoomHold} onPointerLeave={cancelRoomHold} onPointerCancel={cancelRoomHold}
             onContextMenu={(e) => { if (roomHoldFired.current) e.preventDefault(); }}
@@ -2365,6 +2456,16 @@ export function LiveViewerPage() {
         <StarVoteSheet name={starShow?.stage.find((r) => r.user_id === giftTarget)?.name || nameOfId(giftTarget)}
           gifts={gifts} balance={user?.no_redeem_wallet ?? null}
           onSend={(g) => { void sendGift(g); }} onClose={() => { setGiftTarget(null); setStarVote(false); }} />
+      )}
+      {sdBirthday && (
+        <SpeedDatingBirthdaySheet onClose={() => setSdBirthday(null)} onSave={async (dob) => {
+          if (!user) return null;
+          const r = await saveSpeedDatingBirthday(user.id, dob);
+          if (!r.ok) return sdReasonText(r.reason, r.message);
+          setSdBirthday(null);
+          void requestToJoin();
+          return null;
+        }} />
       )}
       {starSetup && <StarSetupCard kind={starSetup} onCancel={() => setStarSetup(null)} onStart={(lowest) => beginStarShow(starSetup, lowest)} />}
       {starBirthday && <StarBirthdaySheet onClose={() => setStarBirthday(null)} onSave={saveHostBirthday} />}
@@ -3173,6 +3274,7 @@ function VideoTile({ tile, label, user, watchers, onWatchers, soundOff, onSpeake
       )}
       {/* A gift for (or from) this member plays in here, not over the room (2026-11-23). */}
       <TileGiftLayer uid={tile.userId} />
+      <SpeedDatingTileLayer uid={tile.userId} />
       <span className="name">{label || "Guest"}{tile.audioOnly ? " · 🎙" : tile.muted ? " · camera off" : ""}</span>
       {/* A double click on the grid sends a heart; one on these buttons must not. */}
       <div className="tile-acts" onDoubleClick={(e) => e.stopPropagation()}>

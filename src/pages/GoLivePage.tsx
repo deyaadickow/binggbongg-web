@@ -11,6 +11,8 @@ import { InfoBanner } from "./InformationCenterPage";
 import { SingingRecorder } from "../components/SingingRecorder";
 import { scDemo, useSingingContestEnabled } from "../lib/singingContest";
 import { partnerEntryVisible, useMyPartnership } from "../lib/partnership";
+import { SD_MODE, saveSpeedDatingBirthday, sdReasonText, useSpeedDatingEnabled } from "../lib/speedDating";
+import { SpeedDatingBirthdaySheet, SpeedDatingToggle } from "../components/SpeedDating";
 
 /** Steve, 2026-11-25: the Bingg Bongg button's page IS the Information Center now — "add all the links
  *  from the information center on this page and delete the information center link". Every box is the
@@ -107,6 +109,12 @@ export function GoLivePage() {
   const singing = search.get("singing") === "1";
   const recDemo = import.meta.env.DEV && singing && scDemo() === "rec";
   // Multi-live 24 (2026-11-05): the host picks how many are on camera, him included (4 = today).
+  // Bingg Bongg Speed Dating (Steve, 2026-11-28): the gold choice, only while the admin switch is on;
+  // /go-live?speed_dating=1 (the directory tile) turns it on. 18+: a host with no birthday gives it once.
+  const sdEnabled = useSpeedDatingEnabled();
+  const [speedDating, setSpeedDating] = useState(search.get("speed_dating") === "1");
+  const [sdBirthday, setSdBirthday] = useState(false);
+  const sdOn = sdEnabled && speedDating && !singing;
 
   useEffect(() => {
     if (!isLoggedIn && !recDemo) return;
@@ -135,8 +143,12 @@ export function GoLivePage() {
       // to the big grid when a 5th person comes in.
       // startLive takes no title today; the Singing Contest title rides along (ignored by an older server) and
       // the room shows it from ?singing=1.
-      const res = await post<unknown>("startLive", singing ? { user_id: user.id, title: tt("sc_live_tag") } : { user_id: user.id });
+      const res = await post<unknown>("startLive", singing ? { user_id: user.id, title: tt("sc_live_tag") }
+        : sdOn ? { user_id: user.id, live_mode: SD_MODE } : { user_id: user.id });
       const roomName = (res as { room_name?: string }).room_name;
+      const reason = (res as unknown as { reason?: string }).reason ?? null;
+      if (!res.status && sdOn && reason === "need_birthday") { setSdBirthday(true); setBusy(false); return; }
+      if (!res.status && sdOn && reason) throw new Error(sdReasonText(reason, res.message ?? null));
       if (!res.status || !roomName) throw new Error(res.message ?? tt("couldn_t_start_the_stream"));
       streamRef.current?.getTracks().forEach((t) => t.stop()); // the room takes the camera over
       navigate(`/live/${encodeURIComponent(roomName)}?host=1${singing ? "&singing=1" : ""}`, { replace: true });
@@ -181,9 +193,20 @@ export function GoLivePage() {
       <div className="card" style={{ aspectRatio: "9 / 12", background: "#000", display: "grid", placeItems: "center" }}>
         {previewError ? <p className="muted center" style={{ padding: 20 }}>{previewError}</p> : <video ref={videoRef} autoPlay muted playsInline style={{ width: "100%", height: "100%", objectFit: "cover" }} />}
       </div>
+      {sdEnabled && !singing && <SpeedDatingToggle on={speedDating} onChange={setSpeedDating} />}
       {error && <div style={{ marginTop: 12 }}><Notice error>{error}</Notice></div>}
+      {sdBirthday && (
+        <SpeedDatingBirthdaySheet onClose={() => setSdBirthday(false)} onSave={async (dob) => {
+          if (!user) return null;
+          const r = await saveSpeedDatingBirthday(user.id, dob);
+          if (!r.ok) return sdReasonText(r.reason, r.message);
+          setSdBirthday(false);
+          void goLive();
+          return null;
+        }} />
+      )}
       <button className="btn block" style={{ marginTop: 14, minHeight: 52, fontSize: 17 }} onClick={goLive} disabled={busy}>
-        {busy ? "Starting…" : "Go Live"}
+        {busy ? "Starting…" : sdOn ? `💛 ${t("go_live")}` : "Go Live"}
       </button>
       {/* The "Join the … whole country battle Now" button under Go Live was removed (Steve,
           2026-11-24: "Remove the join the american whole country from this page"); in its place

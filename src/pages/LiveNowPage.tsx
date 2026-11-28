@@ -5,6 +5,7 @@ import { useSession } from "../lib/session";
 import { Avatar, Loading, Notice } from "../components/Common";
 import { tt, useT  } from "../lib/i18n";
 import { PodcastBadge, isPodcastRoom } from "../components/PodcastBits";
+import { SpeedDatingBadge } from "../components/SpeedDating";
 import { FeaturedLiveCard, FeaturedLivePlayer } from "../components/FeaturedLiveVideos";
 import { LiveSwipeNav } from "../components/LiveSwipe";
 import { swipeStateOf } from "../lib/liveSwipe";
@@ -155,6 +156,7 @@ export function LiveNowPage() {
                 <div className="row" style={{ marginTop: 6, gap: 6, flexWrap: "wrap" }}>
                   <span className="pill live">{t("live")}</span>
                   {isPodcastRoom(s) && <PodcastBadge title={s.podcast_title} />}
+                  {(s.is_speed_dating === true || s.is_speed_dating === 1) && <SpeedDatingBadge />}
                   <LiveBadge tier={s.live_badge_tier} name={s.live_badge_tier_name} minutes={s.live_badge_minutes} />
                 </div>
               </div>

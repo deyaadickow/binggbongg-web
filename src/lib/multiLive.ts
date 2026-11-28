@@ -12,6 +12,7 @@
 import { post } from "./api";
 import { tt, type StringKey } from "./i18n";
 import { normStarShow, type StarShow } from "./starShow";
+import { normSpeedDating, type SpeedDating } from "./speedDating";
 
 /** Today's room. Rooms of this size or smaller keep today's 4-tile layout. */
 export const ML_DEFAULT_SIZE = 4;
@@ -78,6 +79,8 @@ export interface MlState {
   /** Star shows (2026-11-25): the public show while one runs here — draw it INSTEAD of the room
    *  battle (every show round is also a room_battle for older apps; ignored while this is set). */
   star_show: StarShow | null;
+  /** Bingg Bongg Speed Dating (2026-11-28): the mode's state, or null when this is a normal live. */
+  speed_dating: SpeedDating | null;
 }
 
 const truthy = (v: unknown) => v === true || v === 1 || v === "1" || v === "true";
@@ -119,6 +122,7 @@ export function normalizeMl(raw: unknown): MlState | null {
     members,
     room_battle: normalizeBattle(r.room_battle),
     star_show: normStarShow(r.star_show),
+    speed_dating: normSpeedDating(r.speed_dating),
   };
 }
 

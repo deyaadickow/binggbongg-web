@@ -138,7 +138,7 @@ export function HomePage() {
     const byKey: Record<string, Feature> = {};
     for (const f of FEATURES.flatMap((sec) => sec.features)) {
       const vk = promoVideoKey(f);
-      if ((hasContest || !f.contestOnly) && !f.singingOnly && !f.partnerOnly && featureVideos[vk] && !byKey[vk]) byKey[vk] = f;
+      if ((hasContest || !f.contestOnly) && !f.singingOnly && !f.partnerOnly && !f.speedDatingOnly && featureVideos[vk] && !byKey[vk]) byKey[vk] = f;
     }
     return byKey;
   }, [featureVideos, hasContest]);

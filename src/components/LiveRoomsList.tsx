@@ -8,6 +8,7 @@ import { useSession } from "../lib/session";
 import { useT } from "../lib/i18n";
 import { Avatar } from "./Common";
 import { PodcastBadge, isPodcastRoom } from "./PodcastBits";
+import { SpeedDatingBadge } from "./SpeedDating";
 
 export function LiveRoomsList() {
   const { t } = useT();
@@ -46,6 +47,7 @@ export function LiveRoomsList() {
             <b>{s.host_fullname || s.host_username}</b>
             {s.host_username && <div className="muted" style={{ fontSize: 13 }}>@{s.host_username}</div>}
             {isPodcastRoom(s) && <div style={{ marginTop: 4 }}><PodcastBadge title={s.podcast_title} /></div>}
+            {(s.is_speed_dating === true || s.is_speed_dating === 1) && <div style={{ marginTop: 4 }}><SpeedDatingBadge /></div>}
           </div>
           <span className="pill" style={{ borderColor: "#E53935", color: "#ff6b6b" }}>● LIVE</span>
         </Link>

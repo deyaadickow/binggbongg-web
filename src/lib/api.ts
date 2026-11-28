@@ -355,6 +355,8 @@ export interface LiveStream {
   live_badge_minutes?: number;
   /** Bingg Bongg Podcast (2026-11-10): this room is a podcast — a "🎙 PODCAST" badge on the card. */
   is_podcast?: boolean | number;
+  /** Bingg Bongg Speed Dating (2026-11-28): the room is a speed dating live. */
+  is_speed_dating?: boolean | number;
   podcast_id?: number | null;
   podcast_kind?: string | null;
   podcast_title?: string | null;

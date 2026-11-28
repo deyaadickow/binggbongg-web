@@ -22,6 +22,7 @@ import { PageTitle } from "../components/PageTitle";
 import { IDEA_SUPPORT_REASON } from "../lib/ideas";
 import { CountryBattleReminderToggle } from "../components/CountryBattleBits";
 import { InviteLinkCard } from "../components/InviteLinkCard";
+import { useSpeedDatingEnabled } from "../lib/speedDating";
 import { fetchDmSettings, setDmBlock, setDmOpen, type DmSettings } from "../lib/dm";
 
 const SITE = "https://www.binggbongg.com";
@@ -75,6 +76,7 @@ export function SettingsHubPage() {
   const podcastOn = usePodcastEnabled();
   const singingOn = useSingingContestEnabled(user?.id);
   const partnerOn = partnerEntryVisible(useMyPartnership(user?.id));
+  const speedDatingOn = useSpeedDatingEnabled();
   const all = sidebarSections(user?.id ?? null, contestOn, podcastOn).flatMap((sec) => sec.links)
     .filter((l) => !l.needsLogin || isLoggedIn);
   const byRoute = new Map(all.map((l) => [l.to, l]));
@@ -95,7 +97,7 @@ export function SettingsHubPage() {
   const features = [...first, ...all.filter((l) => !placed.has(l.to) && !l.external)].filter((l) => fresh(l.to, l.label));
   const tiles: SideLink[] = [];
   FEATURES.flatMap((sec) => sec.features)
-    .filter((f) => (!f.contestOnly || contestOn) && (!f.podcastOnly || podcastOn) && (!f.singingOnly || singingOn) && (!f.partnerOnly || partnerOn))
+    .filter((f) => (!f.contestOnly || contestOn) && (!f.podcastOnly || podcastOn) && (!f.singingOnly || singingOn) && (!f.partnerOnly || partnerOn) && (!f.speedDatingOnly || speedDatingOn))
     .forEach((f) => {
       const href = featureHref(f, user?.id ?? null);
       if (!href || !fresh(href, f.labelKey ?? f.nameKey)) return;

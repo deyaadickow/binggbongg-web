@@ -2416,3 +2416,31 @@ body:has(.story-viewer) .get-app-bar { display: none; }
 .top-supporters .ts-text { display: flex; flex-direction: column; min-width: 0; line-height: 1.15; }
 .top-supporters .ts-name { color: #fff; font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .top-supporters .ts-bbs { color: var(--gold); font-size: 11px; font-weight: 700; }
+
+/* Bingg Bongg Speed Dating (2026-11-28) — black and gold. */
+.sd-header { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px; margin: 8px 0; padding: 10px 14px; background: #000; border: 2px solid var(--gold); border-radius: 14px; color: var(--gold); text-align: center; }
+.sd-header-title { font-weight: 900; font-size: 19px; letter-spacing: .06em; }
+.sd-header-heart { font-size: 18px; }
+.sd-header-count { flex-basis: 100%; font-size: 13px; font-weight: 800; color: #fff; }
+.sd-layer { position: absolute; inset: 0; z-index: 5; pointer-events: none; border-radius: inherit; overflow: hidden; }
+.sd-acts { position: absolute; bottom: 46px; left: 0; right: 0; flex-wrap: wrap; padding: 0 6px; display: flex; justify-content: center; gap: 6px; pointer-events: auto; }
+.sd-btn { border-radius: 999px; padding: 5px 12px; font-weight: 900; font-size: 13px; cursor: pointer; line-height: 1.2; box-shadow: 0 2px 8px rgba(0,0,0,.5); }
+.sd-btn:disabled { opacity: .6; cursor: default; }
+.sd-match { background: var(--gold); color: #000; border: 2px solid var(--gold); }
+.sd-pass { background: rgba(0,0,0,.78); color: var(--gold); border: 2px solid var(--gold); }
+.sd-matched-pill { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,.78); color: var(--gold); border: 1.5px solid var(--gold); border-radius: 999px; padding: 2px 9px; font-size: 12px; font-weight: 900; }
+.sd-passing { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(0,0,0,.6); animation: sd-fade .25s ease-out; }
+.sd-passing span { color: var(--gold); font-weight: 900; font-size: clamp(22px, 9cqw, 44px); border: 2px solid var(--gold); border-radius: 14px; padding: 4px 18px; background: #000; }
+.sd-burst { position: absolute; inset: 0; display: grid; place-items: center; background: radial-gradient(circle, rgba(240,196,32,.45) 0%, rgba(0,0,0,.55) 70%); animation: sd-fade .2s ease-out; }
+.sd-burst b { position: relative; z-index: 1; color: var(--gold); font-weight: 900; font-size: clamp(16px, 7cqw, 34px); text-align: center; padding: 6px 12px; background: #000; border: 2px solid var(--gold); border-radius: 14px; animation: sd-pop .5s cubic-bezier(.2,1.6,.4,1); text-shadow: 0 0 10px rgba(240,196,32,.7); }
+.sd-burst i { position: absolute; left: calc(10% + var(--i) * 11%); bottom: -10%; font-style: normal; font-size: clamp(16px, 8cqw, 34px); animation: sd-rise 2.6s ease-out forwards; animation-delay: calc(var(--i) * 90ms); opacity: 0; }
+.video-grid .tile, .ml-tile { container-type: inline-size; }
+@keyframes sd-pop { 0% { transform: scale(.3); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes sd-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes sd-rise { 0% { transform: translateY(0) scale(.6); opacity: 0; } 15% { opacity: 1; } 100% { transform: translateY(-120%) scale(1.15); opacity: 0; } }
+.sd-toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; margin: 12px 0 0; padding: 12px 14px; background: #000; border: 2px solid var(--gold); border-radius: 14px; color: var(--gold); text-align: left; cursor: pointer; }
+.sd-toggle.on { box-shadow: 0 0 0 2px rgba(240,196,32,.35), 0 0 18px rgba(240,196,32,.35); }
+.sd-toggle-text { display: flex; flex-direction: column; gap: 3px; }
+.sd-toggle-text b { font-size: 16px; font-weight: 900; }
+.sd-toggle-text small { color: var(--gold); opacity: .9; font-size: 12.5px; font-weight: 700; }
+.sd-live-tag { display: inline-block; background: #000; color: var(--gold); border: 1.5px solid var(--gold); border-radius: 999px; padding: 1px 8px; font-size: 11px; font-weight: 900; }
